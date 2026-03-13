@@ -1,0 +1,557 @@
+'use client';
+
+import Link from 'next/link';
+import { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import {
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  ArrowRight,
+  Shield,
+  Users,
+  Globe,
+  DollarSign,
+  Info,
+  MessageCircle,
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+
+/* ------------------------------------------------------------------ */
+/*  Testimonial data                                                   */
+/* ------------------------------------------------------------------ */
+const testimonials = [
+  {
+    quote:
+      'AFU transformed my small maize operation into a thriving commercial farm. The financing and training programs are world-class.',
+    name: 'Grace Mwangi',
+    role: 'Commercial Farmer, Kenya',
+  },
+  {
+    quote:
+      'Access to trade finance through AFU opened export markets I never thought possible. My cassava now reaches three countries.',
+    name: 'Kwame Asante',
+    role: 'Export Farmer, Ghana',
+  },
+  {
+    quote:
+      'The input supply program cut my costs by 30%. AFU is not just a union \u2014 it is a growth partner for every African farmer.',
+    name: 'Amina Diallo',
+    role: 'Cooperative Leader, Senegal',
+  },
+];
+
+/* ------------------------------------------------------------------ */
+/*  Framer Motion variants (typed for strict TS)                       */
+/* ------------------------------------------------------------------ */
+const fadeInUp = {
+  hidden: { opacity: 0, y: 24 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      delay: i * 0.1,
+      duration: 0.5,
+      ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
+    },
+  }),
+};
+
+const panelSlide = {
+  hidden: { opacity: 0, x: -40 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: {
+      duration: 0.7,
+      ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
+    },
+  },
+};
+
+const formContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 0.2,
+    },
+  },
+};
+
+const formItem = {
+  hidden: { opacity: 0, y: 16 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.4,
+      ease: 'easeOut' as const,
+    },
+  },
+};
+
+const testimonialVariant = {
+  enter: { opacity: 0, y: 20 },
+  center: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      ease: 'easeOut' as const,
+    },
+  },
+  exit: {
+    opacity: 0,
+    y: -20,
+    transition: {
+      duration: 0.3,
+      ease: 'easeIn' as const,
+    },
+  },
+};
+
+const pulseRing = {
+  initial: { scale: 1, opacity: 0.15 },
+  animate: {
+    scale: [1, 1.5, 1],
+    opacity: [0.15, 0, 0.15],
+    transition: {
+      duration: 4,
+      repeat: Infinity,
+      ease: 'easeInOut' as const,
+    },
+  },
+};
+
+/* ------------------------------------------------------------------ */
+/*  Page component                                                     */
+/* ------------------------------------------------------------------ */
+export default function LoginPage() {
+  const router = useRouter();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [activeTestimonial, setActiveTestimonial] = useState(0);
+
+  // Rotate testimonials
+  const nextTestimonial = useCallback(() => {
+    setActiveTestimonial((prev) => (prev + 1) % testimonials.length);
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(nextTestimonial, 5000);
+    return () => clearInterval(interval);
+  }, [nextTestimonial]);
+
+  // Login handler
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+
+    if (email && password) {
+      setIsLoading(true);
+      // Simulate brief network delay for UX
+      await new Promise((resolve) => setTimeout(resolve, 600));
+      localStorage.setItem(
+        'afu_user',
+        JSON.stringify({
+          email,
+          name: 'Demo Member',
+          tier: 'commercial',
+          memberId: 'AFU-2024-001',
+        })
+      );
+      router.push('/dashboard');
+    } else {
+      setError('Please enter your email and password.');
+    }
+  };
+
+  return (
+    <div className="flex min-h-screen">
+      {/* ============================================================ */}
+      {/*  LEFT PANEL  (hidden on mobile / tablet)                      */}
+      {/* ============================================================ */}
+      <motion.div
+        variants={panelSlide}
+        initial="hidden"
+        animate="visible"
+        className="relative hidden lg:flex lg:w-1/2 xl:w-[55%] flex-col justify-between overflow-hidden"
+      >
+        {/* Background image */}
+        <Image
+          src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=1200&h=1800&fit=crop"
+          alt="African farming landscape"
+          fill
+          className="object-cover"
+          priority
+        />
+
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-navy/90 via-navy/80 to-teal/70" />
+
+        {/* Decorative background shapes */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <motion.div
+            variants={pulseRing}
+            initial="initial"
+            animate="animate"
+            className="absolute -top-32 -right-32 w-96 h-96 rounded-full border border-white/10"
+          />
+          <div className="absolute top-1/4 -left-16 w-64 h-64 rounded-full bg-teal/10 blur-3xl" />
+          <div className="absolute bottom-1/4 right-8 w-48 h-48 rounded-full bg-white/5 blur-2xl" />
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 60, repeat: Infinity, ease: 'linear' as const }}
+            className="absolute bottom-20 -left-20 w-80 h-80 rounded-full border border-white/5"
+          />
+          {/* Small dot pattern */}
+          <div
+            className="absolute inset-0 opacity-[0.03]"
+            style={{
+              backgroundImage:
+                'radial-gradient(circle, white 1px, transparent 1px)',
+              backgroundSize: '24px 24px',
+            }}
+          />
+        </div>
+
+        {/* Content layer */}
+        <div className="relative z-10 flex flex-col justify-between h-full p-10 xl:p-14">
+          {/* Top: Logo + brand */}
+          <div>
+            <Link href="/" className="inline-flex items-center gap-3 group">
+              <div className="w-11 h-11 bg-white/15 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/20 transition-colors group-hover:bg-white/25">
+                <span className="text-white font-bold text-lg">A</span>
+              </div>
+              <div>
+                <span className="text-white font-bold text-lg tracking-tight">
+                  African Farming Union
+                </span>
+                <span className="block text-teal-light/70 text-xs tracking-widest uppercase">
+                  Member Portal
+                </span>
+              </div>
+            </Link>
+          </div>
+
+          {/* Center: Testimonial carousel */}
+          <div className="flex-1 flex flex-col justify-center max-w-lg">
+            <div className="mb-6">
+              <Shield className="w-8 h-8 text-teal-light/60 mb-4" />
+              <h2 className="text-white/90 text-2xl xl:text-3xl font-semibold leading-snug">
+                Empowering Africa&apos;s farmers with finance, inputs &amp; market access.
+              </h2>
+            </div>
+
+            {/* Testimonial */}
+            <div className="relative min-h-[160px]">
+              <AnimatePresence mode="wait">
+                <motion.blockquote
+                  key={activeTestimonial}
+                  variants={testimonialVariant}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  className="absolute inset-0"
+                >
+                  <p className="text-white/75 text-base xl:text-lg leading-relaxed italic">
+                    &ldquo;{testimonials[activeTestimonial].quote}&rdquo;
+                  </p>
+                  <footer className="mt-5 flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-teal/30 flex items-center justify-center text-white font-semibold text-sm">
+                      {testimonials[activeTestimonial].name.charAt(0)}
+                    </div>
+                    <div>
+                      <p className="text-white font-medium text-sm">
+                        {testimonials[activeTestimonial].name}
+                      </p>
+                      <p className="text-white/50 text-xs">
+                        {testimonials[activeTestimonial].role}
+                      </p>
+                    </div>
+                  </footer>
+                </motion.blockquote>
+              </AnimatePresence>
+            </div>
+
+            {/* Dots indicator */}
+            <div className="flex gap-2 mt-4">
+              {testimonials.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setActiveTestimonial(i)}
+                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                    i === activeTestimonial
+                      ? 'w-8 bg-teal-light'
+                      : 'w-4 bg-white/25 hover:bg-white/40'
+                  }`}
+                  aria-label={`Show testimonial ${i + 1}`}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Bottom: Stats bar */}
+          <div className="grid grid-cols-3 gap-6 pt-8 border-t border-white/10">
+            {[
+              { icon: Users, label: 'Members', value: '5,000+' },
+              { icon: Globe, label: 'Countries', value: '12' },
+              { icon: DollarSign, label: 'Financed', value: '$50M+' },
+            ].map((stat, i) => (
+              <motion.div
+                key={stat.label}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8 + i * 0.15, duration: 0.5 }}
+                className="text-center"
+              >
+                <stat.icon className="w-5 h-5 text-teal-light/60 mx-auto mb-1.5" />
+                <p className="text-white font-bold text-lg">{stat.value}</p>
+                <p className="text-white/40 text-xs uppercase tracking-wider">
+                  {stat.label}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </motion.div>
+
+      {/* ============================================================ */}
+      {/*  RIGHT PANEL  (login form)                                    */}
+      {/* ============================================================ */}
+      <div className="flex-1 flex items-center justify-center bg-cream px-4 py-12 sm:px-8 lg:px-12 xl:px-20">
+        <motion.div
+          variants={formContainer}
+          initial="hidden"
+          animate="visible"
+          className="w-full max-w-md"
+        >
+          {/* Mobile-only logo */}
+          <motion.div variants={formItem} className="text-center mb-8 lg:hidden">
+            <Link href="/" className="inline-flex items-center gap-2.5">
+              <div className="w-11 h-11 bg-teal rounded-xl flex items-center justify-center">
+                <span className="text-white font-bold text-lg">A</span>
+              </div>
+              <span className="text-navy font-bold text-lg tracking-tight">
+                African Farming Union
+              </span>
+            </Link>
+          </motion.div>
+
+          {/* Heading */}
+          <motion.div variants={formItem} className="mb-8">
+            <h1 className="text-3xl font-bold text-navy">Welcome back</h1>
+            <p className="text-gray-500 mt-2">Sign in to your portal</p>
+          </motion.div>
+
+          {/* Demo credentials hint */}
+          <motion.div
+            variants={formItem}
+            className="flex items-start gap-3 bg-blue-50 border border-blue-100 text-blue-700 text-sm p-4 rounded-xl mb-6"
+          >
+            <Info className="w-5 h-5 mt-0.5 shrink-0" />
+            <p>
+              <span className="font-semibold">Demo:</span> Use any email and
+              password to sign in.
+            </p>
+          </motion.div>
+
+          {/* Form card */}
+          <motion.div
+            variants={formItem}
+            className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-100"
+          >
+            {/* Error */}
+            <AnimatePresence>
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="overflow-hidden"
+                >
+                  <div className="bg-red-50 text-red-600 text-sm p-3 rounded-lg mb-6 flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 bg-red-500 rounded-full shrink-0" />
+                    {error}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <form onSubmit={handleLogin} className="space-y-5">
+              {/* Email */}
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-navy mb-2"
+                >
+                  Email address
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400 pointer-events-none" />
+                  <input
+                    id="email"
+                    type="email"
+                    required
+                    className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl bg-white text-navy placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-teal/40 focus:border-teal transition-shadow"
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (error) setError('');
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Password */}
+              <div>
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-navy mb-2"
+                >
+                  Password
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400 pointer-events-none" />
+                  <input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    className="w-full pl-11 pr-12 py-3 border border-gray-200 rounded-xl bg-white text-navy placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-teal/40 focus:border-teal transition-shadow"
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      if (error) setError('');
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-[18px] h-[18px]" />
+                    ) : (
+                      <Eye className="w-[18px] h-[18px]" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Remember / Forgot */}
+              <div className="flex items-center justify-between">
+                <label className="flex items-center gap-2 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    className="w-4 h-4 rounded border-gray-300 text-teal focus:ring-teal/40"
+                  />
+                  <span className="text-sm text-gray-500">Remember me</span>
+                </label>
+                <a
+                  href="#"
+                  className="text-sm text-teal hover:text-teal-dark font-medium transition-colors"
+                >
+                  Forgot password?
+                </a>
+              </div>
+
+              {/* Submit */}
+              <motion.button
+                type="submit"
+                disabled={isLoading}
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.98 }}
+                className="relative w-full bg-teal hover:bg-teal-dark disabled:opacity-70 disabled:cursor-not-allowed text-white py-3 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2 group"
+              >
+                {isLoading ? (
+                  <div className="flex items-center gap-2">
+                    <svg
+                      className="animate-spin h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                      />
+                    </svg>
+                    <span>Signing in...</span>
+                  </div>
+                ) : (
+                  <>
+                    <span>Sign In</span>
+                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                  </>
+                )}
+              </motion.button>
+            </form>
+
+            {/* Divider */}
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-200" />
+              </div>
+              <div className="relative flex justify-center">
+                <span className="bg-white px-4 text-sm text-gray-400">or</span>
+              </div>
+            </div>
+
+            {/* WhatsApp button */}
+            <motion.button
+              type="button"
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.98 }}
+              className="w-full flex items-center justify-center gap-2 py-3 border-2 border-green-500 text-green-600 rounded-xl font-semibold hover:bg-green-50 transition-colors"
+            >
+              <MessageCircle className="w-5 h-5" />
+              Continue with WhatsApp
+            </motion.button>
+          </motion.div>
+
+          {/* Sign-up link */}
+          <motion.p
+            variants={formItem}
+            className="text-center text-gray-500 text-sm mt-6"
+          >
+            Don&apos;t have an account?{' '}
+            <Link
+              href="/apply"
+              className="text-teal hover:text-teal-dark font-medium transition-colors"
+            >
+              Apply for membership
+            </Link>
+          </motion.p>
+
+          {/* Security footer */}
+          <motion.div
+            variants={formItem}
+            className="flex items-center justify-center gap-1.5 mt-4 text-gray-400 text-xs"
+          >
+            <Shield className="w-3.5 h-3.5" />
+            <span>256-bit SSL encrypted &middot; SOC 2 compliant</span>
+          </motion.div>
+        </motion.div>
+      </div>
+    </div>
+  );
+}
