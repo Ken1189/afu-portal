@@ -39,6 +39,7 @@ import {
   getFarmSummary,
 } from '@/lib/data/farm';
 import type { WeatherCondition, ActivityType, FarmTask } from '@/lib/data/farm';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 // ---------------------------------------------------------------------------
 // Animation variants
@@ -85,11 +86,11 @@ const cardVariants = {
 // Helpers
 // ---------------------------------------------------------------------------
 
-function getGreeting(): string {
+function getGreeting(td: { goodMorning: string; goodAfternoon: string; goodEvening: string }): string {
   const hour = new Date().getHours();
-  if (hour < 12) return 'Good morning';
-  if (hour < 17) return 'Good afternoon';
-  return 'Good evening';
+  if (hour < 12) return td.goodMorning;
+  if (hour < 17) return td.goodAfternoon;
+  return td.goodEvening;
 }
 
 function formatDate(): string {
@@ -179,6 +180,7 @@ const priorityBadge: Record<string, { bg: string; dot: string; label: string }> 
 // ---------------------------------------------------------------------------
 
 export default function FarmDashboardPage() {
+  const { t } = useLanguage();
   const summary = useMemo(() => getFarmSummary(), []);
   const today = weatherForecast[0];
 
@@ -192,7 +194,7 @@ export default function FarmDashboardPage() {
 
   const toggleTask = (id: string) => {
     setTasks((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t))
+      prev.map((task) => (task.id === id ? { ...task, completed: !task.completed } : task))
     );
   };
 
@@ -217,7 +219,7 @@ export default function FarmDashboardPage() {
 
           <div className="relative z-10">
             <h2 className="text-lg font-bold leading-tight">
-              {getGreeting()}, Kgosi!
+              {getGreeting(t.dashboard)}, Kgosi!
             </h2>
             <p className="text-xs text-white/70 mt-0.5">{formatDate()}</p>
 
@@ -234,7 +236,7 @@ export default function FarmDashboardPage() {
               className="inline-flex items-center gap-2 mt-4 px-4 py-2.5 rounded-xl bg-white/15 active:bg-white/25 text-sm font-medium transition-colors min-h-[44px]"
             >
               <Camera size={16} />
-              Take a crop photo
+              {t.dashboard.takePhoto}
             </Link>
           </div>
         </div>
@@ -245,7 +247,7 @@ export default function FarmDashboardPage() {
       {/* ================================================================= */}
       <motion.section variants={itemVariants}>
         <div className="px-4 mb-2 flex items-center justify-between">
-          <h3 className="text-sm font-bold text-navy">7-Day Forecast</h3>
+          <h3 className="text-sm font-bold text-navy">{t.dashboard.weatherForecast}</h3>
         </div>
 
         <div className="flex gap-2.5 overflow-x-auto px-4 pb-2 scrollbar-hide snap-x snap-mandatory">
@@ -327,12 +329,12 @@ export default function FarmDashboardPage() {
       {/* ================================================================= */}
       <motion.section variants={itemVariants}>
         <div className="px-4 mb-2 flex items-center justify-between">
-          <h3 className="text-sm font-bold text-navy">My Plots</h3>
+          <h3 className="text-sm font-bold text-navy">{t.dashboard.myPlots}</h3>
           <Link
             href="/farm/crops"
             className="text-xs text-teal font-medium flex items-center gap-0.5"
           >
-            See all <ChevronRight size={14} />
+            {t.common.viewAll} <ChevronRight size={14} />
           </Link>
         </div>
 
@@ -405,7 +407,7 @@ export default function FarmDashboardPage() {
 
                 <p className="text-[11px] text-gray-500 mt-2 flex items-center gap-1">
                   <Leaf size={11} className="text-teal" />
-                  {plot.daysToHarvest} days to harvest
+                  {plot.daysToHarvest} {t.dashboard.daysToHarvest}
                 </p>
               </div>
             </Link>
@@ -419,9 +421,9 @@ export default function FarmDashboardPage() {
       <motion.section variants={itemVariants} className="px-4">
         <div className="mb-2 flex items-center justify-between">
           <h3 className="text-sm font-bold text-navy">
-            Today&apos;s Tasks{' '}
+            {t.dashboard.todaysTasks}{' '}
             <span className="text-xs font-normal text-gray-400">
-              ({tasks.filter((t) => !t.completed).length} pending)
+              ({tasks.filter((task) => !task.completed).length} pending)
             </span>
           </h3>
         </div>
@@ -472,7 +474,7 @@ export default function FarmDashboardPage() {
                   className={`shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-1 ${badge.bg}`}
                 >
                   <span className={`w-1.5 h-1.5 rounded-full ${badge.dot}`} />
-                  {badge.label}
+                  {task.priority === 'high' ? t.dashboard.high : task.priority === 'medium' ? t.dashboard.medium : t.dashboard.low}
                 </span>
               </motion.div>
             );
@@ -484,7 +486,7 @@ export default function FarmDashboardPage() {
             className="flex items-center justify-center gap-2 p-3 text-sm text-teal font-medium active:bg-teal/5 transition-colors min-h-[44px]"
           >
             <Plus size={16} />
-            Add Task
+            {t.dashboard.addTask}
           </Link>
         </div>
       </motion.section>
@@ -493,7 +495,7 @@ export default function FarmDashboardPage() {
       {/* 5. QUICK STATS ROW                                                */}
       {/* ================================================================= */}
       <motion.section variants={itemVariants} className="px-4">
-        <h3 className="text-sm font-bold text-navy mb-2">Quick Stats</h3>
+        <h3 className="text-sm font-bold text-navy mb-2">{t.dashboard.quickStats}</h3>
         <div className="grid grid-cols-2 gap-2.5">
           {/* Income */}
           <motion.div
@@ -504,7 +506,7 @@ export default function FarmDashboardPage() {
               <div className="w-7 h-7 rounded-lg bg-green-50 flex items-center justify-center">
                 <TrendingUp size={14} className="text-green-600" />
               </div>
-              <span className="text-[11px] text-gray-400">Income</span>
+              <span className="text-[11px] text-gray-400">{t.dashboard.totalIncome}</span>
             </div>
             <p className="text-lg font-bold text-green-600">
               ${summary.totalIncome.toLocaleString()}
@@ -520,7 +522,7 @@ export default function FarmDashboardPage() {
               <div className="w-7 h-7 rounded-lg bg-red-50 flex items-center justify-center">
                 <TrendingDown size={14} className="text-red-500" />
               </div>
-              <span className="text-[11px] text-gray-400">Expenses</span>
+              <span className="text-[11px] text-gray-400">{t.dashboard.totalExpenses}</span>
             </div>
             <p className="text-lg font-bold text-red-500">
               ${summary.totalExpenses.toLocaleString()}
@@ -536,7 +538,7 @@ export default function FarmDashboardPage() {
               <div className="w-7 h-7 rounded-lg bg-teal-light flex items-center justify-center">
                 <TrendingUp size={14} className="text-teal" />
               </div>
-              <span className="text-[11px] text-gray-400">Profit</span>
+              <span className="text-[11px] text-gray-400">{t.dashboard.profit}</span>
             </div>
             <p className="text-lg font-bold text-teal">
               ${summary.profit.toLocaleString()}
@@ -552,7 +554,7 @@ export default function FarmDashboardPage() {
               <div className="w-7 h-7 rounded-lg bg-amber-50 flex items-center justify-center">
                 <Heart size={14} className="text-gold" />
               </div>
-              <span className="text-[11px] text-gray-400">Health Score</span>
+              <span className="text-[11px] text-gray-400">{t.dashboard.healthScore}</span>
             </div>
             <p className="text-lg font-bold text-gold">
               {summary.avgHealthScore}
@@ -567,12 +569,12 @@ export default function FarmDashboardPage() {
       {/* ================================================================= */}
       <motion.section variants={itemVariants} className="px-4">
         <div className="mb-2 flex items-center justify-between">
-          <h3 className="text-sm font-bold text-navy">Recent Activity</h3>
+          <h3 className="text-sm font-bold text-navy">{t.dashboard.recentActivity}</h3>
           <Link
             href="/farm/journal"
             className="text-xs text-teal font-medium flex items-center gap-0.5"
           >
-            View All <ChevronRight size={14} />
+            {t.common.viewAll} <ChevronRight size={14} />
           </Link>
         </div>
 
@@ -616,7 +618,7 @@ export default function FarmDashboardPage() {
             <div className="flex items-center gap-2 mb-2">
               <Sparkles size={16} className="text-gold" />
               <span className="text-xs font-bold text-white/80 uppercase tracking-wide">
-                AI Tip of the Day
+                {t.dashboard.aiTip}
               </span>
             </div>
             <p className="text-sm leading-relaxed text-white/95">
@@ -626,7 +628,7 @@ export default function FarmDashboardPage() {
               href="/farm/assistant"
               className="inline-flex items-center gap-2 mt-3 px-4 py-2.5 rounded-xl bg-white/15 active:bg-white/25 text-sm font-medium transition-colors min-h-[44px]"
             >
-              Ask AI Assistant
+              {t.dashboard.askAI}
               <ArrowRight size={14} />
             </Link>
           </div>

@@ -2,6 +2,7 @@
 
 import { useState, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 import {
   Sprout,
   Droplets,
@@ -82,6 +83,21 @@ const moodEmoji: Record<string, string> = {
   worried: '\u{1F630}',
 };
 
+// Map ActivityType values to farmJournal.activities translation keys
+type ActivityTranslationKey = 'planting' | 'watering' | 'fertilizing' | 'spraying' | 'weeding' | 'harvesting' | 'scouting' | 'soilTest' | 'pruning' | 'other';
+const activityTranslationKey: Record<ActivityType, ActivityTranslationKey> = {
+  planting: 'planting',
+  watering: 'watering',
+  fertilizing: 'fertilizing',
+  spraying: 'spraying',
+  weeding: 'weeding',
+  harvesting: 'harvesting',
+  scouting: 'scouting',
+  'soil-test': 'soilTest',
+  pruning: 'pruning',
+  other: 'other',
+};
+
 // ---------------------------------------------------------------------------
 // Animation Variants
 // ---------------------------------------------------------------------------
@@ -154,15 +170,15 @@ const photoGridItemVariants = {
 // Helpers
 // ---------------------------------------------------------------------------
 
-function formatDateHeader(dateStr: string): string {
+function formatDateHeader(dateStr: string, todayLabel: string, yesterdayLabel: string): string {
   const d = new Date(dateStr + 'T00:00:00');
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
 
-  if (d.getTime() === today.getTime()) return 'Today';
-  if (d.getTime() === yesterday.getTime()) return 'Yesterday';
+  if (d.getTime() === today.getTime()) return todayLabel;
+  if (d.getTime() === yesterday.getTime()) return yesterdayLabel;
 
   return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
 }
@@ -181,6 +197,7 @@ function groupByDate(entries: JournalEntry[]): Record<string, JournalEntry[]> {
 // ---------------------------------------------------------------------------
 
 function StatsBar({ entries }: { entries: JournalEntry[] }) {
+  const { t } = useLanguage();
   const thisMonth = entries.filter((e) => {
     const d = new Date(e.date + 'T00:00:00');
     const now = new Date();
@@ -193,15 +210,15 @@ function StatsBar({ entries }: { entries: JournalEntry[] }) {
     <div className="flex items-center gap-3 px-4 py-3 overflow-x-auto">
       <div className="flex items-center gap-1.5 bg-teal/10 text-teal px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap">
         <BookOpen className="w-3.5 h-3.5" />
-        {thisMonth.length} entries this month
+        {thisMonth.length} {t.farmJournal.entries}
       </div>
       <div className="flex items-center gap-1.5 bg-purple-50 text-purple-600 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap">
         <Camera className="w-3.5 h-3.5" />
-        {withPhotos} with photos
+        {withPhotos} {t.farmJournal.photos}
       </div>
       <div className="flex items-center gap-1.5 bg-red-50 text-red-600 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap">
         <DollarSign className="w-3.5 h-3.5" />
-        ${totalSpent} spent
+        ${totalSpent} {t.farmJournal.spent}
       </div>
     </div>
   );
@@ -218,6 +235,7 @@ function FilterBar({
   activityFilter: ActivityType | 'all';
   setActivityFilter: (v: ActivityType | 'all') => void;
 }) {
+  const { t } = useLanguage();
   return (
     <div className="px-4 space-y-2.5">
       {/* Plot Filter */}
@@ -227,7 +245,7 @@ function FilterBar({
           onChange={(e) => setPlotFilter(e.target.value)}
           className="w-full appearance-none bg-white border border-gray-200 rounded-xl px-4 py-2.5 pr-10 text-sm font-medium text-navy focus:outline-none focus:ring-2 focus:ring-teal/30 focus:border-teal"
         >
-          <option value="all">All Plots</option>
+          <option value="all">{t.farmJournal.allPlots}</option>
           {farmPlots.map((p) => (
             <option key={p.id} value={p.id}>
               {p.name}
@@ -263,7 +281,7 @@ function FilterBar({
               }`}
             >
               <Icon className="w-3.5 h-3.5" />
-              {cfg.label}
+              {t.farmJournal.activities[activityTranslationKey[type]]}
             </button>
           );
         })}
@@ -283,6 +301,7 @@ function JournalCard({
   onToggle: () => void;
   onPhotoTap: (url: string) => void;
 }) {
+  const { t } = useLanguage();
   const cfg = activityConfig[entry.type];
   const Icon = cfg.icon;
   const WeatherIcon = entry.weather ? weatherIcons[entry.weather] : null;
@@ -391,11 +410,11 @@ function JournalCard({
               {/* Detail chips row */}
               <div className="flex items-center gap-2 flex-wrap pl-[52px]">
                 <span className={`text-[10px] font-semibold ${cfg.bgColor} ${cfg.color} px-2 py-0.5 rounded-full`}>
-                  {cfg.label}
+                  {t.farmJournal.activities[activityTranslationKey[entry.type]]}
                 </span>
                 {entry.mood && (
                   <span className="text-[10px] font-medium bg-gray-50 text-gray-500 px-2 py-0.5 rounded-full">
-                    {moodEmoji[entry.mood]} {moodOptions.find((m) => m.key === entry.mood)?.label}
+                    {moodEmoji[entry.mood]} {t.farmJournal.moods[entry.mood as keyof typeof t.farmJournal.moods]}
                   </span>
                 )}
                 {entry.weather && (
@@ -419,6 +438,7 @@ function PhotoGallery({
   entries: JournalEntry[];
   onPhotoTap: (url: string) => void;
 }) {
+  const { t } = useLanguage();
   const photosEntries = entries.filter((e) => e.photo);
   if (photosEntries.length === 0) return null;
 
@@ -426,7 +446,7 @@ function PhotoGallery({
     <div className="px-4">
       <h2 className="text-sm font-bold text-navy mb-3 flex items-center gap-2">
         <ImageIcon className="w-4 h-4 text-teal" />
-        Photo Gallery
+        {t.farmJournal.photoGallery}
       </h2>
       <motion.div
         variants={listContainerVariants}
@@ -458,6 +478,7 @@ function PhotoGallery({
 }
 
 function NewEntryForm({ onClose, onSave }: { onClose: () => void; onSave: (entry: JournalEntry) => void }) {
+  const { t } = useLanguage();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [activityType, setActivityType] = useState<ActivityType | null>(null);
   const [title, setTitle] = useState('');
@@ -539,7 +560,7 @@ function NewEntryForm({ onClose, onSave }: { onClose: () => void; onSave: (entry
           {/* Activity Type Selector */}
           <div>
             <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">
-              Activity Type
+              {t.farmJournal.activityType}
             </label>
             <div className="grid grid-cols-5 gap-2">
               {(Object.keys(activityConfig) as ActivityType[]).map((type) => {
@@ -558,7 +579,7 @@ function NewEntryForm({ onClose, onSave }: { onClose: () => void; onSave: (entry
                   >
                     <Icon className="w-5 h-5" />
                     <span className="text-[9px] font-semibold leading-tight text-center">
-                      {cfg.label}
+                      {t.farmJournal.activities[activityTranslationKey[type]]}
                     </span>
                   </button>
                 );
@@ -569,13 +590,13 @@ function NewEntryForm({ onClose, onSave }: { onClose: () => void; onSave: (entry
           {/* Title */}
           <div>
             <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">
-              Title
+              {t.farmJournal.titleField}
             </label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="What did you do?"
+              placeholder={t.farmJournal.whatDidYouDo}
               className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-navy placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-teal/30 focus:border-teal"
             />
           </div>
@@ -583,12 +604,12 @@ function NewEntryForm({ onClose, onSave }: { onClose: () => void; onSave: (entry
           {/* Description */}
           <div>
             <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">
-              Description
+              {t.farmJournal.descriptionField}
             </label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Describe what you did, what you noticed..."
+              placeholder={t.farmJournal.descriptionField}
               rows={3}
               className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-navy placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-teal/30 focus:border-teal resize-none"
             />
@@ -649,7 +670,7 @@ function NewEntryForm({ onClose, onSave }: { onClose: () => void; onSave: (entry
                 className="w-full flex items-center justify-center gap-2 bg-gray-50 border-2 border-dashed border-gray-200 rounded-xl py-3 text-sm font-medium text-gray-500 active:bg-gray-100 transition-colors min-h-[48px]"
               >
                 <Camera className="w-5 h-5" />
-                Add Photo
+                {t.farmJournal.addPhoto}
               </button>
             )}
           </div>
@@ -657,7 +678,7 @@ function NewEntryForm({ onClose, onSave }: { onClose: () => void; onSave: (entry
           {/* Mood Selector */}
           <div>
             <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">
-              How are you feeling?
+              {t.farmJournal.howAreYou}
             </label>
             <div className="flex items-center gap-2 justify-between">
               {moodOptions.map((m) => (
@@ -671,7 +692,7 @@ function NewEntryForm({ onClose, onSave }: { onClose: () => void; onSave: (entry
                   }`}
                 >
                   <span className="text-2xl leading-none">{m.emoji}</span>
-                  <span className="text-[9px] font-semibold text-gray-500">{m.label}</span>
+                  <span className="text-[9px] font-semibold text-gray-500">{t.farmJournal.moods[m.key as keyof typeof t.farmJournal.moods]}</span>
                 </button>
               ))}
             </div>
@@ -680,7 +701,7 @@ function NewEntryForm({ onClose, onSave }: { onClose: () => void; onSave: (entry
           {/* Cost */}
           <div>
             <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">
-              Cost (optional)
+              {t.farmJournal.cost}
             </label>
             <div className="relative">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-medium text-gray-400">
@@ -707,7 +728,7 @@ function NewEntryForm({ onClose, onSave }: { onClose: () => void; onSave: (entry
                 : 'bg-gray-200 text-gray-400 cursor-not-allowed'
             }`}
           >
-            Save Entry
+            {t.farmJournal.saveEntry}
           </button>
         </div>
       </motion.div>
@@ -751,6 +772,7 @@ function PhotoViewer({ url, onClose }: { url: string; onClose: () => void }) {
 // ---------------------------------------------------------------------------
 
 export default function FarmJournalPage() {
+  const { t } = useLanguage();
   const [entries, setEntries] = useState<JournalEntry[]>(initialEntries);
   const [showNewEntry, setShowNewEntry] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -797,7 +819,7 @@ export default function FarmJournalPage() {
           className="w-full bg-gradient-to-r from-teal to-teal-dark text-white py-3.5 rounded-2xl text-sm font-bold shadow-lg shadow-teal/25 active:shadow-md transition-shadow flex items-center justify-center gap-2 min-h-[48px]"
         >
           <Plus className="w-5 h-5" />
-          What did you do today?
+          {t.farmJournal.whatDidYouDo}
         </motion.button>
       </div>
 
@@ -830,7 +852,7 @@ export default function FarmJournalPage() {
           }`}
         >
           <ImageIcon className="w-3.5 h-3.5" />
-          Photos
+          {t.farmJournal.photos}
         </button>
       </div>
 
@@ -859,7 +881,7 @@ export default function FarmJournalPage() {
                 <div key={date} className="space-y-2.5">
                   {/* Date header */}
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-navy">{formatDateHeader(date)}</span>
+                    <span className="text-xs font-bold text-navy">{formatDateHeader(date, t.common.today, t.common.yesterday)}</span>
                     <div className="flex-1 h-px bg-gray-100" />
                     <span className="text-[10px] text-gray-400 font-medium">
                       {grouped[date].length} {grouped[date].length === 1 ? 'entry' : 'entries'}

@@ -29,6 +29,8 @@ import {
   getFarmSummary,
 } from '@/lib/data/farm';
 import type { FarmTransaction, TransactionCategory } from '@/lib/data/farm';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
+import type { Translations } from '@/lib/i18n/translations';
 
 // ---------------------------------------------------------------------------
 // Animation variants
@@ -103,18 +105,33 @@ const transactionCardVariants = {
 
 const categoryConfig: Record<
   TransactionCategory,
-  { icon: React.ElementType; label: string; color: string; bg: string }
+  { icon: React.ElementType; color: string; bg: string }
 > = {
-  seeds: { icon: Sprout, label: 'Seeds', color: 'text-green-600', bg: 'bg-green-50' },
-  fertilizer: { icon: FlaskConical, label: 'Fertilizer', color: 'text-amber-600', bg: 'bg-amber-50' },
-  pesticides: { icon: Bug, label: 'Pesticides', color: 'text-red-500', bg: 'bg-red-50' },
-  labor: { icon: Users, label: 'Labor', color: 'text-blue-600', bg: 'bg-blue-50' },
-  equipment: { icon: Wrench, label: 'Equipment', color: 'text-gray-600', bg: 'bg-gray-100' },
-  transport: { icon: Truck, label: 'Transport', color: 'text-purple-600', bg: 'bg-purple-50' },
-  'harvest-sale': { icon: ShoppingCart, label: 'Harvest Sale', color: 'text-green-600', bg: 'bg-green-50' },
-  'contract-payment': { icon: FileText, label: 'Contract', color: 'text-teal', bg: 'bg-teal-light' },
-  subsidy: { icon: Gift, label: 'Subsidy', color: 'text-gold', bg: 'bg-amber-50' },
-  other: { icon: MoreHorizontal, label: 'Other', color: 'text-gray-500', bg: 'bg-gray-50' },
+  seeds: { icon: Sprout, color: 'text-green-600', bg: 'bg-green-50' },
+  fertilizer: { icon: FlaskConical, color: 'text-amber-600', bg: 'bg-amber-50' },
+  pesticides: { icon: Bug, color: 'text-red-500', bg: 'bg-red-50' },
+  labor: { icon: Users, color: 'text-blue-600', bg: 'bg-blue-50' },
+  equipment: { icon: Wrench, color: 'text-gray-600', bg: 'bg-gray-100' },
+  transport: { icon: Truck, color: 'text-purple-600', bg: 'bg-purple-50' },
+  'harvest-sale': { icon: ShoppingCart, color: 'text-green-600', bg: 'bg-green-50' },
+  'contract-payment': { icon: FileText, color: 'text-teal', bg: 'bg-teal-light' },
+  subsidy: { icon: Gift, color: 'text-gold', bg: 'bg-amber-50' },
+  other: { icon: MoreHorizontal, color: 'text-gray-500', bg: 'bg-gray-50' },
+};
+
+// Map TransactionCategory keys to moneyTracker.categories translation keys
+type CategoryKey = keyof Translations['moneyTracker']['categories'];
+const categoryTranslationKey: Record<TransactionCategory, CategoryKey> = {
+  seeds: 'seeds',
+  fertilizer: 'fertilizer',
+  pesticides: 'pesticides',
+  labor: 'labor',
+  equipment: 'equipment',
+  transport: 'transport',
+  'harvest-sale': 'harvestSale',
+  'contract-payment': 'contractPayment',
+  subsidy: 'subsidy',
+  other: 'other',
 };
 
 // ---------------------------------------------------------------------------
@@ -123,16 +140,16 @@ const categoryConfig: Record<
 
 const NOW = new Date('2026-03-14T12:00:00');
 
-function getDateLabel(dateStr: string): string {
+function getDateLabel(dateStr: string, todayLabel: string, yesterdayLabel: string): string {
   const d = new Date(dateStr + 'T00:00:00');
   const diffMs = NOW.getTime() - d.getTime();
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-  if (diffDays === 0) return 'Today';
-  if (diffDays === 1) return 'Yesterday';
+  if (diffDays === 0) return todayLabel;
+  if (diffDays === 1) return yesterdayLabel;
   return d.toLocaleDateString('en-GB', { month: 'long', day: 'numeric' });
 }
 
-function groupByDate(txns: FarmTransaction[]): { label: string; date: string; transactions: FarmTransaction[] }[] {
+function groupByDate(txns: FarmTransaction[], todayLabel: string, yesterdayLabel: string): { label: string; date: string; transactions: FarmTransaction[] }[] {
   const map = new Map<string, FarmTransaction[]>();
   const sorted = [...txns].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   for (const t of sorted) {
@@ -144,7 +161,7 @@ function groupByDate(txns: FarmTransaction[]): { label: string; date: string; tr
     }
   }
   return Array.from(map.entries()).map(([date, transactions]) => ({
-    label: getDateLabel(date),
+    label: getDateLabel(date, todayLabel, yesterdayLabel),
     date,
     transactions,
   }));
@@ -187,6 +204,7 @@ function useAnimatedCounter(target: number, duration = 1200): number {
 type FilterTab = 'all' | 'income' | 'expense';
 
 export default function MoneyTrackerPage() {
+  const { t } = useLanguage();
   const summary = useMemo(() => getFarmSummary(), []);
   const [filter, setFilter] = useState<FilterTab>('all');
   const [expandedTxn, setExpandedTxn] = useState<string | null>(null);
@@ -216,7 +234,7 @@ export default function MoneyTrackerPage() {
 
   const incomeCount = useMemo(() => transactions.filter((t) => t.type === 'income').length, [transactions]);
   const expenseCount = useMemo(() => transactions.filter((t) => t.type === 'expense').length, [transactions]);
-  const grouped = useMemo(() => groupByDate(filtered), [filtered]);
+  const grouped = useMemo(() => groupByDate(filtered, t.common.today, t.common.yesterday), [filtered, t.common.today, t.common.yesterday]);
 
   // Income / Expense breakdowns
   const incomeBreakdown = useMemo(() => {
@@ -263,13 +281,13 @@ export default function MoneyTrackerPage() {
       amount: parseFloat(modalAmount),
       currency: 'USD',
       date: modalDate,
-      description: modalDescription || `${modalType === 'income' ? 'Income' : 'Expense'} — ${categoryConfig[modalCategory as TransactionCategory]?.label || modalCategory}`,
+      description: modalDescription || `${modalType === 'income' ? t.moneyTracker.income : t.moneyTracker.expenses} — ${t.moneyTracker.categories[categoryTranslationKey[modalCategory as TransactionCategory]] || modalCategory}`,
       plotId: modalPlotId || undefined,
       plotName: modalPlotId ? farmPlots.find((p) => p.id === modalPlotId)?.name : undefined,
     };
     setTransactions((prev) => [newTxn, ...prev]);
     setModalOpen(false);
-  }, [modalAmount, modalCategory, modalType, modalDate, modalDescription, modalPlotId]);
+  }, [modalAmount, modalCategory, modalType, modalDate, modalDescription, modalPlotId, t]);
 
   // Income categories for modal
   const incomeCategories: TransactionCategory[] = ['harvest-sale', 'contract-payment', 'subsidy', 'other'];
@@ -309,7 +327,7 @@ export default function MoneyTrackerPage() {
 
             <div className="relative z-10 text-center">
               <p className="text-xs font-medium text-white/70 uppercase tracking-wider mb-1">
-                This Season
+                {t.moneyTracker.thisSeason}
               </p>
               <motion.p
                 className="text-[32px] font-extrabold leading-tight"
@@ -319,7 +337,7 @@ export default function MoneyTrackerPage() {
               >
                 ${animatedProfit.toLocaleString()}
               </motion.p>
-              <p className="text-sm text-white/80 font-medium mt-0.5">Profit</p>
+              <p className="text-sm text-white/80 font-medium mt-0.5">{t.moneyTracker.profit}</p>
 
               {/* Income / Expenses row */}
               <div className="flex items-center justify-center gap-6 mt-4">
@@ -328,7 +346,7 @@ export default function MoneyTrackerPage() {
                     <TrendingUp size={14} />
                   </div>
                   <div className="text-left">
-                    <p className="text-[11px] text-white/60">Income</p>
+                    <p className="text-[11px] text-white/60">{t.moneyTracker.income}</p>
                     <p className="text-sm font-bold">${animatedIncome.toLocaleString()}</p>
                   </div>
                 </div>
@@ -338,7 +356,7 @@ export default function MoneyTrackerPage() {
                     <TrendingDown size={14} />
                   </div>
                   <div className="text-left">
-                    <p className="text-[11px] text-white/60">Expenses</p>
+                    <p className="text-[11px] text-white/60">{t.moneyTracker.expenses}</p>
                     <p className="text-sm font-bold">${animatedExpenses.toLocaleString()}</p>
                   </div>
                 </div>
@@ -357,14 +375,14 @@ export default function MoneyTrackerPage() {
               className="flex items-center justify-center gap-2 py-3.5 rounded-xl border-2 border-green-400 text-green-600 font-semibold text-sm active:bg-green-50 transition-colors min-h-[48px]"
             >
               <Plus size={18} strokeWidth={2.5} />
-              Income
+              {t.moneyTracker.income}
             </button>
             <button
               onClick={() => openModal('expense')}
               className="flex items-center justify-center gap-2 py-3.5 rounded-xl border-2 border-red-400 text-red-500 font-semibold text-sm active:bg-red-50 transition-colors min-h-[48px]"
             >
               <Plus size={18} strokeWidth={2.5} />
-              Expense
+              {t.moneyTracker.expenses}
             </button>
           </div>
         </motion.section>
@@ -375,9 +393,9 @@ export default function MoneyTrackerPage() {
         <motion.section variants={itemVariants} className="px-4">
           <div className="flex gap-2">
             {([
-              { key: 'all' as FilterTab, label: 'All', count: transactions.length },
-              { key: 'income' as FilterTab, label: 'Income', count: incomeCount },
-              { key: 'expense' as FilterTab, label: 'Expenses', count: expenseCount },
+              { key: 'all' as FilterTab, label: t.moneyTracker.all, count: transactions.length },
+              { key: 'income' as FilterTab, label: t.moneyTracker.income, count: incomeCount },
+              { key: 'expense' as FilterTab, label: t.moneyTracker.expenses, count: expenseCount },
             ]).map((tab) => (
               <button
                 key={tab.key}
@@ -462,7 +480,7 @@ export default function MoneyTrackerPage() {
                               <span
                                 className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${config.bg} ${config.color}`}
                               >
-                                {config.label}
+                                {t.moneyTracker.categories[categoryTranslationKey[txn.category]]}
                               </span>
                             </div>
                           </div>
@@ -512,7 +530,7 @@ export default function MoneyTrackerPage() {
                                     </div>
                                   )}
                                   <div>
-                                    <p className="text-[10px] text-gray-400 uppercase">Date</p>
+                                    <p className="text-[10px] text-gray-400 uppercase">{t.moneyTracker.date}</p>
                                     <p className="text-xs text-navy font-medium">
                                       {new Date(txn.date + 'T00:00:00').toLocaleDateString('en-GB', {
                                         day: 'numeric',
@@ -545,7 +563,7 @@ export default function MoneyTrackerPage() {
         {/* 5. INCOME BY SOURCE                                               */}
         {/* ================================================================= */}
         <motion.section variants={itemVariants} className="px-4">
-          <h3 className="text-sm font-bold text-navy mb-3">Income by Source</h3>
+          <h3 className="text-sm font-bold text-navy mb-3">{t.moneyTracker.incomeBySource}</h3>
           <div className="rounded-2xl bg-white border border-gray-100 p-4">
             {/* Stacked bar */}
             <div className="h-4 rounded-full overflow-hidden flex mb-4">
@@ -562,19 +580,16 @@ export default function MoneyTrackerPage() {
 
             {/* List */}
             <div className="space-y-2.5">
-              {incomeBreakdown.map((item, idx) => {
-                const config = categoryConfig[item.category];
-                return (
+              {incomeBreakdown.map((item, idx) => (
                   <div key={item.category} className="flex items-center gap-3">
                     <span
                       className={`w-3 h-3 rounded-full shrink-0 ${breakdownColors[idx % breakdownColors.length]}`}
                     />
-                    <span className="text-xs text-gray-600 flex-1">{config.label}</span>
+                    <span className="text-xs text-gray-600 flex-1">{t.moneyTracker.categories[categoryTranslationKey[item.category]]}</span>
                     <span className="text-xs font-bold text-navy">${item.amount.toLocaleString()}</span>
                     <span className="text-[11px] text-gray-400 w-8 text-right">{item.percent}%</span>
                   </div>
-                );
-              })}
+              ))}
             </div>
           </div>
         </motion.section>
@@ -583,7 +598,7 @@ export default function MoneyTrackerPage() {
         {/* 6. EXPENSES BY CATEGORY                                           */}
         {/* ================================================================= */}
         <motion.section variants={itemVariants} className="px-4">
-          <h3 className="text-sm font-bold text-navy mb-3">Expenses by Category</h3>
+          <h3 className="text-sm font-bold text-navy mb-3">{t.moneyTracker.expensesByCategory}</h3>
           <div className="rounded-2xl bg-white border border-gray-100 p-4">
             {/* Stacked bar */}
             <div className="h-4 rounded-full overflow-hidden flex mb-4">
@@ -600,19 +615,16 @@ export default function MoneyTrackerPage() {
 
             {/* List */}
             <div className="space-y-2.5">
-              {expenseBreakdown.map((item, idx) => {
-                const config = categoryConfig[item.category];
-                return (
+              {expenseBreakdown.map((item, idx) => (
                   <div key={item.category} className="flex items-center gap-3">
                     <span
                       className={`w-3 h-3 rounded-full shrink-0 ${breakdownColors[idx % breakdownColors.length]}`}
                     />
-                    <span className="text-xs text-gray-600 flex-1">{config.label}</span>
+                    <span className="text-xs text-gray-600 flex-1">{t.moneyTracker.categories[categoryTranslationKey[item.category]]}</span>
                     <span className="text-xs font-bold text-navy">${item.amount.toLocaleString()}</span>
                     <span className="text-[11px] text-gray-400 w-8 text-right">{item.percent}%</span>
                   </div>
-                );
-              })}
+              ))}
             </div>
           </div>
         </motion.section>
@@ -630,7 +642,7 @@ export default function MoneyTrackerPage() {
               <div className="flex items-center gap-2 mb-2">
                 <Sparkles size={16} className="text-gold" />
                 <span className="text-xs font-bold text-white/80 uppercase tracking-wide">
-                  Money Insight
+                  {t.moneyTracker.aiInsight}
                 </span>
               </div>
               <p className="text-sm leading-relaxed text-white/95">
@@ -641,7 +653,7 @@ export default function MoneyTrackerPage() {
                 href="/farm/assistant"
                 className="inline-flex items-center gap-2 mt-3 px-4 py-2.5 rounded-xl bg-white/15 active:bg-white/25 text-sm font-medium transition-colors min-h-[44px]"
               >
-                Talk to AI
+                {t.moneyTracker.talkToAI}
                 <ArrowRight size={14} />
               </Link>
             </div>
@@ -673,7 +685,7 @@ export default function MoneyTrackerPage() {
               {/* Modal header */}
               <div className="flex items-center justify-between mb-5">
                 <h2 className="text-lg font-bold text-navy">
-                  {modalType === 'income' ? 'Add Income' : 'Add Expense'}
+                  {modalType === 'income' ? t.moneyTracker.addIncome : t.moneyTracker.addExpense}
                 </h2>
                 <button
                   onClick={() => setModalOpen(false)}
@@ -686,7 +698,7 @@ export default function MoneyTrackerPage() {
               {/* Amount input */}
               <div className="mb-5">
                 <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 block">
-                  Amount (USD)
+                  {t.moneyTracker.amount} (USD)
                 </label>
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-bold text-gray-300">
@@ -706,7 +718,7 @@ export default function MoneyTrackerPage() {
               {/* Category selector */}
               <div className="mb-5">
                 <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 block">
-                  Category
+                  {t.moneyTracker.category}
                 </label>
                 <div className="grid grid-cols-4 gap-2">
                   {(modalType === 'income' ? incomeCategories : expenseCategories).map(
@@ -735,7 +747,7 @@ export default function MoneyTrackerPage() {
                               isSelected ? 'text-navy' : 'text-gray-500'
                             }`}
                           >
-                            {config.label}
+                            {t.moneyTracker.categories[categoryTranslationKey[cat]]}
                           </span>
                         </button>
                       );
@@ -747,7 +759,7 @@ export default function MoneyTrackerPage() {
               {/* Description */}
               <div className="mb-4">
                 <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 block">
-                  Description
+                  {t.moneyTracker.description}
                 </label>
                 <input
                   type="text"
@@ -761,7 +773,7 @@ export default function MoneyTrackerPage() {
               {/* Plot selector */}
               <div className="mb-4">
                 <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 block">
-                  Plot (optional)
+                  {t.moneyTracker.selectPlot}
                 </label>
                 <div className="relative">
                   <select
@@ -786,7 +798,7 @@ export default function MoneyTrackerPage() {
               {/* Date */}
               <div className="mb-6">
                 <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 block">
-                  Date
+                  {t.moneyTracker.date}
                 </label>
                 <div className="relative">
                   <Calendar
@@ -814,7 +826,7 @@ export default function MoneyTrackerPage() {
                       : 'bg-red-500 active:bg-red-600 shadow-lg shadow-red-500/25'
                 }`}
               >
-                {modalType === 'income' ? 'Save Income' : 'Save Expense'}
+                {modalType === 'income' ? `${t.common.save} ${t.moneyTracker.income}` : `${t.common.save} ${t.moneyTracker.expenses}`}
               </button>
             </motion.div>
           </motion.div>

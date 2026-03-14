@@ -37,6 +37,7 @@ import {
   type ActivityType,
   type FarmPlot,
 } from '@/lib/data/farm';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -219,18 +220,19 @@ function formatDate(dateStr: string): string {
 // ─── Component: Summary Bar ──────────────────────────────────────────────────
 
 function SummaryBar() {
+  const { t } = useLanguage();
   const summary = getFarmSummary();
   return (
     <div className="px-4 pt-4 pb-2">
       <div className="flex items-center gap-3 bg-white rounded-2xl p-3 shadow-sm border border-gray-100">
         <div className="flex-1 text-center">
           <p className="text-lg font-bold text-navy">{summary.totalHectares}</p>
-          <p className="text-[11px] text-gray-500 leading-tight">Hectares</p>
+          <p className="text-[11px] text-gray-500 leading-tight">{t.cropTracker.totalHectares}</p>
         </div>
         <div className="w-px h-8 bg-gray-200" />
         <div className="flex-1 text-center">
           <p className="text-lg font-bold text-navy">{summary.plotCount}</p>
-          <p className="text-[11px] text-gray-500 leading-tight">Plots</p>
+          <p className="text-[11px] text-gray-500 leading-tight">{t.cropTracker.plots}</p>
         </div>
         <div className="w-px h-8 bg-gray-200" />
         <div className="flex-1 text-center">
@@ -238,7 +240,7 @@ function SummaryBar() {
             <span className={`w-2 h-2 rounded-full ${getHealthBg(summary.avgHealthScore)}`} />
             <p className="text-lg font-bold text-navy">{summary.avgHealthScore}%</p>
           </div>
-          <p className="text-[11px] text-gray-500 leading-tight">Avg Health</p>
+          <p className="text-[11px] text-gray-500 leading-tight">{t.cropTracker.avgHealth}</p>
         </div>
       </div>
     </div>
@@ -248,11 +250,13 @@ function SummaryBar() {
 // ─── Component: Growth Timeline ──────────────────────────────────────────────
 
 function GrowthTimeline({ currentStage }: { currentStage: CropStage }) {
+  const { t } = useLanguage();
+  const stageLabels = t.cropTracker.stages;
   const currentIndex = ALL_STAGES.indexOf(currentStage);
 
   return (
     <div className="py-3">
-      <p className="text-xs font-semibold text-navy mb-3">Growth Timeline</p>
+      <p className="text-xs font-semibold text-navy mb-3">{t.cropTracker.growthTimeline}</p>
       <div className="relative">
         {/* Track line */}
         <div className="absolute top-3 left-0 right-0 h-0.5 bg-gray-200 rounded-full" />
@@ -299,7 +303,7 @@ function GrowthTimeline({ currentStage }: { currentStage: CropStage }) {
                         : 'text-gray-400'
                   }`}
                 >
-                  {STAGE_LABELS[stage]}
+                  {stageLabels[stage]}
                 </span>
               </div>
             );
@@ -373,6 +377,7 @@ function LogActivityModal({
   onClose: () => void;
   plotName: string;
 }) {
+  const { t } = useLanguage();
   const [selectedType, setSelectedType] = useState<ActivityType | null>(null);
   const [notes, setNotes] = useState('');
   const [saved, setSaved] = useState(false);
@@ -417,7 +422,7 @@ function LogActivityModal({
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-100">
               <div>
-                <h3 className="text-base font-bold text-navy">Log Activity</h3>
+                <h3 className="text-base font-bold text-navy">{t.cropTracker.logActivity}</h3>
                 <p className="text-xs text-gray-500">{plotName}</p>
               </div>
               <button
@@ -490,7 +495,7 @@ function LogActivityModal({
                       : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                 }`}
               >
-                {saved ? 'Saved!' : 'Save Activity'}
+                {saved ? 'Saved!' : t.common.save}
               </button>
             </div>
           </motion.div>
@@ -503,6 +508,7 @@ function LogActivityModal({
 // ─── Component: Add Plot Modal ───────────────────────────────────────────────
 
 function AddPlotModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { t } = useLanguage();
   const [plotName, setPlotName] = useState('');
   const [crop, setCrop] = useState('');
   const [variety, setVariety] = useState('');
@@ -558,7 +564,7 @@ function AddPlotModal({ open, onClose }: { open: boolean; onClose: () => void })
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-100">
               <div>
-                <h3 className="text-base font-bold text-navy">Add New Plot</h3>
+                <h3 className="text-base font-bold text-navy">{t.cropTracker.addPlot}</h3>
                 <p className="text-xs text-gray-500">Register a new planting area</p>
               </div>
               <button
@@ -572,7 +578,7 @@ function AddPlotModal({ open, onClose }: { open: boolean; onClose: () => void })
             <div className="p-4 space-y-3">
               {/* Plot name */}
               <div>
-                <label className="text-xs font-semibold text-navy block mb-1">Plot Name *</label>
+                <label className="text-xs font-semibold text-navy block mb-1">{t.cropTracker.plotName} *</label>
                 <input
                   type="text"
                   value={plotName}
@@ -584,7 +590,7 @@ function AddPlotModal({ open, onClose }: { open: boolean; onClose: () => void })
 
               {/* Crop */}
               <div>
-                <label className="text-xs font-semibold text-navy block mb-1">Crop *</label>
+                <label className="text-xs font-semibold text-navy block mb-1">{t.cropTracker.crop} *</label>
                 <input
                   type="text"
                   value={crop}
@@ -596,7 +602,7 @@ function AddPlotModal({ open, onClose }: { open: boolean; onClose: () => void })
 
               {/* Variety */}
               <div>
-                <label className="text-xs font-semibold text-navy block mb-1">Variety</label>
+                <label className="text-xs font-semibold text-navy block mb-1">{t.cropTracker.variety}</label>
                 <input
                   type="text"
                   value={variety}
@@ -609,7 +615,7 @@ function AddPlotModal({ open, onClose }: { open: boolean; onClose: () => void })
               {/* Size and Date row */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-semibold text-navy block mb-1">Size (ha)</label>
+                  <label className="text-xs font-semibold text-navy block mb-1">{t.cropTracker.size}</label>
                   <input
                     type="number"
                     value={size}
@@ -622,7 +628,7 @@ function AddPlotModal({ open, onClose }: { open: boolean; onClose: () => void })
                 </div>
                 <div>
                   <label className="text-xs font-semibold text-navy block mb-1">
-                    Planting Date
+                    {t.cropTracker.plantingDate}
                   </label>
                   <input
                     type="date"
@@ -645,7 +651,7 @@ function AddPlotModal({ open, onClose }: { open: boolean; onClose: () => void })
                       : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                 }`}
               >
-                {saved ? 'Plot Added!' : 'Add Plot'}
+                {saved ? 'Plot Added!' : t.cropTracker.addPlot}
               </button>
             </div>
           </motion.div>
@@ -658,6 +664,8 @@ function AddPlotModal({ open, onClose }: { open: boolean; onClose: () => void })
 // ─── Component: Plot Card ────────────────────────────────────────────────────
 
 function PlotCard({ plot }: { plot: FarmPlot }) {
+  const { t } = useLanguage();
+  const stageLabels = t.cropTracker.stages;
   const [expanded, setExpanded] = useState(false);
   const [logModalOpen, setLogModalOpen] = useState(false);
 
@@ -689,7 +697,7 @@ function PlotCard({ plot }: { plot: FarmPlot }) {
                 className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold backdrop-blur-sm ${STAGE_BADGE_STYLES[plot.stage]}`}
               >
                 <Leaf className="w-3 h-3" />
-                {STAGE_LABELS[plot.stage]}
+                {stageLabels[plot.stage]}
               </span>
             </div>
 
@@ -724,7 +732,7 @@ function PlotCard({ plot }: { plot: FarmPlot }) {
                 <p className={`text-sm font-bold ${getHealthColor(plot.healthScore)}`}>
                   {plot.healthScore}%
                 </p>
-                <p className="text-[10px] text-gray-500">Health</p>
+                <p className="text-[10px] text-gray-500">{t.dashboard.healthScore}</p>
               </div>
             </div>
 
@@ -734,14 +742,14 @@ function PlotCard({ plot }: { plot: FarmPlot }) {
                 <Timer className="w-4 h-4 text-gold" />
                 <span className="text-xl font-bold text-gold">{plot.daysToHarvest}</span>
               </div>
-              <p className="text-[10px] text-gray-500">Days to harvest</p>
+              <p className="text-[10px] text-gray-500">{t.dashboard.daysToHarvest}</p>
             </div>
           </div>
 
           {/* Progress Bar */}
           <div className="mb-3">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-[10px] font-medium text-gray-500">Growth Progress</span>
+              <span className="text-[10px] font-medium text-gray-500">{t.cropTracker.growthTimeline}</span>
               <span className="text-[10px] font-bold text-navy">{plot.progressPercent}%</span>
             </div>
             <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
@@ -753,7 +761,7 @@ function PlotCard({ plot }: { plot: FarmPlot }) {
               />
             </div>
             <p className="text-[10px] text-gray-400 mt-0.5">
-              Stage: {STAGE_LABELS[plot.stage]}
+              Stage: {stageLabels[plot.stage]}
             </p>
           </div>
 
@@ -812,18 +820,18 @@ function PlotCard({ plot }: { plot: FarmPlot }) {
                     className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl bg-teal/10 text-teal active:bg-teal/20 transition-colors min-h-[64px]"
                   >
                     <ClipboardPlus className="w-5 h-5" />
-                    <span className="text-[10px] font-semibold">Log Activity</span>
+                    <span className="text-[10px] font-semibold">{t.cropTracker.logActivity}</span>
                   </button>
                   <Link
                     href="/farm/doctor"
                     className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl bg-amber-50 text-amber-600 active:bg-amber-100 transition-colors min-h-[64px]"
                   >
                     <Camera className="w-5 h-5" />
-                    <span className="text-[10px] font-semibold">Scan Crop</span>
+                    <span className="text-[10px] font-semibold">{t.cropTracker.scanCrop}</span>
                   </Link>
                   <button className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl bg-blue-50 text-blue-600 active:bg-blue-100 transition-colors min-h-[64px]">
                     <History className="w-5 h-5" />
-                    <span className="text-[10px] font-semibold">View History</span>
+                    <span className="text-[10px] font-semibold">{t.cropTracker.viewHistory}</span>
                   </button>
                 </div>
               </div>

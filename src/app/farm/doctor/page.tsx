@@ -18,6 +18,7 @@ import {
   ChevronDown,
 } from 'lucide-react';
 import { cropScans, farmPlots } from '@/lib/data/farm';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -177,7 +178,12 @@ function severityColor(score: number): string {
   return '#EF4444';
 }
 
-function severityLabel(severity: 'healthy' | 'moderate' | 'severe'): string {
+function severityLabel(severity: 'healthy' | 'moderate' | 'severe', labels?: { healthy: string; moderate: string; severe: string }): string {
+  if (labels) {
+    if (severity === 'healthy') return labels.healthy;
+    if (severity === 'moderate') return labels.moderate;
+    return labels.severe;
+  }
   if (severity === 'healthy') return 'Healthy';
   if (severity === 'moderate') return 'Moderate';
   return 'Severe';
@@ -201,10 +207,12 @@ function severityIcon(severity: 'healthy' | 'moderate' | 'severe') {
 
 function HealthScoreRing({
   score,
+  label,
   size = 160,
   strokeWidth = 12,
 }: {
   score: number;
+  label?: string;
   size?: number;
   strokeWidth?: number;
 }) {
@@ -251,7 +259,7 @@ function HealthScoreRing({
         >
           {score}
         </motion.span>
-        <span className="text-xs text-gray-400 font-medium -mt-1">Health Score</span>
+        <span className="text-xs text-gray-400 font-medium -mt-1">{label ?? 'Health Score'}</span>
       </div>
     </div>
   );
@@ -349,6 +357,7 @@ function AnalysisStep({
 // ---------------------------------------------------------------------------
 
 export default function CropDoctorPage() {
+  const { t } = useLanguage();
   const [pageState, setPageState] = useState<PageState>('capture');
   const [selectedPlotId, setSelectedPlotId] = useState<string>(farmPlots[0]?.id ?? '');
   const [plotDropdownOpen, setPlotDropdownOpen] = useState(false);
@@ -423,10 +432,10 @@ export default function CropDoctorPage() {
 
   // ─── Analysis step labels ───
   const analysisSteps = [
-    'Uploading image...',
-    'Analyzing leaf patterns...',
-    'Identifying issues...',
-    'Generating recommendations...',
+    t.cropDoctor.uploadingImage,
+    t.cropDoctor.analyzingLeaf,
+    t.cropDoctor.identifyingIssues,
+    t.cropDoctor.generatingRecs,
   ];
 
   return (
@@ -445,17 +454,17 @@ export default function CropDoctorPage() {
             <motion.div variants={fadeUp} initial="initial" animate="animate">
               <div className="flex items-center gap-2 mb-1">
                 <Scan className="w-5 h-5 text-teal" />
-                <h2 className="text-lg font-bold text-navy">Crop Doctor</h2>
+                <h2 className="text-lg font-bold text-navy">{t.cropDoctor.title}</h2>
               </div>
               <p className="text-sm text-gray-500">
-                Take a photo of your crop and get instant diagnosis with treatment recommendations.
+                {t.cropDoctor.subtitle}
               </p>
             </motion.div>
 
             {/* Plot Selector */}
             <motion.div variants={fadeUp} initial="initial" animate="animate">
               <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5 block">
-                Select Plot
+                {t.cropDoctor.selectPlot}
               </label>
               <div className="relative">
                 <button
@@ -531,7 +540,7 @@ export default function CropDoctorPage() {
                 className="w-full h-32 bg-gradient-to-br from-teal to-teal-dark text-white rounded-2xl flex flex-col items-center justify-center gap-2 shadow-lg shadow-teal/20 active:scale-[0.98] transition-transform"
               >
                 <Camera className="w-10 h-10" />
-                <span className="text-base font-bold">Take Photo</span>
+                <span className="text-base font-bold">{t.cropDoctor.takePhoto}</span>
                 <span className="text-xs opacity-80">Opens your camera</span>
               </button>
             </motion.div>
@@ -550,7 +559,7 @@ export default function CropDoctorPage() {
                 className="w-full h-14 bg-white border-2 border-teal/30 text-teal rounded-2xl flex items-center justify-center gap-2 font-semibold active:bg-teal/5 transition-colors"
               >
                 <ImagePlus className="w-5 h-5" />
-                <span className="text-sm">Choose from Gallery</span>
+                <span className="text-sm">{t.cropDoctor.chooseGallery}</span>
               </button>
             </motion.div>
 
@@ -563,14 +572,14 @@ export default function CropDoctorPage() {
             >
               <h3 className="text-sm font-bold text-amber-800 mb-2 flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4" />
-                For Best Results
+                {t.cropDoctor.tipsTitle}
               </h3>
               <ul className="space-y-1.5">
                 {[
-                  'Take photo in good natural lighting',
-                  'Get a close-up of the affected leaf or stem',
-                  'Include both healthy and affected areas if possible',
-                  'Hold camera steady and avoid shadows',
+                  t.cropDoctor.tip1,
+                  t.cropDoctor.tip2,
+                  t.cropDoctor.tip3,
+                  t.cropDoctor.tip4,
                 ].map((tip, i) => (
                   <li key={i} className="text-xs text-amber-700 flex items-start gap-2">
                     <span className="w-4 h-4 bg-amber-200 text-amber-800 rounded-full flex items-center justify-center flex-shrink-0 text-[10px] font-bold mt-0.5">
@@ -589,7 +598,7 @@ export default function CropDoctorPage() {
                 initial="initial"
                 animate="animate"
               >
-                <h3 className="text-sm font-bold text-navy mb-3">Recent Scans</h3>
+                <h3 className="text-sm font-bold text-navy mb-3">{t.cropDoctor.recentScans}</h3>
                 <div className="space-y-2.5">
                   {recentScans.map((scan) => {
                     const SIcon = severityIcon(scan.severity);
@@ -633,7 +642,7 @@ export default function CropDoctorPage() {
                             scan.severity,
                           )}`}
                         >
-                          {severityLabel(scan.severity)}
+                          {severityLabel(scan.severity, { healthy: t.cropDoctor.healthy, moderate: t.cropDoctor.moderate, severe: t.cropDoctor.severe })}
                         </span>
                       </motion.div>
                     );
@@ -656,7 +665,7 @@ export default function CropDoctorPage() {
             <motion.div variants={fadeUp} initial="initial" animate="animate">
               <div className="flex items-center gap-2 mb-1">
                 <Scan className="w-5 h-5 text-teal" />
-                <h2 className="text-lg font-bold text-navy">Analyzing Crop</h2>
+                <h2 className="text-lg font-bold text-navy">{t.cropDoctor.analyzing}</h2>
               </div>
               <p className="text-sm text-gray-500">
                 Scanning your photo for diseases, pests, and nutrient issues...
@@ -762,7 +771,7 @@ export default function CropDoctorPage() {
               )}
               {/* Health Score */}
               <div className="flex flex-col items-center py-4 -mt-10 relative z-10">
-                <HealthScoreRing score={result.healthScore} />
+                <HealthScoreRing score={result.healthScore} label={t.cropDoctor.healthScore} />
               </div>
             </motion.div>
 
@@ -784,7 +793,7 @@ export default function CropDoctorPage() {
                       const SIcon = severityIcon(result.severity);
                       return <SIcon className="w-3 h-3" />;
                     })()}
-                    {severityLabel(result.severity)}
+                    {severityLabel(result.severity, { healthy: t.cropDoctor.healthy, moderate: t.cropDoctor.moderate, severe: t.cropDoctor.severe })}
                   </span>
                   <h3 className="text-base font-bold text-navy">{result.diagnosis}</h3>
                 </div>
@@ -792,13 +801,13 @@ export default function CropDoctorPage() {
               <div className="grid grid-cols-2 gap-3">
                 <div className="bg-gray-50 rounded-xl p-3 text-center">
                   <p className="text-[10px] text-gray-400 uppercase tracking-wide font-semibold mb-0.5">
-                    Confidence
+                    {t.cropDoctor.confidence}
                   </p>
                   <p className="text-lg font-bold text-navy">{result.confidence}%</p>
                 </div>
                 <div className="bg-gray-50 rounded-xl p-3 text-center">
                   <p className="text-[10px] text-gray-400 uppercase tracking-wide font-semibold mb-0.5">
-                    Affected Area
+                    {t.cropDoctor.affectedArea}
                   </p>
                   <p className="text-lg font-bold text-navy">{result.affectedArea}%</p>
                 </div>
@@ -813,7 +822,7 @@ export default function CropDoctorPage() {
             >
               <h3 className="text-sm font-bold text-navy mb-3 flex items-center gap-2">
                 <Droplets className="w-4 h-4 text-teal" />
-                What To Do
+                {t.cropDoctor.whatToDo}
               </h3>
               <div className="space-y-2">
                 {result.recommendations.map((rec, i) => (
@@ -843,7 +852,7 @@ export default function CropDoctorPage() {
               >
                 <h3 className="text-sm font-bold text-navy mb-3 flex items-center gap-2">
                   <ShoppingCart className="w-4 h-4 text-teal" />
-                  Recommended Treatments
+                  {t.cropDoctor.treatments}
                 </h3>
                 <div className="space-y-2.5">
                   {result.treatments.map((treatment, i) => (
@@ -866,7 +875,7 @@ export default function CropDoctorPage() {
                           className="bg-teal text-white text-xs font-bold px-4 py-2 rounded-xl flex items-center gap-1.5 active:bg-teal-dark transition-colors"
                         >
                           <ShoppingCart className="w-3.5 h-3.5" />
-                          Buy Now
+                          {t.cropDoctor.buyNow}
                         </Link>
                       </div>
                     </motion.div>
@@ -887,14 +896,14 @@ export default function CropDoctorPage() {
                 className="w-full h-14 bg-gradient-to-br from-teal to-teal-dark text-white rounded-2xl flex items-center justify-center gap-2 font-bold shadow-lg shadow-teal/20 active:scale-[0.98] transition-transform"
               >
                 <RotateCcw className="w-5 h-5" />
-                Scan Another Crop
+                {t.cropDoctor.scanAnother}
               </button>
               <Link
                 href="/farm/journal"
                 className="w-full h-12 bg-white border-2 border-gray-200 text-navy rounded-2xl flex items-center justify-center gap-2 font-semibold active:bg-gray-50 transition-colors"
               >
                 <Save className="w-4 h-4" />
-                Save to Journal
+                {t.cropDoctor.saveToJournal}
               </Link>
             </motion.div>
           </motion.div>

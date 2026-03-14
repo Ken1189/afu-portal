@@ -24,6 +24,7 @@ import {
   weatherForecast,
 } from '@/lib/data/farm';
 import type { AIMessage } from '@/lib/data/farm';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 // ---------------------------------------------------------------------------
 // Animation Variants
@@ -80,17 +81,10 @@ const typingDotVariants = {
 };
 
 // ---------------------------------------------------------------------------
-// Quick Suggestion Chips Data
+// Quick Suggestion Chips Icons (labels come from translations)
 // ---------------------------------------------------------------------------
 
-const quickSuggestions = [
-  { label: 'Weather today?', emoji: '\uD83C\uDF24\uFE0F', icon: Sun },
-  { label: 'Check my crops', emoji: '\uD83C\uDF3F', icon: Sprout },
-  { label: 'Farm profit', emoji: '\uD83D\uDCB0', icon: DollarSign },
-  { label: 'Pest advice', emoji: '\uD83D\uDC1B', icon: Bug },
-  { label: 'What should I do today?', emoji: '\uD83D\uDCC5', icon: Calendar },
-  { label: 'Irrigation schedule', emoji: '\uD83D\uDCA7', icon: Droplets },
-];
+const quickSuggestionIcons = [Sun, Sprout, DollarSign, Bug, Calendar, Droplets];
 
 // ---------------------------------------------------------------------------
 // Mock AI Response Generator
@@ -282,6 +276,7 @@ function TypingIndicator() {
 // ---------------------------------------------------------------------------
 
 function ChatMessage({ message }: { message: AIMessage }) {
+  const { t } = useLanguage();
   const isAssistant = message.role === 'assistant';
   const isRecommendation = message.type === 'recommendation';
   const isAlert = message.type === 'alert';
@@ -312,7 +307,7 @@ function ChatMessage({ message }: { message: AIMessage }) {
         {isAssistant && (
           <div className="flex items-center gap-1.5 mb-1 ml-1">
             <Sparkles size={10} className="text-teal" />
-            <span className="text-[10px] font-semibold text-teal">Mkulima AI</span>
+            <span className="text-[10px] font-semibold text-teal">{t.aiAssistant.title}</span>
           </div>
         )}
 
@@ -378,12 +373,23 @@ function ChatMessage({ message }: { message: AIMessage }) {
 // ---------------------------------------------------------------------------
 
 export default function AssistantPage() {
+  const { t } = useLanguage();
   const [messages, setMessages] = useState<AIMessage[]>(() => [...aiConversation]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Build quick suggestions from translations
+  const quickSuggestions = [
+    t.aiAssistant.weatherToday,
+    t.aiAssistant.checkCrops,
+    t.aiAssistant.farmProfit,
+    t.aiAssistant.pestAdvice,
+    t.aiAssistant.whatToDoToday,
+    t.aiAssistant.irrigation,
+  ].map((label, i) => ({ label, icon: quickSuggestionIcons[i] }));
 
   // Auto-scroll to bottom
   const scrollToBottom = useCallback(() => {
@@ -467,11 +473,11 @@ export default function AssistantPage() {
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-bold text-navy">Mkulima AI</span>
+              <span className="text-sm font-bold text-navy">{t.aiAssistant.title}</span>
               <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
             </div>
             <p className="text-[10px] text-gray-400">
-              Powered by AFU &middot; Online &mdash; Ready to help
+              {t.aiAssistant.poweredBy} &middot; {t.aiAssistant.online}
             </p>
           </div>
         </div>
@@ -510,7 +516,6 @@ export default function AssistantPage() {
               disabled={isTyping}
               className="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-full bg-white border border-gray-200 text-[12px] font-medium text-gray-600 active:bg-gray-50 active:border-teal/30 transition-colors disabled:opacity-50 min-h-[36px]"
             >
-              <span className="text-sm">{chip.emoji}</span>
               <span className="whitespace-nowrap">{chip.label}</span>
             </motion.button>
           ))}
@@ -536,7 +541,7 @@ export default function AssistantPage() {
               type="text"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              placeholder="Ask me anything about your farm..."
+              placeholder={t.aiAssistant.askAnything}
               className="w-full h-11 px-4 pr-3 rounded-full bg-gray-50 border border-gray-200 text-sm text-navy placeholder:text-gray-400 focus:outline-none focus:border-teal focus:ring-1 focus:ring-teal/30 transition-all"
               disabled={isTyping}
             />
