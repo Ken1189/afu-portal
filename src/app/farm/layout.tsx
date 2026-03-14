@@ -141,7 +141,7 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* ─── Main Column ─── */}
-      <div className="flex-1 flex flex-col lg:ml-64">
+      <div className="flex-1 flex flex-col lg:ml-64 min-w-0">
         {/* ─── Mobile Top Header (hidden on desktop) ─── */}
         <header className="lg:hidden sticky top-0 z-40 bg-white border-b border-gray-100 px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
