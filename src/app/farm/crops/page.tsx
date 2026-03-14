@@ -295,7 +295,7 @@ function GrowthTimeline({ currentStage }: { currentStage: CropStage }) {
                   </div>
                 </div>
                 <span
-                  className={`mt-1.5 text-[8px] font-medium leading-tight text-center ${
+                  className={`mt-1.5 text-[10px] font-medium leading-tight text-center ${
                     isCurrent
                       ? 'text-teal font-bold'
                       : isPast
@@ -350,10 +350,10 @@ function ActivityLog({ plotId }: { plotId: string }) {
             <div className="flex-1 min-w-0">
               <p className="text-xs font-medium text-navy truncate">{act.description}</p>
               <div className="flex items-center gap-2 mt-0.5">
-                <span className="text-[10px] text-gray-500">{formatDate(act.date)}</span>
-                <span className="text-[10px] text-gray-400">{act.time}</span>
+                <span className="text-[11px] text-gray-500">{formatDate(act.date)}</span>
+                <span className="text-[11px] text-gray-400">{act.time}</span>
                 {act.cost != null && act.cost > 0 && (
-                  <span className="text-[10px] font-semibold text-amber-600">
+                  <span className="text-[11px] font-semibold text-amber-600">
                     ${act.cost}
                   </span>
                 )}
@@ -427,7 +427,7 @@ function LogActivityModal({
               </div>
               <button
                 onClick={handleClose}
-                className="w-9 h-9 flex items-center justify-center rounded-xl bg-gray-100 text-gray-500 active:bg-gray-200"
+                className="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-100 text-gray-500 active:bg-gray-100 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -437,7 +437,7 @@ function LogActivityModal({
               {/* Activity type grid */}
               <div>
                 <p className="text-xs font-semibold text-navy mb-2">What did you do?</p>
-                <div className="grid grid-cols-5 gap-2">
+                <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
                   {ALL_ACTIVITY_TYPES.map((type) => {
                     const Icon = ACTIVITY_ICONS[type];
                     const isSelected = selectedType === type;
@@ -459,7 +459,7 @@ function LogActivityModal({
                           <Icon className="w-3.5 h-3.5" />
                         </div>
                         <span
-                          className={`text-[9px] font-medium leading-tight text-center ${
+                          className={`text-[10px] font-medium leading-tight text-center ${
                             isSelected ? 'text-teal-dark' : 'text-gray-600'
                           }`}
                         >
@@ -569,7 +569,7 @@ function AddPlotModal({ open, onClose }: { open: boolean; onClose: () => void })
               </div>
               <button
                 onClick={handleClose}
-                className="w-9 h-9 flex items-center justify-center rounded-xl bg-gray-100 text-gray-500 active:bg-gray-200"
+                className="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-100 text-gray-500 active:bg-gray-100 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -680,7 +680,7 @@ function PlotCard({ plot }: { plot: FarmPlot }) {
           onClick={() => setExpanded((prev) => !prev)}
           className="w-full text-left focus:outline-none"
         >
-          <div className="relative h-[200px] w-full overflow-hidden">
+          <div className="relative h-[160px] sm:h-[200px] w-full overflow-hidden">
             <Image
               src={plot.image}
               alt={`${plot.crop} — ${plot.name}`}
@@ -732,7 +732,7 @@ function PlotCard({ plot }: { plot: FarmPlot }) {
                 <p className={`text-sm font-bold ${getHealthColor(plot.healthScore)}`}>
                   {plot.healthScore}%
                 </p>
-                <p className="text-[10px] text-gray-500">{t.dashboard.healthScore}</p>
+                <p className="text-[11px] text-gray-500">{t.dashboard.healthScore}</p>
               </div>
             </div>
 
@@ -742,15 +742,15 @@ function PlotCard({ plot }: { plot: FarmPlot }) {
                 <Timer className="w-4 h-4 text-gold" />
                 <span className="text-xl font-bold text-gold">{plot.daysToHarvest}</span>
               </div>
-              <p className="text-[10px] text-gray-500">{t.dashboard.daysToHarvest}</p>
+              <p className="text-[11px] text-gray-500">{t.dashboard.daysToHarvest}</p>
             </div>
           </div>
 
           {/* Progress Bar */}
           <div className="mb-3">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-[10px] font-medium text-gray-500">{t.cropTracker.growthTimeline}</span>
-              <span className="text-[10px] font-bold text-navy">{plot.progressPercent}%</span>
+              <span className="text-[11px] font-medium text-gray-500">{t.cropTracker.growthTimeline}</span>
+              <span className="text-[11px] font-bold text-navy">{plot.progressPercent}%</span>
             </div>
             <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
               <motion.div
@@ -760,7 +760,7 @@ function PlotCard({ plot }: { plot: FarmPlot }) {
                 transition={{ duration: 0.8, ease: 'easeOut' as const }}
               />
             </div>
-            <p className="text-[10px] text-gray-400 mt-0.5">
+            <p className="text-[11px] text-gray-400 mt-0.5">
               Stage: {stageLabels[plot.stage]}
             </p>
           </div>
@@ -820,18 +820,18 @@ function PlotCard({ plot }: { plot: FarmPlot }) {
                     className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl bg-teal/10 text-teal active:bg-teal/20 transition-colors min-h-[64px]"
                   >
                     <ClipboardPlus className="w-5 h-5" />
-                    <span className="text-[10px] font-semibold">{t.cropTracker.logActivity}</span>
+                    <span className="text-[11px] font-semibold">{t.cropTracker.logActivity}</span>
                   </button>
                   <Link
                     href="/farm/doctor"
                     className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl bg-amber-50 text-amber-600 active:bg-amber-100 transition-colors min-h-[64px]"
                   >
                     <Camera className="w-5 h-5" />
-                    <span className="text-[10px] font-semibold">{t.cropTracker.scanCrop}</span>
+                    <span className="text-[11px] font-semibold">{t.cropTracker.scanCrop}</span>
                   </Link>
                   <button className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl bg-blue-50 text-blue-600 active:bg-blue-100 transition-colors min-h-[64px]">
                     <History className="w-5 h-5" />
-                    <span className="text-[10px] font-semibold">{t.cropTracker.viewHistory}</span>
+                    <span className="text-[11px] font-semibold">{t.cropTracker.viewHistory}</span>
                   </button>
                 </div>
               </div>
@@ -879,7 +879,7 @@ export default function CropsPage() {
         initial="rest"
         whileHover="hover"
         whileTap="tap"
-        className="fixed bottom-24 right-4 z-30 w-14 h-14 rounded-full bg-teal text-white shadow-lg shadow-teal/30 flex items-center justify-center max-w-lg"
+        className="fixed bottom-28 right-4 z-30 w-14 h-14 rounded-full bg-teal text-white shadow-lg shadow-teal/30 flex items-center justify-center max-w-lg"
         aria-label="Add new plot"
       >
         <Plus className="w-6 h-6" />

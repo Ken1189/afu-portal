@@ -83,6 +83,31 @@ html {
   animation: bounce-slow 2s ease-in-out infinite;
 }
 
+/* ─── Mobile Utilities ─── */
+
+/* Safe area padding for devices with home indicator (iPhone X+, etc.) */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.safe-area-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* Hide scrollbar on horizontal scroll containers */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Touch-friendly: ensure minimum touch targets */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
 /* Gradient line animation */
 @keyframes gradient-flow {
   0% {

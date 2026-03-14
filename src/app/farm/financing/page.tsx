@@ -119,7 +119,7 @@ export default function FinancingPage() {
         {tab === 'loans' && (
           <button
             onClick={handleApply}
-            className="bg-teal hover:bg-teal-dark text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors flex items-center gap-2 self-start sm:self-auto"
+            className="bg-teal hover:bg-teal-dark active:bg-teal-dark text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors flex items-center gap-2 self-start sm:self-auto"
           >
             <Wallet className="w-4 h-4" />
             {tf.applyNow}
@@ -243,7 +243,7 @@ export default function FinancingPage() {
                 })}
               </div>
             ) : (
-              <div className="bg-white rounded-xl border border-gray-100 p-8 text-center">
+              <div className="bg-white rounded-xl border border-gray-100 p-5 sm:p-8 text-center">
                 <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Wallet className="w-8 h-8 text-gray-400" />
                 </div>
@@ -293,12 +293,12 @@ export default function FinancingPage() {
           >
             {submitted ? (
               /* ── Success Screen ── */
-              <div className="bg-white rounded-xl border border-gray-100 p-8 text-center">
+              <div className="bg-white rounded-xl border border-gray-100 p-5 sm:p-8 text-center">
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ type: 'spring' as const, stiffness: 200, damping: 15 }}
-                  className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4"
+                  className="w-16 h-16 sm:w-20 sm:h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4"
                 >
                   <CheckCircle2 className="w-10 h-10 text-green-600" />
                 </motion.div>
@@ -371,7 +371,7 @@ export default function FinancingPage() {
                                 className={`p-4 rounded-xl border-2 text-left transition-all ${
                                   selected
                                     ? 'border-teal bg-teal/5'
-                                    : 'border-gray-100 hover:border-gray-200'
+                                    : 'border-gray-100 hover:border-gray-200 active:border-gray-300'
                                 }`}
                               >
                                 <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-2 ${
@@ -403,10 +403,10 @@ export default function FinancingPage() {
                             <button
                               key={amt}
                               onClick={() => setFormData({ ...formData, amount: amt })}
-                              className={`py-3 rounded-xl text-sm font-medium border-2 transition-all ${
+                              className={`py-3 min-h-[44px] rounded-xl text-sm font-medium border-2 transition-all ${
                                 formData.amount === amt
                                   ? 'border-teal bg-teal/5 text-teal'
-                                  : 'border-gray-100 text-gray-600 hover:border-gray-200'
+                                  : 'border-gray-100 text-gray-600 hover:border-gray-200 active:border-gray-300'
                               }`}
                             >
                               P {amt.toLocaleString()}
@@ -451,6 +451,7 @@ export default function FinancingPage() {
                           <label className="text-sm font-medium text-navy block mb-2">{tf.farmSize}</label>
                           <input
                             type="number"
+                            inputMode="decimal"
                             value={formData.farmSize}
                             onChange={(e) => setFormData({ ...formData, farmSize: e.target.value })}
                             placeholder="e.g. 5.3"
@@ -461,6 +462,7 @@ export default function FinancingPage() {
                           <label className="text-sm font-medium text-navy block mb-2">{tf.yearsExperience}</label>
                           <input
                             type="number"
+                            inputMode="decimal"
                             value={formData.experience}
                             onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
                             placeholder="e.g. 5"
@@ -476,7 +478,7 @@ export default function FinancingPage() {
                     {step > 0 && (
                       <button
                         onClick={() => setStep(step - 1)}
-                        className="px-5 py-2.5 rounded-xl text-sm font-medium text-gray-500 border border-gray-200 hover:bg-gray-50 transition-colors"
+                        className="px-5 py-2.5 min-h-[44px] rounded-xl text-sm font-medium text-gray-500 border border-gray-200 hover:bg-gray-50 active:bg-gray-100 transition-colors"
                       >
                         {t.common.back}
                       </button>
@@ -485,9 +487,9 @@ export default function FinancingPage() {
                       <button
                         onClick={() => canProceed() && setStep(step + 1)}
                         disabled={!canProceed()}
-                        className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-2 ${
+                        className={`flex-1 py-2.5 min-h-[44px] rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-2 ${
                           canProceed()
-                            ? 'bg-teal text-white hover:bg-teal-dark'
+                            ? 'bg-teal text-white hover:bg-teal-dark active:bg-teal-dark'
                             : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                         }`}
                       >
@@ -498,9 +500,9 @@ export default function FinancingPage() {
                       <button
                         onClick={handleSubmit}
                         disabled={!canProceed()}
-                        className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-2 ${
+                        className={`flex-1 py-2.5 min-h-[44px] rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-2 ${
                           canProceed()
-                            ? 'bg-teal text-white hover:bg-teal-dark'
+                            ? 'bg-teal text-white hover:bg-teal-dark active:bg-teal-dark'
                             : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                         }`}
                       >

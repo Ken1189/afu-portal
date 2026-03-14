@@ -537,7 +537,7 @@ export default function CropDoctorPage() {
               />
               <button
                 onClick={() => cameraInputRef.current?.click()}
-                className="w-full h-32 bg-gradient-to-br from-teal to-teal-dark text-white rounded-2xl flex flex-col items-center justify-center gap-2 shadow-lg shadow-teal/20 active:scale-[0.98] transition-transform"
+                className="w-full h-24 sm:h-32 bg-gradient-to-br from-teal to-teal-dark text-white rounded-2xl flex flex-col items-center justify-center gap-2 shadow-lg shadow-teal/20 active:scale-[0.98] transition-transform"
               >
                 <Camera className="w-10 h-10" />
                 <span className="text-base font-bold">{t.cropDoctor.takePhoto}</span>
@@ -582,7 +582,7 @@ export default function CropDoctorPage() {
                   t.cropDoctor.tip4,
                 ].map((tip, i) => (
                   <li key={i} className="text-xs text-amber-700 flex items-start gap-2">
-                    <span className="w-4 h-4 bg-amber-200 text-amber-800 rounded-full flex items-center justify-center flex-shrink-0 text-[10px] font-bold mt-0.5">
+                    <span className="w-4 h-4 bg-amber-200 text-amber-800 rounded-full flex items-center justify-center flex-shrink-0 text-[11px] font-bold mt-0.5">
                       {i + 1}
                     </span>
                     {tip}
@@ -738,7 +738,7 @@ export default function CropDoctorPage() {
           <motion.div
             key="results"
             {...pageTransition}
-            className="p-4 space-y-5 pb-8"
+            className="p-4 space-y-5 pb-12"
           >
             {/* Header */}
             <motion.div variants={fadeUp} initial="initial" animate="animate">
@@ -800,13 +800,13 @@ export default function CropDoctorPage() {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="bg-gray-50 rounded-xl p-3 text-center">
-                  <p className="text-[10px] text-gray-400 uppercase tracking-wide font-semibold mb-0.5">
+                  <p className="text-[11px] text-gray-400 uppercase tracking-wide font-semibold mb-0.5">
                     {t.cropDoctor.confidence}
                   </p>
                   <p className="text-lg font-bold text-navy">{result.confidence}%</p>
                 </div>
                 <div className="bg-gray-50 rounded-xl p-3 text-center">
-                  <p className="text-[10px] text-gray-400 uppercase tracking-wide font-semibold mb-0.5">
+                  <p className="text-[11px] text-gray-400 uppercase tracking-wide font-semibold mb-0.5">
                     {t.cropDoctor.affectedArea}
                   </p>
                   <p className="text-lg font-bold text-navy">{result.affectedArea}%</p>
@@ -872,7 +872,7 @@ export default function CropDoctorPage() {
                         </div>
                         <Link
                           href="/dashboard/inputs"
-                          className="bg-teal text-white text-xs font-bold px-4 py-2 rounded-xl flex items-center gap-1.5 active:bg-teal-dark transition-colors"
+                          className="bg-teal text-white text-xs font-bold px-4 py-2 min-h-[44px] rounded-xl flex items-center gap-1.5 active:bg-teal-dark transition-colors"
                         >
                           <ShoppingCart className="w-3.5 h-3.5" />
                           {t.cropDoctor.buyNow}

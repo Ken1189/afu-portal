@@ -297,7 +297,7 @@ function ChatMessage({ message }: { message: AIMessage }) {
 
       {/* Message bubble */}
       <div
-        className={`max-w-[85%] ${
+        className={`max-w-[85%] sm:max-w-md ${
           isAssistant
             ? 'order-2'
             : 'order-1'
@@ -307,7 +307,7 @@ function ChatMessage({ message }: { message: AIMessage }) {
         {isAssistant && (
           <div className="flex items-center gap-1.5 mb-1 ml-1">
             <Sparkles size={10} className="text-teal" />
-            <span className="text-[10px] font-semibold text-teal">{t.aiAssistant.title}</span>
+            <span className="text-[11px] font-semibold text-teal">{t.aiAssistant.title}</span>
           </div>
         )}
 
@@ -347,7 +347,7 @@ function ChatMessage({ message }: { message: AIMessage }) {
 
         {/* Timestamp */}
         <p
-          className={`text-[10px] mt-1 ${
+          className={`text-[11px] mt-1 ${
             isAssistant ? 'text-gray-400 ml-1' : 'text-gray-400 text-right mr-1'
           }`}
         >
@@ -464,9 +464,9 @@ export default function AssistantPage() {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100dvh-52px-60px)] bg-gray-50">
+    <div className="flex flex-col h-[calc(100dvh-52px-72px)] bg-gray-50">
       {/* ─── Header Enhancement ─── */}
-      <div className="bg-white border-b border-gray-100 px-4 py-2.5">
+      <div className="bg-white border-b border-gray-100 px-4 py-2">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-full bg-gradient-to-br from-teal to-teal-dark flex items-center justify-center">
             <Bot size={18} className="text-white" />
@@ -476,7 +476,7 @@ export default function AssistantPage() {
               <span className="text-sm font-bold text-navy">{t.aiAssistant.title}</span>
               <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
             </div>
-            <p className="text-[10px] text-gray-400">
+            <p className="text-[11px] text-gray-400">
               {t.aiAssistant.poweredBy} &middot; {t.aiAssistant.online}
             </p>
           </div>
@@ -514,7 +514,7 @@ export default function AssistantPage() {
               whileTap={{ scale: 0.95 }}
               onClick={() => handleChipTap(chip.label)}
               disabled={isTyping}
-              className="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-full bg-white border border-gray-200 text-[12px] font-medium text-gray-600 active:bg-gray-50 active:border-teal/30 transition-colors disabled:opacity-50 min-h-[36px]"
+              className="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-full bg-white border border-gray-200 text-[12px] font-medium text-gray-600 active:bg-gray-50 active:border-teal/30 active:scale-95 transition-all disabled:opacity-50 min-h-[36px]"
             >
               <span className="whitespace-nowrap">{chip.label}</span>
             </motion.button>

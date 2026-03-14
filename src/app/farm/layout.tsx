@@ -151,8 +151,8 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
             >
               <Menu className="w-5 h-5" />
             </button>
-            <div>
-              <h1 className="text-base font-bold text-navy leading-tight">{getPageTitle()}</h1>
+            <div className="min-w-0 flex-1">
+              <h1 className="text-base font-bold text-navy leading-tight truncate">{getPageTitle()}</h1>
               <p className="text-[11px] text-gray-400 leading-tight">Kgosi Mosweu • 5.3 ha</p>
             </div>
           </div>
@@ -271,7 +271,7 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
                 animate={{ x: 0 }}
                 exit={{ x: '-100%' }}
                 transition={{ type: 'spring' as const, stiffness: 300, damping: 30 }}
-                className="fixed top-0 left-0 bottom-0 z-50 w-72 bg-white shadow-2xl flex flex-col"
+                className="fixed top-0 left-0 bottom-0 z-50 w-[85vw] max-w-72 bg-white shadow-2xl flex flex-col"
               >
                 <div className="bg-gradient-to-br from-navy to-teal p-5 text-white">
                   <div className="flex items-center justify-between mb-4">
@@ -356,14 +356,14 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
         </AnimatePresence>
 
         {/* ─── Page Content ─── */}
-        <main className="flex-1 pb-20 lg:pb-6 overflow-y-auto">
+        <main className="flex-1 pb-24 lg:pb-6 overflow-y-auto">
           <div className="max-w-5xl mx-auto">{children}</div>
         </main>
       </div>
 
       {/* ─── Mobile Bottom Navigation (hidden on desktop) ─── */}
       <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-100 safe-area-bottom">
-        <div className="flex items-center justify-around py-1.5">
+        <div className="flex items-center justify-evenly py-1">
           {bottomNavLinks.map((link) => {
             const active = isActive(link.href);
             const Icon = link.icon;
@@ -371,8 +371,8 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl min-w-[60px] transition-colors ${
-                  active ? 'text-teal' : 'text-gray-400 active:text-gray-600'
+                className={`flex flex-col items-center justify-center gap-0.5 px-2 py-1.5 rounded-xl min-w-[56px] min-h-[48px] transition-colors active:bg-gray-50 ${
+                  active ? 'text-teal' : 'text-gray-400'
                 }`}
               >
                 <div className="relative">
@@ -381,7 +381,7 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
                   )}
                   <Icon className={`w-5 h-5 ${active ? 'stroke-[2.5]' : ''}`} />
                 </div>
-                <span className={`text-[10px] font-medium ${active ? 'font-semibold' : ''}`}>
+                <span className={`text-[11px] font-medium leading-tight ${active ? 'font-semibold' : ''}`}>
                   {t.common[link.shortKey]}
                 </span>
               </Link>

@@ -341,12 +341,12 @@ function JournalCard({
             {/* Plot badge + cost */}
             <div className="flex items-center gap-2 mt-1 flex-wrap">
               {entry.plotName && (
-                <span className="text-[10px] font-semibold bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">
+                <span className="text-[11px] font-semibold bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">
                   {entry.plotName}
                 </span>
               )}
               {entry.cost != null && entry.cost > 0 && (
-                <span className="text-[10px] font-bold bg-red-50 text-red-600 px-2 py-0.5 rounded-full">
+                <span className="text-[11px] font-bold bg-red-50 text-red-600 px-2 py-0.5 rounded-full">
                   - ${entry.cost}
                 </span>
               )}
@@ -384,13 +384,13 @@ function JournalCard({
           >
             <div className="px-4 pb-4 space-y-3">
               {/* Full description */}
-              <p className="text-xs text-gray-600 leading-relaxed pl-[52px]">
+              <p className="text-xs text-gray-600 leading-relaxed pl-10 sm:pl-[52px]">
                 {entry.description}
               </p>
 
               {/* Photo */}
               {entry.photo && (
-                <div className="pl-[52px]">
+                <div className="pl-10 sm:pl-[52px]">
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -408,17 +408,17 @@ function JournalCard({
               )}
 
               {/* Detail chips row */}
-              <div className="flex items-center gap-2 flex-wrap pl-[52px]">
-                <span className={`text-[10px] font-semibold ${cfg.bgColor} ${cfg.color} px-2 py-0.5 rounded-full`}>
+              <div className="flex items-center gap-2 flex-wrap pl-10 sm:pl-[52px]">
+                <span className={`text-[11px] font-semibold ${cfg.bgColor} ${cfg.color} px-2 py-0.5 rounded-full`}>
                   {t.farmJournal.activities[activityTranslationKey[entry.type]]}
                 </span>
                 {entry.mood && (
-                  <span className="text-[10px] font-medium bg-gray-50 text-gray-500 px-2 py-0.5 rounded-full">
+                  <span className="text-[11px] font-medium bg-gray-50 text-gray-500 px-2 py-0.5 rounded-full">
                     {moodEmoji[entry.mood]} {t.farmJournal.moods[entry.mood as keyof typeof t.farmJournal.moods]}
                   </span>
                 )}
                 {entry.weather && (
-                  <span className="text-[10px] font-medium bg-gray-50 text-gray-500 px-2 py-0.5 rounded-full capitalize">
+                  <span className="text-[11px] font-medium bg-gray-50 text-gray-500 px-2 py-0.5 rounded-full capitalize">
                     {entry.weather.replace('-', ' ')}
                   </span>
                 )}
@@ -467,7 +467,7 @@ function PhotoGallery({
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-            <span className="absolute bottom-1.5 left-2 text-[10px] font-semibold text-white">
+            <span className="absolute bottom-1.5 left-2 text-[11px] font-semibold text-white">
               {new Date(entry.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
             </span>
           </motion.button>
@@ -550,19 +550,19 @@ function NewEntryForm({ onClose, onSave }: { onClose: () => void; onSave: (entry
           <h2 className="text-base font-bold text-navy">New Journal Entry</h2>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 active:bg-gray-200"
+            className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 active:bg-gray-100 transition-colors"
           >
             <X className="w-4 h-4 text-gray-500" />
           </button>
         </div>
 
-        <div className="px-5 pb-8 space-y-5">
+        <div className="px-5 pb-12 space-y-5">
           {/* Activity Type Selector */}
           <div>
             <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">
               {t.farmJournal.activityType}
             </label>
-            <div className="grid grid-cols-5 gap-2">
+            <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
               {(Object.keys(activityConfig) as ActivityType[]).map((type) => {
                 const cfg = activityConfig[type];
                 const Icon = cfg.icon;
@@ -578,7 +578,7 @@ function NewEntryForm({ onClose, onSave }: { onClose: () => void; onSave: (entry
                     }`}
                   >
                     <Icon className="w-5 h-5" />
-                    <span className="text-[9px] font-semibold leading-tight text-center">
+                    <span className="text-[10px] font-semibold leading-tight text-center">
                       {t.farmJournal.activities[activityTranslationKey[type]]}
                     </span>
                   </button>
@@ -680,12 +680,12 @@ function NewEntryForm({ onClose, onSave }: { onClose: () => void; onSave: (entry
             <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">
               {t.farmJournal.howAreYou}
             </label>
-            <div className="flex items-center gap-2 justify-between">
+            <div className="flex items-center gap-2 justify-between overflow-x-auto scrollbar-hide">
               {moodOptions.map((m) => (
                 <button
                   key={m.key}
                   onClick={() => setMood(mood === m.key ? undefined : m.key)}
-                  className={`flex flex-col items-center gap-0.5 px-2 py-2 rounded-xl transition-all min-w-[52px] min-h-[52px] ${
+                  className={`flex flex-col items-center gap-0.5 px-2 py-2 rounded-xl transition-all min-w-[48px] min-h-[52px] ${
                     mood === m.key
                       ? 'bg-teal/10 ring-2 ring-teal/40'
                       : 'bg-gray-50 active:bg-gray-100'
@@ -748,7 +748,7 @@ function PhotoViewer({ url, onClose }: { url: string; onClose: () => void }) {
       >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 w-10 h-10 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center z-10"
+          className="absolute top-4 right-4 w-10 h-10 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center z-10 active:bg-gray-100 transition-colors"
         >
           <X className="w-5 h-5 text-white" />
         </button>
@@ -883,7 +883,7 @@ export default function FarmJournalPage() {
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-bold text-navy">{formatDateHeader(date, t.common.today, t.common.yesterday)}</span>
                     <div className="flex-1 h-px bg-gray-100" />
-                    <span className="text-[10px] text-gray-400 font-medium">
+                    <span className="text-[11px] text-gray-400 font-medium">
                       {grouped[date].length} {grouped[date].length === 1 ? 'entry' : 'entries'}
                     </span>
                   </div>

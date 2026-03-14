@@ -314,9 +314,9 @@ export default function FarmDashboardPage() {
                 </div>
                 <button
                   onClick={() => setSelectedWeatherDay(null)}
-                  className="shrink-0 w-6 h-6 flex items-center justify-center rounded-full hover:bg-teal/10"
+                  className="shrink-0 w-8 h-8 flex items-center justify-center rounded-full active:bg-teal/10 transition-colors"
                 >
-                  <X size={12} className="text-gray-400" />
+                  <X size={14} className="text-gray-400" />
                 </button>
               </div>
             </motion.div>
@@ -439,16 +439,18 @@ export default function FarmDashboardPage() {
                   task.completed ? 'bg-gray-50/50' : ''
                 }`}
               >
-                {/* Checkbox */}
+                {/* Checkbox — padded touch area */}
                 <button
                   onClick={() => toggleTask(task.id)}
-                  className={`shrink-0 mt-0.5 w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${
+                  className="shrink-0 p-1.5 -m-1.5 touch-target flex items-center justify-center"
+                >
+                  <span className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${
                     task.completed
                       ? 'bg-teal border-teal'
                       : 'border-gray-200 active:border-teal'
-                  }`}
-                >
-                  {task.completed && <Check size={14} className="text-white" />}
+                  }`}>
+                    {task.completed && <Check size={14} className="text-white" />}
+                  </span>
                 </button>
 
                 {/* Task details */}
@@ -506,7 +508,7 @@ export default function FarmDashboardPage() {
               <div className="w-7 h-7 rounded-lg bg-green-50 flex items-center justify-center">
                 <TrendingUp size={14} className="text-green-600" />
               </div>
-              <span className="text-[11px] text-gray-400">{t.dashboard.totalIncome}</span>
+              <span className="text-[11px] text-gray-400 truncate">{t.dashboard.totalIncome}</span>
             </div>
             <p className="text-lg font-bold text-green-600">
               ${summary.totalIncome.toLocaleString()}
@@ -522,7 +524,7 @@ export default function FarmDashboardPage() {
               <div className="w-7 h-7 rounded-lg bg-red-50 flex items-center justify-center">
                 <TrendingDown size={14} className="text-red-500" />
               </div>
-              <span className="text-[11px] text-gray-400">{t.dashboard.totalExpenses}</span>
+              <span className="text-[11px] text-gray-400 truncate">{t.dashboard.totalExpenses}</span>
             </div>
             <p className="text-lg font-bold text-red-500">
               ${summary.totalExpenses.toLocaleString()}
@@ -538,7 +540,7 @@ export default function FarmDashboardPage() {
               <div className="w-7 h-7 rounded-lg bg-teal-light flex items-center justify-center">
                 <TrendingUp size={14} className="text-teal" />
               </div>
-              <span className="text-[11px] text-gray-400">{t.dashboard.profit}</span>
+              <span className="text-[11px] text-gray-400 truncate">{t.dashboard.profit}</span>
             </div>
             <p className="text-lg font-bold text-teal">
               ${summary.profit.toLocaleString()}
@@ -554,7 +556,7 @@ export default function FarmDashboardPage() {
               <div className="w-7 h-7 rounded-lg bg-amber-50 flex items-center justify-center">
                 <Heart size={14} className="text-gold" />
               </div>
-              <span className="text-[11px] text-gray-400">{t.dashboard.healthScore}</span>
+              <span className="text-[11px] text-gray-400 truncate">{t.dashboard.healthScore}</span>
             </div>
             <p className="text-lg font-bold text-gold">
               {summary.avgHealthScore}

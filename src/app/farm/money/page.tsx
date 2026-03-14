@@ -330,7 +330,7 @@ export default function MoneyTrackerPage() {
                 {t.moneyTracker.thisSeason}
               </p>
               <motion.p
-                className="text-[32px] font-extrabold leading-tight"
+                className="text-2xl sm:text-[32px] font-extrabold leading-tight"
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ type: 'spring' as const, stiffness: 200, damping: 18, delay: 0.2 }}
@@ -340,7 +340,7 @@ export default function MoneyTrackerPage() {
               <p className="text-sm text-white/80 font-medium mt-0.5">{t.moneyTracker.profit}</p>
 
               {/* Income / Expenses row */}
-              <div className="flex items-center justify-center gap-6 mt-4">
+              <div className="flex items-center justify-center gap-4 sm:gap-6 mt-4">
                 <div className="flex items-center gap-2">
                   <div className="w-7 h-7 rounded-full bg-white/15 flex items-center justify-center">
                     <TrendingUp size={14} />
@@ -391,7 +391,7 @@ export default function MoneyTrackerPage() {
         {/* 3. FILTER TABS                                                    */}
         {/* ================================================================= */}
         <motion.section variants={itemVariants} className="px-4">
-          <div className="flex gap-2">
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide">
             {([
               { key: 'all' as FilterTab, label: t.moneyTracker.all, count: transactions.length },
               { key: 'income' as FilterTab, label: t.moneyTracker.income, count: incomeCount },
@@ -402,7 +402,7 @@ export default function MoneyTrackerPage() {
                 onClick={() => setFilter(tab.key)}
                 className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all min-h-[44px] ${
                   filter === tab.key
-                    ? 'bg-navy text-white shadow-sm'
+                    ? 'bg-navy text-white shadow-sm active:bg-navy/90'
                     : 'bg-white text-gray-500 border border-gray-200 active:bg-gray-50'
                 }`}
               >
@@ -449,7 +449,7 @@ export default function MoneyTrackerPage() {
                       >
                         <button
                           onClick={() => setExpandedTxn(isExpanded ? null : txn.id)}
-                          className="w-full flex items-center gap-3 p-3 min-h-[56px] text-left"
+                          className="w-full flex items-center gap-3 p-3 min-h-[56px] text-left active:bg-gray-50 transition-colors"
                         >
                           {/* Category icon */}
                           <div
@@ -478,7 +478,7 @@ export default function MoneyTrackerPage() {
                                 <span className="text-[11px] text-gray-300">&middot;</span>
                               )}
                               <span
-                                className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${config.bg} ${config.color}`}
+                                className={`text-[11px] font-medium px-1.5 py-0.5 rounded-full ${config.bg} ${config.color}`}
                               >
                                 {t.moneyTracker.categories[categoryTranslationKey[txn.category]]}
                               </span>
@@ -509,13 +509,13 @@ export default function MoneyTrackerPage() {
                                 <div className="grid grid-cols-2 gap-2 mt-2">
                                   {txn.buyer && (
                                     <div>
-                                      <p className="text-[10px] text-gray-400 uppercase">Buyer</p>
+                                      <p className="text-[11px] text-gray-400 uppercase">Buyer</p>
                                       <p className="text-xs text-navy font-medium">{txn.buyer}</p>
                                     </div>
                                   )}
                                   {txn.quantity != null && (
                                     <div>
-                                      <p className="text-[10px] text-gray-400 uppercase">Quantity</p>
+                                      <p className="text-[11px] text-gray-400 uppercase">Quantity</p>
                                       <p className="text-xs text-navy font-medium">
                                         {txn.quantity} {txn.unit}
                                       </p>
@@ -523,14 +523,14 @@ export default function MoneyTrackerPage() {
                                   )}
                                   {txn.pricePerUnit != null && (
                                     <div>
-                                      <p className="text-[10px] text-gray-400 uppercase">Unit Price</p>
+                                      <p className="text-[11px] text-gray-400 uppercase">Unit Price</p>
                                       <p className="text-xs text-navy font-medium">
                                         ${txn.pricePerUnit}/{txn.unit}
                                       </p>
                                     </div>
                                   )}
                                   <div>
-                                    <p className="text-[10px] text-gray-400 uppercase">{t.moneyTracker.date}</p>
+                                    <p className="text-[11px] text-gray-400 uppercase">{t.moneyTracker.date}</p>
                                     <p className="text-xs text-navy font-medium">
                                       {new Date(txn.date + 'T00:00:00').toLocaleDateString('en-GB', {
                                         day: 'numeric',
@@ -671,7 +671,7 @@ export default function MoneyTrackerPage() {
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-end justify-center"
+            className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-end sm:items-center justify-center"
             onClick={() => setModalOpen(false)}
           >
             <motion.div
@@ -680,7 +680,7 @@ export default function MoneyTrackerPage() {
               animate="visible"
               exit="exit"
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-lg bg-white rounded-t-3xl p-5 pb-8 max-h-[85vh] overflow-y-auto"
+              className="w-full max-w-lg bg-white rounded-t-3xl sm:rounded-2xl p-5 pb-8 max-h-[85vh] overflow-y-auto"
             >
               {/* Modal header */}
               <div className="flex items-center justify-between mb-5">
@@ -689,7 +689,7 @@ export default function MoneyTrackerPage() {
                 </h2>
                 <button
                   onClick={() => setModalOpen(false)}
-                  className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 active:bg-gray-200 transition-colors"
+                  className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 active:bg-gray-200 transition-colors"
                 >
                   <X size={18} className="text-gray-500" />
                 </button>
@@ -720,7 +720,7 @@ export default function MoneyTrackerPage() {
                 <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 block">
                   {t.moneyTracker.category}
                 </label>
-                <div className="grid grid-cols-4 gap-2">
+                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
                   {(modalType === 'income' ? incomeCategories : expenseCategories).map(
                     (cat) => {
                       const config = categoryConfig[cat];
@@ -743,7 +743,7 @@ export default function MoneyTrackerPage() {
                             className={isSelected ? (modalType === 'income' ? 'text-green-600' : 'text-red-500') : 'text-gray-400'}
                           />
                           <span
-                            className={`text-[10px] font-medium leading-tight text-center ${
+                            className={`text-[11px] font-medium leading-tight text-center ${
                               isSelected ? 'text-navy' : 'text-gray-500'
                             }`}
                           >
