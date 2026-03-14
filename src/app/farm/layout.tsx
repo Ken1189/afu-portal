@@ -13,29 +13,46 @@ import {
   ChevronLeft,
   Menu,
   X,
+  Wallet,
+  Globe,
 } from 'lucide-react';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { LanguageProvider, useLanguage } from '@/lib/i18n/LanguageContext';
+import { localeNames, localeFlags, type Locale } from '@/lib/i18n/translations';
 
 const navLinks = [
-  { href: '/farm', label: 'Farm Dashboard', shortLabel: 'Home', icon: Home },
-  { href: '/farm/crops', label: 'My Crops', shortLabel: 'Crops', icon: Sprout },
-  { href: '/farm/doctor', label: 'Crop Doctor', shortLabel: 'Doctor', icon: Camera },
-  { href: '/farm/money', label: 'Money Tracker', shortLabel: 'Money', icon: DollarSign },
-  { href: '/farm/journal', label: 'Farm Journal', shortLabel: 'Journal', icon: BookOpen },
-  { href: '/farm/assistant', label: 'AI Assistant', shortLabel: 'AI Chat', icon: Bot },
+  { href: '/farm', labelKey: 'home' as const, shortKey: 'home' as const, icon: Home },
+  { href: '/farm/crops', labelKey: 'crops' as const, shortKey: 'crops' as const, icon: Sprout },
+  { href: '/farm/doctor', labelKey: 'doctor' as const, shortKey: 'doctor' as const, icon: Camera },
+  { href: '/farm/money', labelKey: 'money' as const, shortKey: 'money' as const, icon: DollarSign },
+  { href: '/farm/financing', labelKey: 'financing' as const, shortKey: 'financing' as const, icon: Wallet },
+  { href: '/farm/journal', labelKey: 'journal' as const, shortKey: 'journal' as const, icon: BookOpen },
+  { href: '/farm/assistant', labelKey: 'assistant' as const, shortKey: 'assistant' as const, icon: Bot },
 ];
 
-const bottomNavLinks = navLinks.slice(0, 5); // First 5 for bottom nav
+// Bottom nav: Home, Crops, Doctor, Money, Financing (5 tabs)
+const bottomNavKeys = ['home', 'crops', 'doctor', 'money', 'financing'] as const;
+const bottomNavLinks = navLinks.filter(l => (bottomNavKeys as readonly string[]).includes(l.labelKey));
 
 export default function FarmLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <LanguageProvider>
+      <FarmLayoutInner>{children}</FarmLayoutInner>
+    </LanguageProvider>
+  );
+}
+
+function FarmLayoutInner({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
+  const { locale, setLocale, t } = useLanguage();
 
   const getPageTitle = () => {
     if (pathname === '/farm') return 'Mkulima Hub';
     const link = navLinks.find((l) => pathname.startsWith(l.href) && l.href !== '/farm');
-    return link?.label || 'Mkulima Hub';
+    return link ? t.common[link.labelKey] : 'Mkulima Hub';
   };
 
   const isActive = (href: string) =>
@@ -80,8 +97,8 @@ export default function FarmLayout({ children }: { children: React.ReactNode }) 
                 }`}
               >
                 <Icon className="w-5 h-5" />
-                {link.label}
-                {link.label === 'AI Assistant' && !active && (
+                {t.common[link.labelKey]}
+                {link.labelKey === 'assistant' && !active && (
                   <span className="ml-auto text-[10px] font-bold bg-gold/20 text-gold px-2 py-0.5 rounded-full">
                     AI
                   </span>
@@ -91,6 +108,26 @@ export default function FarmLayout({ children }: { children: React.ReactNode }) 
           })}
         </nav>
 
+        {/* Language Selector */}
+        <div className="px-3 py-2 border-t border-gray-100">
+          <p className="text-[10px] uppercase tracking-wider text-gray-400 px-4 mb-1">{t.common.language}</p>
+          <div className="flex gap-1 px-2">
+            {(Object.keys(localeNames) as Locale[]).map((loc) => (
+              <button
+                key={loc}
+                onClick={() => setLocale(loc)}
+                className={`flex-1 text-xs py-1.5 rounded-lg font-medium transition-colors ${
+                  locale === loc
+                    ? 'bg-teal text-white'
+                    : 'text-gray-500 hover:bg-gray-50'
+                }`}
+              >
+                {localeFlags[loc]} {localeNames[loc]}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Sidebar Footer */}
         <div className="p-3 border-t border-gray-100">
           <Link
@@ -98,7 +135,7 @@ export default function FarmLayout({ children }: { children: React.ReactNode }) 
             className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors"
           >
             <ChevronLeft className="w-5 h-5" />
-            Back to AFU Portal
+            {t.common.backToPortal}
           </Link>
         </div>
       </aside>
@@ -120,6 +157,31 @@ export default function FarmLayout({ children }: { children: React.ReactNode }) 
             </div>
           </div>
           <div className="flex items-center gap-2">
+            {/* Language toggle (mobile) */}
+            <div className="relative">
+              <button
+                onClick={() => setLangOpen(!langOpen)}
+                className="w-9 h-9 flex items-center justify-center rounded-xl bg-gray-50 text-gray-500 active:bg-gray-100 transition-colors text-sm"
+              >
+                {localeFlags[locale]}
+              </button>
+              {langOpen && (
+                <div className="absolute right-0 top-full mt-1 w-36 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50">
+                  {(Object.keys(localeNames) as Locale[]).map((loc) => (
+                    <button
+                      key={loc}
+                      onClick={() => { setLocale(loc); setLangOpen(false); }}
+                      className={`w-full text-left px-3 py-2 text-sm flex items-center gap-2 ${
+                        locale === loc ? 'bg-teal/10 text-teal font-medium' : 'text-gray-600 active:bg-gray-50'
+                      }`}
+                    >
+                      <span>{localeFlags[loc]}</span>
+                      {localeNames[loc]}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
             <Link
               href="/farm/assistant"
               className="w-9 h-9 flex items-center justify-center rounded-xl bg-teal/10 text-teal active:bg-teal/20 transition-colors relative"
@@ -143,12 +205,38 @@ export default function FarmLayout({ children }: { children: React.ReactNode }) 
             <p className="text-xs text-gray-400">Farmer Portal — Mkulima Hub</p>
           </div>
           <div className="flex items-center gap-4">
+            {/* Desktop Language Selector */}
+            <div className="relative">
+              <button
+                onClick={() => setLangOpen(!langOpen)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-gray-500 hover:bg-gray-50 transition-colors border border-gray-200"
+              >
+                <Globe className="w-4 h-4" />
+                <span>{localeFlags[locale]} {localeNames[locale]}</span>
+              </button>
+              {langOpen && (
+                <div className="absolute right-0 top-full mt-1 w-40 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50">
+                  {(Object.keys(localeNames) as Locale[]).map((loc) => (
+                    <button
+                      key={loc}
+                      onClick={() => { setLocale(loc); setLangOpen(false); }}
+                      className={`w-full text-left px-4 py-2 text-sm flex items-center gap-2 transition-colors ${
+                        locale === loc ? 'bg-teal/10 text-teal font-medium' : 'text-gray-600 hover:bg-gray-50'
+                      }`}
+                    >
+                      <span>{localeFlags[loc]}</span>
+                      {localeNames[loc]}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
             <Link
               href="/farm/assistant"
               className="flex items-center gap-2 bg-teal/10 text-teal px-4 py-2 rounded-xl text-sm font-medium hover:bg-teal/20 transition-colors"
             >
               <Bot className="w-4 h-4" />
-              AI Assistant
+              {t.common.assistant}
               <span className="w-2 h-2 bg-green-400 rounded-full" />
             </Link>
             <button className="relative text-gray-400 hover:text-navy transition-colors">
@@ -221,8 +309,8 @@ export default function FarmLayout({ children }: { children: React.ReactNode }) 
                         }`}
                       >
                         <Icon className="w-5 h-5" />
-                        {link.label}
-                        {link.label === 'AI Assistant' && (
+                        {t.common[link.labelKey]}
+                        {link.labelKey === 'assistant' && (
                           <span className="ml-auto text-[10px] font-bold bg-gold/20 text-gold px-2 py-0.5 rounded-full">
                             AI
                           </span>
@@ -232,6 +320,26 @@ export default function FarmLayout({ children }: { children: React.ReactNode }) 
                   })}
                 </nav>
 
+                {/* Language selector in drawer */}
+                <div className="px-3 py-2 border-t border-gray-100">
+                  <p className="text-[10px] uppercase tracking-wider text-gray-400 px-4 mb-1.5">{t.common.language}</p>
+                  <div className="flex gap-1 px-2">
+                    {(Object.keys(localeNames) as Locale[]).map((loc) => (
+                      <button
+                        key={loc}
+                        onClick={() => setLocale(loc)}
+                        className={`flex-1 text-xs py-2 rounded-lg font-medium transition-colors ${
+                          locale === loc
+                            ? 'bg-teal text-white'
+                            : 'text-gray-500 active:bg-gray-100'
+                        }`}
+                      >
+                        {localeFlags[loc]} {localeNames[loc]}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 <div className="p-3 border-t border-gray-100">
                   <Link
                     href="/dashboard"
@@ -239,7 +347,7 @@ export default function FarmLayout({ children }: { children: React.ReactNode }) 
                     className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-500 active:bg-gray-50"
                   >
                     <ChevronLeft className="w-5 h-5" />
-                    Back to AFU Portal
+                    {t.common.backToPortal}
                   </Link>
                 </div>
               </motion.aside>
@@ -274,7 +382,7 @@ export default function FarmLayout({ children }: { children: React.ReactNode }) 
                   <Icon className={`w-5 h-5 ${active ? 'stroke-[2.5]' : ''}`} />
                 </div>
                 <span className={`text-[10px] font-medium ${active ? 'font-semibold' : ''}`}>
-                  {link.shortLabel}
+                  {t.common[link.shortKey]}
                 </span>
               </Link>
             );
