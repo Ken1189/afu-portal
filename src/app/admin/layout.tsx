@@ -1,72 +1,305 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useState } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  LayoutDashboard,
+  Users,
+  FileText,
+  GraduationCap,
+  BarChart3,
+  Landmark,
+  Banknote,
+  ArrowDownToLine,
+  Store,
+  UserCheck,
+  Award,
+  CreditCard,
+  ScrollText,
+  Shield,
+  Settings,
+  UserCog,
+  Bell,
+  ChevronDown,
+  ArrowLeft,
+  Menu,
+  X,
+} from 'lucide-react';
 
-const adminLinks = [
-  { href: "/admin", label: "Dashboard", icon: "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" },
-  { href: "/admin/members", label: "Members", icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" },
-  { href: "/admin/applications", label: "Applications", icon: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" },
-  { href: "/admin/training", label: "Training", icon: "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" },
-  { href: "/admin/reports", label: "Reports", icon: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" },
+// ── Navigation structure with collapsible groups ──
+
+interface NavLink {
+  href: string;
+  label: string;
+  icon: React.ReactNode;
+}
+
+interface NavGroup {
+  label: string;
+  links: NavLink[];
+  defaultOpen?: boolean;
+}
+
+const navGroups: NavGroup[] = [
+  {
+    label: 'Overview',
+    defaultOpen: true,
+    links: [
+      { href: '/admin', label: 'Dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
+    ],
+  },
+  {
+    label: 'Operations',
+    defaultOpen: true,
+    links: [
+      { href: '/admin/members', label: 'Members', icon: <Users className="w-4 h-4" /> },
+      { href: '/admin/applications', label: 'Applications', icon: <FileText className="w-4 h-4" /> },
+      { href: '/admin/training', label: 'Training', icon: <GraduationCap className="w-4 h-4" /> },
+      { href: '/admin/reports', label: 'Reports', icon: <BarChart3 className="w-4 h-4" /> },
+    ],
+  },
+  {
+    label: 'Financial',
+    defaultOpen: true,
+    links: [
+      { href: '/admin/financial', label: 'Financial Mgmt', icon: <Landmark className="w-4 h-4" /> },
+      { href: '/admin/financial/collections', label: 'Collections', icon: <Banknote className="w-4 h-4" /> },
+      { href: '/admin/financial/disbursements', label: 'Disbursements', icon: <ArrowDownToLine className="w-4 h-4" /> },
+      { href: '/admin/payments', label: 'Payments', icon: <CreditCard className="w-4 h-4" /> },
+    ],
+  },
+  {
+    label: 'Marketplace',
+    defaultOpen: false,
+    links: [
+      { href: '/admin/suppliers', label: 'Suppliers', icon: <Store className="w-4 h-4" /> },
+      { href: '/admin/suppliers/sponsorships', label: 'Sponsorships', icon: <Award className="w-4 h-4" /> },
+    ],
+  },
+  {
+    label: 'System',
+    defaultOpen: false,
+    links: [
+      { href: '/admin/audit', label: 'Audit Trail', icon: <ScrollText className="w-4 h-4" /> },
+      { href: '/admin/compliance', label: 'Compliance', icon: <Shield className="w-4 h-4" /> },
+      { href: '/admin/users', label: 'Users', icon: <UserCog className="w-4 h-4" /> },
+      { href: '/admin/notifications', label: 'Notifications', icon: <Bell className="w-4 h-4" /> },
+      { href: '/admin/settings', label: 'Settings', icon: <Settings className="w-4 h-4" /> },
+    ],
+  },
 ];
+
+// ── Collapsible nav group component ──
+
+function NavSection({
+  group,
+  pathname,
+  collapsed,
+  onToggle,
+}: {
+  group: NavGroup;
+  pathname: string;
+  collapsed: boolean;
+  onToggle: () => void;
+}) {
+  const hasActiveLink = group.links.some(
+    (l) => pathname === l.href || pathname.startsWith(l.href + '/')
+  );
+
+  return (
+    <div>
+      <button
+        onClick={onToggle}
+        className="w-full flex items-center justify-between px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-400 hover:text-gray-200 transition-colors"
+      >
+        <span className={hasActiveLink && collapsed ? 'text-teal' : ''}>{group.label}</span>
+        <ChevronDown
+          className={`w-3 h-3 transition-transform duration-200 ${collapsed ? '-rotate-90' : ''}`}
+        />
+      </button>
+      <AnimatePresence initial={false}>
+        {!collapsed && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2, ease: 'easeInOut' }}
+            className="overflow-hidden"
+          >
+            <div className="space-y-0.5 pb-2">
+              {group.links.map((link) => {
+                const isActive =
+                  link.href === '/admin'
+                    ? pathname === '/admin'
+                    : pathname === link.href || pathname.startsWith(link.href + '/');
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium transition-all ${
+                      isActive
+                        ? 'bg-teal text-white shadow-sm shadow-teal/20'
+                        : 'text-gray-300 hover:bg-white/8 hover:text-white'
+                    }`}
+                  >
+                    {link.icon}
+                    {link.label}
+                  </Link>
+                );
+              })}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+// ── Sidebar content (shared between desktop and mobile) ──
+
+function SidebarContent({
+  pathname,
+  collapsedGroups,
+  toggleGroup,
+  onLinkClick,
+}: {
+  pathname: string;
+  collapsedGroups: Record<string, boolean>;
+  toggleGroup: (label: string) => void;
+  onLinkClick?: () => void;
+}) {
+  return (
+    <>
+      <div className="p-5 border-b border-white/10">
+        <Link href="/admin" className="flex items-center gap-2.5" onClick={onLinkClick}>
+          <div className="w-8 h-8 bg-teal rounded-lg flex items-center justify-center">
+            <span className="text-white font-bold text-sm">A</span>
+          </div>
+          <div>
+            <span className="font-bold text-sm">AFU Admin</span>
+            <p className="text-[10px] text-gray-400 -mt-0.5">Control Panel</p>
+          </div>
+        </Link>
+      </div>
+
+      <nav className="flex-1 px-3 py-3 space-y-1 overflow-y-auto scrollbar-hide">
+        {navGroups.map((group) => (
+          <NavSection
+            key={group.label}
+            group={group}
+            pathname={pathname}
+            collapsed={collapsedGroups[group.label] ?? false}
+            onToggle={() => toggleGroup(group.label)}
+          />
+        ))}
+      </nav>
+
+      <div className="p-3 border-t border-white/10">
+        <Link
+          href="/"
+          className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium text-gray-400 hover:bg-white/8 hover:text-white transition-colors"
+          onClick={onLinkClick}
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Site
+        </Link>
+      </div>
+    </>
+  );
+}
+
+// ═══════════════════════════════════════════════════════
+//  MAIN LAYOUT
+// ═══════════════════════════════════════════════════════
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Initialize collapsed state — some groups start collapsed
+  const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>(() => {
+    const initial: Record<string, boolean> = {};
+    navGroups.forEach((g) => {
+      initial[g.label] = !g.defaultOpen;
+    });
+    return initial;
+  });
+
+  const toggleGroup = (label: string) => {
+    setCollapsedGroups((prev) => ({ ...prev, [label]: !prev[label] }));
+  };
 
   return (
     <div className="min-h-screen bg-cream flex">
-      <aside className="hidden lg:flex w-64 bg-navy-dark flex-col text-white">
-        <div className="p-6 border-b border-white/10">
-          <Link href="/admin" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-teal rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">A</span>
-            </div>
-            <div>
-              <span className="font-bold">AFU Admin</span>
-            </div>
-          </Link>
-        </div>
-        <nav className="flex-1 p-4 space-y-1">
-          {adminLinks.map((link) => {
-            const isActive = pathname === link.href;
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                  isActive ? "bg-teal text-white" : "text-gray-300 hover:bg-white/10 hover:text-white"
-                }`}
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={link.icon} />
-                </svg>
-                {link.label}
-              </Link>
-            );
-          })}
-        </nav>
-        <div className="p-4 border-t border-white/10">
-          <Link href="/" className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-gray-400 hover:bg-white/10 hover:text-white transition-colors">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 17l-5-5m0 0l5-5m-5 5h12" />
-            </svg>
-            Back to Site
-          </Link>
-        </div>
+      {/* ── Desktop Sidebar ─────────────────────────────────── */}
+      <aside className="hidden lg:flex w-64 bg-navy-dark flex-col text-white fixed inset-y-0 left-0 z-30">
+        <SidebarContent
+          pathname={pathname}
+          collapsedGroups={collapsedGroups}
+          toggleGroup={toggleGroup}
+        />
       </aside>
 
-      <div className="flex-1 flex flex-col">
-        <header className="bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-navy">Admin Panel</h2>
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-navy rounded-full flex items-center justify-center">
-              <span className="text-white text-sm font-bold">AD</span>
+      {/* ── Mobile Drawer Overlay ───────────────────────────── */}
+      <AnimatePresence>
+        {mobileOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+              onClick={() => setMobileOpen(false)}
+            />
+            <motion.aside
+              initial={{ x: -280 }}
+              animate={{ x: 0 }}
+              exit={{ x: -280 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              className="fixed inset-y-0 left-0 w-[280px] bg-navy-dark text-white z-50 flex flex-col lg:hidden shadow-2xl"
+            >
+              <SidebarContent
+                pathname={pathname}
+                collapsedGroups={collapsedGroups}
+                toggleGroup={toggleGroup}
+                onLinkClick={() => setMobileOpen(false)}
+              />
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* ── Main Content Area ───────────────────────────────── */}
+      <div className="flex-1 flex flex-col lg:ml-64 min-w-0">
+        <header className="bg-white border-b border-gray-100 px-4 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-20">
+          <div className="flex items-center gap-3">
+            <button
+              className="lg:hidden p-2 -ml-2 rounded-lg hover:bg-gray-100 transition-colors"
+              onClick={() => setMobileOpen(true)}
+            >
+              <Menu className="w-5 h-5 text-navy" />
+            </button>
+            <h2 className="text-lg font-semibold text-navy">Admin Panel</h2>
+          </div>
+          <div className="flex items-center gap-3">
+            <button className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors">
+              <Bell className="w-5 h-5 text-gray-500" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
+            </button>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-navy rounded-full flex items-center justify-center">
+                <span className="text-white text-xs font-bold">TC</span>
+              </div>
+              <div className="hidden sm:block">
+                <p className="text-sm font-medium text-navy leading-tight">Tendai C.</p>
+                <p className="text-[10px] text-gray-400 leading-tight">Super Admin</p>
+              </div>
             </div>
-            <span className="text-sm font-medium text-navy">Admin</span>
           </div>
         </header>
-        <main className="flex-1 p-6">{children}</main>
+        <main className="flex-1 p-4 sm:p-6">{children}</main>
       </div>
     </div>
   );
