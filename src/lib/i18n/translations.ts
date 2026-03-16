@@ -28,6 +28,8 @@ export interface Translations {
     journal: string;
     financing: string;
     insurance: string;
+    marketplace: string;
+    logistics: string;
     assistant: string;
     save: string;
     cancel: string;
@@ -334,6 +336,8 @@ export const en: Translations = {
     journal: 'Journal',
     financing: 'Financing',
     insurance: 'Insurance',
+    marketplace: 'Marketplace',
+    logistics: 'Logistics',
     assistant: 'AI Chat',
     save: 'Save',
     cancel: 'Cancel',
@@ -632,6 +636,8 @@ export const sn: Translations = {
     journal: 'Bhuku',
     financing: 'Mafundisi eMari',
     insurance: 'Inishuwarenzi',
+    marketplace: 'Musika',
+    logistics: 'Kutakura',
     assistant: 'AI Rubatsiro',
     save: 'Sevha',
     cancel: 'Kanzura',
@@ -930,6 +936,8 @@ export const nd: Translations = {
     journal: 'Ibhuku',
     financing: 'Imali Yokuboleka',
     insurance: 'Umshwalense',
+    marketplace: 'Imakethe',
+    logistics: 'Ukuthwala',
     assistant: 'AI Uncedo',
     save: 'Gcina',
     cancel: 'Khansela',

@@ -16,6 +16,8 @@ import {
   Wallet,
   Globe,
   Shield,
+  ShoppingBag,
+  Truck,
 } from 'lucide-react';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -29,6 +31,8 @@ const navLinks = [
   { href: '/farm/money', labelKey: 'money' as const, shortKey: 'money' as const, icon: DollarSign },
   { href: '/farm/financing', labelKey: 'financing' as const, shortKey: 'financing' as const, icon: Wallet },
   { href: '/farm/insurance', labelKey: 'insurance' as const, shortKey: 'insurance' as const, icon: Shield },
+  { href: '/farm/marketplace', labelKey: 'marketplace' as const, shortKey: 'marketplace' as const, icon: ShoppingBag },
+  { href: '/farm/logistics', labelKey: 'logistics' as const, shortKey: 'logistics' as const, icon: Truck },
   { href: '/farm/journal', labelKey: 'journal' as const, shortKey: 'journal' as const, icon: BookOpen },
   { href: '/farm/assistant', labelKey: 'assistant' as const, shortKey: 'assistant' as const, icon: Bot },
 ];

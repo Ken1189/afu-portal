@@ -27,6 +27,12 @@ import {
   Zap,
   ShieldPlus,
   Scale,
+  PieChart,
+  Target,
+  Building2,
+  LineChart,
+  Landmark,
+  BadgeDollarSign,
 } from 'lucide-react';
 import { useCountUp } from '@/hooks/useCountUp';
 
@@ -821,6 +827,193 @@ export default function Home() {
               </motion.div>
             ))}
           </StaggerChildren>
+        </div>
+      </section>
+
+      {/* ─── INVESTOR SECTION ─── */}
+      <section className="py-24 bg-gradient-to-br from-navy-dark via-navy to-[#1e3a5f] text-white overflow-hidden relative">
+        {/* Subtle pattern overlay */}
+        <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'1\' fill-rule=\'evenodd\'%3E%3Ccircle cx=\'30\' cy=\'30\' r=\'1.5\'/%3E%3C/g%3E%3C/svg%3E")' }} />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          {/* Section header */}
+          <FadeInWhenVisible>
+            <div className="text-center mb-16">
+              <div className="inline-flex items-center gap-2 bg-gold/20 border border-gold/30 text-gold px-4 py-1.5 rounded-full text-sm font-medium mb-4">
+                <Landmark className="w-4 h-4" />
+                Investment Opportunity
+              </div>
+              <h2 className="text-3xl md:text-5xl font-bold mt-2 mb-4">
+                Invest in Africa&apos;s Agricultural{' '}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold to-amber-300">
+                  Transformation
+                </span>
+              </h2>
+              <p className="text-gray-300 max-w-3xl mx-auto text-lg">
+                Join a generational investment opportunity. Africa&apos;s agriculture sector is projected to reach
+                $1 trillion by 2030. AFU is the integrated platform positioned to capture this growth.
+              </p>
+            </div>
+          </FadeInWhenVisible>
+
+          {/* Investment metrics */}
+          <StaggerChildren className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-16">
+            {[
+              { icon: Target, value: '$1T', label: 'African Agri Market by 2030', color: 'from-gold to-amber-500' },
+              { icon: TrendingUp, value: '32%', label: 'Projected Annual ROI', color: 'from-green-400 to-emerald-500' },
+              { icon: PieChart, value: '$50B+', label: 'Annual Food Import Gap', color: 'from-teal to-cyan-400' },
+              { icon: LineChart, value: '10x', label: 'Value-Chain Multiplier', color: 'from-purple-400 to-indigo-400' },
+            ].map((item) => {
+              const Icon = item.icon;
+              return (
+                <motion.div key={item.label} variants={fadeUpChild}>
+                  <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 text-center hover:bg-white/10 transition-colors group">
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform shadow-lg`}>
+                      <Icon className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="text-2xl md:text-3xl font-bold text-white mb-1">{item.value}</div>
+                    <p className="text-gray-400 text-xs sm:text-sm">{item.label}</p>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </StaggerChildren>
+
+          {/* Two column: Investment thesis + Investment tiers */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+            {/* Left: Investment thesis */}
+            <FadeInWhenVisible direction="right">
+              <div>
+                <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
+                  <BadgeDollarSign className="w-7 h-7 text-gold" />
+                  Why Invest in AFU
+                </h3>
+                <div className="space-y-5">
+                  {[
+                    {
+                      title: 'Vertically Integrated Model',
+                      desc: 'AFU controls the full value chain — financing, inputs, processing, and offtake — creating compounding returns at every stage.',
+                    },
+                    {
+                      title: 'Capital-Efficient Flywheel',
+                      desc: 'Cash recycles through the loop: farmer repayments fund new disbursements. Each rotation costs less and yields more.',
+                    },
+                    {
+                      title: 'Massive Addressable Market',
+                      desc: 'Africa imports $50B+ in food annually despite having 60% of the world\'s uncultivated arable land. The supply gap is our opportunity.',
+                    },
+                    {
+                      title: 'Technology Moat',
+                      desc: 'AI credit scoring, satellite crop monitoring, and blockchain traceability create defensible advantages over traditional lenders.',
+                    },
+                    {
+                      title: 'ESG & Impact Aligned',
+                      desc: 'Every dollar deployed creates measurable social impact: jobs, food security, rural income growth, and climate resilience.',
+                    },
+                  ].map((item, i) => (
+                    <div key={i} className="flex gap-4 group">
+                      <div className="w-8 h-8 rounded-lg bg-teal/20 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-teal/30 transition-colors">
+                        <CheckCircle2 className="w-4 h-4 text-teal" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-white text-sm mb-1">{item.title}</h4>
+                        <p className="text-gray-400 text-sm leading-relaxed">{item.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </FadeInWhenVisible>
+
+            {/* Right: Investment tiers */}
+            <FadeInWhenVisible direction="left">
+              <div className="space-y-4">
+                <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
+                  <Building2 className="w-7 h-7 text-gold" />
+                  Investment Tiers
+                </h3>
+                {[
+                  {
+                    tier: 'Seed Investor',
+                    min: '$10,000',
+                    returns: '18-24% target',
+                    features: ['Quarterly distributions', 'Annual impact report', 'Investor portal access'],
+                    color: 'border-teal/40 bg-teal/5',
+                    badge: 'bg-teal/20 text-teal',
+                  },
+                  {
+                    tier: 'Growth Partner',
+                    min: '$100,000',
+                    returns: '24-32% target',
+                    features: ['Monthly distributions', 'Advisory board seat', 'Direct deal co-investment', 'Priority pipeline access'],
+                    color: 'border-gold/40 bg-gold/5 ring-1 ring-gold/20',
+                    badge: 'bg-gold/20 text-gold',
+                  },
+                  {
+                    tier: 'Strategic Partner',
+                    min: '$1,000,000+',
+                    returns: 'Custom structure',
+                    features: ['Board observer rights', 'Country exclusivity options', 'Joint venture structures', 'Equity participation option', 'Dedicated relationship manager'],
+                    color: 'border-purple-400/40 bg-purple-500/5',
+                    badge: 'bg-purple-500/20 text-purple-300',
+                  },
+                ].map((item) => (
+                  <div
+                    key={item.tier}
+                    className={`border rounded-2xl p-6 ${item.color} hover:scale-[1.02] transition-all duration-300`}
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <span className={`text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full ${item.badge}`}>
+                        {item.tier}
+                      </span>
+                      <span className="text-white font-bold text-lg">{item.min}</span>
+                    </div>
+                    <p className="text-gray-300 text-sm mb-3">
+                      Target returns: <span className="text-white font-semibold">{item.returns}</span>
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {item.features.map((f, j) => (
+                        <span key={j} className="text-xs bg-white/5 border border-white/10 text-gray-300 px-2.5 py-1 rounded-lg">
+                          {f}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+
+                {/* CTA */}
+                <div className="pt-4 flex flex-col sm:flex-row gap-3">
+                  <Link
+                    href="/contact"
+                    className="group flex-1 bg-gradient-to-r from-gold to-amber-500 hover:from-gold hover:to-amber-400 text-navy-dark px-6 py-3.5 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-gold/20"
+                  >
+                    Request Investor Pack
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                  <Link
+                    href="/contact"
+                    className="flex-1 border border-white/30 hover:border-white/60 hover:bg-white/5 text-white px-6 py-3.5 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2"
+                  >
+                    Schedule a Call
+                  </Link>
+                </div>
+              </div>
+            </FadeInWhenVisible>
+          </div>
+
+          {/* Trusted investors / backing */}
+          <FadeInWhenVisible delay={0.3}>
+            <div className="mt-16 pt-12 border-t border-white/10 text-center">
+              <p className="text-gray-400 text-sm mb-6">Backed by institutional-grade agriculture finance infrastructure</p>
+              <div className="flex flex-wrap items-center justify-center gap-6">
+                {['DFI-Ready Structure', 'Ring-Fenced SPV', 'Annual Audits (Big 4)', 'IFRS Compliant', 'ESG Framework'].map((badge) => (
+                  <div key={badge} className="flex items-center gap-2 bg-white/5 border border-white/10 px-4 py-2 rounded-lg">
+                    <ShieldPlus className="w-3.5 h-3.5 text-teal" />
+                    <span className="text-gray-300 text-xs font-medium">{badge}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </FadeInWhenVisible>
         </div>
       </section>
 
