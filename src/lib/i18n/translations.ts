@@ -27,6 +27,7 @@ export interface Translations {
     money: string;
     journal: string;
     financing: string;
+    insurance: string;
     assistant: string;
     save: string;
     cancel: string;
@@ -253,6 +254,59 @@ export interface Translations {
     step3: string;
     repaymentNote: string;
   };
+  // Insurance
+  insurance: {
+    title: string;
+    subtitle: string;
+    myPolicies: string;
+    fileClaim: string;
+    myClaims: string;
+    browseProducts: string;
+    getQuote: string;
+    activePolicies: string;
+    totalCoverage: string;
+    monthlyPremium: string;
+    pendingClaims: string;
+    policyDetails: string;
+    coverageAmount: string;
+    premium: string;
+    deductible: string;
+    startDate: string;
+    endDate: string;
+    nextPayment: string;
+    coveredItems: string;
+    renewPolicy: string;
+    cancelPolicy: string;
+    claimHistory: string;
+    noActiveClaims: string;
+    status: string;
+    submitted: string;
+    underReview: string;
+    approved: string;
+    rejected: string;
+    paid: string;
+    estimatedLoss: string;
+    approvedAmount: string;
+    incidentDate: string;
+    describeIncident: string;
+    uploadPhotos: string;
+    selectPolicy: string;
+    submitClaim: string;
+    eligibilityCheck: string;
+    calculatePremium: string;
+    farmDetails: string;
+    cropType: string;
+    farmSize: string;
+    estimatedPremium: string;
+    getInsured: string;
+    popular: string;
+    perMonth: string;
+    coverage: string;
+    waitingPeriod: string;
+    claimProcess: string;
+    viewDetails: string;
+    compareProducts: string;
+  };
   // AI Assistant
   aiAssistant: {
     title: string;
@@ -279,6 +333,7 @@ export const en: Translations = {
     money: 'Money',
     journal: 'Journal',
     financing: 'Financing',
+    insurance: 'Insurance',
     assistant: 'AI Chat',
     save: 'Save',
     cancel: 'Cancel',
@@ -499,6 +554,58 @@ export const en: Translations = {
     step3: 'If approved, funds are disbursed directly to your mobile wallet',
     repaymentNote: 'Repayment is flexible and tied to your harvest cycle. No penalties for early repayment.',
   },
+  insurance: {
+    title: 'Farm Insurance',
+    subtitle: 'Protect your crops, livestock, and equipment',
+    myPolicies: 'My Policies',
+    fileClaim: 'File a Claim',
+    myClaims: 'My Claims',
+    browseProducts: 'Browse Products',
+    getQuote: 'Get a Quote',
+    activePolicies: 'Active Policies',
+    totalCoverage: 'Total Coverage',
+    monthlyPremium: 'Monthly Premium',
+    pendingClaims: 'Pending Claims',
+    policyDetails: 'Policy Details',
+    coverageAmount: 'Coverage Amount',
+    premium: 'Premium',
+    deductible: 'Deductible',
+    startDate: 'Start Date',
+    endDate: 'End Date',
+    nextPayment: 'Next Payment',
+    coveredItems: 'Covered Items',
+    renewPolicy: 'Renew Policy',
+    cancelPolicy: 'Cancel Policy',
+    claimHistory: 'Claim History',
+    noActiveClaims: 'No active claims',
+    status: 'Status',
+    submitted: 'Submitted',
+    underReview: 'Under Review',
+    approved: 'Approved',
+    rejected: 'Rejected',
+    paid: 'Paid',
+    estimatedLoss: 'Estimated Loss',
+    approvedAmount: 'Approved Amount',
+    incidentDate: 'Incident Date',
+    describeIncident: 'Describe the Incident',
+    uploadPhotos: 'Upload Photos',
+    selectPolicy: 'Select Policy',
+    submitClaim: 'Submit Claim',
+    eligibilityCheck: 'Eligibility Check',
+    calculatePremium: 'Calculate Premium',
+    farmDetails: 'Farm Details',
+    cropType: 'Crop Type',
+    farmSize: 'Farm Size',
+    estimatedPremium: 'Estimated Premium',
+    getInsured: 'Get Insured',
+    popular: 'Popular',
+    perMonth: '/month',
+    coverage: 'Coverage',
+    waitingPeriod: 'Waiting Period',
+    claimProcess: 'Claim Process',
+    viewDetails: 'View Details',
+    compareProducts: 'Compare Products',
+  },
   aiAssistant: {
     title: 'Mkulima AI',
     poweredBy: 'Powered by AFU',
@@ -524,6 +631,7 @@ export const sn: Translations = {
     money: 'Mari',
     journal: 'Bhuku',
     financing: 'Mafundisi eMari',
+    insurance: 'Inishuwarenzi',
     assistant: 'AI Rubatsiro',
     save: 'Sevha',
     cancel: 'Kanzura',
@@ -744,6 +852,58 @@ export const sn: Translations = {
     step3: 'Kana chabvumirwa, mari inotumirwa kumobile wallet yako',
     repaymentNote: 'Kubhadhara kunochinja maererano negoho rako. Hapana muripo wekubhadhara munguva pfupi.',
   },
+  insurance: {
+    title: 'Inishuwarenzi yeMunda',
+    subtitle: 'Dzivirira zvirimwa, mhuka, nemichina yako',
+    myPolicies: 'Maphorisi Angu',
+    fileClaim: 'Isa Chikumbiro',
+    myClaims: 'Zvikumbiro Zvangu',
+    browseProducts: 'Tarisa Zvigadzirwa',
+    getQuote: 'Wana Mutengo',
+    activePolicies: 'Maphorisi Anoshanda',
+    totalCoverage: 'Kuchengetedzwa Kwose',
+    monthlyPremium: 'Muripo weMwedzi',
+    pendingClaims: 'Zvikumbiro Zvakamirira',
+    policyDetails: 'Mashoko ePhorisi',
+    coverageAmount: 'Huwandu Hwekuchengetedzwa',
+    premium: 'Muripo',
+    deductible: 'Deductible',
+    startDate: 'Zuva Rekutanga',
+    endDate: 'Zuva Rekupera',
+    nextPayment: 'Kubhadhara Kunotevera',
+    coveredItems: 'Zvinhu Zvinochengedzwa',
+    renewPolicy: 'Vandudza Phorisi',
+    cancelPolicy: 'Kanzura Phorisi',
+    claimHistory: 'Nhoroondo yeZvikumbiro',
+    noActiveClaims: 'Hapana zvikumbiro zviripo',
+    status: 'Mamiriro',
+    submitted: 'Yakatumirwa',
+    underReview: 'Iri Kuongororwa',
+    approved: 'Yabvumirwa',
+    rejected: 'Yarambidzwa',
+    paid: 'Yakabhadharwa',
+    estimatedLoss: 'Kurasikirwa Kunofungidzirwa',
+    approvedAmount: 'Huwandu Hwakabvumirwa',
+    incidentDate: 'Zuva Rechiitiko',
+    describeIncident: 'Tsanangura Chiitiko',
+    uploadPhotos: 'Isa Mifananidzo',
+    selectPolicy: 'Sarudza Phorisi',
+    submitClaim: 'Tumira Chikumbiro',
+    eligibilityCheck: 'Ongorora Kukodzera',
+    calculatePremium: 'Verenga Muripo',
+    farmDetails: 'Mashoko eMunda',
+    cropType: 'Rudzi rweChirimwa',
+    farmSize: 'Kukura kweMunda',
+    estimatedPremium: 'Muripo Unofungidzirwa',
+    getInsured: 'Chengetedzwa',
+    popular: 'Inozivikanwa',
+    perMonth: '/mwedzi',
+    coverage: 'Kuchengetedzwa',
+    waitingPeriod: 'Nguva Yekumirira',
+    claimProcess: 'Nzira yeChikumbiro',
+    viewDetails: 'Ona Zvakadzama',
+    compareProducts: 'Enzanisa Zvigadzirwa',
+  },
   aiAssistant: {
     title: 'Mkulima AI',
     poweredBy: 'Yakagadzirwa neAFU',
@@ -769,6 +929,7 @@ export const nd: Translations = {
     money: 'Imali',
     journal: 'Ibhuku',
     financing: 'Imali Yokuboleka',
+    insurance: 'Umshwalense',
     assistant: 'AI Uncedo',
     save: 'Gcina',
     cancel: 'Khansela',
@@ -988,6 +1149,58 @@ export const nd: Translations = {
     step2: 'Uzathola impendulo nge-SMS kanye le-notification',
     step3: 'Nxa kuvunyelwe, imali izathunyelwa ku-mobile wallet yakho',
     repaymentNote: 'Ukubhadala kuhambisana lesivuno sakho. Akulanjongo yokubhadala ngesikhathi esifitshane.',
+  },
+  insurance: {
+    title: 'Umshwalense weNsimu',
+    subtitle: 'Vikela izilimo, imfuyo, lezinto zakho zokulima',
+    myPolicies: 'Amapholisi Ami',
+    fileClaim: 'Faka Isicelo',
+    myClaims: 'Izicelo Zami',
+    browseProducts: 'Bheka Imikhiqizo',
+    getQuote: 'Thola Intengo',
+    activePolicies: 'Amapholisi Asebenzayo',
+    totalCoverage: 'Isivikelo Sonke',
+    monthlyPremium: 'Umholawano weNyanga',
+    pendingClaims: 'Izicelo Ezilindile',
+    policyDetails: 'Imininingwane yePholisi',
+    coverageAmount: 'Isilinganiso Sesivikelo',
+    premium: 'Umholawano',
+    deductible: 'I-Deductible',
+    startDate: 'Usuku Lokuqala',
+    endDate: 'Usuku Lokucina',
+    nextPayment: 'Ukubhadala Okulandelayo',
+    coveredItems: 'Izinto Ezivikelweyo',
+    renewPolicy: 'Vuselela iPholisi',
+    cancelPolicy: 'Khansela iPholisi',
+    claimHistory: 'Imbali Yezicelo',
+    noActiveClaims: 'Akulazicelo ezikhona',
+    status: 'Isimo',
+    submitted: 'Kuthunyelwe',
+    underReview: 'Kuyahlolwa',
+    approved: 'Kuvunyelwe',
+    rejected: 'Kwaliwe',
+    paid: 'Kubhadalwe',
+    estimatedLoss: 'Ukulahlekelwa Okulinganisiwayo',
+    approvedAmount: 'Isilinganiso Esivunyelweyo',
+    incidentDate: 'Usuku Lwesigameko',
+    describeIncident: 'Chaza Isigameko',
+    uploadPhotos: 'Layitsha Izithombe',
+    selectPolicy: 'Khetha iPholisi',
+    submitClaim: 'Thumela Isicelo',
+    eligibilityCheck: 'Hlola Ukufaneleka',
+    calculatePremium: 'Bala Umholawano',
+    farmDetails: 'Imininingwane yeNsimu',
+    cropType: 'Uhlobo lweSilimo',
+    farmSize: 'Ubukhulu beNsimu',
+    estimatedPremium: 'Umholawano Olinganisiwayo',
+    getInsured: 'Vikeleka',
+    popular: 'Edumileyo',
+    perMonth: '/inyanga',
+    coverage: 'Isivikelo',
+    waitingPeriod: 'Isikhathi Sokulinda',
+    claimProcess: 'Indlela Yesicelo',
+    viewDetails: 'Bona Imininingwane',
+    compareProducts: 'Qathanisa Imikhiqizo',
   },
   aiAssistant: {
     title: 'Mkulima AI',
