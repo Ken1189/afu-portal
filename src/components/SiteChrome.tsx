@@ -7,18 +7,24 @@ import ChatWidget from '@/components/chat/ChatWidget';
 
 /**
  * Conditionally renders the site-wide Navbar, Footer, and ChatWidget.
- * Hidden on /farm/* routes which have their own layout chrome.
+ * Hidden on portal routes (/farm/*, /supplier/*) which have their own layout chrome.
  */
+
+const PORTAL_PREFIXES = ['/farm', '/supplier'];
+
+function isPortalRoute(pathname: string) {
+  return PORTAL_PREFIXES.some((prefix) => pathname.startsWith(prefix));
+}
 
 export function SiteNavbar() {
   const pathname = usePathname();
-  if (pathname.startsWith('/farm')) return null;
+  if (isPortalRoute(pathname)) return null;
   return <Navbar />;
 }
 
 export function SiteFooter() {
   const pathname = usePathname();
-  if (pathname.startsWith('/farm')) return null;
+  if (isPortalRoute(pathname)) return null;
   return (
     <>
       <Footer />
