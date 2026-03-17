@@ -1,100 +1,470 @@
+'use client';
+
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import {
+  FileBarChart,
+  Download,
+  Share2,
+  Trash2,
+  Calendar,
+  Clock,
+  FileText,
+  FileSpreadsheet,
+  File,
+  Play,
+  Pause,
+  Edit3,
+  Search,
+  Filter,
+  CheckCircle2,
+  Loader2,
+  BarChart3,
+  TrendingUp,
+  Users,
+  Ship,
+  Shield,
+  Store,
+  RefreshCw,
+} from 'lucide-react';
+
+// ── Animation variants ──
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: { opacity: 1, transition: { staggerChildren: 0.08 } },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 100, damping: 15 } },
+};
+
+// ── Types ──
+type TabKey = 'generate' | 'saved' | 'scheduled';
+
+interface QuickReport {
+  id: number;
+  name: string;
+  icon: React.ReactNode;
+  lastGenerated: string;
+  color: string;
+  bgColor: string;
+}
+
+interface SavedReport {
+  id: number;
+  name: string;
+  type: string;
+  date: string;
+  size: string;
+  format: 'pdf' | 'excel' | 'csv';
+}
+
+interface ScheduledReport {
+  id: number;
+  name: string;
+  frequency: 'daily' | 'weekly' | 'monthly';
+  nextRun: string;
+  recipients: string;
+  active: boolean;
+}
+
+// ── Mock Data ──
+const quickReports: QuickReport[] = [
+  { id: 1, name: 'Monthly Summary', icon: <BarChart3 className="w-5 h-5" />, lastGenerated: 'Mar 1, 2026', color: 'text-[#1B2A4A]', bgColor: 'bg-[#1B2A4A]/10' },
+  { id: 2, name: 'Financial Overview', icon: <TrendingUp className="w-5 h-5" />, lastGenerated: 'Mar 5, 2026', color: 'text-[#2AA198]', bgColor: 'bg-[#2AA198]/10' },
+  { id: 3, name: 'Member Growth', icon: <Users className="w-5 h-5" />, lastGenerated: 'Mar 3, 2026', color: 'text-blue-600', bgColor: 'bg-blue-50' },
+  { id: 4, name: 'Export Performance', icon: <Ship className="w-5 h-5" />, lastGenerated: 'Feb 28, 2026', color: 'text-[#D4A843]', bgColor: 'bg-[#D4A843]/10' },
+  { id: 5, name: 'Compliance Status', icon: <Shield className="w-5 h-5" />, lastGenerated: 'Mar 10, 2026', color: 'text-red-600', bgColor: 'bg-red-50' },
+  { id: 6, name: 'Supplier Activity', icon: <Store className="w-5 h-5" />, lastGenerated: 'Mar 8, 2026', color: 'text-purple-600', bgColor: 'bg-purple-50' },
+];
+
+const savedReports: SavedReport[] = [
+  { id: 1, name: 'Q1 2026 Financial Summary', type: 'Financial', date: 'Mar 14, 2026', size: '2.4 MB', format: 'pdf' },
+  { id: 2, name: 'February Member Growth Report', type: 'Membership', date: 'Mar 3, 2026', size: '1.8 MB', format: 'excel' },
+  { id: 3, name: 'Export Shipments - Feb 2026', type: 'Export', date: 'Mar 2, 2026', size: '856 KB', format: 'csv' },
+  { id: 4, name: 'Loan Portfolio Analysis', type: 'Financial', date: 'Feb 28, 2026', size: '3.1 MB', format: 'pdf' },
+  { id: 5, name: 'Training Completion Report', type: 'Training', date: 'Feb 25, 2026', size: '1.2 MB', format: 'pdf' },
+  { id: 6, name: 'Compliance Audit Trail - Q4 2025', type: 'Compliance', date: 'Feb 15, 2026', size: '4.7 MB', format: 'excel' },
+  { id: 7, name: 'Marketplace Transaction Summary', type: 'Marketplace', date: 'Feb 10, 2026', size: '2.0 MB', format: 'csv' },
+  { id: 8, name: 'Annual Report 2025', type: 'Summary', date: 'Jan 31, 2026', size: '8.5 MB', format: 'pdf' },
+];
+
+const scheduledReports: ScheduledReport[] = [
+  { id: 1, name: 'Daily Collections Report', frequency: 'daily', nextRun: 'Mar 17, 2026 06:00', recipients: 'Finance Team (8)', active: true },
+  { id: 2, name: 'Weekly Member Summary', frequency: 'weekly', nextRun: 'Mar 23, 2026 08:00', recipients: 'Management (5)', active: true },
+  { id: 3, name: 'Monthly Financial Overview', frequency: 'monthly', nextRun: 'Apr 1, 2026 07:00', recipients: 'Board Members (12)', active: true },
+  { id: 4, name: 'Weekly Compliance Check', frequency: 'weekly', nextRun: 'Mar 23, 2026 09:00', recipients: 'Compliance Team (4)', active: false },
+];
+
+const reportTypes = [
+  'Monthly Summary', 'Financial Overview', 'Member Growth', 'Export Performance',
+  'Compliance Status', 'Supplier Activity', 'Loan Portfolio', 'Training Progress',
+  'Marketplace Analytics', 'Custom Report',
+];
+
+function formatIcon(format: string) {
+  switch (format) {
+    case 'pdf': return <FileText className="w-4 h-4 text-red-500" />;
+    case 'excel': return <FileSpreadsheet className="w-4 h-4 text-green-600" />;
+    case 'csv': return <File className="w-4 h-4 text-blue-500" />;
+    default: return <FileText className="w-4 h-4 text-gray-400" />;
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  MAIN PAGE COMPONENT
+// ═══════════════════════════════════════════════════════
+
 export default function AdminReportsPage() {
+  const [activeTab, setActiveTab] = useState<TabKey>('generate');
+  const [scheduledState, setScheduledState] = useState(scheduledReports);
+  const [generating, setGenerating] = useState(false);
+  const [generated, setGenerated] = useState(false);
+  const [progress, setProgress] = useState(0);
+
+  // Generate report form state
+  const [reportType, setReportType] = useState('Monthly Summary');
+  const [dateRange, setDateRange] = useState('this-month');
+  const [filterCountry, setFilterCountry] = useState('all');
+  const [filterRegion, setFilterRegion] = useState('all');
+  const [filterTier, setFilterTier] = useState('all');
+  const [filterCategory, setFilterCategory] = useState('all');
+  const [exportFormat, setExportFormat] = useState<'pdf' | 'excel' | 'csv'>('pdf');
+
+  const tabs: { key: TabKey; label: string }[] = [
+    { key: 'generate', label: 'Generate Report' },
+    { key: 'saved', label: 'Saved Reports' },
+    { key: 'scheduled', label: 'Scheduled' },
+  ];
+
+  const handleGenerate = () => {
+    setGenerating(true);
+    setGenerated(false);
+    setProgress(0);
+    const interval = setInterval(() => {
+      setProgress((p) => {
+        if (p >= 100) {
+          clearInterval(interval);
+          setGenerating(false);
+          setGenerated(true);
+          return 100;
+        }
+        return p + Math.random() * 15 + 5;
+      });
+    }, 300);
+  };
+
+  const toggleSchedule = (id: number) => {
+    setScheduledState((prev) =>
+      prev.map((s) => (s.id === id ? { ...s, active: !s.active } : s))
+    );
+  };
+
   return (
-    <div>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-navy">Reports & Analytics</h1>
-        <p className="text-gray-500 text-sm mt-1">Key metrics and performance data</p>
-      </div>
-
-      {/* Financial Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {[
-          { label: "Total Deployed", value: "$4.2M", sub: "Across all products" },
-          { label: "Outstanding", value: "$2.8M", sub: "Active loan book" },
-          { label: "Repayment Rate", value: "94.2%", sub: "Above 92% target" },
-          { label: "Revenue (YTD)", value: "$487K", sub: "Interest + fees" },
-        ].map((s, i) => (
-          <div key={i} className="bg-white rounded-xl p-6 border border-gray-100">
-            <p className="text-sm text-gray-500">{s.label}</p>
-            <p className="text-3xl font-bold text-navy mt-1">{s.value}</p>
-            <p className="text-xs text-gray-400 mt-1">{s.sub}</p>
+    <motion.div variants={containerVariants} initial="hidden" animate="show" className="space-y-6">
+      {/* ── Header ── */}
+      <motion.div variants={cardVariants} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-[#1B2A4A] rounded-xl flex items-center justify-center">
+            <FileBarChart className="w-5 h-5 text-white" />
           </div>
-        ))}
-      </div>
-
-      {/* Loan Portfolio Breakdown */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-        <div className="bg-white rounded-xl p-8 border border-gray-100">
-          <h3 className="font-semibold text-navy mb-6">Loan Portfolio by Product</h3>
-          <div className="space-y-4">
-            {[
-              { product: "Working Capital", amount: "$2.5M", count: 45, percent: 60 },
-              { product: "Invoice Finance", amount: "$1.2M", count: 32, percent: 28 },
-              { product: "Equipment Finance", amount: "$350K", count: 8, percent: 8 },
-              { product: "Input Bundle Finance", amount: "$150K", count: 4, percent: 4 },
-            ].map((p, i) => (
-              <div key={i}>
-                <div className="flex justify-between text-sm mb-1">
-                  <span className="text-navy font-medium">{p.product}</span>
-                  <span className="text-gray-500">{p.amount} ({p.count} loans)</span>
-                </div>
-                <div className="w-full bg-gray-100 rounded-full h-2.5">
-                  <div className="h-2.5 rounded-full bg-teal" style={{ width: `${p.percent}%` }} />
-                </div>
-              </div>
-            ))}
+          <div>
+            <h1 className="text-2xl font-bold text-[#1B2A4A]">Reports & Analytics</h1>
+            <p className="text-gray-500 text-sm mt-0.5">Generate, manage, and schedule reports</p>
           </div>
         </div>
+      </motion.div>
 
-        <div className="bg-white rounded-xl p-8 border border-gray-100">
-          <h3 className="font-semibold text-navy mb-6">Revenue Breakdown</h3>
-          <div className="space-y-4">
-            {[
-              { source: "Interest Income", amount: "$312K", percent: 64 },
-              { source: "Origination Fees", amount: "$78K", percent: 16 },
-              { source: "Membership Fees", amount: "$47K", percent: 10 },
-              { source: "Training Revenue", amount: "$35K", percent: 7 },
-              { source: "Processing Fees", amount: "$15K", percent: 3 },
-            ].map((r, i) => (
-              <div key={i}>
-                <div className="flex justify-between text-sm mb-1">
-                  <span className="text-navy font-medium">{r.source}</span>
-                  <span className="text-gray-500">{r.amount} ({r.percent}%)</span>
-                </div>
-                <div className="w-full bg-gray-100 rounded-full h-2.5">
-                  <div className="h-2.5 rounded-full bg-gold" style={{ width: `${r.percent}%` }} />
-                </div>
+      {/* ── Quick Reports ── */}
+      <motion.div variants={cardVariants}>
+        <h3 className="text-sm font-semibold text-[#1B2A4A] mb-3">Quick Reports</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
+          {quickReports.map((qr) => (
+            <div key={qr.id} className="bg-white rounded-xl border border-gray-100 p-4 hover:shadow-sm transition-all group">
+              <div className={`w-9 h-9 ${qr.bgColor} rounded-lg flex items-center justify-center ${qr.color} mb-3`}>
+                {qr.icon}
               </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Milestone Tracker */}
-      <div className="bg-white rounded-xl p-8 border border-gray-100">
-        <h3 className="font-semibold text-navy mb-6">Seed Milestones Progress</h3>
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-          {[
-            { target: "$15M Deployed", current: "$4.2M", percent: 28, status: "In Progress" },
-            { target: "92%+ Repayment", current: "94.2%", percent: 100, status: "Achieved" },
-            { target: "2 Export Buyer LOIs", current: "2 LOIs + 1 Conversion", percent: 100, status: "Achieved" },
-            { target: "1 Hub Operational", current: "Under Construction", percent: 65, status: "In Progress" },
-            { target: "BW Licensing", current: "Application Filed", percent: 40, status: "In Progress" },
-          ].map((m, i) => (
-            <div key={i} className="text-center">
-              <div className="relative w-20 h-20 mx-auto mb-3">
-                <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 36 36">
-                  <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#E5E7EB" strokeWidth="3" />
-                  <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke={m.percent === 100 ? "#22C55E" : "#2AA198"} strokeWidth="3" strokeDasharray={`${m.percent}, 100`} />
-                </svg>
-                <span className="absolute inset-0 flex items-center justify-center text-sm font-bold text-navy">{m.percent}%</span>
-              </div>
-              <p className="font-medium text-navy text-sm">{m.target}</p>
-              <p className="text-xs text-gray-400 mt-1">{m.current}</p>
+              <h4 className="text-sm font-medium text-[#1B2A4A] mb-1">{qr.name}</h4>
+              <p className="text-[10px] text-gray-400 mb-3">Last: {qr.lastGenerated}</p>
+              <button
+                onClick={() => { setReportType(qr.name); setActiveTab('generate'); }}
+                className="w-full py-1.5 text-xs font-medium text-[#2AA198] bg-[#2AA198]/10 rounded-lg hover:bg-[#2AA198]/20 transition-colors opacity-80 group-hover:opacity-100"
+              >
+                Generate
+              </button>
             </div>
           ))}
         </div>
-      </div>
-    </div>
+      </motion.div>
+
+      {/* ── Tab Switcher ── */}
+      <motion.div variants={cardVariants} className="flex gap-1 bg-white rounded-xl p-1 border border-gray-100 w-fit">
+        {tabs.map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              activeTab === tab.key
+                ? 'bg-[#1B2A4A] text-white shadow-sm'
+                : 'text-gray-500 hover:text-[#1B2A4A] hover:bg-gray-50'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </motion.div>
+
+      {/* ===== GENERATE REPORT TAB ===== */}
+      {activeTab === 'generate' && (
+        <motion.div variants={containerVariants} initial="hidden" animate="show" className="space-y-4">
+          <motion.div variants={cardVariants} className="bg-white rounded-xl border border-gray-100 p-6">
+            <h3 className="text-sm font-semibold text-[#1B2A4A] mb-5">Configure Report</h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {/* Report Type */}
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1.5">Report Type</label>
+                <select
+                  value={reportType}
+                  onChange={(e) => setReportType(e.target.value)}
+                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2AA198]/50"
+                >
+                  {reportTypes.map((t) => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Date Range */}
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1.5">Date Range</label>
+                <select
+                  value={dateRange}
+                  onChange={(e) => setDateRange(e.target.value)}
+                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2AA198]/50"
+                >
+                  <option value="this-month">This Month</option>
+                  <option value="last-quarter">Last Quarter</option>
+                  <option value="ytd">Year to Date</option>
+                  <option value="custom">Custom Range</option>
+                </select>
+              </div>
+
+              {/* Format */}
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1.5">Export Format</label>
+                <div className="flex gap-2">
+                  {(['pdf', 'excel', 'csv'] as const).map((fmt) => (
+                    <button
+                      key={fmt}
+                      onClick={() => setExportFormat(fmt)}
+                      className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg border-2 text-sm font-medium transition-all ${
+                        exportFormat === fmt
+                          ? 'border-[#2AA198] bg-[#2AA198]/5 text-[#2AA198]'
+                          : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                      }`}
+                    >
+                      {formatIcon(fmt)}
+                      {fmt.toUpperCase()}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Country */}
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1.5">Country</label>
+                <select
+                  value={filterCountry}
+                  onChange={(e) => setFilterCountry(e.target.value)}
+                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2AA198]/50"
+                >
+                  <option value="all">All Countries</option>
+                  <option value="zw">Zimbabwe</option>
+                  <option value="tz">Tanzania</option>
+                  <option value="bw">Botswana</option>
+                  <option value="ke">Kenya</option>
+                  <option value="ug">Uganda</option>
+                </select>
+              </div>
+
+              {/* Region */}
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1.5">Region</label>
+                <select
+                  value={filterRegion}
+                  onChange={(e) => setFilterRegion(e.target.value)}
+                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2AA198]/50"
+                >
+                  <option value="all">All Regions</option>
+                  <option value="southern">Southern Africa</option>
+                  <option value="eastern">East Africa</option>
+                  <option value="western">West Africa</option>
+                </select>
+              </div>
+
+              {/* Member Tier */}
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1.5">Member Tier</label>
+                <select
+                  value={filterTier}
+                  onChange={(e) => setFilterTier(e.target.value)}
+                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2AA198]/50"
+                >
+                  <option value="all">All Tiers</option>
+                  <option value="a">Tier A - Commercial</option>
+                  <option value="b">Tier B - Smallholder</option>
+                  <option value="c">Tier C - Enterprise</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Generate Button & Progress */}
+            <div className="mt-6 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              {!generating && !generated && (
+                <button
+                  onClick={handleGenerate}
+                  className="flex items-center gap-2 px-6 py-2.5 bg-[#2AA198] text-white rounded-lg text-sm font-semibold hover:bg-[#2AA198]/90 transition-colors shadow-sm"
+                >
+                  <Play className="w-4 h-4" /> Generate Report
+                </button>
+              )}
+              {generating && (
+                <div className="flex-1 max-w-md">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Loader2 className="w-4 h-4 text-[#2AA198] animate-spin" />
+                    <span className="text-sm text-gray-600">Generating report...</span>
+                    <span className="text-sm font-medium text-[#1B2A4A]">{Math.min(Math.round(progress), 100)}%</span>
+                  </div>
+                  <div className="w-full bg-gray-100 rounded-full h-2">
+                    <div
+                      className="h-2 rounded-full bg-[#2AA198] transition-all duration-300"
+                      style={{ width: `${Math.min(progress, 100)}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+              {generated && (
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 text-green-600">
+                    <CheckCircle2 className="w-5 h-5" />
+                    <span className="text-sm font-medium">Report generated successfully!</span>
+                  </div>
+                  <button className="flex items-center gap-2 px-5 py-2.5 bg-[#1B2A4A] text-white rounded-lg text-sm font-semibold hover:bg-[#1B2A4A]/90 transition-colors">
+                    <Download className="w-4 h-4" /> Download {exportFormat.toUpperCase()}
+                  </button>
+                  <button
+                    onClick={() => { setGenerated(false); setProgress(0); }}
+                    className="flex items-center gap-1.5 px-3 py-2.5 text-sm font-medium text-gray-500 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5" /> New
+                  </button>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+
+      {/* ===== SAVED REPORTS TAB ===== */}
+      {activeTab === 'saved' && (
+        <motion.div variants={containerVariants} initial="hidden" animate="show" className="space-y-4">
+          <motion.div variants={cardVariants} className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Report Name</th>
+                    <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Type</th>
+                    <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Date</th>
+                    <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Size</th>
+                    <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Format</th>
+                    <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {savedReports.map((report) => (
+                    <tr key={report.id} className="hover:bg-gray-50/50 transition-colors">
+                      <td className="px-6 py-4 text-sm font-medium text-[#1B2A4A]">{report.name}</td>
+                      <td className="px-6 py-4">
+                        <span className="text-xs px-2.5 py-1 rounded-full bg-gray-100 text-gray-600 font-medium">{report.type}</span>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-400">{report.date}</td>
+                      <td className="px-6 py-4 text-sm text-gray-500">{report.size}</td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-1.5">
+                          {formatIcon(report.format)}
+                          <span className="text-xs font-medium text-gray-500 uppercase">{report.format}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex gap-1.5">
+                          <button className="p-1.5 text-[#2AA198] bg-[#2AA198]/10 rounded-md hover:bg-[#2AA198]/20 transition-colors" title="Download">
+                            <Download className="w-3.5 h-3.5" />
+                          </button>
+                          <button className="p-1.5 text-blue-500 bg-blue-50 rounded-md hover:bg-blue-100 transition-colors" title="Share">
+                            <Share2 className="w-3.5 h-3.5" />
+                          </button>
+                          <button className="p-1.5 text-red-500 bg-red-50 rounded-md hover:bg-red-100 transition-colors" title="Delete">
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+
+      {/* ===== SCHEDULED TAB ===== */}
+      {activeTab === 'scheduled' && (
+        <motion.div variants={containerVariants} initial="hidden" animate="show" className="space-y-4">
+          {scheduledState.map((sched) => (
+            <motion.div key={sched.id} variants={cardVariants} className="bg-white rounded-xl border border-gray-100 p-5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                    sched.active ? 'bg-[#2AA198]/10 text-[#2AA198]' : 'bg-gray-100 text-gray-400'
+                  }`}>
+                    <Clock className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-semibold text-[#1B2A4A]">{sched.name}</h4>
+                    <div className="flex items-center gap-3 mt-0.5">
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
+                        sched.frequency === 'daily' ? 'bg-blue-100 text-blue-700' :
+                        sched.frequency === 'weekly' ? 'bg-purple-100 text-purple-700' :
+                        'bg-amber-100 text-amber-700'
+                      }`}>
+                        {sched.frequency.charAt(0).toUpperCase() + sched.frequency.slice(1)}
+                      </span>
+                      <span className="text-xs text-gray-400">Next: {sched.nextRun}</span>
+                      <span className="text-xs text-gray-400">To: {sched.recipients}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => toggleSchedule(sched.id)}
+                    className={`w-12 h-6 rounded-full transition-all flex items-center ${
+                      sched.active ? 'bg-[#2AA198] justify-end' : 'bg-gray-300 justify-start'
+                    }`}
+                  >
+                    <div className="w-5 h-5 bg-white rounded-full shadow mx-0.5" />
+                  </button>
+                  <button className="p-2 text-gray-400 hover:text-[#1B2A4A] hover:bg-gray-50 rounded-lg transition-colors">
+                    <Edit3 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+      )}
+    </motion.div>
   );
 }

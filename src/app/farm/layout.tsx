@@ -23,6 +23,9 @@ import {
   Beef,
   Leaf,
   Ship,
+  CloudSun,
+  Brain,
+  BarChart3,
 } from 'lucide-react';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -43,6 +46,9 @@ const navLinks = [
   { href: '/farm/livestock', labelKey: 'livestock' as const, shortKey: 'livestock' as const, icon: Beef },
   { href: '/farm/sustainability', labelKey: 'sustainability' as const, shortKey: 'sustainability' as const, icon: Leaf },
   { href: '/farm/exports', labelKey: 'exports' as const, shortKey: 'exports' as const, icon: Ship },
+  { href: '/farm/weather', labelKey: 'weather' as const, shortKey: 'weather' as const, icon: CloudSun },
+  { href: '/farm/ai-tools', labelKey: 'aiTools' as const, shortKey: 'aiTools' as const, icon: Brain },
+  { href: '/farm/market-prices', labelKey: 'marketPrices' as const, shortKey: 'marketPrices' as const, icon: BarChart3 },
   { href: '/farm/journal', labelKey: 'journal' as const, shortKey: 'journal' as const, icon: BookOpen },
   { href: '/farm/assistant', labelKey: 'assistant' as const, shortKey: 'assistant' as const, icon: Bot },
 ];

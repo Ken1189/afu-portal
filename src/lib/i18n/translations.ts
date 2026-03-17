@@ -35,6 +35,9 @@ export interface Translations {
     livestock: string;
     sustainability: string;
     exports: string;
+    weather: string;
+    aiTools: string;
+    marketPrices: string;
     assistant: string;
     save: string;
     cancel: string;
@@ -348,6 +351,9 @@ export const en: Translations = {
     livestock: 'Livestock',
     sustainability: 'Sustainability',
     exports: 'Exports',
+    weather: 'Weather',
+    aiTools: 'AI Tools',
+    marketPrices: 'Market Prices',
     assistant: 'AI Chat',
     save: 'Save',
     cancel: 'Cancel',
@@ -653,6 +659,9 @@ export const sn: Translations = {
     livestock: 'Zvipfuyo',
     sustainability: 'Kudzivirira',
     exports: 'Kuendesa',
+    weather: 'Mamiriro eKunze',
+    aiTools: 'Maturuzi eAI',
+    marketPrices: 'Mitengo yeMusika',
     assistant: 'AI Rubatsiro',
     save: 'Sevha',
     cancel: 'Kanzura',
@@ -958,6 +967,9 @@ export const nd: Translations = {
     livestock: 'Imfuyo',
     sustainability: 'Ukuqhubeka',
     exports: 'Ukuthumela',
+    weather: 'Umumo Womkhathi',
+    aiTools: 'Amathuluzi e-AI',
+    marketPrices: 'Amanani Emakethe',
     assistant: 'AI Uncedo',
     save: 'Gcina',
     cancel: 'Khansela',

@@ -10,6 +10,7 @@ import {
   FileText,
   GraduationCap,
   BarChart3,
+  TrendingUp,
   Landmark,
   Banknote,
   ArrowDownToLine,
@@ -49,6 +50,7 @@ const navGroups: NavGroup[] = [
     defaultOpen: true,
     links: [
       { href: '/admin', label: 'Dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
+      { href: '/admin/analytics', label: 'Analytics', icon: <TrendingUp className="w-4 h-4" /> },
     ],
   },
   {
