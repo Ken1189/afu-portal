@@ -30,6 +30,8 @@ export interface Translations {
     insurance: string;
     marketplace: string;
     logistics: string;
+    cooperatives: string;
+    equipment: string;
     assistant: string;
     save: string;
     cancel: string;
@@ -338,6 +340,8 @@ export const en: Translations = {
     insurance: 'Insurance',
     marketplace: 'Marketplace',
     logistics: 'Logistics',
+    cooperatives: 'Cooperatives',
+    equipment: 'Equipment',
     assistant: 'AI Chat',
     save: 'Save',
     cancel: 'Cancel',
@@ -638,6 +642,8 @@ export const sn: Translations = {
     insurance: 'Inishuwarenzi',
     marketplace: 'Musika',
     logistics: 'Kutakura',
+    cooperatives: 'Makooperetivu',
+    equipment: 'Midziyo',
     assistant: 'AI Rubatsiro',
     save: 'Sevha',
     cancel: 'Kanzura',
@@ -938,6 +944,8 @@ export const nd: Translations = {
     insurance: 'Umshwalense',
     marketplace: 'Imakethe',
     logistics: 'Ukuthwala',
+    cooperatives: 'Amakhoopharethivu',
+    equipment: 'Amathuluzi',
     assistant: 'AI Uncedo',
     save: 'Gcina',
     cancel: 'Khansela',
