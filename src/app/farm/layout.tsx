@@ -26,6 +26,7 @@ import {
   CloudSun,
   Brain,
   BarChart3,
+  CreditCard,
 } from 'lucide-react';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -49,6 +50,7 @@ const navLinks = [
   { href: '/farm/weather', labelKey: 'weather' as const, shortKey: 'weather' as const, icon: CloudSun },
   { href: '/farm/ai-tools', labelKey: 'aiTools' as const, shortKey: 'aiTools' as const, icon: Brain },
   { href: '/farm/market-prices', labelKey: 'marketPrices' as const, shortKey: 'marketPrices' as const, icon: BarChart3 },
+  { href: '/farm/payments', labelKey: 'payments' as const, shortKey: 'payments' as const, icon: CreditCard },
   { href: '/farm/journal', labelKey: 'journal' as const, shortKey: 'journal' as const, icon: BookOpen },
   { href: '/farm/assistant', labelKey: 'assistant' as const, shortKey: 'assistant' as const, icon: Bot },
 ];

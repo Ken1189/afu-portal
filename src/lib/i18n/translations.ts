@@ -38,6 +38,7 @@ export interface Translations {
     weather: string;
     aiTools: string;
     marketPrices: string;
+    payments: string;
     assistant: string;
     save: string;
     cancel: string;
@@ -354,6 +355,7 @@ export const en: Translations = {
     weather: 'Weather',
     aiTools: 'AI Tools',
     marketPrices: 'Market Prices',
+    payments: 'Payments',
     assistant: 'AI Chat',
     save: 'Save',
     cancel: 'Cancel',
@@ -662,6 +664,7 @@ export const sn: Translations = {
     weather: 'Mamiriro eKunze',
     aiTools: 'Maturuzi eAI',
     marketPrices: 'Mitengo yeMusika',
+    payments: 'Mubhadharo',
     assistant: 'AI Rubatsiro',
     save: 'Sevha',
     cancel: 'Kanzura',
@@ -970,6 +973,7 @@ export const nd: Translations = {
     weather: 'Umumo Womkhathi',
     aiTools: 'Amathuluzi e-AI',
     marketPrices: 'Amanani Emakethe',
+    payments: 'Izinkokhelo',
     assistant: 'AI Uncedo',
     save: 'Gcina',
     cancel: 'Khansela',
