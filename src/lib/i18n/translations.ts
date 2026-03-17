@@ -32,6 +32,7 @@ export interface Translations {
     logistics: string;
     cooperatives: string;
     equipment: string;
+    livestock: string;
     assistant: string;
     save: string;
     cancel: string;
@@ -342,6 +343,7 @@ export const en: Translations = {
     logistics: 'Logistics',
     cooperatives: 'Cooperatives',
     equipment: 'Equipment',
+    livestock: 'Livestock',
     assistant: 'AI Chat',
     save: 'Save',
     cancel: 'Cancel',
@@ -644,6 +646,7 @@ export const sn: Translations = {
     logistics: 'Kutakura',
     cooperatives: 'Makooperetivu',
     equipment: 'Midziyo',
+    livestock: 'Zvipfuyo',
     assistant: 'AI Rubatsiro',
     save: 'Sevha',
     cancel: 'Kanzura',
@@ -946,6 +949,7 @@ export const nd: Translations = {
     logistics: 'Ukuthwala',
     cooperatives: 'Amakhoopharethivu',
     equipment: 'Amathuluzi',
+    livestock: 'Imfuyo',
     assistant: 'AI Uncedo',
     save: 'Gcina',
     cancel: 'Khansela',
