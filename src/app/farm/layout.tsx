@@ -21,6 +21,7 @@ import {
   UsersRound,
   Wrench,
   Beef,
+  Leaf,
 } from 'lucide-react';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -39,6 +40,7 @@ const navLinks = [
   { href: '/farm/cooperatives', labelKey: 'cooperatives' as const, shortKey: 'cooperatives' as const, icon: UsersRound },
   { href: '/farm/equipment', labelKey: 'equipment' as const, shortKey: 'equipment' as const, icon: Wrench },
   { href: '/farm/livestock', labelKey: 'livestock' as const, shortKey: 'livestock' as const, icon: Beef },
+  { href: '/farm/sustainability', labelKey: 'sustainability' as const, shortKey: 'sustainability' as const, icon: Leaf },
   { href: '/farm/journal', labelKey: 'journal' as const, shortKey: 'journal' as const, icon: BookOpen },
   { href: '/farm/assistant', labelKey: 'assistant' as const, shortKey: 'assistant' as const, icon: Bot },
 ];
