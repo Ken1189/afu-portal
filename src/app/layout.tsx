@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { SiteNavbar, SiteFooter } from "@/components/SiteChrome";
+import { AuthProvider } from "@/lib/supabase/auth-context";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -23,9 +24,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} font-sans antialiased`}>
-        <SiteNavbar />
-        <main className="min-h-screen">{children}</main>
-        <SiteFooter />
+        <AuthProvider>
+          <SiteNavbar />
+          <main className="min-h-screen">{children}</main>
+          <SiteFooter />
+        </AuthProvider>
       </body>
     </html>
   );

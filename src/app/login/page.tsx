@@ -16,8 +16,10 @@ import {
   DollarSign,
   Info,
   MessageCircle,
+  CheckCircle,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '@/lib/supabase/auth-context';
 
 /* ------------------------------------------------------------------ */
 /*  Testimonial data                                                   */
@@ -132,12 +134,23 @@ const pulseRing = {
 /* ------------------------------------------------------------------ */
 export default function LoginPage() {
   const router = useRouter();
+  const { signIn, signUp, user, isLoading: authLoading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [fullName, setFullName] = useState('');
   const [activeTestimonial, setActiveTestimonial] = useState(0);
+
+  // If already logged in, redirect
+  useEffect(() => {
+    if (!authLoading && user) {
+      router.push('/dashboard');
+    }
+  }, [user, authLoading, router]);
 
   // Rotate testimonials
   const nextTestimonial = useCallback(() => {
@@ -149,27 +162,45 @@ export default function LoginPage() {
     return () => clearInterval(interval);
   }, [nextTestimonial]);
 
-  // Login handler
+  // Login / Signup handler
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
 
-    if (email && password) {
-      setIsLoading(true);
-      // Simulate brief network delay for UX
-      await new Promise((resolve) => setTimeout(resolve, 600));
-      localStorage.setItem(
-        'afu_user',
-        JSON.stringify({
-          email,
-          name: 'Demo Member',
-          tier: 'commercial',
-          memberId: 'AFU-2024-001',
-        })
-      );
-      router.push('/dashboard');
-    } else {
+    if (!email || !password) {
       setError('Please enter your email and password.');
+      return;
+    }
+
+    if (isSignUp && !fullName) {
+      setError('Please enter your full name.');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      if (isSignUp) {
+        const { error: signUpError } = await signUp(email, password, fullName);
+        if (signUpError) {
+          setError(signUpError.message);
+        } else {
+          setSuccess('Account created! Check your email to confirm, or sign in now.');
+          setIsSignUp(false);
+        }
+      } else {
+        const { error: signInError } = await signIn(email, password);
+        if (signInError) {
+          setError(signInError.message);
+        } else {
+          router.push('/dashboard');
+        }
+      }
+    } catch (err) {
+      setError('An unexpected error occurred. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -347,21 +378,30 @@ export default function LoginPage() {
 
           {/* Heading */}
           <motion.div variants={formItem} className="mb-8">
-            <h1 className="text-3xl font-bold text-navy">Welcome back</h1>
-            <p className="text-gray-500 mt-2">Sign in to your portal</p>
-          </motion.div>
-
-          {/* Demo credentials hint */}
-          <motion.div
-            variants={formItem}
-            className="flex items-start gap-3 bg-blue-50 border border-blue-100 text-blue-700 text-sm p-4 rounded-xl mb-6"
-          >
-            <Info className="w-5 h-5 mt-0.5 shrink-0" />
-            <p>
-              <span className="font-semibold">Demo:</span> Use any email and
-              password to sign in.
+            <h1 className="text-3xl font-bold text-navy">
+              {isSignUp ? 'Create your account' : 'Welcome back'}
+            </h1>
+            <p className="text-gray-500 mt-2">
+              {isSignUp ? 'Join the African Farming Union' : 'Sign in to your portal'}
             </p>
           </motion.div>
+
+          {/* Success message */}
+          <AnimatePresence>
+            {success && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="overflow-hidden mb-4"
+              >
+                <div className="flex items-start gap-3 bg-green-50 border border-green-100 text-green-700 text-sm p-4 rounded-xl">
+                  <CheckCircle className="w-5 h-5 mt-0.5 shrink-0" />
+                  <p>{success}</p>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Form card */}
           <motion.div
@@ -386,6 +426,35 @@ export default function LoginPage() {
             </AnimatePresence>
 
             <form onSubmit={handleLogin} className="space-y-5">
+              {/* Full Name (sign-up only) */}
+              <AnimatePresence>
+                {isSignUp && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="pb-1">
+                      <label htmlFor="fullName" className="block text-sm font-medium text-navy mb-2">
+                        Full name
+                      </label>
+                      <div className="relative">
+                        <Users className="absolute left-4 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400 pointer-events-none" />
+                        <input
+                          id="fullName"
+                          type="text"
+                          className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl bg-white text-navy placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-teal/40 focus:border-teal transition-shadow"
+                          placeholder="e.g. Thabo Mokoena"
+                          value={fullName}
+                          onChange={(e) => setFullName(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
               {/* Email */}
               <div>
                 <label
@@ -495,11 +564,11 @@ export default function LoginPage() {
                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
                       />
                     </svg>
-                    <span>Signing in...</span>
+                    <span>{isSignUp ? 'Creating account...' : 'Signing in...'}</span>
                   </div>
                 ) : (
                   <>
-                    <span>Sign In</span>
+                    <span>{isSignUp ? 'Create Account' : 'Sign In'}</span>
                     <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                   </>
                 )}
@@ -528,18 +597,34 @@ export default function LoginPage() {
             </motion.button>
           </motion.div>
 
-          {/* Sign-up link */}
+          {/* Toggle sign-in / sign-up */}
           <motion.p
             variants={formItem}
             className="text-center text-gray-500 text-sm mt-6"
           >
-            Don&apos;t have an account?{' '}
-            <Link
-              href="/apply"
-              className="text-teal hover:text-teal-dark font-medium transition-colors"
-            >
-              Apply for membership
-            </Link>
+            {isSignUp ? (
+              <>
+                Already have an account?{' '}
+                <button
+                  type="button"
+                  onClick={() => { setIsSignUp(false); setError(''); setSuccess(''); }}
+                  className="text-teal hover:text-teal-dark font-medium transition-colors"
+                >
+                  Sign in
+                </button>
+              </>
+            ) : (
+              <>
+                Don&apos;t have an account?{' '}
+                <button
+                  type="button"
+                  onClick={() => { setIsSignUp(true); setError(''); setSuccess(''); }}
+                  className="text-teal hover:text-teal-dark font-medium transition-colors"
+                >
+                  Create one
+                </button>
+              </>
+            )}
           </motion.p>
 
           {/* Security footer */}

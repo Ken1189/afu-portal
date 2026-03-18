@@ -22,7 +22,9 @@ import {
   Calendar,
   Eye,
   AlertCircle,
+  Loader2,
 } from 'lucide-react';
+import { useApplications } from '@/lib/supabase/use-applications';
 
 // ── Animation variants ──
 const containerVariants = {
@@ -168,26 +170,40 @@ const rejectionReasons = [
 // ═══════════════════════════════════════════════════════
 
 export default function AdminApplicationsPage() {
+  const { applications: liveApps, loading: appsLoading, stats: appStats, approveApplication, rejectApplication } = useApplications();
   const [activeTab, setActiveTab] = useState<TabKey>('pending');
   const [expandedApp, setExpandedApp] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<'all' | AppStatus>('all');
   const [countryFilter, setCountryFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   const tabs: { key: TabKey; label: string }[] = [
-    { key: 'pending', label: 'Pending' },
+    { key: 'pending', label: `Pending${appStats.pending > 0 ? ` (${appStats.pending})` : ''}` },
     { key: 'all', label: 'All Applications' },
     { key: 'statistics', label: 'Statistics' },
   ];
 
-  // ── Stats ──
-  const totalApps = allApplications.length;
-  const pendingCount = allApplications.filter((a) => a.status === 'pending').length;
-  const approvedMtd = allApplications.filter((a) => a.status === 'approved' && a.date.includes('Mar')).length;
-  const rejectedMtd = allApplications.filter((a) => a.status === 'rejected' && a.date.includes('Mar')).length;
+  // ── Stats — use live data if available, fall back to mock ──
+  const totalApps = liveApps.length > 0 ? liveApps.length : allApplications.length;
+  const pendingCount = liveApps.length > 0 ? appStats.pending : allApplications.filter((a) => a.status === 'pending').length;
+  const approvedMtd = liveApps.length > 0 ? appStats.approved : allApplications.filter((a) => a.status === 'approved' && a.date.includes('Mar')).length;
+  const rejectedMtd = liveApps.length > 0 ? appStats.rejected : allApplications.filter((a) => a.status === 'rejected' && a.date.includes('Mar')).length;
 
-  // ── Filtered all applications ──
-  const filteredAll = allApplications.filter((a) => {
+  // ── Filtered all applications (use live if available) ──
+  const allAppsData = liveApps.length > 0
+    ? liveApps.map(a => ({
+        id: a.id.slice(0, 8),
+        name: a.full_name,
+        country: a.country,
+        tier: a.requested_tier || 'smallholder',
+        date: new Date(a.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        status: a.status as AppStatus,
+        reviewer: a.reviewed_by ? 'Admin' : '-',
+      }))
+    : allApplications;
+
+  const filteredAll = allAppsData.filter((a) => {
     const matchesStatus = statusFilter === 'all' || a.status === statusFilter;
     const matchesCountry = countryFilter === 'all' || a.country === countryFilter;
     const matchesSearch = !searchQuery || a.name.toLowerCase().includes(searchQuery.toLowerCase()) || a.id.toLowerCase().includes(searchQuery.toLowerCase());

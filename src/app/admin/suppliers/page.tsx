@@ -26,7 +26,8 @@ import {
   Package,
   ArrowUpDown,
 } from 'lucide-react';
-import { suppliers, type SupplierCategory, type SponsorshipTier } from '@/lib/data/suppliers';
+import { useSuppliers, type SupplierRow } from '@/lib/supabase/use-suppliers';
+import type { SupplierCategory, SponsorshipTier } from '@/lib/supabase/types';
 
 // ── Animation variants ────────────────────────────────────────────────────
 
@@ -117,6 +118,7 @@ function RatingStars({ rating }: { rating: number }) {
 // ═══════════════════════════════════════════════════════════════════════════
 
 export default function AdminSuppliersPage() {
+  const { suppliers, loading, stats, approveSupplier, suspendSupplier, activateSupplier } = useSuppliers();
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [countryFilter, setCountryFilter] = useState<string>('all');
@@ -125,6 +127,26 @@ export default function AdminSuppliersPage() {
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
   const [sortField, setSortField] = useState<SortField>('companyName');
   const [sortDir, setSortDir] = useState<SortDir>('asc');
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+  // ── Action handlers ───────────────────────────────────────────────────
+  const handleApprove = async (id: string) => {
+    setActionLoading(id);
+    await approveSupplier(id);
+    setActionLoading(null);
+  };
+
+  const handleSuspend = async (id: string) => {
+    setActionLoading(id);
+    await suspendSupplier(id);
+    setActionLoading(null);
+  };
+
+  const handleActivate = async (id: string) => {
+    setActionLoading(id);
+    await activateSupplier(id);
+    setActionLoading(null);
+  };
 
   // ── Filtering ─────────────────────────────────────────────────────────
   const filtered = useMemo(() => {
@@ -134,8 +156,8 @@ export default function AdminSuppliersPage() {
       const q = searchQuery.toLowerCase();
       result = result.filter(
         (s) =>
-          s.companyName.toLowerCase().includes(q) ||
-          s.contactName.toLowerCase().includes(q) ||
+          s.company_name.toLowerCase().includes(q) ||
+          s.contact_name.toLowerCase().includes(q) ||
           s.email.toLowerCase().includes(q)
       );
     }
@@ -144,9 +166,9 @@ export default function AdminSuppliersPage() {
     if (statusFilter !== 'all') result = result.filter((s) => s.status === statusFilter);
     if (tierFilter !== 'all') {
       if (tierFilter === 'none') {
-        result = result.filter((s) => s.sponsorshipTier === null);
+        result = result.filter((s) => s.sponsorship_tier === null);
       } else {
-        result = result.filter((s) => s.sponsorshipTier === tierFilter);
+        result = result.filter((s) => s.sponsorship_tier === tierFilter);
       }
     }
 
@@ -156,7 +178,7 @@ export default function AdminSuppliersPage() {
       let cmp = 0;
       switch (sortField) {
         case 'companyName':
-          cmp = a.companyName.localeCompare(b.companyName);
+          cmp = a.company_name.localeCompare(b.company_name);
           break;
         case 'category':
           cmp = a.category.localeCompare(b.category);
@@ -168,29 +190,29 @@ export default function AdminSuppliersPage() {
           cmp = a.status.localeCompare(b.status);
           break;
         case 'productsCount':
-          cmp = a.productsCount - b.productsCount;
+          cmp = a.products_count - b.products_count;
           break;
         case 'totalSales':
-          cmp = a.totalSales - b.totalSales;
+          cmp = a.total_sales - b.total_sales;
           break;
         case 'rating':
           cmp = a.rating - b.rating;
           break;
         case 'sponsorshipTier':
-          cmp = (tierOrder[a.sponsorshipTier || ''] || 0) - (tierOrder[b.sponsorshipTier || ''] || 0);
+          cmp = (tierOrder[a.sponsorship_tier || ''] || 0) - (tierOrder[b.sponsorship_tier || ''] || 0);
           break;
       }
       return sortDir === 'asc' ? cmp : -cmp;
     });
 
     return result;
-  }, [searchQuery, categoryFilter, countryFilter, statusFilter, tierFilter, sortField, sortDir]);
+  }, [suppliers, searchQuery, categoryFilter, countryFilter, statusFilter, tierFilter, sortField, sortDir]);
 
   // ── Summary stats ─────────────────────────────────────────────────────
-  const totalSuppliers = suppliers.length;
-  const activeCount = suppliers.filter((s) => s.status === 'active').length;
-  const pendingCount = suppliers.filter((s) => s.status === 'pending').length;
-  const suspendedCount = suppliers.filter((s) => s.status === 'suspended').length;
+  const totalSuppliers = stats.total;
+  const activeCount = stats.active;
+  const pendingCount = stats.pending;
+  const suspendedCount = stats.suspended;
 
   const summaryCards = [
     { label: 'Total Suppliers', value: totalSuppliers, icon: <Store className="w-5 h-5" />, color: 'text-teal', bgColor: 'bg-teal/10' },
@@ -225,14 +247,36 @@ export default function AdminSuppliersPage() {
           <h1 className="text-2xl font-bold text-navy">Supplier Management</h1>
           <p className="text-sm text-gray-500 mt-0.5">Manage all marketplace suppliers and their listings</p>
         </div>
-        <Link
-          href="/admin/suppliers/sponsorships"
-          className="inline-flex items-center gap-2 bg-navy hover:bg-navy/90 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors"
-        >
-          <Award className="w-4 h-4" />
-          Sponsorship Tiers
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/admin/suppliers/new"
+            className="inline-flex items-center gap-2 bg-teal hover:bg-teal-dark text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors"
+          >
+            <Package className="w-4 h-4" />
+            Add Supplier
+          </Link>
+          <Link
+            href="/admin/suppliers/sponsorships"
+            className="inline-flex items-center gap-2 bg-navy hover:bg-navy/90 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors"
+          >
+            <Award className="w-4 h-4" />
+            Sponsorship Tiers
+          </Link>
+        </div>
       </motion.div>
+
+      {/* ── Loading State ────────────────────────────────────────────────── */}
+      {loading && (
+        <motion.div variants={fadeUp} className="text-center py-8">
+          <div className="inline-flex items-center gap-2 text-sm text-gray-500">
+            <svg className="animate-spin h-4 w-4 text-teal" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+            Loading suppliers from database...
+          </div>
+        </motion.div>
+      )}
 
       {/* ── Summary Row ──────────────────────────────────────────────────── */}
       <motion.div variants={containerVariants} className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -462,16 +506,16 @@ export default function AdminSuppliersPage() {
                         <Link href={`/admin/suppliers/${supplier.id}`} className="flex items-center gap-3">
                           <div className="w-9 h-9 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
                             <img
-                              src={supplier.logo}
-                              alt={supplier.companyName}
+                              src={supplier.logo_url || '/placeholder-logo.png'}
+                              alt={supplier.company_name}
                               className="w-full h-full object-cover"
                             />
                           </div>
                           <div className="min-w-0">
                             <p className="font-medium text-navy text-sm truncate group-hover:text-teal transition-colors">
-                              {supplier.companyName}
+                              {supplier.company_name}
                             </p>
-                            <p className="text-xs text-gray-400 truncate">{supplier.contactName}</p>
+                            <p className="text-xs text-gray-400 truncate">{supplier.contact_name}</p>
                           </div>
                           {supplier.verified && (
                             <ShieldCheck className="w-4 h-4 text-teal flex-shrink-0" />
@@ -496,18 +540,18 @@ export default function AdminSuppliersPage() {
                         </span>
                       </td>
                       <td className="py-3 px-4 text-right">
-                        <span className="text-sm font-medium text-navy tabular-nums">{supplier.productsCount}</span>
+                        <span className="text-sm font-medium text-navy tabular-nums">{supplier.products_count}</span>
                       </td>
                       <td className="py-3 px-4 text-right">
-                        <span className="text-sm font-medium text-navy tabular-nums">{formatCurrency(supplier.totalSales)}</span>
+                        <span className="text-sm font-medium text-navy tabular-nums">{formatCurrency(supplier.total_sales)}</span>
                       </td>
                       <td className="py-3 px-4">
                         <RatingStars rating={supplier.rating} />
                       </td>
                       <td className="py-3 px-4">
-                        {supplier.sponsorshipTier ? (
-                          <span className={`inline-block text-xs px-2 py-0.5 rounded-full font-medium ${tierColors[supplier.sponsorshipTier]}`}>
-                            {supplier.sponsorshipTier.charAt(0).toUpperCase() + supplier.sponsorshipTier.slice(1)}
+                        {supplier.sponsorship_tier ? (
+                          <span className={`inline-block text-xs px-2 py-0.5 rounded-full font-medium ${tierColors[supplier.sponsorship_tier]}`}>
+                            {supplier.sponsorship_tier.charAt(0).toUpperCase() + supplier.sponsorship_tier.slice(1)}
                           </span>
                         ) : (
                           <span className="text-xs text-gray-300">--</span>
@@ -524,7 +568,9 @@ export default function AdminSuppliersPage() {
                           </Link>
                           {supplier.status === 'pending' && (
                             <button
-                              className="p-1.5 rounded-lg hover:bg-green-50 text-gray-400 hover:text-green-600 transition-colors"
+                              onClick={(e) => { e.preventDefault(); handleApprove(supplier.id); }}
+                              disabled={actionLoading === supplier.id}
+                              className="p-1.5 rounded-lg hover:bg-green-50 text-gray-400 hover:text-green-600 transition-colors disabled:opacity-50"
                               title="Approve"
                             >
                               <CheckCircle2 className="w-4 h-4" />
@@ -532,10 +578,22 @@ export default function AdminSuppliersPage() {
                           )}
                           {supplier.status === 'active' && (
                             <button
-                              className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-600 transition-colors"
+                              onClick={(e) => { e.preventDefault(); handleSuspend(supplier.id); }}
+                              disabled={actionLoading === supplier.id}
+                              className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-600 transition-colors disabled:opacity-50"
                               title="Suspend"
                             >
                               <Ban className="w-4 h-4" />
+                            </button>
+                          )}
+                          {supplier.status === 'suspended' && (
+                            <button
+                              onClick={(e) => { e.preventDefault(); handleActivate(supplier.id); }}
+                              disabled={actionLoading === supplier.id}
+                              className="p-1.5 rounded-lg hover:bg-green-50 text-gray-400 hover:text-green-600 transition-colors disabled:opacity-50"
+                              title="Activate"
+                            >
+                              <CheckCircle2 className="w-4 h-4" />
                             </button>
                           )}
                           <button
@@ -588,16 +646,16 @@ export default function AdminSuppliersPage() {
                 >
                   <div className="flex items-start gap-3 mb-3">
                     <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
-                      <img src={supplier.logo} alt={supplier.companyName} className="w-full h-full object-cover" />
+                      <img src={supplier.logo_url || '/placeholder-logo.png'} alt={supplier.company_name} className="w-full h-full object-cover" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5">
                         <h3 className="font-semibold text-navy text-sm truncate group-hover:text-teal transition-colors">
-                          {supplier.companyName}
+                          {supplier.company_name}
                         </h3>
                         {supplier.verified && <ShieldCheck className="w-4 h-4 text-teal flex-shrink-0" />}
                       </div>
-                      <p className="text-xs text-gray-400 mt-0.5">{supplier.contactName}</p>
+                      <p className="text-xs text-gray-400 mt-0.5">{supplier.contact_name}</p>
                     </div>
                     <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium whitespace-nowrap ${statusColors[supplier.status]}`}>
                       {statusIcons[supplier.status]}
@@ -609,12 +667,12 @@ export default function AdminSuppliersPage() {
                     <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${categoryColors[supplier.category]}`}>
                       {categoryLabels[supplier.category]}
                     </span>
-                    {supplier.sponsorshipTier && (
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${tierColors[supplier.sponsorshipTier]}`}>
-                        {supplier.sponsorshipTier.charAt(0).toUpperCase() + supplier.sponsorshipTier.slice(1)}
+                    {supplier.sponsorship_tier && (
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${tierColors[supplier.sponsorship_tier]}`}>
+                        {supplier.sponsorship_tier.charAt(0).toUpperCase() + supplier.sponsorship_tier.slice(1)}
                       </span>
                     )}
-                    {supplier.isFounding && (
+                    {supplier.is_founding && (
                       <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-navy/10 text-navy">
                         Founding
                       </span>
@@ -629,11 +687,11 @@ export default function AdminSuppliersPage() {
                   <div className="grid grid-cols-3 gap-3 pt-3 border-t border-gray-100">
                     <div>
                       <p className="text-xs text-gray-400">Products</p>
-                      <p className="text-sm font-semibold text-navy">{supplier.productsCount}</p>
+                      <p className="text-sm font-semibold text-navy">{supplier.products_count}</p>
                     </div>
                     <div>
                       <p className="text-xs text-gray-400">Sales</p>
-                      <p className="text-sm font-semibold text-navy">{formatCurrency(supplier.totalSales)}</p>
+                      <p className="text-sm font-semibold text-navy">{formatCurrency(supplier.total_sales)}</p>
                     </div>
                     <div>
                       <p className="text-xs text-gray-400">Rating</p>

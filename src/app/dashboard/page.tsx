@@ -58,6 +58,7 @@ import { dashboardStats, weatherData } from '@/lib/data/stats';
 import { marketPrices } from '@/lib/data/marketPrices';
 import { notifications } from '@/lib/data/notifications';
 import { activities } from '@/lib/data/activities';
+import { useAuth } from '@/lib/supabase/auth-context';
 
 // ---------------------------------------------------------------------------
 // Icon map for activities (string -> Lucide component)
@@ -212,7 +213,9 @@ function LoanTooltip({
 // Main Dashboard
 // ---------------------------------------------------------------------------
 export default function DashboardPage() {
+  const { profile, user } = useAuth();
   const [alertDismissed, setAlertDismissed] = useState(false);
+  const userName = profile?.full_name || user?.email?.split('@')[0] || 'Member';
 
   // Unread high-priority notifications
   const urgentNotifications = useMemo(
@@ -328,7 +331,7 @@ export default function DashboardPage() {
                 <User className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl md:text-2xl font-bold">{greeting}, Demo Member</h1>
+                <h1 className="text-xl md:text-2xl font-bold">{greeting}, {userName}</h1>
                 <div className="flex items-center gap-2 mt-0.5">
                   <span className="text-sm text-gray-300">AFU-2024-001</span>
                   <span className="text-gray-500">|</span>

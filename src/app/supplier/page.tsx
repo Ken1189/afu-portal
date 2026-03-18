@@ -35,10 +35,13 @@ import {
   BarChart3,
   MousePointerClick,
 } from 'lucide-react';
-import { suppliers } from '@/lib/data/suppliers';
+import { suppliers as staticSuppliers } from '@/lib/data/suppliers';
 import { supplierProducts } from '@/lib/data/supplierProducts';
 import { commissions } from '@/lib/data/commissions';
 import { advertisements } from '@/lib/data/advertisements';
+import { useSuppliers } from '@/lib/supabase/use-suppliers';
+import { useProducts } from '@/lib/supabase/use-products';
+import { useAuth } from '@/lib/supabase/auth-context';
 
 // ── Animation variants ──────────────────────────────────────────────────────
 
@@ -78,12 +81,12 @@ const fadeUp = {
   },
 };
 
-// ── Supplier context (simulating logged-in supplier) ────────────────────────
+// ── Static fallback context ──────────────────────────────────────────────────
 
-const currentSupplier = suppliers.find((s) => s.id === 'SUP-001')!;
-const supplierProductsList = supplierProducts.filter((p) => p.supplierId === currentSupplier.id);
-const supplierCommissions = commissions.filter((c) => c.supplierId === currentSupplier.id);
-const supplierAds = advertisements.filter((a) => a.supplierId === currentSupplier.id);
+const staticSupplier = staticSuppliers.find((s) => s.id === 'SUP-001')!;
+const supplierProductsList = supplierProducts.filter((p) => p.supplierId === 'SUP-001');
+const supplierCommissions = commissions.filter((c) => c.supplierId === 'SUP-001');
+const supplierAds = advertisements.filter((a) => a.supplierId === 'SUP-001');
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -101,7 +104,7 @@ function formatCompact(value: number): string {
 
 // ── KPI calculations ────────────────────────────────────────────────────────
 
-const totalRevenue = currentSupplier.totalSales;
+const totalRevenue = staticSupplier.totalSales;
 const activeProductsCount = supplierProductsList.length;
 const pendingOrdersCount = 8;
 const commissionBalance = supplierCommissions
@@ -324,12 +327,12 @@ export default function SupplierDashboard() {
         </div>
         <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold">Welcome back, {currentSupplier.companyName}!</h1>
+            <h1 className="text-2xl font-bold">Welcome back, {staticSupplier.companyName}!</h1>
             <p className="text-white/80 text-sm mt-1">
-              {currentSupplier.sponsorshipTier
-                ? `${currentSupplier.sponsorshipTier.charAt(0).toUpperCase() + currentSupplier.sponsorshipTier.slice(1)} Sponsor`
+              {staticSupplier.sponsorshipTier
+                ? `${staticSupplier.sponsorshipTier.charAt(0).toUpperCase() + staticSupplier.sponsorshipTier.slice(1)} Sponsor`
                 : 'Active Supplier'}{' '}
-              &bull; Member since {new Date(currentSupplier.joinDate).getFullYear()}
+              &bull; Member since {new Date(staticSupplier.joinDate).getFullYear()}
             </p>
           </div>
           <div className="flex items-center gap-3">

@@ -19,7 +19,9 @@ import {
   Tag,
   Filter,
 } from 'lucide-react';
-import { supplierProducts, SupplierProduct } from '@/lib/data/supplierProducts';
+import { supplierProducts as staticProducts, SupplierProduct } from '@/lib/data/supplierProducts';
+import { useProducts, type ProductRow } from '@/lib/supabase/use-products';
+import { useAuth } from '@/lib/supabase/auth-context';
 
 // ── Animation variants ──────────────────────────────────────────────────────
 
@@ -59,9 +61,9 @@ const fadeUp = {
   },
 };
 
-// ── Supplier context ────────────────────────────────────────────────────────
+// ── Static fallback ─────────────────────────────────────────────────────────
 
-const myProducts = supplierProducts.filter((p) => p.supplierId === 'SUP-001');
+const staticMyProducts = staticProducts.filter((p) => p.supplierId === 'SUP-001');
 
 // ── All categories from SupplierProduct ─────────────────────────────────────
 
@@ -132,12 +134,44 @@ function formatCurrency(value: number): string {
 // ═══════════════════════════════════════════════════════════════════════════
 
 export default function SupplierProductsPage() {
+  const { products: dbProducts, loading: productsLoading, toggleStock } = useProducts();
+  const { profile } = useAuth();
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [availabilityFilter, setAvailabilityFilter] = useState<string>('all');
   const [sortBy, setSortBy] = useState<SortKey>('name');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+
+  // Convert Supabase products to the UI shape if available
+  const myProducts: SupplierProduct[] = useMemo(() => {
+    if (dbProducts.length > 0) {
+      return dbProducts.map((p: ProductRow) => ({
+        id: p.id,
+        supplierId: p.supplier_id,
+        name: p.name,
+        description: p.description || '',
+        category: p.category === 'input-supplier' ? 'seeds' : p.category === 'financial-services' ? 'finance' : p.category,
+        price: p.price,
+        memberPrice: p.member_price || p.price,
+        discount: p.discount_percent,
+        currency: p.currency || 'USD',
+        unit: p.unit || 'unit',
+        image: p.image_url || 'https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=400&h=300&fit=crop',
+        supplier: p.supplier?.company_name || 'My Products',
+        supplierVerified: p.supplier?.verified || false,
+        inStock: p.in_stock,
+        availability: p.in_stock ? 'in-stock' : 'out-of-stock',
+        rating: p.rating || 0,
+        reviewCount: p.review_count || 0,
+        featured: p.featured,
+        tags: p.tags || [],
+        soldCount: p.sold_count || 0,
+        stockQuantity: p.stock_quantity || 0,
+      } as unknown as SupplierProduct));
+    }
+    return staticMyProducts;
+  }, [dbProducts]);
 
   // ── Filtered + sorted products ──────────────────────────────────────────
   const filteredProducts = useMemo(() => {

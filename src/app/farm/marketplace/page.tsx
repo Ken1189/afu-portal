@@ -25,9 +25,39 @@ import {
   Filter,
   X,
 } from 'lucide-react';
-import { supplierProducts, type SupplierProduct } from '@/lib/data/supplierProducts';
+import { supplierProducts as staticProducts, type SupplierProduct } from '@/lib/data/supplierProducts';
+import { useProducts, type ProductRow } from '@/lib/supabase/use-products';
 import { useCartStore } from '@/lib/stores/cartStore';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
+
+// Bridge function: convert Supabase ProductRow to the SupplierProduct shape the UI expects
+function dbToSupplierProduct(p: ProductRow): SupplierProduct {
+  return {
+    id: p.id,
+    name: p.name,
+    description: p.description || '',
+    category: p.category === 'input-supplier' ? 'seeds' :
+              p.category === 'equipment' ? 'equipment' :
+              p.category === 'logistics' ? 'logistics' :
+              p.category === 'processing' ? 'processing' :
+              p.category === 'technology' ? 'technology' :
+              p.category === 'financial-services' ? 'finance' : 'other',
+    subcategory: (p.tags?.[0] || p.category) as string,
+    price: p.price,
+    memberPrice: p.member_price || p.price,
+    discount: p.discount_percent,
+    currency: p.currency || 'USD',
+    unit: p.unit || 'unit',
+    image: p.image_url || 'https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=400&h=300&fit=crop',
+    supplier: p.supplier?.company_name || 'Unknown Supplier',
+    supplierVerified: p.supplier?.verified || false,
+    inStock: p.in_stock,
+    rating: p.rating || 0,
+    reviewCount: p.review_count || 0,
+    featured: p.featured,
+    tags: p.tags || [],
+  } as unknown as SupplierProduct;
+}
 
 // ---------------------------------------------------------------------------
 // Animation variants
@@ -345,8 +375,14 @@ function ProductCard({ product }: { product: SupplierProduct }) {
 export default function MarketplacePage() {
   useLanguage(); // keeps the language context active
 
+  const { products: dbProducts, loading: productsLoading } = useProducts();
   const { getItemCount } = useCartStore();
   const cartCount = useCartStore((state) => state.items.reduce((s, i) => s + i.quantity, 0));
+
+  // Use live products from Supabase if available, fallback to static
+  const supplierProducts = dbProducts.length > 0
+    ? dbProducts.map(dbToSupplierProduct)
+    : staticProducts;
 
   // State
   const [searchQuery, setSearchQuery] = useState('');

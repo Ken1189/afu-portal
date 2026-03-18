@@ -28,6 +28,9 @@ import {
   Hammer,
 } from 'lucide-react';
 import { useCartStore, type CartItem } from '@/lib/stores/cartStore';
+import { useOrders } from '@/lib/supabase/use-orders';
+import { useAuth } from '@/lib/supabase/auth-context';
+import { createClient } from '@/lib/supabase/client';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 // ---------------------------------------------------------------------------
@@ -249,12 +252,16 @@ function CartItemRow({
 export default function CartPage() {
   useLanguage(); // keeps the language context active
 
+  const { user, profile } = useAuth();
+  const { createOrder } = useOrders();
   const { items, removeItem, updateQuantity, clearCart, getTotal, getMemberTotal, getSavings, getItemCount } =
     useCartStore();
 
   const [selectedPayment, setSelectedPayment] = useState<string>('orange-money');
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [orderNumber, setOrderNumber] = useState<string>('');
+  const [isPlacing, setIsPlacing] = useState(false);
 
   const itemCount = getItemCount();
   const subtotal = getTotal();
@@ -263,13 +270,65 @@ export default function CartPage() {
   const deliveryFee = memberTotal >= 200 ? 0 : 15;
   const orderTotal = memberTotal + deliveryFee;
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
     if (items.length === 0) return;
+    setIsPlacing(true);
+
+    // Try to create a real order if user is logged in
+    if (user) {
+      try {
+        // Look up the member record for this user
+        const supabase = createClient();
+        const { data: member } = await supabase
+          .from('members')
+          .select('id')
+          .eq('profile_id', user.id)
+          .single();
+
+        if (member) {
+          // Build order items from cart — need supplier_id for each product
+          const orderItems = await Promise.all(
+            items.map(async (item) => {
+              // Look up product to get supplier_id
+              const { data: product } = await supabase
+                .from('products')
+                .select('supplier_id')
+                .eq('id', item.product.id)
+                .single();
+
+              return {
+                product_id: item.product.id,
+                supplier_id: product?.supplier_id || '',
+                quantity: item.quantity,
+                unit_price: item.product.memberPrice || item.product.price,
+                total_price: (item.product.memberPrice || item.product.price) * item.quantity,
+              };
+            })
+          );
+
+          const validItems = orderItems.filter(i => i.supplier_id);
+
+          if (validItems.length > 0) {
+            const { data: order } = await createOrder(
+              member.id,
+              validItems,
+              { country: profile?.country || '', region: profile?.region || '' }
+            );
+            if (order) {
+              setOrderNumber(order.order_number);
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Order creation error:', err);
+      }
+    }
+
+    setIsPlacing(false);
     setOrderPlaced(true);
     setTimeout(() => {
       clearCart();
-      setOrderPlaced(false);
-    }, 3000);
+    }, 5000);
   };
 
   const handleClearCart = () => {
@@ -362,8 +421,11 @@ export default function CartPage() {
               className="relative z-10"
             >
               <h2 className="text-xl font-bold text-white mb-2">Order Placed Successfully!</h2>
+              {orderNumber && (
+                <p className="text-xs font-mono bg-white/20 px-3 py-1 rounded-full mb-2">{orderNumber}</p>
+              )}
               <p className="text-sm text-white/80 max-w-sm leading-relaxed">
-                Your order has been submitted. You will receive a confirmation via SMS shortly.
+                Your order has been submitted{orderNumber ? ` as ${orderNumber}` : ''}. You will receive a confirmation via SMS shortly.
                 Thank you for shopping with AFU Marketplace!
               </p>
             </motion.div>
@@ -573,10 +635,20 @@ export default function CartPage() {
                 {/* Place Order button */}
                 <button
                   onClick={handlePlaceOrder}
-                  className="w-full mt-2 h-12 rounded-xl bg-teal text-white text-sm font-bold flex items-center justify-center gap-2 hover:bg-teal-dark active:scale-[0.98] transition-all shadow-sm shadow-teal/20 min-h-[48px]"
+                  disabled={isPlacing}
+                  className="w-full mt-2 h-12 rounded-xl bg-teal text-white text-sm font-bold flex items-center justify-center gap-2 hover:bg-teal-dark active:scale-[0.98] transition-all shadow-sm shadow-teal/20 min-h-[48px] disabled:opacity-60"
                 >
-                  <ShoppingCart size={18} />
-                  Place Order &middot; ${orderTotal.toFixed(2)}
+                  {isPlacing ? (
+                    <>
+                      <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingCart size={18} />
+                      Place Order &middot; ${orderTotal.toFixed(2)}
+                    </>
+                  )}
                 </button>
 
                 {/* Security note */}

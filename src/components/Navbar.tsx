@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ChevronDown,
@@ -16,7 +17,12 @@ import {
   BookOpen,
   FlaskConical,
   FolderKanban,
+  LogOut,
+  LayoutDashboard,
+  User,
+  Settings,
 } from "lucide-react";
+import { useAuth } from "@/lib/supabase/auth-context";
 
 /* ─── Data ─── */
 
@@ -70,6 +76,8 @@ const mobileMenuVariants = {
 /* ─── Component ─── */
 
 export default function Navbar() {
+  const { user, profile, isAdmin, signOut, isLoading: authLoading } = useAuth();
+  const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<OpenDropdown>(null);
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
@@ -77,6 +85,13 @@ export default function Navbar() {
   const [mobileFinanceOpen, setMobileFinanceOpen] = useState(false);
   const [mobileInsuranceOpen, setMobileInsuranceOpen] = useState(false);
   const [mobileMoreOpen, setMobileMoreOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+
+  const handleSignOut = async () => {
+    await signOut();
+    setUserMenuOpen(false);
+    router.push('/');
+  };
 
   const navRef = useRef<HTMLElement>(null);
   const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -370,18 +385,91 @@ export default function Navbar() {
 
           {/* ── Desktop CTA ── */}
           <div className="hidden lg:flex items-center gap-3 shrink-0">
-            <Link
-              href="/login"
-              className="text-navy hover:text-teal transition-colors text-sm font-medium"
-            >
-              Sign In
-            </Link>
-            <Link
-              href="/apply"
-              className="bg-teal hover:bg-teal-dark text-white px-5 py-2 rounded-lg text-sm font-semibold transition-colors"
-            >
-              Become a Member
-            </Link>
+            {!authLoading && user ? (
+              /* Signed-in user menu */
+              <div className="relative">
+                <button
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-cream transition-colors"
+                >
+                  <div className="w-8 h-8 rounded-full bg-teal/15 flex items-center justify-center text-teal font-semibold text-sm">
+                    {profile?.full_name?.charAt(0)?.toUpperCase() || user.email?.charAt(0)?.toUpperCase() || 'U'}
+                  </div>
+                  <div className="text-left">
+                    <p className="text-sm font-medium text-navy leading-tight">
+                      {profile?.full_name || user.email?.split('@')[0]}
+                    </p>
+                    <p className="text-[10px] text-gray-400 capitalize leading-tight">
+                      {profile?.role?.replace('_', ' ') || 'Member'}
+                    </p>
+                  </div>
+                  <ChevronDown className={`w-3.5 h-3.5 text-gray-400 transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                <AnimatePresence>
+                  {userMenuOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute right-0 top-full mt-1 w-52 bg-white border border-gray-100 rounded-xl shadow-lg py-2 z-50"
+                    >
+                      <Link
+                        href="/dashboard"
+                        onClick={() => setUserMenuOpen(false)}
+                        className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-navy hover:bg-cream transition-colors"
+                      >
+                        <LayoutDashboard className="w-4 h-4 text-gray-400" />
+                        Dashboard
+                      </Link>
+                      {isAdmin && (
+                        <Link
+                          href="/admin"
+                          onClick={() => setUserMenuOpen(false)}
+                          className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-navy hover:bg-cream transition-colors"
+                        >
+                          <Settings className="w-4 h-4 text-gray-400" />
+                          Admin Portal
+                        </Link>
+                      )}
+                      <Link
+                        href="/dashboard/profile"
+                        onClick={() => setUserMenuOpen(false)}
+                        className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-navy hover:bg-cream transition-colors"
+                      >
+                        <User className="w-4 h-4 text-gray-400" />
+                        My Profile
+                      </Link>
+                      <hr className="my-1.5 border-gray-100" />
+                      <button
+                        onClick={handleSignOut}
+                        className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors w-full text-left"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        Sign Out
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ) : (
+              /* Not signed in */
+              <>
+                <Link
+                  href="/login"
+                  className="text-navy hover:text-teal transition-colors text-sm font-medium"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="/apply"
+                  className="bg-teal hover:bg-teal-dark text-white px-5 py-2 rounded-lg text-sm font-semibold transition-colors"
+                >
+                  Become a Member
+                </Link>
+              </>
+            )}
           </div>
 
           {/* ── Mobile Toggle ── */}
@@ -656,20 +744,61 @@ export default function Navbar() {
 
                 {/* CTA Section */}
                 <hr className="border-gray-200 my-4" />
-                <Link
-                  href="/login"
-                  className="text-navy hover:text-teal text-base font-medium py-3 px-3 rounded-lg hover:bg-teal-light/50 transition-colors"
-                  onClick={closeMobile}
-                >
-                  Sign In
-                </Link>
-                <Link
-                  href="/apply"
-                  className="bg-teal hover:bg-teal-dark text-white px-4 py-3 rounded-lg text-base font-semibold text-center transition-colors"
-                  onClick={closeMobile}
-                >
-                  Become a Member
-                </Link>
+                {!authLoading && user ? (
+                  <>
+                    <div className="flex items-center gap-3 px-3 py-2">
+                      <div className="w-10 h-10 rounded-full bg-teal/15 flex items-center justify-center text-teal font-semibold">
+                        {profile?.full_name?.charAt(0)?.toUpperCase() || 'U'}
+                      </div>
+                      <div>
+                        <p className="font-medium text-navy text-sm">{profile?.full_name || user.email}</p>
+                        <p className="text-xs text-gray-400 capitalize">{profile?.role?.replace('_', ' ') || 'Member'}</p>
+                      </div>
+                    </div>
+                    <Link
+                      href="/dashboard"
+                      className="flex items-center gap-2 text-navy hover:text-teal text-base font-medium py-3 px-3 rounded-lg hover:bg-teal-light/50 transition-colors"
+                      onClick={closeMobile}
+                    >
+                      <LayoutDashboard className="w-4 h-4" />
+                      Dashboard
+                    </Link>
+                    {isAdmin && (
+                      <Link
+                        href="/admin"
+                        className="flex items-center gap-2 text-navy hover:text-teal text-base font-medium py-3 px-3 rounded-lg hover:bg-teal-light/50 transition-colors"
+                        onClick={closeMobile}
+                      >
+                        <Settings className="w-4 h-4" />
+                        Admin Portal
+                      </Link>
+                    )}
+                    <button
+                      onClick={() => { handleSignOut(); closeMobile(); }}
+                      className="flex items-center gap-2 text-red-600 text-base font-medium py-3 px-3 rounded-lg hover:bg-red-50 transition-colors w-full text-left"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Sign Out
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href="/login"
+                      className="text-navy hover:text-teal text-base font-medium py-3 px-3 rounded-lg hover:bg-teal-light/50 transition-colors"
+                      onClick={closeMobile}
+                    >
+                      Sign In
+                    </Link>
+                    <Link
+                      href="/apply"
+                      className="bg-teal hover:bg-teal-dark text-white px-4 py-3 rounded-lg text-base font-semibold text-center transition-colors"
+                      onClick={closeMobile}
+                    >
+                      Become a Member
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </motion.div>

@@ -33,6 +33,7 @@ import {
   CalendarDays,
 } from 'lucide-react';
 import { payments, type PaymentRecord } from '@/lib/data/payments';
+import { createClient } from '@/lib/supabase/client';
 
 // ── Animation variants ──────────────────────────────────────────────────────
 

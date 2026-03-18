@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useApplications } from "@/lib/supabase/use-applications";
 
 type Tier = "smallholder" | "commercial" | "enterprise" | "partner";
 
@@ -29,9 +30,31 @@ export default function ApplyPage() {
     about: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const { submitApplication } = useApplications();
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    setSubmitting(true);
+
+    // Submit to Supabase
+    const { error } = await submitApplication({
+      full_name: `${formData.firstName} ${formData.lastName}`.trim(),
+      email: formData.email,
+      phone: formData.phone || undefined,
+      country: formData.country,
+      farm_name: formData.organization || undefined,
+      farm_size_ha: formData.farmSize ? parseFloat(formData.farmSize) : undefined,
+      primary_crops: formData.crops ? formData.crops.split(',').map((c: string) => c.trim()) : undefined,
+      requested_tier: (selectedTier === 'smallholder' ? 'smallholder' :
+                       selectedTier === 'commercial' ? 'farmer_grower' :
+                       selectedTier === 'enterprise' ? 'commercial' : 'new_enterprise') as any,
+    });
+
+    setSubmitting(false);
+    if (!error) {
+      setSubmitted(true);
+    }
   };
 
   if (submitted) {

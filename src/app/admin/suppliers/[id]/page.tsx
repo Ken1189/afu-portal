@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -45,7 +45,9 @@ import {
   Clock,
   Percent,
 } from 'lucide-react';
-import { suppliers, type SupplierCategory, type SponsorshipTier } from '@/lib/data/suppliers';
+import { createClient } from '@/lib/supabase/client';
+import type { SupplierCategory, SponsorshipTier } from '@/lib/supabase/types';
+import type { SupplierRow } from '@/lib/supabase/use-suppliers';
 
 // ── Animation variants ────────────────────────────────────────────────────
 
@@ -278,22 +280,49 @@ const tabs: { key: TabKey; label: string; icon: React.ReactNode }[] = [
 export default function SupplierDetailPage() {
   const params = useParams();
   const id = params.id as string;
-  const supplier = suppliers.find((s) => s.id === id);
+  const [supplier, setSupplier] = useState<SupplierRow | null>(null);
+  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabKey>('overview');
+
+  // Fetch supplier from Supabase
+  useEffect(() => {
+    const supabase = createClient();
+    supabase
+      .from('suppliers')
+      .select('*')
+      .eq('id', id)
+      .single()
+      .then(({ data, error }) => {
+        if (!error && data) setSupplier(data as SupplierRow);
+        setLoading(false);
+      });
+  }, [id]);
 
   // Generate data based on supplier
   const monthlySales = useMemo(
-    () => (supplier ? generateMonthlySales(supplier.totalSales) : []),
+    () => (supplier ? generateMonthlySales(supplier.total_sales) : []),
     [supplier]
   );
   const products = useMemo(
-    () => (supplier ? generateProducts(supplier.category, supplier.productsCount) : []),
+    () => (supplier ? generateProducts(supplier.category, supplier.products_count) : []),
     [supplier]
   );
   const commissionHistory = useMemo(
-    () => (supplier ? generateCommissionHistory(supplier.commissionRate, supplier.totalSales) : []),
+    () => (supplier ? generateCommissionHistory(supplier.commission_rate, supplier.total_sales) : []),
     [supplier]
   );
+
+  if (loading) {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center">
+        <svg className="animate-spin h-8 w-8 text-teal mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+        </svg>
+        <p className="text-sm text-gray-500">Loading supplier details...</p>
+      </div>
+    );
+  }
 
   if (!supplier) {
     return (
@@ -342,28 +371,28 @@ export default function SupplierDetailPage() {
           <div className="flex items-start gap-4 flex-1">
             <div className="w-20 h-20 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-200">
               <img
-                src={supplier.logo}
-                alt={supplier.companyName}
+                src={supplier.logo_url || '/placeholder-logo.png'}
+                alt={supplier.company_name}
                 className="w-full h-full object-cover"
               />
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="text-xl font-bold text-navy">{supplier.companyName}</h1>
+                <h1 className="text-xl font-bold text-navy">{supplier.company_name}</h1>
                 {supplier.verified && (
                   <span className="inline-flex items-center gap-1 text-xs bg-teal/10 text-teal px-2 py-0.5 rounded-full font-medium">
                     <ShieldCheck className="w-3 h-3" />
                     Verified
                   </span>
                 )}
-                {supplier.isFounding && (
+                {supplier.is_founding && (
                   <span className="inline-flex items-center gap-1 text-xs bg-navy/10 text-navy px-2 py-0.5 rounded-full font-medium">
                     <Award className="w-3 h-3" />
                     Founding Member
                   </span>
                 )}
               </div>
-              <p className="text-sm text-gray-500 mt-1">{supplier.contactName}</p>
+              <p className="text-sm text-gray-500 mt-1">{supplier.contact_name}</p>
               <div className="flex flex-wrap items-center gap-3 mt-2">
                 <span className={`inline-block text-xs px-2.5 py-0.5 rounded-full font-medium ${categoryColors[supplier.category]}`}>
                   {categoryLabels[supplier.category]}
@@ -371,9 +400,9 @@ export default function SupplierDetailPage() {
                 <span className={`inline-flex items-center gap-1 text-xs px-2.5 py-0.5 rounded-full font-medium ${statusColors[supplier.status]}`}>
                   {supplier.status.charAt(0).toUpperCase() + supplier.status.slice(1)}
                 </span>
-                {supplier.sponsorshipTier && (
-                  <span className={`inline-block text-xs px-2.5 py-0.5 rounded-full font-medium ${tierColors[supplier.sponsorshipTier]}`}>
-                    {supplier.sponsorshipTier.charAt(0).toUpperCase() + supplier.sponsorshipTier.slice(1)} Sponsor
+                {supplier.sponsorship_tier && (
+                  <span className={`inline-block text-xs px-2.5 py-0.5 rounded-full font-medium ${tierColors[supplier.sponsorship_tier]}`}>
+                    {supplier.sponsorship_tier.charAt(0).toUpperCase() + supplier.sponsorship_tier.slice(1)} Sponsor
                   </span>
                 )}
                 <span className="flex items-center gap-1 text-xs text-gray-500">
@@ -384,7 +413,7 @@ export default function SupplierDetailPage() {
               <div className="flex items-center gap-2 mt-2">
                 <RatingStars rating={supplier.rating} size="md" />
                 <span className="text-sm font-medium text-navy">{supplier.rating.toFixed(1)}</span>
-                <span className="text-xs text-gray-400">({supplier.reviewCount} reviews)</span>
+                <span className="text-xs text-gray-400">({supplier.review_count} reviews)</span>
               </div>
             </div>
           </div>
@@ -393,19 +422,19 @@ export default function SupplierDetailPage() {
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-3 lg:w-72">
             <div className="bg-cream rounded-lg p-3 text-center">
               <p className="text-xs text-gray-500">Products</p>
-              <p className="text-lg font-bold text-navy">{supplier.productsCount}</p>
+              <p className="text-lg font-bold text-navy">{supplier.products_count}</p>
             </div>
             <div className="bg-cream rounded-lg p-3 text-center">
               <p className="text-xs text-gray-500">Total Sales</p>
-              <p className="text-lg font-bold text-navy">{formatCurrency(supplier.totalSales)}</p>
+              <p className="text-lg font-bold text-navy">{formatCurrency(supplier.total_sales)}</p>
             </div>
             <div className="bg-cream rounded-lg p-3 text-center">
               <p className="text-xs text-gray-500">Orders</p>
-              <p className="text-lg font-bold text-navy">{supplier.totalOrders.toLocaleString()}</p>
+              <p className="text-lg font-bold text-navy">{supplier.total_orders.toLocaleString()}</p>
             </div>
             <div className="bg-cream rounded-lg p-3 text-center">
               <p className="text-xs text-gray-500">Commission</p>
-              <p className="text-lg font-bold text-navy">{supplier.commissionRate}%</p>
+              <p className="text-lg font-bold text-navy">{supplier.commission_rate}%</p>
             </div>
           </div>
         </div>
@@ -506,7 +535,7 @@ export default function SupplierDetailPage() {
                         <div>
                           <p className="text-xs text-gray-400">Website</p>
                           <a
-                            href={supplier.website}
+                            href={supplier.website || '#'}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-sm text-teal hover:text-teal-dark flex items-center gap-1 transition-colors"
@@ -531,7 +560,7 @@ export default function SupplierDetailPage() {
                         <div>
                           <p className="text-xs text-gray-400">Joined</p>
                           <p className="text-sm text-navy">
-                            {new Date(supplier.joinDate).toLocaleDateString('en-US', {
+                            {new Date(supplier.join_date).toLocaleDateString('en-US', {
                               year: 'numeric',
                               month: 'long',
                               day: 'numeric',
@@ -555,7 +584,7 @@ export default function SupplierDetailPage() {
                           <Percent className="w-4 h-4 text-teal" />
                           <p className="text-xs text-gray-500">Member Discount</p>
                         </div>
-                        <p className="text-xl font-bold text-navy">{supplier.memberDiscountPercent}%</p>
+                        <p className="text-xl font-bold text-navy">{supplier.member_discount_percent}%</p>
                         <p className="text-xs text-gray-400">Off retail price</p>
                       </div>
                       <div className="bg-cream rounded-lg p-4">
@@ -563,7 +592,7 @@ export default function SupplierDetailPage() {
                           <DollarSign className="w-4 h-4 text-gold" />
                           <p className="text-xs text-gray-500">Commission Rate</p>
                         </div>
-                        <p className="text-xl font-bold text-navy">{supplier.commissionRate}%</p>
+                        <p className="text-xl font-bold text-navy">{supplier.commission_rate}%</p>
                         <p className="text-xs text-gray-400">Per transaction</p>
                       </div>
                     </div>
@@ -606,7 +635,7 @@ export default function SupplierDetailPage() {
                     Products ({products.length})
                   </h3>
                   <span className="text-xs text-gray-400">
-                    Member discount: {supplier.memberDiscountPercent}% off
+                    Member discount: {supplier.member_discount_percent}% off
                   </span>
                 </div>
                 {products.length > 0 ? (
@@ -775,7 +804,7 @@ export default function SupplierDetailPage() {
                       <span className="text-xs text-gray-500">Avg. Order Value</span>
                     </div>
                     <p className="text-lg font-bold text-navy">
-                      ${supplier.totalOrders > 0 ? Math.round(supplier.totalSales / supplier.totalOrders).toLocaleString() : 0}
+                      ${supplier.total_orders > 0 ? Math.round(supplier.total_sales / supplier.total_orders).toLocaleString() : 0}
                     </p>
                   </div>
                   <div className="bg-cream rounded-lg p-4">
@@ -784,7 +813,7 @@ export default function SupplierDetailPage() {
                       <span className="text-xs text-gray-500">Unique Customers</span>
                     </div>
                     <p className="text-lg font-bold text-navy">
-                      {supplier.totalOrders > 0 ? Math.round(supplier.totalOrders * 0.65) : 0}
+                      {supplier.total_orders > 0 ? Math.round(supplier.total_orders * 0.65) : 0}
                     </p>
                   </div>
                   <div className="bg-cream rounded-lg p-4">
@@ -793,7 +822,7 @@ export default function SupplierDetailPage() {
                       <span className="text-xs text-gray-500">Repeat Rate</span>
                     </div>
                     <p className="text-lg font-bold text-navy">
-                      {supplier.totalOrders > 0 ? '35%' : '0%'}
+                      {supplier.total_orders > 0 ? '35%' : '0%'}
                     </p>
                   </div>
                   <div className="bg-cream rounded-lg p-4">
@@ -802,7 +831,7 @@ export default function SupplierDetailPage() {
                       <span className="text-xs text-gray-500">Fulfillment Rate</span>
                     </div>
                     <p className="text-lg font-bold text-navy">
-                      {supplier.totalOrders > 0 ? '97.2%' : '0%'}
+                      {supplier.total_orders > 0 ? '97.2%' : '0%'}
                     </p>
                   </div>
                 </motion.div>
@@ -897,7 +926,7 @@ export default function SupplierDetailPage() {
                         <td className="py-3 px-4 text-right font-bold text-navy tabular-nums">
                           {formatCurrency(commissionHistory.reduce((s, r) => s + r.sales, 0))}
                         </td>
-                        <td className="py-3 px-4 text-right text-gray-500 tabular-nums">{supplier.commissionRate}%</td>
+                        <td className="py-3 px-4 text-right text-gray-500 tabular-nums">{supplier.commission_rate}%</td>
                         <td className="py-3 px-4 text-right font-bold text-navy tabular-nums">
                           {formatCurrency(totalCommission)}
                         </td>
