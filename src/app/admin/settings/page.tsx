@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Settings,
@@ -367,6 +367,38 @@ export default function SettingsPage() {
   const [templateStates, setTemplateStates] = useState<Record<string, boolean>>(
     () => Object.fromEntries(emailTemplates.map((t) => [t.id, t.enabled]))
   );
+  const [liveSettings, setLiveSettings] = useState<Record<string, Record<string, unknown>> | null>(null);
+  const [saveStatus, setSaveStatus] = useState<string | null>(null);
+
+  // Fetch live settings from API
+  useEffect(() => {
+    fetch('/api/admin/settings')
+      .then(res => res.json())
+      .then(data => { if (!data.error) setLiveSettings(data); })
+      .catch(() => { /* fallback to defaults */ });
+  }, []);
+
+  // Save a setting section
+  const saveSetting = useCallback(async (key: string, value: Record<string, unknown>) => {
+    setSaveStatus('Saving...');
+    try {
+      const res = await fetch('/api/admin/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key, value }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setSaveStatus('Saved!');
+        setLiveSettings(prev => prev ? { ...prev, [key]: value } : { [key]: value });
+      } else {
+        setSaveStatus('Error: ' + (data.error || 'unknown'));
+      }
+    } catch {
+      setSaveStatus('Failed to save');
+    }
+    setTimeout(() => setSaveStatus(null), 3000);
+  }, []);
 
   const tabs: { id: TabId; label: string; icon: React.ReactNode }[] = [
     { id: 'general', label: 'General', icon: <Globe className="w-4 h-4" /> },

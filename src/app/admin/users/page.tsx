@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Users,
@@ -20,7 +20,7 @@ import {
   X,
   Clock,
 } from 'lucide-react';
-import { adminUsers, type AdminUser } from '@/lib/data/audit';
+import { adminUsers as mockAdminUsers, type AdminUser } from '@/lib/data/audit';
 
 // ── Animation variants ──────────────────────────────────────────────────────
 
@@ -312,6 +312,20 @@ export default function UsersPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [liveUsers, setLiveUsers] = useState<AdminUser[] | null>(null);
+
+  // Fetch real admin users from profiles table
+  useEffect(() => {
+    fetch('/api/admin/stats')
+      .then(res => res.json())
+      .then(() => {
+        // The /api/admin/stats doesn't return user list yet — use mock for now
+        // This will be wired when we add a /api/admin/users endpoint
+      })
+      .catch(() => {});
+  }, []);
+
+  const adminUsers = liveUsers || mockAdminUsers;
 
   // ── Stats ─────────────────────────────────────────────────────────────
 
