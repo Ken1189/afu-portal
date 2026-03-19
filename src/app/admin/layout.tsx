@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '@/lib/supabase/auth-context';
 import {
   LayoutDashboard,
   Users,
@@ -220,7 +221,36 @@ function SidebarContent({
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { user, isLoading: authLoading, isAdmin } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [roleChecked, setRoleChecked] = useState(false);
+  const [authorized, setAuthorized] = useState(false);
+
+  // ── Role guard: redirect non-admins ──────────────────────
+  useEffect(() => {
+    if (authLoading) return;
+
+    if (!user) {
+      router.replace('/login?redirect=/admin');
+      return;
+    }
+
+    // Use server API to check role (bypasses RLS)
+    fetch('/api/auth/me')
+      .then((res) => res.json())
+      .then(({ role }) => {
+        if (role === 'admin' || role === 'super_admin') {
+          setAuthorized(true);
+        } else {
+          router.replace('/dashboard');
+        }
+        setRoleChecked(true);
+      })
+      .catch(() => {
+        router.replace('/dashboard');
+      });
+  }, [user, authLoading, router]);
 
   // Initialize collapsed state — some groups start collapsed
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>(() => {
@@ -234,6 +264,21 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const toggleGroup = (label: string) => {
     setCollapsedGroups((prev) => ({ ...prev, [label]: !prev[label] }));
   };
+
+  // Show loading while checking auth
+  if (authLoading || !roleChecked || !authorized) {
+    return (
+      <div className="min-h-screen bg-cream flex items-center justify-center">
+        <div className="text-center">
+          <svg className="animate-spin h-8 w-8 text-teal mx-auto mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+          </svg>
+          <p className="text-sm text-gray-500">Verifying access...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-cream flex">
@@ -294,11 +339,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </button>
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 bg-navy rounded-full flex items-center justify-center">
-                <span className="text-white text-xs font-bold">TC</span>
+                <span className="text-white text-xs font-bold">
+                  {user?.email?.charAt(0).toUpperCase() || 'A'}
+                </span>
               </div>
               <div className="hidden sm:block">
-                <p className="text-sm font-medium text-navy leading-tight">Tendai C.</p>
-                <p className="text-[10px] text-gray-400 leading-tight">Super Admin</p>
+                <p className="text-sm font-medium text-navy leading-tight">
+                  {user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Admin'}
+                </p>
+                <p className="text-[10px] text-gray-400 leading-tight">
+                  {isAdmin ? 'Super Admin' : 'Admin'}
+                </p>
               </div>
             </div>
           </div>
