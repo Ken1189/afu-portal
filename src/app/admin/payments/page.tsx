@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   PieChart,
@@ -32,8 +32,14 @@ import {
   ChevronRight,
   CalendarDays,
 } from 'lucide-react';
-import { payments, type PaymentRecord } from '@/lib/data/payments';
+import { payments as mockPayments, type PaymentRecord } from '@/lib/data/payments';
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { createClient } from '@/lib/supabase/client';
+
+interface FinancialApiData {
+  payments: { records: PaymentRecord[]; stats: { total: number; totalCollected: number; totalPending: number; totalFailed: number; completedCount: number; pendingCount: number; failedCount: number } };
+}
 
 // ── Animation variants ──────────────────────────────────────────────────────
 
@@ -209,27 +215,39 @@ export default function PaymentsPage() {
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [liveData, setLiveData] = useState<FinancialApiData | null>(null);
+
+  // Fetch live financial data
+  useEffect(() => {
+    fetch('/api/admin/financial')
+      .then(res => res.json())
+      .then(data => { if (!data.error) setLiveData(data); })
+      .catch(() => { /* fallback to mock */ });
+  }, []);
+
+  // Use live payments or fallback to mock
+  const payments = liveData?.payments?.records?.length ? liveData.payments.records : mockPayments;
 
   // ── Computed stats ────────────────────────────────────────────────────
 
   const totalRevenue = useMemo(
-    () => payments.filter((p) => p.status === 'completed').reduce((sum, p) => sum + p.amount, 0),
-    []
+    () => liveData?.payments?.stats?.totalCollected ?? payments.filter((p) => p.status === 'completed').reduce((sum, p) => sum + p.amount, 0),
+    [payments, liveData]
   );
 
   const pendingTotal = useMemo(
-    () => payments.filter((p) => p.status === 'pending').reduce((sum, p) => sum + p.amount, 0),
-    []
+    () => liveData?.payments?.stats?.totalPending ?? payments.filter((p) => p.status === 'pending').reduce((sum, p) => sum + p.amount, 0),
+    [payments, liveData]
   );
 
   const failedTotal = useMemo(
-    () => payments.filter((p) => p.status === 'failed').reduce((sum, p) => sum + p.amount, 0),
-    []
+    () => liveData?.payments?.stats?.totalFailed ?? payments.filter((p) => p.status === 'failed').reduce((sum, p) => sum + p.amount, 0),
+    [payments, liveData]
   );
 
   const reversedTotal = useMemo(
     () => payments.filter((p) => p.status === 'reversed').reduce((sum, p) => sum + p.amount, 0),
-    []
+    [payments]
   );
 
   const pendingCount = payments.filter((p) => p.status === 'pending').length;

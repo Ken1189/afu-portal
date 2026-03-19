@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Shield,
@@ -16,7 +16,7 @@ import {
   Activity,
   CalendarDays,
 } from 'lucide-react';
-import { auditEntries, type AuditEntry, type AuditAction, type AuditSeverity } from '@/lib/data/audit';
+import { auditEntries as mockAuditEntries, type AuditEntry, type AuditAction, type AuditSeverity } from '@/lib/data/audit';
 
 // ── Animation variants ──────────────────────────────────────────────────────
 
@@ -265,10 +265,41 @@ export default function AuditPage() {
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_LOAD);
+  const [liveAudit, setLiveAudit] = useState<AuditEntry[] | null>(null);
+
+  // Fetch live audit data
+  useEffect(() => {
+    fetch('/api/admin/financial')
+      .then(res => res.json())
+      .then(data => {
+        if (data?.audit?.length) {
+          // Map API audit entries to the existing AuditEntry shape
+          const mapped: AuditEntry[] = data.audit.map((a: Record<string, unknown>, i: number) => ({
+            id: (a.id as string) || `live-${i}`,
+            timestamp: a.created_at as string,
+            userId: (a.user_id as string) || 'system',
+            userName: (a.details as Record<string, string>)?.user_name || 'System',
+            userRole: (a.details as Record<string, string>)?.user_role || 'admin',
+            action: (a.action as AuditAction) || 'update',
+            entity: (a.entity_type as string) || 'system',
+            entityId: (a.entity_id as string) || '',
+            description: `${a.action} on ${a.entity_type}`,
+            severity: (a.severity as AuditSeverity) || 'info',
+            ipAddress: (a.ip_address as string) || '—',
+            details: a.details as Record<string, string> || {},
+          }));
+          setLiveAudit(mapped);
+        }
+      })
+      .catch(() => { /* fallback to mock */ });
+  }, []);
+
+  // Use live data or mock
+  const auditEntries = liveAudit?.length ? liveAudit : mockAuditEntries;
 
   // ── Computed stats ────────────────────────────────────────────────────
 
-  const todayStr = '2026-03-16';
+  const todayStr = new Date().toISOString().slice(0, 10);
   const todayEvents = auditEntries.filter((e) => e.timestamp.startsWith(todayStr));
   const criticalCount = auditEntries.filter((e) => e.severity === 'critical').length;
   const warningCount = auditEntries.filter((e) => e.severity === 'warning').length;
