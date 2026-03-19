@@ -323,6 +323,17 @@ export default function PaymentHistoryPage() {
               </div>
             </div>
 
+            {/* Actions */}
+            <div className="flex items-center gap-3">
+              <a
+                href="/farm/payments/checkout"
+                className="flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:shadow-md min-h-[44px]"
+                style={{ backgroundColor: COLORS.teal }}
+              >
+                <Plus className="h-4 w-4" />
+                Make Payment
+              </a>
+
             {/* Time period selector */}
             <div className="relative">
               <button
@@ -359,6 +370,7 @@ export default function PaymentHistoryPage() {
                   </motion.div>
                 )}
               </AnimatePresence>
+            </div>
             </div>
           </div>
         </motion.div>
