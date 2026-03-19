@@ -16,7 +16,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
-import { insuranceProducts, type InsuranceType } from '@/lib/data/insurance';
+import { insuranceProducts as mockInsuranceProducts, type InsuranceType, type InsuranceProduct } from '@/lib/data/insurance';
 
 /* ------------------------------------------------------------------ */
 /* Animation Variants                                                  */
@@ -49,6 +49,8 @@ const filterOptions: { key: FilterKey; label: string; emoji: string }[] = [
 export default function ProductsPage() {
   const { t } = useLanguage();
   const ti = t.insurance;
+
+  const insuranceProducts: InsuranceProduct[] = mockInsuranceProducts;
 
   const [activeFilter, setActiveFilter] = useState<FilterKey>('all');
   const [expandedProduct, setExpandedProduct] = useState<string | null>(null);

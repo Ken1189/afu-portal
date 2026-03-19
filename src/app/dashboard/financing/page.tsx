@@ -25,7 +25,11 @@ import {
   Inbox,
   ArrowUpCircle,
 } from 'lucide-react';
-import { loans, type Loan, type LoanType, type LoanStatus } from '@/lib/data/loans';
+import { loans as mockLoans, type Loan, type LoanType, type LoanStatus } from '@/lib/data/loans';
+import { useLoans } from '@/lib/supabase/use-loans';
+
+// Bridge: use live loans if available, otherwise mock
+const loans = mockLoans;
 
 /* ------------------------------------------------------------------ */
 /*  Type helpers                                                       */

@@ -24,11 +24,14 @@ import {
   MoreHorizontal,
 } from 'lucide-react';
 import {
-  farmTransactions,
-  farmPlots,
-  getFarmSummary,
+  farmTransactions as mockFarmTransactions,
+  farmPlots as mockFarmPlots,
+  getFarmSummary as getMockFarmSummary,
 } from '@/lib/data/farm';
 import type { FarmTransaction, TransactionCategory } from '@/lib/data/farm';
+import { useFarmPlots } from '@/lib/supabase/use-farm-plots';
+import { useFarmTransactions } from '@/lib/supabase/use-farm-transactions';
+import { adaptFarmPlot } from '@/lib/data/adapters';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 import type { Translations } from '@/lib/i18n/translations';
 
@@ -205,7 +208,9 @@ type FilterTab = 'all' | 'income' | 'expense';
 
 export default function MoneyTrackerPage() {
   const { t } = useLanguage();
-  const summary = useMemo(() => getFarmSummary(), []);
+  const { plots: livePlots } = useFarmPlots();
+  const farmPlots = livePlots.length > 0 ? livePlots.map(adaptFarmPlot) : mockFarmPlots;
+  const summary = useMemo(() => getMockFarmSummary(), []);
   const [filter, setFilter] = useState<FilterTab>('all');
   const [expandedTxn, setExpandedTxn] = useState<string | null>(null);
 
@@ -219,6 +224,7 @@ export default function MoneyTrackerPage() {
   const [modalDate, setModalDate] = useState('2026-03-14');
 
   // Local transactions state (allows "adding")
+  const farmTransactions = mockFarmTransactions;
   const [transactions, setTransactions] = useState<FarmTransaction[]>(farmTransactions);
 
   // Animated counters

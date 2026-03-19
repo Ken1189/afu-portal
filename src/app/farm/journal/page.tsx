@@ -32,11 +32,13 @@ import {
 } from 'lucide-react';
 import {
   journalEntries as initialEntries,
-  farmPlots,
+  farmPlots as mockFarmPlots,
   type JournalEntry,
   type ActivityType,
   type WeatherCondition,
 } from '@/lib/data/farm';
+// Live data hooks available — sub-components still use mock farmPlots for plot selectors
+const farmPlots = mockFarmPlots;
 
 // ---------------------------------------------------------------------------
 // Constants & Mappings

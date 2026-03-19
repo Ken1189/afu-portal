@@ -18,7 +18,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
-import { insuranceProducts, type InsuranceProduct, type InsuranceType } from '@/lib/data/insurance';
+import { insuranceProducts as mockInsuranceProducts, type InsuranceProduct, type InsuranceType } from '@/lib/data/insurance';
 
 /* ------------------------------------------------------------------ */
 /* Animation Variants                                                  */
@@ -73,6 +73,8 @@ const typeRates: Record<InsuranceType, number> = {
 export default function QuotePage() {
   const { t } = useLanguage();
   const ti = t.insurance;
+
+  const insuranceProducts: InsuranceProduct[] = mockInsuranceProducts;
 
   /* ── Form state ── */
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);

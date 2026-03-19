@@ -31,12 +31,14 @@ import {
   CircleDot,
   X,
 } from 'lucide-react';
+import { useFarmPlots } from '@/lib/supabase/use-farm-plots';
+import { adaptFarmPlot } from '@/lib/data/adapters';
 import {
-  farmPlots,
+  farmPlots as mockFarmPlots,
   weatherForecast,
   farmTasks as initialFarmTasks,
-  farmActivities,
-  getFarmSummary,
+  farmActivities as mockFarmActivities,
+  getFarmSummary as getMockFarmSummary,
 } from '@/lib/data/farm';
 import type { WeatherCondition, ActivityType, FarmTask } from '@/lib/data/farm';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
@@ -181,7 +183,9 @@ const priorityBadge: Record<string, { bg: string; dot: string; label: string }> 
 
 export default function FarmDashboardPage() {
   const { t } = useLanguage();
-  const summary = useMemo(() => getFarmSummary(), []);
+  const { plots: livePlots } = useFarmPlots();
+  const farmPlots = livePlots.length > 0 ? livePlots.map(adaptFarmPlot) : mockFarmPlots;
+  const summary = useMemo(() => getMockFarmSummary(), []);
   const today = weatherForecast[0];
 
   // Task completion state
@@ -581,7 +585,7 @@ export default function FarmDashboardPage() {
         </div>
 
         <div className="rounded-2xl bg-white border border-gray-100 divide-y divide-gray-50 overflow-hidden">
-          {farmActivities.slice(0, 5).map((activity) => (
+          {mockFarmActivities.slice(0, 5).map((activity) => (
             <div
               key={activity.id}
               className="flex items-center gap-3 p-3 min-h-[44px]"

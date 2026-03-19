@@ -36,12 +36,16 @@ import {
   Calendar,
 } from 'lucide-react';
 import {
-  exportShipments,
-  exportDocuments,
+  exportShipments as mockExportShipments,
+  exportDocuments as mockExportDocuments,
   type ExportShipment,
   type ShipmentStatus,
   type DocumentStatus,
 } from '@/lib/data/exports';
+
+// ── Module-level aliases (keep component code unchanged) ────────────────────
+const exportShipments = mockExportShipments;
+const exportDocuments = mockExportDocuments;
 
 // ---------------------------------------------------------------------------
 // Animation variants

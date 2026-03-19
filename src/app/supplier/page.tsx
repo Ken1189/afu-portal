@@ -35,13 +35,19 @@ import {
   BarChart3,
   MousePointerClick,
 } from 'lucide-react';
-import { suppliers as staticSuppliers } from '@/lib/data/suppliers';
-import { supplierProducts } from '@/lib/data/supplierProducts';
-import { commissions } from '@/lib/data/commissions';
-import { advertisements } from '@/lib/data/advertisements';
+import { suppliers as mockSuppliers } from '@/lib/data/suppliers';
+import { supplierProducts as mockSupplierProducts } from '@/lib/data/supplierProducts';
+import { commissions as mockCommissions } from '@/lib/data/commissions';
+import { advertisements as mockAdvertisements } from '@/lib/data/advertisements';
 import { useSuppliers } from '@/lib/supabase/use-suppliers';
 import { useProducts } from '@/lib/supabase/use-products';
 import { useAuth } from '@/lib/supabase/auth-context';
+
+// ── Module-level aliases (keep component code unchanged) ────────────────────
+const staticSuppliers = mockSuppliers;
+const supplierProducts = mockSupplierProducts;
+const commissions = mockCommissions;
+const advertisements = mockAdvertisements;
 
 // ── Animation variants ──────────────────────────────────────────────────────
 

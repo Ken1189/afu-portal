@@ -23,7 +23,9 @@ import {
   Leaf,
   FileText,
 } from 'lucide-react';
-import { products, type Product } from '@/lib/data/products';
+import { products as mockProducts, type Product } from '@/lib/data/products';
+
+const products = mockProducts;
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                             */

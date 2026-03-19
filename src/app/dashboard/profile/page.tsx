@@ -35,7 +35,9 @@ import {
   Copy,
   ExternalLink,
 } from 'lucide-react';
-import { members, type Member } from '@/lib/data/members';
+import { members as mockMembers, type Member } from '@/lib/data/members';
+
+const members = mockMembers;
 
 /* ------------------------------------------------------------------ */
 /*  Use first member as the logged-in user for demo                    */

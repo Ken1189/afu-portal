@@ -21,7 +21,12 @@ import {
   Users,
   FileText,
 } from 'lucide-react';
-import { animals, breedingRecords, type BreedingRecord } from '@/lib/data/livestock';
+import { animals as mockAnimals, breedingRecords as mockBreedingRecords, type BreedingRecord } from '@/lib/data/livestock';
+import { useLivestock } from '@/lib/supabase/use-livestock';
+
+// Use mock data as primary source (rich UI types not yet in DB)
+const animals = mockAnimals;
+const breedingRecords = mockBreedingRecords;
 
 // ---------------------------------------------------------------------------
 // Animation variants
@@ -494,6 +499,9 @@ function OffspringGroupCard({
 // ---------------------------------------------------------------------------
 
 export default function LivestockBreedingPage() {
+  // --- Live Supabase data (available when real data is entered) ---
+  const { livestock: liveLivestock } = useLivestock();
+
   // --- State ---
   const [activeTab, setActiveTab] = useState<TabKey>('active');
   const [historyStatusFilter, setHistoryStatusFilter] = useState<BreedingRecord['status'] | 'all'>('all');

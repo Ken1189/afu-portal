@@ -37,7 +37,8 @@ import {
   Megaphone,
   Zap,
 } from 'lucide-react';
-import { suppliers, type SponsorshipTier } from '@/lib/data/suppliers';
+import { suppliers as mockSuppliers, type SponsorshipTier } from '@/lib/data/suppliers';
+const suppliers = mockSuppliers;
 
 // ── Animation variants ────────────────────────────────────────────────────
 

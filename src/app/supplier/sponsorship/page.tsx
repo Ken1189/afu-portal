@@ -38,7 +38,10 @@ import {
   Shield,
   Mic,
 } from 'lucide-react';
-import { suppliers } from '@/lib/data/suppliers';
+import { suppliers as mockSuppliers } from '@/lib/data/suppliers';
+
+// ── Module-level alias (keep component code unchanged) ──────────────────────
+const suppliers = mockSuppliers;
 
 // ── Animation variants ──────────────────────────────────────────────────────
 

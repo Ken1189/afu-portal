@@ -17,8 +17,8 @@ import {
 } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import {
-  insurancePolicies,
-  insuranceClaims,
+  insurancePolicies as mockInsurancePolicies,
+  insuranceClaims as mockInsuranceClaims,
   type InsuranceType,
 } from '@/lib/data/insurance';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
@@ -122,6 +122,9 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<
 
 export default function InsuranceHomePage() {
   const { t } = useLanguage();
+
+  const insurancePolicies = mockInsurancePolicies;
+  const insuranceClaims = mockInsuranceClaims;
 
   // Compute stats from data
   const stats = useMemo(() => {

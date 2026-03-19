@@ -44,8 +44,12 @@ import {
   ChevronRight,
   CreditCard,
 } from 'lucide-react';
-import { members } from '@/lib/data/members';
-import { loans } from '@/lib/data/loans';
+import { members as mockMembers } from '@/lib/data/members';
+import { loans as mockLoans } from '@/lib/data/loans';
+
+// ── Module-level aliases (keep component code unchanged) ────────────────────
+const members = mockMembers;
+const loans = mockLoans;
 
 // ── Animation variants ──────────────────────────────────────────────────────
 

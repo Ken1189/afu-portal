@@ -26,7 +26,10 @@ import {
   TrendingUp,
   User,
 } from 'lucide-react';
-import { applications } from '@/lib/data/applications';
+import { applications as mockApplications } from '@/lib/data/applications';
+
+// ── Module-level alias (keep component code unchanged) ──────────────────────
+const applications = mockApplications;
 
 // ── Animation variants ──────────────────────────────────────────────────────
 

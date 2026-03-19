@@ -55,9 +55,10 @@ import {
 import type { LucideIcon } from 'lucide-react';
 
 import { dashboardStats, weatherData } from '@/lib/data/stats';
-import { marketPrices } from '@/lib/data/marketPrices';
+import { marketPrices as mockMarketPrices } from '@/lib/data/marketPrices';
 import { notifications as mockNotifications } from '@/lib/data/notifications';
 import { activities as mockActivities } from '@/lib/data/activities';
+import { useMarketPrices } from '@/lib/supabase/use-market-prices';
 import { useAuth } from '@/lib/supabase/auth-context';
 
 // Real dashboard data from API
@@ -233,6 +234,8 @@ function LoanTooltip({
 // ---------------------------------------------------------------------------
 export default function DashboardPage() {
   const { profile, user } = useAuth();
+  // Market prices use mock data (DB format lacks sparkline/change data needed for UI)
+  const marketPrices = mockMarketPrices;
   const [alertDismissed, setAlertDismissed] = useState(false);
   const [dashData, setDashData] = useState<DashboardData | null>(null);
   const userName = profile?.full_name || user?.email?.split('@')[0] || 'Member';

@@ -17,8 +17,11 @@ import {
   Save,
   ChevronDown,
 } from 'lucide-react';
-import { cropScans, farmPlots } from '@/lib/data/farm';
+import { cropScans as mockCropScans, farmPlots as mockFarmPlots } from '@/lib/data/farm';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
+
+const cropScans = mockCropScans;
+const farmPlots = mockFarmPlots;
 
 // ---------------------------------------------------------------------------
 // Types

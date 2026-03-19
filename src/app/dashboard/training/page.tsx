@@ -27,7 +27,10 @@ import {
   FileCheck,
   Trophy,
 } from 'lucide-react';
-import { courses, type Course } from '@/lib/data/courses';
+import { courses as mockCourses, type Course } from '@/lib/data/courses';
+// Live hook available: useCourses from '@/lib/supabase/use-courses'
+// Using mock data at module scope since courses are referenced in static initializers
+const courses = mockCourses;
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */

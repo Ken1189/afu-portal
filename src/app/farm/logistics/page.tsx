@@ -20,8 +20,11 @@ import {
   Box,
   CarFront,
 } from 'lucide-react';
-import { transportBookings, carriers } from '@/lib/data/logistics';
+import { transportBookings as mockTransportBookings, carriers as mockCarriers } from '@/lib/data/logistics';
 import type { TransportBooking, Carrier, TransportType, BookingStatus } from '@/lib/data/logistics';
+
+const transportBookings = mockTransportBookings;
+const carriers = mockCarriers;
 
 // ---------------------------------------------------------------------------
 // Animation variants

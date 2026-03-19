@@ -33,13 +33,17 @@ import {
   Globe,
 } from 'lucide-react';
 import {
-  exportDocuments,
-  exportShipments,
+  exportDocuments as mockExportDocuments,
+  exportShipments as mockExportShipments,
   type ExportDocument,
   type DocumentType,
   type DocumentStatus,
   type ExportShipment,
 } from '@/lib/data/exports';
+
+// ── Module-level aliases (keep component code unchanged) ────────────────────
+const exportDocuments = mockExportDocuments;
+const exportShipments = mockExportShipments;
 
 // ---------------------------------------------------------------------------
 // Animation variants

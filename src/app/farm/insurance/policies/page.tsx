@@ -16,7 +16,7 @@ import {
   Inbox,
 } from 'lucide-react';
 import {
-  insurancePolicies,
+  insurancePolicies as mockInsurancePolicies,
   type InsuranceType,
   type PolicyStatus,
 } from '@/lib/data/insurance';
@@ -88,6 +88,9 @@ type FilterTab = 'all' | PolicyStatus;
 
 export default function PoliciesPage() {
   const { t } = useLanguage();
+
+  const insurancePolicies = mockInsurancePolicies;
+
   const [activeFilter, setActiveFilter] = useState<FilterTab>('all');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 

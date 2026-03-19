@@ -21,7 +21,7 @@ import {
   X,
 } from 'lucide-react';
 import {
-  insurancePolicies,
+  insurancePolicies as mockInsurancePolicies,
   type InsuranceType,
 } from '@/lib/data/insurance';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
@@ -107,6 +107,8 @@ const incidentTypes = [
 
 export default function FileClaimPage() {
   const { t } = useLanguage();
+
+  const insurancePolicies = mockInsurancePolicies;
 
   // Wizard state
   const [currentStep, setCurrentStep] = useState(0);

@@ -29,7 +29,11 @@ import {
   Search,
   ExternalLink,
 } from 'lucide-react';
-import { exportDocuments, exportShipments } from '@/lib/data/exports';
+import { exportDocuments as mockExportDocuments, exportShipments as mockExportShipments } from '@/lib/data/exports';
+
+// ── Module-level aliases (keep component code unchanged) ────────────────────
+const exportDocuments = mockExportDocuments;
+const exportShipments = mockExportShipments;
 
 // ---------------------------------------------------------------------------
 // Animation variants

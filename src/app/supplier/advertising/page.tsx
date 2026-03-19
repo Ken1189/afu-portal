@@ -30,8 +30,12 @@ import {
   DollarSign,
   ArrowLeft,
 } from 'lucide-react';
-import { advertisements } from '@/lib/data/advertisements';
-import { suppliers } from '@/lib/data/suppliers';
+import { advertisements as mockAdvertisements } from '@/lib/data/advertisements';
+import { suppliers as mockSuppliers } from '@/lib/data/suppliers';
+
+// ── Module-level aliases (keep component code unchanged) ────────────────────
+const advertisements = mockAdvertisements;
+const suppliers = mockSuppliers;
 
 // ── Animation variants ──────────────────────────────────────────────────────
 

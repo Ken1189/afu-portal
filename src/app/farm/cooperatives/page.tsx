@@ -31,8 +31,10 @@ import {
   BarChart3,
   Globe,
 } from 'lucide-react';
+import { useCooperatives } from '@/lib/supabase/use-cooperatives';
+import { adaptCooperative } from '@/lib/data/adapters';
 import {
-  cooperatives,
+  cooperatives as mockCooperatives,
   cooperativeActivities,
   type Cooperative,
   type CooperativeActivity,
@@ -225,6 +227,9 @@ const filterTabs = ['All', 'Crop', 'Livestock', 'Mixed', 'Processing', 'Marketin
 // ---------------------------------------------------------------------------
 
 export default function CooperativesPage() {
+  const { cooperatives: liveCoops, loading: coopsLoading } = useCooperatives();
+  const cooperatives: Cooperative[] = liveCoops.length > 0 ? liveCoops.map(adaptCooperative) as Cooperative[] : mockCooperatives;
+
   // The user's cooperative is the first one
   const myCooperative = cooperatives[0];
 

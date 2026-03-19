@@ -19,7 +19,9 @@ import {
   Star,
   RefreshCw,
 } from 'lucide-react';
-import { contracts, type OfftakeContract } from '@/lib/data/contracts';
+import { useContracts } from '@/lib/supabase/use-contracts';
+import { adaptContract } from '@/lib/data/adapters';
+import { contracts as mockContracts, type OfftakeContract } from '@/lib/data/contracts';
 
 type StatusFilter = 'all' | OfftakeContract['status'];
 
@@ -35,6 +37,9 @@ function formatPeriod(period: { start: string; end: string }) {
 }
 
 export default function OfftakePage() {
+  const { contracts: liveContracts, loading: contractsLoading } = useContracts();
+  const contracts: OfftakeContract[] = liveContracts.length > 0 ? liveContracts.map(adaptContract) as OfftakeContract[] : mockContracts;
+
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [expanded, setExpanded] = useState<string | null>(null);
 

@@ -17,7 +17,7 @@ import {
   ArrowLeft,
 } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
-import { insuranceClaims, type ClaimStatus } from '@/lib/data/insurance';
+import { insuranceClaims as mockInsuranceClaims, type ClaimStatus } from '@/lib/data/insurance';
 
 /* ------------------------------------------------------------------ */
 /* Animation Variants                                                  */
@@ -66,6 +66,8 @@ type FilterKey = 'all' | ClaimStatus;
 export default function ClaimsPage() {
   const { t } = useLanguage();
   const ti = t.insurance;
+
+  const insuranceClaims = mockInsuranceClaims;
 
   const [activeFilter, setActiveFilter] = useState<FilterKey>('all');
   const [expandedClaim, setExpandedClaim] = useState<string | null>(null);

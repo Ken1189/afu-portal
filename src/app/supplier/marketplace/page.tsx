@@ -14,7 +14,8 @@ import {
   Users,
   Percent,
 } from 'lucide-react';
-import { supplierProducts } from '@/lib/data/supplierProducts';
+import { supplierProducts as mockSupplierProducts } from '@/lib/data/supplierProducts';
+const supplierProducts = mockSupplierProducts;
 
 // -- Animation variants -------------------------------------------------------
 

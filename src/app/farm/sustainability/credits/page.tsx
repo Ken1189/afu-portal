@@ -29,13 +29,14 @@ import {
   Sparkles,
 } from 'lucide-react';
 import {
-  carbonCredits,
-  carbonTransactions,
+  carbonCredits as mockCarbonCredits,
+  carbonTransactions as mockCarbonTransactions,
   type CarbonCredit,
   type CreditStatus,
   type CarbonCreditType,
   type CarbonTransaction,
 } from '@/lib/data/sustainability';
+import { useCarbonCredits } from '@/lib/supabase/use-sustainability';
 
 // ---------------------------------------------------------------------------
 // Animation variants
@@ -778,6 +779,28 @@ function RetireSection({ credits }: { credits: CarbonCredit[] }) {
 // ---------------------------------------------------------------------------
 
 export default function CarbonCreditsPage() {
+  const { credits: liveCredits, loading: creditsLoading } = useCarbonCredits();
+
+  // Use live Supabase data when available, fall back to mock data
+  const carbonCredits: CarbonCredit[] = liveCredits.length > 0
+    ? liveCredits.map((c) => ({
+        id: c.id,
+        type: c.project_type as CarbonCreditType,
+        projectName: c.project_type,
+        credits: c.credits_earned,
+        pricePerTonne: c.value_usd ? c.value_usd / c.credits_earned : 0,
+        totalValue: c.value_usd ?? 0,
+        status: c.verification_status as CreditStatus,
+        vintageYear: c.vintage_year ?? new Date().getFullYear(),
+        verificationBody: c.registry ?? 'Unknown',
+        description: '',
+        issuanceDate: c.created_at,
+        expiryDate: c.updated_at,
+        buyerName: null,
+      }))
+    : mockCarbonCredits;
+  const carbonTransactions = mockCarbonTransactions;
+
   const [activeTab, setActiveTab] = useState<TabKey>('credits');
   const [creditFilter, setCreditFilter] = useState<CreditFilter>('all');
 

@@ -28,8 +28,12 @@ import {
   AlertCircle,
   Banknote,
 } from 'lucide-react';
-import { commissions } from '@/lib/data/commissions';
-import { suppliers } from '@/lib/data/suppliers';
+import { commissions as mockCommissions } from '@/lib/data/commissions';
+import { suppliers as mockSuppliers } from '@/lib/data/suppliers';
+
+// ── Module-level aliases (keep component code unchanged) ────────────────────
+const commissions = mockCommissions;
+const suppliers = mockSuppliers;
 
 // ── Animation variants ──────────────────────────────────────────────────────
 

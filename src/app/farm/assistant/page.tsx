@@ -18,13 +18,18 @@ import {
   User,
 } from 'lucide-react';
 import {
-  aiConversation,
-  farmPlots,
-  getFarmSummary,
-  weatherForecast,
+  aiConversation as mockAiConversation,
+  farmPlots as mockFarmPlots,
+  getFarmSummary as mockGetFarmSummary,
+  weatherForecast as mockWeatherForecast,
 } from '@/lib/data/farm';
 import type { AIMessage } from '@/lib/data/farm';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
+
+const aiConversation = mockAiConversation;
+const farmPlots = mockFarmPlots;
+const getFarmSummary = mockGetFarmSummary;
+const weatherForecast = mockWeatherForecast;
 
 // ---------------------------------------------------------------------------
 // Animation Variants

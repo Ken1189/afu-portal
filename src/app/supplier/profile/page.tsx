@@ -25,7 +25,8 @@ import {
   Smartphone,
   Save,
 } from 'lucide-react';
-import { suppliers } from '@/lib/data/suppliers';
+import { suppliers as mockSuppliers } from '@/lib/data/suppliers';
+const suppliers = mockSuppliers;
 
 // -- Animation variants -------------------------------------------------------
 

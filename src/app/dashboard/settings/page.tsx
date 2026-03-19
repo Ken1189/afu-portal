@@ -30,7 +30,9 @@ import {
   AlertTriangle,
   ChevronRight,
 } from 'lucide-react';
-import { members } from '@/lib/data/members';
+import { members as mockMembers } from '@/lib/data/members';
+
+const members = mockMembers;
 
 // ---------------------------------------------------------------------------
 // Current user (first member in mock data)

@@ -17,8 +17,10 @@ import {
   Thermometer,
   ArrowRight,
 } from 'lucide-react';
-import { transportBookings } from '@/lib/data/logistics';
+import { transportBookings as mockTransportBookings } from '@/lib/data/logistics';
 import type { TransportBooking, BookingStatus } from '@/lib/data/logistics';
+
+const transportBookings = mockTransportBookings;
 
 // ---------------------------------------------------------------------------
 // Animation variants

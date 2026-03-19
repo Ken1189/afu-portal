@@ -33,13 +33,15 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import {
-  sustainabilityProjects,
-  sustainabilityMetrics,
-  carbonCredits,
+  sustainabilityProjects as mockSustainabilityProjects,
+  sustainabilityMetrics as mockSustainabilityMetrics,
+  carbonCredits as mockCarbonCredits,
   type SustainabilityProject,
   type ProjectType,
   type CarbonCreditType,
+  type CarbonCredit,
 } from '@/lib/data/sustainability';
+import { useCarbonCredits } from '@/lib/supabase/use-sustainability';
 
 // ---------------------------------------------------------------------------
 // Animation variants
@@ -438,7 +440,7 @@ function CategoryScoreBar({
 function MarketplaceCreditCard({
   credit,
 }: {
-  credit: (typeof carbonCredits)[number];
+  credit: CarbonCredit;
 }) {
   return (
     <motion.div
@@ -548,6 +550,29 @@ function PriceTrendChart() {
 // ---------------------------------------------------------------------------
 
 export default function SustainabilityPage() {
+  const { credits: liveCredits, loading: creditsLoading } = useCarbonCredits();
+
+  // Use live Supabase data when available, fall back to mock data
+  const sustainabilityProjects = mockSustainabilityProjects;
+  const sustainabilityMetrics = mockSustainabilityMetrics;
+  const carbonCredits = liveCredits.length > 0
+    ? liveCredits.map((c) => ({
+        id: c.id,
+        type: c.project_type as CarbonCreditType,
+        projectName: c.project_type,
+        credits: c.credits_earned,
+        pricePerTonne: c.value_usd ? c.value_usd / c.credits_earned : 0,
+        totalValue: c.value_usd ?? 0,
+        status: c.verification_status as 'verified' | 'pending' | 'retired' | 'listed',
+        vintageYear: c.vintage_year ?? new Date().getFullYear(),
+        verificationBody: c.registry ?? 'Unknown',
+        description: '',
+        issuanceDate: c.created_at,
+        expiryDate: c.updated_at,
+        buyerName: null,
+      }))
+    : mockCarbonCredits;
+
   const [activeTab, setActiveTab] = useState<TabKey>('projects');
 
   // Metrics for the top cards

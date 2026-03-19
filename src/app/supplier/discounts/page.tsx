@@ -19,8 +19,12 @@ import {
   Info,
   ShoppingCart,
 } from 'lucide-react';
-import { suppliers } from '@/lib/data/suppliers';
-import { supplierProducts } from '@/lib/data/supplierProducts';
+import { suppliers as mockSuppliers } from '@/lib/data/suppliers';
+import { supplierProducts as mockSupplierProducts } from '@/lib/data/supplierProducts';
+
+// ── Module-level aliases (keep component code unchanged) ────────────────────
+const suppliers = mockSuppliers;
+const supplierProducts = mockSupplierProducts;
 
 // ── Animation variants ──────────────────────────────────────────────────────
 

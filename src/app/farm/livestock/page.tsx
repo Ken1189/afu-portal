@@ -30,14 +30,21 @@ import {
   X,
 } from 'lucide-react';
 import {
-  animals,
-  vetRecords,
-  breedingRecords,
-  getLivestockSummary,
+  animals as mockAnimals,
+  vetRecords as mockVetRecords,
+  breedingRecords as mockBreedingRecords,
+  getLivestockSummary as mockGetLivestockSummary,
   type Animal,
   type AnimalType,
   type AnimalStatus,
 } from '@/lib/data/livestock';
+import { useLivestock } from '@/lib/supabase/use-livestock';
+
+// Use mock data as primary source (rich UI types not yet in DB)
+const animals = mockAnimals;
+const vetRecords = mockVetRecords;
+const breedingRecords = mockBreedingRecords;
+const getLivestockSummary = mockGetLivestockSummary;
 
 // ─── Animation Variants ──────────────────────────────────────────────────────
 
@@ -500,6 +507,9 @@ function AlertCard({
 // ─── Main Page ───────────────────────────────────────────────────────────────
 
 export default function LivestockPage() {
+  // --- Live Supabase data (available when real data is entered) ---
+  const { livestock: liveLivestock } = useLivestock();
+
   // --- State ---
   const [activeTab, setActiveTab] = useState<TabKey>('herd');
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all');

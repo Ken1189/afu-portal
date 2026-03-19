@@ -28,7 +28,12 @@ import {
   Activity,
   ChevronUp,
 } from 'lucide-react';
-import { animals, vetRecords, type VetRecord } from '@/lib/data/livestock';
+import { animals as mockAnimals, vetRecords as mockVetRecords, type VetRecord } from '@/lib/data/livestock';
+import { useLivestock } from '@/lib/supabase/use-livestock';
+
+// Use mock data as primary source (rich UI types not yet in DB)
+const animals = mockAnimals;
+const vetRecords = mockVetRecords;
 
 // ---------------------------------------------------------------------------
 // Animation variants
@@ -348,6 +353,9 @@ function ScheduleItem({ record, isOverdue }: { record: VetRecord; isOverdue: boo
 // ---------------------------------------------------------------------------
 
 export default function LivestockHealthPage() {
+  // --- Live Supabase data (available when real data is entered) ---
+  const { livestock: liveLivestock } = useLivestock();
+
   // --- State ---
   const [activeTab, setActiveTab] = useState<TabKey>('all');
   const [typeFilter, setTypeFilter] = useState<RecordTypeFilter>('all');

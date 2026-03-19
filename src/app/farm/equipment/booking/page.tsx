@@ -21,7 +21,9 @@ import {
   Info,
   Settings,
 } from 'lucide-react';
-import { equipment } from '@/lib/data/equipment';
+import { equipment as mockEquipment } from '@/lib/data/equipment';
+
+const equipment = mockEquipment;
 
 // ---------------------------------------------------------------------------
 // Animation variants

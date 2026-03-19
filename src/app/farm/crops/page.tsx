@@ -29,9 +29,12 @@ import {
   CircleDot,
   Check,
 } from 'lucide-react';
+import { useFarmPlots } from '@/lib/supabase/use-farm-plots';
+import { useFarmActivities } from '@/lib/supabase/use-farm-activities';
+import { adaptFarmPlot } from '@/lib/data/adapters';
 import {
-  farmPlots,
-  farmActivities,
+  farmPlots as mockFarmPlots,
+  farmActivities as mockFarmActivities,
   getFarmSummary,
   type CropStage,
   type ActivityType,
@@ -319,7 +322,7 @@ function GrowthTimeline({ currentStage }: { currentStage: CropStage }) {
 function ActivityLog({ plotId }: { plotId: string }) {
   const activities = useMemo(
     () =>
-      farmActivities
+      mockFarmActivities
         .filter((a) => a.plotId === plotId)
         .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
         .slice(0, 5),
@@ -854,6 +857,8 @@ function PlotCard({ plot }: { plot: FarmPlot }) {
 
 export default function CropsPage() {
   const [addPlotOpen, setAddPlotOpen] = useState(false);
+  const { plots: livePlots, loading } = useFarmPlots();
+  const farmPlots: FarmPlot[] = livePlots.length > 0 ? livePlots.map(adaptFarmPlot) as FarmPlot[] : mockFarmPlots;
 
   return (
     <div className="relative min-h-full">
