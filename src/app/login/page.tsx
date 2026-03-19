@@ -134,7 +134,7 @@ const pulseRing = {
 /* ------------------------------------------------------------------ */
 export default function LoginPage() {
   const router = useRouter();
-  const { signIn, signUp, user, profile: authProfile, isLoading: authLoading, isAdmin } = useAuth();
+  const { signIn, signUp, user, isLoading: authLoading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -144,22 +144,24 @@ export default function LoginPage() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [fullName, setFullName] = useState('');
   const [activeTestimonial, setActiveTestimonial] = useState(0);
-  const [waitingForProfile, setWaitingForProfile] = useState(false);
 
-  // If already logged in and profile loaded, redirect based on role
-  useEffect(() => {
-    if (!authLoading && user && authProfile) {
-      router.push(isAdmin ? '/admin' : '/dashboard');
+  // Helper: fetch role from server API (bypasses RLS)
+  const fetchRoleAndRedirect = useCallback(async () => {
+    try {
+      const res = await fetch('/api/auth/me');
+      const { role } = await res.json();
+      router.push((role === 'admin' || role === 'super_admin') ? '/admin' : '/dashboard');
+    } catch {
+      router.push('/dashboard');
     }
-  }, [user, authProfile, authLoading, isAdmin, router]);
+  }, [router]);
 
-  // After sign-in, wait for the auth context to load the profile, then redirect
+  // If already logged in, redirect based on role
   useEffect(() => {
-    if (waitingForProfile && authProfile) {
-      setWaitingForProfile(false);
-      router.push(isAdmin ? '/admin' : '/dashboard');
+    if (!authLoading && user) {
+      fetchRoleAndRedirect();
     }
-  }, [waitingForProfile, authProfile, isAdmin, router]);
+  }, [user, authLoading, fetchRoleAndRedirect]);
 
   // Rotate testimonials
   const nextTestimonial = useCallback(() => {
@@ -203,9 +205,8 @@ export default function LoginPage() {
         if (signInError) {
           setError(signInError.message);
         } else {
-          // Signal that we're waiting for the auth context to load the profile
-          // The useEffect above will handle the redirect once profile is available
-          setWaitingForProfile(true);
+          // Fetch role from server API (bypasses RLS) and redirect
+          await fetchRoleAndRedirect();
         }
       }
     } catch (err) {
