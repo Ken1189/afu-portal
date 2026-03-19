@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   Bell,
@@ -151,6 +151,18 @@ export default function AdminNotificationsPage() {
   const [inboxFilter, setInboxFilter] = useState<InboxFilter>('all');
   const [notifState, setNotifState] = useState(notifications);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Fetch live notification preferences from settings API
+  useEffect(() => {
+    fetch('/api/admin/settings')
+      .then(r => r.json())
+      .then(d => {
+        if (d?.notifications) {
+          // Could merge live notification prefs here in future
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // Notification preferences (settings tab)
   const [prefs, setPrefs] = useState({

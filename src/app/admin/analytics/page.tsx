@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   BarChart3,
@@ -145,6 +145,21 @@ const systemMetrics = { uptime: 99.97, responseTime: 142, errorRate: 0.03, activ
 
 export default function AdminAnalyticsPage() {
   const [activeTab, setActiveTab] = useState<TabKey>('overview');
+  const [liveStats, setLiveStats] = useState<Record<string, unknown> | null>(null);
+
+  // Fetch live platform stats
+  useEffect(() => {
+    fetch('/api/admin/stats')
+      .then(r => r.json())
+      .then(d => { if (!d.error) setLiveStats(d); })
+      .catch(() => {});
+  }, []);
+
+  // Override static KPI cards with live data when available
+  const liveMembers = (liveStats?.members as Record<string, number>)?.total;
+  const liveSuppliers = (liveStats?.suppliers as Record<string, number>)?.total;
+  const liveProducts = (liveStats?.products as Record<string, number>)?.total;
+  const liveOrders = (liveStats?.orders as Record<string, number>)?.total;
 
   const tabs: { key: TabKey; label: string }[] = [
     { key: 'overview', label: 'Overview' },

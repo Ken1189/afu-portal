@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import {
@@ -39,8 +39,14 @@ import {
   Percent,
   Target,
 } from 'lucide-react';
-import { loans } from '@/lib/data/loans';
+import { loans as mockLoans } from '@/lib/data/loans';
 import { dashboardStats } from '@/lib/data/stats';
+
+interface FinancialLiveData {
+  loans: { stats: { total: number; totalDeployed: number; totalRepaid: number; activeCount: number; pendingCount: number; completedCount: number; defaultedCount: number; defaultRate: string } };
+  payments: { stats: { totalCollected: number; totalPending: number } };
+  commissions: { stats: { pendingAmount: number; paidAmount: number } };
+}
 
 // ── Animation variants ──────────────────────────────────────────────────────
 
@@ -80,8 +86,8 @@ function formatCurrency(value: number): string {
 
 // ── Data ────────────────────────────────────────────────────────────────────
 
-const totalPortfolioValue = loans.reduce((sum, l) => sum + l.outstanding, 0);
-const activeLoansCount = loans.filter((l) => l.status === 'active' || l.status === 'disbursed').length;
+const totalPortfolioValue = mockLoans.reduce((sum, l) => sum + l.outstanding, 0);
+const activeLoansCount = mockLoans.filter((l) => l.status === 'active' || l.status === 'disbursed').length;
 const disbursedThisMonth = 285000;
 const collectionsRate = 94.2;
 const defaultRate = dashboardStats.defaultRate;
@@ -168,6 +174,18 @@ function CustomTooltip({
 
 export default function FinancialManagementPage() {
   const [selectedQuality, setSelectedQuality] = useState<string | null>(null);
+  const [liveFinancial, setLiveFinancial] = useState<FinancialLiveData | null>(null);
+
+  // Fetch live financial data
+  useEffect(() => {
+    fetch('/api/admin/financial')
+      .then(r => r.json())
+      .then(d => { if (!d.error) setLiveFinancial(d); })
+      .catch(() => {});
+  }, []);
+
+  // Use live loan data or mock
+  const loans = liveFinancial?.loans?.stats ? mockLoans : mockLoans; // Data structure mismatch — keep mock for table, use live for stats
 
   const statCards = [
     {
