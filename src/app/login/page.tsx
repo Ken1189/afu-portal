@@ -145,10 +145,22 @@ export default function LoginPage() {
   const [fullName, setFullName] = useState('');
   const [activeTestimonial, setActiveTestimonial] = useState(0);
 
-  // If already logged in, redirect
+  // If already logged in, redirect based on role
   useEffect(() => {
     if (!authLoading && user) {
-      router.push('/dashboard');
+      // Check profile role to decide where to go
+      const checkRole = async () => {
+        const { createClient } = await import('@/lib/supabase/client');
+        const supabase = createClient();
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+        const role = profile?.role as string | undefined;
+        router.push((role === 'admin' || role === 'super_admin') ? '/admin' : '/dashboard');
+      };
+      checkRole();
     }
   }, [user, authLoading, router]);
 
@@ -194,7 +206,21 @@ export default function LoginPage() {
         if (signInError) {
           setError(signInError.message);
         } else {
-          router.push('/dashboard');
+          // Check role to redirect admin vs member
+          const { createClient } = await import('@/lib/supabase/client');
+          const supabase = createClient();
+          const { data: { user: currentUser } } = await supabase.auth.getUser();
+          if (currentUser) {
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('role')
+              .eq('id', currentUser.id)
+              .single();
+            const role = profile?.role as string | undefined;
+            router.push((role === 'admin' || role === 'super_admin') ? '/admin' : '/dashboard');
+          } else {
+            router.push('/dashboard');
+          }
         }
       }
     } catch (err) {

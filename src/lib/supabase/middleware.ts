@@ -48,11 +48,18 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // If logged in and visiting /login → redirect to dashboard
+  // If logged in and visiting /login → redirect based on role
   if (pathname === '/login' && user) {
-    const dashUrl = request.nextUrl.clone();
-    dashUrl.pathname = '/dashboard';
-    return NextResponse.redirect(dashUrl);
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    const role = profile?.role as string | undefined;
+    const dest = request.nextUrl.clone();
+    dest.pathname = (role === 'admin' || role === 'super_admin') ? '/admin' : '/dashboard';
+    return NextResponse.redirect(dest);
   }
 
   // ── Role-based access ───────────────────────────────────────────────
