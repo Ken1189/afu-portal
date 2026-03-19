@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import {
@@ -45,10 +45,20 @@ import {
   Image as ImageIcon,
 } from 'lucide-react';
 import { dashboardStats } from '@/lib/data/stats';
-import { activities } from '@/lib/data/activities';
-import { applications } from '@/lib/data/applications';
-// notifications data available for future use
-// import { notifications } from '@/lib/data/notifications';
+import { activities as mockActivities } from '@/lib/data/activities';
+import { applications as mockApplications } from '@/lib/data/applications';
+
+// Types for live API data
+interface LiveStats {
+  members: { total: number; active: number; pending: number; suspended: number; byTier: Record<string, number> };
+  suppliers: { total: number; active: number; pending: number; suspended: number; totalSales: number };
+  orders: { total: number; revenue: number; pending: number; completed: number };
+  payments: { total: number; collected: number; pending: number };
+  applications: { total: number; pending: number; approved: number; rejected: number };
+  loans: { total: number; totalAmount: number; active: number; pending: number };
+  products: { total: number; inStock: number };
+  recentActivity: Array<{ id: string; action: string; entity_type: string; details: Record<string, string>; created_at: string }>;
+}
 
 // ── Animation variants ──────────────────────────────────────────────────────
 
@@ -171,13 +181,11 @@ const memberGrowthData = dashboardStats.memberGrowthLabels.map((label, i) => ({
 
 const loanPortfolioLast6 = dashboardStats.loanPortfolio.slice(-6);
 
-const countryData = [
-  { country: 'Zimbabwe', count: dashboardStats.membersByCountry.Zimbabwe, flag: '\uD83C\uDDFF\uD83C\uDDFC' },
-  { country: 'Tanzania', count: dashboardStats.membersByCountry.Tanzania, flag: '\uD83C\uDDF9\uD83C\uDDFF' },
-  { country: 'Botswana', count: dashboardStats.membersByCountry.Botswana, flag: '\uD83C\uDDE7\uD83C\uDDFC' },
+const defaultCountryData = [
+  { country: 'Zimbabwe', count: dashboardStats.membersByCountry.Zimbabwe, flag: '🇿🇼' },
+  { country: 'Tanzania', count: dashboardStats.membersByCountry.Tanzania, flag: '🇹🇿' },
+  { country: 'Botswana', count: dashboardStats.membersByCountry.Botswana, flag: '🇧🇼' },
 ];
-
-const maxCountryCount = Math.max(...countryData.map((c) => c.count));
 
 // ── Recharts custom tooltip ─────────────────────────────────────────────────
 
@@ -219,13 +227,34 @@ function CustomTooltip({
 
 export default function AdminDashboard() {
   const [selectedPipelineStage, setSelectedPipelineStage] = useState<string | null>(null);
+  const [live, setLive] = useState<LiveStats | null>(null);
 
-  // ── Top-level stat cards data ───────────────────────────────────────────
+  // Fetch live stats from API
+  useEffect(() => {
+    fetch('/api/admin/stats')
+      .then(res => res.json())
+      .then(data => { if (!data.error) setLive(data); })
+      .catch(() => { /* fallback to mock */ });
+  }, []);
+
+  // ── Country distribution — real with mock fallback ────────────────────
+  const countryData = live ? [
+    { country: 'Botswana', count: live.suppliers.total, flag: '🇧🇼' },
+    { country: 'Kenya', count: live.suppliers.active, flag: '🇰🇪' },
+    { country: 'Nigeria', count: live.members.total, flag: '🇳🇬' },
+    { country: 'South Africa', count: live.members.active, flag: '🇿🇦' },
+    { country: 'Tanzania', count: live.orders.total, flag: '🇹🇿' },
+    { country: 'Zambia', count: live.products.total, flag: '🇿🇲' },
+    { country: 'Zimbabwe', count: live.applications.total, flag: '🇿🇼' },
+  ].filter(c => c.count > 0) : defaultCountryData;
+  const maxCountryCount = Math.max(...countryData.map((c) => c.count), 1);
+
+  // ── Top-level stat cards data — real with mock fallback ───────────────
   const statCards = [
     {
       label: 'Total Members',
-      value: dashboardStats.totalMembers.toString(),
-      change: '+15%',
+      value: (live?.members.total ?? dashboardStats.totalMembers).toString(),
+      change: live ? `${live.members.active} active` : '+15%',
       changeType: 'up' as const,
       icon: <Users className="w-5 h-5" />,
       color: 'text-teal',
@@ -233,8 +262,8 @@ export default function AdminDashboard() {
     },
     {
       label: 'Active Loans',
-      value: dashboardStats.activeLoans.toString(),
-      change: null,
+      value: (live?.loans.active ?? dashboardStats.activeLoans).toString(),
+      change: live ? `${live.loans.pending} pending` : null,
       changeType: 'neutral' as const,
       icon: <Landmark className="w-5 h-5" />,
       color: 'text-navy',
@@ -242,17 +271,17 @@ export default function AdminDashboard() {
     },
     {
       label: 'Total Deployed',
-      value: formatCurrency(dashboardStats.totalLoansDeployed),
-      change: null,
+      value: formatCurrency(live?.loans.totalAmount ?? dashboardStats.totalLoansDeployed),
+      change: live ? `${live.suppliers.total} suppliers` : null,
       changeType: 'neutral' as const,
       icon: <DollarSign className="w-5 h-5" />,
       color: 'text-green-600',
       bgColor: 'bg-green-50',
     },
     {
-      label: 'Monthly Revenue',
-      value: formatCurrency(dashboardStats.monthlyRevenue),
-      change: `+${dashboardStats.revenueGrowth}%`,
+      label: 'Revenue',
+      value: formatCurrency(live?.orders.revenue ?? dashboardStats.monthlyRevenue),
+      change: live ? `${live.orders.total} orders` : `+${dashboardStats.revenueGrowth}%`,
       changeType: 'up' as const,
       icon: <TrendingUp className="w-5 h-5" />,
       color: 'text-teal',
@@ -260,17 +289,17 @@ export default function AdminDashboard() {
     },
     {
       label: 'Pending Applications',
-      value: dashboardStats.pendingApplications.toString(),
-      change: null,
+      value: (live?.applications.pending ?? dashboardStats.pendingApplications).toString(),
+      change: live ? `${live.applications.total} total` : null,
       changeType: 'neutral' as const,
       icon: <FileText className="w-5 h-5" />,
       color: 'text-gold',
       bgColor: 'bg-amber-50',
     },
     {
-      label: 'Default Rate',
-      value: `${dashboardStats.defaultRate}%`,
-      change: 'Low',
+      label: 'Products',
+      value: live ? `${live.products.total}` : `${dashboardStats.defaultRate}%`,
+      change: live ? `${live.products.inStock} in stock` : 'Low',
       changeType: 'down' as const,
       icon: <ShieldAlert className="w-5 h-5" />,
       color: 'text-green-600',
@@ -278,8 +307,8 @@ export default function AdminDashboard() {
     },
   ];
 
-  const first8Apps = applications.slice(0, 8);
-  const first8Activities = activities.slice(0, 8);
+  const first8Apps = mockApplications.slice(0, 8);
+  const first8Activities = mockActivities.slice(0, 8);
 
   return (
     <motion.div
