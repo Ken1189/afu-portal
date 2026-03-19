@@ -75,11 +75,13 @@ export async function PUT(request: Request) {
     }
 
     const body = await request.json();
-    const { key, value } = body;
 
-    if (!key || !value) {
-      return NextResponse.json({ error: 'Missing key or value' }, { status: 400 });
+    const { validate, updateSettingSchema } = await import('@/lib/validation');
+    const validation = validate(updateSettingSchema, body);
+    if (!validation.success) {
+      return NextResponse.json({ error: validation.error }, { status: 400 });
     }
+    const { key, value } = validation.data;
 
     const { error } = await svc.from('platform_settings').upsert({
       key,

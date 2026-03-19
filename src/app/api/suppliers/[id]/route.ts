@@ -65,18 +65,17 @@ export async function PATCH(
 
   const body = await request.json();
 
-  // Allowed fields for update
-  const allowedFields = [
-    'company_name', 'contact_name', 'email', 'phone', 'website',
-    'logo_url', 'category', 'status', 'country', 'region', 'description',
-    'verified', 'is_founding', 'sponsorship_tier', 'commission_rate',
-    'member_discount_percent', 'certifications',
-  ];
+  const { validate, updateSupplierSchema } = await import('@/lib/validation');
+  const validation = validate(updateSupplierSchema, body);
+  if (!validation.success) {
+    return NextResponse.json({ error: validation.error }, { status: 400 });
+  }
 
+  // Only include fields that were actually sent
   const updates: Record<string, unknown> = {};
-  for (const field of allowedFields) {
-    if (body[field] !== undefined) {
-      updates[field] = body[field];
+  for (const [key, value] of Object.entries(validation.data)) {
+    if (body[key] !== undefined) {
+      updates[key] = value;
     }
   }
 

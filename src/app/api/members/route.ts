@@ -99,24 +99,16 @@ export async function POST(request: NextRequest) {
 
   const body = await request.json();
 
-  if (!body.profile_id) {
-    return NextResponse.json({ error: 'profile_id is required' }, { status: 400 });
+  const { validate, createMemberSchema } = await import('@/lib/validation');
+  const validation = validate(createMemberSchema, body);
+  if (!validation.success) {
+    return NextResponse.json({ error: validation.error }, { status: 400 });
   }
 
   const adminClient = await createAdminClient();
   const { data, error } = await adminClient
     .from('members')
-    .insert({
-      profile_id: body.profile_id,
-      tier: body.tier || 'new_enterprise',
-      status: body.status || 'active',
-      farm_name: body.farm_name || null,
-      farm_size_ha: body.farm_size_ha || null,
-      primary_crops: body.primary_crops || [],
-      livestock_types: body.livestock_types || [],
-      bio: body.bio || null,
-      certifications: body.certifications || [],
-    })
+    .insert(validation.data)
     .select()
     .single();
 

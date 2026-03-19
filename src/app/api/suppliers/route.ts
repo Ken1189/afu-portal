@@ -116,37 +116,16 @@ export async function POST(request: NextRequest) {
 
   const body = await request.json();
 
-  // Validate required fields
-  const required = ['company_name', 'contact_name', 'email', 'category', 'country'];
-  for (const field of required) {
-    if (!body[field]) {
-      return NextResponse.json(
-        { error: `Missing required field: ${field}` },
-        { status: 400 }
-      );
-    }
+  const { validate, createSupplierSchema } = await import('@/lib/validation');
+  const validation = validate(createSupplierSchema, body);
+  if (!validation.success) {
+    return NextResponse.json({ error: validation.error }, { status: 400 });
   }
 
   const adminClient = await createAdminClient();
   const { data, error } = await adminClient
     .from('suppliers')
-    .insert({
-      company_name: body.company_name,
-      contact_name: body.contact_name,
-      email: body.email,
-      phone: body.phone || null,
-      website: body.website || null,
-      logo_url: body.logo_url || null,
-      category: body.category,
-      status: body.status || 'pending',
-      country: body.country,
-      region: body.region || null,
-      description: body.description || null,
-      verified: body.verified || false,
-      commission_rate: body.commission_rate || 10,
-      member_discount_percent: body.member_discount_percent || 10,
-      certifications: body.certifications || [],
-    })
+    .insert(validation.data)
     .select()
     .single();
 

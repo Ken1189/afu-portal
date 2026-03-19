@@ -58,15 +58,10 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const body = await request.json();
 
-  // Validate required fields
-  const required = ['full_name', 'email', 'country'];
-  for (const field of required) {
-    if (!body[field]) {
-      return NextResponse.json(
-        { error: `Missing required field: ${field}` },
-        { status: 400 }
-      );
-    }
+  const { validate, createApplicationSchema } = await import('@/lib/validation');
+  const validation = validate(createApplicationSchema, body);
+  if (!validation.success) {
+    return NextResponse.json({ error: validation.error }, { status: 400 });
   }
 
   // Use admin client to bypass RLS for public submission
@@ -74,15 +69,7 @@ export async function POST(request: NextRequest) {
   const { data, error } = await adminClient
     .from('membership_applications')
     .insert({
-      full_name: body.full_name,
-      email: body.email,
-      phone: body.phone || null,
-      country: body.country,
-      region: body.region || null,
-      farm_name: body.farm_name || null,
-      farm_size_ha: body.farm_size_ha || null,
-      primary_crops: body.primary_crops || [],
-      requested_tier: body.requested_tier || 'smallholder',
+      ...validation.data,
       status: 'pending',
     })
     .select()
