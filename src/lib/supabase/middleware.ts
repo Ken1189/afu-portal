@@ -1,5 +1,30 @@
 import { createServerClient } from '@supabase/ssr';
+import { createClient } from '@supabase/supabase-js';
 import { NextResponse, type NextRequest } from 'next/server';
+
+/**
+ * Creates a service-role Supabase client that bypasses RLS.
+ * Used only for role lookups in middleware.
+ */
+function getServiceClient() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+}
+
+/**
+ * Looks up a user's role from the profiles table using service role (bypasses RLS).
+ */
+async function getUserRole(userId: string): Promise<string | null> {
+  const svc = getServiceClient();
+  const { data } = await svc
+    .from('profiles')
+    .select('role')
+    .eq('id', userId)
+    .single();
+  return data?.role ?? null;
+}
 
 /**
  * Refreshes the Supabase session on every request and
@@ -50,13 +75,7 @@ export async function updateSession(request: NextRequest) {
 
   // If logged in and visiting /login → redirect based on role
   if (pathname === '/login' && user) {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single();
-
-    const role = profile?.role as string | undefined;
+    const role = await getUserRole(user.id);
     const dest = request.nextUrl.clone();
     dest.pathname = (role === 'admin' || role === 'super_admin') ? '/admin' : '/dashboard';
     return NextResponse.redirect(dest);
@@ -64,13 +83,8 @@ export async function updateSession(request: NextRequest) {
 
   // ── Role-based access ───────────────────────────────────────────────
   if (user && pathname.startsWith('/admin')) {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single();
-
-    if (!profile || !['admin', 'super_admin'].includes(profile.role as string)) {
+    const role = await getUserRole(user.id);
+    if (!role || !['admin', 'super_admin'].includes(role)) {
       const forbiddenUrl = request.nextUrl.clone();
       forbiddenUrl.pathname = '/dashboard';
       return NextResponse.redirect(forbiddenUrl);
@@ -78,13 +92,8 @@ export async function updateSession(request: NextRequest) {
   }
 
   if (user && pathname.startsWith('/supplier')) {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single();
-
-    if (!profile || !['supplier', 'admin', 'super_admin'].includes(profile.role as string)) {
+    const role = await getUserRole(user.id);
+    if (!role || !['supplier', 'admin', 'super_admin'].includes(role)) {
       const forbiddenUrl = request.nextUrl.clone();
       forbiddenUrl.pathname = '/dashboard';
       return NextResponse.redirect(forbiddenUrl);
