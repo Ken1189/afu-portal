@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import {
@@ -56,9 +56,28 @@ import type { LucideIcon } from 'lucide-react';
 
 import { dashboardStats, weatherData } from '@/lib/data/stats';
 import { marketPrices } from '@/lib/data/marketPrices';
-import { notifications } from '@/lib/data/notifications';
-import { activities } from '@/lib/data/activities';
+import { notifications as mockNotifications } from '@/lib/data/notifications';
+import { activities as mockActivities } from '@/lib/data/activities';
 import { useAuth } from '@/lib/supabase/auth-context';
+
+// Real dashboard data from API
+interface DashboardData {
+  profile: { full_name: string; email: string; role: string } | null;
+  member: { tier: string; credit_score: number; total_spent: number; member_id: string; join_date: string } | null;
+  stats: {
+    totalSpent: number;
+    orderCount: number;
+    totalLoanAmount: number;
+    totalRepaid: number;
+    activeLoanCount: number;
+    unreadNotifications: number;
+    tier: string;
+    creditScore: number;
+  };
+  recentOrders: Array<{ id: string; order_number: string; total: number; status: string; created_at: string }>;
+  recentLoans: Array<{ id: string; loan_number: string; loan_type: string; amount: number; status: string }>;
+  notifications: Array<{ id: string; title: string; message: string; type: string; read: boolean }>;
+}
 
 // ---------------------------------------------------------------------------
 // Icon map for activities (string -> Lucide component)
@@ -215,16 +234,30 @@ function LoanTooltip({
 export default function DashboardPage() {
   const { profile, user } = useAuth();
   const [alertDismissed, setAlertDismissed] = useState(false);
+  const [dashData, setDashData] = useState<DashboardData | null>(null);
   const userName = profile?.full_name || user?.email?.split('@')[0] || 'Member';
+
+  // Fetch real dashboard data from API
+  useEffect(() => {
+    fetch('/api/member/dashboard')
+      .then(res => res.json())
+      .then(data => { if (!data.error) setDashData(data); })
+      .catch(() => { /* fallback to mock */ });
+  }, []);
+
+  // Use real notifications if available, otherwise mock
+  const notifications = dashData?.notifications?.length
+    ? dashData.notifications.map(n => ({ ...n, priority: n.type === 'warning' ? 'high' as const : 'medium' as const }))
+    : mockNotifications;
 
   // Unread high-priority notifications
   const urgentNotifications = useMemo(
-    () => notifications.filter((n) => !n.read && n.priority === 'high'),
-    []
+    () => notifications.filter((n) => !n.read && (('priority' in n) ? n.priority === 'high' : false)),
+    [notifications]
   );
 
-  // Recent 6 activities
-  const recentActivities = useMemo(() => activities.slice(0, 6), []);
+  // Recent 6 activities (mock for now — real audit_log coming in Sprint 11)
+  const recentActivities = useMemo(() => mockActivities.slice(0, 6), []);
 
   // First 4 market commodities
   const topCommodities = useMemo(() => marketPrices.slice(0, 4), []);
@@ -237,11 +270,40 @@ export default function DashboardPage() {
     return 'Good evening';
   }, []);
 
-  // Profile completion
-  const profileCompletion = 75;
+  // Profile completion — calculate from real profile data
+  const profileCompletion = useMemo(() => {
+    if (!dashData?.profile) return 75; // fallback
+    let score = 30; // base for having an account
+    if (dashData.profile.full_name) score += 15;
+    if (dashData.member?.tier && dashData.member.tier !== 'new_enterprise') score += 15;
+    if (dashData.member?.member_id) score += 20;
+    if (dashData.stats?.creditScore > 0) score += 20;
+    return Math.min(score, 100);
+  }, [dashData]);
 
-  // Financing applications (static inline data matching existing pattern)
-  const recentApplications = [
+  // Use real loan data if available, otherwise static
+  const recentApplications = useMemo(() => {
+    if (dashData?.recentLoans?.length) {
+      const statusMap: Record<string, { label: string; color: string }> = {
+        draft: { label: 'Draft', color: 'bg-gray-100 text-gray-600' },
+        submitted: { label: 'Submitted', color: 'bg-blue-100 text-blue-700' },
+        under_review: { label: 'Under Review', color: 'bg-amber-100 text-amber-700' },
+        approved: { label: 'Approved', color: 'bg-green-100 text-green-700' },
+        disbursed: { label: 'Active', color: 'bg-green-100 text-green-700' },
+        repaying: { label: 'Repaying', color: 'bg-teal/10 text-teal' },
+        completed: { label: 'Completed', color: 'bg-gray-100 text-gray-600' },
+        rejected: { label: 'Rejected', color: 'bg-red-100 text-red-700' },
+        defaulted: { label: 'Defaulted', color: 'bg-red-100 text-red-700' },
+      };
+      return dashData.recentLoans.map(l => ({
+        id: l.loan_number,
+        type: l.loan_type,
+        amount: `$${Number(l.amount).toLocaleString()}`,
+        status: statusMap[l.status]?.label || l.status,
+        statusColor: statusMap[l.status]?.color || 'bg-gray-100 text-gray-600',
+      }));
+    }
+    return [
     {
       id: 'FIN-2024-012',
       type: 'Working Capital',
@@ -264,6 +326,7 @@ export default function DashboardPage() {
       statusColor: 'bg-amber-100 text-amber-700',
     },
   ];
+  }, [dashData]);
 
   // Training courses in progress
   const coursesInProgress = [
@@ -388,7 +451,7 @@ export default function DashboardPage() {
               <TrendingUp className="w-3 h-3" /> +12%
             </span>
           </div>
-          <p className="text-2xl font-bold text-navy">{dashboardStats.activeLoans}</p>
+          <p className="text-2xl font-bold text-navy">{dashData?.stats?.activeLoanCount ?? dashboardStats.activeLoans}</p>
           <p className="text-xs text-gray-500 mt-0.5">Active Loans</p>
         </motion.div>
 
@@ -405,7 +468,7 @@ export default function DashboardPage() {
               <TrendingUp className="w-3 h-3" /> +{dashboardStats.revenueGrowth}%
             </span>
           </div>
-          <p className="text-2xl font-bold text-navy">{formatCurrency(dashboardStats.totalLoansDeployed)}</p>
+          <p className="text-2xl font-bold text-navy">{formatCurrency(dashData?.stats?.totalLoanAmount ?? dashboardStats.totalLoansDeployed)}</p>
           <p className="text-xs text-gray-500 mt-0.5">Total Deployed</p>
         </motion.div>
 
