@@ -1,10 +1,10 @@
 // AFU Portal - Members Mock Data
-// Realistic African names from Botswana, Zimbabwe, and Tanzania
+// Realistic African names across 9 AFU countries
 
 export type MemberTier = 'smallholder' | 'commercial' | 'enterprise' | 'partner';
 export type MemberStatus = 'active' | 'pending' | 'suspended';
 export type KycStatus = 'complete' | 'partial' | 'pending';
-export type Country = 'Botswana' | 'Zimbabwe' | 'Tanzania';
+export type Country = 'Botswana' | 'Kenya' | 'Mozambique' | 'Nigeria' | 'Sierra Leone' | 'South Africa' | 'Tanzania' | 'Zambia' | 'Zimbabwe';
 
 export interface Member {
   id: string;

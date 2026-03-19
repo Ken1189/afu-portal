@@ -1,9 +1,9 @@
 // AFU Portal - Suppliers Mock Data
-// Realistic African agricultural supplier companies from Botswana, Zimbabwe, and Tanzania
+// Realistic African agricultural supplier companies across 9 AFU countries
 
 export type SupplierCategory = 'input-supplier' | 'equipment' | 'logistics' | 'processing' | 'technology' | 'financial-services';
 export type SponsorshipTier = 'platinum' | 'gold' | 'silver' | 'bronze';
-export type Country = 'Botswana' | 'Zimbabwe' | 'Tanzania';
+export type Country = 'Botswana' | 'Kenya' | 'Mozambique' | 'Nigeria' | 'Sierra Leone' | 'South Africa' | 'Tanzania' | 'Zambia' | 'Zimbabwe';
 
 export interface Supplier {
   id: string;

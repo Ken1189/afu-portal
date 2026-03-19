@@ -129,8 +129,14 @@ export default function AdminMembersPage() {
             <select value={countryFilter} onChange={(e) => setCountryFilter(e.target.value)} className="px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white">
               <option value="all">All Countries</option>
               <option value="Botswana">Botswana</option>
-              <option value="Zimbabwe">Zimbabwe</option>
+              <option value="Kenya">Kenya</option>
+              <option value="Mozambique">Mozambique</option>
+              <option value="Nigeria">Nigeria</option>
+              <option value="Sierra Leone">Sierra Leone</option>
+              <option value="South Africa">South Africa</option>
               <option value="Tanzania">Tanzania</option>
+              <option value="Zambia">Zambia</option>
+              <option value="Zimbabwe">Zimbabwe</option>
             </select>
           </div>
         </div>

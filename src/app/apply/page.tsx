@@ -210,8 +210,14 @@ export default function ApplyPage() {
                     <select required className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal/50 focus:border-teal" value={formData.country} onChange={(e) => setFormData({ ...formData, country: e.target.value })}>
                       <option value="">Select country</option>
                       <option value="BW">Botswana</option>
-                      <option value="ZW">Zimbabwe</option>
+                      <option value="KE">Kenya</option>
+                      <option value="MZ">Mozambique</option>
+                      <option value="NG">Nigeria</option>
+                      <option value="SL">Sierra Leone</option>
+                      <option value="ZA">South Africa</option>
                       <option value="TZ">Tanzania</option>
+                      <option value="ZM">Zambia</option>
+                      <option value="ZW">Zimbabwe</option>
                       <option value="other">Other</option>
                     </select>
                   </div>

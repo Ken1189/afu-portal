@@ -343,8 +343,14 @@ export default function AdminSuppliersPage() {
             >
               <option value="all">All Countries</option>
               <option value="Botswana">Botswana</option>
-              <option value="Zimbabwe">Zimbabwe</option>
+              <option value="Kenya">Kenya</option>
+              <option value="Mozambique">Mozambique</option>
+              <option value="Nigeria">Nigeria</option>
+              <option value="Sierra Leone">Sierra Leone</option>
+              <option value="South Africa">South Africa</option>
               <option value="Tanzania">Tanzania</option>
+              <option value="Zambia">Zambia</option>
+              <option value="Zimbabwe">Zimbabwe</option>
             </select>
 
             <select
