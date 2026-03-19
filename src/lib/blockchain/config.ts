@@ -1,26 +1,29 @@
 /**
- * EDMA Network Configuration
+ * EDMA L2 Network Configuration
  *
  * EDMA is an Ethereum Layer-2 for Real-World Assets (PoV Protocol).
  * This config defines the chain parameters, contract addresses,
  * and staking tiers for the AFU integration.
+ *
+ * All contract addresses use environment variables with fallback to
+ * placeholder zeros until EDMA contracts are deployed.
  */
 
 export const EDMA_CHAIN = {
-  chainId: 1, // Ethereum mainnet (EDMA L2 settles here) — update when EDMA L2 goes live
-  name: 'Ethereum Mainnet',
-  rpcUrl: 'https://eth-mainnet.g.alchemy.com/v2/demo',
-  blockExplorer: 'https://etherscan.io',
+  chainId: parseInt(process.env.NEXT_PUBLIC_EDMA_CHAIN_ID || '4488', 10),
+  name: 'EDMA L2',
+  rpcUrl: process.env.NEXT_PUBLIC_EDMA_RPC_URL || 'https://rpc.edma.io',
+  blockExplorer: process.env.NEXT_PUBLIC_EDMA_EXPLORER || 'https://explorer.edma.io',
   currency: {
-    name: 'Ether',
-    symbol: 'ETH',
+    name: 'EDMA',
+    symbol: 'EDM',
     decimals: 18,
   },
 };
 
 // EDM Token Contract (ERC-20)
 export const EDM_TOKEN = {
-  address: '0x0000000000000000000000000000000000000000', // Placeholder — update with real contract
+  address: process.env.NEXT_PUBLIC_EDM_TOKEN_ADDRESS || '0x0000000000000000000000000000000000000000',
   symbol: 'EDM',
   decimals: 18,
   name: 'EDMA Token',
@@ -28,9 +31,9 @@ export const EDM_TOKEN = {
   logoUrl: '/edma-logo.png',
 };
 
-// EDSD Settlement Token
+// EDSD Settlement Token (ERC-20)
 export const EDSD_TOKEN = {
-  address: '0x0000000000000000000000000000000000000000', // Placeholder
+  address: process.env.NEXT_PUBLIC_EDSD_TOKEN_ADDRESS || '0x0000000000000000000000000000000000000000',
   symbol: 'EDSD',
   decimals: 18,
   name: 'EDMA Settlement Dollar',
@@ -38,8 +41,22 @@ export const EDSD_TOKEN = {
 
 // Staking Contract
 export const STAKING_CONTRACT = {
-  address: '0x0000000000000000000000000000000000000000', // Placeholder
+  address: process.env.NEXT_PUBLIC_STAKING_CONTRACT_ADDRESS || '0x0000000000000000000000000000000000000000',
 };
+
+// Referral Contract
+export const REFERRAL_CONTRACT = {
+  address: process.env.NEXT_PUBLIC_REFERRAL_CONTRACT_ADDRESS || '0x0000000000000000000000000000000000000000',
+};
+
+// Commodity Token Contract (ERC-1155 for RWA)
+export const COMMODITY_TOKEN = {
+  address: process.env.NEXT_PUBLIC_COMMODITY_TOKEN_ADDRESS || '0x0000000000000000000000000000000000000000',
+  name: 'AFU Commodity Token',
+};
+
+// Placeholder address constant for deployment checks
+export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
 // Presale price
 export const EDM_PRESALE_PRICE = 0.215; // $0.215 per EDM
