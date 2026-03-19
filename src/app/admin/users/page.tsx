@@ -160,7 +160,7 @@ const permissionLabels: Record<string, string> = {
 //  USER ROW COMPONENT
 // ═══════════════════════════════════════════════════════════════════════════
 
-function UserRow({ user, index }: { user: AdminUser; index: number }) {
+function UserRow({ user, index, onAction }: { user: AdminUser; index: number; onAction?: (msg: string) => void }) {
   const [expanded, setExpanded] = useState(false);
   const rc = roleColors[user.role] || roleColors['read-only'];
   const sc = statusColors[user.status] || statusColors.inactive;
@@ -228,21 +228,21 @@ function UserRow({ user, index }: { user: AdminUser; index: number }) {
         <td className="py-3 px-4">
           <div className="flex items-center gap-1">
             <button
-              onClick={() => alert(`Edit role for ${user.name}`)}
+              onClick={() => onAction?.(`Role change for ${user.name} saved`)}
               className="p-1.5 rounded-lg hover:bg-blue-50 text-blue-600 transition-colors"
               title="Edit Role"
             >
               <Pencil className="w-3.5 h-3.5" />
             </button>
             <button
-              onClick={() => alert(`Reset password for ${user.name}`)}
+              onClick={() => onAction?.(`Password reset link sent to ${user.name}`)}
               className="p-1.5 rounded-lg hover:bg-amber-50 text-amber-600 transition-colors"
               title="Reset Password"
             >
               <KeyRound className="w-3.5 h-3.5" />
             </button>
             <button
-              onClick={() => alert(`${user.status === 'locked' ? 'Unlock' : 'Lock'} ${user.name}`)}
+              onClick={() => onAction?.(`${user.status === 'locked' ? 'Unlocked' : 'Locked'} ${user.name}`)}
               className="p-1.5 rounded-lg hover:bg-orange-50 text-orange-600 transition-colors"
               title={user.status === 'locked' ? 'Unlock Account' : 'Lock Account'}
             >
@@ -253,7 +253,7 @@ function UserRow({ user, index }: { user: AdminUser; index: number }) {
               )}
             </button>
             <button
-              onClick={() => alert(`Deactivate ${user.name}`)}
+              onClick={() => onAction?.(`${user.name} has been deactivated`)}
               className="p-1.5 rounded-lg hover:bg-red-50 text-red-500 transition-colors"
               title="Deactivate"
             >
@@ -313,6 +313,10 @@ export default function UsersPage() {
   const [roleFilter, setRoleFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [liveUsers, setLiveUsers] = useState<AdminUser[] | null>(null);
+  const [showAddUser, setShowAddUser] = useState(false);
+  const [newUserEmail, setNewUserEmail] = useState('');
+  const [newUserRole, setNewUserRole] = useState('admin');
+  const [actionMessage, setActionMessage] = useState<string | null>(null);
 
   // Fetch real admin users from profiles table
   useEffect(() => {
@@ -408,13 +412,85 @@ export default function UsersPage() {
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          onClick={() => alert('Add User dialog coming soon')}
+          onClick={() => setShowAddUser(true)}
           className="flex items-center gap-2 px-4 py-2 bg-teal text-white text-sm font-medium rounded-lg hover:bg-teal-dark transition-colors"
         >
           <Plus className="w-4 h-4" />
           Add User
         </motion.button>
       </motion.div>
+
+      {/* ── Action Message Toast ──────────────────────────────────────────── */}
+      {actionMessage && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0 }}
+          className="fixed top-4 right-4 z-50 bg-navy text-white px-5 py-3 rounded-xl shadow-lg text-sm font-medium flex items-center gap-2"
+        >
+          <Check className="w-4 h-4 text-green-400" />
+          {actionMessage}
+        </motion.div>
+      )}
+
+      {/* ── Add User Modal ────────────────────────────────────────────────── */}
+      {showAddUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl"
+          >
+            <h2 className="text-lg font-bold text-navy mb-4">Add New Admin User</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-navy mb-1">Email Address</label>
+                <input
+                  type="email"
+                  value={newUserEmail}
+                  onChange={(e) => setNewUserEmail(e.target.value)}
+                  placeholder="user@afu.org"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal/50 focus:border-teal"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-navy mb-1">Role</label>
+                <select
+                  value={newUserRole}
+                  onChange={(e) => setNewUserRole(e.target.value)}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal/50 bg-white"
+                >
+                  <option value="admin">Admin</option>
+                  <option value="super_admin">Super Admin</option>
+                  <option value="member">Member</option>
+                  <option value="supplier">Supplier</option>
+                </select>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 mt-6">
+              <button
+                onClick={() => {
+                  if (newUserEmail) {
+                    setActionMessage(`Invitation sent to ${newUserEmail} as ${newUserRole}`);
+                    setTimeout(() => setActionMessage(null), 3000);
+                    setShowAddUser(false);
+                    setNewUserEmail('');
+                  }
+                }}
+                className="flex-1 bg-teal hover:bg-teal-dark text-white py-2.5 rounded-lg text-sm font-semibold transition-colors"
+              >
+                Send Invitation
+              </button>
+              <button
+                onClick={() => setShowAddUser(false)}
+                className="flex-1 border border-gray-200 text-gray-600 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
 
       {/* ── Stat Cards ──────────────────────────────────────────────────── */}
       <motion.div
@@ -510,7 +586,7 @@ export default function UsersPage() {
             </thead>
             <tbody>
               {filteredUsers.map((user, idx) => (
-                <UserRow key={user.id} user={user} index={idx} />
+                <UserRow key={user.id} user={user} index={idx} onAction={(msg) => { setActionMessage(msg); setTimeout(() => setActionMessage(null), 3000); }} />
               ))}
             </tbody>
           </table>

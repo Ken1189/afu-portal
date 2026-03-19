@@ -488,7 +488,7 @@ export default function SettingsPage() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 className="px-4 py-2 bg-teal text-white text-sm font-medium rounded-lg hover:bg-teal-dark transition-colors"
-                onClick={() => alert('Settings saved (mock)')}
+                onClick={() => saveSetting('general', liveSettings?.general as Record<string, unknown> || {})}
               >
                 Save Changes
               </motion.button>
@@ -571,7 +571,7 @@ export default function SettingsPage() {
                       <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        onClick={() => alert(`Preview: ${template.name}`)}
+                        onClick={() => window.open('#', '_blank')}
                         className="p-2 rounded-lg hover:bg-blue-50 text-blue-500 transition-colors"
                         title="Preview"
                       >
