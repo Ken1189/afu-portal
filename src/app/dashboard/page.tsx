@@ -344,6 +344,7 @@ export default function DashboardPage() {
     { label: 'View Contracts', href: '/dashboard/offtake', icon: Handshake, color: 'bg-indigo-50 text-indigo-600' },
     { label: 'Crop Scanner', href: '/dashboard', icon: ScanLine, color: 'bg-green-50 text-green-600' },
     { label: 'EDMA Wallet', href: '/dashboard/wallet', icon: Wallet, color: 'bg-orange-50 text-[#FF4500]' },
+    { label: 'Refer & Earn', href: '/dashboard/referral', icon: Activity, color: 'bg-pink-50 text-pink-600' },
   ];
 
   return (
