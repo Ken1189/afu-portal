@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -156,16 +157,8 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* ── Logo ── */}
-          <Link href="/" className="flex items-center gap-2 shrink-0">
-            <div className="w-10 h-10 bg-teal rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">A</span>
-            </div>
-            <div>
-              <span className="text-navy font-bold text-xl">AFU</span>
-              <span className="hidden sm:inline text-navy-light text-sm ml-2">
-                African Farming Union
-              </span>
-            </div>
+          <Link href="/" className="flex items-center shrink-0">
+            <Image src="/afu-logo.jpeg" alt="African Farming Union" width={160} height={50} className="h-11 w-auto object-contain" priority />
           </Link>
 
           {/* ── Desktop Nav ── */}

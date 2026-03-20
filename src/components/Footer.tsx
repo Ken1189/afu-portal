@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Footer() {
   return (
@@ -7,11 +8,8 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
           {/* Brand */}
           <div>
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 bg-teal rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">A</span>
-              </div>
-              <span className="font-bold text-xl">AFU</span>
+            <div className="mb-4">
+              <Image src="/afu-logo.jpeg" alt="African Farming Union" width={160} height={50} className="h-12 w-auto object-contain rounded-lg bg-white p-1" />
             </div>
             <p className="text-gray-300 text-sm leading-relaxed">
               Africa&apos;s Agriculture Development Bank + Operating Platform.

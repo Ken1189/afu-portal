@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAuth } from "@/lib/supabase/auth-context";
@@ -45,11 +46,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <aside className="hidden lg:flex w-64 bg-white border-r border-gray-100 flex-col fixed top-0 left-0 bottom-0 z-30">
         {/* Gradient Header — matches farm layout style */}
         <div className="gradient-navy p-5 text-white">
-          <Link href="/" className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">A</span>
-            </div>
-            <span className="font-bold text-lg">AFU Portal</span>
+          <Link href="/" className="block mb-4">
+            <Image src="/afu-logo.jpeg" alt="African Farming Union" width={150} height={47} className="h-10 w-auto object-contain rounded-md bg-white p-1" />
           </Link>
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center font-bold">
@@ -110,11 +108,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <aside className="absolute top-0 left-0 bottom-0 w-72 bg-white shadow-2xl flex flex-col">
             <div className="gradient-navy p-5 text-white">
               <div className="flex items-center justify-between mb-4">
-                <Link href="/" className="flex items-center gap-2" onClick={() => setMobileNavOpen(false)}>
-                  <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
-                    <span className="font-bold text-sm">A</span>
-                  </div>
-                  <span className="font-bold">AFU Portal</span>
+                <Link href="/" className="flex items-center" onClick={() => setMobileNavOpen(false)}>
+                  <Image src="/afu-logo.jpeg" alt="African Farming Union" width={130} height={41} className="h-9 w-auto object-contain rounded-md bg-white p-1" />
                 </Link>
                 <button
                   onClick={() => setMobileNavOpen(false)}

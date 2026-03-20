@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -214,13 +215,7 @@ function SidebarContent({
     <>
       <div className="p-5 border-b border-white/10">
         <Link href="/admin" className="flex items-center gap-2.5" onClick={onLinkClick}>
-          <div className="w-8 h-8 bg-teal rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">A</span>
-          </div>
-          <div>
-            <span className="font-bold text-sm">AFU Admin</span>
-            <p className="text-[10px] text-gray-400 -mt-0.5">Control Panel</p>
-          </div>
+          <Image src="/afu-logo.jpeg" alt="African Farming Union" width={150} height={47} className="h-10 w-auto object-contain rounded-md bg-white p-1" />
         </Link>
       </div>
 

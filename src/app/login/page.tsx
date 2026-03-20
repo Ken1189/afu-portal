@@ -270,11 +270,9 @@ export default function LoginPage() {
           {/* Top: Logo + brand */}
           <div>
             <Link href="/" className="inline-flex items-center gap-3 group">
-              <div className="w-11 h-11 bg-white/15 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/20 transition-colors group-hover:bg-white/25">
-                <span className="text-white font-bold text-lg">A</span>
-              </div>
+              <Image src="/afu-logo.jpeg" alt="African Farming Union" width={180} height={56} className="h-14 w-auto object-contain rounded-lg bg-white/95 p-1.5" />
               <div>
-                <span className="text-white font-bold text-lg tracking-tight">
+                <span className="text-white font-bold text-lg tracking-tight sr-only">
                   African Farming Union
                 </span>
                 <span className="block text-teal-light/70 text-xs tracking-widest uppercase">
@@ -379,12 +377,7 @@ export default function LoginPage() {
           {/* Mobile-only logo */}
           <motion.div variants={formItem} className="text-center mb-8 lg:hidden">
             <Link href="/" className="inline-flex items-center gap-2.5">
-              <div className="w-11 h-11 bg-teal rounded-xl flex items-center justify-center">
-                <span className="text-white font-bold text-lg">A</span>
-              </div>
-              <span className="text-navy font-bold text-lg tracking-tight">
-                African Farming Union
-              </span>
+              <Image src="/afu-logo.jpeg" alt="African Farming Union" width={160} height={50} className="h-12 w-auto object-contain" />
             </Link>
           </motion.div>
 
