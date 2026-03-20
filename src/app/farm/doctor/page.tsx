@@ -17,11 +17,66 @@ import {
   Save,
   ChevronDown,
 } from 'lucide-react';
-import { cropScans as mockCropScans, farmPlots as mockFarmPlots } from '@/lib/data/farm';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 
-const cropScans = mockCropScans;
-const farmPlots = mockFarmPlots;
+// ---------------------------------------------------------------------------
+// Inlined types & data (previously from @/lib/data/farm)
+// ---------------------------------------------------------------------------
+
+type ScanResult = 'healthy' | 'moderate' | 'severe';
+
+interface CropScan {
+  id: string;
+  plotId: string;
+  plotName: string;
+  date: string;
+  image: string;
+  diagnosis: string;
+  healthScore: number;
+  severity: ScanResult;
+  confidence: number;
+  affectedArea: number;
+  recommendations: string[];
+  treatments: { name: string; price: number; unit: string }[];
+}
+
+interface FarmPlotMinimal {
+  id: string;
+  name: string;
+  crop: string;
+  variety: string;
+}
+
+const cropScans: CropScan[] = [
+  {
+    id: 'SCN-001', plotId: 'PLT-001', plotName: 'Main Blueberry Field', date: '2026-03-11',
+    image: 'https://images.unsplash.com/photo-1498579809087-ef1e558fd1da?w=400&h=300&fit=crop',
+    diagnosis: 'Healthy — No Issues Detected', healthScore: 92, severity: 'healthy', confidence: 94, affectedArea: 0,
+    recommendations: ['Continue current care regimen', 'Monitor soil pH weekly during fruiting', 'Maintain mulch layer around root zone'],
+    treatments: [],
+  },
+  {
+    id: 'SCN-002', plotId: 'PLT-002', plotName: 'Cassava Plot', date: '2026-03-10',
+    image: 'https://images.unsplash.com/photo-1590682680695-43b964a3ae17?w=400&h=300&fit=crop',
+    diagnosis: 'Possible Cassava Mosaic — Early Signs', healthScore: 72, severity: 'moderate', confidence: 78, affectedArea: 12,
+    recommendations: ['Remove and destroy affected plants immediately', 'Apply Imidacloprid for whitefly control', 'Check neighboring plants within 3-meter radius', 'Consider resistant variety for next planting'],
+    treatments: [{ name: 'Imidacloprid 200SL', price: 28, unit: 'per liter' }, { name: 'Neem Oil Organic', price: 18, unit: 'per liter' }],
+  },
+  {
+    id: 'SCN-003', plotId: 'PLT-003', plotName: 'Sesame Strip', date: '2026-03-09',
+    image: 'https://images.unsplash.com/photo-1595855759920-86582396756a?w=400&h=300&fit=crop',
+    diagnosis: 'Minor Leaf Spot (Cercospora)', healthScore: 82, severity: 'moderate', confidence: 85, affectedArea: 8,
+    recommendations: ['Apply copper oxychloride fungicide', 'Improve spacing for air circulation', 'Avoid overhead irrigation'],
+    treatments: [{ name: 'Copper Oxychloride', price: 22, unit: 'per kg' }],
+  },
+];
+
+const farmPlots: FarmPlotMinimal[] = [
+  { id: 'PLT-001', name: 'Main Blueberry Field', crop: 'Blueberries', variety: 'Duke' },
+  { id: 'PLT-002', name: 'Cassava Plot', crop: 'Cassava', variety: 'TMS 30572' },
+  { id: 'PLT-003', name: 'Sesame Strip', crop: 'Sesame', variety: 'S42 White' },
+  { id: 'PLT-004', name: 'Maize Field', crop: 'Maize', variety: 'SC 513' },
+];
 
 // ---------------------------------------------------------------------------
 // Types

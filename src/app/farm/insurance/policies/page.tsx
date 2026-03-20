@@ -15,12 +15,119 @@ import {
   AlertTriangle,
   Inbox,
 } from 'lucide-react';
-import {
-  insurancePolicies as mockInsurancePolicies,
-  type InsuranceType,
-  type PolicyStatus,
-} from '@/lib/data/insurance';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
+
+/* ------------------------------------------------------------------ */
+/* Inline mock data (formerly from @/lib/data/insurance)               */
+/* ------------------------------------------------------------------ */
+type InsuranceType = 'crop' | 'livestock' | 'equipment' | 'weather-index';
+type PolicyStatus = 'active' | 'expired' | 'pending' | 'cancelled';
+
+interface InsurancePolicy {
+  id: string;
+  productId: string;
+  productName: string;
+  type: InsuranceType;
+  status: PolicyStatus;
+  startDate: string;
+  endDate: string;
+  premiumAmount: number;
+  premiumFrequency: 'monthly' | 'quarterly' | 'annual';
+  nextPremiumDue: string;
+  coverageAmount: number;
+  deductible: number;
+  coveredItems: string[];
+  claimsCount: number;
+  lastClaimDate: string | null;
+}
+
+const mockInsurancePolicies: InsurancePolicy[] = [
+  {
+    id: 'POL-001',
+    productId: 'INS-PROD-001',
+    productName: 'Crop Shield Basic',
+    type: 'crop',
+    status: 'active',
+    startDate: '2025-10-01',
+    endDate: '2026-09-30',
+    premiumAmount: 28,
+    premiumFrequency: 'monthly',
+    nextPremiumDue: '2026-04-01',
+    coverageAmount: 3500,
+    deductible: 10,
+    coveredItems: ['Maize (Plot A - 2.1 ha)', 'Groundnuts (Plot B - 1.5 ha)'],
+    claimsCount: 1,
+    lastClaimDate: '2026-01-15',
+  },
+  {
+    id: 'POL-002',
+    productId: 'INS-PROD-003',
+    productName: 'Livestock Guardian',
+    type: 'livestock',
+    status: 'active',
+    startDate: '2025-11-15',
+    endDate: '2026-11-14',
+    premiumAmount: 45,
+    premiumFrequency: 'monthly',
+    nextPremiumDue: '2026-04-15',
+    coverageAmount: 6000,
+    deductible: 15,
+    coveredItems: ['Cattle (12 head)', 'Goats (8 head)'],
+    claimsCount: 0,
+    lastClaimDate: null,
+  },
+  {
+    id: 'POL-003',
+    productId: 'INS-PROD-005',
+    productName: 'Weather Index',
+    type: 'weather-index',
+    status: 'active',
+    startDate: '2025-12-01',
+    endDate: '2026-05-31',
+    premiumAmount: 18,
+    premiumFrequency: 'monthly',
+    nextPremiumDue: '2026-04-01',
+    coverageAmount: 1500,
+    deductible: 0,
+    coveredItems: ['All registered plots (3.6 ha total)'],
+    claimsCount: 1,
+    lastClaimDate: '2026-02-10',
+  },
+  {
+    id: 'POL-004',
+    productId: 'INS-PROD-004',
+    productName: 'Equipment Protect',
+    type: 'equipment',
+    status: 'expired',
+    startDate: '2025-01-01',
+    endDate: '2025-12-31',
+    premiumAmount: 35,
+    premiumFrequency: 'quarterly',
+    nextPremiumDue: '2026-01-01',
+    coverageAmount: 4500,
+    deductible: 10,
+    coveredItems: ['Water pump (Honda WB30)', 'Maize sheller (manual)'],
+    claimsCount: 1,
+    lastClaimDate: '2025-08-20',
+  },
+  {
+    id: 'POL-005',
+    productId: 'INS-PROD-002',
+    productName: 'Crop Shield Premium',
+    type: 'crop',
+    status: 'pending',
+    startDate: '2026-04-01',
+    endDate: '2027-03-31',
+    premiumAmount: 55,
+    premiumFrequency: 'monthly',
+    nextPremiumDue: '2026-04-01',
+    coverageAmount: 8000,
+    deductible: 5,
+    coveredItems: ['Soya Beans (Plot C - 1.8 ha)', 'Sunflower (Plot D - 0.9 ha)'],
+    claimsCount: 0,
+    lastClaimDate: null,
+  },
+];
 
 // ---------------------------------------------------------------------------
 // Animation variants

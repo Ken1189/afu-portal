@@ -32,16 +32,210 @@ import {
   X,
 } from 'lucide-react';
 import { useFarmPlots } from '@/lib/supabase/use-farm-plots';
-import { adaptFarmPlot } from '@/lib/data/adapters';
-import {
-  farmPlots as mockFarmPlots,
-  weatherForecast,
-  farmTasks as initialFarmTasks,
-  farmActivities as mockFarmActivities,
-  getFarmSummary as getMockFarmSummary,
-} from '@/lib/data/farm';
-import type { WeatherCondition, ActivityType, FarmTask } from '@/lib/data/farm';
+import type { FarmPlotRow } from '@/lib/supabase/use-farm-plots';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
+
+// ---------------------------------------------------------------------------
+// Types (inlined from @/lib/data/farm)
+// ---------------------------------------------------------------------------
+
+type CropStage = 'planning' | 'planted' | 'germinating' | 'vegetative' | 'flowering' | 'fruiting' | 'harvesting' | 'completed';
+type ActivityType = 'planting' | 'watering' | 'fertilizing' | 'spraying' | 'weeding' | 'harvesting' | 'scouting' | 'soil-test' | 'pruning' | 'other';
+type WeatherCondition = 'sunny' | 'partly-cloudy' | 'cloudy' | 'rainy' | 'stormy' | 'windy';
+
+interface FarmPlot {
+  id: string;
+  name: string;
+  size: number;
+  sizeUnit: 'hectares' | 'acres';
+  crop: string;
+  variety: string;
+  stage: CropStage;
+  plantingDate: string;
+  expectedHarvest: string;
+  daysToHarvest: number;
+  progressPercent: number;
+  healthScore: number;
+  lastActivity: string;
+  activities: FarmActivity[];
+  image: string;
+  soilPH: number;
+  location: string;
+}
+
+interface FarmActivity {
+  id: string;
+  plotId: string;
+  plotName: string;
+  type: ActivityType;
+  date: string;
+  time: string;
+  description: string;
+  notes?: string;
+  photo?: string;
+  cost?: number;
+  currency: string;
+}
+
+interface FarmTransaction {
+  id: string;
+  type: 'income' | 'expense';
+  category: string;
+  amount: number;
+  currency: string;
+  date: string;
+  description: string;
+}
+
+interface FarmTask {
+  id: string;
+  title: string;
+  plotId?: string;
+  plotName?: string;
+  dueDate: string;
+  priority: 'high' | 'medium' | 'low';
+  completed: boolean;
+  type: ActivityType;
+}
+
+interface WeatherDay {
+  date: string;
+  day: string;
+  condition: WeatherCondition;
+  tempHigh: number;
+  tempLow: number;
+  humidity: number;
+  rainChance: number;
+  windSpeed: number;
+  advice: string;
+}
+
+// ---------------------------------------------------------------------------
+// Inline adaptFarmPlot (from @/lib/data/adapters)
+// ---------------------------------------------------------------------------
+
+const CROP_IMAGES: Record<string, string> = {
+  blueberries: 'https://images.unsplash.com/photo-1498159332174-be5f8a9afc86?w=600&h=400&fit=crop',
+  tomatoes: 'https://images.unsplash.com/photo-1592841200221-a6898f307baa?w=600&h=400&fit=crop',
+  maize: 'https://images.unsplash.com/photo-1601004890684-d8573e10e7e7?w=600&h=400&fit=crop',
+  cassava: 'https://images.unsplash.com/photo-1590682680695-43b964a3ae17?w=600&h=400&fit=crop',
+  sesame: 'https://images.unsplash.com/photo-1595855759920-86582396756a?w=600&h=400&fit=crop',
+  sorghum: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&h=400&fit=crop',
+  default: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&h=400&fit=crop',
+};
+
+function getCropImage(crop: string | null): string {
+  if (!crop) return CROP_IMAGES.default;
+  const key = crop.toLowerCase();
+  for (const [k, v] of Object.entries(CROP_IMAGES)) {
+    if (key.includes(k)) return v;
+  }
+  return CROP_IMAGES.default;
+}
+
+function computeProgress(stage: string): number {
+  const stages = ['planning', 'planted', 'germinating', 'vegetative', 'flowering', 'fruiting', 'harvesting', 'completed'];
+  const idx = stages.indexOf(stage);
+  if (idx < 0) return 0;
+  return Math.round((idx / (stages.length - 1)) * 100);
+}
+
+function computeDaysToHarvest(expectedHarvest: string | null): number {
+  if (!expectedHarvest) return 0;
+  const diff = new Date(expectedHarvest).getTime() - Date.now();
+  return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+}
+
+function adaptFarmPlot(row: FarmPlotRow) {
+  return {
+    id: row.id,
+    name: row.name,
+    size: row.size_ha || 0,
+    sizeUnit: 'hectares' as const,
+    crop: row.crop || 'Unknown',
+    variety: row.variety || '',
+    stage: row.stage as CropStage,
+    plantingDate: row.planting_date || '',
+    expectedHarvest: row.expected_harvest || '',
+    daysToHarvest: computeDaysToHarvest(row.expected_harvest),
+    progressPercent: computeProgress(row.stage),
+    healthScore: row.health_score,
+    lastActivity: row.updated_at,
+    activities: [] as FarmActivity[],
+    image: getCropImage(row.crop),
+    soilPH: row.soil_ph || 6.5,
+    location: row.location || '',
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Inline fallback data (from @/lib/data/farm)
+// ---------------------------------------------------------------------------
+
+const mockFarmPlots: FarmPlot[] = [
+  { id: 'PLT-001', name: 'Main Blueberry Field', size: 1.5, sizeUnit: 'hectares', crop: 'Blueberries', variety: 'Duke', stage: 'fruiting', plantingDate: '2025-09-15', expectedHarvest: '2026-04-10', daysToHarvest: 27, progressPercent: 78, healthScore: 92, lastActivity: '2026-03-12', activities: [], image: 'https://images.unsplash.com/photo-1498579809087-ef1e558fd1da?w=400&h=300&fit=crop', soilPH: 4.8, location: 'Plot A \u2014 North Field' },
+  { id: 'PLT-002', name: 'Cassava Plot', size: 2.0, sizeUnit: 'hectares', crop: 'Cassava', variety: 'TMS 30572', stage: 'vegetative', plantingDate: '2025-12-01', expectedHarvest: '2026-09-30', daysToHarvest: 200, progressPercent: 35, healthScore: 78, lastActivity: '2026-03-10', activities: [], image: 'https://images.unsplash.com/photo-1590682680695-43b964a3ae17?w=400&h=300&fit=crop', soilPH: 6.2, location: 'Plot B \u2014 South Field' },
+  { id: 'PLT-003', name: 'Sesame Strip', size: 0.8, sizeUnit: 'hectares', crop: 'Sesame', variety: 'S42 White', stage: 'flowering', plantingDate: '2025-11-20', expectedHarvest: '2026-04-25', daysToHarvest: 42, progressPercent: 65, healthScore: 85, lastActivity: '2026-03-11', activities: [], image: 'https://images.unsplash.com/photo-1595855759920-86582396756a?w=400&h=300&fit=crop', soilPH: 6.8, location: 'Plot C \u2014 East Strip' },
+  { id: 'PLT-004', name: 'Maize Field', size: 1.0, sizeUnit: 'hectares', crop: 'Maize', variety: 'SC 513', stage: 'planted', plantingDate: '2026-03-01', expectedHarvest: '2026-07-15', daysToHarvest: 123, progressPercent: 8, healthScore: 95, lastActivity: '2026-03-01', activities: [], image: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400&h=300&fit=crop', soilPH: 6.5, location: 'Plot D \u2014 West Field' },
+];
+
+const mockFarmActivities: FarmActivity[] = [
+  { id: 'ACT-001', plotId: 'PLT-001', plotName: 'Main Blueberry Field', type: 'fertilizing', date: '2026-03-12', time: '07:30', description: 'Applied sulfur-based acidifier around drip lines', cost: 45, currency: 'USD' },
+  { id: 'ACT-002', plotId: 'PLT-001', plotName: 'Main Blueberry Field', type: 'scouting', date: '2026-03-11', time: '06:00', description: 'Checked for aphid presence \u2014 minimal activity spotted on north rows', currency: 'USD' },
+  { id: 'ACT-003', plotId: 'PLT-002', plotName: 'Cassava Plot', type: 'weeding', date: '2026-03-10', time: '08:00', description: 'Manual weeding between rows, 3 laborers for 4 hours', cost: 36, currency: 'USD' },
+  { id: 'ACT-004', plotId: 'PLT-003', plotName: 'Sesame Strip', type: 'spraying', date: '2026-03-11', time: '16:00', description: 'Neem oil application for pest prevention', cost: 18, currency: 'USD' },
+  { id: 'ACT-005', plotId: 'PLT-003', plotName: 'Sesame Strip', type: 'watering', date: '2026-03-09', time: '05:30', description: 'Drip irrigation \u2014 2 hours cycle', currency: 'USD' },
+  { id: 'ACT-006', plotId: 'PLT-001', plotName: 'Main Blueberry Field', type: 'pruning', date: '2026-03-08', time: '07:00', description: 'Light pruning on mature bushes to improve air circulation', currency: 'USD' },
+  { id: 'ACT-007', plotId: 'PLT-004', plotName: 'Maize Field', type: 'planting', date: '2026-03-01', time: '06:00', description: 'Planted SC 513 variety, 75cm row spacing, 25cm plant spacing', cost: 85, currency: 'USD' },
+  { id: 'ACT-008', plotId: 'PLT-002', plotName: 'Cassava Plot', type: 'fertilizing', date: '2026-03-05', time: '07:00', description: 'NPK 15-15-15 side dressing, 200kg per hectare', cost: 90, currency: 'USD' },
+  { id: 'ACT-009', plotId: 'PLT-001', plotName: 'Main Blueberry Field', type: 'harvesting', date: '2026-03-07', time: '06:00', description: 'First pick \u2014 120kg Grade A berries harvested', currency: 'USD' },
+  { id: 'ACT-010', plotId: 'PLT-001', plotName: 'Main Blueberry Field', type: 'soil-test', date: '2026-03-03', time: '09:00', description: 'Soil pH test: 4.8 \u2014 optimal for blueberries', cost: 15, currency: 'USD' },
+];
+
+const initialFarmTasks: FarmTask[] = [
+  { id: 'TSK-001', title: 'Harvest blueberries \u2014 Row 5-8', plotId: 'PLT-001', plotName: 'Main Blueberry Field', dueDate: '2026-03-15', priority: 'high', completed: false, type: 'harvesting' },
+  { id: 'TSK-002', title: 'Apply foliar feed to sesame', plotId: 'PLT-003', plotName: 'Sesame Strip', dueDate: '2026-03-16', priority: 'medium', completed: false, type: 'fertilizing' },
+  { id: 'TSK-003', title: 'Scout cassava for mosaic virus', plotId: 'PLT-002', plotName: 'Cassava Plot', dueDate: '2026-03-15', priority: 'high', completed: false, type: 'scouting' },
+  { id: 'TSK-004', title: 'Irrigate maize field', plotId: 'PLT-004', plotName: 'Maize Field', dueDate: '2026-03-14', priority: 'medium', completed: false, type: 'watering' },
+  { id: 'TSK-005', title: 'Check soil moisture sensors', plotId: 'PLT-001', plotName: 'Main Blueberry Field', dueDate: '2026-03-17', priority: 'low', completed: false, type: 'scouting' },
+  { id: 'TSK-006', title: 'Weed between cassava rows', plotId: 'PLT-002', plotName: 'Cassava Plot', dueDate: '2026-03-18', priority: 'medium', completed: false, type: 'weeding' },
+];
+
+const weatherForecast: WeatherDay[] = [
+  { date: '2026-03-14', day: 'Today', condition: 'partly-cloudy', tempHigh: 31, tempLow: 18, humidity: 55, rainChance: 15, windSpeed: 12, advice: 'Good day for harvesting. Apply pesticides before noon.' },
+  { date: '2026-03-15', day: 'Sun', condition: 'sunny', tempHigh: 33, tempLow: 19, humidity: 45, rainChance: 5, windSpeed: 8, advice: 'Hot day ahead. Ensure irrigation is running. Harvest early morning.' },
+  { date: '2026-03-16', day: 'Mon', condition: 'partly-cloudy', tempHigh: 30, tempLow: 17, humidity: 60, rainChance: 25, windSpeed: 15, advice: 'Good conditions for foliar feeding.' },
+  { date: '2026-03-17', day: 'Tue', condition: 'rainy', tempHigh: 26, tempLow: 16, humidity: 80, rainChance: 75, windSpeed: 20, advice: 'Rain expected. Do not spray. Check drainage channels.' },
+  { date: '2026-03-18', day: 'Wed', condition: 'rainy', tempHigh: 24, tempLow: 15, humidity: 85, rainChance: 80, windSpeed: 18, advice: 'Continued rain. Monitor for waterlogging in cassava plot.' },
+  { date: '2026-03-19', day: 'Thu', condition: 'cloudy', tempHigh: 27, tempLow: 16, humidity: 70, rainChance: 35, windSpeed: 14, advice: 'Clearing skies. Good day for scouting and weeding.' },
+  { date: '2026-03-20', day: 'Fri', condition: 'sunny', tempHigh: 32, tempLow: 18, humidity: 50, rainChance: 10, windSpeed: 10, advice: 'Warm and dry. Resume normal spraying schedule.' },
+];
+
+const farmTransactions: FarmTransaction[] = [
+  { id: 'TXN-001', type: 'income', category: 'harvest-sale', amount: 960, currency: 'USD', date: '2026-03-07', description: 'Blueberries 120kg @ $8/kg' },
+  { id: 'TXN-002', type: 'income', category: 'contract-payment', amount: 500, currency: 'USD', date: '2026-03-01', description: 'Advance payment' },
+  { id: 'TXN-003', type: 'expense', category: 'fertilizer', amount: 45, currency: 'USD', date: '2026-03-12', description: 'Sulfur-based soil acidifier' },
+  { id: 'TXN-004', type: 'expense', category: 'labor', amount: 36, currency: 'USD', date: '2026-03-10', description: 'Weeding labor' },
+  { id: 'TXN-005', type: 'expense', category: 'pesticides', amount: 18, currency: 'USD', date: '2026-03-11', description: 'Neem oil' },
+  { id: 'TXN-006', type: 'expense', category: 'seeds', amount: 85, currency: 'USD', date: '2026-03-01', description: 'Maize seed' },
+  { id: 'TXN-007', type: 'expense', category: 'fertilizer', amount: 90, currency: 'USD', date: '2026-03-05', description: 'NPK fertilizer' },
+  { id: 'TXN-008', type: 'expense', category: 'equipment', amount: 15, currency: 'USD', date: '2026-03-03', description: 'Soil pH testing' },
+  { id: 'TXN-009', type: 'income', category: 'subsidy', amount: 200, currency: 'USD', date: '2026-02-28', description: 'AFU member input subsidy' },
+  { id: 'TXN-010', type: 'expense', category: 'transport', amount: 25, currency: 'USD', date: '2026-03-07', description: 'Transport blueberries' },
+  { id: 'TXN-011', type: 'income', category: 'harvest-sale', amount: 180, currency: 'USD', date: '2026-02-22', description: 'Cassava chips 300kg' },
+  { id: 'TXN-012', type: 'expense', category: 'labor', amount: 48, currency: 'USD', date: '2026-02-20', description: 'Harvesting labor' },
+];
+
+function getMockFarmSummary() {
+  const totalIncome = farmTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+  const totalExpenses = farmTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+  const profit = totalIncome - totalExpenses;
+  const totalHectares = mockFarmPlots.reduce((sum, p) => sum + p.size, 0);
+  const avgHealthScore = Math.round(mockFarmPlots.reduce((sum, p) => sum + p.healthScore, 0) / mockFarmPlots.length);
+  const pendingTasks = initialFarmTasks.filter(t => !t.completed).length;
+  const highPriorityTasks = initialFarmTasks.filter(t => !t.completed && t.priority === 'high').length;
+  return { totalIncome, totalExpenses, profit, totalHectares, avgHealthScore, pendingTasks, highPriorityTasks, plotCount: mockFarmPlots.length };
+}
 
 // ---------------------------------------------------------------------------
 // Animation variants

@@ -16,7 +16,186 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
-import { insuranceProducts as mockInsuranceProducts, type InsuranceType, type InsuranceProduct } from '@/lib/data/insurance';
+
+/* ------------------------------------------------------------------ */
+/* Inline mock data (formerly from @/lib/data/insurance)               */
+/* ------------------------------------------------------------------ */
+type InsuranceType = 'crop' | 'livestock' | 'equipment' | 'weather-index';
+
+interface InsuranceProduct {
+  id: string;
+  name: string;
+  type: InsuranceType;
+  description: string;
+  coverageDetails: string[];
+  premiumRange: { min: number; max: number };
+  coverageRange: { min: number; max: number };
+  deductible: number;
+  waitingPeriod: string;
+  claimProcess: string;
+  eligibility: string[];
+  popular: boolean;
+  icon: string;
+}
+
+const mockInsuranceProducts: InsuranceProduct[] = [
+  {
+    id: 'INS-PROD-001',
+    name: 'Crop Shield Basic',
+    type: 'crop',
+    description: 'Essential crop protection against drought, flood, and pest damage. Ideal for smallholder farmers growing staple crops.',
+    coverageDetails: [
+      'Drought damage (rainfall below 60% of average)',
+      'Flood damage (waterlogging > 72 hours)',
+      'Pest infestation (verified by agronomist)',
+      'Hail damage',
+      'Fire (accidental)',
+    ],
+    premiumRange: { min: 15, max: 45 },
+    coverageRange: { min: 500, max: 5000 },
+    deductible: 10,
+    waitingPeriod: '14 days after enrollment',
+    claimProcess: 'Submit photos + agronomist verification within 7 days of incident',
+    eligibility: [
+      'AFU member in good standing',
+      'Farm size 0.5 - 20 hectares',
+      'Crops registered on platform',
+    ],
+    popular: true,
+    icon: '🌾',
+  },
+  {
+    id: 'INS-PROD-002',
+    name: 'Crop Shield Premium',
+    type: 'crop',
+    description: 'Comprehensive crop coverage with higher limits and additional perils including market price drops and disease.',
+    coverageDetails: [
+      'All Basic plan coverage',
+      'Crop disease (verified diagnosis)',
+      'Market price decline (> 30% drop)',
+      'Input loss (seed/fertilizer spoilage)',
+      'Replanting costs',
+      'Revenue guarantee up to 80%',
+    ],
+    premiumRange: { min: 35, max: 90 },
+    coverageRange: { min: 2000, max: 15000 },
+    deductible: 5,
+    waitingPeriod: '7 days after enrollment',
+    claimProcess: 'Submit photos + AFU field officer visit within 14 days',
+    eligibility: [
+      'AFU member for 6+ months',
+      'Complete KYC verification',
+      'Active crop tracking on platform',
+    ],
+    popular: false,
+    icon: '🛡️',
+  },
+  {
+    id: 'INS-PROD-003',
+    name: 'Livestock Guardian',
+    type: 'livestock',
+    description: 'Protect your livestock investment against disease, theft, and natural disasters. Covers cattle, goats, sheep, and poultry.',
+    coverageDetails: [
+      'Disease-related death (verified by vet)',
+      'Theft (with police report)',
+      'Natural disaster (flood, drought stress)',
+      'Predator attack',
+      'Accidental injury',
+      'Emergency veterinary costs',
+    ],
+    premiumRange: { min: 20, max: 80 },
+    coverageRange: { min: 300, max: 10000 },
+    deductible: 15,
+    waitingPeriod: '21 days after enrollment',
+    claimProcess: 'Vet report + photos within 48 hours of incident',
+    eligibility: [
+      'AFU member in good standing',
+      'Livestock registered with ear tags/photos',
+      'Vaccination records up to date',
+    ],
+    popular: true,
+    icon: '🐄',
+  },
+  {
+    id: 'INS-PROD-004',
+    name: 'Equipment Protect',
+    type: 'equipment',
+    description: 'Insurance for farming equipment and machinery against breakdowns, theft, and damage. Covers owned and rented equipment.',
+    coverageDetails: [
+      'Mechanical breakdown',
+      'Theft (with police report)',
+      'Fire and lightning damage',
+      'Flood damage',
+      'Vandalism',
+      'Transit damage (during transport)',
+    ],
+    premiumRange: { min: 25, max: 120 },
+    coverageRange: { min: 500, max: 25000 },
+    deductible: 10,
+    waitingPeriod: '7 days after enrollment',
+    claimProcess: 'Photos + repair estimate from authorized mechanic',
+    eligibility: [
+      'AFU member in good standing',
+      'Equipment registered on platform',
+      'Equipment value verified',
+    ],
+    popular: false,
+    icon: '🚜',
+  },
+  {
+    id: 'INS-PROD-005',
+    name: 'Weather Index',
+    type: 'weather-index',
+    description: 'Automatic payouts based on satellite weather data. No claims process needed — payments trigger automatically when conditions are met.',
+    coverageDetails: [
+      'Rainfall deficit (< 70% of 10-year average)',
+      'Excess rainfall (> 150% of average)',
+      'Temperature extremes (> 40°C or < 5°C for 3+ days)',
+      'Automatic satellite monitoring',
+      'No claims paperwork required',
+      'Payout within 14 days of trigger',
+    ],
+    premiumRange: { min: 10, max: 35 },
+    coverageRange: { min: 200, max: 3000 },
+    deductible: 0,
+    waitingPeriod: 'Coverage starts at planting date',
+    claimProcess: 'Automatic — no claims needed. Satellite data triggers payout.',
+    eligibility: [
+      'AFU member in good standing',
+      'Farm GPS coordinates registered',
+      'Active for current growing season',
+    ],
+    popular: true,
+    icon: '🌦️',
+  },
+  {
+    id: 'INS-PROD-006',
+    name: 'Comprehensive Farm Shield',
+    type: 'crop',
+    description: 'All-in-one protection combining crop, livestock, and equipment coverage at a bundled discount. Best value for diversified farms.',
+    coverageDetails: [
+      'Full Crop Shield Premium coverage',
+      'Full Livestock Guardian coverage',
+      'Basic Equipment Protect coverage',
+      '15% bundle discount on premiums',
+      'Priority claims processing',
+      'Dedicated claims officer',
+    ],
+    premiumRange: { min: 60, max: 200 },
+    coverageRange: { min: 5000, max: 50000 },
+    deductible: 5,
+    waitingPeriod: '7 days after enrollment',
+    claimProcess: 'Priority processing — dedicated officer assigned within 24 hours',
+    eligibility: [
+      'AFU member for 12+ months',
+      'Complete KYC verification',
+      'Min 2 hectares farm size',
+      'Active crop + livestock records',
+    ],
+    popular: false,
+    icon: '⭐',
+  },
+];
 
 /* ------------------------------------------------------------------ */
 /* Animation Variants                                                  */

@@ -23,17 +23,140 @@ import {
   Gift,
   MoreHorizontal,
 } from 'lucide-react';
-import {
-  farmTransactions as mockFarmTransactions,
-  farmPlots as mockFarmPlots,
-  getFarmSummary as getMockFarmSummary,
-} from '@/lib/data/farm';
-import type { FarmTransaction, TransactionCategory } from '@/lib/data/farm';
-import { useFarmPlots } from '@/lib/supabase/use-farm-plots';
+import { useFarmPlots, type FarmPlotRow } from '@/lib/supabase/use-farm-plots';
 import { useFarmTransactions } from '@/lib/supabase/use-farm-transactions';
-import { adaptFarmPlot } from '@/lib/data/adapters';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 import type { Translations } from '@/lib/i18n/translations';
+
+// ---------------------------------------------------------------------------
+// Inlined types & data (previously from @/lib/data/farm & @/lib/data/adapters)
+// ---------------------------------------------------------------------------
+
+type TransactionType = 'income' | 'expense';
+type TransactionCategory = 'seeds' | 'fertilizer' | 'pesticides' | 'labor' | 'equipment' | 'transport' | 'harvest-sale' | 'contract-payment' | 'subsidy' | 'other';
+
+interface FarmTransaction {
+  id: string;
+  type: TransactionType;
+  category: TransactionCategory;
+  amount: number;
+  currency: string;
+  date: string;
+  description: string;
+  plotId?: string;
+  plotName?: string;
+  buyer?: string;
+  quantity?: number;
+  unit?: string;
+  pricePerUnit?: number;
+}
+
+interface FarmPlot {
+  id: string;
+  name: string;
+  size: number;
+  sizeUnit: 'hectares' | 'acres';
+  crop: string;
+  variety: string;
+  stage: string;
+  plantingDate: string;
+  expectedHarvest: string;
+  daysToHarvest: number;
+  progressPercent: number;
+  healthScore: number;
+  lastActivity: string;
+  activities: any[];
+  image: string;
+  soilPH: number;
+  location: string;
+}
+
+const mockFarmTransactions: FarmTransaction[] = [
+  { id: 'TXN-001', type: 'income', category: 'harvest-sale', amount: 960, currency: 'USD', date: '2026-03-07', description: 'Blueberries 120kg @ $8/kg — FreshPack Exports', plotId: 'PLT-001', plotName: 'Main Blueberry Field', buyer: 'FreshPack Exports', quantity: 120, unit: 'kg', pricePerUnit: 8 },
+  { id: 'TXN-002', type: 'income', category: 'contract-payment', amount: 500, currency: 'USD', date: '2026-03-01', description: 'Advance payment — March sesame delivery contract', plotId: 'PLT-003', plotName: 'Sesame Strip', buyer: 'SesaMe Trading' },
+  { id: 'TXN-003', type: 'expense', category: 'fertilizer', amount: 45, currency: 'USD', date: '2026-03-12', description: 'Sulfur-based soil acidifier — 25kg bag', plotId: 'PLT-001', plotName: 'Main Blueberry Field' },
+  { id: 'TXN-004', type: 'expense', category: 'labor', amount: 36, currency: 'USD', date: '2026-03-10', description: '3 laborers x 4 hours weeding @ $3/hr', plotId: 'PLT-002', plotName: 'Cassava Plot' },
+  { id: 'TXN-005', type: 'expense', category: 'pesticides', amount: 18, currency: 'USD', date: '2026-03-11', description: 'Neem oil organic pesticide — 1 liter', plotId: 'PLT-003', plotName: 'Sesame Strip' },
+  { id: 'TXN-006', type: 'expense', category: 'seeds', amount: 85, currency: 'USD', date: '2026-03-01', description: 'SC 513 maize seed — 10kg bag', plotId: 'PLT-004', plotName: 'Maize Field' },
+  { id: 'TXN-007', type: 'expense', category: 'fertilizer', amount: 90, currency: 'USD', date: '2026-03-05', description: 'NPK 15-15-15 — 2 x 50kg bags', plotId: 'PLT-002', plotName: 'Cassava Plot' },
+  { id: 'TXN-008', type: 'expense', category: 'equipment', amount: 15, currency: 'USD', date: '2026-03-03', description: 'Soil pH testing supplies', plotId: 'PLT-001', plotName: 'Main Blueberry Field' },
+  { id: 'TXN-009', type: 'income', category: 'subsidy', amount: 200, currency: 'USD', date: '2026-02-28', description: 'AFU member input subsidy — Q1 2026' },
+  { id: 'TXN-010', type: 'expense', category: 'transport', amount: 25, currency: 'USD', date: '2026-03-07', description: 'Transport blueberries to FreshPack collection point', plotId: 'PLT-001', plotName: 'Main Blueberry Field' },
+  { id: 'TXN-011', type: 'income', category: 'harvest-sale', amount: 180, currency: 'USD', date: '2026-02-22', description: 'Cassava chips 300kg @ $0.60/kg — local market', plotId: 'PLT-002', plotName: 'Cassava Plot', buyer: 'Gaborone Market', quantity: 300, unit: 'kg', pricePerUnit: 0.6 },
+  { id: 'TXN-012', type: 'expense', category: 'labor', amount: 48, currency: 'USD', date: '2026-02-20', description: '4 laborers x 4 hours harvesting cassava @ $3/hr', plotId: 'PLT-002', plotName: 'Cassava Plot' },
+];
+
+const mockFarmPlots: FarmPlot[] = [
+  { id: 'PLT-001', name: 'Main Blueberry Field', size: 1.5, sizeUnit: 'hectares', crop: 'Blueberries', variety: 'Duke', stage: 'fruiting', plantingDate: '2025-09-15', expectedHarvest: '2026-04-10', daysToHarvest: 27, progressPercent: 78, healthScore: 92, lastActivity: '2026-03-12', activities: [], image: 'https://images.unsplash.com/photo-1498579809087-ef1e558fd1da?w=400&h=300&fit=crop', soilPH: 4.8, location: 'Plot A — North Field' },
+  { id: 'PLT-002', name: 'Cassava Plot', size: 2.0, sizeUnit: 'hectares', crop: 'Cassava', variety: 'TMS 30572', stage: 'vegetative', plantingDate: '2025-12-01', expectedHarvest: '2026-09-30', daysToHarvest: 200, progressPercent: 35, healthScore: 78, lastActivity: '2026-03-10', activities: [], image: 'https://images.unsplash.com/photo-1590682680695-43b964a3ae17?w=400&h=300&fit=crop', soilPH: 6.2, location: 'Plot B — South Field' },
+  { id: 'PLT-003', name: 'Sesame Strip', size: 0.8, sizeUnit: 'hectares', crop: 'Sesame', variety: 'S42 White', stage: 'flowering', plantingDate: '2025-11-20', expectedHarvest: '2026-04-25', daysToHarvest: 42, progressPercent: 65, healthScore: 85, lastActivity: '2026-03-11', activities: [], image: 'https://images.unsplash.com/photo-1595855759920-86582396756a?w=400&h=300&fit=crop', soilPH: 6.8, location: 'Plot C — East Strip' },
+  { id: 'PLT-004', name: 'Maize Field', size: 1.0, sizeUnit: 'hectares', crop: 'Maize', variety: 'SC 513', stage: 'planted', plantingDate: '2026-03-01', expectedHarvest: '2026-07-15', daysToHarvest: 123, progressPercent: 8, healthScore: 95, lastActivity: '2026-03-01', activities: [], image: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400&h=300&fit=crop', soilPH: 6.5, location: 'Plot D — West Field' },
+];
+
+function getMockFarmSummary() {
+  const totalIncome = mockFarmTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+  const totalExpenses = mockFarmTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+  const profit = totalIncome - totalExpenses;
+  const totalHectares = mockFarmPlots.reduce((sum, p) => sum + p.size, 0);
+  const avgHealthScore = Math.round(mockFarmPlots.reduce((sum, p) => sum + p.healthScore, 0) / mockFarmPlots.length);
+  return { totalIncome, totalExpenses, profit, totalHectares, avgHealthScore, pendingTasks: 6, highPriorityTasks: 2, plotCount: mockFarmPlots.length };
+}
+
+// ─── adaptFarmPlot (inlined from @/lib/data/adapters) ─────────────────────
+
+const CROP_IMAGES: Record<string, string> = {
+  blueberries: 'https://images.unsplash.com/photo-1498159332174-be5f8a9afc86?w=600&h=400&fit=crop',
+  tomatoes: 'https://images.unsplash.com/photo-1592841200221-a6898f307baa?w=600&h=400&fit=crop',
+  maize: 'https://images.unsplash.com/photo-1601004890684-d8573e10e7e7?w=600&h=400&fit=crop',
+  cassava: 'https://images.unsplash.com/photo-1590682680695-43b964a3ae17?w=600&h=400&fit=crop',
+  sesame: 'https://images.unsplash.com/photo-1595855759920-86582396756a?w=600&h=400&fit=crop',
+  sorghum: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&h=400&fit=crop',
+  default: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&h=400&fit=crop',
+};
+
+function getCropImage(crop: string | null): string {
+  if (!crop) return CROP_IMAGES.default;
+  const key = crop.toLowerCase();
+  for (const [k, v] of Object.entries(CROP_IMAGES)) {
+    if (key.includes(k)) return v;
+  }
+  return CROP_IMAGES.default;
+}
+
+function computeProgress(stage: string): number {
+  const stages = ['planning', 'planted', 'germinating', 'vegetative', 'flowering', 'fruiting', 'harvesting', 'completed'];
+  const idx = stages.indexOf(stage);
+  if (idx < 0) return 0;
+  return Math.round((idx / (stages.length - 1)) * 100);
+}
+
+function computeDaysToHarvest(expectedHarvest: string | null): number {
+  if (!expectedHarvest) return 0;
+  const diff = new Date(expectedHarvest).getTime() - Date.now();
+  return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+}
+
+function adaptFarmPlot(row: FarmPlotRow) {
+  return {
+    id: row.id,
+    name: row.name,
+    size: row.size_ha || 0,
+    sizeUnit: 'hectares' as const,
+    crop: row.crop || 'Unknown',
+    variety: row.variety || '',
+    stage: row.stage as any,
+    plantingDate: row.planting_date || '',
+    expectedHarvest: row.expected_harvest || '',
+    daysToHarvest: computeDaysToHarvest(row.expected_harvest),
+    progressPercent: computeProgress(row.stage),
+    healthScore: row.health_score,
+    lastActivity: row.updated_at,
+    activities: [],
+    image: getCropImage(row.crop),
+    soilPH: row.soil_ph || 6.5,
+    location: row.location || '',
+  };
+}
 
 // ---------------------------------------------------------------------------
 // Animation variants

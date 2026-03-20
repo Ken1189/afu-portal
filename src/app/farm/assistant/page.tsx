@@ -17,19 +17,134 @@ import {
   Droplets,
   User,
 } from 'lucide-react';
-import {
-  aiConversation as mockAiConversation,
-  farmPlots as mockFarmPlots,
-  getFarmSummary as mockGetFarmSummary,
-  weatherForecast as mockWeatherForecast,
-} from '@/lib/data/farm';
-import type { AIMessage } from '@/lib/data/farm';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 
-const aiConversation = mockAiConversation;
-const farmPlots = mockFarmPlots;
-const getFarmSummary = mockGetFarmSummary;
-const weatherForecast = mockWeatherForecast;
+// ---------------------------------------------------------------------------
+// Types (inlined from @/lib/data/farm)
+// ---------------------------------------------------------------------------
+
+type WeatherCondition = 'sunny' | 'partly-cloudy' | 'cloudy' | 'rainy' | 'stormy' | 'windy';
+
+interface WeatherDay {
+  date: string;
+  day: string;
+  condition: WeatherCondition;
+  tempHigh: number;
+  tempLow: number;
+  humidity: number;
+  rainChance: number;
+  windSpeed: number;
+  advice: string;
+}
+
+interface FarmPlot {
+  id: string;
+  name: string;
+  size: number;
+  sizeUnit: 'hectares' | 'acres';
+  crop: string;
+  variety: string;
+  stage: string;
+  plantingDate: string;
+  expectedHarvest: string;
+  daysToHarvest: number;
+  progressPercent: number;
+  healthScore: number;
+  lastActivity: string;
+  activities: unknown[];
+  image: string;
+  soilPH: number;
+  location: string;
+}
+
+interface FarmTransaction {
+  id: string;
+  type: 'income' | 'expense';
+  category: string;
+  amount: number;
+  currency: string;
+  date: string;
+  description: string;
+}
+
+interface FarmTask {
+  id: string;
+  title: string;
+  priority: 'high' | 'medium' | 'low';
+  completed: boolean;
+}
+
+interface AIMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: string;
+  type?: 'text' | 'image' | 'recommendation' | 'alert';
+}
+
+// ---------------------------------------------------------------------------
+// Inline fallback data (from @/lib/data/farm)
+// ---------------------------------------------------------------------------
+
+const farmPlots: FarmPlot[] = [
+  { id: 'PLT-001', name: 'Main Blueberry Field', size: 1.5, sizeUnit: 'hectares', crop: 'Blueberries', variety: 'Duke', stage: 'fruiting', plantingDate: '2025-09-15', expectedHarvest: '2026-04-10', daysToHarvest: 27, progressPercent: 78, healthScore: 92, lastActivity: '2026-03-12', activities: [], image: 'https://images.unsplash.com/photo-1498579809087-ef1e558fd1da?w=400&h=300&fit=crop', soilPH: 4.8, location: 'Plot A \u2014 North Field' },
+  { id: 'PLT-002', name: 'Cassava Plot', size: 2.0, sizeUnit: 'hectares', crop: 'Cassava', variety: 'TMS 30572', stage: 'vegetative', plantingDate: '2025-12-01', expectedHarvest: '2026-09-30', daysToHarvest: 200, progressPercent: 35, healthScore: 78, lastActivity: '2026-03-10', activities: [], image: 'https://images.unsplash.com/photo-1590682680695-43b964a3ae17?w=400&h=300&fit=crop', soilPH: 6.2, location: 'Plot B \u2014 South Field' },
+  { id: 'PLT-003', name: 'Sesame Strip', size: 0.8, sizeUnit: 'hectares', crop: 'Sesame', variety: 'S42 White', stage: 'flowering', plantingDate: '2025-11-20', expectedHarvest: '2026-04-25', daysToHarvest: 42, progressPercent: 65, healthScore: 85, lastActivity: '2026-03-11', activities: [], image: 'https://images.unsplash.com/photo-1595855759920-86582396756a?w=400&h=300&fit=crop', soilPH: 6.8, location: 'Plot C \u2014 East Strip' },
+  { id: 'PLT-004', name: 'Maize Field', size: 1.0, sizeUnit: 'hectares', crop: 'Maize', variety: 'SC 513', stage: 'planted', plantingDate: '2026-03-01', expectedHarvest: '2026-07-15', daysToHarvest: 123, progressPercent: 8, healthScore: 95, lastActivity: '2026-03-01', activities: [], image: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400&h=300&fit=crop', soilPH: 6.5, location: 'Plot D \u2014 West Field' },
+];
+
+const farmTransactions: FarmTransaction[] = [
+  { id: 'TXN-001', type: 'income', category: 'harvest-sale', amount: 960, currency: 'USD', date: '2026-03-07', description: 'Blueberries 120kg @ $8/kg' },
+  { id: 'TXN-002', type: 'income', category: 'contract-payment', amount: 500, currency: 'USD', date: '2026-03-01', description: 'Advance payment' },
+  { id: 'TXN-003', type: 'expense', category: 'fertilizer', amount: 45, currency: 'USD', date: '2026-03-12', description: 'Sulfur-based soil acidifier' },
+  { id: 'TXN-004', type: 'expense', category: 'labor', amount: 36, currency: 'USD', date: '2026-03-10', description: 'Weeding labor' },
+  { id: 'TXN-005', type: 'expense', category: 'pesticides', amount: 18, currency: 'USD', date: '2026-03-11', description: 'Neem oil' },
+  { id: 'TXN-006', type: 'expense', category: 'seeds', amount: 85, currency: 'USD', date: '2026-03-01', description: 'Maize seed' },
+  { id: 'TXN-007', type: 'expense', category: 'fertilizer', amount: 90, currency: 'USD', date: '2026-03-05', description: 'NPK fertilizer' },
+  { id: 'TXN-008', type: 'expense', category: 'equipment', amount: 15, currency: 'USD', date: '2026-03-03', description: 'Soil pH testing' },
+  { id: 'TXN-009', type: 'income', category: 'subsidy', amount: 200, currency: 'USD', date: '2026-02-28', description: 'AFU member input subsidy' },
+  { id: 'TXN-010', type: 'expense', category: 'transport', amount: 25, currency: 'USD', date: '2026-03-07', description: 'Transport blueberries' },
+  { id: 'TXN-011', type: 'income', category: 'harvest-sale', amount: 180, currency: 'USD', date: '2026-02-22', description: 'Cassava chips 300kg' },
+  { id: 'TXN-012', type: 'expense', category: 'labor', amount: 48, currency: 'USD', date: '2026-02-20', description: 'Harvesting labor' },
+];
+
+const farmTasks: FarmTask[] = [
+  { id: 'TSK-001', title: 'Harvest blueberries', priority: 'high', completed: false },
+  { id: 'TSK-002', title: 'Apply foliar feed to sesame', priority: 'medium', completed: false },
+  { id: 'TSK-003', title: 'Scout cassava for mosaic virus', priority: 'high', completed: false },
+  { id: 'TSK-004', title: 'Irrigate maize field', priority: 'medium', completed: false },
+  { id: 'TSK-005', title: 'Check soil moisture sensors', priority: 'low', completed: false },
+  { id: 'TSK-006', title: 'Weed between cassava rows', priority: 'medium', completed: false },
+];
+
+const weatherForecast: WeatherDay[] = [
+  { date: '2026-03-14', day: 'Today', condition: 'partly-cloudy', tempHigh: 31, tempLow: 18, humidity: 55, rainChance: 15, windSpeed: 12, advice: 'Good day for harvesting. Apply pesticides before noon.' },
+  { date: '2026-03-15', day: 'Sun', condition: 'sunny', tempHigh: 33, tempLow: 19, humidity: 45, rainChance: 5, windSpeed: 8, advice: 'Hot day ahead. Ensure irrigation is running. Harvest early morning.' },
+  { date: '2026-03-16', day: 'Mon', condition: 'partly-cloudy', tempHigh: 30, tempLow: 17, humidity: 60, rainChance: 25, windSpeed: 15, advice: 'Good conditions for foliar feeding.' },
+  { date: '2026-03-17', day: 'Tue', condition: 'rainy', tempHigh: 26, tempLow: 16, humidity: 80, rainChance: 75, windSpeed: 20, advice: 'Rain expected. Do not spray. Check drainage channels.' },
+  { date: '2026-03-18', day: 'Wed', condition: 'rainy', tempHigh: 24, tempLow: 15, humidity: 85, rainChance: 80, windSpeed: 18, advice: 'Continued rain. Monitor for waterlogging in cassava plot.' },
+  { date: '2026-03-19', day: 'Thu', condition: 'cloudy', tempHigh: 27, tempLow: 16, humidity: 70, rainChance: 35, windSpeed: 14, advice: 'Clearing skies. Good day for scouting and weeding.' },
+  { date: '2026-03-20', day: 'Fri', condition: 'sunny', tempHigh: 32, tempLow: 18, humidity: 50, rainChance: 10, windSpeed: 10, advice: 'Warm and dry. Resume normal spraying schedule.' },
+];
+
+const aiConversation: AIMessage[] = [
+  { id: 'AI-001', role: 'assistant', content: 'Good morning! \uD83C\uDF31 I see your blueberries are 27 days from harvest. Rows 5-8 look ready for picking tomorrow. Would you like me to set a reminder?', timestamp: '2026-03-14T06:00:00', type: 'recommendation' },
+  { id: 'AI-002', role: 'user', content: 'Yes please. Also when should I spray the sesame?', timestamp: '2026-03-14T06:01:00', type: 'text' },
+  { id: 'AI-003', role: 'assistant', content: 'Reminder set for tomorrow 6:00 AM! \uD83D\uDD14\n\nFor your sesame \u2014 I recommend spraying copper oxychloride today before noon. Rain is expected on Tuesday so you want at least 24 hours of dry weather after application. The leaf spot I detected last week has not spread, which is good news.', timestamp: '2026-03-14T06:01:30', type: 'recommendation' },
+  { id: 'AI-004', role: 'user', content: 'How much fertilizer do I need for the cassava?', timestamp: '2026-03-14T06:05:00', type: 'text' },
+  { id: 'AI-005', role: 'assistant', content: 'For your 2-hectare cassava plot (TMS 30572 variety), I recommend:\n\n\uD83D\uDCCA **NPK 15-15-15**: 400kg total (200kg/ha)\n\uD83D\uDCCA **Urea top-dress**: 200kg total (100kg/ha) \u2014 apply at 8 weeks\n\nYou already applied the NPK on March 5. The urea top-dress is due around March 26. That will cost approximately $76 for the urea.\n\nShall I add this to your calendar?', timestamp: '2026-03-14T06:05:30', type: 'recommendation' },
+];
+
+function getFarmSummary() {
+  const totalIncome = farmTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+  const totalExpenses = farmTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+  const profit = totalIncome - totalExpenses;
+  const totalHectares = farmPlots.reduce((sum, p) => sum + p.size, 0);
+  const avgHealthScore = Math.round(farmPlots.reduce((sum, p) => sum + p.healthScore, 0) / farmPlots.length);
+  const pendingTasks = farmTasks.filter(t => !t.completed).length;
+  const highPriorityTasks = farmTasks.filter(t => !t.completed && t.priority === 'high').length;
+  return { totalIncome, totalExpenses, profit, totalHectares, avgHealthScore, pendingTasks, highPriorityTasks, plotCount: farmPlots.length };
+}
 
 // ---------------------------------------------------------------------------
 // Animation Variants

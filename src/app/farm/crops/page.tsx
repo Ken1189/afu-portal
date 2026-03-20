@@ -29,18 +29,141 @@ import {
   CircleDot,
   Check,
 } from 'lucide-react';
-import { useFarmPlots } from '@/lib/supabase/use-farm-plots';
+import { useFarmPlots, type FarmPlotRow } from '@/lib/supabase/use-farm-plots';
 import { useFarmActivities } from '@/lib/supabase/use-farm-activities';
-import { adaptFarmPlot } from '@/lib/data/adapters';
-import {
-  farmPlots as mockFarmPlots,
-  farmActivities as mockFarmActivities,
-  getFarmSummary,
-  type CropStage,
-  type ActivityType,
-  type FarmPlot,
-} from '@/lib/data/farm';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
+
+// ---------------------------------------------------------------------------
+// Inlined types & data (previously from @/lib/data/farm & @/lib/data/adapters)
+// ---------------------------------------------------------------------------
+
+type CropStage = 'planning' | 'planted' | 'germinating' | 'vegetative' | 'flowering' | 'fruiting' | 'harvesting' | 'completed';
+type ActivityType = 'planting' | 'watering' | 'fertilizing' | 'spraying' | 'weeding' | 'harvesting' | 'scouting' | 'soil-test' | 'pruning' | 'other';
+
+interface FarmActivity {
+  id: string;
+  plotId: string;
+  plotName: string;
+  type: ActivityType;
+  date: string;
+  time: string;
+  description: string;
+  notes?: string;
+  photo?: string;
+  cost?: number;
+  currency: string;
+}
+
+interface FarmPlot {
+  id: string;
+  name: string;
+  size: number;
+  sizeUnit: 'hectares' | 'acres';
+  crop: string;
+  variety: string;
+  stage: CropStage;
+  plantingDate: string;
+  expectedHarvest: string;
+  daysToHarvest: number;
+  progressPercent: number;
+  healthScore: number;
+  lastActivity: string;
+  activities: FarmActivity[];
+  image: string;
+  soilPH: number;
+  location: string;
+}
+
+const mockFarmPlots: FarmPlot[] = [
+  { id: 'PLT-001', name: 'Main Blueberry Field', size: 1.5, sizeUnit: 'hectares', crop: 'Blueberries', variety: 'Duke', stage: 'fruiting', plantingDate: '2025-09-15', expectedHarvest: '2026-04-10', daysToHarvest: 27, progressPercent: 78, healthScore: 92, lastActivity: '2026-03-12', activities: [], image: 'https://images.unsplash.com/photo-1498579809087-ef1e558fd1da?w=400&h=300&fit=crop', soilPH: 4.8, location: 'Plot A — North Field' },
+  { id: 'PLT-002', name: 'Cassava Plot', size: 2.0, sizeUnit: 'hectares', crop: 'Cassava', variety: 'TMS 30572', stage: 'vegetative', plantingDate: '2025-12-01', expectedHarvest: '2026-09-30', daysToHarvest: 200, progressPercent: 35, healthScore: 78, lastActivity: '2026-03-10', activities: [], image: 'https://images.unsplash.com/photo-1590682680695-43b964a3ae17?w=400&h=300&fit=crop', soilPH: 6.2, location: 'Plot B — South Field' },
+  { id: 'PLT-003', name: 'Sesame Strip', size: 0.8, sizeUnit: 'hectares', crop: 'Sesame', variety: 'S42 White', stage: 'flowering', plantingDate: '2025-11-20', expectedHarvest: '2026-04-25', daysToHarvest: 42, progressPercent: 65, healthScore: 85, lastActivity: '2026-03-11', activities: [], image: 'https://images.unsplash.com/photo-1595855759920-86582396756a?w=400&h=300&fit=crop', soilPH: 6.8, location: 'Plot C — East Strip' },
+  { id: 'PLT-004', name: 'Maize Field', size: 1.0, sizeUnit: 'hectares', crop: 'Maize', variety: 'SC 513', stage: 'planted', plantingDate: '2026-03-01', expectedHarvest: '2026-07-15', daysToHarvest: 123, progressPercent: 8, healthScore: 95, lastActivity: '2026-03-01', activities: [], image: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400&h=300&fit=crop', soilPH: 6.5, location: 'Plot D — West Field' },
+];
+
+const mockFarmActivities: FarmActivity[] = [
+  { id: 'ACT-001', plotId: 'PLT-001', plotName: 'Main Blueberry Field', type: 'fertilizing', date: '2026-03-12', time: '07:30', description: 'Applied sulfur-based acidifier around drip lines', cost: 45, currency: 'USD' },
+  { id: 'ACT-002', plotId: 'PLT-001', plotName: 'Main Blueberry Field', type: 'scouting', date: '2026-03-11', time: '06:00', description: 'Checked for aphid presence — minimal activity spotted on north rows', currency: 'USD' },
+  { id: 'ACT-003', plotId: 'PLT-002', plotName: 'Cassava Plot', type: 'weeding', date: '2026-03-10', time: '08:00', description: 'Manual weeding between rows, 3 laborers for 4 hours', cost: 36, currency: 'USD' },
+  { id: 'ACT-004', plotId: 'PLT-003', plotName: 'Sesame Strip', type: 'spraying', date: '2026-03-11', time: '16:00', description: 'Neem oil application for pest prevention', cost: 18, currency: 'USD' },
+  { id: 'ACT-005', plotId: 'PLT-003', plotName: 'Sesame Strip', type: 'watering', date: '2026-03-09', time: '05:30', description: 'Drip irrigation — 2 hours cycle', currency: 'USD' },
+  { id: 'ACT-006', plotId: 'PLT-001', plotName: 'Main Blueberry Field', type: 'pruning', date: '2026-03-08', time: '07:00', description: 'Light pruning on mature bushes to improve air circulation', currency: 'USD' },
+  { id: 'ACT-007', plotId: 'PLT-004', plotName: 'Maize Field', type: 'planting', date: '2026-03-01', time: '06:00', description: 'Planted SC 513 variety, 75cm row spacing, 25cm plant spacing', cost: 85, currency: 'USD' },
+  { id: 'ACT-008', plotId: 'PLT-002', plotName: 'Cassava Plot', type: 'fertilizing', date: '2026-03-05', time: '07:00', description: 'NPK 15-15-15 side dressing, 200kg per hectare', cost: 90, currency: 'USD' },
+  { id: 'ACT-009', plotId: 'PLT-001', plotName: 'Main Blueberry Field', type: 'harvesting', date: '2026-03-07', time: '06:00', description: 'First pick — 120kg Grade A berries harvested', currency: 'USD' },
+  { id: 'ACT-010', plotId: 'PLT-001', plotName: 'Main Blueberry Field', type: 'soil-test', date: '2026-03-03', time: '09:00', description: 'Soil pH test: 4.8 — optimal for blueberries', cost: 15, currency: 'USD' },
+];
+
+function getFarmSummary() {
+  const farmTransactions = [
+    { type: 'income', amount: 960 }, { type: 'income', amount: 500 }, { type: 'expense', amount: 45 },
+    { type: 'expense', amount: 36 }, { type: 'expense', amount: 18 }, { type: 'expense', amount: 85 },
+    { type: 'expense', amount: 90 }, { type: 'expense', amount: 15 }, { type: 'income', amount: 200 },
+    { type: 'expense', amount: 25 }, { type: 'income', amount: 180 }, { type: 'expense', amount: 48 },
+  ];
+  const totalIncome = farmTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+  const totalExpenses = farmTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+  const profit = totalIncome - totalExpenses;
+  const totalHectares = mockFarmPlots.reduce((sum, p) => sum + p.size, 0);
+  const avgHealthScore = Math.round(mockFarmPlots.reduce((sum, p) => sum + p.healthScore, 0) / mockFarmPlots.length);
+  return { totalIncome, totalExpenses, profit, totalHectares, avgHealthScore, pendingTasks: 6, highPriorityTasks: 2, plotCount: mockFarmPlots.length };
+}
+
+// ─── adaptFarmPlot (inlined from @/lib/data/adapters) ─────────────────────
+
+const CROP_IMAGES: Record<string, string> = {
+  blueberries: 'https://images.unsplash.com/photo-1498159332174-be5f8a9afc86?w=600&h=400&fit=crop',
+  tomatoes: 'https://images.unsplash.com/photo-1592841200221-a6898f307baa?w=600&h=400&fit=crop',
+  maize: 'https://images.unsplash.com/photo-1601004890684-d8573e10e7e7?w=600&h=400&fit=crop',
+  cassava: 'https://images.unsplash.com/photo-1590682680695-43b964a3ae17?w=600&h=400&fit=crop',
+  sesame: 'https://images.unsplash.com/photo-1595855759920-86582396756a?w=600&h=400&fit=crop',
+  sorghum: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&h=400&fit=crop',
+  default: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&h=400&fit=crop',
+};
+
+function getCropImage(crop: string | null): string {
+  if (!crop) return CROP_IMAGES.default;
+  const key = crop.toLowerCase();
+  for (const [k, v] of Object.entries(CROP_IMAGES)) {
+    if (key.includes(k)) return v;
+  }
+  return CROP_IMAGES.default;
+}
+
+function computeProgress(stage: string): number {
+  const stages = ['planning', 'planted', 'germinating', 'vegetative', 'flowering', 'fruiting', 'harvesting', 'completed'];
+  const idx = stages.indexOf(stage);
+  if (idx < 0) return 0;
+  return Math.round((idx / (stages.length - 1)) * 100);
+}
+
+function computeDaysToHarvest(expectedHarvest: string | null): number {
+  if (!expectedHarvest) return 0;
+  const diff = new Date(expectedHarvest).getTime() - Date.now();
+  return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+}
+
+function adaptFarmPlot(row: FarmPlotRow) {
+  return {
+    id: row.id,
+    name: row.name,
+    size: row.size_ha || 0,
+    sizeUnit: 'hectares' as const,
+    crop: row.crop || 'Unknown',
+    variety: row.variety || '',
+    stage: row.stage as any,
+    plantingDate: row.planting_date || '',
+    expectedHarvest: row.expected_harvest || '',
+    daysToHarvest: computeDaysToHarvest(row.expected_harvest),
+    progressPercent: computeProgress(row.stage),
+    healthScore: row.health_score,
+    lastActivity: row.updated_at,
+    activities: [],
+    image: getCropImage(row.crop),
+    soilPH: row.soil_ph || 6.5,
+    location: row.location || '',
+  };
+}
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 

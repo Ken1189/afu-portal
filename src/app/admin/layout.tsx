@@ -35,6 +35,9 @@ import {
   ArrowLeft,
   Menu,
   X,
+  Sprout,
+  Beef,
+  Wrench,
 } from 'lucide-react';
 
 // ── Navigation structure with collapsible groups ──
@@ -69,6 +72,17 @@ const navGroups: NavGroup[] = [
       { href: '/admin/training', label: 'Training', icon: <GraduationCap className="w-4 h-4" /> },
       { href: '/admin/exports', label: 'Exports', icon: <Ship className="w-4 h-4" /> },
       { href: '/admin/reports', label: 'Reports', icon: <BarChart3 className="w-4 h-4" /> },
+    ],
+  },
+  {
+    label: 'Farm Management',
+    defaultOpen: true,
+    links: [
+      { href: '/admin/farm-overview', label: 'Farm Overview', icon: <Gauge className="w-4 h-4" /> },
+      { href: '/admin/crops', label: 'Crops', icon: <Sprout className="w-4 h-4" /> },
+      { href: '/admin/livestock', label: 'Livestock', icon: <Beef className="w-4 h-4" /> },
+      { href: '/admin/equipment', label: 'Equipment', icon: <Wrench className="w-4 h-4" /> },
+      { href: '/admin/insurance', label: 'Insurance', icon: <Shield className="w-4 h-4" /> },
     ],
   },
   {
