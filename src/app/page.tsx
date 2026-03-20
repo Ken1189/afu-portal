@@ -1094,6 +1094,52 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── Sponsor a Farmer Section ─────────────────────────────────── */}
+      <section className="py-20 bg-cream">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-12">
+            <span className="inline-block bg-teal/10 text-teal text-sm font-semibold px-4 py-1.5 rounded-full mb-4">
+              🤝 Sponsor a Farmer
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-bold text-navy mb-4">
+              Turn <span className="text-gradient-teal">$5 a Month</span> Into a Farm&apos;s Future
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Real farmers. Real crops. Real impact. Sponsor an African farmer&apos;s membership, inputs,
+              and program access — and get monthly updates as their season unfolds.
+            </p>
+          </div>
+
+          {/* 3 tier preview cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
+            {[
+              { emoji: '🥉', tier: 'Bronze', price: '$5/mo', desc: 'Cover a farmer\'s AFU membership and give them platform access', color: 'border-amber-600' },
+              { emoji: '🥈', tier: 'Silver', price: '$100/mo', desc: 'Fund a full season of crop inputs — seeds, fertiliser, pest control', color: 'border-gray-400', featured: true },
+              { emoji: '🥇', tier: 'Gold', price: '$500/mo', desc: 'Full program sponsorship — inputs, insurance, and working capital', color: 'border-yellow-500' },
+            ].map((item) => (
+              <div key={item.tier} className={`card-polished p-6 border-t-4 ${item.color} relative`}>
+                {item.featured && (
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-teal text-white text-xs font-bold px-3 py-1 rounded-full">Most Popular</span>
+                )}
+                <div className="text-3xl mb-3">{item.emoji}</div>
+                <div className="font-bold text-navy text-lg">{item.tier}</div>
+                <div className="text-2xl font-bold text-teal my-1">{item.price}</div>
+                <p className="text-gray-600 text-sm">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="text-center">
+            <Link href="/sponsor" className="inline-flex items-center gap-2 bg-teal text-white font-semibold px-8 py-4 rounded-xl hover:bg-teal/90 transition-smooth shadow-lg hover:shadow-xl">
+              Meet the Farmers
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* ─── FINAL CTA ─── */}
       <section className="relative py-28 overflow-hidden">
         <div className="absolute inset-0">

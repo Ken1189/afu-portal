@@ -381,6 +381,13 @@ export default function Navbar() {
             >
               Countries
             </Link>
+            <Link
+              href="/sponsor"
+              className="text-teal font-semibold text-sm px-3 py-2 rounded-lg border border-teal/30 bg-teal/5 hover:bg-teal/15 transition-colors flex items-center gap-1.5"
+            >
+              <span>🤝</span>
+              Sponsor a Farmer
+            </Link>
           </div>
 
           {/* ── Desktop CTA ── */}
@@ -740,6 +747,14 @@ export default function Navbar() {
                   onClick={closeMobile}
                 >
                   Countries
+                </Link>
+                <Link
+                  href="/sponsor"
+                  className="text-teal font-semibold text-base py-3 px-3 rounded-lg border border-teal/30 bg-teal/5 hover:bg-teal/15 transition-colors flex items-center gap-2"
+                  onClick={closeMobile}
+                >
+                  <span>🤝</span>
+                  Sponsor a Farmer
                 </Link>
 
                 {/* CTA Section */}

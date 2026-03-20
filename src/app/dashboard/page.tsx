@@ -55,6 +55,7 @@ import {
 import type { LucideIcon } from 'lucide-react';
 
 import { useAuth } from '@/lib/supabase/auth-context';
+import { ProgramBanner } from '@/components/programs/ProgramBanner';
 
 // ---------------------------------------------------------------------------
 // Static data (inlined to remove @/lib/data/ mock imports)
@@ -352,6 +353,8 @@ export default function DashboardPage() {
   const marketPrices = MARKET_PRICES;
   const [alertDismissed, setAlertDismissed] = useState(false);
   const [dashData, setDashData] = useState<DashboardData | null>(null);
+  const [showProgramBanner, setShowProgramBanner] = useState(true);
+  const [availablePrograms, setAvailablePrograms] = useState<{ id: string; country: string; status: string; [key: string]: unknown }[]>([]);
   const userName = profile?.full_name || user?.email?.split('@')[0] || 'Member';
 
   // Fetch real dashboard data from API
@@ -360,6 +363,14 @@ export default function DashboardPage() {
       .then(res => res.json())
       .then(data => { if (!data.error) setDashData(data); })
       .catch(() => { /* fallback to mock */ });
+  }, []);
+
+  // Fetch available programs for banner
+  useEffect(() => {
+    fetch('/api/programs')
+      .then(r => r.json())
+      .then(data => { setAvailablePrograms(data.programs || []); })
+      .catch(() => { /* silent — banner just won't show */ });
   }, []);
 
   // Use real notifications if available, otherwise fallback
@@ -466,6 +477,16 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
+      {/* ----------------------------------------------------------------- */}
+      {/* 0. PROGRAM BANNER */}
+      {/* ----------------------------------------------------------------- */}
+      {showProgramBanner && (
+        <ProgramBanner
+          programs={availablePrograms}
+          onDismiss={() => setShowProgramBanner(false)}
+        />
+      )}
+
       {/* ----------------------------------------------------------------- */}
       {/* 1. NOTIFICATION BAR (urgent unread) */}
       {/* ----------------------------------------------------------------- */}

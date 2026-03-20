@@ -38,6 +38,7 @@ import {
   Sprout,
   Beef,
   Wrench,
+  Heart,
 } from 'lucide-react';
 
 // ── Navigation structure with collapsible groups ──
@@ -70,6 +71,7 @@ const navGroups: NavGroup[] = [
       { href: '/admin/members', label: 'Members', icon: <Users className="w-4 h-4" /> },
       { href: '/admin/applications', label: 'Applications', icon: <FileText className="w-4 h-4" /> },
       { href: '/admin/training', label: 'Training', icon: <GraduationCap className="w-4 h-4" /> },
+      { href: '/admin/programs', label: 'Programs', icon: <Sprout className="w-4 h-4" /> },
       { href: '/admin/exports', label: 'Exports', icon: <Ship className="w-4 h-4" /> },
       { href: '/admin/reports', label: 'Reports', icon: <BarChart3 className="w-4 h-4" /> },
     ],
@@ -111,6 +113,7 @@ const navGroups: NavGroup[] = [
     links: [
       { href: '/admin/suppliers', label: 'Suppliers', icon: <Store className="w-4 h-4" /> },
       { href: '/admin/suppliers/sponsorships', label: 'Sponsorships', icon: <Award className="w-4 h-4" /> },
+      { href: '/admin/sponsor', label: 'Sponsor a Farmer', icon: <Heart className="w-4 h-4" /> },
     ],
   },
   {
