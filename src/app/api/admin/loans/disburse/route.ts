@@ -1,0 +1,110 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { createServerClient } from '@supabase/ssr';
+import { createClient } from '@supabase/supabase-js';
+import { cookies } from 'next/headers';
+
+export async function POST(request: NextRequest) {
+  try {
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() { return cookieStore.getAll(); },
+          setAll() {},
+        },
+      }
+    );
+
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) {
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+    }
+
+    const svc = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
+    // Verify admin role
+    const { data: profile } = await svc
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    const body = await request.json();
+    const { loanId, amount, method, currency } = body as {
+      loanId: string;
+      amount: number;
+      method: string;
+      currency?: string;
+    };
+
+    if (!loanId || !amount || !method) {
+      return NextResponse.json({ error: 'loanId, amount, and method are required' }, { status: 400 });
+    }
+
+    // Verify loan exists and is approved
+    const { data: loan, error: loanError } = await svc
+      .from('loans')
+      .select('id, status, member_id, amount')
+      .eq('id', loanId)
+      .single();
+
+    if (loanError || !loan) {
+      return NextResponse.json({ error: 'Loan not found' }, { status: 404 });
+    }
+
+    if (loan.status !== 'approved') {
+      return NextResponse.json({ error: `Cannot disburse: loan status is "${loan.status}", must be "approved"` }, { status: 400 });
+    }
+
+    // Create disbursement record
+    const { data: disbursement, error: disbError } = await svc
+      .from('loan_disbursements')
+      .insert({
+        loan_id: loanId,
+        member_id: loan.member_id,
+        amount,
+        currency: currency || 'USD',
+        disbursement_method: method,
+        status: 'completed',
+        disbursed_at: new Date().toISOString(),
+      })
+      .select()
+      .single();
+
+    if (disbError) {
+      return NextResponse.json({ error: disbError.message }, { status: 500 });
+    }
+
+    // Update loan status to disbursed
+    await svc
+      .from('loans')
+      .update({
+        status: 'disbursed',
+        disbursed_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', loanId);
+
+    // Log to audit
+    await svc.from('audit_log').insert({
+      user_id: user.id,
+      action: 'loan_disbursed',
+      entity_type: 'loan',
+      entity_id: loanId,
+      details: { amount, method, currency: currency || 'USD', disbursement_id: disbursement.id },
+    });
+
+    return NextResponse.json({ success: true, disbursement });
+  } catch {
+    return NextResponse.json({ error: 'Server error' }, { status: 500 });
+  }
+}
