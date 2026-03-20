@@ -9,9 +9,9 @@ export default function AboutPage() {
   return (
     <>
       {/* Hero */}
-      <section className="bg-navy text-white py-20">
+      <section className="gradient-navy text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">About AFU</h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-6 text-glow">About AFU</h1>
           <p className="text-xl text-gray-300 max-w-3xl leading-relaxed">
             The African Farming Union is a vertically integrated agriculture development platform
             designed to function as a specialized agri dev bank + execution engine.
@@ -71,7 +71,7 @@ export default function AboutPage() {
                 items: ["Project finance + infrastructure", "Anchor processing hubs", "Full corridor offtake contracts"],
               },
             ].map((item, i) => (
-              <div key={i} className="bg-white rounded-2xl p-8 border border-gray-100">
+              <div key={i} className="card-polished bg-white rounded-2xl p-8 border border-gray-100">
                 <div className="text-teal text-sm font-semibold uppercase tracking-wider mb-1">{item.tier}</div>
                 <h3 className="text-xl font-bold text-navy mb-4">{item.name}</h3>
                 <ul className="space-y-3">
@@ -112,9 +112,9 @@ export default function AboutPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-teal">
+      <section className="py-16 gradient-teal">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-white mb-6">Join the AFU Ecosystem</h2>
+          <h2 className="text-3xl font-bold text-white mb-6 text-glow">Join the AFU Ecosystem</h2>
           <Link href="/apply" className="inline-block bg-white text-teal hover:bg-gray-100 px-8 py-3.5 rounded-lg font-semibold text-lg transition-colors">
             Apply for Membership
           </Link>

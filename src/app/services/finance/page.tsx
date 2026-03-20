@@ -119,7 +119,7 @@ export default function FinanceHubPage() {
               <Link
                 key={i}
                 href={product.link}
-                className="bg-cream rounded-2xl p-8 hover:shadow-lg transition-all group border border-transparent hover:border-teal/20"
+                className="card-polished bg-cream rounded-2xl p-8 hover:shadow-lg transition-all group border border-transparent hover:border-teal/20"
               >
                 <div className="text-4xl mb-4">{product.icon}</div>
                 <h3 className="text-xl font-bold text-navy mb-3 group-hover:text-teal transition-colors">
@@ -186,13 +186,13 @@ export default function FinanceHubPage() {
           <div className="flex gap-4 justify-center flex-wrap">
             <Link
               href="/apply"
-              className="bg-teal hover:bg-teal-dark text-white px-8 py-3 rounded-lg font-semibold transition-colors"
+              className="bg-teal hover:bg-teal-dark text-white px-8 py-3 rounded-lg font-semibold transition-smooth"
             >
               Check Eligibility
             </Link>
             <Link
               href="/contact"
-              className="border-2 border-white/20 hover:border-white/40 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
+              className="border-2 border-white/20 hover:border-white/40 text-white px-8 py-3 rounded-lg font-semibold transition-smooth"
             >
               Talk to an Advisor
             </Link>

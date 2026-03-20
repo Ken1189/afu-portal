@@ -77,7 +77,7 @@ export default function EducationPage() {
               <Link
                 key={i}
                 href={section.link}
-                className="bg-cream rounded-2xl p-8 hover:shadow-lg transition-all group border border-transparent hover:border-teal/20"
+                className="card-polished bg-cream rounded-2xl p-8 hover:shadow-lg transition-all group border border-transparent hover:border-teal/20"
               >
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 bg-teal rounded-xl flex items-center justify-center text-white font-bold">
@@ -136,13 +136,13 @@ export default function EducationPage() {
           <div className="flex gap-4 justify-center flex-wrap">
             <Link
               href="/education/knowledgebase"
-              className="inline-block bg-white text-teal hover:bg-gray-100 px-8 py-3.5 rounded-lg font-semibold text-lg transition-colors"
+              className="inline-block bg-white text-teal hover:bg-gray-100 px-8 py-3.5 rounded-lg font-semibold text-lg transition-smooth"
             >
               Browse Knowledgebase
             </Link>
             <Link
               href="/education/research"
-              className="inline-block border-2 border-white text-white hover:bg-white/10 px-8 py-3.5 rounded-lg font-semibold text-lg transition-colors"
+              className="inline-block border-2 border-white text-white hover:bg-white/10 px-8 py-3.5 rounded-lg font-semibold text-lg transition-smooth"
             >
               View Research Centres
             </Link>

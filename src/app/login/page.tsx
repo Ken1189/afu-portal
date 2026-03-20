@@ -418,7 +418,7 @@ export default function LoginPage() {
           {/* Form card */}
           <motion.div
             variants={formItem}
-            className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-100"
+            className="bg-white rounded-2xl p-6 sm:p-8 card-elevated"
           >
             {/* Error */}
             <AnimatePresence>

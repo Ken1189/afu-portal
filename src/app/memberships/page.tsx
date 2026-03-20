@@ -187,9 +187,9 @@ export default function MembershipsPage() {
   return (
     <>
       {/* Hero */}
-      <section className="bg-navy text-white py-20">
+      <section className="gradient-navy text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">
+          <h1 className="text-4xl md:text-5xl font-bold mb-6 text-glow">
             Join the African Farming Union
           </h1>
           <p className="text-xl text-gray-300 max-w-3xl leading-relaxed">
@@ -207,7 +207,7 @@ export default function MembershipsPage() {
             {tiers.map((tier, i) => (
               <div
                 key={i}
-                className={`relative rounded-2xl p-6 border-2 ${tier.accent} flex flex-col`}
+                className={`card-polished stat-card relative rounded-2xl p-6 border-2 ${tier.accent} flex flex-col`}
               >
                 {tier.popular && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
@@ -271,7 +271,7 @@ export default function MembershipsPage() {
 
                 <Link
                   href="/apply"
-                  className={`block text-center px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors ${
+                  className={`block text-center px-4 py-2.5 rounded-lg text-sm font-semibold transition-smooth ${
                     tier.popular
                       ? 'bg-teal hover:bg-teal-dark text-white'
                       : 'bg-navy/10 hover:bg-navy/20 text-navy'
@@ -357,7 +357,7 @@ export default function MembershipsPage() {
                   onClick={() =>
                     setExpandedFaq(expandedFaq === i ? null : i)
                   }
-                  className="w-full flex items-center justify-between p-5 text-left"
+                  className="w-full flex items-center justify-between p-5 text-left focus-ring"
                 >
                   <span className="font-semibold text-navy text-sm pr-4">
                     {faq.q}
@@ -398,9 +398,9 @@ export default function MembershipsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-teal">
+      <section className="py-16 gradient-teal">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">
+          <h2 className="text-3xl font-bold text-white mb-4 text-glow">
             Ready to Transform Your Farming?
           </h2>
           <p className="text-white/80 mb-8 max-w-2xl mx-auto">

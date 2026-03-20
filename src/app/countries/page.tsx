@@ -83,9 +83,9 @@ const countries = [
 export default function CountriesPage() {
   return (
     <>
-      <section className="bg-navy text-white py-20">
+      <section className="gradient-navy text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">Our Countries</h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-6 text-glow">Our Countries</h1>
           <p className="text-xl text-gray-300 max-w-3xl">
             Nine strategic markets across Africa, each serving a distinct purpose in the AFU flywheel.
           </p>
@@ -103,7 +103,7 @@ export default function CountriesPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {countries.map((c, i) => (
-              <div key={i} className={`rounded-2xl p-8 border-2 ${c.color} hover:shadow-lg transition-shadow`}>
+              <div key={i} className={`card-polished rounded-2xl p-8 border-2 ${c.color} hover:shadow-lg transition-shadow`}>
                 <div className="text-5xl mb-4">{c.flag}</div>
                 <h2 className="text-2xl font-bold text-navy mb-1">{c.country}</h2>
                 <div className="text-teal font-semibold text-sm mb-4">{c.role}</div>

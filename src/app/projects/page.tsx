@@ -135,7 +135,7 @@ export default function ProjectsPage() {
             {projects.map((project, i) => (
               <div
                 key={i}
-                className={`rounded-2xl p-8 border-2 ${project.color}`}
+                className={`card-polished rounded-2xl p-8 border-2 ${project.color}`}
               >
                 <div className="flex flex-col lg:flex-row gap-8">
                   {/* Content */}
@@ -188,7 +188,7 @@ export default function ProjectsPage() {
                       {project.impact.map((stat, j) => (
                         <div
                           key={j}
-                          className="bg-white rounded-xl p-4 text-center lg:text-left"
+                          className="stat-card bg-white rounded-xl p-4 text-center lg:text-left"
                         >
                           <div className="text-xl font-bold text-teal">
                             {stat.value}
@@ -238,13 +238,13 @@ export default function ProjectsPage() {
           <div className="flex gap-4 justify-center flex-wrap">
             <Link
               href="/apply"
-              className="inline-block bg-white text-teal hover:bg-gray-100 px-8 py-3.5 rounded-lg font-semibold text-lg transition-colors"
+              className="inline-block bg-white text-teal hover:bg-gray-100 px-8 py-3.5 rounded-lg font-semibold text-lg transition-smooth"
             >
               Apply to Participate
             </Link>
             <Link
               href="/contact"
-              className="inline-block border-2 border-white text-white hover:bg-white/10 px-8 py-3.5 rounded-lg font-semibold text-lg transition-colors"
+              className="inline-block border-2 border-white text-white hover:bg-white/10 px-8 py-3.5 rounded-lg font-semibold text-lg transition-smooth"
             >
               Partner With Us
             </Link>

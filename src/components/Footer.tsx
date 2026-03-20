@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="bg-navy text-white">
+    <footer className="bg-navy text-white" style={{ background: 'linear-gradient(180deg, #1B2A4A 0%, #0F1A30 100%)' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
           {/* Brand */}
@@ -61,7 +61,7 @@ export default function Footer() {
             <div className="mt-6">
               <Link
                 href="/apply"
-                className="inline-block bg-teal hover:bg-teal-dark text-white px-5 py-2 rounded-lg text-sm font-semibold transition-colors"
+                className="inline-block bg-teal hover:bg-teal-dark text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-smooth shadow-sm hover:shadow-md"
               >
                 Join AFU Today
               </Link>

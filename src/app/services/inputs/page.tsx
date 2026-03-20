@@ -19,10 +19,10 @@ export default function InputsServicePage() {
             Contact us to learn more about how we can support your agricultural operation.
           </p>
           <div className="flex gap-4 justify-center">
-            <Link href="/apply" className="bg-teal hover:bg-teal-dark text-white px-8 py-3 rounded-lg font-semibold transition-colors">
+            <Link href="/apply" className="bg-teal hover:bg-teal-dark text-white px-8 py-3 rounded-lg font-semibold transition-smooth">
               Become a Member
             </Link>
-            <Link href="/contact" className="border-2 border-navy/20 hover:border-navy/40 text-navy px-8 py-3 rounded-lg font-semibold transition-colors">
+            <Link href="/contact" className="border-2 border-navy/20 hover:border-navy/40 text-navy px-8 py-3 rounded-lg font-semibold transition-smooth">
               Contact Us
             </Link>
           </div>

@@ -474,7 +474,7 @@ export default function DashboardPage() {
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
-          className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 flex items-start gap-3"
+          className="bg-gradient-to-r from-amber-100 via-amber-50 to-yellow-50 border border-amber-300 rounded-xl px-4 py-3 flex items-start gap-3 shadow-sm"
         >
           <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5 shrink-0" />
           <div className="flex-1 min-w-0">
@@ -560,7 +560,7 @@ export default function DashboardPage() {
         {/* Active Loans */}
         <motion.div
           variants={staggerItem}
-          className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm hover:shadow-md hover:border-teal/20 transition-all"
+          className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm hover:shadow-md hover:border-teal/20 transition-all card-polished stat-card"
         >
           <div className="flex items-center justify-between mb-3">
             <div className="w-10 h-10 bg-teal/10 rounded-lg flex items-center justify-center">
@@ -577,7 +577,7 @@ export default function DashboardPage() {
         {/* Total Deployed */}
         <motion.div
           variants={staggerItem}
-          className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm hover:shadow-md hover:border-teal/20 transition-all"
+          className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm hover:shadow-md hover:border-teal/20 transition-all card-polished stat-card"
         >
           <div className="flex items-center justify-between mb-3">
             <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
@@ -594,7 +594,7 @@ export default function DashboardPage() {
         {/* Training Rate */}
         <motion.div
           variants={staggerItem}
-          className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm hover:shadow-md hover:border-teal/20 transition-all"
+          className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm hover:shadow-md hover:border-teal/20 transition-all card-polished stat-card"
         >
           <div className="flex items-center justify-between mb-3">
             <div className="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center">
@@ -619,7 +619,7 @@ export default function DashboardPage() {
         {/* Next Payment */}
         <motion.div
           variants={staggerItem}
-          className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm hover:shadow-md hover:border-teal/20 transition-all"
+          className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm hover:shadow-md hover:border-teal/20 transition-all card-polished stat-card"
         >
           <div className="flex items-center justify-between mb-3">
             <div className="w-10 h-10 bg-amber-50 rounded-lg flex items-center justify-center">
@@ -636,7 +636,7 @@ export default function DashboardPage() {
         {/* Default Rate */}
         <motion.div
           variants={staggerItem}
-          className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm hover:shadow-md hover:border-teal/20 transition-all"
+          className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm hover:shadow-md hover:border-teal/20 transition-all card-polished stat-card"
         >
           <div className="flex items-center justify-between mb-3">
             <div className="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center">
@@ -669,7 +669,7 @@ export default function DashboardPage() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.2 }}
-            className="bg-white rounded-xl border border-gray-100 shadow-sm p-6"
+            className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 card-polished"
           >
             <div className="flex items-center justify-between mb-6">
               <div>
@@ -763,7 +763,7 @@ export default function DashboardPage() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.2 }}
-            className="bg-white rounded-xl border border-gray-100 shadow-sm"
+            className="bg-white rounded-xl border border-gray-100 shadow-sm card-polished"
           >
             <div className="p-5 border-b border-gray-100 flex items-center justify-between">
               <div>
@@ -822,7 +822,7 @@ export default function DashboardPage() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.2 }}
-            className="bg-white rounded-xl border border-gray-100 shadow-sm p-5"
+            className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 card-polished"
           >
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-base font-semibold text-navy">Weather</h3>
@@ -864,7 +864,7 @@ export default function DashboardPage() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.2 }}
-            className="bg-white rounded-xl border border-gray-100 shadow-sm p-5"
+            className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 card-polished"
           >
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-base font-semibold text-navy">Market Prices</h3>
@@ -919,7 +919,7 @@ export default function DashboardPage() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
-          className="bg-white rounded-xl border border-gray-100 shadow-sm"
+          className="bg-white rounded-xl border border-gray-100 shadow-sm card-polished"
         >
           <div className="p-5 border-b border-gray-100 flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -966,7 +966,7 @@ export default function DashboardPage() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
-          className="bg-white rounded-xl border border-gray-100 shadow-sm p-5"
+          className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 card-polished"
         >
           <div className="flex items-center gap-2 mb-5">
             <Sparkles className="w-5 h-5 text-teal" />
@@ -979,7 +979,7 @@ export default function DashboardPage() {
                 <Link
                   key={action.label}
                   href={action.href}
-                  className="group flex flex-col items-center gap-2.5 p-4 rounded-xl border border-gray-100 hover:border-teal/20 hover:shadow-md transition-all text-center"
+                  className="group flex flex-col items-center gap-2.5 p-4 rounded-xl border border-gray-100 hover:border-teal/20 hover:shadow-md transition-all text-center card-polished"
                 >
                   <div
                     className={`w-11 h-11 rounded-xl flex items-center justify-center ${action.color} group-hover:scale-110 transition-transform`}
@@ -1004,7 +1004,7 @@ export default function DashboardPage() {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.2 }}
-        className="bg-white rounded-xl border border-gray-100 shadow-sm p-5"
+        className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 card-polished"
       >
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-2">
@@ -1024,7 +1024,7 @@ export default function DashboardPage() {
             return (
               <div
                 key={course.title}
-                className="rounded-xl border border-gray-100 p-4 hover:border-teal/20 hover:shadow-sm transition-all"
+                className="rounded-xl border border-gray-100 p-4 hover:border-teal/20 hover:shadow-sm transition-all card-polished"
               >
                 <span className="inline-block text-[10px] font-semibold uppercase tracking-wider text-gray-400 bg-gray-50 px-2 py-0.5 rounded mb-2">
                   {course.category}

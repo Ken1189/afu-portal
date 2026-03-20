@@ -287,14 +287,14 @@ export default function Home() {
             >
               <Link
                 href="/apply"
-                className="group bg-teal hover:bg-teal-dark text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all flex items-center justify-center gap-2 shadow-lg shadow-teal/25 hover:shadow-xl hover:shadow-teal/30"
+                className="group bg-teal hover:bg-teal-dark text-white px-8 py-4 rounded-xl font-semibold text-lg transition-smooth flex items-center justify-center gap-2 shadow-lg shadow-teal/25 hover:shadow-xl hover:shadow-teal/30"
               >
                 Become a Member
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
                 href="/services/financing"
-                className="group border-2 border-white/30 hover:border-white/60 hover:bg-white/10 backdrop-blur-sm text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all flex items-center justify-center gap-2"
+                className="group border-2 border-white/30 hover:border-white/60 hover:bg-white/10 backdrop-blur-sm text-white px-8 py-4 rounded-xl font-semibold text-lg transition-smooth flex items-center justify-center gap-2"
               >
                 <Play className="w-5 h-5" />
                 See How It Works
@@ -342,7 +342,7 @@ export default function Home() {
           <FadeInWhenVisible>
             <div className="text-center mb-14">
               <span className="text-teal text-sm font-semibold uppercase tracking-wider">The Africa Agriculture Paradox</span>
-              <h2 className="text-3xl md:text-4xl font-bold text-navy mt-2 mb-4">
+              <h2 className="text-3xl md:text-4xl font-bold text-navy mt-2 mb-4 text-gradient-teal">
                 The Opportunity is Enormous
               </h2>
               <p className="text-gray-500 max-w-2xl mx-auto">
@@ -353,22 +353,22 @@ export default function Home() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             <FadeInWhenVisible delay={0}>
-              <div className="bg-gradient-to-br from-teal-light to-white rounded-2xl p-8 border border-teal/10">
+              <div className="card-polished stat-card bg-gradient-to-br from-teal-light to-white rounded-2xl p-8 border border-teal/10">
                 <CountStat target={60} suffix="%" label="of world's uncultivated arable land is in Africa" />
               </div>
             </FadeInWhenVisible>
             <FadeInWhenVisible delay={0.1}>
-              <div className="bg-gradient-to-br from-teal-light to-white rounded-2xl p-8 border border-teal/10">
+              <div className="card-polished stat-card bg-gradient-to-br from-teal-light to-white rounded-2xl p-8 border border-teal/10">
                 <CountStat target={50} prefix="$" suffix="B+" label="of food imported annually across Africa" />
               </div>
             </FadeInWhenVisible>
             <FadeInWhenVisible delay={0.2}>
-              <div className="bg-gradient-to-br from-teal-light to-white rounded-2xl p-8 border border-teal/10">
+              <div className="card-polished stat-card bg-gradient-to-br from-teal-light to-white rounded-2xl p-8 border border-teal/10">
                 <CountStat target={40} suffix="%" label="of food lost post-harvest due to weak infrastructure" />
               </div>
             </FadeInWhenVisible>
             <FadeInWhenVisible delay={0.3}>
-              <div className="bg-gradient-to-br from-teal-light to-white rounded-2xl p-8 border border-teal/10">
+              <div className="card-polished stat-card bg-gradient-to-br from-teal-light to-white rounded-2xl p-8 border border-teal/10">
                 <CountStat target={247} suffix="+" label="active AFU members across 3 countries" />
               </div>
             </FadeInWhenVisible>
@@ -382,7 +382,7 @@ export default function Home() {
           <FadeInWhenVisible>
             <div className="text-center mb-16">
               <span className="text-teal text-sm font-semibold uppercase tracking-wider">Our Services</span>
-              <h2 className="text-3xl md:text-4xl font-bold text-navy mt-2 mb-4">
+              <h2 className="text-3xl md:text-4xl font-bold text-navy mt-2 mb-4 text-gradient-teal">
                 One Platform, Complete Value Chain
               </h2>
               <p className="text-gray-500 max-w-2xl mx-auto">
@@ -398,7 +398,7 @@ export default function Home() {
                 <motion.div key={svc.title} variants={fadeUpChild}>
                   <Link
                     href={svc.link}
-                    className="group block bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-teal/30 hover:shadow-xl transition-all duration-300"
+                    className="group block bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-teal/30 hover:shadow-xl transition-all duration-300 card-polished"
                   >
                     {/* Card image */}
                     <div className="relative h-48 overflow-hidden">
@@ -437,7 +437,7 @@ export default function Home() {
           <FadeInWhenVisible>
             <div className="text-center mb-16">
               <span className="text-teal text-sm font-semibold uppercase tracking-wider">The Model</span>
-              <h2 className="text-3xl md:text-4xl font-bold mt-2 mb-4">
+              <h2 className="text-3xl md:text-4xl font-bold mt-2 mb-4 text-glow">
                 The AFU Flywheel
               </h2>
               <p className="text-gray-400 max-w-2xl mx-auto">
@@ -495,7 +495,7 @@ export default function Home() {
           <FadeInWhenVisible>
             <div className="text-center mb-16">
               <span className="text-teal text-sm font-semibold uppercase tracking-wider">Getting Started</span>
-              <h2 className="text-3xl md:text-4xl font-bold text-navy mt-2 mb-4">
+              <h2 className="text-3xl md:text-4xl font-bold text-navy mt-2 mb-4 text-gradient-teal">
                 Four Steps to Growth
               </h2>
               <p className="text-gray-500 max-w-2xl mx-auto">
@@ -516,7 +516,7 @@ export default function Home() {
                         <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-teal" />
                       </div>
                     )}
-                    <div className="bg-cream rounded-2xl p-8 h-full group-hover:shadow-lg transition-shadow border border-transparent group-hover:border-teal/20">
+                    <div className="card-polished bg-cream rounded-2xl p-8 h-full group-hover:shadow-lg transition-shadow border border-transparent group-hover:border-teal/20">
                       <div className="text-5xl font-bold text-teal/15 mb-4">{item.step}</div>
                       <div className="w-12 h-12 bg-teal/10 rounded-xl flex items-center justify-center mb-4">
                         <Icon className="w-6 h-6 text-teal" />
@@ -564,7 +564,7 @@ export default function Home() {
             <FadeInWhenVisible direction="left">
               <div>
                 <span className="text-teal text-sm font-semibold uppercase tracking-wider">Technology Advantage</span>
-                <h2 className="text-3xl md:text-4xl font-bold text-navy mt-2 mb-6">
+                <h2 className="text-3xl md:text-4xl font-bold text-navy mt-2 mb-6 text-gradient-teal">
                   AI-Powered Agriculture for Smarter Farming
                 </h2>
                 <p className="text-gray-500 mb-8 leading-relaxed">
@@ -603,7 +603,7 @@ export default function Home() {
           <FadeInWhenVisible>
             <div className="text-center mb-16">
               <span className="text-teal text-sm font-semibold uppercase tracking-wider">Success Stories</span>
-              <h2 className="text-3xl md:text-4xl font-bold text-navy mt-2 mb-4">
+              <h2 className="text-3xl md:text-4xl font-bold text-navy mt-2 mb-4 text-gradient-teal">
                 Hear From Our Members
               </h2>
               <p className="text-gray-500 max-w-2xl mx-auto">
@@ -617,7 +617,7 @@ export default function Home() {
               <motion.div
                 key={t.name}
                 variants={fadeUpChild}
-                className="bg-cream rounded-2xl p-8 border border-gray-100 hover:shadow-lg transition-shadow"
+                className="card-polished bg-cream rounded-2xl p-8 border border-gray-100 hover:shadow-lg transition-shadow"
               >
                 {/* Stars */}
                 <div className="flex gap-1 mb-4">
@@ -681,7 +681,7 @@ export default function Home() {
           <FadeInWhenVisible>
             <div className="text-center mb-16">
               <span className="text-teal text-sm font-semibold uppercase tracking-wider">Membership</span>
-              <h2 className="text-3xl md:text-4xl font-bold text-navy mt-2 mb-4">
+              <h2 className="text-3xl md:text-4xl font-bold text-navy mt-2 mb-4 text-gradient-teal">
                 Choose Your Tier
               </h2>
               <p className="text-gray-500 max-w-2xl mx-auto">
@@ -758,7 +758,7 @@ export default function Home() {
                   className={`rounded-2xl p-8 h-full flex flex-col transition-all duration-300 hover:shadow-xl ${
                     item.highlight
                       ? 'bg-navy text-white ring-2 ring-teal shadow-xl relative'
-                      : 'bg-white border border-gray-200 hover:border-teal/30'
+                      : 'card-polished bg-white border border-gray-200 hover:border-teal/30'
                   }`}
                 >
                   {item.highlight && (
@@ -815,7 +815,7 @@ export default function Home() {
                   </ul>
                   <Link
                     href="/apply"
-                    className={`block text-center py-3 rounded-xl font-semibold text-sm transition-all ${
+                    className={`block text-center py-3 rounded-xl font-semibold text-sm transition-smooth ${
                       item.highlight
                         ? 'bg-teal hover:bg-teal-dark text-white shadow-lg'
                         : 'bg-teal/10 hover:bg-teal/20 text-teal'
@@ -984,14 +984,14 @@ export default function Home() {
                 <div className="pt-4 flex flex-col sm:flex-row gap-3">
                   <Link
                     href="/contact"
-                    className="group flex-1 bg-gradient-to-r from-gold to-amber-500 hover:from-gold hover:to-amber-400 text-navy-dark px-6 py-3.5 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-gold/20"
+                    className="group flex-1 bg-gradient-to-r from-gold to-amber-500 hover:from-gold hover:to-amber-400 text-navy-dark px-6 py-3.5 rounded-xl font-bold text-sm transition-smooth flex items-center justify-center gap-2 shadow-lg shadow-gold/20"
                   >
                     Request Investor Pack
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </Link>
                   <Link
                     href="/contact"
-                    className="flex-1 border border-white/30 hover:border-white/60 hover:bg-white/5 text-white px-6 py-3.5 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2"
+                    className="flex-1 border border-white/30 hover:border-white/60 hover:bg-white/5 text-white px-6 py-3.5 rounded-xl font-bold text-sm transition-smooth flex items-center justify-center gap-2"
                   >
                     Schedule a Call
                   </Link>
@@ -1024,7 +1024,7 @@ export default function Home() {
             <FadeInWhenVisible direction="right">
               <div>
                 <span className="text-teal text-sm font-semibold uppercase tracking-wider">Coverage</span>
-                <h2 className="text-3xl md:text-4xl font-bold text-navy mt-2 mb-6">
+                <h2 className="text-3xl md:text-4xl font-bold text-navy mt-2 mb-6 text-gradient-teal">
                   Expanding Across Africa
                 </h2>
                 <p className="text-gray-500 mb-8 leading-relaxed">
@@ -1054,7 +1054,7 @@ export default function Home() {
                   ].map((c) => (
                     <div
                       key={c.name}
-                      className="flex items-center gap-4 bg-white rounded-xl p-4 border border-gray-100 hover:border-teal/20 hover:shadow-md transition-all"
+                      className="card-polished flex items-center gap-4 bg-white rounded-xl p-4 border border-gray-100 hover:border-teal/20 hover:shadow-md transition-smooth"
                     >
                       <span className="text-3xl">{c.flag}</span>
                       <div className="flex-1">
@@ -1108,7 +1108,7 @@ export default function Home() {
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <FadeInWhenVisible>
             <Droplets className="w-12 h-12 text-white/30 mx-auto mb-6" />
-            <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 leading-tight">
+            <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 leading-tight text-glow">
               Ready to Join the Future of African Agriculture?
             </h2>
             <p className="text-white/80 text-lg mb-10 max-w-2xl mx-auto">
@@ -1118,14 +1118,14 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/apply"
-                className="group bg-white text-teal hover:bg-gray-50 px-8 py-4 rounded-xl font-semibold text-lg transition-all flex items-center justify-center gap-2 shadow-lg"
+                className="group bg-white text-teal hover:bg-gray-50 px-8 py-4 rounded-xl font-semibold text-lg transition-smooth flex items-center justify-center gap-2 shadow-lg"
               >
                 Apply for Membership
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
                 href="/contact"
-                className="border-2 border-white/50 hover:border-white text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all flex items-center justify-center"
+                className="border-2 border-white/50 hover:border-white text-white px-8 py-4 rounded-xl font-semibold text-lg transition-smooth flex items-center justify-center"
               >
                 Get in Touch
               </Link>

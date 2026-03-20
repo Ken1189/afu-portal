@@ -261,7 +261,7 @@ export default function PodcastsPage() {
                   {filtered.map((ep, i) => (
                     <div
                       key={i}
-                      className="bg-white rounded-2xl p-6 border border-gray-100 hover:shadow-md transition-shadow"
+                      className="card-polished bg-white rounded-2xl p-6 border border-gray-100 hover:shadow-md transition-shadow"
                     >
                       <div className="flex items-center gap-3 mb-3">
                         {/* Mini Play Button */}
@@ -306,7 +306,7 @@ export default function PodcastsPage() {
             {/* Sidebar */}
             <aside className="lg:w-80 shrink-0 space-y-8">
               {/* Subscribe */}
-              <div className="bg-white rounded-2xl p-6 border border-gray-100">
+              <div className="card-polished bg-white rounded-2xl p-6 border border-gray-100">
                 <h3 className="text-lg font-bold text-navy mb-4">
                   Subscribe
                 </h3>
@@ -341,7 +341,7 @@ export default function PodcastsPage() {
               </div>
 
               {/* Hosts */}
-              <div className="bg-white rounded-2xl p-6 border border-gray-100">
+              <div className="card-polished bg-white rounded-2xl p-6 border border-gray-100">
                 <h3 className="text-lg font-bold text-navy mb-4">
                   Your Hosts
                 </h3>
@@ -390,7 +390,7 @@ export default function PodcastsPage() {
           </p>
           <Link
             href="/contact"
-            className="inline-block bg-white text-teal hover:bg-gray-100 px-8 py-3.5 rounded-lg font-semibold text-lg transition-colors"
+            className="inline-block bg-white text-teal hover:bg-gray-100 px-8 py-3.5 rounded-lg font-semibold text-lg transition-smooth"
           >
             Get in Touch
           </Link>

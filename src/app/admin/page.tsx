@@ -432,7 +432,7 @@ export default function AdminDashboard() {
             key={i}
             variants={cardVariants}
             whileHover={{ y: -2, boxShadow: '0 8px 25px rgba(27,42,74,0.08)' }}
-            className="bg-white rounded-xl p-4 border border-gray-100 cursor-default"
+            className="bg-white rounded-xl p-4 border border-gray-100 cursor-default card-polished stat-card"
           >
             <div className="flex items-center justify-between mb-2">
               <div className={`w-9 h-9 rounded-lg ${stat.bgColor} flex items-center justify-center ${stat.color}`}>
@@ -470,7 +470,7 @@ export default function AdminDashboard() {
         {/* ── Member Growth Line Chart ─────────────────────────────────── */}
         <motion.div
           variants={cardVariants}
-          className="bg-white rounded-xl border border-gray-100 p-5"
+          className="bg-white rounded-xl border border-gray-100 p-5 card-polished"
         >
           <h3 className="font-semibold text-navy text-sm mb-4">Member Growth</h3>
           <div className="h-56">
@@ -504,7 +504,7 @@ export default function AdminDashboard() {
         {/* ── Revenue Breakdown Donut ──────────────────────────────────── */}
         <motion.div
           variants={cardVariants}
-          className="bg-white rounded-xl border border-gray-100 p-5"
+          className="bg-white rounded-xl border border-gray-100 p-5 card-polished"
         >
           <h3 className="font-semibold text-navy text-sm mb-4">Revenue Breakdown</h3>
           <div className="h-56 flex items-center">
@@ -548,7 +548,7 @@ export default function AdminDashboard() {
         {/* ── Loan Portfolio Stacked Bar Chart ─────────────────────────── */}
         <motion.div
           variants={cardVariants}
-          className="bg-white rounded-xl border border-gray-100 p-5"
+          className="bg-white rounded-xl border border-gray-100 p-5 card-polished"
         >
           <h3 className="font-semibold text-navy text-sm mb-4">Loan Portfolio (Last 6 Months)</h3>
           <div className="h-56">
@@ -579,7 +579,7 @@ export default function AdminDashboard() {
       ═════════════════════════════════════════════════════════════════ */}
       <motion.div
         variants={fadeUp}
-        className="bg-white rounded-xl border border-gray-100 p-5"
+        className="bg-white rounded-xl border border-gray-100 p-5 card-polished"
       >
         <h3 className="font-semibold text-navy text-sm mb-4">Application Pipeline</h3>
         <div className="flex items-center justify-center gap-2 overflow-x-auto py-2">
@@ -641,7 +641,7 @@ export default function AdminDashboard() {
         {/* ── Recent Applications Table ────────────────────────────────── */}
         <motion.div
           variants={cardVariants}
-          className="xl:col-span-2 bg-white rounded-xl border border-gray-100 overflow-hidden"
+          className="xl:col-span-2 bg-white rounded-xl border border-gray-100 overflow-hidden card-polished"
         >
           <div className="p-5 border-b border-gray-100 flex items-center justify-between">
             <h3 className="font-semibold text-navy text-sm">Recent Applications</h3>
@@ -653,7 +653,7 @@ export default function AdminDashboard() {
             </Link>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-sm table-striped">
               <thead>
                 <tr className="border-b border-gray-50">
                   <th className="text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">
@@ -716,7 +716,7 @@ export default function AdminDashboard() {
         {/* ── Activity Feed ─────────────────────────────────────────────── */}
         <motion.div
           variants={cardVariants}
-          className="bg-white rounded-xl border border-gray-100 overflow-hidden"
+          className="bg-white rounded-xl border border-gray-100 overflow-hidden card-polished"
         >
           <div className="p-5 border-b border-gray-100 flex items-center justify-between">
             <h3 className="font-semibold text-navy text-sm flex items-center gap-2">
@@ -766,7 +766,7 @@ export default function AdminDashboard() {
         {/* ── Milestones / KPI Tracker ─────────────────────────────────── */}
         <motion.div
           variants={cardVariants}
-          className="bg-white rounded-xl border border-gray-100 p-5"
+          className="bg-white rounded-xl border border-gray-100 p-5 card-polished"
         >
           <h3 className="font-semibold text-navy text-sm mb-4 flex items-center gap-2">
             <Target className="w-4 h-4 text-gold" />
@@ -827,7 +827,7 @@ export default function AdminDashboard() {
         {/* ── Members by Country ────────────────────────────────────────── */}
         <motion.div
           variants={cardVariants}
-          className="bg-white rounded-xl border border-gray-100 p-5"
+          className="bg-white rounded-xl border border-gray-100 p-5 card-polished"
         >
           <h3 className="font-semibold text-navy text-sm mb-4">Members by Country</h3>
           <div className="space-y-5">

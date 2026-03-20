@@ -299,13 +299,13 @@ export default function PartnersPage() {
   return (
     <>
       {/* Hero */}
-      <section className="bg-navy text-white py-24">
+      <section className="gradient-navy text-white py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <span className="inline-block bg-gold/20 text-gold text-sm font-medium px-4 py-1.5 rounded-full mb-6">
               Our Network
             </span>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight text-glow">
               Our Partners &amp; Network
             </h1>
             <p className="text-xl text-gray-300 leading-relaxed">
@@ -355,7 +355,7 @@ export default function PartnersPage() {
               {partners[activeTab].map((partner, i) => (
                 <div
                   key={i}
-                  className="bg-cream rounded-2xl p-6 border border-gray-100 hover:shadow-lg hover:border-teal/20 transition-all"
+                  className="card-polished bg-cream rounded-2xl p-6 border border-gray-100 hover:shadow-lg hover:border-teal/20 transition-all"
                 >
                   {/* Header with Logo + Name */}
                   <div className="flex items-start gap-4 mb-4">
