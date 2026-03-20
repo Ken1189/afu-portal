@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 
 export default function Footer() {
   return (
@@ -9,7 +8,7 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <div className="mb-4">
-              <Image src="/afu-logo.jpeg" alt="African Farming Union" width={160} height={50} className="h-12 w-auto object-contain rounded-lg bg-white p-1" />
+              <img src="/afu-logo.jpeg" alt="African Farming Union" className="h-12 w-auto object-contain rounded-lg bg-white p-1" />
             </div>
             <p className="text-gray-300 text-sm leading-relaxed">
               Africa&apos;s Agriculture Development Bank + Operating Platform.
@@ -19,7 +18,7 @@ export default function Footer() {
 
           {/* Services */}
           <div>
-            <h4 className="font-semibold text-sm uppercase tracking-wider mb-4 text-teal">
+            <h4 className="font-semibold text-sm uppercase tracking-wider mb-4" style={{ color: '#6ABF4B' }}>
               Services
             </h4>
             <div className="flex flex-col gap-2">
@@ -34,7 +33,7 @@ export default function Footer() {
 
           {/* Company */}
           <div>
-            <h4 className="font-semibold text-sm uppercase tracking-wider mb-4 text-teal">
+            <h4 className="font-semibold text-sm uppercase tracking-wider mb-4" style={{ color: '#6ABF4B' }}>
               Company
             </h4>
             <div className="flex flex-col gap-2">
@@ -48,7 +47,7 @@ export default function Footer() {
 
           {/* Phase 1 Countries */}
           <div>
-            <h4 className="font-semibold text-sm uppercase tracking-wider mb-4 text-teal">
+            <h4 className="font-semibold text-sm uppercase tracking-wider mb-4" style={{ color: '#6ABF4B' }}>
               Phase 1 Countries
             </h4>
             <div className="flex flex-col gap-2 text-gray-300 text-sm">
@@ -59,7 +58,10 @@ export default function Footer() {
             <div className="mt-6">
               <Link
                 href="/apply"
-                className="inline-block bg-teal hover:bg-teal-dark text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-smooth shadow-sm hover:shadow-md"
+                className="inline-block text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-smooth shadow-sm hover:shadow-md"
+                style={{ background: '#5DB347' }}
+                onMouseEnter={e => (e.currentTarget.style.background = '#449933')}
+                onMouseLeave={e => (e.currentTarget.style.background = '#5DB347')}
               >
                 Join AFU Today
               </Link>

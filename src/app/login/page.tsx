@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
+import Image from 'next/image'; // kept for background landscape image
 import {
   Mail,
   Lock,
@@ -270,7 +270,7 @@ export default function LoginPage() {
           {/* Top: Logo + brand */}
           <div>
             <Link href="/" className="inline-flex items-center gap-3 group">
-              <Image src="/afu-logo.jpeg" alt="African Farming Union" width={180} height={56} className="h-14 w-auto object-contain rounded-lg bg-white/95 p-1.5" />
+              <img src="/afu-logo.jpeg" alt="African Farming Union" className="h-14 w-auto object-contain rounded-lg bg-white/95 p-1.5" />
               <div>
                 <span className="text-white font-bold text-lg tracking-tight sr-only">
                   African Farming Union
@@ -330,7 +330,7 @@ export default function LoginPage() {
                   onClick={() => setActiveTestimonial(i)}
                   className={`h-1.5 rounded-full transition-all duration-300 ${
                     i === activeTestimonial
-                      ? 'w-8 bg-teal-light'
+                      ? 'w-8 bg-green-400'
                       : 'w-4 bg-white/25 hover:bg-white/40'
                   }`}
                   aria-label={`Show testimonial ${i + 1}`}
@@ -377,7 +377,7 @@ export default function LoginPage() {
           {/* Mobile-only logo */}
           <motion.div variants={formItem} className="text-center mb-8 lg:hidden">
             <Link href="/" className="inline-flex items-center gap-2.5">
-              <Image src="/afu-logo.jpeg" alt="African Farming Union" width={160} height={50} className="h-12 w-auto object-contain" />
+              <img src="/afu-logo.jpeg" alt="African Farming Union" className="h-12 w-auto object-contain" />
             </Link>
           </motion.div>
 
@@ -545,7 +545,10 @@ export default function LoginPage() {
                 disabled={isLoading}
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.98 }}
-                className="relative w-full bg-teal hover:bg-teal-dark disabled:opacity-70 disabled:cursor-not-allowed text-white py-3 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2 group"
+                className="relative w-full disabled:opacity-70 disabled:cursor-not-allowed text-white py-3 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2 group"
+                style={{ background: '#5DB347' }}
+                onMouseEnter={e => { if (!isLoading) (e.currentTarget as HTMLButtonElement).style.background = '#449933'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#5DB347'; }}
               >
                 {isLoading ? (
                   <div className="flex items-center gap-2">

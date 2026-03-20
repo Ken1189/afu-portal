@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -155,7 +154,7 @@ function NavSection({
         onClick={onToggle}
         className="w-full flex items-center justify-between px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-400 hover:text-gray-200 transition-colors"
       >
-        <span className={hasActiveLink && collapsed ? 'text-teal' : ''}>{group.label}</span>
+        <span className={hasActiveLink && collapsed ? 'text-green-400' : ''}>{group.label}</span>
         <ChevronDown
           className={`w-3 h-3 transition-transform duration-200 ${collapsed ? '-rotate-90' : ''}`}
         />
@@ -181,9 +180,10 @@ function NavSection({
                     href={link.href}
                     className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium transition-all ${
                       isActive
-                        ? 'bg-teal text-white shadow-sm shadow-teal/20'
-                        : 'text-gray-300 hover:bg-white/8 hover:text-white'
+                        ? 'text-white shadow-sm'
+                        : 'text-gray-300 hover:bg-green-50/10 hover:text-white'
                     }`}
+                    style={isActive ? { background: '#5DB347' } : {}}
                   >
                     {link.icon}
                     {link.label}
@@ -215,7 +215,7 @@ function SidebarContent({
     <>
       <div className="p-5 border-b border-white/10">
         <Link href="/admin" className="flex items-center gap-2.5" onClick={onLinkClick}>
-          <Image src="/afu-logo.jpeg" alt="African Farming Union" width={150} height={47} className="h-10 w-auto object-contain rounded-md bg-white p-1" />
+          <img src="/afu-logo.jpeg" alt="African Farming Union" className="h-10 w-auto object-contain rounded-md bg-white p-1" />
         </Link>
       </div>
 

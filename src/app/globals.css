@@ -7,6 +7,14 @@
   --color-teal: #2AA198;
   --color-teal-light: #E8F5F3;
   --color-teal-dark: #1A7A72;
+
+  /* ── AFU Logo Greens ── */
+  --color-green: #5DB347;
+  --color-green-dark: #449933;
+  --color-green-light: #EBF7E5;
+  --color-green-mid: #4A9E35;
+  --color-green-bar: #6ABF4B;
+
   --color-mint: #D4EDDA;
   --color-gold: #D4A843;
   --color-gold-light: #FBF5E6;
@@ -20,6 +28,7 @@
   --shadow-card-hover: 0 4px 12px rgba(27, 42, 74, 0.08), 0 2px 4px rgba(27, 42, 74, 0.04);
   --shadow-elevated: 0 8px 24px rgba(27, 42, 74, 0.10), 0 4px 8px rgba(27, 42, 74, 0.05);
   --shadow-glow-teal: 0 0 0 3px rgba(42, 161, 152, 0.15);
+  --shadow-glow-green: 0 0 0 3px rgba(93, 179, 71, 0.18);
 }
 
 body {
@@ -167,7 +176,7 @@ html {
   border-radius: 1rem;
 }
 
-/* Stat card accent — gradient top border */
+/* Stat card accent — gradient top border using logo greens */
 .stat-card {
   position: relative;
   overflow: hidden;
@@ -179,7 +188,7 @@ html {
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, var(--color-teal), var(--color-teal-dark));
+  background: linear-gradient(90deg, var(--color-green) 0%, var(--color-green-bar) 50%, var(--color-teal) 100%);
   border-radius: 1rem 1rem 0 0;
 }
 
@@ -198,6 +207,24 @@ html {
 .gradient-teal {
   background: linear-gradient(135deg, var(--color-teal) 0%, var(--color-teal-dark) 100%);
 }
+
+/* AFU Logo green gradients */
+.gradient-green {
+  background: linear-gradient(135deg, var(--color-green) 0%, var(--color-green-dark) 100%);
+}
+.gradient-green-navy {
+  background: linear-gradient(135deg, var(--color-navy) 0%, var(--color-green-dark) 100%);
+}
+.text-gradient-green {
+  background: linear-gradient(135deg, var(--color-green) 0%, var(--color-green-bar) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.bg-green-light { background-color: var(--color-green-light); }
+.border-green { border-color: var(--color-green); }
+.text-green { color: var(--color-green); }
+.text-green-dark { color: var(--color-green-dark); }
 
 .gradient-gold {
   background: linear-gradient(135deg, var(--color-gold) 0%, #B88E2E 100%);

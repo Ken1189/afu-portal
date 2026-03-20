@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -158,7 +157,7 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-16">
           {/* ── Logo ── */}
           <Link href="/" className="flex items-center shrink-0">
-            <Image src="/afu-logo.jpeg" alt="African Farming Union" width={160} height={50} className="h-11 w-auto object-contain" priority />
+            <img src="/afu-logo.jpeg" alt="African Farming Union" className="h-11 w-auto object-contain" />
           </Link>
 
           {/* ── Desktop Nav ── */}
@@ -376,7 +375,7 @@ export default function Navbar() {
             </Link>
             <Link
               href="/sponsor"
-              className="text-teal font-semibold text-sm px-3 py-2 rounded-lg border border-teal/30 bg-teal/5 hover:bg-teal/15 transition-colors flex items-center gap-1.5"
+              className="text-green-700 font-semibold text-sm px-3 py-2 rounded-lg border border-green-600/30 bg-green-50 hover:bg-green-100 transition-colors flex items-center gap-1.5"
             >
               <span>🤝</span>
               Sponsor a Farmer
@@ -464,7 +463,10 @@ export default function Navbar() {
                 </Link>
                 <Link
                   href="/apply"
-                  className="bg-teal hover:bg-teal-dark text-white px-5 py-2 rounded-lg text-sm font-semibold transition-colors"
+                  className="text-white px-5 py-2 rounded-lg text-sm font-semibold transition-colors"
+                  style={{ background: '#5DB347' }}
+                  onMouseEnter={e => (e.currentTarget.style.background = '#449933')}
+                  onMouseLeave={e => (e.currentTarget.style.background = '#5DB347')}
                 >
                   Become a Member
                 </Link>
@@ -743,7 +745,7 @@ export default function Navbar() {
                 </Link>
                 <Link
                   href="/sponsor"
-                  className="text-teal font-semibold text-base py-3 px-3 rounded-lg border border-teal/30 bg-teal/5 hover:bg-teal/15 transition-colors flex items-center gap-2"
+                  className="text-green-700 font-semibold text-base py-3 px-3 rounded-lg border border-green-600/30 bg-green-50 hover:bg-green-100 transition-colors flex items-center gap-2"
                   onClick={closeMobile}
                 >
                   <span>🤝</span>
@@ -800,7 +802,10 @@ export default function Navbar() {
                     </Link>
                     <Link
                       href="/apply"
-                      className="bg-teal hover:bg-teal-dark text-white px-4 py-3 rounded-lg text-base font-semibold text-center transition-colors"
+                      className="text-white px-4 py-3 rounded-lg text-base font-semibold text-center transition-colors"
+                      style={{ background: '#5DB347' }}
+                      onMouseEnter={e => (e.currentTarget.style.background = '#449933')}
+                      onMouseLeave={e => (e.currentTarget.style.background = '#5DB347')}
                       onClick={closeMobile}
                     >
                       Become a Member

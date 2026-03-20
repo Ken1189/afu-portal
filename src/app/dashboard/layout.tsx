@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAuth } from "@/lib/supabase/auth-context";
@@ -47,7 +46,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Gradient Header — matches farm layout style */}
         <div className="gradient-navy p-5 text-white">
           <Link href="/" className="block mb-4">
-            <Image src="/afu-logo.jpeg" alt="African Farming Union" width={150} height={47} className="h-10 w-auto object-contain rounded-md bg-white p-1" />
+            <img src="/afu-logo.jpeg" alt="African Farming Union" className="h-10 w-auto object-contain rounded-md bg-white p-1" />
           </Link>
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center font-bold">
@@ -68,9 +67,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 href={link.href}
                 className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
                   isActive
-                    ? "bg-teal text-white shadow-sm"
-                    : "text-gray-600 hover:bg-teal-light hover:text-navy"
+                    ? "text-white shadow-sm"
+                    : "text-gray-600 hover:bg-green-50 hover:text-green-800"
                 }`}
+                style={isActive ? { background: '#5DB347' } : {}}
               >
                 <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={link.icon} />
@@ -81,7 +81,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           })}
         </nav>
         <div className="p-3 border-t border-gray-100 space-y-0.5">
-          <Link href="/farm" className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-teal hover:bg-teal-light transition-colors">
+          <Link href="/farm" className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-green-700 hover:bg-green-50 transition-colors">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064" />
             </svg>
@@ -109,7 +109,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <div className="gradient-navy p-5 text-white">
               <div className="flex items-center justify-between mb-4">
                 <Link href="/" className="flex items-center" onClick={() => setMobileNavOpen(false)}>
-                  <Image src="/afu-logo.jpeg" alt="African Farming Union" width={130} height={41} className="h-9 w-auto object-contain rounded-md bg-white p-1" />
+                  <img src="/afu-logo.jpeg" alt="African Farming Union" className="h-9 w-auto object-contain rounded-md bg-white p-1" />
                 </Link>
                 <button
                   onClick={() => setMobileNavOpen(false)}
@@ -140,9 +140,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     onClick={() => setMobileNavOpen(false)}
                     className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                       isActive
-                        ? "bg-teal text-white shadow-sm"
+                        ? "text-white shadow-sm"
                         : "text-gray-600 active:bg-gray-50"
                     }`}
+                    style={isActive ? { background: '#5DB347' } : {}}
                   >
                     <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={link.icon} />
@@ -156,7 +157,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <Link
                 href="/farm"
                 onClick={() => setMobileNavOpen(false)}
-                className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-teal active:bg-teal-light transition-colors"
+                className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-green-700 active:bg-green-50 transition-colors"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064" />
