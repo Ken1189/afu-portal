@@ -67,7 +67,7 @@ const partners: Record<PartnerTab, Partner[]> = {
     {
       name: "Commercial Farmers Union of Zimbabwe",
       initials: "CF",
-      color: "bg-teal",
+      color: "bg-[#5DB347]",
       type: "Commercial Farmers Union",
       country: "Zimbabwe",
       description:
@@ -149,7 +149,7 @@ const partners: Record<PartnerTab, Partner[]> = {
     {
       name: "Aerobotics",
       initials: "AB",
-      color: "bg-teal",
+      color: "bg-[#5DB347]",
       type: "AgTech",
       country: "Pan-African",
       description:
@@ -169,7 +169,7 @@ const partners: Record<PartnerTab, Partner[]> = {
     {
       name: "SunCulture",
       initials: "SU",
-      color: "bg-gold",
+      color: "bg-[#5DB347]",
       type: "Solar Energy",
       country: "Pan-African",
       description:
@@ -273,7 +273,7 @@ const partners: Record<PartnerTab, Partner[]> = {
     {
       name: "Botswana University of Agriculture",
       initials: "BA",
-      color: "bg-teal",
+      color: "bg-[#5DB347]",
       type: "Agricultural University",
       country: "Botswana",
       description:
@@ -302,7 +302,7 @@ export default function PartnersPage() {
       <section className="gradient-navy text-white py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
-            <span className="inline-block bg-gold/20 text-gold text-sm font-medium px-4 py-1.5 rounded-full mb-6">
+            <span className="inline-block bg-[#EBF7E5] text-[#5DB347] text-sm font-medium px-4 py-1.5 rounded-full mb-6">
               Our Network
             </span>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight text-glow">
@@ -331,8 +331,8 @@ export default function PartnersPage() {
                   onClick={() => setActiveTab(tab.key)}
                   className={`flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-medium transition-all ${
                     activeTab === tab.key
-                      ? "bg-teal text-white shadow-md"
-                      : "bg-cream text-navy hover:bg-teal-light"
+                      ? "bg-[#5DB347] text-white shadow-md"
+                      : "bg-cream text-navy hover:bg-[#EBF7E5]"
                   }`}
                 >
                   <Icon className="w-4 h-4" />
@@ -355,7 +355,7 @@ export default function PartnersPage() {
               {partners[activeTab].map((partner, i) => (
                 <div
                   key={i}
-                  className="card-polished bg-cream rounded-2xl p-6 border border-gray-100 hover:shadow-lg hover:border-teal/20 transition-all"
+                  className="card-polished bg-cream rounded-2xl p-6 border border-gray-100 hover:shadow-lg hover:border-[#5DB347]/20 transition-all"
                 >
                   {/* Header with Logo + Name */}
                   <div className="flex items-start gap-4 mb-4">
@@ -376,7 +376,7 @@ export default function PartnersPage() {
 
                   {/* Country */}
                   <div className="flex items-center gap-1.5 mb-3">
-                    <MapPin className="w-3.5 h-3.5 text-teal" />
+                    <MapPin className="w-3.5 h-3.5 text-[#5DB347]" />
                     <span className="text-xs text-gray-500 font-medium">
                       {partner.country}
                     </span>
@@ -389,7 +389,7 @@ export default function PartnersPage() {
 
                   {/* Focus */}
                   <div className="flex items-center gap-1.5">
-                    <Target className="w-3.5 h-3.5 text-gold" />
+                    <Target className="w-3.5 h-3.5 text-[#5DB347]" />
                     <span className="text-xs font-medium text-navy">
                       {partner.focus}
                     </span>
@@ -419,7 +419,7 @@ export default function PartnersPage() {
             </p>
             <Link
               href="/apply"
-              className="inline-flex items-center gap-2 bg-teal hover:bg-teal-dark text-white px-8 py-3.5 rounded-lg font-semibold transition-colors"
+              className="inline-flex items-center gap-2 bg-[#5DB347] hover:bg-[#449933] text-white px-8 py-3.5 rounded-lg font-semibold transition-colors"
             >
               Apply as Partner
               <ArrowRight className="w-5 h-5" />

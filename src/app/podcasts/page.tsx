@@ -148,8 +148,8 @@ const episodes = [
 ];
 
 const categoryColors: Record<string, string> = {
-  Agronomy: 'bg-emerald-100 text-emerald-700',
-  Markets: 'bg-blue-100 text-blue-700',
+  Agronomy: 'bg-[#EBF7E5] text-[#449933]',
+  Markets: 'bg-[#EBF7E5] text-[#5DB347]',
   Technology: 'bg-purple-100 text-purple-700',
   Finance: 'bg-amber-100 text-amber-700',
   'Success Stories': 'bg-pink-100 text-pink-700',
@@ -168,7 +168,7 @@ export default function PodcastsPage() {
       {/* Hero */}
       <section className="bg-navy text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="inline-block bg-teal/20 text-teal px-4 py-1.5 rounded-full text-sm font-medium mb-4">
+          <div className="inline-block bg-[#EBF7E5] text-[#5DB347] px-4 py-1.5 rounded-full text-sm font-medium mb-4">
             Media
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-6">AFU Podcasts</h1>
@@ -187,8 +187,8 @@ export default function PodcastsPage() {
           <div className="bg-gradient-to-r from-navy to-navy-light rounded-2xl p-8 md:p-10 text-white">
             <div className="flex flex-col md:flex-row gap-8 items-start">
               {/* Play Button Placeholder */}
-              <div className="w-24 h-24 md:w-32 md:h-32 bg-teal/20 rounded-2xl flex items-center justify-center shrink-0">
-                <div className="w-14 h-14 bg-teal rounded-full flex items-center justify-center cursor-pointer hover:bg-teal-dark transition-colors">
+              <div className="w-24 h-24 md:w-32 md:h-32 bg-[#EBF7E5] rounded-2xl flex items-center justify-center shrink-0">
+                <div className="w-14 h-14 bg-[#5DB347] rounded-full flex items-center justify-center cursor-pointer hover:bg-[#449933] transition-colors">
                   <svg className="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M8 5v14l11-7z" />
                   </svg>
@@ -196,7 +196,7 @@ export default function PodcastsPage() {
               </div>
               <div className="flex-1">
                 <div className="flex flex-wrap items-center gap-3 mb-3">
-                  <span className="text-teal text-sm font-bold">
+                  <span className="text-[#5DB347] text-sm font-bold">
                     {featured.episode}
                   </span>
                   <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${categoryColors[featured.category]}`}>
@@ -239,8 +239,8 @@ export default function PodcastsPage() {
                     onClick={() => setActiveFilter(cat)}
                     className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                       activeFilter === cat
-                        ? 'bg-teal text-white'
-                        : 'bg-white text-navy hover:bg-teal-light border border-gray-200'
+                        ? 'bg-[#5DB347] text-white'
+                        : 'bg-white text-navy hover:bg-[#EBF7E5] border border-gray-200'
                     }`}
                   >
                     {cat}
@@ -265,9 +265,9 @@ export default function PodcastsPage() {
                     >
                       <div className="flex items-center gap-3 mb-3">
                         {/* Mini Play Button */}
-                        <div className="w-10 h-10 bg-teal/10 rounded-full flex items-center justify-center shrink-0 cursor-pointer hover:bg-teal/20 transition-colors">
+                        <div className="w-10 h-10 bg-[#EBF7E5] rounded-full flex items-center justify-center shrink-0 cursor-pointer hover:bg-[#EBF7E5]/80 transition-colors">
                           <svg
-                            className="w-4 h-4 text-teal ml-0.5"
+                            className="w-4 h-4 text-[#5DB347] ml-0.5"
                             fill="currentColor"
                             viewBox="0 0 24 24"
                           >
@@ -276,7 +276,7 @@ export default function PodcastsPage() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 text-xs text-gray-400 mb-0.5">
-                            <span className="font-bold text-teal">
+                            <span className="font-bold text-[#5DB347]">
                               {ep.episode}
                             </span>
                             <span>{ep.duration}</span>
@@ -312,7 +312,7 @@ export default function PodcastsPage() {
                 </h3>
                 <div className="space-y-3">
                   {[
-                    { name: 'Spotify', color: 'bg-green-50 text-green-700 border-green-200' },
+                    { name: 'Spotify', color: 'bg-[#EBF7E5] text-[#449933] border-green-200' },
                     { name: 'Apple Podcasts', color: 'bg-purple-50 text-purple-700 border-purple-200' },
                     { name: 'Google Podcasts', color: 'bg-blue-50 text-blue-700 border-blue-200' },
                     { name: 'RSS Feed', color: 'bg-orange-50 text-orange-700 border-orange-200' },
@@ -349,8 +349,8 @@ export default function PodcastsPage() {
                   {hosts.map((host, i) => (
                     <div key={i}>
                       <div className="flex items-center gap-3 mb-2">
-                        <div className="w-10 h-10 bg-teal/10 rounded-full flex items-center justify-center">
-                          <span className="text-teal font-bold text-sm">
+                        <div className="w-10 h-10 bg-[#EBF7E5] rounded-full flex items-center justify-center">
+                          <span className="text-[#5DB347] font-bold text-sm">
                             {host.name
                               .split(' ')
                               .map((n) => n[0])
@@ -379,7 +379,7 @@ export default function PodcastsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-teal">
+      <section className="py-16" style={{ background: '#1B2A4A' }}>
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">
             Never Miss an Episode
@@ -390,7 +390,7 @@ export default function PodcastsPage() {
           </p>
           <Link
             href="/contact"
-            className="inline-block bg-white text-teal hover:bg-gray-100 px-8 py-3.5 rounded-lg font-semibold text-lg transition-smooth"
+            className="inline-block bg-white text-[#5DB347] hover:bg-gray-100 px-8 py-3.5 rounded-lg font-semibold text-lg transition-smooth"
           >
             Get in Touch
           </Link>

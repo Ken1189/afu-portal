@@ -330,7 +330,7 @@ export default function LoginPage() {
                   onClick={() => setActiveTestimonial(i)}
                   className={`h-1.5 rounded-full transition-all duration-300 ${
                     i === activeTestimonial
-                      ? 'w-8 bg-green-400'
+                      ? 'w-8 bg-[#5DB347]'
                       : 'w-4 bg-white/25 hover:bg-white/40'
                   }`}
                   aria-label={`Show testimonial ${i + 1}`}
@@ -449,7 +449,7 @@ export default function LoginPage() {
                         <input
                           id="fullName"
                           type="text"
-                          className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl bg-white text-navy placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-teal/40 focus:border-teal transition-shadow"
+                          className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl bg-white text-navy placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#5DB347]/40 focus:border-[#5DB347] transition-shadow"
                           placeholder="e.g. Thabo Mokoena"
                           value={fullName}
                           onChange={(e) => setFullName(e.target.value)}
@@ -474,7 +474,7 @@ export default function LoginPage() {
                     id="email"
                     type="email"
                     required
-                    className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl bg-white text-navy placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-teal/40 focus:border-teal transition-shadow"
+                    className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl bg-white text-navy placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#5DB347]/40 focus:border-[#5DB347] transition-shadow"
                     placeholder="you@example.com"
                     value={email}
                     onChange={(e) => {
@@ -499,7 +499,7 @@ export default function LoginPage() {
                     id="password"
                     type={showPassword ? 'text' : 'password'}
                     required
-                    className="w-full pl-11 pr-12 py-3 border border-gray-200 rounded-xl bg-white text-navy placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-teal/40 focus:border-teal transition-shadow"
+                    className="w-full pl-11 pr-12 py-3 border border-gray-200 rounded-xl bg-white text-navy placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#5DB347]/40 focus:border-[#5DB347] transition-shadow"
                     placeholder="Enter your password"
                     value={password}
                     onChange={(e) => {
@@ -527,13 +527,13 @@ export default function LoginPage() {
                 <label className="flex items-center gap-2 cursor-pointer select-none">
                   <input
                     type="checkbox"
-                    className="w-4 h-4 rounded border-gray-300 text-teal focus:ring-teal/40"
+                    className="w-4 h-4 rounded border-gray-300 text-[#5DB347] focus:ring-[#5DB347]/40"
                   />
                   <span className="text-sm text-gray-500">Remember me</span>
                 </label>
                 <a
                   href="#"
-                  className="text-sm text-teal hover:text-teal-dark font-medium transition-colors"
+                  className="text-sm text-[#5DB347] hover:text-[#449933] font-medium transition-colors"
                 >
                   Forgot password?
                 </a>
@@ -598,7 +598,7 @@ export default function LoginPage() {
               type="button"
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.98 }}
-              className="w-full flex items-center justify-center gap-2 py-3 border-2 border-green-500 text-green-600 rounded-xl font-semibold hover:bg-green-50 transition-colors"
+              className="w-full flex items-center justify-center gap-2 py-3 border-2 border-[#5DB347] text-[#5DB347] rounded-xl font-semibold hover:bg-[#EBF7E5] transition-colors"
             >
               <MessageCircle className="w-5 h-5" />
               Continue with WhatsApp
@@ -616,7 +616,7 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => { setIsSignUp(false); setError(''); setSuccess(''); }}
-                  className="text-teal hover:text-teal-dark font-medium transition-colors"
+                  className="text-[#5DB347] hover:text-[#449933] font-medium transition-colors"
                 >
                   Sign in
                 </button>
@@ -627,7 +627,7 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => { setIsSignUp(true); setError(''); setSuccess(''); }}
-                  className="text-teal hover:text-teal-dark font-medium transition-colors"
+                  className="text-[#5DB347] hover:text-[#449933] font-medium transition-colors"
                 >
                   Create one
                 </button>

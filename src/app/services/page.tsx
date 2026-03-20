@@ -60,12 +60,12 @@ export default function ServicesPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {services.map((svc, i) => (
-              <Link key={i} href={svc.link} className="card-polished bg-cream rounded-2xl p-8 hover:shadow-lg transition-all group border border-transparent hover:border-teal/20">
+              <Link key={i} href={svc.link} className="card-polished bg-cream rounded-2xl p-8 hover:shadow-lg transition-all group border border-transparent hover:border-[#5DB347]/20">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-teal rounded-xl flex items-center justify-center text-white font-bold">
+                  <div className="w-10 h-10 bg-[#5DB347] rounded-xl flex items-center justify-center text-white font-bold">
                     {i + 1}
                   </div>
-                  <h3 className="text-xl font-bold text-navy group-hover:text-teal transition-colors">{svc.title}</h3>
+                  <h3 className="text-xl font-bold text-navy group-hover:text-[#449933] transition-colors">{svc.title}</h3>
                 </div>
                 <p className="text-gray-500 text-sm mb-5 leading-relaxed">{svc.desc}</p>
                 <div className="flex flex-wrap gap-2">

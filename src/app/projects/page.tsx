@@ -144,7 +144,7 @@ export default function ProjectsPage() {
                       <h3 className="text-xl font-bold text-navy">
                         {project.name}
                       </h3>
-                      <span className="bg-teal/10 text-teal text-xs font-semibold px-3 py-1 rounded-full">
+                      <span className="bg-[#EBF7E5] text-[#5DB347] text-xs font-semibold px-3 py-1 rounded-full">
                         {project.category}
                       </span>
                     </div>
@@ -190,7 +190,7 @@ export default function ProjectsPage() {
                           key={j}
                           className="stat-card bg-white rounded-xl p-4 text-center lg:text-left"
                         >
-                          <div className="text-xl font-bold text-teal">
+                          <div className="text-xl font-bold text-[#5DB347]">
                             {stat.value}
                           </div>
                           <div className="text-xs text-gray-500">
@@ -216,7 +216,7 @@ export default function ProjectsPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {impactStats.map((stat, i) => (
               <div key={i} className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-teal mb-2">
+                <div className="text-3xl md:text-4xl font-bold text-[#5DB347] mb-2">
                   {stat.value}
                 </div>
                 <div className="text-gray-300 text-sm">{stat.label}</div>
@@ -227,7 +227,7 @@ export default function ProjectsPage() {
       </section>
 
       {/* Get Involved CTA */}
-      <section className="py-16 bg-teal">
+      <section className="py-16" style={{ background: '#1B2A4A' }}>
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">Get Involved</h2>
           <p className="text-white/80 mb-8 max-w-2xl mx-auto">
@@ -238,7 +238,7 @@ export default function ProjectsPage() {
           <div className="flex gap-4 justify-center flex-wrap">
             <Link
               href="/apply"
-              className="inline-block bg-white text-teal hover:bg-gray-100 px-8 py-3.5 rounded-lg font-semibold text-lg transition-smooth"
+              className="inline-block bg-white text-[#6ABF4B] hover:bg-gray-100 px-8 py-3.5 rounded-lg font-semibold text-lg transition-smooth"
             >
               Apply to Participate
             </Link>

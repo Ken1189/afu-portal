@@ -12,7 +12,7 @@ const countries = [
     role: "Institutional Base",
     desc: "Full bank licensing pathway + compliance foundation. Creates permanence and access to larger capital pools.",
     highlights: ["Bank licensing pathway", "Compliance foundation", "Access to larger capital pools", "Institutional credibility"],
-    color: "bg-blue-50 border-blue-200",
+    color: "bg-[#EBF7E5] border-[#5DB347]/20",
   },
   {
     flag: "🇰🇪",
@@ -20,7 +20,7 @@ const countries = [
     role: "East African Gateway",
     desc: "East Africa's agricultural powerhouse. Tea, coffee, horticulture exports, and mobile money leadership with M-Pesa.",
     highlights: ["M-Pesa integration", "Horticulture exports to EU", "Strong agri-tech ecosystem", "EAC trade access"],
-    color: "bg-red-50 border-red-200",
+    color: "bg-[#EBF7E5] border-[#5DB347]/20",
   },
   {
     flag: "🇲🇿",
@@ -28,7 +28,7 @@ const countries = [
     role: "Southern Corridor",
     desc: "Strategic port access for Southern African trade. Cashew, maize, and cassava production with export potential.",
     highlights: ["Port of Maputo access", "Cashew nut exports", "Cross-border grain trade", "SADC corridor"],
-    color: "bg-yellow-50 border-yellow-200",
+    color: "bg-[#EBF7E5] border-[#5DB347]/20",
   },
   {
     flag: "🇳🇬",
@@ -36,7 +36,7 @@ const countries = [
     role: "West African Scale",
     desc: "Africa's largest economy and most populous nation. Massive domestic market for inputs, equipment, and processing.",
     highlights: ["200M+ population market", "Cassava & cocoa production", "Fintech ecosystem", "Largest food import market"],
-    color: "bg-green-50 border-green-200",
+    color: "bg-[#EBF7E5] border-[#5DB347]/20",
   },
   {
     flag: "🇸🇱",
@@ -44,7 +44,7 @@ const countries = [
     role: "West African Frontier",
     desc: "Emerging agricultural sector with untapped potential. Rice, cocoa, and oil palm production ready for modernisation.",
     highlights: ["Rice self-sufficiency drive", "Cocoa & palm oil exports", "Development capital inflows", "Smallholder focus"],
-    color: "bg-cyan-50 border-cyan-200",
+    color: "bg-[#EBF7E5] border-[#5DB347]/20",
   },
   {
     flag: "🇿🇦",
@@ -52,7 +52,7 @@ const countries = [
     role: "Financial Hub",
     desc: "Africa's most advanced financial infrastructure. Agricultural development finance, insurance, and institutional capital.",
     highlights: ["Advanced banking system", "Agricultural insurance market", "Institutional capital access", "Commercial farming scale"],
-    color: "bg-purple-50 border-purple-200",
+    color: "bg-[#EBF7E5] border-[#5DB347]/20",
   },
   {
     flag: "🇹🇿",
@@ -60,7 +60,7 @@ const countries = [
     role: "Scale Lane (Cassava + Sesame)",
     desc: "Cassava for food security + processing potential. Sesame as an export commodity with fast turnover.",
     highlights: ["Cassava processing", "Sesame exports", "Food security impact", "Fast capital turnover"],
-    color: "bg-amber-50 border-amber-200",
+    color: "bg-[#EBF7E5] border-[#5DB347]/20",
   },
   {
     flag: "🇿🇲",
@@ -68,7 +68,7 @@ const countries = [
     role: "Processing Hub",
     desc: "Grain milling, soya processing, and value-addition centre for the Southern African region. Stable policy environment.",
     highlights: ["Maize milling capacity", "Soya & sunflower processing", "Stable regulatory environment", "Regional export hub"],
-    color: "bg-teal-light border-teal/20",
+    color: "bg-[#EBF7E5] border-[#5DB347]/20",
   },
   {
     flag: "🇿🇼",
@@ -76,7 +76,7 @@ const countries = [
     role: "Export Lane (Blueberries)",
     desc: "High-value export crop with structured buyer demand. Ideal for escrow-based repayment + invoice finance.",
     highlights: ["Blueberry export focus", "Structured buyer demand", "Escrow-based repayment", "Invoice finance ready"],
-    color: "bg-orange-50 border-orange-200",
+    color: "bg-[#EBF7E5] border-[#5DB347]/20",
   },
 ];
 
@@ -106,12 +106,12 @@ export default function CountriesPage() {
               <div key={i} className={`card-polished rounded-2xl p-8 border-2 ${c.color} hover:shadow-lg transition-shadow`}>
                 <div className="text-5xl mb-4">{c.flag}</div>
                 <h2 className="text-2xl font-bold text-navy mb-1">{c.country}</h2>
-                <div className="text-teal font-semibold text-sm mb-4">{c.role}</div>
+                <div className="font-semibold text-sm mb-4" style={{ color: '#5DB347' }}>{c.role}</div>
                 <p className="text-gray-600 text-sm mb-6 leading-relaxed">{c.desc}</p>
                 <ul className="space-y-2">
                   {c.highlights.map((h, j) => (
                     <li key={j} className="flex items-center gap-2 text-sm text-gray-600">
-                      <svg className="w-4 h-4 text-teal shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 text-[#5DB347] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                       {h}
@@ -122,11 +122,11 @@ export default function CountriesPage() {
             ))}
           </div>
 
-          <div className="mt-16 bg-teal-light rounded-2xl p-10 text-center">
+          <div className="mt-16 bg-[#EBF7E5] rounded-2xl p-10 text-center">
             <h3 className="text-2xl font-bold text-navy mb-4">Join the Pan-African Agricultural Revolution</h3>
             <p className="text-gray-600 mb-6">9 countries. One integrated platform. Apply for membership or become a supplier today.</p>
             <div className="flex flex-wrap gap-4 justify-center">
-              <Link href="/apply" className="inline-block bg-teal hover:bg-teal-dark text-white px-8 py-3 rounded-lg font-semibold transition-colors">
+              <Link href="/apply" className="inline-block bg-[#5DB347] hover:bg-[#449933] text-white px-8 py-3 rounded-lg font-semibold transition-colors">
                 Apply for Membership
               </Link>
               <Link href="/contact" className="inline-block bg-navy hover:bg-navy/90 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
