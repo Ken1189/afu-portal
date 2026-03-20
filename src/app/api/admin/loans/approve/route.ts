@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
+import { sendNotification } from '@/lib/notifications/engine';
+import { loanApprovedTemplate } from '@/lib/notifications/templates';
 
 export async function POST(request: NextRequest) {
   try {
@@ -76,6 +78,27 @@ export async function POST(request: NextRequest) {
       entity_id: loanId,
       details: { status: newStatus, notes },
     });
+
+    // Send notification to the member (fire-and-forget)
+    if (loan.member_id) {
+      const template = loanApprovedTemplate(
+        String(loan.amount),
+        'USD',
+        loan.loan_number || loanId,
+      );
+      sendNotification({
+        recipientId: loan.member_id,
+        category: 'loan',
+        priority: 'high',
+        channels: ['in_app', 'email', 'sms'],
+        actionUrl: '/dashboard/financing',
+        ...template,
+        title: action === 'approve' ? template.title : 'Loan Application Rejected',
+        body: action === 'approve'
+          ? template.body
+          : `Your loan application (${loan.loan_number || loanId}) has been rejected.${notes ? ` Reason: ${notes}` : ''}`,
+      }).catch(() => {});
+    }
 
     return NextResponse.json({ success: true, loan });
   } catch {

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
+import { sendNotification } from '@/lib/notifications/engine';
+import { paymentReceivedTemplate } from '@/lib/notifications/templates';
 
 export async function POST(request: NextRequest) {
   try {
@@ -102,6 +104,22 @@ export async function POST(request: NextRequest) {
       entity_id: loanId,
       details: { amount, method, currency: currency || 'USD', disbursement_id: disbursement.id },
     });
+
+    // Notify member of disbursement (fire-and-forget)
+    if (loan.member_id) {
+      const cur = currency || 'USD';
+      const template = paymentReceivedTemplate(String(amount), cur, disbursement.id);
+      sendNotification({
+        recipientId: loan.member_id,
+        category: 'loan',
+        priority: 'high',
+        channels: ['in_app', 'email', 'sms'],
+        actionUrl: '/dashboard/financing',
+        ...template,
+        title: 'Loan Disbursed',
+        body: `Your loan of ${cur} ${amount.toLocaleString()} has been disbursed via ${method}.`,
+      }).catch(() => {});
+    }
 
     return NextResponse.json({ success: true, disbursement });
   } catch {

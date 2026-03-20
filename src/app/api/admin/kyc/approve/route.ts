@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
+import { sendNotification } from '@/lib/notifications/engine';
+import { kycVerifiedTemplate } from '@/lib/notifications/templates';
 
 export async function POST(request: NextRequest) {
   try {
@@ -98,6 +100,30 @@ export async function POST(request: NextRequest) {
       entity_id: verification.id,
       details: { member_id: memberId, tier: tierValue, notes },
     });
+
+    // Send notification to member (fire-and-forget)
+    const tierLabel = tierValue.replace('_', ' ').replace('tier', 'Tier');
+    if (action === 'approve') {
+      const template = kycVerifiedTemplate(tierLabel);
+      sendNotification({
+        recipientId: memberId,
+        category: 'security',
+        priority: 'high',
+        channels: ['in_app', 'email', 'sms'],
+        actionUrl: '/dashboard/kyc',
+        ...template,
+      }).catch(() => {});
+    } else {
+      sendNotification({
+        recipientId: memberId,
+        category: 'security',
+        priority: 'high',
+        channels: ['in_app', 'email'],
+        title: 'KYC Verification Rejected',
+        body: `Your ${tierLabel} identity verification was not approved.${notes ? ` Reason: ${notes}` : ''} Please resubmit your documents.`,
+        actionUrl: '/dashboard/kyc',
+      }).catch(() => {});
+    }
 
     return NextResponse.json({ success: true, verification });
   } catch {
