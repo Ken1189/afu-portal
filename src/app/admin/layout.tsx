@@ -28,6 +28,9 @@ import {
   Coins,
   Globe,
   Server,
+  ScanEye,
+  HandCoins,
+  Gauge,
   ChevronDown,
   ArrowLeft,
   Menu,
@@ -73,9 +76,12 @@ const navGroups: NavGroup[] = [
     defaultOpen: true,
     links: [
       { href: '/admin/financial', label: 'Financial Mgmt', icon: <Landmark className="w-4 h-4" /> },
+      { href: '/admin/loans', label: 'Loan Management', icon: <HandCoins className="w-4 h-4" /> },
+      { href: '/admin/credit-scores', label: 'Credit Scoring', icon: <Gauge className="w-4 h-4" /> },
       { href: '/admin/financial/collections', label: 'Collections', icon: <Banknote className="w-4 h-4" /> },
       { href: '/admin/financial/disbursements', label: 'Disbursements', icon: <ArrowDownToLine className="w-4 h-4" /> },
       { href: '/admin/payments', label: 'Payments', icon: <CreditCard className="w-4 h-4" /> },
+      { href: '/admin/kyc', label: 'KYC / AML', icon: <ScanEye className="w-4 h-4" /> },
     ],
   },
   {
