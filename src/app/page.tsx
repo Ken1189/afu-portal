@@ -122,7 +122,7 @@ function CountStat({
   const { ref, formatted } = useCountUp({ target, prefix, suffix, decimals, duration: 2200 });
   return (
     <div ref={ref} className="text-center">
-      <div className="text-4xl md:text-5xl font-bold text-teal mb-2">{formatted}</div>
+      <div className="text-4xl md:text-5xl font-bold mb-2" style={{ color: '#5DB347' }}>{formatted}</div>
       <p className="text-navy/70 text-lg">{label}</p>
     </div>
   );
@@ -176,13 +176,13 @@ const services = [
 
 /* ─── Flywheel steps ─── */
 const flywheelSteps = [
-  { step: 1, label: 'Capital', icon: Banknote, color: 'from-teal to-teal-dark' },
-  { step: 2, label: 'Inputs', icon: Sprout, color: 'from-green-500 to-green-600' },
-  { step: 3, label: 'Production', icon: Tractor, color: 'from-amber-500 to-amber-600' },
-  { step: 4, label: 'Processing', icon: Factory, color: 'from-orange-500 to-orange-600' },
-  { step: 5, label: 'Offtake', icon: ShieldCheck, color: 'from-blue-500 to-blue-600' },
-  { step: 6, label: 'Trade Finance', icon: Scale, color: 'from-indigo-500 to-indigo-600' },
-  { step: 7, label: 'Cash Recycle', icon: TrendingUp, color: 'from-teal to-teal-dark' },
+  { step: 1, label: 'Capital', icon: Banknote, bg: 'linear-gradient(135deg, #1B2A4A, #2D4A7A)' },
+  { step: 2, label: 'Inputs', icon: Sprout, bg: 'linear-gradient(135deg, #5DB347, #449933)' },
+  { step: 3, label: 'Production', icon: Tractor, bg: 'linear-gradient(135deg, #2AA198, #1A7A72)' },
+  { step: 4, label: 'Processing', icon: Factory, bg: 'linear-gradient(135deg, #4A9E35, #449933)' },
+  { step: 5, label: 'Offtake', icon: ShieldCheck, bg: 'linear-gradient(135deg, #2D4A7A, #1B2A4A)' },
+  { step: 6, label: 'Trade Finance', icon: Scale, bg: 'linear-gradient(135deg, #6ABF4B, #5DB347)' },
+  { step: 7, label: 'Cash Recycle', icon: TrendingUp, bg: 'linear-gradient(135deg, #5DB347, #2AA198)' },
 ];
 
 /* ─── Testimonials ─── */
@@ -250,9 +250,9 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className="inline-flex items-center gap-2 bg-teal/20 backdrop-blur-sm border border-teal/30 text-teal-light px-4 py-1.5 rounded-full text-sm font-medium mb-6"
+              className="inline-flex items-center gap-2 bg-[#5DB347]/20 backdrop-blur-sm border border-[#5DB347]/30 text-[#EBF7E5] px-4 py-1.5 rounded-full text-sm font-medium mb-6"
             >
-              <span className="w-2 h-2 bg-teal rounded-full animate-pulse-soft" />
+              <span className="w-2 h-2 bg-[#5DB347] rounded-full animate-pulse-soft" />
               Phase 1: Botswana &bull; Zimbabwe &bull; Tanzania
             </motion.div>
 
@@ -263,7 +263,7 @@ export default function Home() {
               className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] text-white mb-6"
             >
               Africa&apos;s Agriculture{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal to-green-400">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#5DB347] to-[#6ABF4B]">
                 Development Bank
               </span>{' '}
               + Operating Platform
@@ -287,7 +287,10 @@ export default function Home() {
             >
               <Link
                 href="/apply"
-                className="group bg-teal hover:bg-teal-dark text-white px-8 py-4 rounded-xl font-semibold text-lg transition-smooth flex items-center justify-center gap-2 shadow-lg shadow-teal/25 hover:shadow-xl hover:shadow-teal/30"
+                className="group text-white px-8 py-4 rounded-xl font-semibold text-lg transition-smooth flex items-center justify-center gap-2 shadow-lg"
+                style={{ background: '#5DB347' }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = '#449933')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = '#5DB347')}
               >
                 Become a Member
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -337,12 +340,12 @@ export default function Home() {
 
       {/* ─── IMPACT STATS (Animated counters) ─── */}
       <section className="py-20 bg-white relative overflow-hidden">
-        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-teal/30 to-transparent" />
+        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#5DB347]/30 to-transparent" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeInWhenVisible>
             <div className="text-center mb-14">
-              <span className="text-teal text-sm font-semibold uppercase tracking-wider">The Africa Agriculture Paradox</span>
-              <h2 className="text-3xl md:text-4xl font-bold text-navy mt-2 mb-4 text-gradient-teal">
+              <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#5DB347' }}>The Africa Agriculture Paradox</span>
+              <h2 className="text-3xl md:text-4xl font-bold text-navy mt-2 mb-4 text-gradient-green">
                 The Opportunity is Enormous
               </h2>
               <p className="text-gray-500 max-w-2xl mx-auto">
@@ -353,22 +356,22 @@ export default function Home() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             <FadeInWhenVisible delay={0}>
-              <div className="card-polished stat-card bg-gradient-to-br from-teal-light to-white rounded-2xl p-8 border border-teal/10">
+              <div className="card-polished stat-card bg-gradient-to-br from-[#EBF7E5] to-white rounded-2xl p-8 border border-[#5DB347]/10">
                 <CountStat target={60} suffix="%" label="of world's uncultivated arable land is in Africa" />
               </div>
             </FadeInWhenVisible>
             <FadeInWhenVisible delay={0.1}>
-              <div className="card-polished stat-card bg-gradient-to-br from-teal-light to-white rounded-2xl p-8 border border-teal/10">
+              <div className="card-polished stat-card bg-gradient-to-br from-[#EBF7E5] to-white rounded-2xl p-8 border border-[#5DB347]/10">
                 <CountStat target={50} prefix="$" suffix="B+" label="of food imported annually across Africa" />
               </div>
             </FadeInWhenVisible>
             <FadeInWhenVisible delay={0.2}>
-              <div className="card-polished stat-card bg-gradient-to-br from-teal-light to-white rounded-2xl p-8 border border-teal/10">
+              <div className="card-polished stat-card bg-gradient-to-br from-[#EBF7E5] to-white rounded-2xl p-8 border border-[#5DB347]/10">
                 <CountStat target={40} suffix="%" label="of food lost post-harvest due to weak infrastructure" />
               </div>
             </FadeInWhenVisible>
             <FadeInWhenVisible delay={0.3}>
-              <div className="card-polished stat-card bg-gradient-to-br from-teal-light to-white rounded-2xl p-8 border border-teal/10">
+              <div className="card-polished stat-card bg-gradient-to-br from-[#EBF7E5] to-white rounded-2xl p-8 border border-[#5DB347]/10">
                 <CountStat target={247} suffix="+" label="active AFU members across 3 countries" />
               </div>
             </FadeInWhenVisible>
@@ -381,8 +384,8 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeInWhenVisible>
             <div className="text-center mb-16">
-              <span className="text-teal text-sm font-semibold uppercase tracking-wider">Our Services</span>
-              <h2 className="text-3xl md:text-4xl font-bold text-navy mt-2 mb-4 text-gradient-teal">
+              <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#5DB347' }}>Our Services</span>
+              <h2 className="text-3xl md:text-4xl font-bold text-navy mt-2 mb-4 text-gradient-green">
                 One Platform, Complete Value Chain
               </h2>
               <p className="text-gray-500 max-w-2xl mx-auto">
@@ -398,7 +401,7 @@ export default function Home() {
                 <motion.div key={svc.title} variants={fadeUpChild}>
                   <Link
                     href={svc.link}
-                    className="group block bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-teal/30 hover:shadow-xl transition-all duration-300 card-polished"
+                    className="group block bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-[#5DB347]/30 hover:shadow-xl transition-all duration-300 card-polished"
                   >
                     {/* Card image */}
                     <div className="relative h-48 overflow-hidden">
@@ -410,14 +413,14 @@ export default function Home() {
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-navy/60 to-transparent" />
                       <div className="absolute bottom-4 left-4">
-                        <div className="w-10 h-10 bg-teal rounded-xl flex items-center justify-center shadow-lg">
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg" style={{ background: '#5DB347' }}>
                           <Icon className="w-5 h-5 text-white" />
                         </div>
                       </div>
                     </div>
                     {/* Card body */}
                     <div className="p-6">
-                      <h3 className="text-lg font-bold text-navy mb-2 group-hover:text-teal transition-colors flex items-center gap-2">
+                      <h3 className="text-lg font-bold text-navy mb-2 group-hover:text-[#5DB347] transition-colors flex items-center gap-2">
                         {svc.title}
                         <ArrowRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                       </h3>
@@ -436,7 +439,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeInWhenVisible>
             <div className="text-center mb-16">
-              <span className="text-teal text-sm font-semibold uppercase tracking-wider">The Model</span>
+              <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#5DB347' }}>The Model</span>
               <h2 className="text-3xl md:text-4xl font-bold mt-2 mb-4 text-glow">
                 The AFU Flywheel
               </h2>
@@ -459,17 +462,18 @@ export default function Home() {
                   >
                     <div className="flex flex-col items-center text-center">
                       <div
-                        className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center mb-3 shadow-lg group-hover:scale-110 transition-transform`}
+                        className="w-16 h-16 rounded-2xl flex items-center justify-center mb-3 shadow-lg group-hover:scale-110 transition-transform"
+                        style={{ background: item.bg }}
                       >
                         <Icon className="w-7 h-7 text-white" />
                       </div>
-                      <span className="text-xs font-bold text-teal mb-1">Step {item.step}</span>
+                      <span className="text-xs font-bold mb-1" style={{ color: '#5DB347' }}>Step {item.step}</span>
                       <span className="text-sm font-semibold text-white">{item.label}</span>
                     </div>
                     {/* Connector arrow (hidden on last item and small screens) */}
                     {item.step < 7 && (
                       <div className="hidden lg:flex absolute top-8 -right-2 w-4 items-center justify-center">
-                        <ArrowRight className="w-4 h-4 text-teal/50" />
+                        <ArrowRight className="w-4 h-4 text-[#5DB347]/50" />
                       </div>
                     )}
                   </motion.div>
@@ -478,11 +482,11 @@ export default function Home() {
             </div>
             {/* Recycle arrow */}
             <FadeInWhenVisible delay={0.5}>
-              <div className="mt-8 flex items-center justify-center gap-3 text-teal">
-                <div className="h-px w-16 bg-gradient-to-r from-transparent to-teal/50" />
+              <div className="mt-8 flex items-center justify-center gap-3" style={{ color: '#5DB347' }}>
+                <div className="h-px w-16 bg-gradient-to-r from-transparent to-[#5DB347]/50" />
                 <Zap className="w-5 h-5" />
                 <span className="text-sm font-semibold">That&apos;s the compounding flywheel — cash recycles back into capital</span>
-                <div className="h-px w-16 bg-gradient-to-l from-transparent to-teal/50" />
+                <div className="h-px w-16 bg-gradient-to-l from-transparent to-[#5DB347]/50" />
               </div>
             </FadeInWhenVisible>
           </StaggerChildren>
@@ -494,8 +498,8 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeInWhenVisible>
             <div className="text-center mb-16">
-              <span className="text-teal text-sm font-semibold uppercase tracking-wider">Getting Started</span>
-              <h2 className="text-3xl md:text-4xl font-bold text-navy mt-2 mb-4 text-gradient-teal">
+              <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#5DB347' }}>Getting Started</span>
+              <h2 className="text-3xl md:text-4xl font-bold text-navy mt-2 mb-4 text-gradient-green">
                 Four Steps to Growth
               </h2>
               <p className="text-gray-500 max-w-2xl mx-auto">
@@ -513,13 +517,13 @@ export default function Home() {
                     {/* Connector line */}
                     {i < 3 && (
                       <div className="hidden lg:block absolute top-12 left-[calc(100%+0.5rem)] w-[calc(100%-1rem)] h-px bg-gray-200">
-                        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-teal" />
+                        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full" style={{ background: '#5DB347' }} />
                       </div>
                     )}
-                    <div className="card-polished bg-cream rounded-2xl p-8 h-full group-hover:shadow-lg transition-shadow border border-transparent group-hover:border-teal/20">
-                      <div className="text-5xl font-bold text-teal/15 mb-4">{item.step}</div>
-                      <div className="w-12 h-12 bg-teal/10 rounded-xl flex items-center justify-center mb-4">
-                        <Icon className="w-6 h-6 text-teal" />
+                    <div className="card-polished bg-cream rounded-2xl p-8 h-full group-hover:shadow-lg transition-shadow border border-transparent group-hover:border-[#5DB347]/20">
+                      <div className="text-5xl font-bold text-[#5DB347]/15 mb-4">{item.step}</div>
+                      <div className="w-12 h-12 bg-[#EBF7E5] rounded-xl flex items-center justify-center mb-4">
+                        <Icon className="w-6 h-6" style={{ color: '#5DB347' }} />
                       </div>
                       <h3 className="text-lg font-bold text-navy mb-2">{item.title}</h3>
                       <p className="text-gray-500 text-sm leading-relaxed">{item.desc}</p>
@@ -548,7 +552,7 @@ export default function Home() {
                 />
                 <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-navy/80 to-transparent p-6">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-teal rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: '#5DB347' }}>
                       <BarChart3 className="w-5 h-5 text-white" />
                     </div>
                     <div>
@@ -563,8 +567,8 @@ export default function Home() {
             {/* Text */}
             <FadeInWhenVisible direction="left">
               <div>
-                <span className="text-teal text-sm font-semibold uppercase tracking-wider">Technology Advantage</span>
-                <h2 className="text-3xl md:text-4xl font-bold text-navy mt-2 mb-6 text-gradient-teal">
+                <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#5DB347' }}>Technology Advantage</span>
+                <h2 className="text-3xl md:text-4xl font-bold text-navy mt-2 mb-6 text-gradient-green">
                   AI-Powered Agriculture for Smarter Farming
                 </h2>
                 <p className="text-gray-500 mb-8 leading-relaxed">
@@ -579,14 +583,15 @@ export default function Home() {
                     'Satellite monitoring and weather forecasts',
                   ].map((item, i) => (
                     <div key={i} className="flex items-start gap-3">
-                      <CheckCircle2 className="w-5 h-5 text-teal shrink-0 mt-0.5" />
+                      <CheckCircle2 className="w-5 h-5 shrink-0 mt-0.5" style={{ color: '#5DB347' }} />
                       <span className="text-navy text-sm font-medium">{item}</span>
                     </div>
                   ))}
                 </div>
                 <Link
                   href="/services/financing"
-                  className="inline-flex items-center gap-2 mt-8 text-teal font-semibold hover:gap-3 transition-all"
+                  className="inline-flex items-center gap-2 mt-8 font-semibold hover:gap-3 transition-all"
+                  style={{ color: '#5DB347' }}
                 >
                   Learn more about our technology
                   <ArrowRight className="w-4 h-4" />
@@ -602,8 +607,8 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeInWhenVisible>
             <div className="text-center mb-16">
-              <span className="text-teal text-sm font-semibold uppercase tracking-wider">Success Stories</span>
-              <h2 className="text-3xl md:text-4xl font-bold text-navy mt-2 mb-4 text-gradient-teal">
+              <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#5DB347' }}>Success Stories</span>
+              <h2 className="text-3xl md:text-4xl font-bold text-navy mt-2 mb-4 text-gradient-green">
                 Hear From Our Members
               </h2>
               <p className="text-gray-500 max-w-2xl mx-auto">
@@ -680,8 +685,8 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeInWhenVisible>
             <div className="text-center mb-16">
-              <span className="text-teal text-sm font-semibold uppercase tracking-wider">Membership</span>
-              <h2 className="text-3xl md:text-4xl font-bold text-navy mt-2 mb-4 text-gradient-teal">
+              <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#5DB347' }}>Membership</span>
+              <h2 className="text-3xl md:text-4xl font-bold text-navy mt-2 mb-4 text-gradient-green">
                 Choose Your Tier
               </h2>
               <p className="text-gray-500 max-w-2xl mx-auto">
@@ -757,19 +762,18 @@ export default function Home() {
                 <div
                   className={`rounded-2xl p-8 h-full flex flex-col transition-all duration-300 hover:shadow-xl ${
                     item.highlight
-                      ? 'bg-navy text-white ring-2 ring-teal shadow-xl relative'
-                      : 'card-polished bg-white border border-gray-200 hover:border-teal/30'
+                      ? 'bg-navy text-white ring-2 ring-[#5DB347] shadow-xl relative'
+                      : 'card-polished bg-white border border-gray-200 hover:border-[#5DB347]/30'
                   }`}
                 >
                   {item.highlight && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-teal text-white text-xs font-bold px-4 py-1 rounded-full shadow-lg">
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-white text-xs font-bold px-4 py-1 rounded-full shadow-lg" style={{ background: '#5DB347' }}>
                       Most Popular
                     </div>
                   )}
                   <div
-                    className={`text-xs font-semibold uppercase tracking-wider mb-1 ${
-                      item.highlight ? 'text-teal' : 'text-teal'
-                    }`}
+                    className="text-xs font-semibold uppercase tracking-wider mb-1"
+                    style={{ color: '#5DB347' }}
                   >
                     {item.tier}
                   </div>
@@ -805,9 +809,8 @@ export default function Home() {
                         }`}
                       >
                         <CheckCircle2
-                          className={`w-4 h-4 shrink-0 mt-0.5 ${
-                            item.highlight ? 'text-teal' : 'text-teal'
-                          }`}
+                          className="w-4 h-4 shrink-0 mt-0.5"
+                          style={{ color: '#5DB347' }}
                         />
                         {f}
                       </li>
@@ -817,9 +820,12 @@ export default function Home() {
                     href="/apply"
                     className={`block text-center py-3 rounded-xl font-semibold text-sm transition-smooth ${
                       item.highlight
-                        ? 'bg-teal hover:bg-teal-dark text-white shadow-lg'
-                        : 'bg-teal/10 hover:bg-teal/20 text-teal'
+                        ? 'text-white shadow-lg'
+                        : 'bg-[#EBF7E5] hover:bg-[#d4efcc] text-[#449933]'
                     }`}
+                    style={item.highlight ? { background: '#5DB347' } : {}}
+                    onMouseEnter={item.highlight ? (e) => (e.currentTarget.style.background = '#449933') : undefined}
+                    onMouseLeave={item.highlight ? (e) => (e.currentTarget.style.background = '#5DB347') : undefined}
                   >
                     {item.cta}
                   </Link>
@@ -911,8 +917,8 @@ export default function Home() {
                     },
                   ].map((item, i) => (
                     <div key={i} className="flex gap-4 group">
-                      <div className="w-8 h-8 rounded-lg bg-teal/20 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-teal/30 transition-colors">
-                        <CheckCircle2 className="w-4 h-4 text-teal" />
+                      <div className="w-8 h-8 rounded-lg bg-[#5DB347]/20 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-[#5DB347]/30 transition-colors">
+                        <CheckCircle2 className="w-4 h-4" style={{ color: '#5DB347' }} />
                       </div>
                       <div>
                         <h4 className="font-semibold text-white text-sm mb-1">{item.title}</h4>
@@ -937,8 +943,8 @@ export default function Home() {
                     min: '$10,000',
                     returns: '18-24% target',
                     features: ['Quarterly distributions', 'Annual impact report', 'Investor portal access'],
-                    color: 'border-teal/40 bg-teal/5',
-                    badge: 'bg-teal/20 text-teal',
+                    color: 'border-[#5DB347]/40 bg-[#5DB347]/5',
+                    badge: 'bg-[#5DB347]/20 text-[#5DB347]',
                   },
                   {
                     tier: 'Growth Partner',
@@ -1007,7 +1013,7 @@ export default function Home() {
               <div className="flex flex-wrap items-center justify-center gap-6">
                 {['DFI-Ready Structure', 'Ring-Fenced SPV', 'Annual Audits (Big 4)', 'IFRS Compliant', 'ESG Framework'].map((badge) => (
                   <div key={badge} className="flex items-center gap-2 bg-white/5 border border-white/10 px-4 py-2 rounded-lg">
-                    <ShieldPlus className="w-3.5 h-3.5 text-teal" />
+                    <ShieldPlus className="w-3.5 h-3.5" style={{ color: '#5DB347' }} />
                     <span className="text-gray-300 text-xs font-medium">{badge}</span>
                   </div>
                 ))}
@@ -1023,8 +1029,8 @@ export default function Home() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <FadeInWhenVisible direction="right">
               <div>
-                <span className="text-teal text-sm font-semibold uppercase tracking-wider">Coverage</span>
-                <h2 className="text-3xl md:text-4xl font-bold text-navy mt-2 mb-6 text-gradient-teal">
+                <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#5DB347' }}>Coverage</span>
+                <h2 className="text-3xl md:text-4xl font-bold text-navy mt-2 mb-6 text-gradient-green">
                   Expanding Across Africa
                 </h2>
                 <p className="text-gray-500 mb-8 leading-relaxed">
@@ -1054,7 +1060,7 @@ export default function Home() {
                   ].map((c) => (
                     <div
                       key={c.name}
-                      className="card-polished flex items-center gap-4 bg-white rounded-xl p-4 border border-gray-100 hover:border-teal/20 hover:shadow-md transition-smooth"
+                      className="card-polished flex items-center gap-4 bg-white rounded-xl p-4 border border-gray-100 hover:border-[#5DB347]/20 hover:shadow-md transition-smooth"
                     >
                       <span className="text-3xl">{c.flag}</span>
                       <div className="flex-1">
@@ -1062,7 +1068,7 @@ export default function Home() {
                         <p className="text-gray-500 text-xs">{c.crops}</p>
                       </div>
                       <div className="text-right">
-                        <span className="text-teal font-bold text-lg">{c.members}</span>
+                        <span className="font-bold text-lg" style={{ color: '#5DB347' }}>{c.members}</span>
                         <p className="text-gray-400 text-xs">members</p>
                       </div>
                     </div>
@@ -1070,7 +1076,8 @@ export default function Home() {
                 </div>
                 <Link
                   href="/countries"
-                  className="inline-flex items-center gap-2 mt-8 text-teal font-semibold hover:gap-3 transition-all"
+                  className="inline-flex items-center gap-2 mt-8 font-semibold hover:gap-3 transition-all"
+                  style={{ color: '#5DB347' }}
                 >
                   View all countries
                   <ArrowRight className="w-4 h-4" />
@@ -1098,11 +1105,11 @@ export default function Home() {
       <section className="py-20 bg-cream">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
-            <span className="inline-block bg-teal/10 text-teal text-sm font-semibold px-4 py-1.5 rounded-full mb-4">
+            <span className="inline-block bg-[#5DB347]/10 text-sm font-semibold px-4 py-1.5 rounded-full mb-4" style={{ color: '#5DB347' }}>
               🤝 Sponsor a Farmer
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-navy mb-4">
-              Turn <span className="text-gradient-teal">$5 a Month</span> Into a Farm&apos;s Future
+              Turn <span className="text-gradient-green">$5 a Month</span> Into a Farm&apos;s Future
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               Real farmers. Real crops. Real impact. Sponsor an African farmer&apos;s membership, inputs,
@@ -1119,18 +1126,18 @@ export default function Home() {
             ].map((item) => (
               <div key={item.tier} className={`card-polished p-6 border-t-4 ${item.color} relative`}>
                 {item.featured && (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-teal text-white text-xs font-bold px-3 py-1 rounded-full">Most Popular</span>
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-white text-xs font-bold px-3 py-1 rounded-full" style={{ background: '#5DB347' }}>Most Popular</span>
                 )}
                 <div className="text-3xl mb-3">{item.emoji}</div>
                 <div className="font-bold text-navy text-lg">{item.tier}</div>
-                <div className="text-2xl font-bold text-teal my-1">{item.price}</div>
+                <div className="text-2xl font-bold my-1" style={{ color: '#5DB347' }}>{item.price}</div>
                 <p className="text-gray-600 text-sm">{item.desc}</p>
               </div>
             ))}
           </div>
 
           <div className="text-center">
-            <Link href="/sponsor" className="inline-flex items-center gap-2 bg-teal text-white font-semibold px-8 py-4 rounded-xl hover:bg-teal/90 transition-smooth shadow-lg hover:shadow-xl">
+            <Link href="/sponsor" className="inline-flex items-center gap-2 text-white font-semibold px-8 py-4 rounded-xl transition-smooth shadow-lg hover:shadow-xl" style={{ background: '#5DB347' }} onMouseEnter={(e) => (e.currentTarget.style.background = '#449933')} onMouseLeave={(e) => (e.currentTarget.style.background = '#5DB347')}>
               Meet the Farmers
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -1149,7 +1156,7 @@ export default function Home() {
             fill
             className="object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-teal-dark/95 to-teal/90" />
+          <div className="absolute inset-0 bg-gradient-to-r from-navy-dark/95 via-navy/90 to-[#1e3a3a]/85" />
         </div>
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <FadeInWhenVisible>
@@ -1164,7 +1171,8 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/apply"
-                className="group bg-white text-teal hover:bg-gray-50 px-8 py-4 rounded-xl font-semibold text-lg transition-smooth flex items-center justify-center gap-2 shadow-lg"
+                className="group bg-white hover:bg-gray-50 px-8 py-4 rounded-xl font-semibold text-lg transition-smooth flex items-center justify-center gap-2 shadow-lg"
+                style={{ color: '#5DB347' }}
               >
                 Apply for Membership
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
