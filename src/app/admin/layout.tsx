@@ -25,6 +25,9 @@ import {
   Settings,
   UserCog,
   Bell,
+  Coins,
+  Globe,
+  Server,
   ChevronDown,
   ArrowLeft,
   Menu,
@@ -76,6 +79,13 @@ const navGroups: NavGroup[] = [
     ],
   },
   {
+    label: 'Blockchain',
+    defaultOpen: false,
+    links: [
+      { href: '/admin/blockchain', label: 'EDMA Blockchain', icon: <Coins className="w-4 h-4" /> },
+    ],
+  },
+  {
     label: 'Marketplace',
     defaultOpen: false,
     links: [
@@ -87,6 +97,8 @@ const navGroups: NavGroup[] = [
     label: 'System',
     defaultOpen: false,
     links: [
+      { href: '/admin/countries', label: 'Countries', icon: <Globe className="w-4 h-4" /> },
+      { href: '/admin/system', label: 'System Health', icon: <Server className="w-4 h-4" /> },
       { href: '/admin/audit', label: 'Audit Trail', icon: <ScrollText className="w-4 h-4" /> },
       { href: '/admin/compliance', label: 'Compliance', icon: <Shield className="w-4 h-4" /> },
       { href: '/admin/users', label: 'Users', icon: <UserCog className="w-4 h-4" /> },
