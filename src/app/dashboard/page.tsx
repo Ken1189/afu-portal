@@ -54,12 +54,126 @@ import {
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
-import { dashboardStats, weatherData } from '@/lib/data/stats';
-import { marketPrices as mockMarketPrices } from '@/lib/data/marketPrices';
-import { notifications as mockNotifications } from '@/lib/data/notifications';
-import { activities as mockActivities } from '@/lib/data/activities';
-import { useMarketPrices } from '@/lib/supabase/use-market-prices';
 import { useAuth } from '@/lib/supabase/auth-context';
+
+// ---------------------------------------------------------------------------
+// Static data (inlined to remove @/lib/data/ mock imports)
+// ---------------------------------------------------------------------------
+
+const WEATHER_DATA = {
+  location: 'Harare, Zimbabwe',
+  current: { temp: 28, condition: 'Sunny', humidity: 45, wind: 12 },
+  forecast: [
+    { day: 'Today', temp: 28, condition: 'Sunny', icon: '\u2600\uFE0F' },
+    { day: 'Tomorrow', temp: 26, condition: 'Partly Cloudy', icon: '\uD83C\uDF24' },
+    { day: 'Thursday', temp: 22, condition: 'Rain', icon: '\uD83C\uDF27' },
+    { day: 'Friday', temp: 25, condition: 'Sunny', icon: '\u2600\uFE0F' },
+    { day: 'Saturday', temp: 27, condition: 'Sunny', icon: '\u2600\uFE0F' },
+  ],
+};
+
+/** Fallback scalar stats used when the API hasn't responded yet. */
+const FALLBACK_STATS = {
+  activeLoans: 89,
+  totalLoansDeployed: 4200000,
+  revenueGrowth: 18.5,
+  trainingCompletionRate: 60.3,
+  defaultRate: 2.3,
+};
+
+/** Loan portfolio chart data (static — no live DB source yet). */
+const LOAN_PORTFOLIO = [
+  { month: 'Apr', workingCapital: 180000, invoiceFinance: 95000, equipment: 45000, inputBundle: 22000 },
+  { month: 'May', workingCapital: 210000, invoiceFinance: 110000, equipment: 52000, inputBundle: 28000 },
+  { month: 'Jun', workingCapital: 245000, invoiceFinance: 125000, equipment: 60000, inputBundle: 35000 },
+  { month: 'Jul', workingCapital: 280000, invoiceFinance: 140000, equipment: 68000, inputBundle: 42000 },
+  { month: 'Aug', workingCapital: 310000, invoiceFinance: 155000, equipment: 75000, inputBundle: 48000 },
+  { month: 'Sep', workingCapital: 340000, invoiceFinance: 170000, equipment: 82000, inputBundle: 55000 },
+  { month: 'Oct', workingCapital: 370000, invoiceFinance: 185000, equipment: 88000, inputBundle: 60000 },
+  { month: 'Nov', workingCapital: 395000, invoiceFinance: 198000, equipment: 92000, inputBundle: 65000 },
+  { month: 'Dec', workingCapital: 420000, invoiceFinance: 210000, equipment: 98000, inputBundle: 70000 },
+  { month: 'Jan', workingCapital: 450000, invoiceFinance: 225000, equipment: 105000, inputBundle: 75000 },
+  { month: 'Feb', workingCapital: 480000, invoiceFinance: 240000, equipment: 110000, inputBundle: 80000 },
+  { month: 'Mar', workingCapital: 510000, invoiceFinance: 255000, equipment: 115000, inputBundle: 85000 },
+];
+
+interface CommodityPrice {
+  crop: string;
+  currentPrice: number;
+  currency: string;
+  unit: string;
+  change24h: number;
+  change7d: number;
+  prices: number[];
+  icon: string;
+}
+
+/** Market prices with sparkline data (DB format lacks sparkline/change fields). */
+const MARKET_PRICES: CommodityPrice[] = [
+  {
+    crop: 'Blueberries', currentPrice: 12.50, currency: 'USD', unit: 'kg', change24h: 0.8, change7d: 3.2, icon: '\uD83E\uDED0',
+    prices: [11.20, 11.35, 11.50, 11.40, 11.60, 11.55, 11.70, 11.80, 11.75, 11.90, 12.00, 11.95, 12.10, 12.05, 12.20, 12.15, 12.30, 12.25, 12.10, 12.20, 12.35, 12.40, 12.30, 12.45, 12.50, 12.40, 12.55, 12.60, 12.45, 12.50],
+  },
+  {
+    crop: 'Cassava', currentPrice: 0.15, currency: 'USD', unit: 'kg', change24h: -0.3, change7d: -1.1, icon: '\uD83C\uDF3F',
+    prices: [0.16, 0.16, 0.16, 0.15, 0.16, 0.16, 0.15, 0.15, 0.16, 0.15, 0.15, 0.16, 0.15, 0.15, 0.15, 0.16, 0.15, 0.15, 0.15, 0.15, 0.16, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15],
+  },
+  {
+    crop: 'Sesame', currentPrice: 2.80, currency: 'USD', unit: 'kg', change24h: 0.2, change7d: 0.5, icon: '\uD83C\uDF3E',
+    prices: [2.65, 2.68, 2.70, 2.67, 2.72, 2.70, 2.73, 2.75, 2.72, 2.74, 2.76, 2.73, 2.75, 2.78, 2.76, 2.74, 2.77, 2.75, 2.78, 2.76, 2.79, 2.77, 2.80, 2.78, 2.76, 2.79, 2.78, 2.80, 2.79, 2.80],
+  },
+  {
+    crop: 'Maize', currentPrice: 0.28, currency: 'USD', unit: 'kg', change24h: 0.5, change7d: 1.8, icon: '\uD83C\uDF3D',
+    prices: [0.25, 0.25, 0.26, 0.25, 0.26, 0.26, 0.26, 0.27, 0.26, 0.27, 0.27, 0.26, 0.27, 0.27, 0.27, 0.28, 0.27, 0.27, 0.28, 0.27, 0.28, 0.28, 0.27, 0.28, 0.28, 0.28, 0.28, 0.27, 0.28, 0.28],
+  },
+  {
+    crop: 'Sorghum', currentPrice: 0.32, currency: 'USD', unit: 'kg', change24h: -0.1, change7d: 0.3, icon: '\uD83C\uDF3F',
+    prices: [0.30, 0.30, 0.31, 0.30, 0.31, 0.31, 0.31, 0.31, 0.31, 0.32, 0.31, 0.31, 0.32, 0.31, 0.32, 0.32, 0.31, 0.32, 0.32, 0.32, 0.32, 0.31, 0.32, 0.32, 0.32, 0.32, 0.32, 0.32, 0.32, 0.32],
+  },
+  {
+    crop: 'Groundnuts', currentPrice: 1.45, currency: 'USD', unit: 'kg', change24h: 0.3, change7d: 1.2, icon: '\uD83E\uDD5C',
+    prices: [1.32, 1.33, 1.35, 1.34, 1.36, 1.35, 1.37, 1.36, 1.38, 1.37, 1.38, 1.39, 1.38, 1.40, 1.39, 1.40, 1.41, 1.40, 1.42, 1.41, 1.42, 1.43, 1.42, 1.43, 1.44, 1.43, 1.44, 1.45, 1.44, 1.45],
+  },
+];
+
+interface Notification {
+  id: string;
+  type: string;
+  title: string;
+  message: string;
+  timestamp: string;
+  read: boolean;
+  link: string;
+  priority: 'high' | 'medium' | 'low';
+}
+
+/** Fallback notifications shown when the API hasn't loaded yet. */
+const FALLBACK_NOTIFICATIONS: Notification[] = [
+  { id: 'NTF-001', type: 'payment', title: 'Payment Due in 5 Days', message: 'Your loan repayment of $2,100 for FIN-2026-003 is due on March 20, 2026.', timestamp: '2026-03-13T08:00:00Z', read: false, link: '/dashboard/financing', priority: 'high' },
+  { id: 'NTF-002', type: 'application', title: 'Application Under Review', message: 'Your financing application APP-2026-010 is now being reviewed by our credit team.', timestamp: '2026-03-12T14:30:00Z', read: false, link: '/dashboard/financing', priority: 'medium' },
+  { id: 'NTF-003', type: 'training', title: 'New Course Available', message: 'Drone Technology in Agriculture is now available. Recommended for your farm profile.', timestamp: '2026-03-12T09:00:00Z', read: false, link: '/dashboard/training', priority: 'low' },
+  { id: 'NTF-009', type: 'document', title: 'Document Expiring Soon', message: 'Your passport expires in 60 days (May 12, 2026). Please renew to maintain your KYC status.', timestamp: '2026-03-07T08:00:00Z', read: false, link: '/dashboard/documents', priority: 'high' },
+];
+
+interface Activity {
+  id: string;
+  memberId: string;
+  memberName: string;
+  type: 'application' | 'payment' | 'document' | 'training' | 'login' | 'profile' | 'contract';
+  description: string;
+  timestamp: string;
+  icon: string;
+}
+
+/** Recent activities (static until audit_log integration in Sprint 11). */
+const FALLBACK_ACTIVITIES: Activity[] = [
+  { id: 'ACT-001', memberId: 'AFU-2024-005', memberName: 'Grace Moyo', type: 'application', description: 'Submitted financing application for $45,000 working capital', timestamp: '2026-03-13T09:15:00Z', icon: 'FileText' },
+  { id: 'ACT-002', memberId: 'AFU-2024-025', memberName: 'Rumbidzai Chikore', type: 'application', description: 'Submitted financing application for $6,500', timestamp: '2026-03-13T08:42:00Z', icon: 'FileText' },
+  { id: 'ACT-003', memberId: 'AFU-2024-018', memberName: 'Amina Salim', type: 'document', description: 'Uploaded invoice from EuroFruit GmbH', timestamp: '2026-03-12T16:30:00Z', icon: 'Upload' },
+  { id: 'ACT-004', memberId: 'AFU-2024-022', memberName: 'Farai Ndlovu', type: 'training', description: 'Completed "Drip Irrigation Setup & Management" course', timestamp: '2026-03-12T14:20:00Z', icon: 'GraduationCap' },
+  { id: 'ACT-005', memberId: 'AFU-2024-033', memberName: 'Nyasha Mutasa', type: 'application', description: 'Submitted financing application for $38,000 working capital', timestamp: '2026-03-12T11:00:00Z', icon: 'FileText' },
+  { id: 'ACT-006', memberId: 'AFU-2024-041', memberName: 'Baraka Mushi', type: 'contract', description: 'Logged delivery: 15,000kg sesame to Dubai Fresh Markets', timestamp: '2026-03-12T08:30:00Z', icon: 'Truck' },
+];
 
 // Real dashboard data from API
 interface DashboardData {
@@ -234,8 +348,8 @@ function LoanTooltip({
 // ---------------------------------------------------------------------------
 export default function DashboardPage() {
   const { profile, user } = useAuth();
-  // Market prices use mock data (DB format lacks sparkline/change data needed for UI)
-  const marketPrices = mockMarketPrices;
+  // Market prices (DB format lacks sparkline/change data needed for UI)
+  const marketPrices = MARKET_PRICES;
   const [alertDismissed, setAlertDismissed] = useState(false);
   const [dashData, setDashData] = useState<DashboardData | null>(null);
   const userName = profile?.full_name || user?.email?.split('@')[0] || 'Member';
@@ -248,10 +362,10 @@ export default function DashboardPage() {
       .catch(() => { /* fallback to mock */ });
   }, []);
 
-  // Use real notifications if available, otherwise mock
+  // Use real notifications if available, otherwise fallback
   const notifications = dashData?.notifications?.length
     ? dashData.notifications.map(n => ({ ...n, priority: n.type === 'warning' ? 'high' as const : 'medium' as const }))
-    : mockNotifications;
+    : FALLBACK_NOTIFICATIONS;
 
   // Unread high-priority notifications
   const urgentNotifications = useMemo(
@@ -259,8 +373,8 @@ export default function DashboardPage() {
     [notifications]
   );
 
-  // Recent 6 activities (mock for now — real audit_log coming in Sprint 11)
-  const recentActivities = useMemo(() => mockActivities.slice(0, 6), []);
+  // Recent 6 activities (static until audit_log integration in Sprint 11)
+  const recentActivities = useMemo(() => FALLBACK_ACTIVITIES, []);
 
   // First 4 market commodities
   const topCommodities = useMemo(() => marketPrices.slice(0, 4), []);
@@ -456,7 +570,7 @@ export default function DashboardPage() {
               <TrendingUp className="w-3 h-3" /> +12%
             </span>
           </div>
-          <p className="text-2xl font-bold text-navy">{dashData?.stats?.activeLoanCount ?? dashboardStats.activeLoans}</p>
+          <p className="text-2xl font-bold text-navy">{dashData?.stats?.activeLoanCount ?? FALLBACK_STATS.activeLoans}</p>
           <p className="text-xs text-gray-500 mt-0.5">Active Loans</p>
         </motion.div>
 
@@ -470,10 +584,10 @@ export default function DashboardPage() {
               <DollarSign className="w-5 h-5 text-blue-600" />
             </div>
             <span className="inline-flex items-center gap-1 text-xs font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
-              <TrendingUp className="w-3 h-3" /> +{dashboardStats.revenueGrowth}%
+              <TrendingUp className="w-3 h-3" /> +{FALLBACK_STATS.revenueGrowth}%
             </span>
           </div>
-          <p className="text-2xl font-bold text-navy">{formatCurrency(dashData?.stats?.totalLoanAmount ?? dashboardStats.totalLoansDeployed)}</p>
+          <p className="text-2xl font-bold text-navy">{formatCurrency(dashData?.stats?.totalLoanAmount ?? FALLBACK_STATS.totalLoansDeployed)}</p>
           <p className="text-xs text-gray-500 mt-0.5">Total Deployed</p>
         </motion.div>
 
@@ -491,13 +605,13 @@ export default function DashboardPage() {
             </span>
           </div>
           <div className="flex items-end gap-2">
-            <p className="text-2xl font-bold text-navy">{dashboardStats.trainingCompletionRate}%</p>
+            <p className="text-2xl font-bold text-navy">{FALLBACK_STATS.trainingCompletionRate}%</p>
           </div>
           <p className="text-xs text-gray-500 mt-0.5">Training Completion</p>
           <div className="w-full bg-gray-100 rounded-full h-1.5 mt-2">
             <div
               className="bg-purple-500 h-1.5 rounded-full"
-              style={{ width: `${dashboardStats.trainingCompletionRate}%` }}
+              style={{ width: `${FALLBACK_STATS.trainingCompletionRate}%` }}
             />
           </div>
         </motion.div>
@@ -532,12 +646,12 @@ export default function DashboardPage() {
               <TrendingDown className="w-3 h-3" /> Low
             </span>
           </div>
-          <p className="text-2xl font-bold text-navy">{dashboardStats.defaultRate}%</p>
+          <p className="text-2xl font-bold text-navy">{FALLBACK_STATS.defaultRate}%</p>
           <p className="text-xs text-gray-500 mt-0.5">Default Rate</p>
           <div className="w-full bg-gray-100 rounded-full h-1.5 mt-2">
             <div
               className="bg-green-500 h-1.5 rounded-full"
-              style={{ width: `${(dashboardStats.defaultRate / 5) * 100}%` }}
+              style={{ width: `${(FALLBACK_STATS.defaultRate / 5) * 100}%` }}
             />
           </div>
         </motion.div>
@@ -569,7 +683,7 @@ export default function DashboardPage() {
             </div>
             <div className="w-full" style={{ height: 320 }}>
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={dashboardStats.loanPortfolio} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
+                <AreaChart data={LOAN_PORTFOLIO} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
                   <defs>
                     <linearGradient id="gradWC" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#2AA198" stopOpacity={0.3} />
@@ -716,24 +830,24 @@ export default function DashboardPage() {
             </div>
             <div className="flex items-center gap-4 mb-4">
               <div className="text-4xl">
-                {weatherData.forecast[0].icon}
+                {WEATHER_DATA.forecast[0].icon}
               </div>
               <div>
-                <p className="text-3xl font-bold text-navy">{weatherData.current.temp}&deg;C</p>
-                <p className="text-sm text-gray-500">{weatherData.location}</p>
+                <p className="text-3xl font-bold text-navy">{WEATHER_DATA.current.temp}&deg;C</p>
+                <p className="text-sm text-gray-500">{WEATHER_DATA.location}</p>
               </div>
             </div>
             <div className="flex items-center gap-4 text-xs text-gray-500 mb-4">
               <span className="flex items-center gap-1">
-                <Droplets className="w-3.5 h-3.5" /> {weatherData.current.humidity}%
+                <Droplets className="w-3.5 h-3.5" /> {WEATHER_DATA.current.humidity}%
               </span>
               <span className="flex items-center gap-1">
-                <Wind className="w-3.5 h-3.5" /> {weatherData.current.wind} km/h
+                <Wind className="w-3.5 h-3.5" /> {WEATHER_DATA.current.wind} km/h
               </span>
             </div>
             <div className="border-t border-gray-100 pt-3">
               <div className="grid grid-cols-5 gap-1">
-                {weatherData.forecast.map((day) => (
+                {WEATHER_DATA.forecast.map((day) => (
                   <div key={day.day} className="text-center">
                     <p className="text-[10px] text-gray-400 mb-1">{day.day.slice(0, 3)}</p>
                     <p className="text-lg leading-none mb-1">{day.icon}</p>

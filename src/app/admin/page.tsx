@@ -44,9 +44,99 @@ import {
   XCircle,
   Image as ImageIcon,
 } from 'lucide-react';
-import { dashboardStats } from '@/lib/data/stats';
-import { activities as mockActivities } from '@/lib/data/activities';
-import { applications as mockApplications } from '@/lib/data/applications';
+// ── Inline fallback data (replaces former @/lib/data/* mock imports) ─────────
+
+const FALLBACK_STATS = {
+  totalMembers: 247,
+  membersByCountry: { Botswana: 48, Zimbabwe: 112, Tanzania: 87 } as Record<string, number>,
+  totalLoansDeployed: 4_200_000,
+  activeLoans: 89,
+  defaultRate: 2.3,
+  monthlyRevenue: 127_000,
+  revenueGrowth: 18.5,
+  pendingApplications: 15,
+  memberGrowth: [45, 62, 78, 95, 112, 134, 152, 170, 189, 210, 231, 247],
+  memberGrowthLabels: ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'],
+  loanPortfolio: [
+    { month: 'Apr', workingCapital: 180000, invoiceFinance: 95000, equipment: 45000, inputBundle: 22000 },
+    { month: 'May', workingCapital: 210000, invoiceFinance: 110000, equipment: 52000, inputBundle: 28000 },
+    { month: 'Jun', workingCapital: 245000, invoiceFinance: 125000, equipment: 60000, inputBundle: 35000 },
+    { month: 'Jul', workingCapital: 280000, invoiceFinance: 140000, equipment: 68000, inputBundle: 42000 },
+    { month: 'Aug', workingCapital: 310000, invoiceFinance: 155000, equipment: 75000, inputBundle: 48000 },
+    { month: 'Sep', workingCapital: 340000, invoiceFinance: 170000, equipment: 82000, inputBundle: 55000 },
+    { month: 'Oct', workingCapital: 370000, invoiceFinance: 185000, equipment: 88000, inputBundle: 60000 },
+    { month: 'Nov', workingCapital: 395000, invoiceFinance: 198000, equipment: 92000, inputBundle: 65000 },
+    { month: 'Dec', workingCapital: 420000, invoiceFinance: 210000, equipment: 98000, inputBundle: 70000 },
+    { month: 'Jan', workingCapital: 450000, invoiceFinance: 225000, equipment: 105000, inputBundle: 75000 },
+    { month: 'Feb', workingCapital: 480000, invoiceFinance: 240000, equipment: 110000, inputBundle: 80000 },
+    { month: 'Mar', workingCapital: 510000, invoiceFinance: 255000, equipment: 115000, inputBundle: 85000 },
+  ],
+  revenueBreakdown: [
+    { source: 'Interest Income', amount: 68000, color: '#2AA198' },
+    { source: 'Membership Fees', amount: 24000, color: '#1B2A4A' },
+    { source: 'Origination Fees', amount: 18000, color: '#D4A843' },
+    { source: 'Partner Fees', amount: 12000, color: '#2D4A7A' },
+    { source: 'Training Revenue', amount: 5000, color: '#1A7A72' },
+  ],
+  applicationPipeline: [
+    { stage: 'New', count: 4, color: '#60A5FA' },
+    { stage: 'Documents Review', count: 3, color: '#FBBF24' },
+    { stage: 'Credit Assessment', count: 3, color: '#F97316' },
+    { stage: 'Approved', count: 3, color: '#34D399' },
+    { stage: 'Disbursed', count: 2, color: '#2AA198' },
+  ],
+  milestones: [
+    { label: '500 Members', target: 500, current: 247, deadline: 'Q4 2026' },
+    { label: '$10M Deployed', target: 10_000_000, current: 4_200_000, deadline: 'Q2 2027' },
+    { label: '3 Countries', target: 3, current: 3, deadline: 'Q1 2026' },
+    { label: 'Default Rate <5%', target: 5, current: 2.3, deadline: 'Ongoing', inverted: true },
+    { label: '60% Training Rate', target: 60, current: 60.3, deadline: 'Q1 2026' },
+  ],
+};
+
+interface FallbackActivity {
+  id: string;
+  memberId: string;
+  memberName: string;
+  type: string;
+  description: string;
+  timestamp: string;
+  icon: string;
+}
+
+const FALLBACK_ACTIVITIES: FallbackActivity[] = [
+  { id: 'ACT-001', memberId: 'AFU-2024-005', memberName: 'Grace Moyo', type: 'application', description: 'Submitted financing application for $45,000 working capital', timestamp: '2026-03-13T09:15:00Z', icon: 'FileText' },
+  { id: 'ACT-002', memberId: 'AFU-2024-025', memberName: 'Rumbidzai Chikore', type: 'application', description: 'Submitted financing application for $6,500', timestamp: '2026-03-13T08:42:00Z', icon: 'FileText' },
+  { id: 'ACT-003', memberId: 'AFU-2024-018', memberName: 'Amina Salim', type: 'document', description: 'Uploaded invoice from EuroFruit GmbH', timestamp: '2026-03-12T16:30:00Z', icon: 'Upload' },
+  { id: 'ACT-004', memberId: 'AFU-2024-022', memberName: 'Farai Ndlovu', type: 'training', description: 'Completed "Drip Irrigation Setup & Management" course', timestamp: '2026-03-12T14:20:00Z', icon: 'GraduationCap' },
+  { id: 'ACT-005', memberId: 'AFU-2024-033', memberName: 'Nyasha Mutasa', type: 'application', description: 'Submitted financing application for $38,000 working capital', timestamp: '2026-03-12T11:00:00Z', icon: 'FileText' },
+  { id: 'ACT-006', memberId: 'AFU-2024-041', memberName: 'Baraka Mushi', type: 'contract', description: 'Logged delivery: 15,000kg sesame to Dubai Fresh Markets', timestamp: '2026-03-12T08:30:00Z', icon: 'Truck' },
+  { id: 'ACT-007', memberId: 'AFU-2024-012', memberName: 'Tendai Chirwa', type: 'document', description: 'Uploaded farm photos (3 images)', timestamp: '2026-03-11T15:45:00Z', icon: 'Image' },
+  { id: 'ACT-008', memberId: 'AFU-2024-003', memberName: 'John Maseko', type: 'payment', description: 'Payment of $1,800 received for loan FIN-2026-002', timestamp: '2026-03-11T10:20:00Z', icon: 'DollarSign' },
+];
+
+interface FallbackApplication {
+  id: string;
+  memberId: string;
+  memberName: string;
+  type: string;
+  amount: number;
+  status: string;
+  submittedDate: string;
+  assignedOfficer: string;
+  crop: string;
+}
+
+const FALLBACK_APPLICATIONS: FallbackApplication[] = [
+  { id: 'APP-2026-001', memberId: 'AFU-2024-005', memberName: 'Grace Moyo', type: 'working-capital', amount: 45000, status: 'new', submittedDate: '2026-03-11', assignedOfficer: 'Unassigned', crop: 'Blueberries' },
+  { id: 'APP-2026-002', memberId: 'AFU-2024-012', memberName: 'Tendai Chirwa', type: 'input-bundle', amount: 3500, status: 'documents-review', submittedDate: '2026-03-08', assignedOfficer: 'Lebo Molefe', crop: 'Cassava' },
+  { id: 'APP-2026-003', memberId: 'AFU-2024-018', memberName: 'Amina Salim', type: 'invoice-finance', amount: 78000, status: 'credit-assessment', submittedDate: '2026-03-05', assignedOfficer: 'David Nkomo', crop: 'Sesame' },
+  { id: 'APP-2026-004', memberId: 'AFU-2024-003', memberName: 'John Maseko', type: 'working-capital', amount: 8000, status: 'approved', submittedDate: '2026-02-28', assignedOfficer: 'Lebo Molefe', crop: 'Sorghum' },
+  { id: 'APP-2026-005', memberId: 'AFU-2024-022', memberName: 'Farai Ndlovu', type: 'equipment', amount: 12000, status: 'new', submittedDate: '2026-03-12', assignedOfficer: 'Unassigned', crop: 'Blueberries' },
+  { id: 'APP-2026-006', memberId: 'AFU-2024-031', memberName: 'Halima Mwanga', type: 'working-capital', amount: 95000, status: 'documents-review', submittedDate: '2026-03-06', assignedOfficer: 'David Nkomo', crop: 'Cassava' },
+  { id: 'APP-2026-007', memberId: 'AFU-2024-009', memberName: 'Kago Setshedi', type: 'input-bundle', amount: 2200, status: 'approved', submittedDate: '2026-03-01', assignedOfficer: 'Lebo Molefe', crop: 'Groundnuts' },
+  { id: 'APP-2026-008', memberId: 'AFU-2024-015', memberName: 'Tinashe Gumbo', type: 'working-capital', amount: 5000, status: 'rejected', submittedDate: '2026-02-20', assignedOfficer: 'David Nkomo', crop: 'Maize' },
+];
 
 // Types for live API data
 interface LiveStats {
@@ -174,17 +264,17 @@ function relativeTime(timestamp: string): string {
 
 // ── Chart data ──────────────────────────────────────────────────────────────
 
-const memberGrowthData = dashboardStats.memberGrowthLabels.map((label, i) => ({
+const memberGrowthData = FALLBACK_STATS.memberGrowthLabels.map((label, i) => ({
   month: label,
-  members: dashboardStats.memberGrowth[i],
+  members: FALLBACK_STATS.memberGrowth[i],
 }));
 
-const loanPortfolioLast6 = dashboardStats.loanPortfolio.slice(-6);
+const loanPortfolioLast6 = FALLBACK_STATS.loanPortfolio.slice(-6);
 
 const defaultCountryData = [
-  { country: 'Zimbabwe', count: dashboardStats.membersByCountry.Zimbabwe, flag: '🇿🇼' },
-  { country: 'Tanzania', count: dashboardStats.membersByCountry.Tanzania, flag: '🇹🇿' },
-  { country: 'Botswana', count: dashboardStats.membersByCountry.Botswana, flag: '🇧🇼' },
+  { country: 'Zimbabwe', count: FALLBACK_STATS.membersByCountry.Zimbabwe, flag: '🇿🇼' },
+  { country: 'Tanzania', count: FALLBACK_STATS.membersByCountry.Tanzania, flag: '🇹🇿' },
+  { country: 'Botswana', count: FALLBACK_STATS.membersByCountry.Botswana, flag: '🇧🇼' },
 ];
 
 // ── Recharts custom tooltip ─────────────────────────────────────────────────
@@ -253,7 +343,7 @@ export default function AdminDashboard() {
   const statCards = [
     {
       label: 'Total Members',
-      value: (live?.members.total ?? dashboardStats.totalMembers).toString(),
+      value: (live?.members.total ?? FALLBACK_STATS.totalMembers).toString(),
       change: live ? `${live.members.active} active` : '+15%',
       changeType: 'up' as const,
       icon: <Users className="w-5 h-5" />,
@@ -262,7 +352,7 @@ export default function AdminDashboard() {
     },
     {
       label: 'Active Loans',
-      value: (live?.loans.active ?? dashboardStats.activeLoans).toString(),
+      value: (live?.loans.active ?? FALLBACK_STATS.activeLoans).toString(),
       change: live ? `${live.loans.pending} pending` : null,
       changeType: 'neutral' as const,
       icon: <Landmark className="w-5 h-5" />,
@@ -271,7 +361,7 @@ export default function AdminDashboard() {
     },
     {
       label: 'Total Deployed',
-      value: formatCurrency(live?.loans.totalAmount ?? dashboardStats.totalLoansDeployed),
+      value: formatCurrency(live?.loans.totalAmount ?? FALLBACK_STATS.totalLoansDeployed),
       change: live ? `${live.suppliers.total} suppliers` : null,
       changeType: 'neutral' as const,
       icon: <DollarSign className="w-5 h-5" />,
@@ -280,8 +370,8 @@ export default function AdminDashboard() {
     },
     {
       label: 'Revenue',
-      value: formatCurrency(live?.orders.revenue ?? dashboardStats.monthlyRevenue),
-      change: live ? `${live.orders.total} orders` : `+${dashboardStats.revenueGrowth}%`,
+      value: formatCurrency(live?.orders.revenue ?? FALLBACK_STATS.monthlyRevenue),
+      change: live ? `${live.orders.total} orders` : `+${FALLBACK_STATS.revenueGrowth}%`,
       changeType: 'up' as const,
       icon: <TrendingUp className="w-5 h-5" />,
       color: 'text-teal',
@@ -289,7 +379,7 @@ export default function AdminDashboard() {
     },
     {
       label: 'Pending Applications',
-      value: (live?.applications.pending ?? dashboardStats.pendingApplications).toString(),
+      value: (live?.applications.pending ?? FALLBACK_STATS.pendingApplications).toString(),
       change: live ? `${live.applications.total} total` : null,
       changeType: 'neutral' as const,
       icon: <FileText className="w-5 h-5" />,
@@ -298,7 +388,7 @@ export default function AdminDashboard() {
     },
     {
       label: 'Products',
-      value: live ? `${live.products.total}` : `${dashboardStats.defaultRate}%`,
+      value: live ? `${live.products.total}` : `${FALLBACK_STATS.defaultRate}%`,
       change: live ? `${live.products.inStock} in stock` : 'Low',
       changeType: 'down' as const,
       icon: <ShieldAlert className="w-5 h-5" />,
@@ -307,8 +397,8 @@ export default function AdminDashboard() {
     },
   ];
 
-  const first8Apps = mockApplications.slice(0, 8);
-  const first8Activities = mockActivities.slice(0, 8);
+  const first8Apps = FALLBACK_APPLICATIONS.slice(0, 8);
+  const first8Activities = FALLBACK_ACTIVITIES.slice(0, 8);
 
   return (
     <motion.div
@@ -421,7 +511,7 @@ export default function AdminDashboard() {
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
-                  data={dashboardStats.revenueBreakdown}
+                  data={FALLBACK_STATS.revenueBreakdown}
                   cx="50%"
                   cy="50%"
                   innerRadius={55}
@@ -431,7 +521,7 @@ export default function AdminDashboard() {
                   nameKey="source"
                   stroke="none"
                 >
-                  {dashboardStats.revenueBreakdown.map((entry, index) => (
+                  {FALLBACK_STATS.revenueBreakdown.map((entry, index) => (
                     <Cell key={index} fill={entry.color} />
                   ))}
                 </Pie>
@@ -493,7 +583,7 @@ export default function AdminDashboard() {
       >
         <h3 className="font-semibold text-navy text-sm mb-4">Application Pipeline</h3>
         <div className="flex items-center justify-center gap-2 overflow-x-auto py-2">
-          {dashboardStats.applicationPipeline.map((stage, i) => (
+          {FALLBACK_STATS.applicationPipeline.map((stage, i) => (
             <div key={stage.stage} className="flex items-center">
               <motion.button
                 whileHover={{ scale: 1.05 }}
@@ -526,7 +616,7 @@ export default function AdminDashboard() {
                   {stage.stage}
                 </span>
               </motion.button>
-              {i < dashboardStats.applicationPipeline.length - 1 && (
+              {i < FALLBACK_STATS.applicationPipeline.length - 1 && (
                 <ChevronRight className="w-5 h-5 text-gray-300 flex-shrink-0 mx-1" />
               )}
             </div>
@@ -683,7 +773,7 @@ export default function AdminDashboard() {
             Milestones &amp; KPI Tracker
           </h3>
           <div className="space-y-4">
-            {dashboardStats.milestones.map((ms, i) => {
+            {FALLBACK_STATS.milestones.map((ms, i) => {
               const isCompleted = ms.inverted
                 ? ms.current <= ms.target
                 : ms.current >= ms.target;
@@ -756,7 +846,7 @@ export default function AdminDashboard() {
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-bold text-navy tabular-nums">{c.count}</span>
                     <span className="text-xs text-gray-400">
-                      ({Math.round((c.count / dashboardStats.totalMembers) * 100)}%)
+                      ({Math.round((c.count / FALLBACK_STATS.totalMembers) * 100)}%)
                     </span>
                   </div>
                 </div>
@@ -777,7 +867,7 @@ export default function AdminDashboard() {
           {/* Country total summary */}
           <div className="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between">
             <span className="text-xs text-gray-400">Total across 3 countries</span>
-            <span className="text-sm font-bold text-navy">{dashboardStats.totalMembers} members</span>
+            <span className="text-sm font-bold text-navy">{FALLBACK_STATS.totalMembers} members</span>
           </div>
         </motion.div>
       </motion.div>
