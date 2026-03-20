@@ -204,10 +204,7 @@ export default function AboutPage() {
           </p>
           <Link
             href="/apply"
-            className="inline-block font-semibold text-lg px-8 py-3.5 rounded-lg transition-colors"
-            style={{ background: '#5DB347', color: '#fff' }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = '#449933')}
-            onMouseLeave={(e) => (e.currentTarget.style.background = '#5DB347')}
+            className="inline-block font-semibold text-lg px-8 py-3.5 rounded-lg transition-colors bg-[#5DB347] hover:bg-[#449933] text-white"
           >
             Apply for Membership
           </Link>
