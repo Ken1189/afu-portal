@@ -31,7 +31,8 @@ import {
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LanguageProvider, useLanguage } from '@/lib/i18n/LanguageContext';
-import { localeNames, localeFlags, type Locale } from '@/lib/i18n/translations';
+import { localeNames, type Locale } from '@/lib/i18n/translations';
+import { FlagIcon } from '@/components/FlagIcon';
 
 const navLinks = [
   { href: '/farm', labelKey: 'home' as const, shortKey: 'home' as const, icon: Home },
@@ -71,6 +72,7 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
+  const [sidebarLangOpen, setSidebarLangOpen] = useState(false);
   const { locale, setLocale, t } = useLanguage();
 
   const getPageTitle = () => {
@@ -133,23 +135,32 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
         </nav>
 
         {/* Language Selector */}
-        <div className="px-3 py-2 border-t border-gray-100">
-          <p className="text-[10px] uppercase tracking-wider text-gray-400 px-4 mb-1">{t.common.language}</p>
-          <div className="flex gap-1 px-2">
-            {(Object.keys(localeNames) as Locale[]).map((loc) => (
-              <button
-                key={loc}
-                onClick={() => setLocale(loc)}
-                className={`flex-1 text-xs py-1.5 rounded-lg font-medium transition-colors ${
-                  locale === loc
-                    ? 'bg-teal text-white'
-                    : 'text-gray-500 hover:bg-gray-50'
-                }`}
-              >
-                {localeFlags[loc]} {localeNames[loc]}
-              </button>
-            ))}
-          </div>
+        <div className="px-3 py-2 border-t border-gray-100 relative">
+          <button
+            onClick={() => setSidebarLangOpen(!sidebarLangOpen)}
+            className="w-full flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm text-gray-600 hover:bg-gray-50 transition-colors"
+          >
+            <Globe className="w-4 h-4 text-gray-400" />
+            <FlagIcon locale={locale} size={20} />
+            <span className="font-medium">{localeNames[locale]}</span>
+            <ChevronLeft className={`w-4 h-4 ml-auto text-gray-400 transition-transform ${sidebarLangOpen ? 'rotate-90' : '-rotate-90'}`} />
+          </button>
+          {sidebarLangOpen && (
+            <div className="absolute bottom-full left-3 right-3 mb-1 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50 max-h-72 overflow-y-auto">
+              {(Object.keys(localeNames) as Locale[]).map((loc) => (
+                <button
+                  key={loc}
+                  onClick={() => { setLocale(loc); setSidebarLangOpen(false); }}
+                  className={`w-full text-left px-4 py-2 text-sm flex items-center gap-2.5 transition-colors ${
+                    locale === loc ? 'bg-teal/10 text-teal font-medium' : 'text-gray-600 hover:bg-gray-50'
+                  }`}
+                >
+                  <FlagIcon locale={loc} size={20} />
+                  {localeNames[loc]}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Sidebar Footer */}
@@ -185,21 +196,21 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
             <div className="relative">
               <button
                 onClick={() => setLangOpen(!langOpen)}
-                className="w-9 h-9 flex items-center justify-center rounded-xl bg-gray-50 text-gray-500 active:bg-gray-100 transition-colors text-sm"
+                className="w-9 h-9 flex items-center justify-center rounded-xl bg-gray-50 text-gray-500 active:bg-gray-100 transition-colors"
               >
-                {localeFlags[locale]}
+                <FlagIcon locale={locale} size={20} />
               </button>
               {langOpen && (
-                <div className="absolute right-0 top-full mt-1 w-36 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50">
+                <div className="absolute right-0 top-full mt-1 w-44 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50 max-h-80 overflow-y-auto">
                   {(Object.keys(localeNames) as Locale[]).map((loc) => (
                     <button
                       key={loc}
                       onClick={() => { setLocale(loc); setLangOpen(false); }}
-                      className={`w-full text-left px-3 py-2 text-sm flex items-center gap-2 ${
+                      className={`w-full text-left px-3 py-2.5 text-sm flex items-center gap-2.5 ${
                         locale === loc ? 'bg-teal/10 text-teal font-medium' : 'text-gray-600 active:bg-gray-50'
                       }`}
                     >
-                      <span>{localeFlags[loc]}</span>
+                      <FlagIcon locale={loc} size={20} />
                       {localeNames[loc]}
                     </button>
                   ))}
@@ -233,22 +244,23 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
             <div className="relative">
               <button
                 onClick={() => setLangOpen(!langOpen)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-gray-500 hover:bg-gray-50 transition-colors border border-gray-200"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-gray-500 hover:bg-gray-50 transition-colors border border-gray-200"
               >
                 <Globe className="w-4 h-4" />
-                <span>{localeFlags[locale]} {localeNames[locale]}</span>
+                <FlagIcon locale={locale} size={20} />
+                <span>{localeNames[locale]}</span>
               </button>
               {langOpen && (
-                <div className="absolute right-0 top-full mt-1 w-40 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50">
+                <div className="absolute right-0 top-full mt-1 w-44 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50 max-h-80 overflow-y-auto">
                   {(Object.keys(localeNames) as Locale[]).map((loc) => (
                     <button
                       key={loc}
                       onClick={() => { setLocale(loc); setLangOpen(false); }}
-                      className={`w-full text-left px-4 py-2 text-sm flex items-center gap-2 transition-colors ${
+                      className={`w-full text-left px-4 py-2.5 text-sm flex items-center gap-2.5 transition-colors ${
                         locale === loc ? 'bg-teal/10 text-teal font-medium' : 'text-gray-600 hover:bg-gray-50'
                       }`}
                     >
-                      <span>{localeFlags[loc]}</span>
+                      <FlagIcon locale={loc} size={20} />
                       {localeNames[loc]}
                     </button>
                   ))}
@@ -347,18 +359,19 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
                 {/* Language selector in drawer */}
                 <div className="px-3 py-2 border-t border-gray-100">
                   <p className="text-[10px] uppercase tracking-wider text-gray-400 px-4 mb-1.5">{t.common.language}</p>
-                  <div className="flex gap-1 px-2">
+                  <div className="grid grid-cols-2 gap-1 px-2 max-h-48 overflow-y-auto">
                     {(Object.keys(localeNames) as Locale[]).map((loc) => (
                       <button
                         key={loc}
                         onClick={() => setLocale(loc)}
-                        className={`flex-1 text-xs py-2 rounded-lg font-medium transition-colors ${
+                        className={`flex items-center gap-2 text-xs py-2 px-2.5 rounded-lg font-medium transition-colors ${
                           locale === loc
                             ? 'bg-teal text-white'
                             : 'text-gray-500 active:bg-gray-100'
                         }`}
                       >
-                        {localeFlags[loc]} {localeNames[loc]}
+                        <FlagIcon locale={loc} size={16} />
+                        {localeNames[loc]}
                       </button>
                     ))}
                   </div>

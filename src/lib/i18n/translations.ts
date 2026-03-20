@@ -35,6 +35,28 @@ export const localeFlags: Record<Locale, string> = {
   kri: '🇸🇱',
 };
 
+/** ISO country code per locale — used for flag image URLs */
+export const localeCountryCodes: Record<Locale, string> = {
+  en: 'gb',
+  sn: 'zw',
+  nd: 'zw',
+  sw: 'tz',
+  tn: 'bw',
+  pt: 'mz',
+  ha: 'ng',
+  yo: 'ng',
+  zu: 'za',
+  af: 'za',
+  bem: 'zm',
+  kri: 'sl',
+};
+
+/** Get flag image URL for a locale (uses flagcdn.com SVGs) */
+export function getFlagUrl(locale: Locale, size: 16 | 20 | 24 | 32 | 48 = 20): string {
+  const code = localeCountryCodes[locale];
+  return `https://flagcdn.com/${size}x${Math.round(size * 0.75)}/${code}.png`;
+}
+
 // Translation keys organized by section
 export interface Translations {
   // Common
