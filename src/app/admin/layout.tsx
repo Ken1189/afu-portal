@@ -240,10 +240,18 @@ function SidebarContent({
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, isLoading: authLoading, isAdmin } = useAuth();
+  const { user, profile, signOut, isLoading: authLoading, isAdmin } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [roleChecked, setRoleChecked] = useState(false);
   const [authorized, setAuthorized] = useState(false);
+
+  const displayName = profile?.full_name || user?.email?.split('@')[0] || 'Admin';
+  const initials = displayName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
+
+  const handleSignOut = async () => {
+    await signOut();
+    router.push('/login');
+  };
 
   // ── Role guard: redirect non-admins ──────────────────────
   useEffect(() => {
@@ -357,18 +365,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </button>
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 bg-navy rounded-full flex items-center justify-center">
-                <span className="text-white text-xs font-bold">
-                  {user?.email?.charAt(0).toUpperCase() || 'A'}
-                </span>
+                <span className="text-white text-xs font-bold">{initials}</span>
               </div>
               <div className="hidden sm:block">
-                <p className="text-sm font-medium text-navy leading-tight">
-                  {user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Admin'}
-                </p>
+                <p className="text-sm font-medium text-navy leading-tight">{displayName}</p>
                 <p className="text-[10px] text-gray-400 leading-tight">
                   {isAdmin ? 'Super Admin' : 'Admin'}
                 </p>
               </div>
+              <button
+                onClick={handleSignOut}
+                className="ml-2 text-xs text-gray-400 hover:text-red-600 transition-colors font-medium"
+              >
+                Sign Out
+              </button>
             </div>
           </div>
         </header>
