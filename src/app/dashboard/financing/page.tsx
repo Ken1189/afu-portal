@@ -264,7 +264,7 @@ export default function FinancingPage() {
         </div>
         <Link
           href="/dashboard/financing/apply"
-          className="flex items-center gap-2 bg-teal hover:bg-teal-dark text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors"
+          className="flex items-center gap-2 bg-[#5DB347] hover:bg-[#449933] text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors"
         >
           <Plus className="w-4 h-4" />
           New Application
@@ -285,8 +285,8 @@ export default function FinancingPage() {
             label: 'Outstanding Balance',
             value: fmtCurrency(outstandingBalance),
             icon: CreditCard,
-            color: 'text-teal',
-            bg: 'bg-teal/10',
+            color: 'text-[#5DB347]',
+            bg: 'bg-[#5DB347]/10',
           },
           {
             label: 'Next Payment Due',
@@ -341,8 +341,8 @@ export default function FinancingPage() {
             onClick={() => setStatusFilter(f.key)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               statusFilter === f.key
-                ? 'bg-teal text-white'
-                : 'border border-gray-200 text-gray-600 hover:border-teal/30 hover:text-teal'
+                ? 'bg-[#5DB347] text-white'
+                : 'border border-gray-200 text-gray-600 hover:border-[#5DB347]/30 hover:text-[#5DB347]'
             }`}
           >
             {f.label} ({countByStatus[f.key] || 0})
@@ -418,7 +418,7 @@ export default function FinancingPage() {
                             ? 'bg-red-500'
                             : loan.repaidPercentage === 100
                             ? 'bg-blue-500'
-                            : 'bg-teal'
+                            : 'bg-[#5DB347]'
                         }`}
                         style={{ width: `${Math.min(loan.repaidPercentage, 100)}%` }}
                       />
@@ -548,7 +548,7 @@ export default function FinancingPage() {
                             ? 'bg-red-500'
                             : loan.repaidPercentage === 100
                             ? 'bg-blue-500'
-                            : 'bg-teal'
+                            : 'bg-[#5DB347]'
                         }`}
                         style={{
                           width: `${Math.min(loan.repaidPercentage, 100)}%`,
@@ -567,17 +567,17 @@ export default function FinancingPage() {
 
                   {/* Action buttons */}
                   <div className="flex gap-3 flex-wrap">
-                    <button className="flex items-center gap-2 text-sm text-teal font-medium hover:text-teal-dark transition-colors px-4 py-2 rounded-lg hover:bg-teal/5">
+                    <button className="flex items-center gap-2 text-sm text-[#5DB347] font-medium hover:text-[#449933] transition-colors px-4 py-2 rounded-lg hover:bg-[#5DB347]/5">
                       <Eye className="w-4 h-4" />
                       View Details
                     </button>
                     {loan.status !== 'completed' && (
-                      <button className="flex items-center gap-2 text-sm text-navy font-medium hover:text-teal transition-colors px-4 py-2 rounded-lg hover:bg-gray-50">
+                      <button className="flex items-center gap-2 text-sm text-navy font-medium hover:text-[#5DB347] transition-colors px-4 py-2 rounded-lg hover:bg-gray-50">
                         <Wallet className="w-4 h-4" />
                         Make Payment
                       </button>
                     )}
-                    <button className="flex items-center gap-2 text-sm text-navy font-medium hover:text-teal transition-colors px-4 py-2 rounded-lg hover:bg-gray-50">
+                    <button className="flex items-center gap-2 text-sm text-navy font-medium hover:text-[#5DB347] transition-colors px-4 py-2 rounded-lg hover:bg-gray-50">
                       <FileText className="w-4 h-4" />
                       Download Statement
                     </button>
@@ -596,7 +596,7 @@ export default function FinancingPage() {
           <p className="text-gray-500 text-sm">No loans match your filter</p>
           <button
             onClick={() => setStatusFilter('all')}
-            className="mt-3 text-teal text-sm font-medium hover:underline"
+            className="mt-3 text-[#5DB347] text-sm font-medium hover:underline"
           >
             View all loans
           </button>

@@ -97,7 +97,7 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
       {/* ─── Desktop Sidebar (hidden on mobile) ─── */}
       <aside className="hidden lg:flex w-64 bg-white border-r border-gray-100 flex-col fixed top-0 left-0 bottom-0 z-30">
         {/* Sidebar Header */}
-        <div className="bg-gradient-to-br from-navy to-teal p-5 text-white">
+        <div className="bg-gradient-to-br from-navy to-[#5DB347] p-5 text-white">
           <div className="flex items-center gap-2 mb-4">
             <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
               <Sprout className="w-5 h-5" />
@@ -126,8 +126,8 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
                 href={link.href}
                 className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
                   active
-                    ? 'bg-teal text-white shadow-sm'
-                    : 'text-gray-600 hover:bg-teal-light hover:text-navy'
+                    ? 'bg-[#5DB347] text-white shadow-sm'
+                    : 'text-gray-600 hover:bg-[#EBF7E5] hover:text-navy'
                 }`}
               >
                 <Icon className="w-5 h-5" />
@@ -160,7 +160,7 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
                   key={loc}
                   onClick={() => { setLocale(loc); setSidebarLangOpen(false); }}
                   className={`w-full text-left px-4 py-2 text-sm flex items-center gap-2.5 transition-colors ${
-                    locale === loc ? 'bg-teal/10 text-teal font-medium' : 'text-gray-600 hover:bg-gray-50'
+                    locale === loc ? 'bg-[#5DB347]/10 text-[#5DB347] font-medium' : 'text-gray-600 hover:bg-gray-50'
                   }`}
                 >
                   <FlagIcon locale={loc} size={20} />
@@ -215,7 +215,7 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
                       key={loc}
                       onClick={() => { setLocale(loc); setLangOpen(false); }}
                       className={`w-full text-left px-3 py-2.5 text-sm flex items-center gap-2.5 ${
-                        locale === loc ? 'bg-teal/10 text-teal font-medium' : 'text-gray-600 active:bg-gray-50'
+                        locale === loc ? 'bg-[#5DB347]/10 text-[#5DB347] font-medium' : 'text-gray-600 active:bg-gray-50'
                       }`}
                     >
                       <FlagIcon locale={loc} size={20} />
@@ -227,7 +227,7 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
             </div>
             <Link
               href="/farm/assistant"
-              className="w-9 h-9 flex items-center justify-center rounded-xl bg-teal/10 text-teal active:bg-teal/20 transition-colors relative"
+              className="w-9 h-9 flex items-center justify-center rounded-xl bg-[#5DB347]/10 text-[#5DB347] active:bg-[#5DB347]/20 transition-colors relative"
             >
               <Bot className="w-5 h-5" />
               <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-gold rounded-full border-2 border-white" />
@@ -265,7 +265,7 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
                       key={loc}
                       onClick={() => { setLocale(loc); setLangOpen(false); }}
                       className={`w-full text-left px-4 py-2.5 text-sm flex items-center gap-2.5 transition-colors ${
-                        locale === loc ? 'bg-teal/10 text-teal font-medium' : 'text-gray-600 hover:bg-gray-50'
+                        locale === loc ? 'bg-[#5DB347]/10 text-[#5DB347] font-medium' : 'text-gray-600 hover:bg-gray-50'
                       }`}
                     >
                       <FlagIcon locale={loc} size={20} />
@@ -277,7 +277,7 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
             </div>
             <Link
               href="/farm/assistant"
-              className="flex items-center gap-2 bg-teal/10 text-teal px-4 py-2 rounded-xl text-sm font-medium hover:bg-teal/20 transition-colors"
+              className="flex items-center gap-2 bg-[#5DB347]/10 text-[#5DB347] px-4 py-2 rounded-xl text-sm font-medium hover:bg-[#5DB347]/20 transition-colors"
             >
               <Bot className="w-4 h-4" />
               {t.common.assistant}
@@ -290,7 +290,7 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
               </span>
             </button>
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-teal rounded-full flex items-center justify-center">
+              <div className="w-8 h-8 bg-[#5DB347] rounded-full flex items-center justify-center">
                 <span className="text-white text-sm font-bold">{initials}</span>
               </div>
               <span className="text-sm font-medium text-navy">{displayName}</span>
@@ -317,7 +317,7 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
                 transition={{ type: 'spring' as const, stiffness: 300, damping: 30 }}
                 className="fixed top-0 left-0 bottom-0 z-50 w-[85vw] max-w-72 bg-white shadow-2xl flex flex-col"
               >
-                <div className="bg-gradient-to-br from-navy to-teal p-5 text-white">
+                <div className="bg-gradient-to-br from-navy to-[#5DB347] p-5 text-white">
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-sm font-medium opacity-80">Mkulima Hub</span>
                     <button
@@ -349,7 +349,7 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
                         href={link.href}
                         onClick={() => setDrawerOpen(false)}
                         className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                          active ? 'bg-teal/10 text-teal' : 'text-gray-600 active:bg-gray-50'
+                          active ? 'bg-[#5DB347]/10 text-[#5DB347]' : 'text-gray-600 active:bg-gray-50'
                         }`}
                       >
                         <Icon className="w-5 h-5" />
@@ -374,7 +374,7 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
                         onClick={() => setLocale(loc)}
                         className={`flex items-center gap-2 text-xs py-2 px-2.5 rounded-lg font-medium transition-colors ${
                           locale === loc
-                            ? 'bg-teal text-white'
+                            ? 'bg-[#5DB347] text-white'
                             : 'text-gray-500 active:bg-gray-100'
                         }`}
                       >
@@ -417,12 +417,12 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
                 key={link.href}
                 href={link.href}
                 className={`flex flex-col items-center justify-center gap-0.5 px-2 py-1.5 rounded-xl min-w-[56px] min-h-[48px] transition-colors active:bg-gray-50 ${
-                  active ? 'text-teal' : 'text-gray-400'
+                  active ? 'text-[#5DB347]' : 'text-gray-400'
                 }`}
               >
                 <div className="relative">
                   {active && (
-                    <span className="absolute -top-1 left-1/2 -translate-x-1/2 w-5 h-0.5 bg-teal rounded-full" />
+                    <span className="absolute -top-1 left-1/2 -translate-x-1/2 w-5 h-0.5 bg-[#5DB347] rounded-full" />
                   )}
                   <Icon className={`w-5 h-5 ${active ? 'stroke-[2.5]' : ''}`} />
                 </div>

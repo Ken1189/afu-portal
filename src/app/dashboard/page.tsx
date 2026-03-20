@@ -224,7 +224,7 @@ const activityTypeColors: Record<string, string> = {
   document: 'bg-amber-500',
   training: 'bg-purple-500',
   login: 'bg-gray-400',
-  profile: 'bg-teal',
+  profile: 'bg-[#5DB347]',
   contract: 'bg-indigo-500',
 };
 
@@ -418,7 +418,7 @@ export default function DashboardPage() {
         under_review: { label: 'Under Review', color: 'bg-amber-100 text-amber-700' },
         approved: { label: 'Approved', color: 'bg-green-100 text-green-700' },
         disbursed: { label: 'Active', color: 'bg-green-100 text-green-700' },
-        repaying: { label: 'Repaying', color: 'bg-teal/10 text-teal' },
+        repaying: { label: 'Repaying', color: 'bg-[#5DB347]/10 text-[#5DB347]' },
         completed: { label: 'Completed', color: 'bg-gray-100 text-gray-600' },
         rejected: { label: 'Rejected', color: 'bg-red-100 text-red-700' },
         defaulted: { label: 'Defaulted', color: 'bg-red-100 text-red-700' },
@@ -465,7 +465,7 @@ export default function DashboardPage() {
 
   // Quick actions
   const quickActions = [
-    { label: 'Apply for Finance', href: '/dashboard/financing/apply', icon: Wallet, color: 'bg-teal/10 text-teal' },
+    { label: 'Apply for Finance', href: '/dashboard/financing/apply', icon: Wallet, color: 'bg-[#5DB347]/10 text-[#5DB347]' },
     { label: 'Browse Inputs', href: '/dashboard/inputs', icon: ShoppingCart, color: 'bg-blue-50 text-blue-600' },
     { label: 'Start a Course', href: '/dashboard/training', icon: BookOpen, color: 'bg-purple-50 text-purple-600' },
     { label: 'Upload Document', href: '/dashboard/documents', icon: Upload, color: 'bg-amber-50 text-amber-600' },
@@ -525,7 +525,7 @@ export default function DashboardPage() {
       >
         {/* Decorative circles */}
         <div className="absolute -right-10 -top-10 w-48 h-48 bg-white/5 rounded-full" />
-        <div className="absolute -right-4 -bottom-8 w-32 h-32 bg-teal/10 rounded-full" />
+        <div className="absolute -right-4 -bottom-8 w-32 h-32 bg-[#5DB347]/10 rounded-full" />
 
         <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
@@ -555,13 +555,13 @@ export default function DashboardPage() {
             </div>
             <div className="w-full bg-white/10 rounded-full h-2">
               <div
-                className="bg-gradient-to-r from-teal to-gold h-2 rounded-full transition-all"
+                className="bg-gradient-to-r from-[#5DB347] to-gold h-2 rounded-full transition-all"
                 style={{ width: `${profileCompletion}%` }}
               />
             </div>
             <Link
               href="/dashboard/profile"
-              className="text-xs text-teal-light hover:text-white transition-colors mt-1.5 inline-flex items-center gap-1"
+              className="text-xs text-[#EBF7E5] hover:text-white transition-colors mt-1.5 inline-flex items-center gap-1"
             >
               Complete your profile <ChevronRight className="w-3 h-3" />
             </Link>
@@ -581,11 +581,11 @@ export default function DashboardPage() {
         {/* Active Loans */}
         <motion.div
           variants={staggerItem}
-          className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm hover:shadow-md hover:border-teal/20 transition-all card-polished stat-card"
+          className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm hover:shadow-md hover:border-[#5DB347]/20 transition-all card-polished stat-card"
         >
           <div className="flex items-center justify-between mb-3">
-            <div className="w-10 h-10 bg-teal/10 rounded-lg flex items-center justify-center">
-              <FileCheck className="w-5 h-5 text-teal" />
+            <div className="w-10 h-10 bg-[#5DB347]/10 rounded-lg flex items-center justify-center">
+              <FileCheck className="w-5 h-5 text-[#5DB347]" />
             </div>
             <span className="inline-flex items-center gap-1 text-xs font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
               <TrendingUp className="w-3 h-3" /> +12%
@@ -598,7 +598,7 @@ export default function DashboardPage() {
         {/* Total Deployed */}
         <motion.div
           variants={staggerItem}
-          className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm hover:shadow-md hover:border-teal/20 transition-all card-polished stat-card"
+          className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm hover:shadow-md hover:border-[#5DB347]/20 transition-all card-polished stat-card"
         >
           <div className="flex items-center justify-between mb-3">
             <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
@@ -615,7 +615,7 @@ export default function DashboardPage() {
         {/* Training Rate */}
         <motion.div
           variants={staggerItem}
-          className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm hover:shadow-md hover:border-teal/20 transition-all card-polished stat-card"
+          className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm hover:shadow-md hover:border-[#5DB347]/20 transition-all card-polished stat-card"
         >
           <div className="flex items-center justify-between mb-3">
             <div className="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center">
@@ -640,7 +640,7 @@ export default function DashboardPage() {
         {/* Next Payment */}
         <motion.div
           variants={staggerItem}
-          className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm hover:shadow-md hover:border-teal/20 transition-all card-polished stat-card"
+          className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm hover:shadow-md hover:border-[#5DB347]/20 transition-all card-polished stat-card"
         >
           <div className="flex items-center justify-between mb-3">
             <div className="w-10 h-10 bg-amber-50 rounded-lg flex items-center justify-center">
@@ -657,7 +657,7 @@ export default function DashboardPage() {
         {/* Default Rate */}
         <motion.div
           variants={staggerItem}
-          className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm hover:shadow-md hover:border-teal/20 transition-all card-polished stat-card"
+          className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm hover:shadow-md hover:border-[#5DB347]/20 transition-all card-polished stat-card"
         >
           <div className="flex items-center justify-between mb-3">
             <div className="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center">
@@ -793,7 +793,7 @@ export default function DashboardPage() {
               </div>
               <Link
                 href="/dashboard/financing/apply"
-                className="text-sm font-medium text-teal hover:text-teal-dark transition-colors inline-flex items-center gap-1"
+                className="text-sm font-medium text-[#5DB347] hover:text-[#449933] transition-colors inline-flex items-center gap-1"
               >
                 <Sparkles className="w-4 h-4" /> New Application
               </Link>
@@ -805,8 +805,8 @@ export default function DashboardPage() {
                   className="px-5 py-4 flex items-center justify-between hover:bg-cream/50 transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 bg-teal/10 rounded-lg flex items-center justify-center">
-                      <FileText className="w-4 h-4 text-teal" />
+                    <div className="w-9 h-9 bg-[#5DB347]/10 rounded-lg flex items-center justify-center">
+                      <FileText className="w-4 h-4 text-[#5DB347]" />
                     </div>
                     <div>
                       <p className="text-sm font-medium text-navy">{app.type}</p>
@@ -827,7 +827,7 @@ export default function DashboardPage() {
             <div className="px-5 py-3 border-t border-gray-100">
               <Link
                 href="/dashboard/financing"
-                className="text-sm font-medium text-teal hover:text-teal-dark transition-colors inline-flex items-center gap-1"
+                className="text-sm font-medium text-[#5DB347] hover:text-[#449933] transition-colors inline-flex items-center gap-1"
               >
                 View all applications <ChevronRight className="w-4 h-4" />
               </Link>
@@ -944,7 +944,7 @@ export default function DashboardPage() {
         >
           <div className="p-5 border-b border-gray-100 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Activity className="w-5 h-5 text-teal" />
+              <Activity className="w-5 h-5 text-[#5DB347]" />
               <h3 className="text-base font-semibold text-navy">Recent Activity</h3>
             </div>
             <span className="text-xs text-gray-400">Last 7 days</span>
@@ -975,7 +975,7 @@ export default function DashboardPage() {
             })}
           </div>
           <div className="px-5 py-3 border-t border-gray-100 text-center">
-            <button className="text-sm font-medium text-teal hover:text-teal-dark transition-colors inline-flex items-center gap-1">
+            <button className="text-sm font-medium text-[#5DB347] hover:text-[#449933] transition-colors inline-flex items-center gap-1">
               View all activity <ChevronRight className="w-4 h-4" />
             </button>
           </div>
@@ -990,7 +990,7 @@ export default function DashboardPage() {
           className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 card-polished"
         >
           <div className="flex items-center gap-2 mb-5">
-            <Sparkles className="w-5 h-5 text-teal" />
+            <Sparkles className="w-5 h-5 text-[#5DB347]" />
             <h3 className="text-base font-semibold text-navy">Quick Actions</h3>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -1000,14 +1000,14 @@ export default function DashboardPage() {
                 <Link
                   key={action.label}
                   href={action.href}
-                  className="group flex flex-col items-center gap-2.5 p-4 rounded-xl border border-gray-100 hover:border-teal/20 hover:shadow-md transition-all text-center card-polished"
+                  className="group flex flex-col items-center gap-2.5 p-4 rounded-xl border border-gray-100 hover:border-[#5DB347]/20 hover:shadow-md transition-all text-center card-polished"
                 >
                   <div
                     className={`w-11 h-11 rounded-xl flex items-center justify-center ${action.color} group-hover:scale-110 transition-transform`}
                   >
                     <ActionIcon className="w-5 h-5" />
                   </div>
-                  <span className="text-xs font-medium text-navy group-hover:text-teal transition-colors leading-tight">
+                  <span className="text-xs font-medium text-navy group-hover:text-[#5DB347] transition-colors leading-tight">
                     {action.label}
                   </span>
                 </Link>
@@ -1034,7 +1034,7 @@ export default function DashboardPage() {
           </div>
           <Link
             href="/dashboard/training"
-            className="text-sm font-medium text-teal hover:text-teal-dark transition-colors inline-flex items-center gap-1"
+            className="text-sm font-medium text-[#5DB347] hover:text-[#449933] transition-colors inline-flex items-center gap-1"
           >
             All courses <ChevronRight className="w-4 h-4" />
           </Link>
@@ -1045,7 +1045,7 @@ export default function DashboardPage() {
             return (
               <div
                 key={course.title}
-                className="rounded-xl border border-gray-100 p-4 hover:border-teal/20 hover:shadow-sm transition-all card-polished"
+                className="rounded-xl border border-gray-100 p-4 hover:border-[#5DB347]/20 hover:shadow-sm transition-all card-polished"
               >
                 <span className="inline-block text-[10px] font-semibold uppercase tracking-wider text-gray-400 bg-gray-50 px-2 py-0.5 rounded mb-2">
                   {course.category}
@@ -1059,7 +1059,7 @@ export default function DashboardPage() {
                 </div>
                 <div className="w-full bg-gray-100 rounded-full h-2">
                   <div
-                    className="bg-gradient-to-r from-purple-500 to-teal h-2 rounded-full transition-all"
+                    className="bg-gradient-to-r from-purple-500 to-[#5DB347] h-2 rounded-full transition-all"
                     style={{ width: `${pct}%` }}
                   />
                 </div>

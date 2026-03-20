@@ -233,7 +233,7 @@ const ACTIVITY_COLORS: Record<ActivityType, string> = {
   spraying: 'bg-orange-100 text-orange-700',
   weeding: 'bg-yellow-100 text-yellow-700',
   harvesting: 'bg-amber-100 text-amber-700',
-  scouting: 'bg-teal-light text-teal-dark',
+  scouting: 'bg-[#EBF7E5] text-[#449933]',
   'soil-test': 'bg-rose-100 text-rose-700',
   pruning: 'bg-lime-100 text-lime-700',
   other: 'bg-gray-100 text-gray-700',
@@ -387,7 +387,7 @@ function GrowthTimeline({ currentStage }: { currentStage: CropStage }) {
         {/* Track line */}
         <div className="absolute top-3 left-0 right-0 h-0.5 bg-gray-200 rounded-full" />
         <div
-          className="absolute top-3 left-0 h-0.5 bg-teal rounded-full transition-all duration-500"
+          className="absolute top-3 left-0 h-0.5 bg-[#5DB347] rounded-full transition-all duration-500"
           style={{ width: `${(currentIndex / (ALL_STAGES.length - 1)) * 100}%` }}
         />
 
@@ -402,14 +402,14 @@ function GrowthTimeline({ currentStage }: { currentStage: CropStage }) {
               <div key={stage} className="flex flex-col items-center" style={{ width: '12.5%' }}>
                 <div className="relative">
                   {isCurrent && (
-                    <span className="absolute inset-0 -m-1 rounded-full bg-teal/30 animate-ping" />
+                    <span className="absolute inset-0 -m-1 rounded-full bg-[#5DB347]/30 animate-ping" />
                   )}
                   <div
                     className={`w-6 h-6 rounded-full border-2 flex items-center justify-center z-10 relative ${
                       isCurrent
-                        ? 'bg-teal border-teal text-white'
+                        ? 'bg-[#5DB347] border-[#5DB347] text-white'
                         : isPast
-                          ? 'bg-teal border-teal text-white'
+                          ? 'bg-[#5DB347] border-[#5DB347] text-white'
                           : 'bg-white border-gray-300 text-gray-400'
                     }`}
                   >
@@ -423,9 +423,9 @@ function GrowthTimeline({ currentStage }: { currentStage: CropStage }) {
                 <span
                   className={`mt-1.5 text-[10px] font-medium leading-tight text-center ${
                     isCurrent
-                      ? 'text-teal font-bold'
+                      ? 'text-[#5DB347] font-bold'
                       : isPast
-                        ? 'text-teal-dark'
+                        ? 'text-[#449933]'
                         : 'text-gray-400'
                   }`}
                 >
@@ -573,20 +573,20 @@ function LogActivityModal({
                         onClick={() => setSelectedType(type)}
                         className={`flex flex-col items-center gap-1 p-2.5 rounded-xl border transition-all min-h-[64px] ${
                           isSelected
-                            ? 'border-teal bg-teal/10 ring-1 ring-teal/30'
+                            ? 'border-[#5DB347] bg-[#5DB347]/10 ring-1 ring-[#5DB347]/30'
                             : 'border-gray-200 bg-white active:bg-gray-50'
                         }`}
                       >
                         <div
                           className={`w-7 h-7 rounded-lg flex items-center justify-center ${
-                            isSelected ? 'bg-teal text-white' : ACTIVITY_COLORS[type]
+                            isSelected ? 'bg-[#5DB347] text-white' : ACTIVITY_COLORS[type]
                           }`}
                         >
                           <Icon className="w-3.5 h-3.5" />
                         </div>
                         <span
                           className={`text-[10px] font-medium leading-tight text-center ${
-                            isSelected ? 'text-teal-dark' : 'text-gray-600'
+                            isSelected ? 'text-[#449933]' : 'text-gray-600'
                           }`}
                         >
                           {ACTIVITY_LABELS[type]}
@@ -605,7 +605,7 @@ function LogActivityModal({
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="What happened? Add any details..."
                   rows={3}
-                  className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-navy placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-teal/40 focus:border-teal resize-none"
+                  className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-navy placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#5DB347]/40 focus:border-[#5DB347] resize-none"
                 />
               </div>
 
@@ -617,7 +617,7 @@ function LogActivityModal({
                   saved
                     ? 'bg-green-500 text-white'
                     : selectedType
-                      ? 'bg-teal text-white active:bg-teal-dark'
+                      ? 'bg-[#5DB347] text-white active:bg-[#449933]'
                       : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                 }`}
               >
@@ -710,7 +710,7 @@ function AddPlotModal({ open, onClose }: { open: boolean; onClose: () => void })
                   value={plotName}
                   onChange={(e) => setPlotName(e.target.value)}
                   placeholder="e.g. North Tomato Field"
-                  className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-navy placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-teal/40 focus:border-teal"
+                  className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-navy placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#5DB347]/40 focus:border-[#5DB347]"
                 />
               </div>
 
@@ -722,7 +722,7 @@ function AddPlotModal({ open, onClose }: { open: boolean; onClose: () => void })
                   value={crop}
                   onChange={(e) => setCrop(e.target.value)}
                   placeholder="e.g. Tomatoes"
-                  className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-navy placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-teal/40 focus:border-teal"
+                  className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-navy placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#5DB347]/40 focus:border-[#5DB347]"
                 />
               </div>
 
@@ -734,7 +734,7 @@ function AddPlotModal({ open, onClose }: { open: boolean; onClose: () => void })
                   value={variety}
                   onChange={(e) => setVariety(e.target.value)}
                   placeholder="e.g. Roma VF"
-                  className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-navy placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-teal/40 focus:border-teal"
+                  className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-navy placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#5DB347]/40 focus:border-[#5DB347]"
                 />
               </div>
 
@@ -749,7 +749,7 @@ function AddPlotModal({ open, onClose }: { open: boolean; onClose: () => void })
                     placeholder="0.5"
                     step="0.1"
                     min="0"
-                    className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-navy placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-teal/40 focus:border-teal"
+                    className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-navy placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#5DB347]/40 focus:border-[#5DB347]"
                   />
                 </div>
                 <div>
@@ -760,7 +760,7 @@ function AddPlotModal({ open, onClose }: { open: boolean; onClose: () => void })
                     type="date"
                     value={plantingDate}
                     onChange={(e) => setPlantingDate(e.target.value)}
-                    className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-navy placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-teal/40 focus:border-teal"
+                    className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-navy placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#5DB347]/40 focus:border-[#5DB347]"
                   />
                 </div>
               </div>
@@ -773,7 +773,7 @@ function AddPlotModal({ open, onClose }: { open: boolean; onClose: () => void })
                   saved
                     ? 'bg-green-500 text-white'
                     : isValid
-                      ? 'bg-teal text-white active:bg-teal-dark'
+                      ? 'bg-[#5DB347] text-white active:bg-[#449933]'
                       : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                 }`}
               >
@@ -943,7 +943,7 @@ function PlotCard({ plot }: { plot: FarmPlot }) {
                 <div className="grid grid-cols-3 gap-2">
                   <button
                     onClick={() => setLogModalOpen(true)}
-                    className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl bg-teal/10 text-teal active:bg-teal/20 transition-colors min-h-[64px]"
+                    className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl bg-[#5DB347]/10 text-[#5DB347] active:bg-[#5DB347]/20 transition-colors min-h-[64px]"
                   >
                     <ClipboardPlus className="w-5 h-5" />
                     <span className="text-[11px] font-semibold">{t.cropTracker.logActivity}</span>
@@ -1007,7 +1007,7 @@ export default function CropsPage() {
         initial="rest"
         whileHover="hover"
         whileTap="tap"
-        className="fixed bottom-28 right-4 z-30 w-14 h-14 rounded-full bg-teal text-white shadow-lg shadow-teal/30 flex items-center justify-center max-w-lg"
+        className="fixed bottom-28 right-4 z-30 w-14 h-14 rounded-full bg-[#5DB347] text-white shadow-lg shadow-[#5DB347]/30 flex items-center justify-center max-w-lg"
         aria-label="Add new plot"
       >
         <Plus className="w-6 h-6" />

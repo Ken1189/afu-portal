@@ -127,7 +127,7 @@ function Toggle({
       className={`
         relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full
         transition-colors duration-200 ease-in-out focus:outline-none
-        ${enabled ? 'bg-teal' : 'bg-gray-200'}
+        ${enabled ? 'bg-[#5DB347]' : 'bg-gray-200'}
       `}
     >
       <span
@@ -221,7 +221,7 @@ function Selector({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className="text-sm bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-navy
-                   focus:outline-none focus:ring-2 focus:ring-teal/30 focus:border-teal
+                   focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347]
                    cursor-pointer min-w-[180px]"
       >
         {options.map((opt) => (
@@ -242,7 +242,7 @@ const tierData = [
     id: 'smallholder' as const,
     name: 'Smallholder',
     price: '$150/yr',
-    gradient: 'from-emerald-500 to-teal',
+    gradient: 'from-emerald-500 to-[#5DB347]',
     features: {
       contracts: 'Up to 3 offtake contracts',
       financing: '$5,000 financing limit',
@@ -254,7 +254,7 @@ const tierData = [
     id: 'commercial' as const,
     name: 'Commercial',
     price: '$500/yr',
-    gradient: 'from-teal to-cyan-600',
+    gradient: 'from-[#5DB347] to-cyan-600',
     features: {
       contracts: 'Up to 10 offtake contracts',
       financing: '$50,000 financing limit',
@@ -399,7 +399,7 @@ export default function SettingsPage() {
               {/* Email Notifications */}
               <SectionCard>
                 <div className="flex items-center gap-2 mb-4">
-                  <Bell size={18} className="text-teal" />
+                  <Bell size={18} className="text-[#5DB347]" />
                   <h3 className="font-semibold text-navy">
                     Email Notifications
                   </h3>
@@ -437,7 +437,7 @@ export default function SettingsPage() {
               {/* SMS / WhatsApp Notifications */}
               <SectionCard>
                 <div className="flex items-center gap-2 mb-4">
-                  <MessageSquare size={18} className="text-teal" />
+                  <MessageSquare size={18} className="text-[#5DB347]" />
                   <h3 className="font-semibold text-navy">
                     SMS / WhatsApp Notifications
                   </h3>
@@ -468,7 +468,7 @@ export default function SettingsPage() {
               {/* Push Notifications */}
               <SectionCard>
                 <div className="flex items-center gap-2 mb-4">
-                  <Smartphone size={18} className="text-teal" />
+                  <Smartphone size={18} className="text-[#5DB347]" />
                   <h3 className="font-semibold text-navy">
                     Push Notifications
                   </h3>
@@ -593,7 +593,7 @@ export default function SettingsPage() {
                           transition-all duration-200 flex-1 justify-center
                           ${
                             isSelected
-                              ? 'bg-teal/10 border-teal text-teal'
+                              ? 'bg-[#5DB347]/10 border-[#5DB347] text-[#5DB347]'
                               : 'bg-white border-gray-200 text-gray-500 hover:border-gray-300'
                           }
                         `}
@@ -629,7 +629,7 @@ export default function SettingsPage() {
                           transition-all duration-200
                           ${
                             isSelected
-                              ? 'bg-teal/10 border-teal text-teal'
+                              ? 'bg-[#5DB347]/10 border-[#5DB347] text-[#5DB347]'
                               : 'bg-white border-gray-200 text-gray-500 hover:border-gray-300'
                           }
                         `}
@@ -662,7 +662,7 @@ export default function SettingsPage() {
                   relative overflow-hidden rounded-xl p-6
                   bg-gradient-to-r ${
                     tierData.find((t) => t.id === currentTier)?.gradient ??
-                    'from-teal to-cyan-600'
+                    'from-[#5DB347] to-cyan-600'
                   }
                 `}
               >
@@ -715,13 +715,13 @@ export default function SettingsPage() {
                           transition-all duration-200
                           ${
                             isCurrent
-                              ? 'border-teal bg-teal/5 ring-1 ring-teal/20'
+                              ? 'border-[#5DB347] bg-[#5DB347]/5 ring-1 ring-[#5DB347]/20'
                               : 'border-gray-100 bg-white hover:border-gray-200 hover:shadow-sm'
                           }
                         `}
                       >
                         {isCurrent && (
-                          <span className="absolute -top-2.5 left-4 bg-teal text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full">
+                          <span className="absolute -top-2.5 left-4 bg-[#5DB347] text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full">
                             Current Plan
                           </span>
                         )}
@@ -748,7 +748,7 @@ export default function SettingsPage() {
                                   size={14}
                                   className={`mt-0.5 shrink-0 ${
                                     isCurrent
-                                      ? 'text-teal'
+                                      ? 'text-[#5DB347]'
                                       : 'text-gray-400'
                                   }`}
                                 />
@@ -761,7 +761,7 @@ export default function SettingsPage() {
                         </div>
                         <div className="mt-5">
                           {isCurrent ? (
-                            <div className="w-full text-center py-2 rounded-lg bg-teal/10 text-teal text-sm font-semibold">
+                            <div className="w-full text-center py-2 rounded-lg bg-[#5DB347]/10 text-[#5DB347] text-sm font-semibold">
                               Active
                             </div>
                           ) : (
@@ -794,7 +794,7 @@ export default function SettingsPage() {
               {/* Data Export */}
               <SectionCard>
                 <div className="flex items-center gap-2 mb-2">
-                  <Download size={18} className="text-teal" />
+                  <Download size={18} className="text-[#5DB347]" />
                   <h3 className="font-semibold text-navy">Data Export</h3>
                 </div>
                 <p className="text-gray-500 text-sm mb-4">
@@ -802,7 +802,7 @@ export default function SettingsPage() {
                   including profile information, transaction history, and
                   activity logs.
                 </p>
-                <button className="inline-flex items-center gap-2 bg-teal hover:bg-teal-dark text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition-colors">
+                <button className="inline-flex items-center gap-2 bg-[#5DB347] hover:bg-[#449933] text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition-colors">
                   <Download size={16} />
                   Export All My Data
                 </button>

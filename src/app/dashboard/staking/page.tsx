@@ -151,7 +151,7 @@ export default function StakingPage() {
                 {tier.cleReward && (
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-gray-500">CLE Reward</span>
-                    <span className="text-sm font-bold text-teal">{tier.cleReward}</span>
+                    <span className="text-sm font-bold text-[#5DB347]">{tier.cleReward}</span>
                   </div>
                 )}
                 <div className="flex items-center justify-between">

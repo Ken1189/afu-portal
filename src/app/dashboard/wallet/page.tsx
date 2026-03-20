@@ -162,14 +162,14 @@ export default function WalletPage() {
           <motion.div variants={stagger} className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
               { label: 'Buy EDM', icon: <Zap className="w-5 h-5" />, href: BUY_EDM_URL, color: 'bg-[#FF4500]/10 text-[#FF4500]', external: true },
-              { label: 'Stake EDM', icon: <Coins className="w-5 h-5" />, href: '/dashboard/staking', color: 'bg-teal/10 text-teal', external: false },
+              { label: 'Stake EDM', icon: <Coins className="w-5 h-5" />, href: '/dashboard/staking', color: 'bg-[#5DB347]/10 text-[#5DB347]', external: false },
               { label: 'Send EDM', icon: <ArrowUpRight className="w-5 h-5" />, href: '#', color: 'bg-blue-50 text-blue-600', external: false },
               { label: 'Receive', icon: <ArrowDownLeft className="w-5 h-5" />, href: '#', color: 'bg-green-50 text-green-600', external: false },
             ].map((action, i) => (
               <motion.div key={i} variants={card}>
                 {action.external ? (
                   <a href={action.href} target="_blank" rel="noopener noreferrer"
-                    className="block bg-white rounded-xl p-5 border border-gray-100 hover:shadow-md hover:border-teal/20 transition-all text-center">
+                    className="block bg-white rounded-xl p-5 border border-gray-100 hover:shadow-md hover:border-[#5DB347]/20 transition-all text-center">
                     <div className={`w-12 h-12 ${action.color} rounded-xl flex items-center justify-center mx-auto mb-3`}>
                       {action.icon}
                     </div>
@@ -177,7 +177,7 @@ export default function WalletPage() {
                   </a>
                 ) : (
                   <Link href={action.href}
-                    className="block bg-white rounded-xl p-5 border border-gray-100 hover:shadow-md hover:border-teal/20 transition-all text-center">
+                    className="block bg-white rounded-xl p-5 border border-gray-100 hover:shadow-md hover:border-[#5DB347]/20 transition-all text-center">
                     <div className={`w-12 h-12 ${action.color} rounded-xl flex items-center justify-center mx-auto mb-3`}>
                       {action.icon}
                     </div>
@@ -206,8 +206,8 @@ export default function WalletPage() {
 
             <motion.div variants={card} className="bg-white rounded-xl p-5 border border-gray-100">
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 bg-teal/10 rounded-xl flex items-center justify-center">
-                  <Coins className="w-5 h-5 text-teal" />
+                <div className="w-10 h-10 bg-[#5DB347]/10 rounded-xl flex items-center justify-center">
+                  <Coins className="w-5 h-5 text-[#5DB347]" />
                 </div>
                 <div>
                   <p className="font-semibold text-navy text-sm">Staking Reward</p>
@@ -229,7 +229,7 @@ export default function WalletPage() {
                 </div>
               </div>
               <p className="text-sm text-gray-600">Real-world assets verified before tokenization</p>
-              <a href="https://edma.app" target="_blank" rel="noopener noreferrer" className="text-xs text-teal hover:underline mt-2 inline-flex items-center gap-1">
+              <a href="https://edma.app" target="_blank" rel="noopener noreferrer" className="text-xs text-[#5DB347] hover:underline mt-2 inline-flex items-center gap-1">
                 Learn more <ExternalLink className="w-3 h-3" />
               </a>
             </motion.div>

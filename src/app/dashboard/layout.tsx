@@ -204,13 +204,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             {isAdmin && (
               <Link
                 href="/admin"
-                className="text-xs font-medium text-teal bg-teal/10 px-3 py-1.5 rounded-lg hover:bg-teal/20 transition-colors hidden sm:inline-block"
+                className="text-xs font-medium text-[#5DB347] bg-[#5DB347]/10 px-3 py-1.5 rounded-lg hover:bg-[#5DB347]/20 transition-colors hidden sm:inline-block"
               >
                 Admin Panel
               </Link>
             )}
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-teal rounded-full flex items-center justify-center">
+              <div className="w-8 h-8 bg-[#5DB347] rounded-full flex items-center justify-center">
                 <span className="text-white text-sm font-bold">{initials}</span>
               </div>
               <span className="text-sm font-medium text-navy hidden sm:inline">{displayName}</span>

@@ -338,7 +338,7 @@ function getActivityIcon(type: ActivityType, size = 16) {
     case 'soil-test':
       return <CircleDot size={size} className={`${cls} text-orange-400`} />;
     case 'pruning':
-      return <Scissors size={size} className={`${cls} text-teal`} />;
+      return <Scissors size={size} className={`${cls} text-[#5DB347]`} />;
     default:
       return <Leaf size={size} className={`${cls} text-gray-400`} />;
   }
@@ -361,7 +361,7 @@ const stageBadgeColor: Record<string, string> = {
   vegetative: 'bg-green-50 text-green-700',
   flowering: 'bg-purple-50 text-purple-600',
   fruiting: 'bg-amber-50 text-amber-700',
-  harvesting: 'bg-teal-light text-teal-dark',
+  harvesting: 'bg-[#EBF7E5] text-[#449933]',
   completed: 'bg-gray-100 text-gray-500',
 };
 
@@ -459,13 +459,13 @@ export default function FarmDashboardPage() {
                 }
                 className={`shrink-0 snap-start flex flex-col items-center gap-1 px-3 py-2.5 rounded-2xl min-w-[68px] transition-all min-h-[44px] ${
                   isToday
-                    ? 'bg-teal/10 border-2 border-teal'
+                    ? 'bg-[#5DB347]/10 border-2 border-[#5DB347]'
                     : 'bg-white border border-gray-100'
                 }`}
               >
                 <span
                   className={`text-[11px] font-semibold ${
-                    isToday ? 'text-teal' : 'text-gray-500'
+                    isToday ? 'text-[#5DB347]' : 'text-gray-500'
                   }`}
                 >
                   {day.day}
@@ -500,10 +500,10 @@ export default function FarmDashboardPage() {
               transition={{ type: 'spring' as const, stiffness: 300, damping: 28 }}
               className="mx-4 overflow-hidden"
             >
-              <div className="mt-2 rounded-xl bg-teal/5 border border-teal/20 p-3 flex items-start gap-2">
-                <Sparkles size={14} className="text-teal shrink-0 mt-0.5" />
+              <div className="mt-2 rounded-xl bg-[#5DB347]/5 border border-[#5DB347]/20 p-3 flex items-start gap-2">
+                <Sparkles size={14} className="text-[#5DB347] shrink-0 mt-0.5" />
                 <div className="flex-1">
-                  <p className="text-xs font-semibold text-teal mb-0.5">
+                  <p className="text-xs font-semibold text-[#5DB347] mb-0.5">
                     {weatherForecast[selectedWeatherDay].day} &mdash; Advice
                   </p>
                   <p className="text-xs text-gray-600 leading-relaxed">
@@ -512,7 +512,7 @@ export default function FarmDashboardPage() {
                 </div>
                 <button
                   onClick={() => setSelectedWeatherDay(null)}
-                  className="shrink-0 w-8 h-8 flex items-center justify-center rounded-full active:bg-teal/10 transition-colors"
+                  className="shrink-0 w-8 h-8 flex items-center justify-center rounded-full active:bg-[#5DB347]/10 transition-colors"
                 >
                   <X size={14} className="text-gray-400" />
                 </button>
@@ -530,7 +530,7 @@ export default function FarmDashboardPage() {
           <h3 className="text-sm font-bold text-navy">{t.dashboard.myPlots}</h3>
           <Link
             href="/farm/crops"
-            className="text-xs text-teal font-medium flex items-center gap-0.5"
+            className="text-xs text-[#5DB347] font-medium flex items-center gap-0.5"
           >
             {t.common.viewAll} <ChevronRight size={14} />
           </Link>
@@ -597,14 +597,14 @@ export default function FarmDashboardPage() {
                   </div>
                   <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
                     <div
-                      className="h-full rounded-full bg-teal transition-all"
+                      className="h-full rounded-full bg-[#5DB347] transition-all"
                       style={{ width: `${plot.progressPercent}%` }}
                     />
                   </div>
                 </div>
 
                 <p className="text-[11px] text-gray-500 mt-2 flex items-center gap-1">
-                  <Leaf size={11} className="text-teal" />
+                  <Leaf size={11} className="text-[#5DB347]" />
                   {plot.daysToHarvest} {t.dashboard.daysToHarvest}
                 </p>
               </div>
@@ -644,8 +644,8 @@ export default function FarmDashboardPage() {
                 >
                   <span className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${
                     task.completed
-                      ? 'bg-teal border-teal'
-                      : 'border-gray-200 active:border-teal'
+                      ? 'bg-[#5DB347] border-[#5DB347]'
+                      : 'border-gray-200 active:border-[#5DB347]'
                   }`}>
                     {task.completed && <Check size={14} className="text-white" />}
                   </span>
@@ -683,7 +683,7 @@ export default function FarmDashboardPage() {
           {/* Add task button */}
           <Link
             href="/farm/journal"
-            className="flex items-center justify-center gap-2 p-3 text-sm text-teal font-medium active:bg-teal/5 transition-colors min-h-[44px]"
+            className="flex items-center justify-center gap-2 p-3 text-sm text-[#5DB347] font-medium active:bg-[#5DB347]/5 transition-colors min-h-[44px]"
           >
             <Plus size={16} />
             {t.dashboard.addTask}
@@ -735,12 +735,12 @@ export default function FarmDashboardPage() {
             className="rounded-2xl bg-white border border-gray-100 p-3"
           >
             <div className="flex items-center gap-2 mb-1">
-              <div className="w-7 h-7 rounded-lg bg-teal-light flex items-center justify-center">
-                <TrendingUp size={14} className="text-teal" />
+              <div className="w-7 h-7 rounded-lg bg-[#EBF7E5] flex items-center justify-center">
+                <TrendingUp size={14} className="text-[#5DB347]" />
               </div>
               <span className="text-[11px] text-gray-400 truncate">{t.dashboard.profit}</span>
             </div>
-            <p className="text-lg font-bold text-teal">
+            <p className="text-lg font-bold text-[#5DB347]">
               ${summary.profit.toLocaleString()}
             </p>
           </motion.div>
@@ -772,7 +772,7 @@ export default function FarmDashboardPage() {
           <h3 className="text-sm font-bold text-navy">{t.dashboard.recentActivity}</h3>
           <Link
             href="/farm/journal"
-            className="text-xs text-teal font-medium flex items-center gap-0.5"
+            className="text-xs text-[#5DB347] font-medium flex items-center gap-0.5"
           >
             {t.common.viewAll} <ChevronRight size={14} />
           </Link>
@@ -809,7 +809,7 @@ export default function FarmDashboardPage() {
       {/* 7. AI TIP OF THE DAY                                              */}
       {/* ================================================================= */}
       <motion.section variants={itemVariants} className="px-4 pb-2">
-        <div className="rounded-2xl bg-gradient-to-br from-teal to-teal-dark p-4 text-white relative overflow-hidden">
+        <div className="rounded-2xl bg-gradient-to-br from-[#5DB347] to-[#449933] p-4 text-white relative overflow-hidden">
           {/* Decorative */}
           <div className="absolute -top-6 -right-6 w-24 h-24 bg-white/10 rounded-full" />
           <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-white/5 rounded-full" />

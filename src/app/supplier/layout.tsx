@@ -67,7 +67,7 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
       {/* ─── Desktop Sidebar (hidden on mobile) ─── */}
       <aside className="hidden lg:flex w-64 bg-[#1A7A72] flex-col text-white fixed top-0 left-0 bottom-0 z-30">
         {/* Sidebar Header */}
-        <div className="bg-gradient-to-br from-[#1A7A72] to-teal p-5">
+        <div className="bg-gradient-to-br from-[#1A7A72] to-[#5DB347] p-5">
           <Link href="/supplier" className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">{initials}</span>
@@ -181,7 +181,7 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
                 className="fixed top-0 left-0 bottom-0 z-50 w-[85vw] max-w-72 bg-[#1A7A72] shadow-2xl flex flex-col text-white"
               >
                 {/* Drawer Header */}
-                <div className="bg-gradient-to-br from-[#1A7A72] to-teal p-5">
+                <div className="bg-gradient-to-br from-[#1A7A72] to-[#5DB347] p-5">
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-sm font-medium opacity-80">Supplier Portal</span>
                     <button

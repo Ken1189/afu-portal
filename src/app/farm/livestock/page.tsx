@@ -878,7 +878,7 @@ export default function LivestockPage() {
               label: 'Total Animals',
               value: summary.totalAnimals.toString(),
               icon: <Beef size={20} className="text-[#2AA198]" />,
-              accent: 'bg-teal-light',
+              accent: 'bg-[#EBF7E5]',
             },
             {
               label: 'Herd Value',
@@ -1071,7 +1071,7 @@ export default function LivestockPage() {
                             }}
                             className={`w-full text-left text-sm px-4 py-2.5 hover:bg-gray-50 transition-colors ${
                               sortKey === opt.key
-                                ? 'text-[#2AA198] font-semibold bg-teal-light/50'
+                                ? 'text-[#2AA198] font-semibold bg-[#EBF7E5]/50'
                                 : 'text-gray-600'
                             }`}
                           >

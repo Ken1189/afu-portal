@@ -99,7 +99,7 @@ export default function TechnologyPage() {
       <section className="bg-navy text-white py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
-            <span className="inline-block bg-teal/20 text-teal-light text-sm font-medium px-4 py-1.5 rounded-full mb-6">
+            <span className="inline-block bg-[#5DB347]/20 text-[#EBF7E5] text-sm font-medium px-4 py-1.5 rounded-full mb-6">
               AgTech Solutions
             </span>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
@@ -133,9 +133,9 @@ export default function TechnologyPage() {
               return (
                 <div
                   key={i}
-                  className="bg-cream rounded-2xl p-8 hover:shadow-lg transition-all border border-transparent hover:border-teal/20 group"
+                  className="bg-cream rounded-2xl p-8 hover:shadow-lg transition-all border border-transparent hover:border-[#5DB347]/20 group"
                 >
-                  <div className="w-14 h-14 bg-teal rounded-xl flex items-center justify-center mb-6 group-hover:bg-teal-dark transition-colors">
+                  <div className="w-14 h-14 bg-[#5DB347] rounded-xl flex items-center justify-center mb-6 group-hover:bg-[#449933] transition-colors">
                     <Icon className="w-7 h-7 text-white" />
                   </div>
                   <h3 className="text-xl font-bold text-navy mb-3">
@@ -180,8 +180,8 @@ export default function TechnologyPage() {
                   key={i}
                   className="text-center bg-white/5 rounded-2xl p-8 border border-white/10"
                 >
-                  <div className="w-14 h-14 bg-teal/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Icon className="w-7 h-7 text-teal" />
+                  <div className="w-14 h-14 bg-[#5DB347]/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Icon className="w-7 h-7 text-[#5DB347]" />
                   </div>
                   <div className="text-4xl font-bold text-white mb-2">
                     {stat.value}
@@ -210,7 +210,7 @@ export default function TechnologyPage() {
             {partners.map((partner, i) => (
               <div
                 key={i}
-                className="bg-white rounded-xl p-6 flex items-center justify-center h-20 border border-gray-100 hover:border-teal/30 transition-colors"
+                className="bg-white rounded-xl p-6 flex items-center justify-center h-20 border border-gray-100 hover:border-[#5DB347]/30 transition-colors"
               >
                 <span className="text-navy font-semibold text-sm">
                   {partner}
@@ -224,18 +224,18 @@ export default function TechnologyPage() {
       {/* CTA */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-br from-teal to-teal-dark rounded-2xl p-10 md:p-16 text-center text-white">
+          <div className="bg-gradient-to-br from-[#5DB347] to-[#449933] rounded-2xl p-10 md:p-16 text-center text-white">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
               Ready to Digitise Your Farm?
             </h2>
-            <p className="text-teal-light/80 text-lg mb-8 max-w-2xl mx-auto">
+            <p className="text-[#EBF7E5]/80 text-lg mb-8 max-w-2xl mx-auto">
               Try Mkulima Hub, our all-in-one farmer app. Track crops, access
               the marketplace, get AI diagnostics, and manage your farm from
               your phone.
             </p>
             <Link
               href="/farm"
-              className="inline-flex items-center gap-2 bg-white text-teal hover:bg-cream px-8 py-3.5 rounded-lg font-semibold transition-colors"
+              className="inline-flex items-center gap-2 bg-white text-[#5DB347] hover:bg-cream px-8 py-3.5 rounded-lg font-semibold transition-colors"
             >
               Try Mkulima Hub
               <ArrowRight className="w-5 h-5" />

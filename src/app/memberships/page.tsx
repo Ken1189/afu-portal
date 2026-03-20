@@ -60,8 +60,8 @@ const tiers = [
     price: '$15',
     priceNote: 'per month',
     audience: 'Smallholder farmers under 10 hectares',
-    accent: 'border-teal bg-teal-light',
-    accentBadge: 'bg-teal/10 text-teal',
+    accent: 'border-[#5DB347] bg-[#EBF7E5]',
+    accentBadge: 'bg-[#5DB347]/10 text-[#5DB347]',
     popular: true,
     features: {
       'Crop Tracking': true,
@@ -167,7 +167,7 @@ const faqs = [
 function FeatureCell({ value }: { value: boolean | string }) {
   if (value === true)
     return (
-      <svg className="w-5 h-5 text-teal mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg className="w-5 h-5 text-[#5DB347] mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
       </svg>
     );
@@ -211,7 +211,7 @@ export default function MembershipsPage() {
               >
                 {tier.popular && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <span className="bg-teal text-white text-xs font-bold px-4 py-1 rounded-full">
+                    <span className="bg-[#5DB347] text-white text-xs font-bold px-4 py-1 rounded-full">
                       Most Popular
                     </span>
                   </div>
@@ -244,7 +244,7 @@ export default function MembershipsPage() {
                         className="flex items-start gap-2 text-xs text-gray-600"
                       >
                         <svg
-                          className="w-3.5 h-3.5 text-teal mt-0.5 shrink-0"
+                          className="w-3.5 h-3.5 text-[#5DB347] mt-0.5 shrink-0"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -259,7 +259,7 @@ export default function MembershipsPage() {
                         <span>
                           {feature}
                           {typeof value === 'string' && (
-                            <span className="text-teal font-medium ml-1">
+                            <span className="text-[#5DB347] font-medium ml-1">
                               ({value})
                             </span>
                           )}
@@ -273,7 +273,7 @@ export default function MembershipsPage() {
                   href="/apply"
                   className={`block text-center px-4 py-2.5 rounded-lg text-sm font-semibold transition-smooth ${
                     tier.popular
-                      ? 'bg-teal hover:bg-teal-dark text-white'
+                      ? 'bg-[#5DB347] hover:bg-[#449933] text-white'
                       : 'bg-navy/10 hover:bg-navy/20 text-navy'
                   }`}
                 >
@@ -292,7 +292,7 @@ export default function MembershipsPage() {
             <h2 className="text-3xl font-bold text-navy">Feature Comparison</h2>
             <button
               onClick={() => setShowComparison(!showComparison)}
-              className="lg:hidden bg-teal text-white px-4 py-2 rounded-lg text-sm font-medium"
+              className="lg:hidden bg-[#5DB347] text-white px-4 py-2 rounded-lg text-sm font-medium"
             >
               {showComparison ? 'Hide' : 'Show'} Comparison
             </button>
@@ -411,7 +411,7 @@ export default function MembershipsPage() {
           <div className="flex gap-4 justify-center flex-wrap">
             <Link
               href="/apply"
-              className="inline-block bg-white text-teal hover:bg-gray-100 px-8 py-3.5 rounded-lg font-semibold text-lg transition-colors"
+              className="inline-block bg-white text-[#5DB347] hover:bg-gray-100 px-8 py-3.5 rounded-lg font-semibold text-lg transition-colors"
             >
               Apply for Membership
             </Link>

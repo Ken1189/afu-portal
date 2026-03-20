@@ -159,7 +159,7 @@ export default function ReferralPage() {
       {/* Stats Cards */}
       <motion.div variants={stagger} className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: 'Total Referrals', value: data?.referralCount || 0, icon: <Users className="w-5 h-5" />, color: 'text-teal bg-teal/10' },
+          { label: 'Total Referrals', value: data?.referralCount || 0, icon: <Users className="w-5 h-5" />, color: 'text-[#5DB347] bg-[#5DB347]/10' },
           { label: 'Total Earned', value: `$${(data?.totalEarnings || 0).toFixed(2)}`, icon: <DollarSign className="w-5 h-5" />, color: 'text-green-600 bg-green-50' },
           { label: 'Pending', value: `$${(data?.pendingEarnings || 0).toFixed(2)}`, icon: <TrendingUp className="w-5 h-5" />, color: 'text-amber-600 bg-amber-50' },
           { label: 'Cashback Rate', value: `${REFERRAL_CONFIG.cashbackPercent}%`, icon: <Gift className="w-5 h-5" />, color: 'text-[#FF4500] bg-[#FF4500]/10' },

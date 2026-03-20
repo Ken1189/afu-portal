@@ -141,7 +141,7 @@ export default function InsuranceHubPage() {
                 className="card-polished bg-cream rounded-2xl p-8 hover:shadow-lg transition-all group border border-transparent hover:border-gold/20"
               >
                 <div className="text-4xl mb-4">{product.icon}</div>
-                <h3 className="text-xl font-bold text-navy mb-3 group-hover:text-teal transition-colors">
+                <h3 className="text-xl font-bold text-navy mb-3 group-hover:text-[#5DB347] transition-colors">
                   {product.name}
                 </h3>
                 <p className="text-gray-500 text-sm mb-5 leading-relaxed">
@@ -151,7 +151,7 @@ export default function InsuranceHubPage() {
                   <span className="bg-gold/10 text-gold text-xs font-semibold px-3 py-1 rounded-full">
                     {product.premium}
                   </span>
-                  <span className="text-teal text-sm font-medium group-hover:translate-x-1 transition-transform inline-block">
+                  <span className="text-[#5DB347] text-sm font-medium group-hover:translate-x-1 transition-transform inline-block">
                     Learn More &rarr;
                   </span>
                 </div>
@@ -217,7 +217,7 @@ export default function InsuranceHubPage() {
                     key={i}
                     className="flex items-start gap-3 text-gray-600 text-sm"
                   >
-                    <span className="text-teal mt-0.5 font-bold">&#10003;</span>
+                    <span className="text-[#5DB347] mt-0.5 font-bold">&#10003;</span>
                     {item}
                   </li>
                 ))}

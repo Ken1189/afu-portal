@@ -446,8 +446,8 @@ export default function InsuranceHomePage() {
       href: '/farm/insurance/policies',
       label: t.insurance.myPolicies,
       icon: FileText,
-      color: 'bg-teal/10 text-teal',
-      iconBg: 'bg-teal/15',
+      color: 'bg-[#5DB347]/10 text-[#5DB347]',
+      iconBg: 'bg-[#5DB347]/15',
     },
     {
       href: '/farm/insurance/claim',
@@ -483,7 +483,7 @@ export default function InsuranceHomePage() {
       {/* 1. WELCOME BANNER                                                 */}
       {/* ================================================================= */}
       <motion.section variants={itemVariants} className="px-4">
-        <div className="rounded-2xl bg-gradient-to-br from-teal to-teal-dark p-5 text-white relative overflow-hidden">
+        <div className="rounded-2xl bg-gradient-to-br from-[#5DB347] to-[#449933] p-5 text-white relative overflow-hidden">
           {/* Decorative circles */}
           <div className="absolute -top-10 -right-10 w-32 h-32 bg-white/5 rounded-full" />
           <div className="absolute -bottom-8 -right-6 w-24 h-24 bg-white/5 rounded-full" />
@@ -523,14 +523,14 @@ export default function InsuranceHomePage() {
             className="rounded-2xl bg-white border border-gray-100 p-3"
           >
             <div className="flex items-center gap-2 mb-1">
-              <div className="w-7 h-7 rounded-lg bg-teal/10 flex items-center justify-center">
-                <ShieldCheck size={14} className="text-teal" />
+              <div className="w-7 h-7 rounded-lg bg-[#5DB347]/10 flex items-center justify-center">
+                <ShieldCheck size={14} className="text-[#5DB347]" />
               </div>
               <span className="text-[11px] text-gray-400 truncate">
                 {t.insurance.activePolicies}
               </span>
             </div>
-            <p className="text-2xl font-bold text-teal">{stats.activePoliciesCount}</p>
+            <p className="text-2xl font-bold text-[#5DB347]">{stats.activePoliciesCount}</p>
           </motion.div>
 
           {/* Total Coverage */}
@@ -673,7 +673,7 @@ export default function InsuranceHomePage() {
           <h3 className="text-sm font-bold text-navy">{t.insurance.activePolicies}</h3>
           <Link
             href="/farm/insurance/policies"
-            className="text-xs text-teal font-medium flex items-center gap-0.5"
+            className="text-xs text-[#5DB347] font-medium flex items-center gap-0.5"
           >
             {t.common.viewAll} <ChevronRight size={14} />
           </Link>

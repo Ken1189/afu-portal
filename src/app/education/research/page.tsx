@@ -141,7 +141,7 @@ export default function ResearchCentresPage() {
       {/* Hero */}
       <section className="bg-navy text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="inline-block bg-teal/20 text-teal px-4 py-1.5 rounded-full text-sm font-medium mb-4">
+          <div className="inline-block bg-[#5DB347]/20 text-[#5DB347] px-4 py-1.5 rounded-full text-sm font-medium mb-4">
             Education
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-6">
@@ -180,7 +180,7 @@ export default function ResearchCentresPage() {
                   </span>
                 </div>
 
-                <div className="inline-block bg-teal/10 text-teal px-3 py-1 rounded-full text-xs font-medium mb-4">
+                <div className="inline-block bg-[#5DB347]/10 text-[#5DB347] px-3 py-1 rounded-full text-xs font-medium mb-4">
                   {centre.focus}
                 </div>
 
@@ -199,7 +199,7 @@ export default function ResearchCentresPage() {
                         className="flex items-start gap-2 text-gray-600 text-sm"
                       >
                         <svg
-                          className="w-4 h-4 text-teal mt-0.5 shrink-0"
+                          className="w-4 h-4 text-[#5DB347] mt-0.5 shrink-0"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -239,7 +239,7 @@ export default function ResearchCentresPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-teal">
+      <section className="py-16 bg-[#5DB347]">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">
             Partner With Our Research Network
@@ -252,7 +252,7 @@ export default function ResearchCentresPage() {
           <div className="flex gap-4 justify-center flex-wrap">
             <Link
               href="/contact"
-              className="inline-block bg-white text-teal hover:bg-gray-100 px-8 py-3.5 rounded-lg font-semibold text-lg transition-colors"
+              className="inline-block bg-white text-[#5DB347] hover:bg-gray-100 px-8 py-3.5 rounded-lg font-semibold text-lg transition-colors"
             >
               Contact Us
             </Link>

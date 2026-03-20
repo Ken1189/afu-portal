@@ -70,7 +70,7 @@ export default function FinanceHubPage() {
       {/* Hero */}
       <section className="bg-navy text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="inline-block bg-teal/20 text-teal px-4 py-1.5 rounded-full text-sm font-medium mb-4">
+          <div className="inline-block bg-[#5DB347]/20 text-[#5DB347] px-4 py-1.5 rounded-full text-sm font-medium mb-4">
             Financial Services
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-6">
@@ -85,7 +85,7 @@ export default function FinanceHubPage() {
       </section>
 
       {/* Trust Indicators */}
-      <section className="bg-teal text-white py-12">
+      <section className="bg-[#5DB347] text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             {stats.map((stat, i) => (
@@ -119,20 +119,20 @@ export default function FinanceHubPage() {
               <Link
                 key={i}
                 href={product.link}
-                className="card-polished bg-cream rounded-2xl p-8 hover:shadow-lg transition-all group border border-transparent hover:border-teal/20"
+                className="card-polished bg-cream rounded-2xl p-8 hover:shadow-lg transition-all group border border-transparent hover:border-[#5DB347]/20"
               >
                 <div className="text-4xl mb-4">{product.icon}</div>
-                <h3 className="text-xl font-bold text-navy mb-3 group-hover:text-teal transition-colors">
+                <h3 className="text-xl font-bold text-navy mb-3 group-hover:text-[#5DB347] transition-colors">
                   {product.title}
                 </h3>
                 <p className="text-gray-500 text-sm mb-5 leading-relaxed">
                   {product.description}
                 </p>
                 <div className="flex items-center justify-between">
-                  <span className="bg-teal/10 text-teal text-xs font-semibold px-3 py-1 rounded-full">
+                  <span className="bg-[#5DB347]/10 text-[#5DB347] text-xs font-semibold px-3 py-1 rounded-full">
                     {product.stat}
                   </span>
-                  <span className="text-teal text-sm font-medium group-hover:translate-x-1 transition-transform inline-block">
+                  <span className="text-[#5DB347] text-sm font-medium group-hover:translate-x-1 transition-transform inline-block">
                     Learn More &rarr;
                   </span>
                 </div>
@@ -162,7 +162,7 @@ export default function FinanceHubPage() {
               { step: "04", title: "Get Funded", desc: "Receive funds directly or through supplier payments." },
             ].map((item, i) => (
               <div key={i} className="text-center">
-                <div className="w-14 h-14 bg-teal rounded-2xl flex items-center justify-center text-white font-bold text-lg mx-auto mb-4">
+                <div className="w-14 h-14 bg-[#5DB347] rounded-2xl flex items-center justify-center text-white font-bold text-lg mx-auto mb-4">
                   {item.step}
                 </div>
                 <h3 className="font-bold text-navy mb-2">{item.title}</h3>
@@ -186,7 +186,7 @@ export default function FinanceHubPage() {
           <div className="flex gap-4 justify-center flex-wrap">
             <Link
               href="/apply"
-              className="bg-teal hover:bg-teal-dark text-white px-8 py-3 rounded-lg font-semibold transition-smooth"
+              className="bg-[#5DB347] hover:bg-[#449933] text-white px-8 py-3 rounded-lg font-semibold transition-smooth"
             >
               Check Eligibility
             </Link>

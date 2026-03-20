@@ -149,7 +149,7 @@ export default function EnergyPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
               <div className="flex items-center gap-3 mb-4">
-                <Battery className="w-8 h-8 text-teal" />
+                <Battery className="w-8 h-8 text-[#5DB347]" />
                 <h2 className="text-3xl font-bold text-navy">
                   Off-Grid Solutions
                 </h2>
@@ -186,9 +186,9 @@ export default function EnergyPage() {
                 ))}
               </div>
             </div>
-            <div className="bg-gradient-to-br from-teal/10 to-navy/10 rounded-2xl h-80 flex items-center justify-center">
+            <div className="bg-gradient-to-br from-[#5DB347]/10 to-navy/10 rounded-2xl h-80 flex items-center justify-center">
               <div className="text-center">
-                <Battery className="w-16 h-16 text-teal mx-auto mb-4" />
+                <Battery className="w-16 h-16 text-[#5DB347] mx-auto mb-4" />
                 <p className="text-navy font-semibold">
                   Off-Grid Energy Systems
                 </p>
@@ -205,9 +205,9 @@ export default function EnergyPage() {
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="order-2 lg:order-1 bg-gradient-to-br from-green-50 to-teal-light rounded-2xl h-80 flex items-center justify-center">
+            <div className="order-2 lg:order-1 bg-gradient-to-br from-green-50 to-[#EBF7E5] rounded-2xl h-80 flex items-center justify-center">
               <div className="text-center">
-                <Flame className="w-16 h-16 text-teal mx-auto mb-4" />
+                <Flame className="w-16 h-16 text-[#5DB347] mx-auto mb-4" />
                 <p className="text-navy font-semibold">
                   Biogas Digesters
                 </p>
@@ -218,7 +218,7 @@ export default function EnergyPage() {
             </div>
             <div className="order-1 lg:order-2">
               <div className="flex items-center gap-3 mb-4">
-                <Flame className="w-8 h-8 text-teal" />
+                <Flame className="w-8 h-8 text-[#5DB347]" />
                 <h2 className="text-3xl font-bold text-navy">
                   Biogas Systems
                 </h2>
@@ -237,7 +237,7 @@ export default function EnergyPage() {
                   "Reduce methane emissions and qualify for carbon credits",
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
-                    <div className="w-5 h-5 bg-teal rounded-full flex items-center justify-center mt-0.5 shrink-0">
+                    <div className="w-5 h-5 bg-[#5DB347] rounded-full flex items-center justify-center mt-0.5 shrink-0">
                       <svg
                         className="w-3 h-3 text-white"
                         fill="none"
@@ -303,7 +303,7 @@ export default function EnergyPage() {
           <div className="bg-cream rounded-2xl p-8 md:p-12 border border-gray-100">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2">
-                <span className="inline-block bg-teal/10 text-teal text-xs font-semibold px-3 py-1 rounded-full mb-4">
+                <span className="inline-block bg-[#5DB347]/10 text-[#5DB347] text-xs font-semibold px-3 py-1 rounded-full mb-4">
                   CASE STUDY
                 </span>
                 <h3 className="text-2xl font-bold text-navy mb-4">
@@ -317,22 +317,22 @@ export default function EnergyPage() {
                 </p>
                 <div className="grid grid-cols-3 gap-4">
                   <div className="bg-white rounded-xl p-4 text-center">
-                    <div className="text-2xl font-bold text-teal">72%</div>
+                    <div className="text-2xl font-bold text-[#5DB347]">72%</div>
                     <div className="text-gray-500 text-xs">Cost Reduction</div>
                   </div>
                   <div className="bg-white rounded-xl p-4 text-center">
-                    <div className="text-2xl font-bold text-teal">3.2yr</div>
+                    <div className="text-2xl font-bold text-[#5DB347]">3.2yr</div>
                     <div className="text-gray-500 text-xs">Payback Period</div>
                   </div>
                   <div className="bg-white rounded-xl p-4 text-center">
-                    <div className="text-2xl font-bold text-teal">45t</div>
+                    <div className="text-2xl font-bold text-[#5DB347]">45t</div>
                     <div className="text-gray-500 text-xs">
                       CO&#8322; Saved/Year
                     </div>
                   </div>
                 </div>
               </div>
-              <div className="bg-gradient-to-br from-gold/10 to-teal/10 rounded-xl flex items-center justify-center p-8">
+              <div className="bg-gradient-to-br from-gold/10 to-[#5DB347]/10 rounded-xl flex items-center justify-center p-8">
                 <div className="text-center">
                   <Sun className="w-12 h-12 text-gold mx-auto mb-3" />
                   <p className="text-navy font-semibold text-sm">

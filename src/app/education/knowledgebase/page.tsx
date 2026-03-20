@@ -135,7 +135,7 @@ export default function KnowledgebasePage() {
       {/* Hero with Search */}
       <section className="bg-navy text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="inline-block bg-teal/20 text-teal px-4 py-1.5 rounded-full text-sm font-medium mb-4">
+          <div className="inline-block bg-[#5DB347]/20 text-[#5DB347] px-4 py-1.5 rounded-full text-sm font-medium mb-4">
             Education
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-6">
@@ -168,7 +168,7 @@ export default function KnowledgebasePage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search articles, topics, or keywords..."
-                className="w-full pl-12 pr-4 py-4 rounded-xl bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal focus:border-transparent text-lg"
+                className="w-full pl-12 pr-4 py-4 rounded-xl bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#5DB347] focus:border-transparent text-lg"
               />
             </div>
           </div>
@@ -247,9 +247,9 @@ export default function KnowledgebasePage() {
                 className="bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow"
               >
                 {/* Thumbnail Placeholder */}
-                <div className="h-40 bg-gradient-to-br from-teal/20 to-navy/20 flex items-center justify-center">
+                <div className="h-40 bg-gradient-to-br from-[#5DB347]/20 to-navy/20 flex items-center justify-center">
                   <svg
-                    className="w-12 h-12 text-teal/40"
+                    className="w-12 h-12 text-[#5DB347]/40"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -263,7 +263,7 @@ export default function KnowledgebasePage() {
                   </svg>
                 </div>
                 <div className="p-5">
-                  <span className="inline-block bg-teal/10 text-teal text-xs font-medium px-2.5 py-0.5 rounded-full mb-3">
+                  <span className="inline-block bg-[#5DB347]/10 text-[#5DB347] text-xs font-medium px-2.5 py-0.5 rounded-full mb-3">
                     {article.category}
                   </span>
                   <h3 className="text-sm font-bold text-navy mb-3 leading-snug line-clamp-2">
@@ -293,7 +293,7 @@ export default function KnowledgebasePage() {
             {popularTopics.map((topic, i) => (
               <span
                 key={i}
-                className="bg-cream text-navy text-sm font-medium px-4 py-2 rounded-full border border-gray-200 hover:border-teal hover:text-teal transition-colors cursor-pointer"
+                className="bg-cream text-navy text-sm font-medium px-4 py-2 rounded-full border border-gray-200 hover:border-[#5DB347] hover:text-[#5DB347] transition-colors cursor-pointer"
               >
                 {topic}
               </span>
@@ -303,7 +303,7 @@ export default function KnowledgebasePage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-teal">
+      <section className="py-16 bg-[#5DB347]">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">
             Can&apos;t Find What You&apos;re Looking For?
@@ -316,7 +316,7 @@ export default function KnowledgebasePage() {
           <div className="flex gap-4 justify-center flex-wrap">
             <Link
               href="/contact"
-              className="inline-block bg-white text-teal hover:bg-gray-100 px-8 py-3.5 rounded-lg font-semibold text-lg transition-colors"
+              className="inline-block bg-white text-[#5DB347] hover:bg-gray-100 px-8 py-3.5 rounded-lg font-semibold text-lg transition-colors"
             >
               Ask an Expert
             </Link>

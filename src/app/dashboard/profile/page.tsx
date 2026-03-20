@@ -79,8 +79,8 @@ const members: Member[] = [
 const me: Member = members[0];
 
 const tierConfig: Record<string, { label: string; cls: string; badge: string }> = {
-  smallholder: { label: 'Tier A: Smallholder', cls: 'from-emerald-500 to-teal', badge: 'bg-emerald-500' },
-  commercial: { label: 'Tier B: Commercial', cls: 'from-blue-600 to-teal', badge: 'bg-blue-600' },
+  smallholder: { label: 'Tier A: Smallholder', cls: 'from-emerald-500 to-[#5DB347]', badge: 'bg-emerald-500' },
+  commercial: { label: 'Tier B: Commercial', cls: 'from-blue-600 to-[#5DB347]', badge: 'bg-blue-600' },
   enterprise: { label: 'Tier C: Enterprise', cls: 'from-purple-600 to-indigo-600', badge: 'bg-purple-600' },
   partner: { label: 'Tier D: Partner', cls: 'from-gold to-amber-600', badge: 'bg-gold' },
 };
@@ -125,7 +125,7 @@ function Field({
           type={type}
           disabled={!editing}
           defaultValue={value}
-          className={`w-full ${Icon ? 'pl-10' : 'pl-4'} pr-4 py-2.5 border border-gray-200 rounded-lg text-sm disabled:bg-cream/70 disabled:text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal/50 transition-colors`}
+          className={`w-full ${Icon ? 'pl-10' : 'pl-4'} pr-4 py-2.5 border border-gray-200 rounded-lg text-sm disabled:bg-cream/70 disabled:text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#5DB347]/50 transition-colors`}
         />
       </div>
     </div>
@@ -170,7 +170,7 @@ export default function ProfilePage() {
 
   const activityIcons: Record<string, { icon: React.ElementType; color: string }> = {
     login: { icon: Globe2, color: 'text-blue-500 bg-blue-50' },
-    edit: { icon: Edit3, color: 'text-teal bg-teal/10' },
+    edit: { icon: Edit3, color: 'text-[#5DB347] bg-[#5DB347]/10' },
     finance: { icon: Banknote, color: 'text-gold bg-gold/10' },
     document: { icon: FileCheck, color: 'text-purple-500 bg-purple-50' },
     training: { icon: Award, color: 'text-green-500 bg-green-50' },
@@ -193,7 +193,7 @@ export default function ProfilePage() {
           className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors shadow-sm ${
             editing
               ? 'bg-gray-200 text-navy hover:bg-gray-300'
-              : 'bg-teal hover:bg-teal-dark text-white'
+              : 'bg-[#5DB347] hover:bg-[#449933] text-white'
           }`}
         >
           {editing ? <X className="w-4 h-4" /> : <Edit3 className="w-4 h-4" />}
@@ -270,7 +270,7 @@ export default function ProfilePage() {
           <div className="bg-white rounded-xl border border-gray-100 p-5">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-navy text-sm">Profile Completion</h3>
-              <span className="text-sm font-bold text-teal">{me.profileCompleteness}%</span>
+              <span className="text-sm font-bold text-[#5DB347]">{me.profileCompleteness}%</span>
             </div>
             {/* Progress bar */}
             <div className="h-2 bg-gray-100 rounded-full mb-4">
@@ -278,7 +278,7 @@ export default function ProfilePage() {
                 initial={{ width: 0 }}
                 animate={{ width: `${me.profileCompleteness}%` }}
                 transition={{ duration: 1, ease: 'easeOut' }}
-                className="h-2 bg-gradient-to-r from-teal to-emerald-400 rounded-full"
+                className="h-2 bg-gradient-to-r from-[#5DB347] to-emerald-400 rounded-full"
               />
             </div>
             <div className="space-y-2.5">
@@ -293,7 +293,7 @@ export default function ProfilePage() {
                     {item.label}
                   </span>
                   {!item.done && (
-                    <button className="ml-auto text-xs text-teal font-medium hover:text-teal-dark">
+                    <button className="ml-auto text-xs text-[#5DB347] font-medium hover:text-[#449933]">
                       Complete
                     </button>
                   )}
@@ -305,7 +305,7 @@ export default function ProfilePage() {
           {/* KYC Status */}
           <div className="bg-white rounded-xl border border-gray-100 p-5">
             <div className="flex items-center gap-2 mb-4">
-              <ShieldCheck className="w-5 h-5 text-teal" />
+              <ShieldCheck className="w-5 h-5 text-[#5DB347]" />
               <h3 className="font-semibold text-navy text-sm">Verification Status</h3>
             </div>
             <div className="space-y-3">
@@ -372,7 +372,7 @@ export default function ProfilePage() {
                 <div className="space-y-6">
                   <div className="bg-white rounded-xl border border-gray-100 p-6">
                     <h3 className="font-semibold text-navy mb-5 flex items-center gap-2">
-                      <User className="w-4 h-4 text-teal" />
+                      <User className="w-4 h-4 text-[#5DB347]" />
                       Personal Information
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -387,7 +387,7 @@ export default function ProfilePage() {
 
                   <div className="bg-white rounded-xl border border-gray-100 p-6">
                     <h3 className="font-semibold text-navy mb-5 flex items-center gap-2">
-                      <CreditCard className="w-4 h-4 text-teal" />
+                      <CreditCard className="w-4 h-4 text-[#5DB347]" />
                       Banking Details
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -409,7 +409,7 @@ export default function ProfilePage() {
                     >
                       <button
                         onClick={() => setEditing(false)}
-                        className="flex items-center gap-2 bg-teal hover:bg-teal-dark text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition-colors shadow-sm"
+                        className="flex items-center gap-2 bg-[#5DB347] hover:bg-[#449933] text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition-colors shadow-sm"
                       >
                         <Save className="w-4 h-4" />
                         Save Changes
@@ -430,7 +430,7 @@ export default function ProfilePage() {
                 <div className="space-y-6">
                   <div className="bg-white rounded-xl border border-gray-100 p-6">
                     <h3 className="font-semibold text-navy mb-5 flex items-center gap-2">
-                      <Sprout className="w-4 h-4 text-teal" />
+                      <Sprout className="w-4 h-4 text-[#5DB347]" />
                       Farm Information
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -444,7 +444,7 @@ export default function ProfilePage() {
                   {/* Farm Stats */}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {[
-                      { label: 'Farm Size', value: `${me.farmSize} ha`, icon: Ruler, color: 'text-teal', bg: 'bg-teal/10' },
+                      { label: 'Farm Size', value: `${me.farmSize} ha`, icon: Ruler, color: 'text-[#5DB347]', bg: 'bg-[#5DB347]/10' },
                       { label: 'Crops', value: String(me.primaryCrops.length), icon: Leaf, color: 'text-green-600', bg: 'bg-green-50' },
                       { label: 'Credit Score', value: `${me.creditScore}/100`, icon: TrendingUp, color: 'text-gold', bg: 'bg-gold/10' },
                       { label: 'Status', value: me.status === 'active' ? 'Active' : 'Inactive', icon: Star, color: 'text-navy', bg: 'bg-navy/5' },
@@ -465,7 +465,7 @@ export default function ProfilePage() {
                   {/* Farm Photos Placeholder */}
                   <div className="bg-white rounded-xl border border-gray-100 p-6">
                     <h3 className="font-semibold text-navy mb-4 flex items-center gap-2">
-                      <Camera className="w-4 h-4 text-teal" />
+                      <Camera className="w-4 h-4 text-[#5DB347]" />
                       Farm Gallery
                     </h3>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -478,7 +478,7 @@ export default function ProfilePage() {
                           <Image src={src} alt={`Farm photo ${i + 1}`} fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
                         </div>
                       ))}
-                      <button className="aspect-[4/3] rounded-lg border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-2 text-gray-400 hover:text-teal hover:border-teal/30 transition-colors">
+                      <button className="aspect-[4/3] rounded-lg border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-2 text-gray-400 hover:text-[#5DB347] hover:border-[#5DB347]/30 transition-colors">
                         <Camera className="w-6 h-6" />
                         <span className="text-xs font-medium">Add Photo</span>
                       </button>
@@ -488,12 +488,12 @@ export default function ProfilePage() {
                   {/* Certifications */}
                   <div className="bg-white rounded-xl border border-gray-100 p-6">
                     <h3 className="font-semibold text-navy mb-4 flex items-center gap-2">
-                      <Award className="w-4 h-4 text-teal" />
+                      <Award className="w-4 h-4 text-[#5DB347]" />
                       Certifications & Badges
                     </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       {[
-                        { label: 'AFU Verified Member', earned: true, date: 'Oct 2024', color: 'bg-teal/10 border-teal/20 text-teal' },
+                        { label: 'AFU Verified Member', earned: true, date: 'Oct 2024', color: 'bg-[#5DB347]/10 border-[#5DB347]/20 text-[#5DB347]' },
                         { label: 'Farm Management Basics', earned: true, date: 'Feb 2026', color: 'bg-blue-50 border-blue-200 text-blue-700' },
                         { label: 'Export Ready', earned: false, date: 'In progress', color: 'bg-gray-50 border-gray-200 text-gray-400' },
                       ].map((cert) => (
@@ -523,7 +523,7 @@ export default function ProfilePage() {
                     >
                       <button
                         onClick={() => setEditing(false)}
-                        className="flex items-center gap-2 bg-teal hover:bg-teal-dark text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition-colors shadow-sm"
+                        className="flex items-center gap-2 bg-[#5DB347] hover:bg-[#449933] text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition-colors shadow-sm"
                       >
                         <Save className="w-4 h-4" />
                         Save Changes
@@ -538,7 +538,7 @@ export default function ProfilePage() {
                 <div className="space-y-6">
                   <div className="bg-white rounded-xl border border-gray-100 p-6">
                     <h3 className="font-semibold text-navy mb-5 flex items-center gap-2">
-                      <Lock className="w-4 h-4 text-teal" />
+                      <Lock className="w-4 h-4 text-[#5DB347]" />
                       Account Security
                     </h3>
                     <div className="space-y-4">
@@ -553,7 +553,7 @@ export default function ProfilePage() {
                             <p className="text-xs text-gray-400">Last changed 14 days ago</p>
                           </div>
                         </div>
-                        <button className="text-sm text-teal font-medium hover:text-teal-dark flex items-center gap-1">
+                        <button className="text-sm text-[#5DB347] font-medium hover:text-[#449933] flex items-center gap-1">
                           Change <ChevronRight className="w-4 h-4" />
                         </button>
                       </div>
@@ -586,7 +586,7 @@ export default function ProfilePage() {
                             <p className="text-xs text-gray-400">2 active sessions</p>
                           </div>
                         </div>
-                        <button className="text-sm text-teal font-medium hover:text-teal-dark flex items-center gap-1">
+                        <button className="text-sm text-[#5DB347] font-medium hover:text-[#449933] flex items-center gap-1">
                           Manage <ChevronRight className="w-4 h-4" />
                         </button>
                       </div>
@@ -596,7 +596,7 @@ export default function ProfilePage() {
                   {/* Connected Services */}
                   <div className="bg-white rounded-xl border border-gray-100 p-6">
                     <h3 className="font-semibold text-navy mb-4 flex items-center gap-2">
-                      <ExternalLink className="w-4 h-4 text-teal" />
+                      <ExternalLink className="w-4 h-4 text-[#5DB347]" />
                       Connected Services
                     </h3>
                     <div className="space-y-3">
@@ -644,7 +644,7 @@ export default function ProfilePage() {
               {activeTab === 'activity' && (
                 <div className="bg-white rounded-xl border border-gray-100 p-6">
                   <h3 className="font-semibold text-navy mb-5 flex items-center gap-2">
-                    <History className="w-4 h-4 text-teal" />
+                    <History className="w-4 h-4 text-[#5DB347]" />
                     Recent Activity
                   </h3>
                   <div className="relative">
@@ -670,7 +670,7 @@ export default function ProfilePage() {
                     </div>
                   </div>
 
-                  <button className="mt-4 w-full text-sm text-teal font-medium hover:text-teal-dark py-2 text-center rounded-lg hover:bg-teal/5 transition-colors">
+                  <button className="mt-4 w-full text-sm text-[#5DB347] font-medium hover:text-[#449933] py-2 text-center rounded-lg hover:bg-[#5DB347]/5 transition-colors">
                     View Full Activity History
                   </button>
                 </div>

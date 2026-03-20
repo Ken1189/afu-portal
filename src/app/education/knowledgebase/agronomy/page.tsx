@@ -124,13 +124,13 @@ export default function AgronomyPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-2 text-sm text-gray-400 mb-6">
-            <Link href="/education/knowledgebase" className="hover:text-teal transition-colors">
+            <Link href="/education/knowledgebase" className="hover:text-[#5DB347] transition-colors">
               Knowledgebase
             </Link>
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
-            <span className="text-teal">Agronomy</span>
+            <span className="text-[#5DB347]">Agronomy</span>
           </nav>
 
           <h1 className="text-4xl md:text-5xl font-bold mb-6">Agronomy</h1>
@@ -169,7 +169,7 @@ export default function AgronomyPage() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search agronomy articles..."
-                    className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#5DB347] focus:border-transparent"
                   />
                 </div>
 
@@ -180,8 +180,8 @@ export default function AgronomyPage() {
                       onClick={() => setActiveTopic(topic)}
                       className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                         activeTopic === topic
-                          ? 'bg-teal text-white'
-                          : 'bg-cream text-navy hover:bg-teal-light'
+                          ? 'bg-[#5DB347] text-white'
+                          : 'bg-cream text-navy hover:bg-[#EBF7E5]'
                       }`}
                     >
                       {topic}
@@ -231,7 +231,7 @@ export default function AgronomyPage() {
                       <p className="text-gray-600 text-sm leading-relaxed mb-4">
                         {article.excerpt}
                       </p>
-                      <button className="text-teal text-sm font-semibold hover:text-teal-dark transition-colors">
+                      <button className="text-[#5DB347] text-sm font-semibold hover:text-[#449933] transition-colors">
                         Read More &rarr;
                       </button>
                     </div>
@@ -252,10 +252,10 @@ export default function AgronomyPage() {
                     <Link
                       key={i}
                       href="/education/knowledgebase"
-                      className="flex items-center gap-2 text-sm text-gray-600 hover:text-teal transition-colors py-1"
+                      className="flex items-center gap-2 text-sm text-gray-600 hover:text-[#5DB347] transition-colors py-1"
                     >
                       <svg
-                        className="w-4 h-4 text-teal shrink-0"
+                        className="w-4 h-4 text-[#5DB347] shrink-0"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -282,9 +282,9 @@ export default function AgronomyPage() {
                   {popularArticles.map((title, i) => (
                     <div
                       key={i}
-                      className="flex items-start gap-3 text-sm text-gray-600 hover:text-teal transition-colors cursor-pointer"
+                      className="flex items-start gap-3 text-sm text-gray-600 hover:text-[#5DB347] transition-colors cursor-pointer"
                     >
-                      <span className="w-6 h-6 bg-teal/10 text-teal rounded-full flex items-center justify-center text-xs font-bold shrink-0">
+                      <span className="w-6 h-6 bg-[#5DB347]/10 text-[#5DB347] rounded-full flex items-center justify-center text-xs font-bold shrink-0">
                         {i + 1}
                       </span>
                       {title}
@@ -302,7 +302,7 @@ export default function AgronomyPage() {
                 </p>
                 <Link
                   href="/contact"
-                  className="inline-block bg-teal hover:bg-teal-dark text-white px-6 py-2.5 rounded-lg text-sm font-semibold transition-colors w-full text-center"
+                  className="inline-block bg-[#5DB347] hover:bg-[#449933] text-white px-6 py-2.5 rounded-lg text-sm font-semibold transition-colors w-full text-center"
                 >
                   Ask a Question
                 </Link>

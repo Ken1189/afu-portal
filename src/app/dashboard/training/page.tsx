@@ -220,7 +220,7 @@ const difficultyColors: Record<Course['difficulty'], string> = {
 };
 
 const categoryColors: Record<Course['category'], string> = {
-  'Farm Management': 'bg-teal-light text-teal-dark',
+  'Farm Management': 'bg-[#EBF7E5] text-[#449933]',
   'Export Compliance': 'bg-navy/10 text-navy',
   'Financial Literacy': 'bg-gold/10 text-gold',
   'Crop-Specific': 'bg-green-50 text-green-700',
@@ -326,7 +326,7 @@ function StarRating({ rating }: { rating: number }) {
 function ProgressBar({
   value,
   max,
-  color = 'bg-teal',
+  color = 'bg-[#5DB347]',
   height = 'h-2',
   animate = true,
 }: {
@@ -408,7 +408,7 @@ export default function TrainingPage() {
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal to-teal-dark flex items-center justify-center shadow-lg shadow-teal/20">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#5DB347] to-[#449933] flex items-center justify-center shadow-lg shadow-[#5DB347]/20">
                 <GraduationCap className="w-5 h-5 text-white" />
               </div>
               <h1 className="text-2xl md:text-3xl font-bold text-navy">
@@ -423,7 +423,7 @@ export default function TrainingPage() {
           {/* Progress summary pills */}
           <div className="flex flex-wrap items-center gap-3 ml-[52px] md:ml-0">
             <div className="inline-flex items-center gap-2 bg-white rounded-full px-4 py-2 border border-gray-200 shadow-sm">
-              <BookOpen className="w-4 h-4 text-teal" />
+              <BookOpen className="w-4 h-4 text-[#5DB347]" />
               <span className="text-sm font-medium text-navy">
                 {coursesStarted} of {courses.length} started
               </span>
@@ -456,8 +456,8 @@ export default function TrainingPage() {
             label: 'Courses Available',
             value: courses.length,
             icon: <Layers className="w-5 h-5" />,
-            color: 'from-teal to-teal-dark',
-            shadow: 'shadow-teal/20',
+            color: 'from-[#5DB347] to-[#449933]',
+            shadow: 'shadow-[#5DB347]/20',
           },
           {
             label: 'In Progress',
@@ -506,9 +506,9 @@ export default function TrainingPage() {
       {/* ============================================================ */}
       <motion.section variants={itemVariants}>
         <div className="flex items-center gap-2 mb-4">
-          <TrendingUp className="w-5 h-5 text-teal" />
+          <TrendingUp className="w-5 h-5 text-[#5DB347]" />
           <h2 className="text-lg font-bold text-navy">Continue Learning</h2>
-          <span className="ml-1 bg-teal-light text-teal text-xs font-semibold px-2 py-0.5 rounded-full">
+          <span className="ml-1 bg-[#EBF7E5] text-[#5DB347] text-xs font-semibold px-2 py-0.5 rounded-full">
             {inProgressCourses.length} in progress
           </span>
         </div>
@@ -573,11 +573,11 @@ export default function TrainingPage() {
                     <ProgressBar
                       value={item.completedModules}
                       max={item.totalModules}
-                      color={pct >= 60 ? 'bg-teal' : 'bg-gold'}
+                      color={pct >= 60 ? 'bg-[#5DB347]' : 'bg-gold'}
                     />
                   </div>
 
-                  <button className="w-full flex items-center justify-center gap-2 bg-teal text-white text-sm font-semibold py-2.5 rounded-lg hover:bg-teal-dark transition-colors">
+                  <button className="w-full flex items-center justify-center gap-2 bg-[#5DB347] text-white text-sm font-semibold py-2.5 rounded-lg hover:bg-[#449933] transition-colors">
                     <Play className="w-4 h-4" />
                     Continue
                   </button>
@@ -798,7 +798,7 @@ export default function TrainingPage() {
                               isCompleted
                                 ? 'bg-green-50 text-green-700 hover:bg-green-100'
                                 : isInProgress
-                                  ? 'bg-teal text-white hover:bg-teal-dark'
+                                  ? 'bg-[#5DB347] text-white hover:bg-[#449933]'
                                   : 'bg-navy text-white hover:bg-navy-light'
                             }
                           `}
@@ -981,7 +981,7 @@ export default function TrainingPage() {
                 </div>
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-gray-400">Credential ID</span>
-                  <span className="text-teal font-mono text-[11px] font-medium">
+                  <span className="text-[#5DB347] font-mono text-[11px] font-medium">
                     {cert.credentialId}
                   </span>
                 </div>
@@ -993,7 +993,7 @@ export default function TrainingPage() {
                   <FileCheck className="w-3 h-3" />
                   Verified
                 </span>
-                <button className="ml-auto inline-flex items-center gap-1.5 text-sm font-semibold text-navy hover:text-teal transition-colors bg-gray-50 hover:bg-teal-light px-3 py-1.5 rounded-lg">
+                <button className="ml-auto inline-flex items-center gap-1.5 text-sm font-semibold text-navy hover:text-[#5DB347] transition-colors bg-gray-50 hover:bg-[#EBF7E5] px-3 py-1.5 rounded-lg">
                   <Download className="w-4 h-4" />
                   Download
                 </button>

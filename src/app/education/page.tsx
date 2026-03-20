@@ -55,7 +55,7 @@ export default function EducationPage() {
       {/* Hero */}
       <section className="bg-navy text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="inline-block bg-teal/20 text-teal px-4 py-1.5 rounded-full text-sm font-medium mb-4">
+          <div className="inline-block bg-[#5DB347]/20 text-[#5DB347] px-4 py-1.5 rounded-full text-sm font-medium mb-4">
             Education Hub
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-6">
@@ -77,13 +77,13 @@ export default function EducationPage() {
               <Link
                 key={i}
                 href={section.link}
-                className="card-polished bg-cream rounded-2xl p-8 hover:shadow-lg transition-all group border border-transparent hover:border-teal/20"
+                className="card-polished bg-cream rounded-2xl p-8 hover:shadow-lg transition-all group border border-transparent hover:border-[#5DB347]/20"
               >
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-teal rounded-xl flex items-center justify-center text-white font-bold">
+                  <div className="w-10 h-10 bg-[#5DB347] rounded-xl flex items-center justify-center text-white font-bold">
                     {i + 1}
                   </div>
-                  <h3 className="text-xl font-bold text-navy group-hover:text-teal transition-colors">
+                  <h3 className="text-xl font-bold text-navy group-hover:text-[#5DB347] transition-colors">
                     {section.title}
                   </h3>
                 </div>
@@ -112,7 +112,7 @@ export default function EducationPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat, i) => (
               <div key={i} className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-teal mb-2">
+                <div className="text-3xl md:text-4xl font-bold text-[#5DB347] mb-2">
                   {stat.value}
                 </div>
                 <div className="text-gray-300 text-sm">{stat.label}</div>
@@ -123,7 +123,7 @@ export default function EducationPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-teal">
+      <section className="py-16 bg-[#5DB347]">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">
             Explore Our Knowledge Base
@@ -136,7 +136,7 @@ export default function EducationPage() {
           <div className="flex gap-4 justify-center flex-wrap">
             <Link
               href="/education/knowledgebase"
-              className="inline-block bg-white text-teal hover:bg-gray-100 px-8 py-3.5 rounded-lg font-semibold text-lg transition-smooth"
+              className="inline-block bg-white text-[#5DB347] hover:bg-gray-100 px-8 py-3.5 rounded-lg font-semibold text-lg transition-smooth"
             >
               Browse Knowledgebase
             </Link>

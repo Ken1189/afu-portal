@@ -126,7 +126,7 @@ const equipment: Equipment[] = [
       "Precision 4-row mechanical planter with fertiliser attachment. Adjustable row spacing for maize, soya, sunflower.",
     priceRange: "$2,500 - $4,000",
     availability: ["Buy", "Rent", "Finance"],
-    gradient: "from-teal to-teal-dark",
+    gradient: "from-[#5DB347] to-[#449933]",
   },
   {
     name: "Boom Sprayer (600L)",
@@ -154,7 +154,7 @@ const acquisitionOptions = [
     description:
       "Purchase equipment directly at competitive prices. We work with authorised dealers across Zimbabwe, Botswana, and Tanzania to source the best deals.",
     icon: ShoppingCart,
-    color: "bg-teal",
+    color: "bg-[#5DB347]",
   },
   {
     title: "Rent (Daily / Seasonal)",
@@ -174,7 +174,7 @@ const acquisitionOptions = [
 
 function AvailabilityBadge({ type }: { type: "Buy" | "Rent" | "Finance" }) {
   const styles = {
-    Buy: "bg-teal/10 text-teal",
+    Buy: "bg-[#5DB347]/10 text-[#5DB347]",
     Rent: "bg-gold/10 text-gold",
     Finance: "bg-navy/10 text-navy",
   };
@@ -201,7 +201,7 @@ export default function MachineryPage() {
       <section className="bg-navy text-white py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
-            <span className="inline-block bg-teal/20 text-teal-light text-sm font-medium px-4 py-1.5 rounded-full mb-6">
+            <span className="inline-block bg-[#5DB347]/20 text-[#EBF7E5] text-sm font-medium px-4 py-1.5 rounded-full mb-6">
               Equipment & Machinery
             </span>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
@@ -220,7 +220,7 @@ export default function MachineryPage() {
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3 mb-8">
-            <Filter className="w-5 h-5 text-teal" />
+            <Filter className="w-5 h-5 text-[#5DB347]" />
             <h2 className="text-2xl font-bold text-navy">
               Browse Equipment
             </h2>
@@ -234,8 +234,8 @@ export default function MachineryPage() {
                 onClick={() => setActiveCategory(cat)}
                 className={`px-5 py-2.5 rounded-lg text-sm font-medium transition-all ${
                   activeCategory === cat
-                    ? "bg-teal text-white shadow-md"
-                    : "bg-cream text-navy hover:bg-teal-light"
+                    ? "bg-[#5DB347] text-white shadow-md"
+                    : "bg-cream text-navy hover:bg-[#EBF7E5]"
                 }`}
               >
                 {cat}
@@ -263,7 +263,7 @@ export default function MachineryPage() {
                     {item.category}
                   </span>
 
-                  <h3 className="text-lg font-bold text-navy mb-2 group-hover:text-teal transition-colors">
+                  <h3 className="text-lg font-bold text-navy mb-2 group-hover:text-[#5DB347] transition-colors">
                     {item.name}
                   </h3>
                   <p className="text-gray-500 text-sm leading-relaxed mb-4">
@@ -382,7 +382,7 @@ export default function MachineryPage() {
                 <ul className="space-y-2.5">
                   {group.items.map((item, j) => (
                     <li key={j} className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 bg-teal rounded-full shrink-0" />
+                      <div className="w-1.5 h-1.5 bg-[#5DB347] rounded-full shrink-0" />
                       <span className="text-gray-600 text-sm">{item}</span>
                     </li>
                   ))}
@@ -396,17 +396,17 @@ export default function MachineryPage() {
       {/* CTA */}
       <section className="py-20 bg-cream">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-br from-teal to-teal-dark rounded-2xl p-10 md:p-16 text-center text-white">
+          <div className="bg-gradient-to-br from-[#5DB347] to-[#449933] rounded-2xl p-10 md:p-16 text-center text-white">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
               Find What You Need on the Marketplace
             </h2>
-            <p className="text-teal-light/80 text-lg mb-8 max-w-2xl mx-auto">
+            <p className="text-[#EBF7E5]/80 text-lg mb-8 max-w-2xl mx-auto">
               Browse our full equipment catalogue on the AFU Marketplace. Compare
               prices, check availability, and connect with verified suppliers.
             </p>
             <Link
               href="/supplier"
-              className="inline-flex items-center gap-2 bg-white text-teal hover:bg-cream px-8 py-3.5 rounded-lg font-semibold transition-colors"
+              className="inline-flex items-center gap-2 bg-white text-[#5DB347] hover:bg-cream px-8 py-3.5 rounded-lg font-semibold transition-colors"
             >
               Browse Marketplace
               <ArrowRight className="w-5 h-5" />

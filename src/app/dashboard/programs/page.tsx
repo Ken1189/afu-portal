@@ -94,7 +94,7 @@ const INCLUSION_CHIPS: Record<string, { label: string; emoji: string; bg: string
   insurance: { label: 'Insurance',  emoji: '🛡️', bg: 'bg-blue-50',    text: 'text-blue-700'  },
   offtake:   { label: 'Offtake',    emoji: '🤝', bg: 'bg-amber-50',   text: 'text-amber-700' },
   financing: { label: 'Financing',  emoji: '💰', bg: 'bg-purple-50',  text: 'text-purple-700'},
-  advisory:  { label: 'Advisory',   emoji: '📋', bg: 'bg-teal/10',    text: 'text-teal-700'  },
+  advisory:  { label: 'Advisory',   emoji: '📋', bg: 'bg-[#5DB347]/10',    text: 'text-[#449933]'  },
 };
 
 const STAGES = [
@@ -146,7 +146,7 @@ function EnrollmentStatusBadge({ status }: { status: Enrollment['status'] }) {
     applied:   'bg-amber-50 text-amber-700',
     approved:  'bg-blue-50 text-blue-700',
     active:    'bg-green-50 text-green-700',
-    completed: 'bg-teal/10 text-teal-700',
+    completed: 'bg-[#5DB347]/10 text-[#449933]',
     rejected:  'bg-red-50 text-red-700',
     withdrawn: 'bg-gray-100 text-gray-500',
   };
@@ -262,7 +262,7 @@ function ApplyModal({ program, onClose, onSuccess }: ApplyModalProps) {
           {/* Modal header */}
           <div className="gradient-navy p-5 flex items-start justify-between">
             <div>
-              <p className="text-xs font-semibold text-teal uppercase tracking-wider mb-1">Apply to Join</p>
+              <p className="text-xs font-semibold text-[#5DB347] uppercase tracking-wider mb-1">Apply to Join</p>
               <h2 className="text-lg font-bold text-white">{program.title}</h2>
               <p className="text-sm text-gray-300 mt-0.5">
                 {COUNTRY_FLAGS[program.country] || '🌍'} {program.country} · {program.crop}
@@ -304,7 +304,7 @@ function ApplyModal({ program, onClose, onSuccess }: ApplyModalProps) {
                   onChange={(e) => setFarmSize(e.target.value)}
                   required
                   placeholder={program.min_farm_size_ha ? `Min. ${program.min_farm_size_ha} ha` : 'e.g. 2.5'}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-navy placeholder-gray-400 focus:outline-none focus:border-teal focus:ring-1 focus:ring-teal/20 transition-colors"
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-navy placeholder-gray-400 focus:outline-none focus:border-[#5DB347] focus:ring-1 focus:ring-[#5DB347]/20 transition-colors"
                 />
               </div>
 
@@ -316,7 +316,7 @@ function ApplyModal({ program, onClose, onSuccess }: ApplyModalProps) {
                   onChange={(e) => setFarmLocation(e.target.value)}
                   required
                   placeholder="District / region where farm is located"
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-navy placeholder-gray-400 focus:outline-none focus:border-teal focus:ring-1 focus:ring-teal/20 transition-colors"
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-navy placeholder-gray-400 focus:outline-none focus:border-[#5DB347] focus:ring-1 focus:ring-[#5DB347]/20 transition-colors"
                 />
               </div>
 
@@ -327,17 +327,17 @@ function ApplyModal({ program, onClose, onSuccess }: ApplyModalProps) {
                   onChange={(e) => setNotes(e.target.value)}
                   rows={3}
                   placeholder="Any extra information you'd like to share…"
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-navy placeholder-gray-400 focus:outline-none focus:border-teal focus:ring-1 focus:ring-teal/20 transition-colors resize-none"
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-navy placeholder-gray-400 focus:outline-none focus:border-[#5DB347] focus:ring-1 focus:ring-[#5DB347]/20 transition-colors resize-none"
                 />
               </div>
 
               {program.financing_available && (
-                <label className="flex items-start gap-3 p-3 rounded-lg border border-gray-100 hover:border-teal/30 cursor-pointer transition-colors bg-purple-50/40">
+                <label className="flex items-start gap-3 p-3 rounded-lg border border-gray-100 hover:border-[#5DB347]/30 cursor-pointer transition-colors bg-purple-50/40">
                   <input
                     type="checkbox"
                     checked={financingRequested}
                     onChange={(e) => setFinancingRequested(e.target.checked)}
-                    className="mt-0.5 w-4 h-4 accent-teal"
+                    className="mt-0.5 w-4 h-4 accent-[#5DB347]"
                   />
                   <div>
                     <p className="text-sm font-semibold text-navy">Request input financing</p>
@@ -434,7 +434,7 @@ function ProgramCard({ program, onApply }: { program: Program; onApply: (p: Prog
 
         {/* Offtake price */}
         {program.offtake_price_per_kg != null && (
-          <p className="text-sm font-semibold text-teal">
+          <p className="text-sm font-semibold text-[#5DB347]">
             {program.offtake_currency || '$'}{program.offtake_price_per_kg}/kg guaranteed
             {program.offtake_buyer && <span className="text-gray-400 font-normal"> · {program.offtake_buyer}</span>}
           </p>
@@ -514,19 +514,19 @@ function EnrollmentCard({ enrollment }: { enrollment: Enrollment }) {
                   <div className="flex flex-col items-center gap-1 shrink-0">
                     <div
                       className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${
-                        isDone    ? 'bg-teal text-white' :
-                        isCurrent ? 'bg-navy text-white ring-2 ring-teal/40' :
+                        isDone    ? 'bg-[#5DB347] text-white' :
+                        isCurrent ? 'bg-navy text-white ring-2 ring-[#5DB347]/40' :
                                     'bg-gray-100 text-gray-400'
                       }`}
                     >
                       {isDone ? '✓' : idx + 1}
                     </div>
-                    <span className={`text-[10px] font-medium leading-none ${isCurrent ? 'text-navy' : isDone ? 'text-teal' : 'text-gray-400'}`}>
+                    <span className={`text-[10px] font-medium leading-none ${isCurrent ? 'text-navy' : isDone ? 'text-[#5DB347]' : 'text-gray-400'}`}>
                       {stage.label}
                     </span>
                   </div>
                   {!isLast && (
-                    <div className={`h-0.5 w-5 mx-0.5 shrink-0 ${idx < stageIndex ? 'bg-teal' : 'bg-gray-100'}`} />
+                    <div className={`h-0.5 w-5 mx-0.5 shrink-0 ${idx < stageIndex ? 'bg-[#5DB347]' : 'bg-gray-100'}`} />
                   )}
                 </div>
               );
@@ -562,7 +562,7 @@ function EnrollmentCard({ enrollment }: { enrollment: Enrollment }) {
         {/* View Details accordion */}
         <button
           onClick={() => setExpanded((v) => !v)}
-          className="w-full flex items-center justify-between text-sm font-medium text-teal hover:text-navy transition-colors pt-1 border-t border-gray-50"
+          className="w-full flex items-center justify-between text-sm font-medium text-[#5DB347] hover:text-navy transition-colors pt-1 border-t border-gray-50"
         >
           {expanded ? 'Hide Details' : 'View Details'}
           {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -593,9 +593,9 @@ function EnrollmentCard({ enrollment }: { enrollment: Enrollment }) {
                     </div>
                   )}
                   {program.offtake_price_per_kg != null && (
-                    <div className="bg-teal/5 rounded-lg p-2.5">
+                    <div className="bg-[#5DB347]/5 rounded-lg p-2.5">
                       <p className="text-gray-400 font-medium">Offtake Price</p>
-                      <p className="font-semibold text-teal mt-0.5">{program.offtake_currency || '$'}{program.offtake_price_per_kg}/kg</p>
+                      <p className="font-semibold text-[#5DB347] mt-0.5">{program.offtake_currency || '$'}{program.offtake_price_per_kg}/kg</p>
                     </div>
                   )}
                   {program.planting_start && (
@@ -729,7 +729,7 @@ export default function ProgramsPage() {
             className="gradient-navy rounded-2xl p-5 md:p-6 relative overflow-hidden"
           >
             <div className="absolute -right-8 -top-8 w-40 h-40 bg-white/5 rounded-full pointer-events-none" />
-            <div className="absolute right-0 bottom-0 w-24 h-24 bg-teal/10 rounded-full pointer-events-none" />
+            <div className="absolute right-0 bottom-0 w-24 h-24 bg-[#5DB347]/10 rounded-full pointer-events-none" />
             <div className="relative z-10 flex flex-col sm:flex-row sm:items-center gap-3">
               <div className="text-4xl">🌱</div>
               <div>
@@ -748,7 +748,7 @@ export default function ProgramsPage() {
               <select
                 value={countryFilter}
                 onChange={(e) => setCountryFilter(e.target.value)}
-                className="border border-gray-200 rounded-lg px-3 py-2 text-sm text-navy bg-white focus:outline-none focus:border-teal focus:ring-1 focus:ring-teal/20 transition-colors"
+                className="border border-gray-200 rounded-lg px-3 py-2 text-sm text-navy bg-white focus:outline-none focus:border-[#5DB347] focus:ring-1 focus:ring-[#5DB347]/20 transition-colors"
               >
                 <option value="">All Countries</option>
                 {countries.map((c) => <option key={c} value={c}>{COUNTRY_FLAGS[c] || ''} {c}</option>)}
@@ -759,7 +759,7 @@ export default function ProgramsPage() {
               <select
                 value={cropFilter}
                 onChange={(e) => setCropFilter(e.target.value)}
-                className="border border-gray-200 rounded-lg px-3 py-2 text-sm text-navy bg-white focus:outline-none focus:border-teal focus:ring-1 focus:ring-teal/20 transition-colors"
+                className="border border-gray-200 rounded-lg px-3 py-2 text-sm text-navy bg-white focus:outline-none focus:border-[#5DB347] focus:ring-1 focus:ring-[#5DB347]/20 transition-colors"
               >
                 <option value="">All Crops</option>
                 {crops.map((c) => <option key={c} value={c}>{c}</option>)}

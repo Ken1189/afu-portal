@@ -131,7 +131,7 @@ export default function ProjectsPage() {
       {/* Hero */}
       <section className="bg-navy text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="inline-block bg-teal/20 text-teal px-4 py-1.5 rounded-full text-sm font-medium mb-4">
+          <div className="inline-block bg-[#5DB347]/20 text-[#5DB347] px-4 py-1.5 rounded-full text-sm font-medium mb-4">
             Education
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-6">Active Projects</h1>
@@ -154,8 +154,8 @@ export default function ProjectsPage() {
                 onClick={() => setActiveFilter(cat)}
                 className={`px-5 py-2 rounded-full text-sm font-medium transition-colors ${
                   activeFilter === cat
-                    ? 'bg-teal text-white'
-                    : 'bg-cream text-navy hover:bg-teal-light'
+                    ? 'bg-[#5DB347] text-white'
+                    : 'bg-cream text-navy hover:bg-[#EBF7E5]'
                 }`}
               >
                 {cat}
@@ -239,7 +239,7 @@ export default function ProjectsPage() {
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2.5">
                       <div
-                        className="bg-teal rounded-full h-2.5 transition-all duration-500"
+                        className="bg-[#5DB347] rounded-full h-2.5 transition-all duration-500"
                         style={{ width: `${project.progress}%` }}
                       />
                     </div>
@@ -252,7 +252,7 @@ export default function ProjectsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-teal">
+      <section className="py-16 bg-[#5DB347]">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">
             Get Involved in Our Research
@@ -265,7 +265,7 @@ export default function ProjectsPage() {
           <div className="flex gap-4 justify-center flex-wrap">
             <Link
               href="/contact"
-              className="inline-block bg-white text-teal hover:bg-gray-100 px-8 py-3.5 rounded-lg font-semibold text-lg transition-colors"
+              className="inline-block bg-white text-[#5DB347] hover:bg-gray-100 px-8 py-3.5 rounded-lg font-semibold text-lg transition-colors"
             >
               Contact Us
             </Link>

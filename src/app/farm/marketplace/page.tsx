@@ -363,7 +363,7 @@ function ProductCard({ product }: { product: SupplierProduct }) {
         {/* Pricing */}
         <div className="mt-3 flex items-baseline gap-2">
           <span className="text-xs text-gray-400 line-through">${product.price.toFixed(2)}</span>
-          <span className="text-base font-bold text-teal">${product.memberPrice.toFixed(2)}</span>
+          <span className="text-base font-bold text-[#5DB347]">${product.memberPrice.toFixed(2)}</span>
           <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-green-100 text-green-700">
             -{savingsPct}%
           </span>
@@ -407,7 +407,7 @@ function ProductCard({ product }: { product: SupplierProduct }) {
                 ? 'bg-green-500 text-white'
                 : product.availability === 'out-of-stock'
                   ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                  : 'bg-teal text-white hover:bg-teal-dark active:scale-[0.97]'
+                  : 'bg-[#5DB347] text-white hover:bg-[#449933] active:scale-[0.97]'
             }`}
           >
             {added ? (
@@ -508,7 +508,7 @@ export default function MarketplacePage() {
           {/* Cart icon */}
           <Link
             href="/farm/marketplace/cart"
-            className="relative shrink-0 w-11 h-11 flex items-center justify-center rounded-xl bg-teal/10 text-teal hover:bg-teal/20 active:scale-95 transition-all"
+            className="relative shrink-0 w-11 h-11 flex items-center justify-center rounded-xl bg-[#5DB347]/10 text-[#5DB347] hover:bg-[#5DB347]/20 active:scale-95 transition-all"
           >
             <ShoppingCart size={20} />
             {cartCount > 0 && (
@@ -538,7 +538,7 @@ export default function MarketplacePage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search products, suppliers, categories..."
-            className="w-full h-11 pl-10 pr-10 rounded-xl border border-gray-200 bg-white text-sm text-navy placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-teal/30 focus:border-teal transition-all"
+            className="w-full h-11 pl-10 pr-10 rounded-xl border border-gray-200 bg-white text-sm text-navy placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347] transition-all"
           />
           {searchQuery && (
             <button
@@ -564,7 +564,7 @@ export default function MarketplacePage() {
                 onClick={() => setSelectedCategory(cat.key)}
                 className={`shrink-0 snap-start flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all min-h-[36px] ${
                   isActive
-                    ? 'bg-teal text-white shadow-sm shadow-teal/20'
+                    ? 'bg-[#5DB347] text-white shadow-sm shadow-[#5DB347]/20'
                     : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 active:bg-gray-100'
                 }`}
               >
@@ -621,7 +621,7 @@ export default function MarketplacePage() {
                         }}
                         className={`w-full text-left px-3.5 py-2 text-xs transition-colors ${
                           sortKey === opt.key
-                            ? 'bg-teal/10 text-teal font-semibold'
+                            ? 'bg-[#5DB347]/10 text-[#5DB347] font-semibold'
                             : 'text-gray-600 hover:bg-gray-50 active:bg-gray-100'
                         }`}
                       >
@@ -673,7 +673,7 @@ export default function MarketplacePage() {
                 setSelectedCategory('all');
                 setSortKey('featured');
               }}
-              className="mt-4 px-4 py-2 rounded-xl bg-teal text-white text-sm font-semibold hover:bg-teal-dark active:scale-[0.97] transition-all"
+              className="mt-4 px-4 py-2 rounded-xl bg-[#5DB347] text-white text-sm font-semibold hover:bg-[#449933] active:scale-[0.97] transition-all"
             >
               Clear Filters
             </button>
