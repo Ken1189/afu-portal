@@ -3,7 +3,26 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { SupplierProduct } from '@/lib/data/supplierProducts';
+export interface SupplierProduct {
+  id: string;
+  supplierId: string;
+  supplierName: string;
+  name: string;
+  description: string;
+  category: 'seeds' | 'fertilizer' | 'pesticides' | 'equipment' | 'irrigation' | 'technology' | 'packaging' | 'storage' | 'tools';
+  price: number;
+  memberPrice: number;
+  currency: string;
+  unit: string;
+  image: string;
+  availability: 'in-stock' | 'limited' | 'pre-order' | 'out-of-stock';
+  rating: number;
+  reviewCount: number;
+  soldCount: number;
+  tags: string[];
+  featured: boolean;
+  minOrder: number;
+}
 
 export interface CartItem {
   product: SupplierProduct;
