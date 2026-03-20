@@ -29,10 +29,12 @@ import {
   CreditCard,
 } from 'lucide-react';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LanguageProvider, useLanguage } from '@/lib/i18n/LanguageContext';
 import { localeNames, type Locale } from '@/lib/i18n/translations';
 import { FlagIcon } from '@/components/FlagIcon';
+import { useAuth } from '@/lib/supabase/auth-context';
 
 const navLinks = [
   { href: '/farm', labelKey: 'home' as const, shortKey: 'home' as const, icon: Home },
@@ -70,10 +72,16 @@ export default function FarmLayout({ children }: { children: React.ReactNode }) 
 
 function FarmLayoutInner({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { profile, signOut } = useAuth();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
   const [sidebarLangOpen, setSidebarLangOpen] = useState(false);
   const { locale, setLocale, t } = useLanguage();
+
+  const displayName = profile?.full_name || profile?.email?.split('@')[0] || 'Farmer';
+  const firstName = displayName.split(' ')[0];
+  const initials = displayName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
 
   const getPageTitle = () => {
     if (pathname === '/farm') return 'Mkulima Hub';
@@ -98,11 +106,11 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
           </div>
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center font-bold">
-              KM
+              {initials}
             </div>
             <div>
-              <p className="font-semibold text-sm">Kgosi Mosweu</p>
-              <p className="text-xs opacity-70">Smallholder • 5.3 ha</p>
+              <p className="font-semibold text-sm">{displayName}</p>
+              <p className="text-xs opacity-70">Smallholder • {profile?.country || 'AFU'}</p>
             </div>
           </div>
         </div>
@@ -188,7 +196,7 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
             </button>
             <div className="min-w-0 flex-1">
               <h1 className="text-base font-bold text-navy leading-tight truncate">{getPageTitle()}</h1>
-              <p className="text-[11px] text-gray-400 leading-tight">Kgosi Mosweu • 5.3 ha</p>
+              <p className="text-[11px] text-gray-400 leading-tight">{firstName} • {profile?.country || 'AFU'}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -283,9 +291,9 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
             </button>
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 bg-teal rounded-full flex items-center justify-center">
-                <span className="text-white text-sm font-bold">KM</span>
+                <span className="text-white text-sm font-bold">{initials}</span>
               </div>
-              <span className="text-sm font-medium text-navy">Kgosi Mosweu</span>
+              <span className="text-sm font-medium text-navy">{displayName}</span>
             </div>
           </div>
         </header>
@@ -321,12 +329,12 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-lg font-bold">
-                      KM
+                      {initials}
                     </div>
                     <div>
-                      <p className="font-semibold">Kgosi Mosweu</p>
-                      <p className="text-xs opacity-80">Smallholder • Gaborone, Botswana</p>
-                      <p className="text-xs opacity-60">Member since 2023</p>
+                      <p className="font-semibold">{displayName}</p>
+                      <p className="text-xs opacity-80">Smallholder • {profile?.region || profile?.country || 'AFU'}</p>
+                      <p className="text-xs opacity-60">{profile?.email}</p>
                     </div>
                   </div>
                 </div>
