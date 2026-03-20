@@ -16,7 +16,77 @@ import {
   Activity,
   CalendarDays,
 } from 'lucide-react';
-import { auditEntries as mockAuditEntries, type AuditEntry, type AuditAction, type AuditSeverity } from '@/lib/data/audit';
+// ── Inline types & fallback data (formerly from @/lib/data/audit) ───────────
+
+type AuditSeverity = 'info' | 'warning' | 'critical';
+type AuditAction =
+  | 'login'
+  | 'logout'
+  | 'member_created'
+  | 'member_updated'
+  | 'member_suspended'
+  | 'member_activated'
+  | 'loan_approved'
+  | 'loan_rejected'
+  | 'loan_disbursed'
+  | 'payment_received'
+  | 'payment_failed'
+  | 'document_uploaded'
+  | 'document_verified'
+  | 'document_rejected'
+  | 'application_submitted'
+  | 'application_reviewed'
+  | 'training_completed'
+  | 'supplier_approved'
+  | 'supplier_suspended'
+  | 'product_approved'
+  | 'product_rejected'
+  | 'claim_submitted'
+  | 'claim_approved'
+  | 'claim_rejected'
+  | 'settings_changed'
+  | 'role_assigned'
+  | 'export_generated'
+  | 'bulk_action';
+
+interface AuditEntry {
+  id: string;
+  timestamp: string;
+  action: AuditAction;
+  severity: AuditSeverity;
+  userId: string;
+  userName: string;
+  userRole: 'admin' | 'officer' | 'member' | 'supplier' | 'system';
+  entityType: 'member' | 'loan' | 'payment' | 'document' | 'supplier' | 'product' | 'claim' | 'training' | 'system';
+  entityId: string;
+  entityName: string;
+  description: string;
+  ipAddress: string;
+  metadata: Record<string, string>;
+}
+
+const mockAuditEntries: AuditEntry[] = [
+  { id: 'AUD-001', timestamp: '2026-03-16T09:15:00Z', action: 'loan_approved', severity: 'info', userId: 'ADM-001', userName: 'Tendai Chikwava', userRole: 'officer', entityType: 'loan', entityId: 'LN-2026-0042', entityName: 'Working Capital - Farai Moyo', description: 'Approved working capital loan of $8,500 for Farai Moyo (AFU-2024-012)', ipAddress: '197.221.44.102', metadata: { amount: '$8,500', loanType: 'Working Capital', riskGrade: 'B+' } },
+  { id: 'AUD-002', timestamp: '2026-03-16T08:45:00Z', action: 'member_suspended', severity: 'warning', userId: 'ADM-002', userName: 'Sarah Moatlhodi', userRole: 'admin', entityType: 'member', entityId: 'AFU-2024-034', entityName: 'Peter Kgabo', description: 'Suspended member due to document verification failure after 3 attempts', ipAddress: '196.216.170.55', metadata: { reason: 'Document Verification Failure', attempts: '3' } },
+  { id: 'AUD-003', timestamp: '2026-03-16T08:30:00Z', action: 'payment_received', severity: 'info', userId: 'SYS-001', userName: 'System', userRole: 'system', entityType: 'payment', entityId: 'PAY-2026-0188', entityName: 'EcoCash Payment - Naledi Sekgoma', description: 'Mobile money payment of $125.00 received via EcoCash for loan LN-2026-0015', ipAddress: '0.0.0.0', metadata: { method: 'EcoCash', amount: '$125.00', loanId: 'LN-2026-0015' } },
+  { id: 'AUD-004', timestamp: '2026-03-16T08:12:00Z', action: 'supplier_approved', severity: 'info', userId: 'ADM-001', userName: 'Tendai Chikwava', userRole: 'admin', entityType: 'supplier', entityId: 'SUP-024', entityName: 'Kalahari Seeds & Feeds', description: 'Approved new supplier application for Kalahari Seeds & Feeds (Bronze tier)', ipAddress: '197.221.44.102', metadata: { tier: 'Bronze', category: 'input-supplier', country: 'Botswana' } },
+  { id: 'AUD-005', timestamp: '2026-03-16T07:55:00Z', action: 'loan_disbursed', severity: 'info', userId: 'ADM-003', userName: 'Grace Nkomo', userRole: 'officer', entityType: 'loan', entityId: 'LN-2026-0038', entityName: 'Equipment Finance - Chipo Banda', description: 'Disbursed $12,000 equipment loan to Chipo Banda via bank transfer', ipAddress: '196.1.2.88', metadata: { amount: '$12,000', method: 'Bank Transfer', bank: 'FNB Botswana' } },
+  { id: 'AUD-006', timestamp: '2026-03-16T07:30:00Z', action: 'document_rejected', severity: 'warning', userId: 'ADM-002', userName: 'Sarah Moatlhodi', userRole: 'officer', entityType: 'document', entityId: 'DOC-2026-0245', entityName: 'Farm Title Deed - James Mwanga', description: 'Rejected farm title deed upload - image quality too low, requested re-upload', ipAddress: '196.216.170.55', metadata: { docType: 'Farm Title Deed', reason: 'Low Image Quality' } },
+  { id: 'AUD-007', timestamp: '2026-03-16T07:15:00Z', action: 'login', severity: 'info', userId: 'ADM-001', userName: 'Tendai Chikwava', userRole: 'admin', entityType: 'system', entityId: 'SESSION-88291', entityName: 'Admin Login', description: 'Admin login from Harare, Zimbabwe (verified 2FA)', ipAddress: '197.221.44.102', metadata: { location: 'Harare, ZW', twoFactor: 'verified' } },
+  { id: 'AUD-008', timestamp: '2026-03-15T18:45:00Z', action: 'bulk_action', severity: 'warning', userId: 'ADM-003', userName: 'Grace Nkomo', userRole: 'admin', entityType: 'payment', entityId: 'BATCH-0056', entityName: 'Bulk Disbursement Batch #56', description: 'Initiated bulk disbursement of 12 loans totaling $67,500', ipAddress: '196.1.2.88', metadata: { loanCount: '12', totalAmount: '$67,500', batchId: 'BATCH-0056' } },
+  { id: 'AUD-009', timestamp: '2026-03-15T17:20:00Z', action: 'claim_submitted', severity: 'info', userId: 'MEM-015', userName: 'Tatenda Mutasa', userRole: 'member', entityType: 'claim', entityId: 'CLM-2026-0012', entityName: 'Crop Loss - Drought', description: 'Insurance claim submitted for drought-related crop loss on 2.5ha maize field', ipAddress: '197.231.12.44', metadata: { claimType: 'Crop Loss', cause: 'Drought', hectares: '2.5', crop: 'Maize' } },
+  { id: 'AUD-010', timestamp: '2026-03-15T16:55:00Z', action: 'settings_changed', severity: 'critical', userId: 'ADM-001', userName: 'Tendai Chikwava', userRole: 'admin', entityType: 'system', entityId: 'CFG-INTEREST', entityName: 'Interest Rate Configuration', description: 'Updated base interest rate from 12.5% to 11.8% for working capital loans', ipAddress: '197.221.44.102', metadata: { setting: 'Base Interest Rate', oldValue: '12.5%', newValue: '11.8%' } },
+  { id: 'AUD-011', timestamp: '2026-03-15T16:30:00Z', action: 'product_approved', severity: 'info', userId: 'ADM-002', userName: 'Sarah Moatlhodi', userRole: 'admin', entityType: 'product', entityId: 'PROD-039', entityName: 'Premium Hybrid Maize Seed (50kg)', description: 'Approved new product listing from Zambezi Agri-Supplies', ipAddress: '196.216.170.55', metadata: { supplier: 'Zambezi Agri-Supplies', price: '$85.00', category: 'Seeds' } },
+  { id: 'AUD-012', timestamp: '2026-03-15T15:45:00Z', action: 'payment_failed', severity: 'critical', userId: 'SYS-001', userName: 'System', userRole: 'system', entityType: 'payment', entityId: 'PAY-2026-0185', entityName: 'M-Pesa Payment - Baraka Mwenda', description: 'Mobile money payment of $200.00 failed - insufficient balance in member wallet', ipAddress: '0.0.0.0', metadata: { method: 'M-Pesa', amount: '$200.00', error: 'Insufficient Balance' } },
+  { id: 'AUD-013', timestamp: '2026-03-15T15:15:00Z', action: 'member_created', severity: 'info', userId: 'ADM-002', userName: 'Sarah Moatlhodi', userRole: 'officer', entityType: 'member', entityId: 'AFU-2026-058', entityName: 'Blessing Ncube', description: 'New smallholder member registered from Matabeleland South, Zimbabwe', ipAddress: '196.216.170.55', metadata: { tier: 'Smallholder', country: 'Zimbabwe', region: 'Matabeleland South' } },
+  { id: 'AUD-014', timestamp: '2026-03-15T14:30:00Z', action: 'application_reviewed', severity: 'info', userId: 'ADM-003', userName: 'Grace Nkomo', userRole: 'officer', entityType: 'loan', entityId: 'APP-2026-0089', entityName: 'Invoice Finance - Thabo Ramaano', description: 'Completed credit assessment for invoice finance application ($15,000)', ipAddress: '196.1.2.88', metadata: { creditScore: '78', riskGrade: 'A-', recommendedAmount: '$15,000' } },
+  { id: 'AUD-015', timestamp: '2026-03-15T14:00:00Z', action: 'training_completed', severity: 'info', userId: 'MEM-023', userName: 'Amara Juma', userRole: 'member', entityType: 'training', entityId: 'CRS-005', entityName: 'Financial Literacy for Farmers', description: 'Completed Financial Literacy for Farmers course with score 88%', ipAddress: '196.192.44.67', metadata: { score: '88%', duration: '4h 30m', certificate: 'Issued' } },
+  { id: 'AUD-016', timestamp: '2026-03-15T12:20:00Z', action: 'loan_rejected', severity: 'warning', userId: 'ADM-001', userName: 'Tendai Chikwava', userRole: 'officer', entityType: 'loan', entityId: 'APP-2026-0085', entityName: 'Working Capital - Mpho Ramotswe', description: 'Rejected loan application due to insufficient credit history and missing collateral docs', ipAddress: '197.221.44.102', metadata: { amount: '$6,000', reason: 'Insufficient Credit History', creditScore: '42' } },
+  { id: 'AUD-017', timestamp: '2026-03-15T11:45:00Z', action: 'document_verified', severity: 'info', userId: 'ADM-002', userName: 'Sarah Moatlhodi', userRole: 'officer', entityType: 'document', entityId: 'DOC-2026-0238', entityName: 'National ID - Flora Mushi', description: 'Verified national ID document for KYC compliance (Tanzania)', ipAddress: '196.216.170.55', metadata: { docType: 'National ID', country: 'Tanzania', verificationMethod: 'Manual' } },
+  { id: 'AUD-018', timestamp: '2026-03-15T10:30:00Z', action: 'export_generated', severity: 'info', userId: 'ADM-001', userName: 'Tendai Chikwava', userRole: 'admin', entityType: 'system', entityId: 'EXP-2026-0034', entityName: 'Monthly Portfolio Report', description: 'Generated monthly portfolio report for February 2026 (PDF, 45 pages)', ipAddress: '197.221.44.102', metadata: { format: 'PDF', pages: '45', period: 'February 2026' } },
+  { id: 'AUD-019', timestamp: '2026-03-15T09:15:00Z', action: 'role_assigned', severity: 'warning', userId: 'ADM-001', userName: 'Tendai Chikwava', userRole: 'admin', entityType: 'system', entityId: 'ADM-005', entityName: 'Joseph Tawanda', description: 'Assigned finance-officer role to Joseph Tawanda with disbursement approval permissions', ipAddress: '197.221.44.102', metadata: { role: 'Finance Officer', permissions: 'disbursement_approve, payment_view' } },
+  { id: 'AUD-020', timestamp: '2026-03-15T08:00:00Z', action: 'login', severity: 'info', userId: 'ADM-002', userName: 'Sarah Moatlhodi', userRole: 'officer', entityType: 'system', entityId: 'SESSION-88245', entityName: 'Officer Login', description: 'Officer login from Gaborone, Botswana', ipAddress: '196.216.170.55', metadata: { location: 'Gaborone, BW', twoFactor: 'verified' } },
+];
 
 // ── Animation variants ──────────────────────────────────────────────────────
 

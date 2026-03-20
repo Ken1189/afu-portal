@@ -19,12 +19,42 @@ import {
   Info,
   ShoppingCart,
 } from 'lucide-react';
-import { suppliers as mockSuppliers } from '@/lib/data/suppliers';
-import { supplierProducts as mockSupplierProducts } from '@/lib/data/supplierProducts';
+// ── Inline types & fallback data (replaces @/lib/data/ imports) ─────────────
 
-// ── Module-level aliases (keep component code unchanged) ────────────────────
-const suppliers = mockSuppliers;
-const supplierProducts = mockSupplierProducts;
+type SupplierCategory = 'input-supplier' | 'equipment' | 'logistics' | 'processing' | 'technology' | 'financial-services';
+type SponsorshipTier = 'platinum' | 'gold' | 'silver' | 'bronze';
+type Country = 'Botswana' | 'Kenya' | 'Mozambique' | 'Nigeria' | 'Sierra Leone' | 'South Africa' | 'Tanzania' | 'Zambia' | 'Zimbabwe';
+
+interface Supplier {
+  id: string; companyName: string; contactName: string; email: string; phone: string;
+  country: Country; region: string; category: SupplierCategory;
+  status: 'active' | 'pending' | 'suspended'; joinDate: string; logo: string;
+  description: string; productsCount: number; totalSales: number; totalOrders: number;
+  rating: number; reviewCount: number; memberDiscountPercent: number; commissionRate: number;
+  isFounding: boolean; sponsorshipTier: SponsorshipTier | null; verified: boolean;
+  website: string; certifications: string[];
+}
+
+interface SupplierProduct {
+  id: string; supplierId: string; supplierName: string; name: string; description: string;
+  category: 'seeds' | 'fertilizer' | 'pesticides' | 'equipment' | 'irrigation' | 'technology' | 'packaging' | 'storage' | 'tools';
+  price: number; memberPrice: number; currency: string; unit: string; image: string;
+  availability: 'in-stock' | 'limited' | 'pre-order' | 'out-of-stock';
+  rating: number; reviewCount: number; soldCount: number; tags: string[];
+  featured: boolean; minOrder: number;
+}
+
+const suppliers: Supplier[] = [
+  { id: 'SUP-001', companyName: 'Zambezi Agri-Supplies', contactName: 'Farai Ndlovu', email: 'farai@zambezi-agri.co.zw', phone: '+263 77 200 1001', country: 'Zimbabwe', region: 'Harare', category: 'input-supplier', status: 'active', joinDate: '2024-06-15', logo: 'https://images.unsplash.com/photo-1560693225-b8507d6f3aa9?w=400&h=300&fit=crop', description: 'Leading agricultural input supplier across Southern Africa.', productsCount: 38, totalSales: 1847320, totalOrders: 4215, rating: 4.8, reviewCount: 312, memberDiscountPercent: 12, commissionRate: 8, isFounding: true, sponsorshipTier: 'platinum', verified: true, website: 'https://zambezi-agri.co.zw', certifications: ['ISO 9001', 'GlobalGAP Approved', 'SADC Trade Certified'] },
+];
+
+const supplierProducts: SupplierProduct[] = [
+  { id: 'SPROD-005', supplierId: 'SUP-001', supplierName: 'Zambezi Agri-Supplies', name: 'Groundnut Seed (Nyanda)', description: 'Virginia-type groundnut variety.', category: 'seeds', price: 78, memberPrice: 68.64, currency: 'USD', unit: 'per 25kg bag', image: 'https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=400&h=300&fit=crop', availability: 'in-stock', rating: 4.8, reviewCount: 98, soldCount: 1678, tags: ['groundnut'], featured: true, minOrder: 1 },
+  { id: 'SPROD-014', supplierId: 'SUP-001', supplierName: 'Zambezi Agri-Supplies', name: 'Metalaxyl + Mancozeb Fungicide', description: 'Systemic and contact fungicide.', category: 'pesticides', price: 35, memberPrice: 30.80, currency: 'USD', unit: 'per kg', image: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400&h=300&fit=crop', availability: 'in-stock', rating: 4.5, reviewCount: 76, soldCount: 1345, tags: ['fungicide'], featured: false, minOrder: 2 },
+  { id: 'SPROD-035', supplierId: 'SUP-001', supplierName: 'Zambezi Agri-Supplies', name: 'Knapsack Sprayer (16L Manual)', description: 'High-pressure manual knapsack sprayer.', category: 'tools', price: 35, memberPrice: 30.80, currency: 'USD', unit: 'per unit', image: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop', availability: 'in-stock', rating: 4.3, reviewCount: 123, soldCount: 3456, tags: ['sprayer'], featured: false, minOrder: 1 },
+  { id: 'SPROD-036', supplierId: 'SUP-001', supplierName: 'Zambezi Agri-Supplies', name: 'Soil pH Test Kit (50 tests)', description: 'Portable soil pH testing kit.', category: 'tools', price: 28, memberPrice: 24.64, currency: 'USD', unit: 'per kit', image: 'https://images.unsplash.com/photo-1585336261022-680e295ce3fe?w=400&h=300&fit=crop', availability: 'in-stock', rating: 4.4, reviewCount: 56, soldCount: 789, tags: ['soil-testing'], featured: false, minOrder: 1 },
+  { id: 'SPROD-038', supplierId: 'SUP-001', supplierName: 'Zambezi Agri-Supplies', name: 'Pruning Shears (Bypass, Professional)', description: 'Professional bypass pruning shears.', category: 'tools', price: 12, memberPrice: 10.56, currency: 'USD', unit: 'per unit', image: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop', availability: 'in-stock', rating: 4.5, reviewCount: 67, soldCount: 1234, tags: ['pruning'], featured: false, minOrder: 2 },
+];
 
 // ── Animation variants ──────────────────────────────────────────────────────
 

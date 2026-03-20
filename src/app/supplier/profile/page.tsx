@@ -25,8 +25,67 @@ import {
   Smartphone,
   Save,
 } from 'lucide-react';
-import { suppliers as mockSuppliers } from '@/lib/data/suppliers';
-const suppliers = mockSuppliers;
+// ── Inline supplier type & fallback data (replaces @/lib/data/suppliers import) ──
+
+type SupplierCategory = 'input-supplier' | 'equipment' | 'logistics' | 'processing' | 'technology' | 'financial-services';
+type SponsorshipTier = 'platinum' | 'gold' | 'silver' | 'bronze';
+type Country = 'Botswana' | 'Kenya' | 'Mozambique' | 'Nigeria' | 'Sierra Leone' | 'South Africa' | 'Tanzania' | 'Zambia' | 'Zimbabwe';
+
+interface Supplier {
+  id: string;
+  companyName: string;
+  contactName: string;
+  email: string;
+  phone: string;
+  country: Country;
+  region: string;
+  category: SupplierCategory;
+  status: 'active' | 'pending' | 'suspended';
+  joinDate: string;
+  logo: string;
+  description: string;
+  productsCount: number;
+  totalSales: number;
+  totalOrders: number;
+  rating: number;
+  reviewCount: number;
+  memberDiscountPercent: number;
+  commissionRate: number;
+  isFounding: boolean;
+  sponsorshipTier: SponsorshipTier | null;
+  verified: boolean;
+  website: string;
+  certifications: string[];
+}
+
+const suppliers: Supplier[] = [
+  {
+    id: 'SUP-001',
+    companyName: 'Zambezi Agri-Supplies',
+    contactName: 'Farai Ndlovu',
+    email: 'farai@zambezi-agri.co.zw',
+    phone: '+263 77 200 1001',
+    country: 'Zimbabwe',
+    region: 'Harare',
+    category: 'input-supplier',
+    status: 'active',
+    joinDate: '2024-06-15',
+    logo: 'https://images.unsplash.com/photo-1560693225-b8507d6f3aa9?w=400&h=300&fit=crop',
+    description: 'Leading agricultural input supplier across Southern Africa. Specializing in certified seeds, fertilizers, and crop protection products for commercial and smallholder farmers.',
+    productsCount: 38,
+    totalSales: 1847320,
+    totalOrders: 4215,
+    rating: 4.8,
+    reviewCount: 312,
+    memberDiscountPercent: 12,
+    commissionRate: 8,
+    isFounding: true,
+    sponsorshipTier: 'platinum',
+    verified: true,
+    website: 'https://zambezi-agri.co.zw',
+    certifications: ['ISO 9001', 'GlobalGAP Approved', 'SADC Trade Certified'],
+  },
+];
 
 // -- Animation variants -------------------------------------------------------
 

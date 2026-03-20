@@ -44,8 +44,76 @@ import {
   ChevronRight,
   CreditCard,
 } from 'lucide-react';
-import { members as mockMembers } from '@/lib/data/members';
-import { loans as mockLoans } from '@/lib/data/loans';
+// ── Inline types & fallback data (formerly from @/lib/data/members & @/lib/data/loans) ─
+
+type MemberTier = 'smallholder' | 'commercial' | 'enterprise' | 'partner';
+type MemberStatus = 'active' | 'pending' | 'suspended';
+type KycStatus = 'complete' | 'partial' | 'pending';
+type MemberCountry = 'Botswana' | 'Kenya' | 'Mozambique' | 'Nigeria' | 'Sierra Leone' | 'South Africa' | 'Tanzania' | 'Zambia' | 'Zimbabwe';
+
+interface Member {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  tier: MemberTier;
+  country: MemberCountry;
+  region: string;
+  status: MemberStatus;
+  kycStatus: KycStatus;
+  profileCompleteness: number;
+  farmName: string;
+  farmSize: number;
+  primaryCrops: string[];
+  joinDate: string;
+  lastActive: string;
+  avatar: null;
+  creditScore: number;
+}
+
+const mockMembers: Member[] = [
+  { id: 'AFU-2024-001', firstName: 'Kgosi', lastName: 'Mosweu', email: 'kgosi.mosweu@email.com', phone: '+267 71 234 567', tier: 'smallholder', country: 'Botswana', region: 'North-West', status: 'active', kycStatus: 'complete', profileCompleteness: 92, farmName: 'Mosweu Family Fields', farmSize: 4.5, primaryCrops: ['Maize', 'Groundnuts'], joinDate: '2024-10-15', lastActive: '2026-03-12', avatar: null, creditScore: 72 },
+  { id: 'AFU-2024-002', firstName: 'Naledi', lastName: 'Sekgoma', email: 'naledi.sekgoma@email.com', phone: '+267 72 345 678', tier: 'smallholder', country: 'Botswana', region: 'Central', status: 'active', kycStatus: 'complete', profileCompleteness: 88, farmName: 'Sunrise Lands', farmSize: 3.2, primaryCrops: ['Sorghum', 'Groundnuts'], joinDate: '2024-11-02', lastActive: '2026-03-11', avatar: null, creditScore: 65 },
+  { id: 'AFU-2024-003', firstName: 'Tendai', lastName: 'Moyo', email: 'tendai.moyo@email.com', phone: '+263 77 123 4567', tier: 'smallholder', country: 'Zimbabwe', region: 'Mashonaland East', status: 'active', kycStatus: 'complete', profileCompleteness: 95, farmName: 'Moyo Heritage Farm', farmSize: 6.0, primaryCrops: ['Maize', 'Soybeans'], joinDate: '2024-09-20', lastActive: '2026-03-13', avatar: null, creditScore: 78 },
+  { id: 'AFU-2024-036', firstName: 'Thabo', lastName: 'Molefe', email: 'thabo.molefe@email.com', phone: '+267 71 567 890', tier: 'commercial', country: 'Botswana', region: 'North-West', status: 'active', kycStatus: 'complete', profileCompleteness: 98, farmName: 'Molefe Commercial Blueberries', farmSize: 45.0, primaryCrops: ['Blueberries', 'Sunflower'], joinDate: '2024-09-05', lastActive: '2026-03-13', avatar: null, creditScore: 88 },
+  { id: 'AFU-2024-037', firstName: 'Rudo', lastName: 'Chidyamakono', email: 'rudo.chidyamakono@email.com', phone: '+263 77 234 5678', tier: 'commercial', country: 'Zimbabwe', region: 'Mashonaland East', status: 'active', kycStatus: 'complete', profileCompleteness: 96, farmName: 'Chidyamakono Export Farms', farmSize: 120.0, primaryCrops: ['Tobacco', 'Soybeans', 'Maize'], joinDate: '2024-09-12', lastActive: '2026-03-13', avatar: null, creditScore: 91 },
+  { id: 'AFU-2024-046', firstName: 'Blessing', lastName: 'Murefu', email: 'blessing.murefu@email.com', phone: '+263 77 567 8901', tier: 'enterprise', country: 'Zimbabwe', region: 'Mashonaland East', status: 'active', kycStatus: 'complete', profileCompleteness: 100, farmName: 'Murefu Agricultural Conglomerate', farmSize: 850.0, primaryCrops: ['Tobacco', 'Cotton', 'Maize', 'Soybeans'], joinDate: '2024-09-01', lastActive: '2026-03-13', avatar: null, creditScore: 95 },
+  { id: 'AFU-2024-047', firstName: 'Joseph', lastName: 'Mwangosi', email: 'joseph.mwangosi@email.com', phone: '+255 712 678 901', tier: 'enterprise', country: 'Tanzania', region: 'Mbeya', status: 'active', kycStatus: 'complete', profileCompleteness: 100, farmName: 'Mwangosi Plantation Group', farmSize: 520.0, primaryCrops: ['Sesame', 'Cassava', 'Sunflower', 'Blueberries'], joinDate: '2024-09-08', lastActive: '2026-03-13', avatar: null, creditScore: 93 },
+  { id: 'AFU-2024-009', firstName: 'Tapiwa', lastName: 'Ncube', email: 'tapiwa.ncube@email.com', phone: '+263 78 345 6789', tier: 'smallholder', country: 'Zimbabwe', region: 'Matabeleland North', status: 'active', kycStatus: 'complete', profileCompleteness: 91, farmName: 'Ncube Ancestral Lands', farmSize: 7.2, primaryCrops: ['Cotton', 'Sorghum'], joinDate: '2024-11-15', lastActive: '2026-03-13', avatar: null, creditScore: 74 },
+  { id: 'AFU-2024-038', firstName: 'Emmanuel', lastName: 'Massawe', email: 'emmanuel.massawe@email.com', phone: '+255 754 345 678', tier: 'commercial', country: 'Tanzania', region: 'Kilimanjaro', status: 'active', kycStatus: 'complete', profileCompleteness: 95, farmName: 'Massawe Highland Berries', farmSize: 55.0, primaryCrops: ['Blueberries', 'Sesame'], joinDate: '2024-10-01', lastActive: '2026-03-12', avatar: null, creditScore: 86 },
+];
+
+interface Loan {
+  id: string;
+  memberId: string;
+  memberName: string;
+  type: 'working-capital' | 'invoice-finance' | 'equipment' | 'input-bundle';
+  amount: number;
+  outstanding: number;
+  interestRate: number;
+  tenor: number;
+  status: 'active' | 'completed' | 'overdue' | 'disbursed' | 'approved';
+  disbursementDate: string;
+  maturityDate: string;
+  nextPaymentDate: string;
+  nextPaymentAmount: number;
+  repaidPercentage: number;
+  crop: string;
+  buyer: string | null;
+  country: string;
+}
+
+const mockLoans: Loan[] = [
+  { id: 'FIN-2024-001', memberId: 'AFU-2024-036', memberName: 'Thabo Molefe', type: 'working-capital', amount: 85000, outstanding: 42500, interestRate: 12.5, tenor: 180, status: 'active', disbursementDate: '2025-10-15', maturityDate: '2026-04-13', nextPaymentDate: '2026-03-15', nextPaymentAmount: 14800, repaidPercentage: 50, crop: 'Blueberries', buyer: null, country: 'Botswana' },
+  { id: 'FIN-2024-002', memberId: 'AFU-2024-037', memberName: 'Rudo Chidyamakono', type: 'invoice-finance', amount: 120000, outstanding: 36000, interestRate: 10.0, tenor: 90, status: 'active', disbursementDate: '2026-01-10', maturityDate: '2026-04-10', nextPaymentDate: '2026-03-20', nextPaymentAmount: 18500, repaidPercentage: 70, crop: 'Tobacco', buyer: 'Berry Fresh UK', country: 'Zimbabwe' },
+  { id: 'FIN-2024-003', memberId: 'AFU-2024-003', memberName: 'Tendai Moyo', type: 'input-bundle', amount: 8500, outstanding: 5950, interestRate: 15.0, tenor: 120, status: 'active', disbursementDate: '2025-12-20', maturityDate: '2026-04-19', nextPaymentDate: '2026-03-20', nextPaymentAmount: 2200, repaidPercentage: 30, crop: 'Maize', buyer: null, country: 'Zimbabwe' },
+  { id: 'FIN-2024-005', memberId: 'AFU-2024-001', memberName: 'Kgosi Mosweu', type: 'working-capital', amount: 12000, outstanding: 3600, interestRate: 14.0, tenor: 150, status: 'active', disbursementDate: '2025-11-01', maturityDate: '2026-03-31', nextPaymentDate: '2026-03-18', nextPaymentAmount: 3800, repaidPercentage: 70, crop: 'Maize', buyer: null, country: 'Botswana' },
+  { id: 'FIN-2024-006', memberId: 'AFU-2024-046', memberName: 'Blessing Murefu', type: 'invoice-finance', amount: 200000, outstanding: 80000, interestRate: 8.5, tenor: 120, status: 'active', disbursementDate: '2025-12-01', maturityDate: '2026-03-31', nextPaymentDate: '2026-03-15', nextPaymentAmount: 42000, repaidPercentage: 60, crop: 'Cotton', buyer: 'Marks & Spencer', country: 'Zimbabwe' },
+  { id: 'FIN-2024-009', memberId: 'AFU-2024-047', memberName: 'Joseph Mwangosi', type: 'equipment', amount: 180000, outstanding: 144000, interestRate: 9.0, tenor: 365, status: 'disbursed', disbursementDate: '2026-01-15', maturityDate: '2027-01-15', nextPaymentDate: '2026-03-15', nextPaymentAmount: 16800, repaidPercentage: 20, crop: 'Sesame', buyer: null, country: 'Tanzania' },
+  { id: 'FIN-2024-010', memberId: 'AFU-2024-009', memberName: 'Tapiwa Ncube', type: 'working-capital', amount: 15000, outstanding: 17250, interestRate: 16.0, tenor: 120, status: 'overdue', disbursementDate: '2025-08-10', maturityDate: '2025-12-08', nextPaymentDate: '2025-12-08', nextPaymentAmount: 17250, repaidPercentage: 0, crop: 'Cotton', buyer: null, country: 'Zimbabwe' },
+  { id: 'FIN-2024-004', memberId: 'AFU-2024-038', memberName: 'Emmanuel Massawe', type: 'equipment', amount: 65000, outstanding: 48750, interestRate: 11.0, tenor: 365, status: 'active', disbursementDate: '2025-09-01', maturityDate: '2026-09-01', nextPaymentDate: '2026-03-25', nextPaymentAmount: 6200, repaidPercentage: 25, crop: 'Blueberries', buyer: null, country: 'Tanzania' },
+];
 
 // ── Module-level aliases (keep component code unchanged) ────────────────────
 const members = mockMembers;

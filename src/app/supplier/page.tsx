@@ -35,19 +35,189 @@ import {
   BarChart3,
   MousePointerClick,
 } from 'lucide-react';
-import { suppliers as mockSuppliers } from '@/lib/data/suppliers';
-import { supplierProducts as mockSupplierProducts } from '@/lib/data/supplierProducts';
-import { commissions as mockCommissions } from '@/lib/data/commissions';
-import { advertisements as mockAdvertisements } from '@/lib/data/advertisements';
 import { useSuppliers } from '@/lib/supabase/use-suppliers';
 import { useProducts } from '@/lib/supabase/use-products';
 import { useAuth } from '@/lib/supabase/auth-context';
 
-// ── Module-level aliases (keep component code unchanged) ────────────────────
-const staticSuppliers = mockSuppliers;
-const supplierProducts = mockSupplierProducts;
-const commissions = mockCommissions;
-const advertisements = mockAdvertisements;
+// ── Inline types ────────────────────────────────────────────────────────────
+
+type SupplierCategory = 'input-supplier' | 'equipment' | 'logistics' | 'processing' | 'technology' | 'financial-services';
+type SponsorshipTier = 'platinum' | 'gold' | 'silver' | 'bronze';
+type Country = 'Botswana' | 'Kenya' | 'Mozambique' | 'Nigeria' | 'Sierra Leone' | 'South Africa' | 'Tanzania' | 'Zambia' | 'Zimbabwe';
+
+interface Supplier {
+  id: string;
+  companyName: string;
+  contactName: string;
+  email: string;
+  phone: string;
+  country: Country;
+  region: string;
+  category: SupplierCategory;
+  status: 'active' | 'pending' | 'suspended';
+  joinDate: string;
+  logo: string;
+  description: string;
+  productsCount: number;
+  totalSales: number;
+  totalOrders: number;
+  rating: number;
+  reviewCount: number;
+  memberDiscountPercent: number;
+  commissionRate: number;
+  isFounding: boolean;
+  sponsorshipTier: SponsorshipTier | null;
+  verified: boolean;
+  website: string;
+  certifications: string[];
+}
+
+interface SupplierProduct {
+  id: string;
+  supplierId: string;
+  supplierName: string;
+  name: string;
+  description: string;
+  category: 'seeds' | 'fertilizer' | 'pesticides' | 'equipment' | 'irrigation' | 'technology' | 'packaging' | 'storage' | 'tools';
+  price: number;
+  memberPrice: number;
+  currency: string;
+  unit: string;
+  image: string;
+  availability: 'in-stock' | 'limited' | 'pre-order' | 'out-of-stock';
+  rating: number;
+  reviewCount: number;
+  soldCount: number;
+  tags: string[];
+  featured: boolean;
+  minOrder: number;
+}
+
+interface Commission {
+  id: string;
+  supplierId: string;
+  supplierName: string;
+  orderId: string;
+  productName: string;
+  buyerName: string;
+  buyerType: 'smallholder' | 'commercial' | 'enterprise' | 'cooperative';
+  orderAmount: number;
+  commissionRate: number;
+  commissionAmount: number;
+  status: 'pending' | 'approved' | 'paid' | 'disputed';
+  orderDate: string;
+  paymentDate: string | null;
+}
+
+interface Advertisement {
+  id: string;
+  supplierId: string;
+  supplierName: string;
+  type: 'banner' | 'featured-product' | 'sponsored-content' | 'sidebar';
+  placement: 'dashboard' | 'marketplace' | 'farm-portal' | 'training';
+  title: string;
+  description: string;
+  image: string;
+  targetUrl: string;
+  startDate: string;
+  endDate: string;
+  impressions: number;
+  clicks: number;
+  ctr: number;
+  budget: number;
+  spent: number;
+  status: 'active' | 'paused' | 'completed' | 'pending-review';
+}
+
+// ── Inline fallback data ────────────────────────────────────────────────────
+
+const staticSuppliers: Supplier[] = [
+  {
+    id: 'SUP-001',
+    companyName: 'Zambezi Agri-Supplies',
+    contactName: 'Farai Ndlovu',
+    email: 'farai@zambezi-agri.co.zw',
+    phone: '+263 77 200 1001',
+    country: 'Zimbabwe',
+    region: 'Harare',
+    category: 'input-supplier',
+    status: 'active',
+    joinDate: '2024-06-15',
+    logo: 'https://images.unsplash.com/photo-1560693225-b8507d6f3aa9?w=400&h=300&fit=crop',
+    description: 'Leading agricultural input supplier across Southern Africa. Specializing in certified seeds, fertilizers, and crop protection products for commercial and smallholder farmers.',
+    productsCount: 38,
+    totalSales: 1847320,
+    totalOrders: 4215,
+    rating: 4.8,
+    reviewCount: 312,
+    memberDiscountPercent: 12,
+    commissionRate: 8,
+    isFounding: true,
+    sponsorshipTier: 'platinum',
+    verified: true,
+    website: 'https://zambezi-agri.co.zw',
+    certifications: ['ISO 9001', 'GlobalGAP Approved', 'SADC Trade Certified'],
+  },
+];
+
+const supplierProducts: SupplierProduct[] = [
+  { id: 'SPROD-005', supplierId: 'SUP-001', supplierName: 'Zambezi Agri-Supplies', name: 'Groundnut Seed (Nyanda)', description: 'Virginia-type groundnut variety with large kernels.', category: 'seeds', price: 78, memberPrice: 68.64, currency: 'USD', unit: 'per 25kg bag', image: 'https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=400&h=300&fit=crop', availability: 'in-stock', rating: 4.8, reviewCount: 98, soldCount: 1678, tags: ['groundnut', 'disease-resistant', 'export-quality', 'virginia-type'], featured: true, minOrder: 1 },
+  { id: 'SPROD-014', supplierId: 'SUP-001', supplierName: 'Zambezi Agri-Supplies', name: 'Metalaxyl + Mancozeb Fungicide', description: 'Systemic and contact fungicide combination.', category: 'pesticides', price: 35, memberPrice: 30.80, currency: 'USD', unit: 'per kg', image: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400&h=300&fit=crop', availability: 'in-stock', rating: 4.5, reviewCount: 76, soldCount: 1345, tags: ['fungicide', 'systemic', 'blight', 'downy-mildew'], featured: false, minOrder: 2 },
+  { id: 'SPROD-035', supplierId: 'SUP-001', supplierName: 'Zambezi Agri-Supplies', name: 'Knapsack Sprayer (16L Manual)', description: 'High-pressure manual knapsack sprayer with 16L tank.', category: 'tools', price: 35, memberPrice: 30.80, currency: 'USD', unit: 'per unit', image: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop', availability: 'in-stock', rating: 4.3, reviewCount: 123, soldCount: 3456, tags: ['sprayer', 'knapsack', 'manual', 'crop-protection'], featured: false, minOrder: 1 },
+  { id: 'SPROD-036', supplierId: 'SUP-001', supplierName: 'Zambezi Agri-Supplies', name: 'Soil pH Test Kit (50 tests)', description: 'Portable soil pH testing kit with colour chart.', category: 'tools', price: 28, memberPrice: 24.64, currency: 'USD', unit: 'per kit', image: 'https://images.unsplash.com/photo-1585336261022-680e295ce3fe?w=400&h=300&fit=crop', availability: 'in-stock', rating: 4.4, reviewCount: 56, soldCount: 789, tags: ['soil-testing', 'pH', 'portable', 'quick-results'], featured: false, minOrder: 1 },
+  { id: 'SPROD-038', supplierId: 'SUP-001', supplierName: 'Zambezi Agri-Supplies', name: 'Pruning Shears (Bypass, Professional)', description: 'Professional bypass pruning shears with SK5 steel blades.', category: 'tools', price: 12, memberPrice: 10.56, currency: 'USD', unit: 'per unit', image: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop', availability: 'in-stock', rating: 4.5, reviewCount: 67, soldCount: 1234, tags: ['pruning', 'shears', 'professional', 'orchard'], featured: false, minOrder: 2 },
+];
+
+const commissions: Commission[] = [
+  { id: 'COM-001', supplierId: 'SUP-001', supplierName: 'Zambezi Agri-Supplies', orderId: 'ORD-2025-0412', productName: 'Groundnut Seed (Nyanda) x 50 bags', buyerName: 'Kgosi Mosweu', buyerType: 'smallholder', orderAmount: 3900, commissionRate: 8, commissionAmount: 312, status: 'paid', orderDate: '2025-09-15', paymentDate: '2025-10-15' },
+  { id: 'COM-002', supplierId: 'SUP-002', supplierName: 'Kalahari Seeds Co.', orderId: 'ORD-2025-0489', productName: 'Hybrid Maize Seed (PAN 4M-21) x 20 bags', buyerName: 'Tendai Moyo', buyerType: 'smallholder', orderAmount: 960, commissionRate: 7, commissionAmount: 67.20, status: 'paid', orderDate: '2025-10-02', paymentDate: '2025-11-02' },
+  { id: 'COM-003', supplierId: 'SUP-009', supplierName: 'Chobe Irrigation Systems', orderId: 'ORD-2025-0523', productName: 'Drip Irrigation Kit (1 Hectare) x 3', buyerName: 'Mosweu Cooperative', buyerType: 'cooperative', orderAmount: 5550, commissionRate: 11, commissionAmount: 610.50, status: 'paid', orderDate: '2025-10-18', paymentDate: '2025-11-18' },
+  { id: 'COM-004', supplierId: 'SUP-004', supplierName: 'Matopos Equipment Hire', orderId: 'ORD-2025-0567', productName: 'Walk-Behind Tractor (15HP Diesel)', buyerName: 'Chiedza Mutasa', buyerType: 'commercial', orderAmount: 3800, commissionRate: 12, commissionAmount: 456, status: 'paid', orderDate: '2025-11-05', paymentDate: '2025-12-05' },
+  { id: 'COM-005', supplierId: 'SUP-006', supplierName: 'Okavango Fertilizers', orderId: 'ORD-2025-0612', productName: 'NPK 15-15-15 x 100 bags', buyerName: 'Tshiamo Rapula', buyerType: 'commercial', orderAmount: 4500, commissionRate: 8, commissionAmount: 360, status: 'paid', orderDate: '2025-11-12', paymentDate: '2025-12-12' },
+  { id: 'COM-006', supplierId: 'SUP-003', supplierName: 'TechFarm Solutions', orderId: 'ORD-2025-0645', productName: 'IoT Soil Moisture Sensor Kit x 5', buyerName: 'Baraka Mfaume', buyerType: 'enterprise', orderAmount: 1900, commissionRate: 10, commissionAmount: 190, status: 'paid', orderDate: '2025-11-20', paymentDate: '2025-12-20' },
+  { id: 'COM-007', supplierId: 'SUP-010', supplierName: 'Kilimanjaro Organic Inputs', orderId: 'ORD-2025-0678', productName: 'Organic Compost Blend x 200 bags', buyerName: 'Upendo Farmers Group', buyerType: 'cooperative', orderAmount: 3600, commissionRate: 9, commissionAmount: 324, status: 'paid', orderDate: '2025-12-01', paymentDate: '2026-01-01' },
+  { id: 'COM-008', supplierId: 'SUP-001', supplierName: 'Zambezi Agri-Supplies', orderId: 'ORD-2025-0712', productName: 'Knapsack Sprayer x 30 units', buyerName: 'Mashonaland Growers Association', buyerType: 'cooperative', orderAmount: 1050, commissionRate: 8, commissionAmount: 84, status: 'paid', orderDate: '2025-12-10', paymentDate: '2026-01-10' },
+  { id: 'COM-009', supplierId: 'SUP-013', supplierName: 'Tswana Agri-Chem', orderId: 'ORD-2025-0734', productName: 'Lambda-Cyhalothrin 5EC x 50L', buyerName: 'Lesego Keabetswe', buyerType: 'commercial', orderAmount: 1200, commissionRate: 7, commissionAmount: 84, status: 'paid', orderDate: '2025-12-15', paymentDate: '2026-01-15' },
+  { id: 'COM-010', supplierId: 'SUP-017', supplierName: 'Chimanimani Grain Storage', orderId: 'ORD-2025-0756', productName: 'Hermetic Grain Storage Bag x 100 packs', buyerName: 'Chipinge Farmers Union', buyerType: 'cooperative', orderAmount: 3500, commissionRate: 9, commissionAmount: 315, status: 'approved', orderDate: '2025-12-22', paymentDate: null },
+  { id: 'COM-011', supplierId: 'SUP-011', supplierName: 'Hwange Solar & Pumps', orderId: 'ORD-2026-0012', productName: 'Solar Panel Kit (300W Off-Grid) x 2', buyerName: 'Nyasha Chimbidzikai', buyerType: 'smallholder', orderAmount: 1040, commissionRate: 13, commissionAmount: 135.20, status: 'approved', orderDate: '2026-01-05', paymentDate: null },
+  { id: 'COM-012', supplierId: 'SUP-002', supplierName: 'Kalahari Seeds Co.', orderId: 'ORD-2026-0034', productName: 'Drought-Resistant Sorghum (Macia) x 40 bags', buyerName: 'Naledi Sekgoma', buyerType: 'smallholder', orderAmount: 2600, commissionRate: 7, commissionAmount: 182, status: 'approved', orderDate: '2026-01-12', paymentDate: null },
+  { id: 'COM-013', supplierId: 'SUP-005', supplierName: 'Safari Logistics Ltd', orderId: 'ORD-2026-0056', productName: 'Cold Chain Transport - Arusha to Dar', buyerName: 'Kilimanjaro Fresh Exports', buyerType: 'enterprise', orderAmount: 2800, commissionRate: 6, commissionAmount: 168, status: 'approved', orderDate: '2026-01-18', paymentDate: null },
+  { id: 'COM-014', supplierId: 'SUP-016', supplierName: 'Makgadikgadi Drones', orderId: 'ORD-2026-0078', productName: 'NDVI Crop Mapping Service x 10 flights', buyerName: 'Gaborone Agri-Enterprise', buyerType: 'enterprise', orderAmount: 850, commissionRate: 15, commissionAmount: 127.50, status: 'approved', orderDate: '2026-01-25', paymentDate: null },
+  { id: 'COM-015', supplierId: 'SUP-009', supplierName: 'Chobe Irrigation Systems', orderId: 'ORD-2026-0092', productName: 'Solar Water Pump (2HP Submersible)', buyerName: 'Thabo Molefe', buyerType: 'commercial', orderAmount: 2200, commissionRate: 11, commissionAmount: 242, status: 'pending', orderDate: '2026-02-03', paymentDate: null },
+  { id: 'COM-016', supplierId: 'SUP-006', supplierName: 'Okavango Fertilizers', orderId: 'ORD-2026-0108', productName: 'Urea (46-0-0) x 80 bags + SSP x 40 bags', buyerName: 'Central District Cooperative', buyerType: 'cooperative', orderAmount: 4160, commissionRate: 8, commissionAmount: 332.80, status: 'pending', orderDate: '2026-02-08', paymentDate: null },
+  { id: 'COM-017', supplierId: 'SUP-020', supplierName: 'Victoria Falls Seed Bank', orderId: 'ORD-2026-0124', productName: 'Cowpea Seeds (IT18) x 100 packs', buyerName: 'Rudo Chidyamakono', buyerType: 'commercial', orderAmount: 2200, commissionRate: 7, commissionAmount: 154, status: 'pending', orderDate: '2026-02-14', paymentDate: null },
+  { id: 'COM-018', supplierId: 'SUP-004', supplierName: 'Matopos Equipment Hire', orderId: 'ORD-2026-0139', productName: 'Boom Sprayer (Tractor-Mounted 600L)', buyerName: 'Mugabe Farms', buyerType: 'enterprise', orderAmount: 2400, commissionRate: 12, commissionAmount: 288, status: 'pending', orderDate: '2026-02-19', paymentDate: null },
+  { id: 'COM-019', supplierId: 'SUP-012', supplierName: 'Ngorongoro Packaging', orderId: 'ORD-2026-0156', productName: 'Export-Grade Produce Cartons x 20 packs', buyerName: 'Moshi Berry Growers', buyerType: 'cooperative', orderAmount: 1500, commissionRate: 8, commissionAmount: 120, status: 'pending', orderDate: '2026-02-25', paymentDate: null },
+  { id: 'COM-020', supplierId: 'SUP-001', supplierName: 'Zambezi Agri-Supplies', orderId: 'ORD-2026-0171', productName: 'Metalaxyl + Mancozeb Fungicide x 25kg', buyerName: 'Tatenda Chikaura', buyerType: 'smallholder', orderAmount: 875, commissionRate: 8, commissionAmount: 70, status: 'pending', orderDate: '2026-03-01', paymentDate: null },
+  { id: 'COM-021', supplierId: 'SUP-003', supplierName: 'TechFarm Solutions', orderId: 'ORD-2026-0185', productName: 'Precision Weather Station x 3', buyerName: 'Dodoma Agricultural Research', buyerType: 'enterprise', orderAmount: 1260, commissionRate: 10, commissionAmount: 126, status: 'pending', orderDate: '2026-03-03', paymentDate: null },
+  { id: 'COM-022', supplierId: 'SUP-008', supplierName: 'Limpopo Agri-Finance', orderId: 'ORD-2026-0198', productName: 'Crop Insurance Premium - Seasonal Plan', buyerName: 'Sipho Dlamini', buyerType: 'smallholder', orderAmount: 320, commissionRate: 5, commissionAmount: 16, status: 'pending', orderDate: '2026-03-05', paymentDate: null },
+  { id: 'COM-023', supplierId: 'SUP-015', supplierName: 'Bagamoyo Marine Harvest', orderId: 'ORD-2026-0212', productName: 'Seaweed Bio-Stimulant x 20 containers', buyerName: 'Tanga Horticulture Group', buyerType: 'cooperative', orderAmount: 640, commissionRate: 10, commissionAmount: 64, status: 'pending', orderDate: '2026-03-07', paymentDate: null },
+  { id: 'COM-024', supplierId: 'SUP-018', supplierName: 'Morogoro Farm Implements', orderId: 'ORD-2026-0228', productName: 'Ox-Drawn Plough x 15 + Hoe Set x 50', buyerName: 'Iringa Smallholders Network', buyerType: 'cooperative', orderAmount: 2550, commissionRate: 11, commissionAmount: 280.50, status: 'pending', orderDate: '2026-03-08', paymentDate: null },
+  { id: 'COM-025', supplierId: 'SUP-009', supplierName: 'Chobe Irrigation Systems', orderId: 'ORD-2026-0243', productName: 'Water Storage Tank (10,000L) x 4', buyerName: 'Boteti Farmers Trust', buyerType: 'cooperative', orderAmount: 2320, commissionRate: 11, commissionAmount: 255.20, status: 'pending', orderDate: '2026-03-10', paymentDate: null },
+  { id: 'COM-026', supplierId: 'SUP-019', supplierName: 'Mmegi Digital Agriculture', orderId: 'ORD-2026-0258', productName: 'FarmTrack Pro License x 50', buyerName: 'AFU Botswana Chapter', buyerType: 'cooperative', orderAmount: 6000, commissionRate: 14, commissionAmount: 840, status: 'pending', orderDate: '2026-03-11', paymentDate: null },
+  { id: 'COM-027', supplierId: 'SUP-014', supplierName: 'Great Zimbabwe Transport', orderId: 'ORD-2026-0271', productName: 'Grain Haulage - Harare to Beira (40 tonnes)', buyerName: 'Zimbabwe Grain Traders', buyerType: 'enterprise', orderAmount: 4800, commissionRate: 6, commissionAmount: 288, status: 'disputed', orderDate: '2026-02-20', paymentDate: null },
+  { id: 'COM-028', supplierId: 'SUP-021', supplierName: 'Zanzibar Spice Exports', orderId: 'ORD-2026-0284', productName: 'Spice Processing Service - Cloves 5 tonnes', buyerName: 'Pemba Clove Growers', buyerType: 'cooperative', orderAmount: 3200, commissionRate: 8, commissionAmount: 256, status: 'disputed', orderDate: '2026-02-28', paymentDate: null },
+  { id: 'COM-029', supplierId: 'SUP-016', supplierName: 'Makgadikgadi Drones', orderId: 'ORD-2026-0297', productName: 'DJI Agras T30 Spray Drone', buyerName: 'Maun Agri-Services', buyerType: 'enterprise', orderAmount: 14500, commissionRate: 15, commissionAmount: 2175, status: 'pending', orderDate: '2026-03-12', paymentDate: null },
+  { id: 'COM-030', supplierId: 'SUP-022', supplierName: 'Tuli Block Livestock Feeds', orderId: 'ORD-2026-0310', productName: 'Cattle Feed Concentrate x 200 bags', buyerName: 'Tuli Ranchers Assoc.', buyerType: 'cooperative', orderAmount: 5600, commissionRate: 8, commissionAmount: 448, status: 'pending', orderDate: '2026-03-14', paymentDate: null },
+];
+
+const advertisements: Advertisement[] = [
+  { id: 'AD-001', supplierId: 'SUP-001', supplierName: 'Zambezi Agri-Supplies', type: 'banner', placement: 'dashboard', title: 'Season Opening Sale - 20% Off All Seeds', description: 'Start your planting season right with premium certified seeds from Zambezi Agri-Supplies.', image: 'https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=400&h=300&fit=crop', targetUrl: 'https://afu-portal.com/marketplace/supplier/SUP-001', startDate: '2026-02-15', endDate: '2026-04-15', impressions: 34500, clicks: 1725, ctr: 5.0, budget: 3500, spent: 2450, status: 'active' },
+  { id: 'AD-002', supplierId: 'SUP-002', supplierName: 'Kalahari Seeds Co.', type: 'featured-product', placement: 'marketplace', title: 'New: Drought-Resistant Sorghum Macia Variety', description: 'Introducing the Macia sorghum variety - bred for Botswana conditions.', image: 'https://images.unsplash.com/photo-1595855759920-86582396756a?w=400&h=300&fit=crop', targetUrl: 'https://afu-portal.com/marketplace/product/SPROD-001', startDate: '2026-01-10', endDate: '2026-03-31', impressions: 28900, clicks: 1878, ctr: 6.5, budget: 2500, spent: 2125, status: 'active' },
+  { id: 'AD-003', supplierId: 'SUP-003', supplierName: 'TechFarm Solutions', type: 'sponsored-content', placement: 'training', title: 'Smart Farming: How IoT Sensors Boost Yields by 30%', description: 'Learn how TechFarm IoT sensors are helping African farmers monitor soil conditions in real-time.', image: 'https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=400&h=300&fit=crop', targetUrl: 'https://afu-portal.com/training/webinar/smart-farming-iot', startDate: '2026-02-01', endDate: '2026-05-01', impressions: 12400, clicks: 868, ctr: 7.0, budget: 1800, spent: 1080, status: 'active' },
+  { id: 'AD-004', supplierId: 'SUP-009', supplierName: 'Chobe Irrigation Systems', type: 'banner', placement: 'farm-portal', title: 'Save Water, Grow More - Drip Irrigation Special', description: 'Complete 1-hectare drip irrigation kits now available at 10% member discount.', image: 'https://images.unsplash.com/photo-1622383563227-04401ab4e5ea?w=400&h=300&fit=crop', targetUrl: 'https://afu-portal.com/marketplace/product/SPROD-020', startDate: '2026-01-20', endDate: '2026-04-20', impressions: 19800, clicks: 1188, ctr: 6.0, budget: 2800, spent: 1960, status: 'active' },
+  { id: 'AD-005', supplierId: 'SUP-004', supplierName: 'Matopos Equipment Hire', type: 'sidebar', placement: 'marketplace', title: 'Hire-to-Own: Walk-Behind Tractors', description: 'Get mechanized without the upfront cost.', image: 'https://images.unsplash.com/photo-1530267981375-f0de937f5f13?w=400&h=300&fit=crop', targetUrl: 'https://afu-portal.com/marketplace/product/SPROD-015', startDate: '2025-11-01', endDate: '2026-04-30', impressions: 42300, clicks: 2538, ctr: 6.0, budget: 5000, spent: 4250, status: 'active' },
+  { id: 'AD-006', supplierId: 'SUP-016', supplierName: 'Makgadikgadi Drones', type: 'featured-product', placement: 'farm-portal', title: 'Drone Crop Spraying - Book Your Season Flights', description: 'Professional drone spraying services available across Botswana.', image: 'https://images.unsplash.com/photo-1508614589041-895b88991e3e?w=400&h=300&fit=crop', targetUrl: 'https://afu-portal.com/marketplace/product/SPROD-028', startDate: '2026-02-10', endDate: '2026-05-10', impressions: 8700, clicks: 609, ctr: 7.0, budget: 1500, spent: 750, status: 'active' },
+  { id: 'AD-007', supplierId: 'SUP-008', supplierName: 'Limpopo Agri-Finance', type: 'banner', placement: 'dashboard', title: 'Crop Insurance from BWP 50/month - Protect Your Harvest', description: 'Weather-index crop insurance now available for AFU members.', image: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=400&h=300&fit=crop', targetUrl: 'https://afu-portal.com/financial-services/insurance', startDate: '2025-12-01', endDate: '2026-03-31', impressions: 48200, clicks: 2892, ctr: 6.0, budget: 4500, spent: 4275, status: 'active' },
+  { id: 'AD-008', supplierId: 'SUP-010', supplierName: 'Kilimanjaro Organic Inputs', type: 'sponsored-content', placement: 'training', title: 'Organic Farming Masterclass: Soil Health Fundamentals', description: 'Join our 4-week online course on organic soil management.', image: 'https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=400&h=300&fit=crop', targetUrl: 'https://afu-portal.com/training/organic-masterclass', startDate: '2026-01-15', endDate: '2026-03-15', impressions: 6800, clicks: 544, ctr: 8.0, budget: 800, spent: 800, status: 'completed' },
+  { id: 'AD-009', supplierId: 'SUP-006', supplierName: 'Okavango Fertilizers', type: 'sidebar', placement: 'dashboard', title: 'Bulk Fertilizer Orders - Free Delivery Over $200', description: 'Order NPK, Urea, or SSP in bulk and get free delivery.', image: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop', targetUrl: 'https://afu-portal.com/marketplace/supplier/SUP-006', startDate: '2026-02-01', endDate: '2026-04-01', impressions: 22100, clicks: 1105, ctr: 5.0, budget: 1200, spent: 840, status: 'active' },
+  { id: 'AD-010', supplierId: 'SUP-011', supplierName: 'Hwange Solar & Pumps', type: 'featured-product', placement: 'marketplace', title: 'Solar-Powered Farm: Complete Off-Grid Kits', description: 'Power your entire farm operation with solar energy.', image: 'https://images.unsplash.com/photo-1509391366360-2e959784a276?w=400&h=300&fit=crop', targetUrl: 'https://afu-portal.com/marketplace/product/SPROD-040', startDate: '2025-10-15', endDate: '2026-01-15', impressions: 31200, clicks: 1872, ctr: 6.0, budget: 2200, spent: 2200, status: 'completed' },
+  { id: 'AD-011', supplierId: 'SUP-017', supplierName: 'Chimanimani Grain Storage', type: 'sidebar', placement: 'farm-portal', title: 'Reduce Post-Harvest Loss by 90%', description: 'Hermetic grain bags and metal silos keeping your harvest safe.', image: 'https://images.unsplash.com/photo-1504370805625-d32c54b16100?w=400&h=300&fit=crop', targetUrl: 'https://afu-portal.com/marketplace/product/SPROD-032', startDate: '2026-03-01', endDate: '2026-06-01', impressions: 5400, clicks: 378, ctr: 7.0, budget: 900, spent: 270, status: 'active' },
+  { id: 'AD-012', supplierId: 'SUP-005', supplierName: 'Safari Logistics Ltd', type: 'banner', placement: 'marketplace', title: 'Reliable Farm-to-Market Transport', description: 'Refrigerated and dry cargo transport across Tanzania.', image: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=400&h=300&fit=crop', targetUrl: 'https://afu-portal.com/logistics/safari-logistics', startDate: '2025-09-01', endDate: '2025-12-31', impressions: 38700, clicks: 1548, ctr: 4.0, budget: 3000, spent: 3000, status: 'completed' },
+  { id: 'AD-013', supplierId: 'SUP-019', supplierName: 'Mmegi Digital Agriculture', type: 'sponsored-content', placement: 'dashboard', title: 'FarmTrack Pro: Digital Record Keeping for Modern Farmers', description: 'Stop using paper notebooks. FarmTrack Pro helps you track every input.', image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=300&fit=crop', targetUrl: 'https://afu-portal.com/marketplace/product/SPROD-027', startDate: '2026-03-01', endDate: '2026-06-30', impressions: 3200, clicks: 256, ctr: 8.0, budget: 1000, spent: 200, status: 'active' },
+  { id: 'AD-014', supplierId: 'SUP-021', supplierName: 'Zanzibar Spice Exports', type: 'featured-product', placement: 'training', title: 'Spice Value Addition: From Farm to Export Market', description: 'Learn how to process, grade, and package spices for international markets.', image: 'https://images.unsplash.com/photo-1590682680695-43b964a3ae17?w=400&h=300&fit=crop', targetUrl: 'https://afu-portal.com/marketplace/supplier/SUP-021', startDate: '2026-01-01', endDate: '2026-02-28', impressions: 4500, clicks: 315, ctr: 7.0, budget: 600, spent: 600, status: 'completed' },
+  { id: 'AD-015', supplierId: 'SUP-022', supplierName: 'Tuli Block Livestock Feeds', type: 'sidebar', placement: 'farm-portal', title: 'Quality Livestock Feeds - Delivered to Your Farm', description: 'Premium cattle feeds, poultry layers mash, and mineral supplements.', image: 'https://images.unsplash.com/photo-1585336261022-680e295ce3fe?w=400&h=300&fit=crop', targetUrl: 'https://afu-portal.com/marketplace/supplier/SUP-022', startDate: '2026-03-10', endDate: '2026-06-10', impressions: 1200, clicks: 72, ctr: 6.0, budget: 500, spent: 100, status: 'pending-review' },
+];
 
 // ── Animation variants ──────────────────────────────────────────────────────
 

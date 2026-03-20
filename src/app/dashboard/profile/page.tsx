@@ -35,9 +35,43 @@ import {
   Copy,
   ExternalLink,
 } from 'lucide-react';
-import { members as mockMembers, type Member } from '@/lib/data/members';
+/* ------------------------------------------------------------------ */
+/*  Member type & data (inlined from @/lib/data/members)                */
+/* ------------------------------------------------------------------ */
 
-const members = mockMembers;
+type MemberTier = 'smallholder' | 'commercial' | 'enterprise' | 'partner';
+type MemberStatus = 'active' | 'pending' | 'suspended';
+type KycStatus = 'complete' | 'partial' | 'pending';
+type Country = 'Botswana' | 'Kenya' | 'Mozambique' | 'Nigeria' | 'Sierra Leone' | 'South Africa' | 'Tanzania' | 'Zambia' | 'Zimbabwe';
+
+interface Member {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  tier: MemberTier;
+  country: Country;
+  region: string;
+  status: MemberStatus;
+  kycStatus: KycStatus;
+  profileCompleteness: number;
+  farmName: string;
+  farmSize: number;
+  primaryCrops: string[];
+  joinDate: string;
+  lastActive: string;
+  avatar: null;
+  creditScore: number;
+}
+
+const members: Member[] = [
+  { id: 'AFU-2024-001', firstName: 'Kgosi', lastName: 'Mosweu', email: 'kgosi.mosweu@email.com', phone: '+267 71 234 567', tier: 'smallholder', country: 'Botswana', region: 'North-West', status: 'active', kycStatus: 'complete', profileCompleteness: 92, farmName: 'Mosweu Family Fields', farmSize: 4.5, primaryCrops: ['Maize', 'Groundnuts'], joinDate: '2024-10-15', lastActive: '2026-03-12', avatar: null, creditScore: 72 },
+  { id: 'AFU-2024-002', firstName: 'Naledi', lastName: 'Sekgoma', email: 'naledi.sekgoma@email.com', phone: '+267 72 345 678', tier: 'smallholder', country: 'Botswana', region: 'Central', status: 'active', kycStatus: 'complete', profileCompleteness: 88, farmName: 'Sunrise Lands', farmSize: 3.2, primaryCrops: ['Sorghum', 'Groundnuts'], joinDate: '2024-11-02', lastActive: '2026-03-11', avatar: null, creditScore: 65 },
+  { id: 'AFU-2024-003', firstName: 'Tendai', lastName: 'Moyo', email: 'tendai.moyo@email.com', phone: '+263 77 123 4567', tier: 'smallholder', country: 'Zimbabwe', region: 'Mashonaland East', status: 'active', kycStatus: 'complete', profileCompleteness: 95, farmName: 'Moyo Heritage Farm', farmSize: 6.0, primaryCrops: ['Maize', 'Soybeans'], joinDate: '2024-09-20', lastActive: '2026-03-13', avatar: null, creditScore: 78 },
+  { id: 'AFU-2024-004', firstName: 'Baraka', lastName: 'Mwakasege', email: 'baraka.mwakasege@email.com', phone: '+255 754 123 456', tier: 'smallholder', country: 'Tanzania', region: 'Arusha', status: 'active', kycStatus: 'partial', profileCompleteness: 74, farmName: 'Kilimanjaro Roots', farmSize: 2.8, primaryCrops: ['Cassava', 'Maize'], joinDate: '2025-01-10', lastActive: '2026-03-10', avatar: null, creditScore: 58 },
+  { id: 'AFU-2024-005', firstName: 'Mpho', lastName: 'Kgosidintsi', email: 'mpho.kgosidintsi@email.com', phone: '+267 73 456 789', tier: 'smallholder', country: 'Botswana', region: 'Southern', status: 'active', kycStatus: 'complete', profileCompleteness: 85, farmName: 'Tshwaragano Farms', farmSize: 5.5, primaryCrops: ['Sunflower', 'Maize'], joinDate: '2024-12-05', lastActive: '2026-03-09', avatar: null, creditScore: 69 },
+];
 
 /* ------------------------------------------------------------------ */
 /*  Use first member as the logged-in user for demo                    */

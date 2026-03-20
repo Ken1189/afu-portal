@@ -23,9 +23,46 @@ import {
   Leaf,
   FileText,
 } from 'lucide-react';
-import { products as mockProducts, type Product } from '@/lib/data/products';
+/* ------------------------------------------------------------------ */
+/*  Product type & data (inlined from @/lib/data/products)              */
+/* ------------------------------------------------------------------ */
 
-const products = mockProducts;
+interface Product {
+  id: string;
+  name: string;
+  category: 'Seeds & Seedlings' | 'Fertilizers' | 'Pest Control' | 'Irrigation' | 'Equipment' | 'Technology';
+  description: string;
+  price: number;
+  unit: string;
+  image: string;
+  availability: 'in-stock' | 'limited' | 'pre-order' | 'out-of-stock';
+  recommendedCrops: string[];
+  supplier: string;
+  rating: number;
+}
+
+const products: Product[] = [
+  { id: 'PRD-001', name: 'Premium Blueberry Seedlings (Duke)', category: 'Seeds & Seedlings', description: 'High-yield Duke variety blueberry seedlings, adapted for sub-Saharan climate. 12-month tissue culture plants.', price: 3.50, unit: 'per plant', image: 'https://images.unsplash.com/photo-1498579809087-ef1e558fd1da?w=400&h=300&fit=crop', availability: 'in-stock', recommendedCrops: ['Blueberries'], supplier: 'AgriPlant Zimbabwe', rating: 4.8 },
+  { id: 'PRD-002', name: 'Blueberry Starter Bundle', category: 'Seeds & Seedlings', description: 'Complete starter kit: 500 seedlings, mycorrhizal inoculant, pH test kit, and planting guide.', price: 2200, unit: 'per bundle', image: 'https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=400&h=300&fit=crop', availability: 'in-stock', recommendedCrops: ['Blueberries'], supplier: 'AgriPlant Zimbabwe', rating: 4.9 },
+  { id: 'PRD-003', name: 'Cassava Stem Cuttings (TMS 30572)', category: 'Seeds & Seedlings', description: 'Disease-resistant cassava variety with high starch content. Suitable for both food and industrial processing.', price: 0.15, unit: 'per cutting', image: 'https://images.unsplash.com/photo-1590682680695-43b964a3ae17?w=400&h=300&fit=crop', availability: 'in-stock', recommendedCrops: ['Cassava'], supplier: 'Tanzania Seed Agency', rating: 4.5 },
+  { id: 'PRD-004', name: 'Sesame Seeds (S42 Variety)', category: 'Seeds & Seedlings', description: 'High-oil content sesame variety, white seed, premium export grade. 25kg bag.', price: 85, unit: 'per 25kg bag', image: 'https://images.unsplash.com/photo-1595855759920-86582396756a?w=400&h=300&fit=crop', availability: 'in-stock', recommendedCrops: ['Sesame'], supplier: 'East Africa Seeds Co.', rating: 4.6 },
+  { id: 'PRD-005', name: 'NPK 15-15-15 Compound Fertilizer', category: 'Fertilizers', description: 'Balanced compound fertilizer for general crop nutrition. 50kg bag.', price: 45, unit: 'per 50kg bag', image: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop', availability: 'in-stock', recommendedCrops: ['Blueberries', 'Cassava', 'Sesame', 'Maize'], supplier: 'Omnia Fertilizers', rating: 4.4 },
+  { id: 'PRD-006', name: 'Calcium Ammonium Nitrate (CAN)', category: 'Fertilizers', description: 'Top-dressing nitrogen fertilizer for rapid growth. 50kg bag, 28% N content.', price: 38, unit: 'per 50kg bag', image: 'https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=400&h=300&fit=crop', availability: 'limited', recommendedCrops: ['Maize', 'Sorghum', 'Blueberries'], supplier: 'Omnia Fertilizers', rating: 4.3 },
+  { id: 'PRD-007', name: 'Sulfur-Based Soil Acidifier', category: 'Fertilizers', description: 'Lower soil pH for acid-loving crops like blueberries. Essential for optimal berry production.', price: 65, unit: 'per 25kg bag', image: 'https://images.unsplash.com/photo-1585336261022-680e295ce3fe?w=400&h=300&fit=crop', availability: 'in-stock', recommendedCrops: ['Blueberries'], supplier: 'AgriChem SA', rating: 4.7 },
+  { id: 'PRD-008', name: 'Imidacloprid 200SL Insecticide', category: 'Pest Control', description: 'Systemic insecticide for whitefly, aphid, and thrip control. Essential for cassava mosaic prevention.', price: 28, unit: 'per liter', image: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=400&h=300&fit=crop', availability: 'in-stock', recommendedCrops: ['Cassava', 'Blueberries', 'Sesame'], supplier: 'Bayer CropScience', rating: 4.5 },
+  { id: 'PRD-009', name: 'Copper Oxychloride Fungicide', category: 'Pest Control', description: 'Broad-spectrum fungicide for blight, leaf spot, and mildew control. GlobalGAP approved.', price: 22, unit: 'per kg', image: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400&h=300&fit=crop', availability: 'in-stock', recommendedCrops: ['Blueberries', 'Groundnuts', 'Soybeans'], supplier: 'AgriChem SA', rating: 4.4 },
+  { id: 'PRD-010', name: 'Neem Oil Organic Pesticide', category: 'Pest Control', description: 'Organic-certified pest control for sustainable farming. Effective against 200+ pest species.', price: 18, unit: 'per liter', image: 'https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=400&h=300&fit=crop', availability: 'in-stock', recommendedCrops: ['Blueberries', 'Sesame', 'Groundnuts'], supplier: 'GreenChem Tanzania', rating: 4.6 },
+  { id: 'PRD-011', name: 'Netafim Drip Irrigation Kit (1 Ha)', category: 'Irrigation', description: 'Complete drip irrigation system for 1 hectare. Includes mainline, laterals, drippers, filter, and fittings.', price: 1850, unit: 'per kit', image: 'https://images.unsplash.com/photo-1622383563227-04401ab4e5ea?w=400&h=300&fit=crop', availability: 'in-stock', recommendedCrops: ['Blueberries', 'Sesame'], supplier: 'Netafim Africa', rating: 4.9 },
+  { id: 'PRD-012', name: 'Solar Water Pump (3HP)', category: 'Irrigation', description: 'Solar-powered submersible pump. 3HP capacity, suitable for boreholes up to 60m depth.', price: 2400, unit: 'per unit', image: 'https://images.unsplash.com/photo-1509391366360-2e959784a276?w=400&h=300&fit=crop', availability: 'limited', recommendedCrops: ['Blueberries', 'Cassava', 'Maize'], supplier: 'SunPump Botswana', rating: 4.8 },
+  { id: 'PRD-013', name: 'Water Storage Tank (5000L)', category: 'Irrigation', description: 'UV-resistant polyethylene water tank. Gravity-feed compatible for drip irrigation systems.', price: 320, unit: 'per tank', image: 'https://images.unsplash.com/photo-1504370805625-d32c54b16100?w=400&h=300&fit=crop', availability: 'in-stock', recommendedCrops: ['Blueberries', 'Cassava', 'Sesame', 'Maize'], supplier: 'JoJo Tanks', rating: 4.5 },
+  { id: 'PRD-014', name: 'Walk-Behind Tractor (12HP)', category: 'Equipment', description: 'Versatile 2-wheel tractor for smallholder farms. Multiple attachments for ploughing, ridging, and transport.', price: 3200, unit: 'per unit', image: 'https://images.unsplash.com/photo-1530267981375-f0de937f5f13?w=400&h=300&fit=crop', availability: 'pre-order', recommendedCrops: ['Cassava', 'Maize', 'Sesame', 'Groundnuts'], supplier: 'FarmMech Africa', rating: 4.6 },
+  { id: 'PRD-015', name: 'Cassava Chipping Machine', category: 'Equipment', description: 'Electric cassava chipper for processing. Capacity: 500kg/hour. Stainless steel construction.', price: 1800, unit: 'per unit', image: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=400&h=300&fit=crop', availability: 'in-stock', recommendedCrops: ['Cassava'], supplier: 'AgriProcess Tanzania', rating: 4.4 },
+  { id: 'PRD-016', name: 'Cold Room (10 Ton Capacity)', category: 'Equipment', description: 'Modular cold storage room for fresh produce. Solar-compatible. Temperature range: 0-10\u00B0C.', price: 15000, unit: 'per unit', image: 'https://images.unsplash.com/photo-1560493676-04071c5f467b?w=400&h=300&fit=crop', availability: 'pre-order', recommendedCrops: ['Blueberries'], supplier: 'ColdChain Solutions', rating: 4.9 },
+  { id: 'PRD-017', name: 'DJI Agras T30 Spray Drone', category: 'Technology', description: 'Agricultural spray drone with 30L tank. GPS-guided precision spraying. 16 hectares/hour coverage.', price: 12500, unit: 'per unit', image: 'https://images.unsplash.com/photo-1508614589041-895b88991e3e?w=400&h=300&fit=crop', availability: 'limited', recommendedCrops: ['Blueberries', 'Sesame', 'Maize'], supplier: 'DroneTech Africa', rating: 4.8 },
+  { id: 'PRD-018', name: 'Soil pH Testing Kit', category: 'Technology', description: 'Digital soil pH meter with buffer solutions. Essential for blueberry soil management.', price: 45, unit: 'per kit', image: 'https://images.unsplash.com/photo-1585336261022-680e295ce3fe?w=400&h=300&fit=crop', availability: 'in-stock', recommendedCrops: ['Blueberries', 'Cassava'], supplier: 'AgriTest SA', rating: 4.3 },
+  { id: 'PRD-019', name: 'Weather Station (Smart)', category: 'Technology', description: 'IoT weather station with temperature, humidity, rainfall, and wind sensors. Mobile app included.', price: 380, unit: 'per unit', image: 'https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=400&h=300&fit=crop', availability: 'in-stock', recommendedCrops: ['Blueberries', 'Cassava', 'Sesame', 'Maize'], supplier: 'SmartFarm IoT', rating: 4.7 },
+  { id: 'PRD-020', name: 'Shade Net (40% Green)', category: 'Equipment', description: 'UV-stabilized shade netting for nursery and young plant protection. 50m roll x 3m width.', price: 85, unit: 'per roll', image: 'https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=400&h=300&fit=crop', availability: 'in-stock', recommendedCrops: ['Blueberries', 'Sesame'], supplier: 'AgriNet Zimbabwe', rating: 4.4 },
+];
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                             */

@@ -30,9 +30,35 @@ import {
   AlertTriangle,
   ChevronRight,
 } from 'lucide-react';
-import { members as mockMembers } from '@/lib/data/members';
+/* ------------------------------------------------------------------ */
+/*  Member type & data (inlined from @/lib/data/members)                */
+/* ------------------------------------------------------------------ */
 
-const members = mockMembers;
+interface Member {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  tier: 'smallholder' | 'commercial' | 'enterprise' | 'partner';
+  country: string;
+  region: string;
+  status: 'active' | 'pending' | 'suspended';
+  kycStatus: 'complete' | 'partial' | 'pending';
+  profileCompleteness: number;
+  farmName: string;
+  farmSize: number;
+  primaryCrops: string[];
+  joinDate: string;
+  lastActive: string;
+  avatar: null;
+  creditScore: number;
+}
+
+const members: Member[] = [
+  { id: 'AFU-2024-001', firstName: 'Kgosi', lastName: 'Mosweu', email: 'kgosi.mosweu@email.com', phone: '+267 71 234 567', tier: 'smallholder', country: 'Botswana', region: 'North-West', status: 'active', kycStatus: 'complete', profileCompleteness: 92, farmName: 'Mosweu Family Fields', farmSize: 4.5, primaryCrops: ['Maize', 'Groundnuts'], joinDate: '2024-10-15', lastActive: '2026-03-12', avatar: null, creditScore: 72 },
+  { id: 'AFU-2024-002', firstName: 'Naledi', lastName: 'Sekgoma', email: 'naledi.sekgoma@email.com', phone: '+267 72 345 678', tier: 'smallholder', country: 'Botswana', region: 'Central', status: 'active', kycStatus: 'complete', profileCompleteness: 88, farmName: 'Sunrise Lands', farmSize: 3.2, primaryCrops: ['Sorghum', 'Groundnuts'], joinDate: '2024-11-02', lastActive: '2026-03-11', avatar: null, creditScore: 65 },
+];
 
 // ---------------------------------------------------------------------------
 // Current user (first member in mock data)

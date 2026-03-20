@@ -20,7 +20,36 @@ import {
   X,
   Clock,
 } from 'lucide-react';
-import { adminUsers as mockAdminUsers, type AdminUser } from '@/lib/data/audit';
+// ── Inline types & fallback data (formerly from @/lib/data/audit) ───────────
+
+interface AdminUser {
+  id: string;
+  name: string;
+  email: string;
+  role: 'super-admin' | 'admin' | 'finance-officer' | 'loan-officer' | 'support-agent' | 'auditor' | 'read-only';
+  department: string;
+  status: 'active' | 'inactive' | 'locked';
+  lastLogin: string;
+  createdAt: string;
+  permissions: string[];
+  twoFactorEnabled: boolean;
+  avatar: string | null;
+}
+
+const mockAdminUsers: AdminUser[] = [
+  { id: 'ADM-001', name: 'Tendai Chikwava', email: 'tendai@afu-portal.org', role: 'super-admin', department: 'Executive', status: 'active', lastLogin: '2026-03-16T07:15:00Z', createdAt: '2024-06-01', permissions: ['all'], twoFactorEnabled: true, avatar: null },
+  { id: 'ADM-002', name: 'Sarah Moatlhodi', email: 'sarah@afu-portal.org', role: 'admin', department: 'Operations', status: 'active', lastLogin: '2026-03-15T08:00:00Z', createdAt: '2024-07-15', permissions: ['member_manage', 'supplier_manage', 'document_verify', 'report_generate'], twoFactorEnabled: true, avatar: null },
+  { id: 'ADM-003', name: 'Grace Nkomo', email: 'grace@afu-portal.org', role: 'finance-officer', department: 'Finance', status: 'active', lastLogin: '2026-03-13T09:30:00Z', createdAt: '2024-08-20', permissions: ['loan_approve', 'disbursement_approve', 'payment_view', 'report_generate'], twoFactorEnabled: true, avatar: null },
+  { id: 'ADM-004', name: 'Michael Dube', email: 'michael@afu-portal.org', role: 'loan-officer', department: 'Credit', status: 'active', lastLogin: '2026-03-15T10:45:00Z', createdAt: '2024-09-10', permissions: ['loan_review', 'application_manage', 'document_verify', 'member_view'], twoFactorEnabled: true, avatar: null },
+  { id: 'ADM-005', name: 'Joseph Tawanda', email: 'joseph@afu-portal.org', role: 'finance-officer', department: 'Finance', status: 'active', lastLogin: '2026-03-14T11:20:00Z', createdAt: '2025-01-15', permissions: ['disbursement_approve', 'payment_view'], twoFactorEnabled: true, avatar: null },
+  { id: 'ADM-006', name: 'Patience Maposa', email: 'patience@afu-portal.org', role: 'auditor', department: 'Compliance', status: 'active', lastLogin: '2026-03-13T14:00:00Z', createdAt: '2025-02-01', permissions: ['read_all_financial', 'audit_view', 'report_generate'], twoFactorEnabled: true, avatar: null },
+  { id: 'ADM-007', name: 'Blessing Ncube', email: 'blessing@afu-portal.org', role: 'support-agent', department: 'Member Services', status: 'active', lastLogin: '2026-03-16T08:30:00Z', createdAt: '2025-03-10', permissions: ['member_view', 'ticket_manage', 'document_upload'], twoFactorEnabled: false, avatar: null },
+  { id: 'ADM-008', name: 'Rumbidzai Magaya', email: 'rumbidzai@afu-portal.org', role: 'loan-officer', department: 'Credit', status: 'active', lastLogin: '2026-03-15T09:00:00Z', createdAt: '2025-04-20', permissions: ['loan_review', 'application_manage', 'document_verify'], twoFactorEnabled: true, avatar: null },
+  { id: 'ADM-009', name: 'David Mogotsi', email: 'david@afu-portal.org', role: 'read-only', department: 'Board Advisory', status: 'active', lastLogin: '2026-03-10T16:00:00Z', createdAt: '2025-06-01', permissions: ['dashboard_view', 'report_view'], twoFactorEnabled: false, avatar: null },
+  { id: 'ADM-010', name: 'Tatenda Mutasa', email: 'tatenda@afu-portal.org', role: 'support-agent', department: 'Member Services', status: 'inactive', lastLogin: '2026-02-20T14:30:00Z', createdAt: '2025-05-15', permissions: ['member_view', 'ticket_manage'], twoFactorEnabled: false, avatar: null },
+  { id: 'ADM-011', name: 'Lilian Mwanga', email: 'lilian@afu-portal.org', role: 'admin', department: 'Operations', status: 'locked', lastLogin: '2026-03-01T08:00:00Z', createdAt: '2025-07-01', permissions: ['member_manage', 'supplier_manage'], twoFactorEnabled: true, avatar: null },
+  { id: 'ADM-012', name: 'Emmanuel Bongani', email: 'emmanuel@afu-portal.org', role: 'finance-officer', department: 'Finance', status: 'active', lastLogin: '2026-03-14T13:15:00Z', createdAt: '2025-08-10', permissions: ['payment_view', 'disbursement_approve', 'report_generate'], twoFactorEnabled: true, avatar: null },
+];
 
 // ── Animation variants ──────────────────────────────────────────────────────
 

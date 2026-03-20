@@ -30,12 +30,54 @@ import {
   DollarSign,
   ArrowLeft,
 } from 'lucide-react';
-import { advertisements as mockAdvertisements } from '@/lib/data/advertisements';
-import { suppliers as mockSuppliers } from '@/lib/data/suppliers';
+// ── Inline types & fallback data (replaces @/lib/data/ imports) ─────────────
 
-// ── Module-level aliases (keep component code unchanged) ────────────────────
-const advertisements = mockAdvertisements;
-const suppliers = mockSuppliers;
+type SupplierCategory = 'input-supplier' | 'equipment' | 'logistics' | 'processing' | 'technology' | 'financial-services';
+type SponsorshipTier = 'platinum' | 'gold' | 'silver' | 'bronze';
+type Country = 'Botswana' | 'Kenya' | 'Mozambique' | 'Nigeria' | 'Sierra Leone' | 'South Africa' | 'Tanzania' | 'Zambia' | 'Zimbabwe';
+
+interface Supplier {
+  id: string; companyName: string; contactName: string; email: string; phone: string;
+  country: Country; region: string; category: SupplierCategory;
+  status: 'active' | 'pending' | 'suspended'; joinDate: string; logo: string;
+  description: string; productsCount: number; totalSales: number; totalOrders: number;
+  rating: number; reviewCount: number; memberDiscountPercent: number; commissionRate: number;
+  isFounding: boolean; sponsorshipTier: SponsorshipTier | null; verified: boolean;
+  website: string; certifications: string[];
+}
+
+interface Advertisement {
+  id: string; supplierId: string; supplierName: string;
+  type: 'banner' | 'featured-product' | 'sponsored-content' | 'sidebar';
+  placement: 'dashboard' | 'marketplace' | 'farm-portal' | 'training';
+  title: string; description: string; image: string; targetUrl: string;
+  startDate: string; endDate: string;
+  impressions: number; clicks: number; ctr: number;
+  budget: number; spent: number;
+  status: 'active' | 'paused' | 'completed' | 'pending-review';
+}
+
+const suppliers: Supplier[] = [
+  { id: 'SUP-001', companyName: 'Zambezi Agri-Supplies', contactName: 'Farai Ndlovu', email: 'farai@zambezi-agri.co.zw', phone: '+263 77 200 1001', country: 'Zimbabwe', region: 'Harare', category: 'input-supplier', status: 'active', joinDate: '2024-06-15', logo: 'https://images.unsplash.com/photo-1560693225-b8507d6f3aa9?w=400&h=300&fit=crop', description: 'Leading agricultural input supplier across Southern Africa.', productsCount: 38, totalSales: 1847320, totalOrders: 4215, rating: 4.8, reviewCount: 312, memberDiscountPercent: 12, commissionRate: 8, isFounding: true, sponsorshipTier: 'platinum', verified: true, website: 'https://zambezi-agri.co.zw', certifications: ['ISO 9001', 'GlobalGAP Approved', 'SADC Trade Certified'] },
+];
+
+const advertisements: Advertisement[] = [
+  { id: 'AD-001', supplierId: 'SUP-001', supplierName: 'Zambezi Agri-Supplies', type: 'banner', placement: 'dashboard', title: 'Season Opening Sale - 20% Off All Seeds', description: 'Start your planting season right with premium certified seeds from Zambezi Agri-Supplies.', image: 'https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=400&h=300&fit=crop', targetUrl: 'https://afu-portal.com/marketplace/supplier/SUP-001', startDate: '2026-02-15', endDate: '2026-04-15', impressions: 34500, clicks: 1725, ctr: 5.0, budget: 3500, spent: 2450, status: 'active' },
+  { id: 'AD-002', supplierId: 'SUP-002', supplierName: 'Kalahari Seeds Co.', type: 'featured-product', placement: 'marketplace', title: 'New: Drought-Resistant Sorghum Macia Variety', description: 'Introducing the Macia sorghum variety - bred for Botswana conditions.', image: 'https://images.unsplash.com/photo-1595855759920-86582396756a?w=400&h=300&fit=crop', targetUrl: 'https://afu-portal.com/marketplace/product/SPROD-001', startDate: '2026-01-10', endDate: '2026-03-31', impressions: 28900, clicks: 1878, ctr: 6.5, budget: 2500, spent: 2125, status: 'active' },
+  { id: 'AD-003', supplierId: 'SUP-003', supplierName: 'TechFarm Solutions', type: 'sponsored-content', placement: 'training', title: 'Smart Farming: How IoT Sensors Boost Yields by 30%', description: 'Learn how TechFarm IoT sensors are helping African farmers monitor soil conditions in real-time.', image: 'https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=400&h=300&fit=crop', targetUrl: 'https://afu-portal.com/training/webinar/smart-farming-iot', startDate: '2026-02-01', endDate: '2026-05-01', impressions: 12400, clicks: 868, ctr: 7.0, budget: 1800, spent: 1080, status: 'active' },
+  { id: 'AD-004', supplierId: 'SUP-009', supplierName: 'Chobe Irrigation Systems', type: 'banner', placement: 'farm-portal', title: 'Save Water, Grow More - Drip Irrigation Special', description: 'Complete 1-hectare drip irrigation kits now available at 10% member discount.', image: 'https://images.unsplash.com/photo-1622383563227-04401ab4e5ea?w=400&h=300&fit=crop', targetUrl: 'https://afu-portal.com/marketplace/product/SPROD-020', startDate: '2026-01-20', endDate: '2026-04-20', impressions: 19800, clicks: 1188, ctr: 6.0, budget: 2800, spent: 1960, status: 'active' },
+  { id: 'AD-005', supplierId: 'SUP-004', supplierName: 'Matopos Equipment Hire', type: 'sidebar', placement: 'marketplace', title: 'Hire-to-Own: Walk-Behind Tractors', description: 'Get mechanized without the upfront cost.', image: 'https://images.unsplash.com/photo-1530267981375-f0de937f5f13?w=400&h=300&fit=crop', targetUrl: 'https://afu-portal.com/marketplace/product/SPROD-015', startDate: '2025-11-01', endDate: '2026-04-30', impressions: 42300, clicks: 2538, ctr: 6.0, budget: 5000, spent: 4250, status: 'active' },
+  { id: 'AD-006', supplierId: 'SUP-016', supplierName: 'Makgadikgadi Drones', type: 'featured-product', placement: 'farm-portal', title: 'Drone Crop Spraying - Book Your Season Flights', description: 'Professional drone spraying services available across Botswana.', image: 'https://images.unsplash.com/photo-1508614589041-895b88991e3e?w=400&h=300&fit=crop', targetUrl: 'https://afu-portal.com/marketplace/product/SPROD-028', startDate: '2026-02-10', endDate: '2026-05-10', impressions: 8700, clicks: 609, ctr: 7.0, budget: 1500, spent: 750, status: 'active' },
+  { id: 'AD-007', supplierId: 'SUP-008', supplierName: 'Limpopo Agri-Finance', type: 'banner', placement: 'dashboard', title: 'Crop Insurance from BWP 50/month - Protect Your Harvest', description: 'Weather-index crop insurance now available for AFU members.', image: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=400&h=300&fit=crop', targetUrl: 'https://afu-portal.com/financial-services/insurance', startDate: '2025-12-01', endDate: '2026-03-31', impressions: 48200, clicks: 2892, ctr: 6.0, budget: 4500, spent: 4275, status: 'active' },
+  { id: 'AD-008', supplierId: 'SUP-010', supplierName: 'Kilimanjaro Organic Inputs', type: 'sponsored-content', placement: 'training', title: 'Organic Farming Masterclass: Soil Health Fundamentals', description: 'Join our 4-week online course on organic soil management.', image: 'https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=400&h=300&fit=crop', targetUrl: 'https://afu-portal.com/training/organic-masterclass', startDate: '2026-01-15', endDate: '2026-03-15', impressions: 6800, clicks: 544, ctr: 8.0, budget: 800, spent: 800, status: 'completed' },
+  { id: 'AD-009', supplierId: 'SUP-006', supplierName: 'Okavango Fertilizers', type: 'sidebar', placement: 'dashboard', title: 'Bulk Fertilizer Orders - Free Delivery Over $200', description: 'Order NPK, Urea, or SSP in bulk and get free delivery.', image: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop', targetUrl: 'https://afu-portal.com/marketplace/supplier/SUP-006', startDate: '2026-02-01', endDate: '2026-04-01', impressions: 22100, clicks: 1105, ctr: 5.0, budget: 1200, spent: 840, status: 'active' },
+  { id: 'AD-010', supplierId: 'SUP-011', supplierName: 'Hwange Solar & Pumps', type: 'featured-product', placement: 'marketplace', title: 'Solar-Powered Farm: Complete Off-Grid Kits', description: 'Power your entire farm operation with solar energy.', image: 'https://images.unsplash.com/photo-1509391366360-2e959784a276?w=400&h=300&fit=crop', targetUrl: 'https://afu-portal.com/marketplace/product/SPROD-040', startDate: '2025-10-15', endDate: '2026-01-15', impressions: 31200, clicks: 1872, ctr: 6.0, budget: 2200, spent: 2200, status: 'completed' },
+  { id: 'AD-011', supplierId: 'SUP-017', supplierName: 'Chimanimani Grain Storage', type: 'sidebar', placement: 'farm-portal', title: 'Reduce Post-Harvest Loss by 90%', description: 'Hermetic grain bags and metal silos keeping your harvest safe from weevils and moisture.', image: 'https://images.unsplash.com/photo-1504370805625-d32c54b16100?w=400&h=300&fit=crop', targetUrl: 'https://afu-portal.com/marketplace/product/SPROD-032', startDate: '2026-03-01', endDate: '2026-06-01', impressions: 5400, clicks: 378, ctr: 7.0, budget: 900, spent: 270, status: 'active' },
+  { id: 'AD-012', supplierId: 'SUP-005', supplierName: 'Safari Logistics Ltd', type: 'banner', placement: 'marketplace', title: 'Reliable Farm-to-Market Transport', description: 'Refrigerated and dry cargo transport across Tanzania.', image: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=400&h=300&fit=crop', targetUrl: 'https://afu-portal.com/logistics/safari-logistics', startDate: '2025-09-01', endDate: '2025-12-31', impressions: 38700, clicks: 1548, ctr: 4.0, budget: 3000, spent: 3000, status: 'completed' },
+  { id: 'AD-013', supplierId: 'SUP-019', supplierName: 'Mmegi Digital Agriculture', type: 'sponsored-content', placement: 'dashboard', title: 'FarmTrack Pro: Digital Record Keeping for Modern Farmers', description: 'Stop using paper notebooks. FarmTrack Pro helps you track every input.', image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=300&fit=crop', targetUrl: 'https://afu-portal.com/marketplace/product/SPROD-027', startDate: '2026-03-01', endDate: '2026-06-30', impressions: 3200, clicks: 256, ctr: 8.0, budget: 1000, spent: 200, status: 'active' },
+  { id: 'AD-014', supplierId: 'SUP-021', supplierName: 'Zanzibar Spice Exports', type: 'featured-product', placement: 'training', title: 'Spice Value Addition: From Farm to Export Market', description: 'Learn how to process, grade, and package spices for international markets.', image: 'https://images.unsplash.com/photo-1590682680695-43b964a3ae17?w=400&h=300&fit=crop', targetUrl: 'https://afu-portal.com/marketplace/supplier/SUP-021', startDate: '2026-01-01', endDate: '2026-02-28', impressions: 4500, clicks: 315, ctr: 7.0, budget: 600, spent: 600, status: 'completed' },
+  { id: 'AD-015', supplierId: 'SUP-022', supplierName: 'Tuli Block Livestock Feeds', type: 'sidebar', placement: 'farm-portal', title: 'Quality Livestock Feeds - Delivered to Your Farm', description: 'Premium cattle feeds, poultry layers mash, and mineral supplements.', image: 'https://images.unsplash.com/photo-1585336261022-680e295ce3fe?w=400&h=300&fit=crop', targetUrl: 'https://afu-portal.com/marketplace/supplier/SUP-022', startDate: '2026-03-10', endDate: '2026-06-10', impressions: 1200, clicks: 72, ctr: 6.0, budget: 500, spent: 100, status: 'pending-review' },
+];
 
 // ── Animation variants ──────────────────────────────────────────────────────
 

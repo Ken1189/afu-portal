@@ -25,11 +25,65 @@ import {
   Inbox,
   ArrowUpCircle,
 } from 'lucide-react';
-import { loans as mockLoans, type Loan, type LoanType, type LoanStatus } from '@/lib/data/loans';
 import { useLoans } from '@/lib/supabase/use-loans';
 
-// Bridge: use live loans if available, otherwise mock
-const loans = mockLoans;
+/* ------------------------------------------------------------------ */
+/*  Loan types & data (inlined from @/lib/data/loans)                   */
+/* ------------------------------------------------------------------ */
+
+type LoanType = 'working-capital' | 'invoice-finance' | 'equipment' | 'input-bundle';
+type LoanStatus = 'active' | 'completed' | 'overdue' | 'disbursed' | 'approved';
+
+interface Loan {
+  id: string;
+  memberId: string;
+  memberName: string;
+  type: LoanType;
+  amount: number;
+  outstanding: number;
+  interestRate: number;
+  tenor: number;
+  status: LoanStatus;
+  disbursementDate: string;
+  maturityDate: string;
+  nextPaymentDate: string;
+  nextPaymentAmount: number;
+  repaidPercentage: number;
+  crop: string;
+  buyer: string | null;
+  country: string;
+}
+
+const loans: Loan[] = [
+  { id: 'FIN-2024-001', memberId: 'AFU-2024-036', memberName: 'Thabo Molefe', type: 'working-capital', amount: 85000, outstanding: 42500, interestRate: 12.5, tenor: 180, status: 'active', disbursementDate: '2025-10-15', maturityDate: '2026-04-13', nextPaymentDate: '2026-03-15', nextPaymentAmount: 14800, repaidPercentage: 50, crop: 'Blueberries', buyer: null, country: 'Botswana' },
+  { id: 'FIN-2024-002', memberId: 'AFU-2024-037', memberName: 'Rudo Chidyamakono', type: 'invoice-finance', amount: 120000, outstanding: 36000, interestRate: 10.0, tenor: 90, status: 'active', disbursementDate: '2026-01-10', maturityDate: '2026-04-10', nextPaymentDate: '2026-03-20', nextPaymentAmount: 18500, repaidPercentage: 70, crop: 'Tobacco', buyer: 'Berry Fresh UK', country: 'Zimbabwe' },
+  { id: 'FIN-2024-003', memberId: 'AFU-2024-003', memberName: 'Tendai Moyo', type: 'input-bundle', amount: 8500, outstanding: 5950, interestRate: 15.0, tenor: 120, status: 'active', disbursementDate: '2025-12-20', maturityDate: '2026-04-19', nextPaymentDate: '2026-03-20', nextPaymentAmount: 2200, repaidPercentage: 30, crop: 'Maize', buyer: null, country: 'Zimbabwe' },
+  { id: 'FIN-2024-004', memberId: 'AFU-2024-038', memberName: 'Emmanuel Massawe', type: 'equipment', amount: 65000, outstanding: 48750, interestRate: 11.0, tenor: 365, status: 'active', disbursementDate: '2025-09-01', maturityDate: '2026-09-01', nextPaymentDate: '2026-03-25', nextPaymentAmount: 6200, repaidPercentage: 25, crop: 'Blueberries', buyer: null, country: 'Tanzania' },
+  { id: 'FIN-2024-005', memberId: 'AFU-2024-001', memberName: 'Kgosi Mosweu', type: 'working-capital', amount: 12000, outstanding: 3600, interestRate: 14.0, tenor: 150, status: 'active', disbursementDate: '2025-11-01', maturityDate: '2026-03-31', nextPaymentDate: '2026-03-18', nextPaymentAmount: 3800, repaidPercentage: 70, crop: 'Maize', buyer: null, country: 'Botswana' },
+  { id: 'FIN-2024-006', memberId: 'AFU-2024-046', memberName: 'Blessing Murefu', type: 'invoice-finance', amount: 200000, outstanding: 80000, interestRate: 8.5, tenor: 120, status: 'active', disbursementDate: '2025-12-01', maturityDate: '2026-03-31', nextPaymentDate: '2026-03-15', nextPaymentAmount: 42000, repaidPercentage: 60, crop: 'Cotton', buyer: 'Marks & Spencer', country: 'Zimbabwe' },
+  { id: 'FIN-2024-007', memberId: 'AFU-2024-006', memberName: 'Rutendo Chirwa', type: 'input-bundle', amount: 7200, outstanding: 0, interestRate: 15.5, tenor: 90, status: 'completed', disbursementDate: '2025-09-15', maturityDate: '2025-12-14', nextPaymentDate: '', nextPaymentAmount: 0, repaidPercentage: 100, crop: 'Blueberries', buyer: null, country: 'Zimbabwe' },
+  { id: 'FIN-2024-008', memberId: 'AFU-2024-039', memberName: 'Gaone Baitshepi', type: 'working-capital', amount: 95000, outstanding: 71250, interestRate: 11.5, tenor: 270, status: 'active', disbursementDate: '2025-10-20', maturityDate: '2026-07-17', nextPaymentDate: '2026-03-20', nextPaymentAmount: 16500, repaidPercentage: 25, crop: 'Maize', buyer: null, country: 'Botswana' },
+  { id: 'FIN-2024-009', memberId: 'AFU-2024-047', memberName: 'Joseph Mwangosi', type: 'equipment', amount: 180000, outstanding: 144000, interestRate: 9.0, tenor: 365, status: 'disbursed', disbursementDate: '2026-01-15', maturityDate: '2027-01-15', nextPaymentDate: '2026-03-15', nextPaymentAmount: 16800, repaidPercentage: 20, crop: 'Sesame', buyer: null, country: 'Tanzania' },
+  { id: 'FIN-2024-010', memberId: 'AFU-2024-009', memberName: 'Tapiwa Ncube', type: 'working-capital', amount: 15000, outstanding: 17250, interestRate: 16.0, tenor: 120, status: 'overdue', disbursementDate: '2025-08-10', maturityDate: '2025-12-08', nextPaymentDate: '2025-12-08', nextPaymentAmount: 17250, repaidPercentage: 0, crop: 'Cotton', buyer: null, country: 'Zimbabwe' },
+  { id: 'FIN-2024-011', memberId: 'AFU-2024-011', memberName: 'Keabetswe Modise', type: 'invoice-finance', amount: 25000, outstanding: 5000, interestRate: 10.5, tenor: 60, status: 'active', disbursementDate: '2026-02-01', maturityDate: '2026-04-02', nextPaymentDate: '2026-03-16', nextPaymentAmount: 5250, repaidPercentage: 80, crop: 'Blueberries', buyer: 'EuroFruit GmbH', country: 'Botswana' },
+  { id: 'FIN-2024-012', memberId: 'AFU-2024-040', memberName: 'Munyaradzi Hove', type: 'working-capital', amount: 110000, outstanding: 0, interestRate: 11.0, tenor: 180, status: 'completed', disbursementDate: '2025-06-01', maturityDate: '2025-11-28', nextPaymentDate: '', nextPaymentAmount: 0, repaidPercentage: 100, crop: 'Cotton', buyer: null, country: 'Zimbabwe' },
+  { id: 'FIN-2024-013', memberId: 'AFU-2024-013', memberName: 'Neema Kimaro', type: 'input-bundle', amount: 6800, outstanding: 4760, interestRate: 15.0, tenor: 120, status: 'active', disbursementDate: '2026-01-05', maturityDate: '2026-05-05', nextPaymentDate: '2026-03-22', nextPaymentAmount: 1750, repaidPercentage: 30, crop: 'Blueberries', buyer: null, country: 'Tanzania' },
+  { id: 'FIN-2024-014', memberId: 'AFU-2024-042', memberName: 'Phenyo Kebonye', type: 'invoice-finance', amount: 55000, outstanding: 16500, interestRate: 9.5, tenor: 90, status: 'active', disbursementDate: '2026-01-20', maturityDate: '2026-04-20', nextPaymentDate: '2026-03-20', nextPaymentAmount: 8500, repaidPercentage: 70, crop: 'Blueberries', buyer: 'Woolworths SA', country: 'Botswana' },
+  { id: 'FIN-2024-015', memberId: 'AFU-2024-017', memberName: 'Boitumelo Ramotswe', type: 'working-capital', amount: 18000, outstanding: 9000, interestRate: 13.5, tenor: 150, status: 'active', disbursementDate: '2025-11-15', maturityDate: '2026-04-14', nextPaymentDate: '2026-03-15', nextPaymentAmount: 3200, repaidPercentage: 50, crop: 'Sunflower', buyer: null, country: 'Botswana' },
+  { id: 'FIN-2024-016', memberId: 'AFU-2024-041', memberName: 'Grace Kilango', type: 'equipment', amount: 45000, outstanding: 33750, interestRate: 12.0, tenor: 365, status: 'active', disbursementDate: '2025-08-20', maturityDate: '2026-08-20', nextPaymentDate: '2026-03-20', nextPaymentAmount: 4500, repaidPercentage: 25, crop: 'Sesame', buyer: null, country: 'Tanzania' },
+  { id: 'FIN-2024-017', memberId: 'AFU-2024-030', memberName: 'Tatenda Maposa', type: 'input-bundle', amount: 9500, outstanding: 0, interestRate: 14.5, tenor: 90, status: 'completed', disbursementDate: '2025-10-01', maturityDate: '2025-12-30', nextPaymentDate: '', nextPaymentAmount: 0, repaidPercentage: 100, crop: 'Maize', buyer: null, country: 'Zimbabwe' },
+  { id: 'FIN-2024-018', memberId: 'AFU-2024-043', memberName: 'Simba Mataruka', type: 'invoice-finance', amount: 78000, outstanding: 23400, interestRate: 10.0, tenor: 90, status: 'active', disbursementDate: '2026-01-25', maturityDate: '2026-04-25', nextPaymentDate: '2026-03-25', nextPaymentAmount: 12000, repaidPercentage: 70, crop: 'Tobacco', buyer: 'Tesco Direct', country: 'Zimbabwe' },
+  { id: 'FIN-2024-019', memberId: 'AFU-2024-019', memberName: 'Zuwena Mhina', type: 'working-capital', amount: 7500, outstanding: 5625, interestRate: 16.0, tenor: 120, status: 'active', disbursementDate: '2026-01-01', maturityDate: '2026-05-01', nextPaymentDate: '2026-03-18', nextPaymentAmount: 1950, repaidPercentage: 25, crop: 'Blueberries', buyer: null, country: 'Tanzania' },
+  { id: 'FIN-2024-020', memberId: 'AFU-2024-045', memberName: 'Olebogeng Mogapi', type: 'working-capital', amount: 72000, outstanding: 54000, interestRate: 11.5, tenor: 270, status: 'active', disbursementDate: '2025-11-01', maturityDate: '2026-07-29', nextPaymentDate: '2026-03-22', nextPaymentAmount: 9500, repaidPercentage: 25, crop: 'Sunflower', buyer: null, country: 'Botswana' },
+  { id: 'FIN-2024-021', memberId: 'AFU-2024-015', memberName: 'Chenai Dziva', type: 'input-bundle', amount: 5500, outstanding: 6050, interestRate: 18.0, tenor: 90, status: 'overdue', disbursementDate: '2025-09-01', maturityDate: '2025-11-30', nextPaymentDate: '2025-11-30', nextPaymentAmount: 6050, repaidPercentage: 0, crop: 'Maize', buyer: null, country: 'Zimbabwe' },
+  { id: 'FIN-2024-022', memberId: 'AFU-2024-044', memberName: 'Halima Msuya', type: 'invoice-finance', amount: 48000, outstanding: 14400, interestRate: 10.5, tenor: 90, status: 'active', disbursementDate: '2026-01-15', maturityDate: '2026-04-15', nextPaymentDate: '2026-03-15', nextPaymentAmount: 7500, repaidPercentage: 70, crop: 'Cassava', buyer: 'Dubai Fresh Markets', country: 'Tanzania' },
+  { id: 'FIN-2024-023', memberId: 'AFU-2024-023', memberName: 'Tebogo Mothibi', type: 'working-capital', amount: 14000, outstanding: 7000, interestRate: 13.0, tenor: 150, status: 'active', disbursementDate: '2025-11-20', maturityDate: '2026-04-19', nextPaymentDate: '2026-03-20', nextPaymentAmount: 2500, repaidPercentage: 50, crop: 'Maize', buyer: null, country: 'Botswana' },
+  { id: 'FIN-2024-024', memberId: 'AFU-2024-010', memberName: 'Amina Hassan', type: 'input-bundle', amount: 5000, outstanding: 2500, interestRate: 15.5, tenor: 120, status: 'active', disbursementDate: '2025-12-10', maturityDate: '2026-04-09', nextPaymentDate: '2026-03-19', nextPaymentAmount: 1300, repaidPercentage: 50, crop: 'Sesame', buyer: null, country: 'Tanzania' },
+  { id: 'FIN-2024-025', memberId: 'AFU-2024-035', memberName: 'Lorato Seretse', type: 'equipment', amount: 22000, outstanding: 16500, interestRate: 12.5, tenor: 365, status: 'disbursed', disbursementDate: '2026-02-01', maturityDate: '2027-02-01', nextPaymentDate: '2026-03-25', nextPaymentAmount: 2100, repaidPercentage: 25, crop: 'Maize', buyer: null, country: 'Botswana' },
+  { id: 'FIN-2024-026', memberId: 'AFU-2024-037', memberName: 'Rudo Chidyamakono', type: 'working-capital', amount: 95000, outstanding: 0, interestRate: 10.0, tenor: 180, status: 'completed', disbursementDate: '2025-04-01', maturityDate: '2025-09-28', nextPaymentDate: '', nextPaymentAmount: 0, repaidPercentage: 100, crop: 'Soybeans', buyer: null, country: 'Zimbabwe' },
+  { id: 'FIN-2024-027', memberId: 'AFU-2024-026', memberName: 'Kagiso Marumo', type: 'working-capital', amount: 11000, outstanding: 8250, interestRate: 14.0, tenor: 150, status: 'active', disbursementDate: '2025-12-15', maturityDate: '2026-05-14', nextPaymentDate: '2026-03-17', nextPaymentAmount: 2800, repaidPercentage: 25, crop: 'Sunflower', buyer: null, country: 'Botswana' },
+  { id: 'FIN-2024-028', memberId: 'AFU-2024-046', memberName: 'Blessing Murefu', type: 'equipment', amount: 150000, outstanding: 112500, interestRate: 8.5, tenor: 365, status: 'active', disbursementDate: '2025-07-01', maturityDate: '2026-07-01', nextPaymentDate: '2026-03-28', nextPaymentAmount: 14000, repaidPercentage: 25, crop: 'Tobacco', buyer: null, country: 'Zimbabwe' },
+];
 
 /* ------------------------------------------------------------------ */
 /*  Type helpers                                                       */

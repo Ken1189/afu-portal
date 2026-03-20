@@ -39,8 +39,92 @@ import {
   Percent,
   Target,
 } from 'lucide-react';
-import { loans as mockLoans } from '@/lib/data/loans';
-import { dashboardStats } from '@/lib/data/stats';
+// ── Inline fallback data (formerly from @/lib/data/loans & @/lib/data/stats) ─
+
+interface Loan {
+  id: string;
+  memberId: string;
+  memberName: string;
+  type: 'working-capital' | 'invoice-finance' | 'equipment' | 'input-bundle';
+  amount: number;
+  outstanding: number;
+  interestRate: number;
+  tenor: number;
+  status: 'active' | 'completed' | 'overdue' | 'disbursed' | 'approved';
+  disbursementDate: string;
+  maturityDate: string;
+  nextPaymentDate: string;
+  nextPaymentAmount: number;
+  repaidPercentage: number;
+  crop: string;
+  buyer: string | null;
+  country: string;
+}
+
+const mockLoans: Loan[] = [
+  { id: 'FIN-2024-001', memberId: 'AFU-2024-036', memberName: 'Thabo Molefe', type: 'working-capital', amount: 85000, outstanding: 42500, interestRate: 12.5, tenor: 180, status: 'active', disbursementDate: '2025-10-15', maturityDate: '2026-04-13', nextPaymentDate: '2026-03-15', nextPaymentAmount: 14800, repaidPercentage: 50, crop: 'Blueberries', buyer: null, country: 'Botswana' },
+  { id: 'FIN-2024-002', memberId: 'AFU-2024-037', memberName: 'Rudo Chidyamakono', type: 'invoice-finance', amount: 120000, outstanding: 36000, interestRate: 10.0, tenor: 90, status: 'active', disbursementDate: '2026-01-10', maturityDate: '2026-04-10', nextPaymentDate: '2026-03-20', nextPaymentAmount: 18500, repaidPercentage: 70, crop: 'Tobacco', buyer: 'Berry Fresh UK', country: 'Zimbabwe' },
+  { id: 'FIN-2024-003', memberId: 'AFU-2024-003', memberName: 'Tendai Moyo', type: 'input-bundle', amount: 8500, outstanding: 5950, interestRate: 15.0, tenor: 120, status: 'active', disbursementDate: '2025-12-20', maturityDate: '2026-04-19', nextPaymentDate: '2026-03-20', nextPaymentAmount: 2200, repaidPercentage: 30, crop: 'Maize', buyer: null, country: 'Zimbabwe' },
+  { id: 'FIN-2024-004', memberId: 'AFU-2024-038', memberName: 'Emmanuel Massawe', type: 'equipment', amount: 65000, outstanding: 48750, interestRate: 11.0, tenor: 365, status: 'active', disbursementDate: '2025-09-01', maturityDate: '2026-09-01', nextPaymentDate: '2026-03-25', nextPaymentAmount: 6200, repaidPercentage: 25, crop: 'Blueberries', buyer: null, country: 'Tanzania' },
+  { id: 'FIN-2024-005', memberId: 'AFU-2024-001', memberName: 'Kgosi Mosweu', type: 'working-capital', amount: 12000, outstanding: 3600, interestRate: 14.0, tenor: 150, status: 'active', disbursementDate: '2025-11-01', maturityDate: '2026-03-31', nextPaymentDate: '2026-03-18', nextPaymentAmount: 3800, repaidPercentage: 70, crop: 'Maize', buyer: null, country: 'Botswana' },
+  { id: 'FIN-2024-006', memberId: 'AFU-2024-046', memberName: 'Blessing Murefu', type: 'invoice-finance', amount: 200000, outstanding: 80000, interestRate: 8.5, tenor: 120, status: 'active', disbursementDate: '2025-12-01', maturityDate: '2026-03-31', nextPaymentDate: '2026-03-15', nextPaymentAmount: 42000, repaidPercentage: 60, crop: 'Cotton', buyer: 'Marks & Spencer', country: 'Zimbabwe' },
+  { id: 'FIN-2024-009', memberId: 'AFU-2024-047', memberName: 'Joseph Mwangosi', type: 'equipment', amount: 180000, outstanding: 144000, interestRate: 9.0, tenor: 365, status: 'disbursed', disbursementDate: '2026-01-15', maturityDate: '2027-01-15', nextPaymentDate: '2026-03-15', nextPaymentAmount: 16800, repaidPercentage: 20, crop: 'Sesame', buyer: null, country: 'Tanzania' },
+  { id: 'FIN-2024-010', memberId: 'AFU-2024-009', memberName: 'Tapiwa Ncube', type: 'working-capital', amount: 15000, outstanding: 17250, interestRate: 16.0, tenor: 120, status: 'overdue', disbursementDate: '2025-08-10', maturityDate: '2025-12-08', nextPaymentDate: '2025-12-08', nextPaymentAmount: 17250, repaidPercentage: 0, crop: 'Cotton', buyer: null, country: 'Zimbabwe' },
+  { id: 'FIN-2024-021', memberId: 'AFU-2024-015', memberName: 'Chenai Dziva', type: 'input-bundle', amount: 5500, outstanding: 6050, interestRate: 18.0, tenor: 90, status: 'overdue', disbursementDate: '2025-09-01', maturityDate: '2025-11-30', nextPaymentDate: '2025-11-30', nextPaymentAmount: 6050, repaidPercentage: 0, crop: 'Maize', buyer: null, country: 'Zimbabwe' },
+  { id: 'FIN-2024-007', memberId: 'AFU-2024-006', memberName: 'Rutendo Chirwa', type: 'input-bundle', amount: 7200, outstanding: 0, interestRate: 15.5, tenor: 90, status: 'completed', disbursementDate: '2025-09-15', maturityDate: '2025-12-14', nextPaymentDate: '', nextPaymentAmount: 0, repaidPercentage: 100, crop: 'Blueberries', buyer: null, country: 'Zimbabwe' },
+  { id: 'FIN-2024-012', memberId: 'AFU-2024-040', memberName: 'Munyaradzi Hove', type: 'working-capital', amount: 110000, outstanding: 0, interestRate: 11.0, tenor: 180, status: 'completed', disbursementDate: '2025-06-01', maturityDate: '2025-11-28', nextPaymentDate: '', nextPaymentAmount: 0, repaidPercentage: 100, crop: 'Cotton', buyer: null, country: 'Zimbabwe' },
+];
+
+const dashboardStats = {
+  totalMembers: 247,
+  membersByTier: { smallholder: 178, commercial: 52, enterprise: 7, partner: 10 },
+  membersByCountry: { Botswana: 48, Zimbabwe: 112, Tanzania: 87 },
+  totalLoansDeployed: 4200000,
+  activeLoans: 89,
+  defaultRate: 2.3,
+  monthlyRevenue: 127000,
+  revenueGrowth: 18.5,
+  pendingApplications: 15,
+  trainingCompletionRate: 60.3,
+  avgProcessingDays: 4.2,
+  memberGrowth: [45, 62, 78, 95, 112, 134, 152, 170, 189, 210, 231, 247],
+  memberGrowthLabels: ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'],
+  loanPortfolio: [
+    { month: 'Apr', workingCapital: 180000, invoiceFinance: 95000, equipment: 45000, inputBundle: 22000 },
+    { month: 'May', workingCapital: 210000, invoiceFinance: 110000, equipment: 52000, inputBundle: 28000 },
+    { month: 'Jun', workingCapital: 245000, invoiceFinance: 125000, equipment: 60000, inputBundle: 35000 },
+    { month: 'Jul', workingCapital: 280000, invoiceFinance: 140000, equipment: 68000, inputBundle: 42000 },
+    { month: 'Aug', workingCapital: 310000, invoiceFinance: 155000, equipment: 75000, inputBundle: 48000 },
+    { month: 'Sep', workingCapital: 340000, invoiceFinance: 170000, equipment: 82000, inputBundle: 55000 },
+    { month: 'Oct', workingCapital: 370000, invoiceFinance: 185000, equipment: 88000, inputBundle: 60000 },
+    { month: 'Nov', workingCapital: 395000, invoiceFinance: 198000, equipment: 92000, inputBundle: 65000 },
+    { month: 'Dec', workingCapital: 420000, invoiceFinance: 210000, equipment: 98000, inputBundle: 70000 },
+    { month: 'Jan', workingCapital: 450000, invoiceFinance: 225000, equipment: 105000, inputBundle: 75000 },
+    { month: 'Feb', workingCapital: 480000, invoiceFinance: 240000, equipment: 110000, inputBundle: 80000 },
+    { month: 'Mar', workingCapital: 510000, invoiceFinance: 255000, equipment: 115000, inputBundle: 85000 },
+  ],
+  revenueBreakdown: [
+    { source: 'Interest Income', amount: 68000, color: '#2AA198' },
+    { source: 'Membership Fees', amount: 24000, color: '#1B2A4A' },
+    { source: 'Origination Fees', amount: 18000, color: '#D4A843' },
+    { source: 'Partner Fees', amount: 12000, color: '#2D4A7A' },
+    { source: 'Training Revenue', amount: 5000, color: '#1A7A72' },
+  ],
+  applicationPipeline: [
+    { stage: 'New', count: 4, color: '#60A5FA' },
+    { stage: 'Documents Review', count: 3, color: '#FBBF24' },
+    { stage: 'Credit Assessment', count: 3, color: '#F97316' },
+    { stage: 'Approved', count: 3, color: '#34D399' },
+    { stage: 'Disbursed', count: 2, color: '#2AA198' },
+  ],
+  milestones: [
+    { label: '500 Members', target: 500, current: 247, deadline: 'Q4 2026' },
+    { label: '$10M Deployed', target: 10000000, current: 4200000, deadline: 'Q2 2027' },
+    { label: '3 Countries', target: 3, current: 3, deadline: 'Q1 2026' },
+    { label: 'Default Rate <5%', target: 5, current: 2.3, deadline: 'Ongoing', inverted: true },
+    { label: '60% Training Rate', target: 60, current: 60.3, deadline: 'Q1 2026' },
+  ],
+};
 
 interface FinancialLiveData {
   loans: { stats: { total: number; totalDeployed: number; totalRepaid: number; activeCount: number; pendingCount: number; completedCount: number; defaultedCount: number; defaultRate: string } };

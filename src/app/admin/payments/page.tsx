@@ -32,7 +32,45 @@ import {
   ChevronRight,
   CalendarDays,
 } from 'lucide-react';
-import { payments as mockPayments, type PaymentRecord } from '@/lib/data/payments';
+// ── Inline types & fallback data (formerly from @/lib/data/payments) ────────
+
+interface PaymentRecord {
+  id: string;
+  memberId: string;
+  memberName: string;
+  type: 'loan-repayment' | 'membership-fee' | 'input-purchase' | 'insurance-premium' | 'equipment-rental' | 'transport' | 'commission-payout' | 'subscription';
+  method: 'mobile-money' | 'bank-transfer' | 'cash' | 'card' | 'ussd';
+  provider: string;
+  amount: number;
+  currency: string;
+  reference: string;
+  status: 'completed' | 'pending' | 'failed' | 'reversed';
+  date: string;
+  relatedId: string;
+  description: string;
+}
+
+const mockPayments: PaymentRecord[] = [
+  { id: 'PAY-001', memberId: 'AFU-2024-001', memberName: 'Kgosi Mosweu', type: 'loan-repayment', method: 'mobile-money', provider: 'Orange Money', amount: 2200, currency: 'USD', reference: 'OM-BW-20250915-7823', status: 'completed', date: '2025-09-15', relatedId: 'FIN-2024-003', description: 'Monthly loan repayment for input bundle financing - maize season 2025' },
+  { id: 'PAY-002', memberId: 'AFU-2024-003', memberName: 'Tendai Moyo', type: 'input-purchase', method: 'mobile-money', provider: 'EcoCash', amount: 960, currency: 'USD', reference: 'EC-ZW-20251002-4512', status: 'completed', date: '2025-10-02', relatedId: 'ORD-2025-0489', description: 'Purchase of Hybrid Maize Seed (PAN 4M-21) x 20 bags from Kalahari Seeds' },
+  { id: 'PAY-003', memberId: 'AFU-2024-036', memberName: 'Thabo Molefe', type: 'loan-repayment', method: 'bank-transfer', provider: 'FNB', amount: 14800, currency: 'USD', reference: 'FNB-BW-20251015-9034', status: 'completed', date: '2025-10-15', relatedId: 'FIN-2024-001', description: 'Working capital loan monthly instalment - blueberry farming operations' },
+  { id: 'PAY-004', memberId: 'AFU-2024-005', memberName: 'Baraka Mfaume', type: 'membership-fee', method: 'mobile-money', provider: 'M-Pesa', amount: 50, currency: 'USD', reference: 'MP-TZ-20251101-2234', status: 'completed', date: '2025-11-01', relatedId: 'MEM-2025-ANNUAL', description: 'Annual AFU membership renewal - commercial tier' },
+  { id: 'PAY-005', memberId: 'AFU-2024-002', memberName: 'Naledi Sekgoma', type: 'insurance-premium', method: 'mobile-money', provider: 'Orange Money', amount: 85, currency: 'USD', reference: 'OM-BW-20251112-5567', status: 'completed', date: '2025-11-12', relatedId: 'INS-2025-0234', description: 'Seasonal crop insurance premium - sorghum and groundnut coverage' },
+  { id: 'PAY-006', memberId: 'AFU-2024-037', memberName: 'Rudo Chidyamakono', type: 'loan-repayment', method: 'bank-transfer', provider: 'Stanbic', amount: 18500, currency: 'USD', reference: 'STB-ZW-20251120-7891', status: 'completed', date: '2025-11-20', relatedId: 'FIN-2024-002', description: 'Invoice finance repayment - tobacco export proceeds' },
+  { id: 'PAY-007', memberId: 'AFU-2024-008', memberName: 'Grace Kimaro', type: 'input-purchase', method: 'mobile-money', provider: 'M-Pesa', amount: 3600, currency: 'USD', reference: 'MP-TZ-20251201-3345', status: 'completed', date: '2025-12-01', relatedId: 'ORD-2025-0678', description: 'Organic Compost Blend (Kilimanjaro Mix) x 200 bags for cooperative' },
+  { id: 'PAY-008', memberId: 'SUP-001', memberName: 'Zambezi Agri-Supplies', type: 'commission-payout', method: 'bank-transfer', provider: 'Stanbic', amount: 312, currency: 'USD', reference: 'STB-ZW-20251015-CP01', status: 'completed', date: '2025-10-15', relatedId: 'COM-001', description: 'Commission payout for groundnut seed order - Kgosi Mosweu' },
+  { id: 'PAY-009', memberId: 'SUP-002', memberName: 'Kalahari Seeds Co.', type: 'commission-payout', method: 'bank-transfer', provider: 'FNB', amount: 67.20, currency: 'USD', reference: 'FNB-BW-20251102-CP02', status: 'completed', date: '2025-11-02', relatedId: 'COM-002', description: 'Commission payout for hybrid maize seed order - Tendai Moyo' },
+  { id: 'PAY-010', memberId: 'AFU-2024-010', memberName: 'Sipho Dlamini', type: 'equipment-rental', method: 'mobile-money', provider: 'EcoCash', amount: 450, currency: 'USD', reference: 'EC-ZW-20251210-8901', status: 'completed', date: '2025-12-10', relatedId: 'RENT-2025-0067', description: 'Walk-behind tractor rental - 2 week hire for land preparation' },
+  { id: 'PAY-024', memberId: 'AFU-2024-001', memberName: 'Kgosi Mosweu', type: 'loan-repayment', method: 'mobile-money', provider: 'Orange Money', amount: 2200, currency: 'USD', reference: 'OM-BW-20260310-2234', status: 'completed', date: '2026-03-10', relatedId: 'FIN-2024-003', description: 'Monthly loan repayment for input bundle financing - instalment 4 of 6' },
+  { id: 'PAY-029', memberId: 'AFU-2024-036', memberName: 'Thabo Molefe', type: 'loan-repayment', method: 'bank-transfer', provider: 'FNB', amount: 14800, currency: 'USD', reference: 'FNB-BW-20260315-9901', status: 'pending', date: '2026-03-15', relatedId: 'FIN-2024-001', description: 'Working capital loan instalment - due today, processing via bank transfer' },
+  { id: 'PAY-030', memberId: 'AFU-2024-003', memberName: 'Tendai Moyo', type: 'input-purchase', method: 'mobile-money', provider: 'EcoCash', amount: 1500, currency: 'USD', reference: 'EC-ZW-20260312-3345', status: 'pending', date: '2026-03-12', relatedId: 'ORD-2026-0156', description: 'Export-Grade Produce Cartons x 20 packs from Ngorongoro Packaging' },
+  { id: 'PAY-035', memberId: 'AFU-2024-009', memberName: 'Rumbidzai Maphosa', type: 'loan-repayment', method: 'mobile-money', provider: 'EcoCash', amount: 4500, currency: 'USD', reference: 'EC-ZW-20260228-5534', status: 'failed', date: '2026-02-28', relatedId: 'FIN-2024-008', description: 'Loan repayment failed - insufficient EcoCash balance. Retry scheduled.' },
+  { id: 'PAY-036', memberId: 'AFU-2024-016', memberName: 'Sibongile Ncube', type: 'input-purchase', method: 'mobile-money', provider: 'EcoCash', amount: 780, currency: 'USD', reference: 'EC-ZW-20260305-6601', status: 'failed', date: '2026-03-05', relatedId: 'ORD-2026-0167', description: 'Seed purchase failed - mobile money network timeout. Customer notified.' },
+  { id: 'PAY-037', memberId: 'AFU-2024-028', memberName: 'Kelebogile Setlhare', type: 'insurance-premium', method: 'ussd', provider: 'Orange Money', amount: 65, currency: 'USD', reference: 'USSD-BW-20260310-7745', status: 'failed', date: '2026-03-10', relatedId: 'INS-2026-0089', description: 'Insurance premium payment failed - USSD session expired. Pending retry.' },
+  { id: 'PAY-038', memberId: 'AFU-2024-037', memberName: 'Rudo Chidyamakono', type: 'loan-repayment', method: 'bank-transfer', provider: 'Stanbic', amount: 18500, currency: 'USD', reference: 'STB-ZW-20260220-REV1', status: 'reversed', date: '2026-02-20', relatedId: 'FIN-2024-002', description: 'Bank transfer reversed - duplicate payment detected. Refund processed.' },
+  { id: 'PAY-039', memberId: 'AFU-2024-001', memberName: 'Kgosi Mosweu', type: 'input-purchase', method: 'cash', provider: 'FNB', amount: 225, currency: 'USD', reference: 'CASH-BW-20260312-0012', status: 'completed', date: '2026-03-12', relatedId: 'ORD-2026-0265', description: 'Cash deposit at FNB branch for fertilizer order collection at depot' },
+  { id: 'PAY-040', memberId: 'SUP-019', memberName: 'Mmegi Digital Agriculture', type: 'commission-payout', method: 'bank-transfer', provider: 'FNB', amount: 840, currency: 'USD', reference: 'FNB-BW-20260315-CP26', status: 'pending', date: '2026-03-15', relatedId: 'COM-026', description: 'Commission payout for FarmTrack Pro bulk license order - AFU Botswana Chapter' },
+];
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { createClient } from '@/lib/supabase/client';

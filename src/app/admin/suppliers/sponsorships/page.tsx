@@ -37,8 +37,48 @@ import {
   Megaphone,
   Zap,
 } from 'lucide-react';
-import { suppliers as mockSuppliers, type SponsorshipTier } from '@/lib/data/suppliers';
-const suppliers = mockSuppliers;
+// ── Inline types & fallback data (formerly from @/lib/data/suppliers) ────────
+
+type SponsorshipTier = 'platinum' | 'gold' | 'silver' | 'bronze';
+type SupplierCategory = 'input-supplier' | 'equipment' | 'logistics' | 'processing' | 'technology' | 'financial-services';
+type SupplierCountry = 'Botswana' | 'Kenya' | 'Mozambique' | 'Nigeria' | 'Sierra Leone' | 'South Africa' | 'Tanzania' | 'Zambia' | 'Zimbabwe';
+
+interface Supplier {
+  id: string;
+  companyName: string;
+  contactName: string;
+  email: string;
+  phone: string;
+  country: SupplierCountry;
+  region: string;
+  category: SupplierCategory;
+  status: 'active' | 'pending' | 'suspended';
+  joinDate: string;
+  logo: string;
+  description: string;
+  productsCount: number;
+  totalSales: number;
+  totalOrders: number;
+  rating: number;
+  reviewCount: number;
+  memberDiscountPercent: number;
+  commissionRate: number;
+  isFounding: boolean;
+  sponsorshipTier: SponsorshipTier | null;
+  verified: boolean;
+  website: string;
+  certifications: string[];
+}
+
+const suppliers: Supplier[] = [
+  { id: 'SUP-001', companyName: 'Zambezi Agri-Supplies', contactName: 'Farai Ndlovu', email: 'farai@zambezi-agri.co.zw', phone: '+263 77 200 1001', country: 'Zimbabwe', region: 'Harare', category: 'input-supplier', status: 'active', joinDate: '2024-06-15', logo: 'https://images.unsplash.com/photo-1560693225-b8507d6f3aa9?w=400&h=300&fit=crop', description: 'Leading agricultural input supplier across Southern Africa.', productsCount: 38, totalSales: 1847320, totalOrders: 4215, rating: 4.8, reviewCount: 312, memberDiscountPercent: 12, commissionRate: 8, isFounding: true, sponsorshipTier: 'platinum', verified: true, website: 'https://zambezi-agri.co.zw', certifications: ['ISO 9001', 'GlobalGAP Approved', 'SADC Trade Certified'] },
+  { id: 'SUP-002', companyName: 'Kalahari Seeds Co.', contactName: 'Mpho Kgosidintsi', email: 'mpho@kalahariSeeds.co.bw', phone: '+267 71 300 2002', country: 'Botswana', region: 'Gaborone', category: 'input-supplier', status: 'active', joinDate: '2024-06-20', logo: 'https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=400&h=300&fit=crop', description: 'Premium seed producer and distributor specializing in drought-resistant varieties.', productsCount: 22, totalSales: 923150, totalOrders: 2890, rating: 4.7, reviewCount: 245, memberDiscountPercent: 10, commissionRate: 7, isFounding: true, sponsorshipTier: 'gold', verified: true, website: 'https://kalahariSeeds.co.bw', certifications: ['ISTA Certified', 'Botswana Bureau of Standards'] },
+  { id: 'SUP-003', companyName: 'TechFarm Solutions', contactName: 'Amina Bakari', email: 'amina@techfarm.co.tz', phone: '+255 75 400 3003', country: 'Tanzania', region: 'Dar es Salaam', category: 'technology', status: 'active', joinDate: '2024-07-01', logo: 'https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=400&h=300&fit=crop', description: 'Agricultural technology company providing IoT sensors, drone services, and precision farming solutions.', productsCount: 15, totalSales: 612400, totalOrders: 845, rating: 4.6, reviewCount: 178, memberDiscountPercent: 8, commissionRate: 10, isFounding: true, sponsorshipTier: 'silver', verified: true, website: 'https://techfarm.co.tz', certifications: ['ISO 27001', 'Tanzania ICT Commission'] },
+  { id: 'SUP-004', companyName: 'Matopos Equipment Hire', contactName: 'Chenjerai Sibanda', email: 'chenjerai@matopos-equip.co.zw', phone: '+263 71 500 4004', country: 'Zimbabwe', region: 'Bulawayo', category: 'equipment', status: 'active', joinDate: '2024-07-10', logo: 'https://images.unsplash.com/photo-1530267981375-f0de937f5f13?w=400&h=300&fit=crop', description: 'Farm equipment rental and sales company.', productsCount: 20, totalSales: 534680, totalOrders: 612, rating: 4.5, reviewCount: 156, memberDiscountPercent: 15, commissionRate: 12, isFounding: true, sponsorshipTier: 'silver', verified: true, website: 'https://matopos-equip.co.zw', certifications: ['Zimbabwe Agricultural Equipment Association'] },
+  { id: 'SUP-005', companyName: 'Safari Logistics Ltd', contactName: 'Baraka Mwangi', email: 'baraka@safarilogistics.co.tz', phone: '+255 74 600 5005', country: 'Tanzania', region: 'Arusha', category: 'logistics', status: 'active', joinDate: '2024-08-05', logo: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=400&h=300&fit=crop', description: 'End-to-end agricultural logistics provider.', productsCount: 8, totalSales: 378900, totalOrders: 1520, rating: 4.4, reviewCount: 198, memberDiscountPercent: 7, commissionRate: 6, isFounding: false, sponsorshipTier: 'bronze', verified: true, website: 'https://safarilogistics.co.tz', certifications: ['TAFFA Member', 'Cold Chain Certified'] },
+  { id: 'SUP-006', companyName: 'Okavango Fertilizers', contactName: 'Thato Mogorosi', email: 'thato@okavango-fert.co.bw', phone: '+267 72 700 6006', country: 'Botswana', region: 'Francistown', category: 'input-supplier', status: 'active', joinDate: '2024-08-18', logo: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop', description: 'Organic and conventional fertilizer manufacturer.', productsCount: 14, totalSales: 456200, totalOrders: 1830, rating: 4.3, reviewCount: 142, memberDiscountPercent: 9, commissionRate: 8, isFounding: false, sponsorshipTier: 'bronze', verified: true, website: 'https://okavango-fert.co.bw', certifications: ['Botswana Bureau of Standards'] },
+  { id: 'SUP-009', companyName: 'Chobe Irrigation Systems', contactName: 'Kagiso Tsheko', email: 'kagiso@chobe-irrigation.co.bw', phone: '+267 73 100 9009', country: 'Botswana', region: 'Maun', category: 'equipment', status: 'active', joinDate: '2024-10-01', logo: 'https://images.unsplash.com/photo-1622383563227-04401ab4e5ea?w=400&h=300&fit=crop', description: 'Specialists in drip and sprinkler irrigation systems.', productsCount: 18, totalSales: 712350, totalOrders: 425, rating: 4.7, reviewCount: 134, memberDiscountPercent: 10, commissionRate: 11, isFounding: false, sponsorshipTier: 'bronze', verified: true, website: 'https://chobe-irrigation.co.bw', certifications: ['Water Utilities Corporation Approved', 'ISO 14001'] },
+];
 
 // ── Animation variants ────────────────────────────────────────────────────
 
