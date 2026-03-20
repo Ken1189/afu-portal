@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { useAuth } from '@/lib/supabase/auth-context';
 import {
   LayoutDashboard,
   Package,
@@ -40,7 +41,17 @@ const supplierLinks = [
 
 export default function SupplierLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { profile, signOut } = useAuth();
   const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const displayName = profile?.full_name || profile?.email?.split('@')[0] || 'Supplier';
+  const initials = displayName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
+
+  const handleSignOut = async () => {
+    await signOut();
+    router.push('/login');
+  };
 
   const isActive = (href: string) =>
     pathname === href || (href !== '/supplier' && pathname.startsWith(href));
@@ -59,10 +70,10 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
         <div className="bg-gradient-to-br from-[#1A7A72] to-teal p-5">
           <Link href="/supplier" className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">ZA</span>
+              <span className="text-white font-bold text-sm">{initials}</span>
             </div>
             <div>
-              <span className="font-bold text-lg leading-tight block">Zambezi Agri-Supplies</span>
+              <span className="font-bold text-lg leading-tight block">{displayName}</span>
             </div>
           </Link>
           <div className="inline-flex items-center gap-1.5 bg-gold/20 text-gold px-3 py-1 rounded-full text-xs font-bold">
@@ -130,7 +141,7 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
         <header className="hidden lg:flex bg-white border-b border-gray-100 px-6 py-4 items-center justify-between">
           <div>
             <h2 className="text-lg font-semibold text-navy">{getPageTitle()}</h2>
-            <p className="text-xs text-gray-400">Supplier Portal — Zambezi Agri-Supplies</p>
+            <p className="text-xs text-gray-400">Supplier Portal — {displayName}</p>
           </div>
           <div className="flex items-center gap-4">
             <button className="relative text-gray-400 hover:text-navy transition-colors">
@@ -141,9 +152,11 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
             </button>
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 bg-[#1A7A72] rounded-full flex items-center justify-center">
-                <span className="text-white text-sm font-bold">ZA</span>
+                <span className="text-white text-sm font-bold">{initials}</span>
               </div>
-              <span className="text-sm font-medium text-navy">Zambezi Agri-Supplies</span>
+              <button onClick={handleSignOut} className="text-sm font-medium text-navy hover:text-red-600 transition-colors">
+                Sign Out
+              </button>
             </div>
           </div>
         </header>
@@ -180,10 +193,10 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center text-lg font-bold">
-                      ZA
+                      {initials}
                     </div>
                     <div>
-                      <p className="font-semibold">Zambezi Agri-Supplies</p>
+                      <p className="font-semibold">{displayName}</p>
                       <p className="text-xs opacity-80">Supplier Partner</p>
                     </div>
                   </div>
