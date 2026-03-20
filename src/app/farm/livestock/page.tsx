@@ -415,7 +415,7 @@ function AnimalCard({ animal }: { animal: Animal }) {
 
           {/* Value */}
           <div className="text-right">
-            <p className="text-sm font-bold text-[#2AA198]">{formatCurrency(animal.currentValue)}</p>
+            <p className="text-sm font-bold text-[#8CB89C]">{formatCurrency(animal.currentValue)}</p>
             <p className="text-[11px] text-gray-500">Value</p>
           </div>
         </div>
@@ -510,8 +510,8 @@ function AnimalCard({ animal }: { animal: Animal }) {
                       key={rec.id}
                       className="flex items-start gap-3 p-2.5 rounded-xl bg-gray-50 border border-gray-100"
                     >
-                      <div className="w-8 h-8 rounded-lg bg-[#2AA198]/10 flex items-center justify-center shrink-0">
-                        {rec.type === 'vaccination' && <Syringe className="w-4 h-4 text-[#2AA198]" />}
+                      <div className="w-8 h-8 rounded-lg bg-[#8CB89C]/10 flex items-center justify-center shrink-0">
+                        {rec.type === 'vaccination' && <Syringe className="w-4 h-4 text-[#8CB89C]" />}
                         {rec.type === 'treatment' && <Pill className="w-4 h-4 text-red-500" />}
                         {rec.type === 'checkup' && <Activity className="w-4 h-4 text-blue-500" />}
                         {rec.type === 'deworming' && <Pill className="w-4 h-4 text-amber-500" />}
@@ -534,7 +534,7 @@ function AnimalCard({ animal }: { animal: Animal }) {
 
               {/* Action buttons */}
               <div className="grid grid-cols-3 gap-2">
-                <button className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl bg-[#2AA198]/10 text-[#2AA198] active:bg-[#2AA198]/20 transition-colors min-h-[64px]">
+                <button className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl bg-[#8CB89C]/10 text-[#8CB89C] active:bg-[#8CB89C]/20 transition-colors min-h-[64px]">
                   <Heart className="w-5 h-5" />
                   <span className="text-[11px] font-semibold">Record Health</span>
                 </button>
@@ -632,7 +632,7 @@ function AlertCard({
               {animalTag}
             </span>
           </div>
-          <button className="mt-2 text-xs font-semibold text-[#2AA198] hover:underline flex items-center gap-1">
+          <button className="mt-2 text-xs font-semibold text-[#8CB89C] hover:underline flex items-center gap-1">
             {actionLabel}
             <ChevronRight className="w-3 h-3" />
           </button>
@@ -827,7 +827,7 @@ export default function LivestockPage() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="bg-gradient-to-br from-[#1B2A4A] via-[#1B2A4A] to-[#2AA198]/30 text-white"
+        className="bg-gradient-to-br from-[#1B2A4A] via-[#1B2A4A] to-[#8CB89C]/30 text-white"
       >
         <div className="max-w-6xl mx-auto px-4 lg:px-6 py-8">
           <div className="flex items-start justify-between gap-4">
@@ -877,7 +877,7 @@ export default function LivestockPage() {
             {
               label: 'Total Animals',
               value: summary.totalAnimals.toString(),
-              icon: <Beef size={20} className="text-[#2AA198]" />,
+              icon: <Beef size={20} className="text-[#8CB89C]" />,
               accent: 'bg-[#EBF7E5]',
             },
             {
@@ -980,7 +980,7 @@ export default function LivestockPage() {
                       className={`flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-xl whitespace-nowrap transition-all border ${
                         isActive
                           ? 'bg-[#1B2A4A] text-white border-[#1B2A4A] shadow-sm'
-                          : 'bg-white text-gray-600 border-gray-200 hover:border-[#2AA198] hover:text-[#2AA198]'
+                          : 'bg-white text-gray-600 border-gray-200 hover:border-[#8CB89C] hover:text-[#8CB89C]'
                       }`}
                     >
                       {tf.label}
@@ -1008,8 +1008,8 @@ export default function LivestockPage() {
                       onClick={() => setStatusFilter(sf.key)}
                       className={`text-xs font-medium px-3 py-1.5 rounded-lg whitespace-nowrap transition-all border ${
                         isActive
-                          ? 'bg-[#2AA198] text-white border-[#2AA198]'
-                          : 'bg-white text-gray-500 border-gray-200 hover:border-[#2AA198] hover:text-[#2AA198]'
+                          ? 'bg-[#8CB89C] text-white border-[#8CB89C]'
+                          : 'bg-white text-gray-500 border-gray-200 hover:border-[#8CB89C] hover:text-[#8CB89C]'
                       }`}
                     >
                       {sf.label}
@@ -1030,7 +1030,7 @@ export default function LivestockPage() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search by name or tag..."
-                    className="w-full h-10 pl-9 pr-4 rounded-xl border border-gray-200 bg-white text-sm text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#2AA198]/30 focus:border-[#2AA198] transition"
+                    className="w-full h-10 pl-9 pr-4 rounded-xl border border-gray-200 bg-white text-sm text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition"
                   />
                   {searchQuery && (
                     <button
@@ -1046,7 +1046,7 @@ export default function LivestockPage() {
                 <div className="relative">
                   <button
                     onClick={() => setShowSortDropdown(!showSortDropdown)}
-                    className="flex items-center gap-2 h-10 px-4 rounded-xl border border-gray-200 bg-white text-sm text-gray-600 hover:border-[#2AA198] transition-colors"
+                    className="flex items-center gap-2 h-10 px-4 rounded-xl border border-gray-200 bg-white text-sm text-gray-600 hover:border-[#8CB89C] transition-colors"
                   >
                     <ArrowUpDown size={14} />
                     <span className="hidden sm:inline">
@@ -1071,7 +1071,7 @@ export default function LivestockPage() {
                             }}
                             className={`w-full text-left text-sm px-4 py-2.5 hover:bg-gray-50 transition-colors ${
                               sortKey === opt.key
-                                ? 'text-[#2AA198] font-semibold bg-[#EBF7E5]/50'
+                                ? 'text-[#8CB89C] font-semibold bg-[#EBF7E5]/50'
                                 : 'text-gray-600'
                             }`}
                           >
@@ -1122,7 +1122,7 @@ export default function LivestockPage() {
                       setTypeFilter('all');
                       setStatusFilter('all');
                     }}
-                    className="mt-4 text-xs font-semibold text-[#2AA198] hover:underline"
+                    className="mt-4 text-xs font-semibold text-[#8CB89C] hover:underline"
                   >
                     Clear all filters
                   </button>
@@ -1159,8 +1159,8 @@ export default function LivestockPage() {
                   icon={<Syringe size={24} />}
                   title="Record Vaccination"
                   description="Log a new vaccination for any animal"
-                  bgColor="bg-[#2AA198]/10"
-                  iconColor="text-[#2AA198]"
+                  bgColor="bg-[#8CB89C]/10"
+                  iconColor="text-[#8CB89C]"
                 />
                 <QuickActionCard
                   icon={<Pill size={24} />}

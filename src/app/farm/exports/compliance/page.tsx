@@ -452,7 +452,7 @@ const AUDIT_STATUS_LABELS: Record<string, string> = {
 
 const AUDIT_TYPE_STYLES: Record<string, string> = {
   internal: 'bg-gray-100 text-gray-600',
-  external: 'bg-[#2AA198]/10 text-[#2AA198]',
+  external: 'bg-[#8CB89C]/10 text-[#8CB89C]',
   regulatory: 'bg-[#1B2A4A]/10 text-[#1B2A4A]',
 };
 
@@ -710,7 +710,7 @@ function CertificationCard({ cert }: { cert: Certification }) {
         </div>
       )}
 
-      <button className="flex items-center gap-1 text-xs font-semibold text-[#2AA198] bg-[#2AA198]/10 hover:bg-[#2AA198]/20 px-3 py-1.5 rounded-lg transition-colors">
+      <button className="flex items-center gap-1 text-xs font-semibold text-[#8CB89C] bg-[#8CB89C]/10 hover:bg-[#8CB89C]/20 px-3 py-1.5 rounded-lg transition-colors">
         <Eye className="w-3.5 h-3.5" /> View Certificate
       </button>
     </motion.div>
@@ -837,7 +837,7 @@ export default function ExportCompliancePage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-gradient-to-br from-green-700 via-green-700 to-[#2AA198]/30 text-white">
+      <div className="bg-gradient-to-br from-green-700 via-green-700 to-[#8CB89C]/30 text-white">
         <div className="max-w-7xl mx-auto px-4 lg:px-6 py-8">
           <motion.div
             initial={{ opacity: 0, y: -20 }}

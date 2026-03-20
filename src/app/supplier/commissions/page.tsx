@@ -165,7 +165,7 @@ const disputedAmount = supplierCommissions
 
 const statusBadgeColors: Record<string, string> = {
   paid: 'bg-green-100 text-green-700',
-  approved: 'bg-[#2AA198]/10 text-[#2AA198]',
+  approved: 'bg-[#8CB89C]/10 text-[#8CB89C]',
   pending: 'bg-amber-100 text-amber-700',
   disputed: 'bg-red-100 text-red-700',
 };
@@ -336,9 +336,9 @@ export default function CommissionTracking() {
       value: formatCurrency(paidOut),
       sublabel: `${supplierCommissions.filter((c) => c.status === 'paid').length} payouts completed`,
       icon: <Wallet className="w-5 h-5" />,
-      color: 'text-[#2AA198]',
-      bgColor: 'bg-[#2AA198]/10',
-      borderColor: 'border-[#2AA198]/20',
+      color: 'text-[#8CB89C]',
+      bgColor: 'bg-[#8CB89C]/10',
+      borderColor: 'border-[#8CB89C]/20',
     },
   ];
 
@@ -375,7 +375,7 @@ export default function CommissionTracking() {
           <button
             onClick={() => setShowPayoutModal(!showPayoutModal)}
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-white text-sm font-medium transition-all hover:shadow-lg"
-            style={{ background: 'linear-gradient(135deg, #2AA198 0%, #1A7A72 100%)' }}
+            style={{ background: 'linear-gradient(135deg, #8CB89C 0%, #729E82 100%)' }}
           >
             <Banknote className="w-4 h-4" />
             Request Payout
@@ -390,7 +390,7 @@ export default function CommissionTracking() {
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-xl border-2 border-[#2AA198]/20 p-5 shadow-lg"
+          className="bg-white rounded-xl border-2 border-[#8CB89C]/20 p-5 shadow-lg"
         >
           <div className="flex items-start justify-between mb-4">
             <div>
@@ -412,12 +412,12 @@ export default function CommissionTracking() {
               <input
                 type="text"
                 defaultValue={formatCurrencyExact(pendingBalance + approvedBalance)}
-                className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm text-[#1B2A4A] focus:outline-none focus:ring-2 focus:ring-[#2AA198]/30 focus:border-[#2AA198]"
+                className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm text-[#1B2A4A] focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C]"
               />
             </div>
             <div>
               <label className="block text-xs text-gray-500 mb-1">Method</label>
-              <select className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm text-[#1B2A4A] focus:outline-none focus:ring-2 focus:ring-[#2AA198]/30 focus:border-[#2AA198]">
+              <select className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm text-[#1B2A4A] focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C]">
                 <option>Bank Transfer</option>
                 <option>Mobile Money</option>
               </select>
@@ -425,7 +425,7 @@ export default function CommissionTracking() {
             <div className="flex items-end">
               <button
                 onClick={() => setShowPayoutModal(false)}
-                className="w-full px-4 py-2 rounded-lg text-sm font-medium bg-[#2AA198] text-white hover:bg-[#1A7A72] transition-colors"
+                className="w-full px-4 py-2 rounded-lg text-sm font-medium bg-[#8CB89C] text-white hover:bg-[#729E82] transition-colors"
               >
                 Submit Request
               </button>
@@ -471,7 +471,7 @@ export default function CommissionTracking() {
         className="bg-white rounded-xl border border-gray-100 p-5"
       >
         <h3 className="font-semibold text-[#1B2A4A] text-sm mb-4 flex items-center gap-2">
-          <TrendingUp className="w-4 h-4 text-[#2AA198]" />
+          <TrendingUp className="w-4 h-4 text-[#8CB89C]" />
           Commission Trend (Last 7 Months)
         </h3>
         <div className="h-56">
@@ -479,8 +479,8 @@ export default function CommissionTracking() {
             <AreaChart data={commissionTrendData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="commGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#2AA198" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#2AA198" stopOpacity={0} />
+                  <stop offset="5%" stopColor="#8CB89C" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#8CB89C" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -490,12 +490,12 @@ export default function CommissionTracking() {
               <Area
                 type="monotone"
                 dataKey="amount"
-                stroke="#2AA198"
+                stroke="#8CB89C"
                 strokeWidth={2.5}
                 fill="url(#commGradient)"
                 name="Commission"
-                dot={{ fill: '#2AA198', r: 3, strokeWidth: 0 }}
-                activeDot={{ fill: '#2AA198', r: 5, strokeWidth: 2, stroke: '#fff' }}
+                dot={{ fill: '#8CB89C', r: 3, strokeWidth: 0 }}
+                activeDot={{ fill: '#8CB89C', r: 5, strokeWidth: 2, stroke: '#fff' }}
               />
             </AreaChart>
           </ResponsiveContainer>
@@ -513,7 +513,7 @@ export default function CommissionTracking() {
         <div className="p-5 border-b border-gray-100">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <h3 className="font-semibold text-[#1B2A4A] text-sm flex items-center gap-2">
-              <Filter className="w-4 h-4 text-[#2AA198]" />
+              <Filter className="w-4 h-4 text-[#8CB89C]" />
               Commission Details
             </h3>
             <div className="flex items-center bg-gray-50 rounded-lg p-1">
@@ -523,7 +523,7 @@ export default function CommissionTracking() {
                   onClick={() => setSelectedPeriod(filter.id)}
                   className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
                     selectedPeriod === filter.id
-                      ? 'bg-white text-[#2AA198] shadow-sm'
+                      ? 'bg-white text-[#8CB89C] shadow-sm'
                       : 'text-gray-500 hover:text-gray-700'
                   }`}
                 >
@@ -586,7 +586,7 @@ export default function CommissionTracking() {
                       <td className="py-3 px-4 text-right text-xs text-gray-500 tabular-nums whitespace-nowrap">
                         {comm.commissionRate}%
                       </td>
-                      <td className="py-3 px-4 text-right text-sm font-semibold text-[#2AA198] tabular-nums whitespace-nowrap">
+                      <td className="py-3 px-4 text-right text-sm font-semibold text-[#8CB89C] tabular-nums whitespace-nowrap">
                         {formatCurrencyExact(comm.commissionAmount)}
                       </td>
                       <td className="py-3 px-4">
@@ -623,7 +623,7 @@ export default function CommissionTracking() {
       >
         <div className="p-5 border-b border-gray-100">
           <h3 className="font-semibold text-[#1B2A4A] text-sm flex items-center gap-2">
-            <Wallet className="w-4 h-4 text-[#2AA198]" />
+            <Wallet className="w-4 h-4 text-[#8CB89C]" />
             Payout History
           </h3>
         </div>

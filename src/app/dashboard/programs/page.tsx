@@ -423,7 +423,7 @@ function ProgramCard({ program, onApply }: { program: Program; onApply: (p: Prog
               className="h-1.5 rounded-full transition-all"
               style={{
                 width: `${pct}%`,
-                background: pct >= 90 ? '#ef4444' : pct >= 70 ? '#f59e0b' : '#2AA198',
+                background: pct >= 90 ? '#ef4444' : pct >= 70 ? '#f59e0b' : '#8CB89C',
               }}
             />
           </div>

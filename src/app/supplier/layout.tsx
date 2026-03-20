@@ -65,9 +65,9 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* ─── Desktop Sidebar (hidden on mobile) ─── */}
-      <aside className="hidden lg:flex w-64 bg-[#1A7A72] flex-col text-white fixed top-0 left-0 bottom-0 z-30">
+      <aside className="hidden lg:flex w-64 bg-[#729E82] flex-col text-white fixed top-0 left-0 bottom-0 z-30">
         {/* Sidebar Header */}
-        <div className="bg-gradient-to-br from-[#1A7A72] to-[#5DB347] p-5">
+        <div className="bg-gradient-to-br from-[#729E82] to-[#5DB347] p-5">
           <Link href="/supplier" className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">{initials}</span>
@@ -119,7 +119,7 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
       {/* ─── Main Column ─── */}
       <div className="flex-1 flex flex-col lg:ml-64 min-w-0">
         {/* ─── Mobile Top Header (hidden on desktop) ─── */}
-        <header className="lg:hidden sticky top-0 z-40 bg-[#1A7A72] px-4 py-3 flex items-center justify-between text-white">
+        <header className="lg:hidden sticky top-0 z-40 bg-[#729E82] px-4 py-3 flex items-center justify-between text-white">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setDrawerOpen(true)}
@@ -131,7 +131,7 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
           </div>
           <button className="w-9 h-9 flex items-center justify-center rounded-lg bg-white/15 active:bg-white/25 transition-colors relative">
             <Bell className="w-5 h-5" />
-            <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center border-2 border-[#1A7A72]">
+            <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center border-2 border-[#729E82]">
               3
             </span>
           </button>
@@ -151,7 +151,7 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
               </span>
             </button>
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-[#1A7A72] rounded-full flex items-center justify-center">
+              <div className="w-8 h-8 bg-[#729E82] rounded-full flex items-center justify-center">
                 <span className="text-white text-sm font-bold">{initials}</span>
               </div>
               <button onClick={handleSignOut} className="text-sm font-medium text-navy hover:text-red-600 transition-colors">
@@ -178,10 +178,10 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
                 animate={{ x: 0 }}
                 exit={{ x: '-100%' }}
                 transition={{ type: 'spring' as const, stiffness: 300, damping: 30 }}
-                className="fixed top-0 left-0 bottom-0 z-50 w-[85vw] max-w-72 bg-[#1A7A72] shadow-2xl flex flex-col text-white"
+                className="fixed top-0 left-0 bottom-0 z-50 w-[85vw] max-w-72 bg-[#729E82] shadow-2xl flex flex-col text-white"
               >
                 {/* Drawer Header */}
-                <div className="bg-gradient-to-br from-[#1A7A72] to-[#5DB347] p-5">
+                <div className="bg-gradient-to-br from-[#729E82] to-[#5DB347] p-5">
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-sm font-medium opacity-80">Supplier Portal</span>
                     <button

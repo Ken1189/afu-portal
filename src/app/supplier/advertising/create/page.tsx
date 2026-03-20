@@ -243,9 +243,9 @@ export default function CreateCampaign() {
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ type: 'spring', stiffness: 300, damping: 20, delay: 0.2 }}
-            className="w-16 h-16 rounded-full bg-[#2AA198]/10 flex items-center justify-center mx-auto mb-5"
+            className="w-16 h-16 rounded-full bg-[#8CB89C]/10 flex items-center justify-center mx-auto mb-5"
           >
-            <Check className="w-8 h-8 text-[#2AA198]" />
+            <Check className="w-8 h-8 text-[#8CB89C]" />
           </motion.div>
           <h2 className="text-xl font-bold text-[#1B2A4A] mb-2">Campaign Submitted!</h2>
           <p className="text-sm text-gray-500 mb-6">
@@ -255,7 +255,7 @@ export default function CreateCampaign() {
           <div className="flex items-center gap-3 justify-center">
             <Link
               href="/supplier/advertising"
-              className="px-5 py-2.5 rounded-lg text-sm font-medium bg-[#2AA198] text-white hover:bg-[#1A7A72] transition-colors"
+              className="px-5 py-2.5 rounded-lg text-sm font-medium bg-[#8CB89C] text-white hover:bg-[#729E82] transition-colors"
             >
               Back to Advertising
             </Link>
@@ -323,9 +323,9 @@ export default function CreateCampaign() {
                   animate={{
                     backgroundColor:
                       currentStep > step.id
-                        ? '#2AA198'
+                        ? '#8CB89C'
                         : currentStep === step.id
-                          ? '#2AA198'
+                          ? '#8CB89C'
                           : '#E5E7EB',
                     color:
                       currentStep >= step.id ? '#FFFFFF' : '#9CA3AF',
@@ -341,7 +341,7 @@ export default function CreateCampaign() {
                 </motion.div>
                 <span
                   className={`text-[10px] mt-1.5 font-medium text-center hidden sm:block ${
-                    currentStep >= step.id ? 'text-[#2AA198]' : 'text-gray-400'
+                    currentStep >= step.id ? 'text-[#8CB89C]' : 'text-gray-400'
                   }`}
                 >
                   {step.label}
@@ -352,7 +352,7 @@ export default function CreateCampaign() {
                   <motion.div
                     className="h-full rounded-full"
                     animate={{
-                      backgroundColor: currentStep > step.id ? '#2AA198' : '#E5E7EB',
+                      backgroundColor: currentStep > step.id ? '#8CB89C' : '#E5E7EB',
                     }}
                     transition={{ duration: 0.3 }}
                   />
@@ -390,7 +390,7 @@ export default function CreateCampaign() {
                     onClick={() => setFormData((prev) => ({ ...prev, campaignType: type.id }))}
                     className={`text-left p-5 rounded-xl border-2 transition-all ${
                       formData.campaignType === type.id
-                        ? 'border-[#2AA198] bg-[#2AA198]/5 shadow-sm'
+                        ? 'border-[#8CB89C] bg-[#8CB89C]/5 shadow-sm'
                         : 'border-gray-100 bg-white hover:border-gray-200'
                     }`}
                   >
@@ -398,7 +398,7 @@ export default function CreateCampaign() {
                       <div
                         className={`w-11 h-11 rounded-lg flex items-center justify-center flex-shrink-0 ${
                           formData.campaignType === type.id
-                            ? 'bg-[#2AA198]/10 text-[#2AA198]'
+                            ? 'bg-[#8CB89C]/10 text-[#8CB89C]'
                             : 'bg-gray-100 text-gray-500'
                         }`}
                       >
@@ -416,7 +416,7 @@ export default function CreateCampaign() {
                       <motion.div
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
-                        className="absolute top-3 right-3 w-5 h-5 rounded-full bg-[#2AA198] flex items-center justify-center"
+                        className="absolute top-3 right-3 w-5 h-5 rounded-full bg-[#8CB89C] flex items-center justify-center"
                       >
                         <Check className="w-3 h-3 text-white" />
                       </motion.div>
@@ -443,7 +443,7 @@ export default function CreateCampaign() {
               {/* Placement */}
               <div className="bg-white rounded-xl border border-gray-100 p-5">
                 <h3 className="font-medium text-[#1B2A4A] text-sm mb-3 flex items-center gap-2">
-                  <LayoutDashboard className="w-4 h-4 text-[#2AA198]" />
+                  <LayoutDashboard className="w-4 h-4 text-[#8CB89C]" />
                   Placement
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -452,7 +452,7 @@ export default function CreateCampaign() {
                       key={opt.id}
                       className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
                         formData.placements.includes(opt.id)
-                          ? 'border-[#2AA198] bg-[#2AA198]/5'
+                          ? 'border-[#8CB89C] bg-[#8CB89C]/5'
                           : 'border-gray-100 hover:border-gray-200'
                       }`}
                     >
@@ -460,9 +460,9 @@ export default function CreateCampaign() {
                         type="checkbox"
                         checked={formData.placements.includes(opt.id)}
                         onChange={() => toggleArrayItem('placements', opt.id)}
-                        className="w-4 h-4 rounded border-gray-300 text-[#2AA198] focus:ring-[#2AA198]"
+                        className="w-4 h-4 rounded border-gray-300 text-[#8CB89C] focus:ring-[#8CB89C]"
                       />
-                      <div className={`${formData.placements.includes(opt.id) ? 'text-[#2AA198]' : 'text-gray-400'}`}>
+                      <div className={`${formData.placements.includes(opt.id) ? 'text-[#8CB89C]' : 'text-gray-400'}`}>
                         {opt.icon}
                       </div>
                       <div>
@@ -477,7 +477,7 @@ export default function CreateCampaign() {
               {/* Country targeting */}
               <div className="bg-white rounded-xl border border-gray-100 p-5">
                 <h3 className="font-medium text-[#1B2A4A] text-sm mb-3 flex items-center gap-2">
-                  <Globe className="w-4 h-4 text-[#2AA198]" />
+                  <Globe className="w-4 h-4 text-[#8CB89C]" />
                   Country Targeting
                 </h3>
                 <div className="flex flex-wrap gap-3">
@@ -486,7 +486,7 @@ export default function CreateCampaign() {
                       key={country}
                       className={`flex items-center gap-2 px-4 py-2 rounded-lg border cursor-pointer transition-all ${
                         formData.countries.includes(country)
-                          ? 'border-[#2AA198] bg-[#2AA198]/5'
+                          ? 'border-[#8CB89C] bg-[#8CB89C]/5'
                           : 'border-gray-100 hover:border-gray-200'
                       }`}
                     >
@@ -494,7 +494,7 @@ export default function CreateCampaign() {
                         type="checkbox"
                         checked={formData.countries.includes(country)}
                         onChange={() => toggleArrayItem('countries', country)}
-                        className="w-4 h-4 rounded border-gray-300 text-[#2AA198] focus:ring-[#2AA198]"
+                        className="w-4 h-4 rounded border-gray-300 text-[#8CB89C] focus:ring-[#8CB89C]"
                       />
                       <span className="text-sm text-[#1B2A4A]">{country}</span>
                     </label>
@@ -505,7 +505,7 @@ export default function CreateCampaign() {
               {/* Member tier targeting */}
               <div className="bg-white rounded-xl border border-gray-100 p-5">
                 <h3 className="font-medium text-[#1B2A4A] text-sm mb-3 flex items-center gap-2">
-                  <Users className="w-4 h-4 text-[#2AA198]" />
+                  <Users className="w-4 h-4 text-[#8CB89C]" />
                   Member Tier Targeting
                 </h3>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -514,7 +514,7 @@ export default function CreateCampaign() {
                       key={tier.id}
                       className={`flex flex-col items-center p-3 rounded-lg border cursor-pointer transition-all text-center ${
                         formData.memberTiers.includes(tier.id)
-                          ? 'border-[#2AA198] bg-[#2AA198]/5'
+                          ? 'border-[#8CB89C] bg-[#8CB89C]/5'
                           : 'border-gray-100 hover:border-gray-200'
                       }`}
                     >
@@ -522,7 +522,7 @@ export default function CreateCampaign() {
                         type="checkbox"
                         checked={formData.memberTiers.includes(tier.id)}
                         onChange={() => toggleArrayItem('memberTiers', tier.id)}
-                        className="w-4 h-4 rounded border-gray-300 text-[#2AA198] focus:ring-[#2AA198] mb-2"
+                        className="w-4 h-4 rounded border-gray-300 text-[#8CB89C] focus:ring-[#8CB89C] mb-2"
                       />
                       <span className="text-sm font-medium text-[#1B2A4A]">{tier.label}</span>
                       <span className="text-[10px] text-gray-400">{tier.count.toLocaleString()} members</span>
@@ -555,7 +555,7 @@ export default function CreateCampaign() {
                     value={formData.title}
                     onChange={(e) => setFormData((prev) => ({ ...prev, title: e.target.value }))}
                     placeholder="e.g., Season Opening Sale - 20% Off All Seeds"
-                    className="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm text-[#1B2A4A] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#2AA198]/30 focus:border-[#2AA198] transition-all"
+                    className="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm text-[#1B2A4A] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition-all"
                   />
                 </div>
 
@@ -567,7 +567,7 @@ export default function CreateCampaign() {
                     onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
                     placeholder="Describe your campaign offer, product, or message..."
                     rows={4}
-                    className="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm text-[#1B2A4A] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#2AA198]/30 focus:border-[#2AA198] transition-all resize-none"
+                    className="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm text-[#1B2A4A] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition-all resize-none"
                   />
                 </div>
 
@@ -577,14 +577,14 @@ export default function CreateCampaign() {
                   {!formData.hasImage ? (
                     <button
                       onClick={() => setFormData((prev) => ({ ...prev, hasImage: true }))}
-                      className="w-full border-2 border-dashed border-gray-200 rounded-xl p-8 flex flex-col items-center gap-3 hover:border-[#2AA198]/40 hover:bg-[#2AA198]/5 transition-all cursor-pointer group"
+                      className="w-full border-2 border-dashed border-gray-200 rounded-xl p-8 flex flex-col items-center gap-3 hover:border-[#8CB89C]/40 hover:bg-[#8CB89C]/5 transition-all cursor-pointer group"
                     >
-                      <div className="w-12 h-12 rounded-full bg-gray-100 group-hover:bg-[#2AA198]/10 flex items-center justify-center transition-colors">
-                        <Upload className="w-5 h-5 text-gray-400 group-hover:text-[#2AA198] transition-colors" />
+                      <div className="w-12 h-12 rounded-full bg-gray-100 group-hover:bg-[#8CB89C]/10 flex items-center justify-center transition-colors">
+                        <Upload className="w-5 h-5 text-gray-400 group-hover:text-[#8CB89C] transition-colors" />
                       </div>
                       <div className="text-center">
                         <p className="text-sm font-medium text-gray-600">
-                          Drag & drop your image here or <span className="text-[#2AA198]">browse</span>
+                          Drag & drop your image here or <span className="text-[#8CB89C]">browse</span>
                         </p>
                         <p className="text-xs text-gray-400 mt-1">PNG, JPG up to 2MB. Recommended: 800x400px</p>
                       </div>
@@ -592,8 +592,8 @@ export default function CreateCampaign() {
                   ) : (
                     <div className="relative border border-gray-200 rounded-xl p-4 bg-gray-50">
                       <div className="flex items-center gap-3">
-                        <div className="w-16 h-10 bg-[#2AA198]/20 rounded-lg flex items-center justify-center">
-                          <ImageIcon className="w-5 h-5 text-[#2AA198]" />
+                        <div className="w-16 h-10 bg-[#8CB89C]/20 rounded-lg flex items-center justify-center">
+                          <ImageIcon className="w-5 h-5 text-[#8CB89C]" />
                         </div>
                         <div className="flex-1">
                           <p className="text-sm font-medium text-[#1B2A4A]">campaign-banner.jpg</p>
@@ -615,14 +615,14 @@ export default function CreateCampaign() {
               {formData.title && (
                 <div className="bg-white rounded-xl border border-gray-100 p-5">
                   <h3 className="font-medium text-[#1B2A4A] text-sm mb-3 flex items-center gap-2">
-                    <Eye className="w-4 h-4 text-[#2AA198]" />
+                    <Eye className="w-4 h-4 text-[#8CB89C]" />
                     Preview
                   </h3>
                   <div className="rounded-lg border border-gray-200 overflow-hidden">
-                    <div className="bg-gradient-to-r from-[#2AA198]/10 to-[#1B2A4A]/5 p-6">
+                    <div className="bg-gradient-to-r from-[#8CB89C]/10 to-[#1B2A4A]/5 p-6">
                       <div className="flex items-start gap-4">
-                        <div className="w-24 h-16 bg-[#2AA198]/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <ImageIcon className="w-6 h-6 text-[#2AA198]" />
+                        <div className="w-24 h-16 bg-[#8CB89C]/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <ImageIcon className="w-6 h-6 text-[#8CB89C]" />
                         </div>
                         <div>
                           <span className="inline-block text-[9px] px-2 py-0.5 rounded-full bg-[#D4A843]/20 text-[#D4A843] font-semibold uppercase tracking-wider mb-1">
@@ -657,7 +657,7 @@ export default function CreateCampaign() {
               {/* Budget */}
               <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-4">
                 <h3 className="font-medium text-[#1B2A4A] text-sm flex items-center gap-2">
-                  <DollarSign className="w-4 h-4 text-[#2AA198]" />
+                  <DollarSign className="w-4 h-4 text-[#8CB89C]" />
                   Total Budget
                 </h3>
                 <div className="flex items-center gap-4">
@@ -674,7 +674,7 @@ export default function CreateCampaign() {
                   onChange={(e) => setFormData((prev) => ({ ...prev, budget: parseInt(e.target.value) }))}
                   className="w-full h-2 rounded-full appearance-none cursor-pointer"
                   style={{
-                    background: `linear-gradient(to right, #2AA198 ${((formData.budget - 100) / 9900) * 100}%, #E5E7EB ${((formData.budget - 100) / 9900) * 100}%)`,
+                    background: `linear-gradient(to right, #8CB89C ${((formData.budget - 100) / 9900) * 100}%, #E5E7EB ${((formData.budget - 100) / 9900) * 100}%)`,
                   }}
                 />
                 <div className="flex justify-between text-xs text-gray-400">
@@ -686,7 +686,7 @@ export default function CreateCampaign() {
               {/* Schedule */}
               <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-4">
                 <h3 className="font-medium text-[#1B2A4A] text-sm flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-[#2AA198]" />
+                  <Calendar className="w-4 h-4 text-[#8CB89C]" />
                   Schedule
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -696,7 +696,7 @@ export default function CreateCampaign() {
                       type="date"
                       value={formData.startDate}
                       onChange={(e) => setFormData((prev) => ({ ...prev, startDate: e.target.value }))}
-                      className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm text-[#1B2A4A] focus:outline-none focus:ring-2 focus:ring-[#2AA198]/30 focus:border-[#2AA198]"
+                      className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm text-[#1B2A4A] focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C]"
                     />
                   </div>
                   <div>
@@ -705,7 +705,7 @@ export default function CreateCampaign() {
                       type="date"
                       value={formData.endDate}
                       onChange={(e) => setFormData((prev) => ({ ...prev, endDate: e.target.value }))}
-                      className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm text-[#1B2A4A] focus:outline-none focus:ring-2 focus:ring-[#2AA198]/30 focus:border-[#2AA198]"
+                      className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm text-[#1B2A4A] focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C]"
                     />
                   </div>
                 </div>
@@ -723,7 +723,7 @@ export default function CreateCampaign() {
                       }))
                     }
                     className={`relative w-11 h-6 rounded-full transition-colors ${
-                      formData.dailyBudgetEnabled ? 'bg-[#2AA198]' : 'bg-gray-200'
+                      formData.dailyBudgetEnabled ? 'bg-[#8CB89C]' : 'bg-gray-200'
                     }`}
                   >
                     <motion.div
@@ -750,7 +750,7 @@ export default function CreateCampaign() {
                             dailyBudget: parseInt(e.target.value) || 0,
                           }))
                         }
-                        className="w-28 px-3 py-2 rounded-lg border border-gray-200 text-sm text-[#1B2A4A] focus:outline-none focus:ring-2 focus:ring-[#2AA198]/30 focus:border-[#2AA198]"
+                        className="w-28 px-3 py-2 rounded-lg border border-gray-200 text-sm text-[#1B2A4A] focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C]"
                       />
                       <span className="text-sm text-gray-600">per day</span>
                     </div>
@@ -797,7 +797,7 @@ export default function CreateCampaign() {
                           formData.placements.map((p) => (
                             <span
                               key={p}
-                              className="text-[10px] px-2 py-0.5 rounded-full bg-[#2AA198]/10 text-[#2AA198] font-medium"
+                              className="text-[10px] px-2 py-0.5 rounded-full bg-[#8CB89C]/10 text-[#8CB89C] font-medium"
                             >
                               {placementOptions.find((o) => o.id === p)?.label || p}
                             </span>
@@ -844,8 +844,8 @@ export default function CreateCampaign() {
                 <div className="border-t border-gray-100 pt-4">
                   <h3 className="text-sm font-medium text-[#1B2A4A] mb-3">Estimated Performance</h3>
                   <div className="grid grid-cols-3 gap-4">
-                    <div className="bg-[#2AA198]/5 rounded-lg p-3 text-center">
-                      <Eye className="w-4 h-4 text-[#2AA198] mx-auto mb-1" />
+                    <div className="bg-[#8CB89C]/5 rounded-lg p-3 text-center">
+                      <Eye className="w-4 h-4 text-[#8CB89C] mx-auto mb-1" />
                       <p className="text-lg font-bold text-[#1B2A4A] tabular-nums">
                         {estimatedTotalImpressions > 0 ? `${(estimatedTotalImpressions / 1000).toFixed(0)}K` : '--'}
                       </p>
@@ -893,7 +893,7 @@ export default function CreateCampaign() {
         {currentStep < 5 ? (
           <button
             onClick={goNext}
-            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-medium bg-[#2AA198] text-white hover:bg-[#1A7A72] transition-colors"
+            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-medium bg-[#8CB89C] text-white hover:bg-[#729E82] transition-colors"
           >
             Next
             <ArrowRight className="w-4 h-4" />

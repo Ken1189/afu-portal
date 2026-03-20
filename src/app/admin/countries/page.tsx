@@ -132,10 +132,10 @@ export default function CountriesPage() {
   const pilotCount = countries.filter((c) => c.status === 'pilot').length;
 
   const summaryCards = [
-    { label: 'Total Countries', value: '9', icon: Globe2, accent: 'text-[#2AA198]' },
+    { label: 'Total Countries', value: '9', icon: Globe2, accent: 'text-[#8CB89C]' },
     { label: 'Total Members', value: totalMembers.toLocaleString(), icon: Users, accent: 'text-[#D4A843]' },
     { label: 'Monthly Revenue', value: formatCurrency(totalRevenue), icon: TrendingUp, accent: 'text-emerald-400' },
-    { label: 'Live / Pilot', value: `${liveCount} / ${pilotCount}`, icon: Radio, accent: 'text-[#2AA198]' },
+    { label: 'Live / Pilot', value: `${liveCount} / ${pilotCount}`, icon: Radio, accent: 'text-[#8CB89C]' },
   ];
 
   return (
@@ -143,7 +143,7 @@ export default function CountriesPage() {
       {/* Back link */}
       <Link
         href="/admin"
-        className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-[#2AA198] transition-colors"
+        className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-[#8CB89C] transition-colors"
       >
         <ArrowLeft className="w-4 h-4" />
         Back to Admin
@@ -152,7 +152,7 @@ export default function CountriesPage() {
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
         <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-          <Globe2 className="w-8 h-8 text-[#2AA198]" />
+          <Globe2 className="w-8 h-8 text-[#8CB89C]" />
           Country Management
         </h1>
         <p className="text-slate-400 mt-1">Manage AFU operating countries across Africa</p>
@@ -189,7 +189,7 @@ export default function CountriesPage() {
             placeholder="Search countries..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-[#1B2A4A]/60 border border-white/10 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:border-[#2AA198]/50 transition-colors text-sm"
+            className="w-full pl-10 pr-4 py-2.5 bg-[#1B2A4A]/60 border border-white/10 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:border-[#8CB89C]/50 transition-colors text-sm"
           />
         </div>
         <div className="flex gap-2">
@@ -199,7 +199,7 @@ export default function CountriesPage() {
               onClick={() => setStatusFilter(s)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors border ${
                 statusFilter === s
-                  ? 'bg-[#2AA198]/20 border-[#2AA198]/40 text-[#2AA198]'
+                  ? 'bg-[#8CB89C]/20 border-[#8CB89C]/40 text-[#8CB89C]'
                   : 'bg-[#1B2A4A]/40 border-white/5 text-slate-400 hover:text-white hover:border-white/10'
               }`}
             >
@@ -222,7 +222,7 @@ export default function CountriesPage() {
             <motion.div
               key={country.iso}
               variants={cardVariants}
-              className="bg-[#1B2A4A]/60 backdrop-blur border border-white/5 rounded-xl overflow-hidden hover:border-[#2AA198]/20 transition-colors group"
+              className="bg-[#1B2A4A]/60 backdrop-blur border border-white/5 rounded-xl overflow-hidden hover:border-[#8CB89C]/20 transition-colors group"
             >
               {/* Card Header */}
               <div className="p-5 pb-4">
@@ -249,7 +249,7 @@ export default function CountriesPage() {
                 {/* Stats Grid */}
                 <div className="grid grid-cols-3 gap-3 mb-4">
                   <div className="text-center p-2.5 bg-white/[0.03] rounded-lg">
-                    <Users className="w-4 h-4 text-[#2AA198] mx-auto mb-1" />
+                    <Users className="w-4 h-4 text-[#8CB89C] mx-auto mb-1" />
                     <p className="text-sm font-semibold text-white">{country.members.toLocaleString()}</p>
                     <p className="text-[10px] text-slate-500 uppercase tracking-wider">Members</p>
                   </div>
@@ -274,7 +274,7 @@ export default function CountriesPage() {
                     {country.paymentProviders.map((p) => (
                       <span
                         key={p}
-                        className="text-xs px-2 py-0.5 rounded-full bg-[#2AA198]/10 text-[#2AA198] border border-[#2AA198]/20"
+                        className="text-xs px-2 py-0.5 rounded-full bg-[#8CB89C]/10 text-[#8CB89C] border border-[#8CB89C]/20"
                       >
                         {p}
                       </span>
@@ -306,7 +306,7 @@ export default function CountriesPage() {
                   <MapPin className="w-3 h-3" />
                   {country.status === 'live' ? 'Fully operational' : country.status === 'pilot' ? 'Pilot programme' : 'Coming soon'}
                 </span>
-                <button className="text-xs text-[#2AA198] hover:text-[#2AA198]/80 font-medium transition-colors">
+                <button className="text-xs text-[#8CB89C] hover:text-[#8CB89C]/80 font-medium transition-colors">
                   Manage
                 </button>
               </div>

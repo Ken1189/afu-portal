@@ -185,7 +185,7 @@ const methodLabels: Record<string, string> = {
 };
 
 const methodChartColors: Record<string, string> = {
-  'mobile-money': '#2AA198',
+  'mobile-money': '#8CB89C',
   'bank-transfer': '#1B2A4A',
   card: '#D4A843',
   cash: '#6366F1',
@@ -494,8 +494,8 @@ export default function PaymentsPage() {
               <AreaChart data={monthlyRevenueData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#2AA198" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#2AA198" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#8CB89C" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#8CB89C" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -510,12 +510,12 @@ export default function PaymentsPage() {
                 <Area
                   type="monotone"
                   dataKey="revenue"
-                  stroke="#2AA198"
+                  stroke="#8CB89C"
                   strokeWidth={2.5}
                   fill="url(#revenueGradient)"
                   name="Revenue"
-                  dot={{ fill: '#2AA198', r: 3, strokeWidth: 0 }}
-                  activeDot={{ fill: '#2AA198', r: 5, strokeWidth: 2, stroke: '#fff' }}
+                  dot={{ fill: '#8CB89C', r: 3, strokeWidth: 0 }}
+                  activeDot={{ fill: '#8CB89C', r: 5, strokeWidth: 2, stroke: '#fff' }}
                 />
               </AreaChart>
             </ResponsiveContainer>

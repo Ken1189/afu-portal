@@ -112,10 +112,10 @@ const topProductsData = [
 // -- Customer demographics ----------------------------------------------------
 
 const demographicsData = [
-  { name: 'Smallholder', value: 45, color: '#2AA198' },
+  { name: 'Smallholder', value: 45, color: '#8CB89C' },
   { name: 'Commercial', value: 30, color: '#1B2A4A' },
   { name: 'Enterprise', value: 15, color: '#D4A843' },
-  { name: 'Cooperative', value: 10, color: '#1A7A72' },
+  { name: 'Cooperative', value: 10, color: '#729E82' },
 ];
 
 // -- Revenue by country -------------------------------------------------------
@@ -151,8 +151,8 @@ const statCards = [
     change: '+22.4%',
     changeType: 'up' as const,
     icon: <DollarSign className="w-5 h-5" />,
-    color: 'text-[#2AA198]',
-    bgColor: 'bg-[#2AA198]/10',
+    color: 'text-[#8CB89C]',
+    bgColor: 'bg-[#8CB89C]/10',
     subtext: 'vs. previous period',
   },
   {
@@ -295,8 +295,8 @@ export default function SupplierAnalyticsPage() {
         className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
       >
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#2AA198]/10 flex items-center justify-center">
-            <BarChart3 className="w-5 h-5 text-[#2AA198]" />
+          <div className="w-10 h-10 rounded-xl bg-[#8CB89C]/10 flex items-center justify-center">
+            <BarChart3 className="w-5 h-5 text-[#8CB89C]" />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-[#1B2A4A]">Analytics</h1>
@@ -310,7 +310,7 @@ export default function SupplierAnalyticsPage() {
             onClick={() => setDateDropdownOpen(!dateDropdownOpen)}
             className="inline-flex items-center gap-2 bg-white hover:bg-gray-50 text-[#1B2A4A] border border-gray-200 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors shadow-sm"
           >
-            <Calendar className="w-4 h-4 text-[#2AA198]" />
+            <Calendar className="w-4 h-4 text-[#8CB89C]" />
             {dateRange}
             <ChevronDown
               className={`w-4 h-4 transition-transform ${dateDropdownOpen ? 'rotate-180' : ''}`}
@@ -331,7 +331,7 @@ export default function SupplierAnalyticsPage() {
                   }}
                   className={`w-full text-left px-4 py-2 text-sm transition-colors ${
                     dateRange === range
-                      ? 'bg-[#2AA198]/10 text-[#2AA198] font-medium'
+                      ? 'bg-[#8CB89C]/10 text-[#8CB89C] font-medium'
                       : 'text-gray-600 hover:bg-gray-50'
                   }`}
                 >
@@ -394,7 +394,7 @@ export default function SupplierAnalyticsPage() {
       >
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
           <h3 className="font-semibold text-[#1B2A4A] text-sm flex items-center gap-2">
-            <TrendingUp className="w-4 h-4 text-[#2AA198]" />
+            <TrendingUp className="w-4 h-4 text-[#8CB89C]" />
             Revenue Trend (12 Months)
           </h3>
           <div className="flex items-center gap-1 bg-gray-50 rounded-lg p-1">
@@ -404,7 +404,7 @@ export default function SupplierAnalyticsPage() {
                 onClick={() => setChartView(view)}
                 className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
                   chartView === view
-                    ? 'bg-[#2AA198] text-white shadow-sm'
+                    ? 'bg-[#8CB89C] text-white shadow-sm'
                     : 'text-gray-500 hover:text-[#1B2A4A]'
                 }`}
               >
@@ -418,8 +418,8 @@ export default function SupplierAnalyticsPage() {
             <AreaChart data={revenueTrendData} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
               <defs>
                 <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#2AA198" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#2AA198" stopOpacity={0} />
+                  <stop offset="5%" stopColor="#8CB89C" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#8CB89C" stopOpacity={0} />
                 </linearGradient>
                 <linearGradient id="ordersGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#D4A843" stopOpacity={0.3} />
@@ -466,12 +466,12 @@ export default function SupplierAnalyticsPage() {
                   yAxisId="revenue"
                   type="monotone"
                   dataKey="revenue"
-                  stroke="#2AA198"
+                  stroke="#8CB89C"
                   strokeWidth={2.5}
                   fill="url(#revenueGradient)"
                   name="Revenue"
-                  dot={{ fill: '#2AA198', r: 3, strokeWidth: 0 }}
-                  activeDot={{ fill: '#2AA198', r: 5, strokeWidth: 2, stroke: '#fff' }}
+                  dot={{ fill: '#8CB89C', r: 3, strokeWidth: 0 }}
+                  activeDot={{ fill: '#8CB89C', r: 5, strokeWidth: 2, stroke: '#fff' }}
                 />
               )}
               {(chartView === 'Orders' || chartView === 'Both') && (
@@ -505,7 +505,7 @@ export default function SupplierAnalyticsPage() {
           className="bg-white rounded-xl border border-gray-100 p-5"
         >
           <h3 className="font-semibold text-[#1B2A4A] text-sm flex items-center gap-2 mb-4">
-            <Package className="w-4 h-4 text-[#2AA198]" />
+            <Package className="w-4 h-4 text-[#8CB89C]" />
             Top Products by Revenue
           </h3>
           <div className="h-72">
@@ -535,7 +535,7 @@ export default function SupplierAnalyticsPage() {
                 <Bar
                   dataKey="revenue"
                   name="Revenue"
-                  fill="#2AA198"
+                  fill="#8CB89C"
                   radius={[0, 6, 6, 0]}
                   barSize={28}
                 />
@@ -550,7 +550,7 @@ export default function SupplierAnalyticsPage() {
           className="bg-white rounded-xl border border-gray-100 p-5"
         >
           <h3 className="font-semibold text-[#1B2A4A] text-sm flex items-center gap-2 mb-4">
-            <Users className="w-4 h-4 text-[#2AA198]" />
+            <Users className="w-4 h-4 text-[#8CB89C]" />
             Customer Demographics
           </h3>
           <div className="flex flex-col sm:flex-row items-center gap-6">
@@ -628,7 +628,7 @@ export default function SupplierAnalyticsPage() {
           className="bg-white rounded-xl border border-gray-100 p-5"
         >
           <h3 className="font-semibold text-[#1B2A4A] text-sm flex items-center gap-2 mb-4">
-            <Globe className="w-4 h-4 text-[#2AA198]" />
+            <Globe className="w-4 h-4 text-[#8CB89C]" />
             Revenue by Country
           </h3>
           <div className="h-72">
@@ -662,7 +662,7 @@ export default function SupplierAnalyticsPage() {
                 <Bar
                   dataKey="revenue"
                   name="Revenue"
-                  fill="#2AA198"
+                  fill="#8CB89C"
                   radius={[6, 6, 0, 0]}
                   barSize={48}
                 />
@@ -685,7 +685,7 @@ export default function SupplierAnalyticsPage() {
         >
           <div className="p-5 border-b border-gray-100">
             <h3 className="font-semibold text-[#1B2A4A] text-sm flex items-center gap-2">
-              <BarChart3 className="w-4 h-4 text-[#2AA198]" />
+              <BarChart3 className="w-4 h-4 text-[#8CB89C]" />
               Monthly Comparison
             </h3>
           </div>

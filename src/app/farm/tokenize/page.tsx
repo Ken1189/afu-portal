@@ -133,7 +133,7 @@ const howItWorksSteps = [
     step: 1,
     title: 'Record Your Harvest',
     description: 'Enter your harvest details including commodity type, quantity, and quality grade.',
-    icon: <FileText size={22} className="text-[#2AA198]" />,
+    icon: <FileText size={22} className="text-[#8CB89C]" />,
   },
   {
     step: 2,
@@ -222,7 +222,7 @@ export default function TokenizePage() {
       {/* HEADER                                                            */}
       {/* ================================================================= */}
       <motion.section variants={itemVariants} className="px-4">
-        <div className="rounded-2xl bg-gradient-to-br from-[#1B2A4A] via-[#1B2A4A] to-[#2AA198] p-5 text-white relative overflow-hidden">
+        <div className="rounded-2xl bg-gradient-to-br from-[#1B2A4A] via-[#1B2A4A] to-[#8CB89C] p-5 text-white relative overflow-hidden">
           {/* Decorative elements */}
           <div className="absolute -top-10 -right-10 w-32 h-32 bg-white/5 rounded-full" />
           <div className="absolute -bottom-8 -right-6 w-24 h-24 bg-white/5 rounded-full" />
@@ -299,7 +299,7 @@ export default function TokenizePage() {
                   <span
                     className={`text-[10px] font-medium px-2.5 py-1 rounded-full border flex items-center gap-1 ${
                       asset.status === 'active'
-                        ? 'bg-[#2AA198]/10 text-[#2AA198] border-[#2AA198]/20'
+                        ? 'bg-[#8CB89C]/10 text-[#8CB89C] border-[#8CB89C]/20'
                         : 'bg-amber-50 text-amber-600 border-amber-200'
                     }`}
                   >
@@ -323,7 +323,7 @@ export default function TokenizePage() {
                   </div>
                   <div>
                     <p className="text-[10px] text-gray-400">Est. Value</p>
-                    <p className="text-sm font-bold text-[#2AA198]">
+                    <p className="text-sm font-bold text-[#8CB89C]">
                       {formatCurrency(asset.estimatedValue)}
                     </p>
                   </div>
@@ -346,10 +346,10 @@ export default function TokenizePage() {
       <motion.section variants={itemVariants} className="px-4">
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
           {/* Form Header */}
-          <div className="bg-gradient-to-r from-[#1B2A4A]/5 to-[#2AA198]/5 px-4 py-4 border-b border-gray-100">
+          <div className="bg-gradient-to-r from-[#1B2A4A]/5 to-[#8CB89C]/5 px-4 py-4 border-b border-gray-100">
             <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-[#2AA198]/10 flex items-center justify-center">
-                <Package size={18} className="text-[#2AA198]" />
+              <div className="w-9 h-9 rounded-xl bg-[#8CB89C]/10 flex items-center justify-center">
+                <Package size={18} className="text-[#8CB89C]" />
               </div>
               <div>
                 <h3 className="text-sm font-bold text-[#1B2A4A]">New Tokenization Request</h3>
@@ -373,7 +373,7 @@ export default function TokenizePage() {
                     setCommodity(e.target.value);
                     if (formErrors.commodity) setFormErrors((p) => ({ ...p, commodity: '' }));
                   }}
-                  className={`w-full appearance-none bg-gray-50 border rounded-xl px-4 py-3 text-sm text-[#1B2A4A] focus:outline-none focus:ring-2 focus:ring-[#2AA198]/30 focus:border-[#2AA198] transition-all ${
+                  className={`w-full appearance-none bg-gray-50 border rounded-xl px-4 py-3 text-sm text-[#1B2A4A] focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition-all ${
                     formErrors.commodity ? 'border-red-300' : 'border-gray-200'
                   }`}
                 >
@@ -410,7 +410,7 @@ export default function TokenizePage() {
                     if (formErrors.quantity) setFormErrors((p) => ({ ...p, quantity: '' }));
                   }}
                   placeholder="e.g. 50"
-                  className={`flex-1 bg-gray-50 border rounded-xl px-4 py-3 text-sm text-[#1B2A4A] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#2AA198]/30 focus:border-[#2AA198] transition-all ${
+                  className={`flex-1 bg-gray-50 border rounded-xl px-4 py-3 text-sm text-[#1B2A4A] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition-all ${
                     formErrors.quantity ? 'border-red-300' : 'border-gray-200'
                   }`}
                 />
@@ -418,7 +418,7 @@ export default function TokenizePage() {
                   <select
                     value={unit}
                     onChange={(e) => setUnit(e.target.value)}
-                    className="appearance-none bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 pr-8 text-sm text-[#1B2A4A] focus:outline-none focus:ring-2 focus:ring-[#2AA198]/30 focus:border-[#2AA198] transition-all"
+                    className="appearance-none bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 pr-8 text-sm text-[#1B2A4A] focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition-all"
                   >
                     {unitOptions.map((u) => (
                       <option key={u} value={u}>
@@ -449,7 +449,7 @@ export default function TokenizePage() {
                   setHarvestDate(e.target.value);
                   if (formErrors.harvestDate) setFormErrors((p) => ({ ...p, harvestDate: '' }));
                 }}
-                className={`w-full bg-gray-50 border rounded-xl px-4 py-3 text-sm text-[#1B2A4A] focus:outline-none focus:ring-2 focus:ring-[#2AA198]/30 focus:border-[#2AA198] transition-all ${
+                className={`w-full bg-gray-50 border rounded-xl px-4 py-3 text-sm text-[#1B2A4A] focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition-all ${
                   formErrors.harvestDate ? 'border-red-300' : 'border-gray-200'
                 }`}
               />
@@ -470,7 +470,7 @@ export default function TokenizePage() {
                     setPlot(e.target.value);
                     if (formErrors.plot) setFormErrors((p) => ({ ...p, plot: '' }));
                   }}
-                  className={`w-full appearance-none bg-gray-50 border rounded-xl px-4 py-3 text-sm text-[#1B2A4A] focus:outline-none focus:ring-2 focus:ring-[#2AA198]/30 focus:border-[#2AA198] transition-all ${
+                  className={`w-full appearance-none bg-gray-50 border rounded-xl px-4 py-3 text-sm text-[#1B2A4A] focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition-all ${
                     formErrors.plot ? 'border-red-300' : 'border-gray-200'
                   }`}
                 >
@@ -541,7 +541,7 @@ export default function TokenizePage() {
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#1B2A4A] to-[#2AA198] text-white text-sm font-semibold hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 min-h-[48px]"
+              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#1B2A4A] to-[#8CB89C] text-white text-sm font-semibold hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 min-h-[48px]"
             >
               <Coins size={16} />
               Request Tokenization
@@ -598,7 +598,7 @@ export default function TokenizePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="bg-gradient-to-br from-[#1B2A4A] to-[#2AA198] rounded-2xl p-5 sm:p-6 text-white relative overflow-hidden"
+          className="bg-gradient-to-br from-[#1B2A4A] to-[#8CB89C] rounded-2xl p-5 sm:p-6 text-white relative overflow-hidden"
         >
           {/* Decorative */}
           <div className="absolute -top-8 -right-8 w-28 h-28 bg-white/5 rounded-full" />
@@ -681,8 +681,8 @@ export default function TokenizePage() {
               className="bg-white rounded-2xl w-full max-w-md p-5 shadow-xl"
             >
               <div className="text-center mb-4">
-                <div className="w-16 h-16 rounded-full bg-[#2AA198]/10 flex items-center justify-center mx-auto mb-3">
-                  <CheckCircle2 size={32} className="text-[#2AA198]" />
+                <div className="w-16 h-16 rounded-full bg-[#8CB89C]/10 flex items-center justify-center mx-auto mb-3">
+                  <CheckCircle2 size={32} className="text-[#8CB89C]" />
                 </div>
                 <h3 className="text-lg font-bold text-[#1B2A4A]">
                   Tokenization Request Submitted
@@ -699,7 +699,7 @@ export default function TokenizePage() {
                   <span>Verification typically takes 2-5 business days</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-gray-500">
-                  <Shield size={12} className="text-[#2AA198]" />
+                  <Shield size={12} className="text-[#8CB89C]" />
                   <span>You will be notified once your token is minted</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-gray-500">

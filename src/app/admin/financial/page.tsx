@@ -104,18 +104,18 @@ const dashboardStats = {
     { month: 'Mar', workingCapital: 510000, invoiceFinance: 255000, equipment: 115000, inputBundle: 85000 },
   ],
   revenueBreakdown: [
-    { source: 'Interest Income', amount: 68000, color: '#2AA198' },
+    { source: 'Interest Income', amount: 68000, color: '#8CB89C' },
     { source: 'Membership Fees', amount: 24000, color: '#1B2A4A' },
     { source: 'Origination Fees', amount: 18000, color: '#D4A843' },
     { source: 'Partner Fees', amount: 12000, color: '#2D4A7A' },
-    { source: 'Training Revenue', amount: 5000, color: '#1A7A72' },
+    { source: 'Training Revenue', amount: 5000, color: '#729E82' },
   ],
   applicationPipeline: [
     { stage: 'New', count: 4, color: '#60A5FA' },
     { stage: 'Documents Review', count: 3, color: '#FBBF24' },
     { stage: 'Credit Assessment', count: 3, color: '#F97316' },
     { stage: 'Approved', count: 3, color: '#34D399' },
-    { stage: 'Disbursed', count: 2, color: '#2AA198' },
+    { stage: 'Disbursed', count: 2, color: '#8CB89C' },
   ],
   milestones: [
     { label: '500 Members', target: 500, current: 247, deadline: 'Q4 2026' },
@@ -471,8 +471,8 @@ export default function FinancialManagementPage() {
               <AreaChart data={portfolioGrowthData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="portfolioGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#2AA198" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#2AA198" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#8CB89C" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#8CB89C" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -482,12 +482,12 @@ export default function FinancialManagementPage() {
                 <Area
                   type="monotone"
                   dataKey="value"
-                  stroke="#2AA198"
+                  stroke="#8CB89C"
                   strokeWidth={2.5}
                   fill="url(#portfolioGradient)"
                   name="Portfolio Value"
-                  dot={{ fill: '#2AA198', r: 3, strokeWidth: 0 }}
-                  activeDot={{ fill: '#2AA198', r: 5, strokeWidth: 2, stroke: '#fff' }}
+                  dot={{ fill: '#8CB89C', r: 3, strokeWidth: 0 }}
+                  activeDot={{ fill: '#8CB89C', r: 5, strokeWidth: 2, stroke: '#fff' }}
                 />
               </AreaChart>
             </ResponsiveContainer>

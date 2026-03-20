@@ -81,11 +81,11 @@ function ToggleSwitch({
       aria-checked={enabled}
       disabled={disabled}
       onClick={() => !disabled && onChange(!enabled)}
-      className={`relative inline-flex h-6 w-11 flex-shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[#2AA198]/30 ${
+      className={`relative inline-flex h-6 w-11 flex-shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 ${
         disabled
           ? 'bg-gray-200 cursor-not-allowed'
           : enabled
-            ? 'bg-[#2AA198] cursor-pointer'
+            ? 'bg-[#8CB89C] cursor-pointer'
             : 'bg-gray-200 cursor-pointer'
       }`}
     >
@@ -216,8 +216,8 @@ export default function SupplierSettingsPage() {
         variants={fadeUp}
         className="flex items-center gap-3"
       >
-        <div className="w-10 h-10 rounded-xl bg-[#2AA198]/10 flex items-center justify-center">
-          <Settings className="w-5 h-5 text-[#2AA198]" />
+        <div className="w-10 h-10 rounded-xl bg-[#8CB89C]/10 flex items-center justify-center">
+          <Settings className="w-5 h-5 text-[#8CB89C]" />
         </div>
         <div>
           <h1 className="text-2xl font-bold text-[#1B2A4A]">Settings</h1>
@@ -234,7 +234,7 @@ export default function SupplierSettingsPage() {
       >
         <div className="flex items-center justify-between mb-5">
           <h3 className="font-semibold text-[#1B2A4A] text-base flex items-center gap-2">
-            <Bell className="w-4.5 h-4.5 text-[#2AA198]" />
+            <Bell className="w-4.5 h-4.5 text-[#8CB89C]" />
             Notification Preferences
           </h3>
         </div>
@@ -265,7 +265,7 @@ export default function SupplierSettingsPage() {
             className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm ${
               notifSaved
                 ? 'bg-green-500 text-white'
-                : 'bg-[#2AA198] hover:bg-[#1A7A72] text-white'
+                : 'bg-[#8CB89C] hover:bg-[#729E82] text-white'
             }`}
           >
             {notifSaved ? (
@@ -288,7 +288,7 @@ export default function SupplierSettingsPage() {
         className="bg-white rounded-xl border border-gray-100 p-6"
       >
         <h3 className="font-semibold text-[#1B2A4A] text-base flex items-center gap-2 mb-5">
-          <CreditCard className="w-4.5 h-4.5 text-[#2AA198]" />
+          <CreditCard className="w-4.5 h-4.5 text-[#8CB89C]" />
           Payout Settings
         </h3>
 
@@ -303,7 +303,7 @@ export default function SupplierSettingsPage() {
                 onClick={() => setPayoutMethod('Bank Transfer')}
                 className={`flex items-center gap-2.5 px-4 py-3 rounded-xl border-2 transition-all text-sm font-medium flex-1 ${
                   payoutMethod === 'Bank Transfer'
-                    ? 'border-[#2AA198] bg-[#2AA198]/5 text-[#2AA198]'
+                    ? 'border-[#8CB89C] bg-[#8CB89C]/5 text-[#8CB89C]'
                     : 'border-gray-200 bg-white text-gray-500 hover:border-gray-300'
                 }`}
               >
@@ -314,7 +314,7 @@ export default function SupplierSettingsPage() {
                 onClick={() => setPayoutMethod('Mobile Money')}
                 className={`flex items-center gap-2.5 px-4 py-3 rounded-xl border-2 transition-all text-sm font-medium flex-1 ${
                   payoutMethod === 'Mobile Money'
-                    ? 'border-[#2AA198] bg-[#2AA198]/5 text-[#2AA198]'
+                    ? 'border-[#8CB89C] bg-[#8CB89C]/5 text-[#8CB89C]'
                     : 'border-gray-200 bg-white text-gray-500 hover:border-gray-300'
                 }`}
               >
@@ -334,7 +334,7 @@ export default function SupplierSettingsPage() {
                   onClick={() => setPayoutFrequency(freq)}
                   className={`px-4 py-2.5 rounded-lg text-xs font-semibold transition-all ${
                     payoutFrequency === freq
-                      ? 'bg-[#2AA198] text-white shadow-sm'
+                      ? 'bg-[#8CB89C] text-white shadow-sm'
                       : 'bg-gray-50 text-gray-500 hover:bg-gray-100 hover:text-[#1B2A4A]'
                   }`}
                 >
@@ -350,7 +350,7 @@ export default function SupplierSettingsPage() {
               <label className="block text-xs font-medium text-gray-500">
                 Minimum Payout Threshold
               </label>
-              <span className="text-sm font-bold text-[#2AA198] tabular-nums">
+              <span className="text-sm font-bold text-[#8CB89C] tabular-nums">
                 ${payoutThreshold}
               </span>
             </div>
@@ -361,7 +361,7 @@ export default function SupplierSettingsPage() {
               step={25}
               value={payoutThreshold}
               onChange={(e) => setPayoutThreshold(Number(e.target.value))}
-              className="w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer accent-[#2AA198]"
+              className="w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer accent-[#8CB89C]"
             />
             <div className="flex items-center justify-between mt-1">
               <span className="text-[10px] text-gray-400">$50</span>
@@ -376,7 +376,7 @@ export default function SupplierSettingsPage() {
             className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm ${
               payoutSaved
                 ? 'bg-green-500 text-white'
-                : 'bg-[#2AA198] hover:bg-[#1A7A72] text-white'
+                : 'bg-[#8CB89C] hover:bg-[#729E82] text-white'
             }`}
           >
             {payoutSaved ? (
@@ -407,7 +407,7 @@ export default function SupplierSettingsPage() {
         </div>
 
         <h3 className="font-semibold text-[#1B2A4A] text-base flex items-center gap-2 mb-5">
-          <Key className="w-4.5 h-4.5 text-[#2AA198]" />
+          <Key className="w-4.5 h-4.5 text-[#8CB89C]" />
           API Access
         </h3>
 
@@ -450,7 +450,7 @@ export default function SupplierSettingsPage() {
         className="bg-white rounded-xl border border-gray-100 p-6"
       >
         <h3 className="font-semibold text-[#1B2A4A] text-base flex items-center gap-2 mb-5">
-          <Shield className="w-4.5 h-4.5 text-[#2AA198]" />
+          <Shield className="w-4.5 h-4.5 text-[#8CB89C]" />
           Account Management
         </h3>
 
@@ -466,7 +466,7 @@ export default function SupplierSettingsPage() {
                 <p className="text-xs text-gray-400">Update your account password</p>
               </div>
             </div>
-            <button className="inline-flex items-center gap-1.5 bg-[#2AA198]/10 text-[#2AA198] hover:bg-[#2AA198]/20 px-4 py-2 rounded-lg text-xs font-medium transition-colors">
+            <button className="inline-flex items-center gap-1.5 bg-[#8CB89C]/10 text-[#8CB89C] hover:bg-[#8CB89C]/20 px-4 py-2 rounded-lg text-xs font-medium transition-colors">
               Change
               <ChevronRight className="w-3.5 h-3.5" />
             </button>
@@ -495,7 +495,7 @@ export default function SupplierSettingsPage() {
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
-              className="mx-3 mt-2 mb-3 bg-[#2AA198]/5 rounded-xl p-5 border border-[#2AA198]/20"
+              className="mx-3 mt-2 mb-3 bg-[#8CB89C]/5 rounded-xl p-5 border border-[#8CB89C]/20"
             >
               <h4 className="text-sm font-semibold text-[#1B2A4A] mb-3">Set Up Two-Factor Authentication</h4>
               <div className="flex flex-col sm:flex-row items-start gap-5">
@@ -516,11 +516,11 @@ export default function SupplierSettingsPage() {
                       type="text"
                       placeholder="Enter 6-digit code"
                       maxLength={6}
-                      className="w-40 px-4 py-2.5 rounded-lg border border-gray-200 text-sm font-mono text-center tracking-[0.3em] focus:outline-none focus:ring-2 focus:ring-[#2AA198]/30 focus:border-[#2AA198] transition-colors bg-white"
+                      className="w-40 px-4 py-2.5 rounded-lg border border-gray-200 text-sm font-mono text-center tracking-[0.3em] focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition-colors bg-white"
                     />
                     <button
                       onClick={handleConfirmTwoFactor}
-                      className="bg-[#2AA198] hover:bg-[#1A7A72] text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors"
+                      className="bg-[#8CB89C] hover:bg-[#729E82] text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors"
                     >
                       Verify &amp; Enable
                     </button>
@@ -544,7 +544,7 @@ export default function SupplierSettingsPage() {
                 <p className="text-xs text-gray-400">Export all your data as a ZIP archive</p>
               </div>
             </div>
-            <button className="inline-flex items-center gap-1.5 bg-[#2AA198]/10 text-[#2AA198] hover:bg-[#2AA198]/20 px-4 py-2 rounded-lg text-xs font-medium transition-colors">
+            <button className="inline-flex items-center gap-1.5 bg-[#8CB89C]/10 text-[#8CB89C] hover:bg-[#8CB89C]/20 px-4 py-2 rounded-lg text-xs font-medium transition-colors">
               <Download className="w-3.5 h-3.5" />
               Download
             </button>

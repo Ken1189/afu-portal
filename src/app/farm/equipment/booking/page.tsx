@@ -692,7 +692,7 @@ function BookingContent() {
             </p>
             <Link
               href="/farm/equipment"
-              className="inline-flex items-center gap-2 bg-[#2AA198] text-white text-sm font-semibold px-6 py-3 rounded-xl hover:bg-[#1A7A72] transition-colors"
+              className="inline-flex items-center gap-2 bg-[#8CB89C] text-white text-sm font-semibold px-6 py-3 rounded-xl hover:bg-[#729E82] transition-colors"
             >
               <ArrowLeft size={16} />
               Browse Equipment
@@ -797,7 +797,7 @@ function BookingContent() {
                   <span className="text-sm font-semibold text-gray-600">
                     Total Cost
                   </span>
-                  <span className="text-lg font-bold text-[#2AA198]">
+                  <span className="text-lg font-bold text-[#8CB89C]">
                     ${grandTotal.toLocaleString()}
                   </span>
                 </div>
@@ -834,7 +834,7 @@ function BookingContent() {
         <div className="max-w-5xl mx-auto px-4 lg:px-6 py-4">
           <Link
             href="/farm/equipment"
-            className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-[#2AA198] transition-colors"
+            className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-[#8CB89C] transition-colors"
           >
             <ArrowLeft size={16} />
             Back to Equipment
@@ -917,7 +917,7 @@ function BookingContent() {
               className="rounded-2xl bg-white border border-gray-100 p-5 shadow-sm"
             >
               <h2 className="text-sm font-bold text-[#1B2A4A] mb-4 flex items-center gap-2">
-                <Settings size={16} className="text-[#2AA198]" />
+                <Settings size={16} className="text-[#8CB89C]" />
                 Specifications
               </h2>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -943,7 +943,7 @@ function BookingContent() {
               className="rounded-2xl bg-white border border-gray-100 p-5 shadow-sm"
             >
               <h2 className="text-sm font-bold text-[#1B2A4A] mb-4 flex items-center gap-2">
-                <Info size={16} className="text-[#2AA198]" />
+                <Info size={16} className="text-[#8CB89C]" />
                 Details
               </h2>
               <div className="space-y-3">
@@ -998,7 +998,7 @@ function BookingContent() {
               className="rounded-2xl bg-white border border-gray-100 p-5 shadow-sm"
             >
               <h2 className="text-sm font-bold text-[#1B2A4A] mb-4 flex items-center gap-2">
-                <DollarSign size={16} className="text-[#2AA198]" />
+                <DollarSign size={16} className="text-[#8CB89C]" />
                 Pricing
               </h2>
               <div className="grid grid-cols-3 gap-3">
@@ -1006,7 +1006,7 @@ function BookingContent() {
                   <div className="text-[10px] text-gray-400 uppercase tracking-wider mb-1">
                     Daily
                   </div>
-                  <div className="text-xl font-bold text-[#2AA198]">
+                  <div className="text-xl font-bold text-[#8CB89C]">
                     ${selectedEquipment.dailyRate}
                   </div>
                   <div className="text-[10px] text-gray-400 mt-0.5">
@@ -1094,7 +1094,7 @@ function BookingContent() {
               className="rounded-2xl bg-white border border-gray-100 p-5 shadow-sm sticky top-6"
             >
               <h2 className="text-base font-bold text-[#1B2A4A] mb-5 flex items-center gap-2">
-                <CalendarDays size={18} className="text-[#2AA198]" />
+                <CalendarDays size={18} className="text-[#8CB89C]" />
                 Book This Equipment
               </h2>
 
@@ -1114,7 +1114,7 @@ function BookingContent() {
                       }
                     }}
                     min={todayStr}
-                    className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-white text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#2AA198]/30 focus:border-[#2AA198] transition"
+                    className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-white text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition"
                   />
                 </div>
 
@@ -1128,7 +1128,7 @@ function BookingContent() {
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
                     min={startDate || todayStr}
-                    className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-white text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#2AA198]/30 focus:border-[#2AA198] transition"
+                    className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-white text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition"
                   />
                 </div>
 
@@ -1168,7 +1168,7 @@ function BookingContent() {
                       <span className="text-xs font-semibold text-gray-600">
                         Equipment cost
                       </span>
-                      <span className="text-base font-bold text-[#2AA198]">
+                      <span className="text-base font-bold text-[#8CB89C]">
                         ${costCalc.total.toLocaleString()}
                       </span>
                     </div>
@@ -1189,7 +1189,7 @@ function BookingContent() {
                       <button
                         onClick={() => setDeliveryToggle(!deliveryToggle)}
                         className={`relative w-11 h-6 rounded-full transition-colors ${
-                          deliveryToggle ? 'bg-[#2AA198]' : 'bg-gray-200'
+                          deliveryToggle ? 'bg-[#8CB89C]' : 'bg-gray-200'
                         }`}
                       >
                         <motion.div
@@ -1223,7 +1223,7 @@ function BookingContent() {
                               setDeliveryAddress(e.target.value)
                             }
                             placeholder="Farm address or coordinates..."
-                            className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-white text-sm text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#2AA198]/30 focus:border-[#2AA198] transition"
+                            className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-white text-sm text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition"
                           />
                         </motion.div>
                       )}
@@ -1251,7 +1251,7 @@ function BookingContent() {
                     onChange={(e) => setSpecialRequirements(e.target.value)}
                     rows={3}
                     placeholder="Any special requests, attachments needed, calibration requirements..."
-                    className="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white text-sm text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#2AA198]/30 focus:border-[#2AA198] transition resize-none"
+                    className="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white text-sm text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition resize-none"
                   />
                 </div>
 
@@ -1293,7 +1293,7 @@ function BookingContent() {
                   }
                   className={`w-full h-12 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all ${
                     startDate && endDate && days > 0 && minDaysValid
-                      ? 'bg-[#2AA198] text-white hover:bg-[#1A7A72] active:scale-[0.97] shadow-lg shadow-teal-200/40'
+                      ? 'bg-[#8CB89C] text-white hover:bg-[#729E82] active:scale-[0.97] shadow-lg shadow-teal-200/40'
                       : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                   }`}
                 >

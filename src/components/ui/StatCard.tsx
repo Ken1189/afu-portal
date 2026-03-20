@@ -62,7 +62,7 @@ function StatCard({
   const currentTrend = trendConfig[resolvedTrend];
   const TrendIcon = currentTrend.icon;
 
-  const chartColor = sparklineColor ?? (resolvedTrend === 'up' ? '#22c55e' : resolvedTrend === 'down' ? '#ef4444' : '#2AA198');
+  const chartColor = sparklineColor ?? (resolvedTrend === 'up' ? '#22c55e' : resolvedTrend === 'down' ? '#ef4444' : '#8CB89C');
 
   return (
     <motion.div

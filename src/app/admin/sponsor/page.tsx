@@ -332,7 +332,7 @@ export default function AdminSponsorPage() {
                             className="h-full rounded-full transition-all"
                             style={{
                               width: `${fundingPct}%`,
-                              background: fundingPct >= 100 ? '#16a34a' : '#2AA198',
+                              background: fundingPct >= 100 ? '#16a34a' : '#8CB89C',
                             }}
                           />
                         </div>

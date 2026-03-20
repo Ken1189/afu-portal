@@ -244,7 +244,7 @@ export default function SupplierOrderDetailPage() {
           </p>
           <Link
             href="/supplier/orders"
-            className="inline-flex items-center gap-2 bg-[#2AA198] hover:bg-[#1A7A72] text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors"
+            className="inline-flex items-center gap-2 bg-[#8CB89C] hover:bg-[#729E82] text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Orders
@@ -287,7 +287,7 @@ export default function SupplierOrderDetailPage() {
           </Link>
           <div>
             <div className="flex items-center gap-2 text-xs text-gray-400 mb-0.5">
-              <Link href="/supplier/orders" className="hover:text-[#2AA198] transition-colors">
+              <Link href="/supplier/orders" className="hover:text-[#8CB89C] transition-colors">
                 Orders
               </Link>
               <ChevronRight className="w-3 h-3" />
@@ -319,7 +319,7 @@ export default function SupplierOrderDetailPage() {
             {/* Connecting Line */}
             <div className="absolute top-5 left-0 right-0 h-0.5 bg-gray-200 mx-[60px]" />
             <div
-              className="absolute top-5 left-0 h-0.5 bg-[#2AA198] mx-[60px] transition-all duration-700"
+              className="absolute top-5 left-0 h-0.5 bg-[#8CB89C] mx-[60px] transition-all duration-700"
               style={{
                 width: currentStatus === 'cancelled'
                   ? '0%'
@@ -345,9 +345,9 @@ export default function SupplierOrderDetailPage() {
                   <div
                     className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 transition-all ${
                       stepStatus === 'completed'
-                        ? 'bg-[#2AA198] text-white'
+                        ? 'bg-[#8CB89C] text-white'
                         : stepStatus === 'active'
-                          ? 'bg-[#2AA198] text-white ring-4 ring-[#2AA198]/20'
+                          ? 'bg-[#8CB89C] text-white ring-4 ring-[#8CB89C]/20'
                           : stepStatus === 'cancelled'
                             ? 'bg-gray-100 text-gray-300'
                             : 'bg-gray-100 text-gray-400'
@@ -401,9 +401,9 @@ export default function SupplierOrderDetailPage() {
                   <div
                     className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
                       stepStatus === 'completed'
-                        ? 'bg-[#2AA198] text-white'
+                        ? 'bg-[#8CB89C] text-white'
                         : stepStatus === 'active'
-                          ? 'bg-[#2AA198] text-white ring-4 ring-[#2AA198]/20'
+                          ? 'bg-[#8CB89C] text-white ring-4 ring-[#8CB89C]/20'
                           : 'bg-gray-100 text-gray-400'
                     }`}
                   >
@@ -416,7 +416,7 @@ export default function SupplierOrderDetailPage() {
                   {!isLast && (
                     <div
                       className={`w-0.5 flex-1 min-h-[24px] ${
-                        stepStatus === 'completed' ? 'bg-[#2AA198]' : 'bg-gray-200'
+                        stepStatus === 'completed' ? 'bg-[#8CB89C]' : 'bg-gray-200'
                       }`}
                     />
                   )}
@@ -476,7 +476,7 @@ export default function SupplierOrderDetailPage() {
           >
             <div className="p-5 border-b border-gray-100">
               <h3 className="font-semibold text-[#1B2A4A] text-sm flex items-center gap-2">
-                <Package className="w-4 h-4 text-[#2AA198]" />
+                <Package className="w-4 h-4 text-[#8CB89C]" />
                 Order Items
               </h3>
             </div>
@@ -494,7 +494,7 @@ export default function SupplierOrderDetailPage() {
                 <div className="flex-1 min-w-0">
                   <Link
                     href={`/supplier/products/${order.productId}`}
-                    className="text-sm font-medium text-[#1B2A4A] hover:text-[#2AA198] transition-colors"
+                    className="text-sm font-medium text-[#1B2A4A] hover:text-[#8CB89C] transition-colors"
                   >
                     {order.productName}
                   </Link>
@@ -518,7 +518,7 @@ export default function SupplierOrderDetailPage() {
                 </div>
                 <div className="flex items-center justify-between text-sm pt-2 border-t border-gray-100">
                   <span className="font-semibold text-[#1B2A4A]">Total</span>
-                  <span className="text-lg font-bold text-[#2AA198] tabular-nums">{formatCurrency(order.amount)}</span>
+                  <span className="text-lg font-bold text-[#8CB89C] tabular-nums">{formatCurrency(order.amount)}</span>
                 </div>
               </div>
             </div>
@@ -531,7 +531,7 @@ export default function SupplierOrderDetailPage() {
           >
             <div className="p-5 border-b border-gray-100">
               <h3 className="font-semibold text-[#1B2A4A] text-sm flex items-center gap-2">
-                <CreditCard className="w-4 h-4 text-[#2AA198]" />
+                <CreditCard className="w-4 h-4 text-[#8CB89C]" />
                 Payment Information
               </h3>
             </div>
@@ -553,7 +553,7 @@ export default function SupplierOrderDetailPage() {
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-gray-500">Amount</span>
-                <span className="font-bold text-[#2AA198] tabular-nums">{formatCurrency(order.amount)}</span>
+                <span className="font-bold text-[#8CB89C] tabular-nums">{formatCurrency(order.amount)}</span>
               </div>
             </div>
           </motion.div>
@@ -568,7 +568,7 @@ export default function SupplierOrderDetailPage() {
           >
             <div className="p-5 border-b border-gray-100">
               <h3 className="font-semibold text-[#1B2A4A] text-sm flex items-center gap-2">
-                <User className="w-4 h-4 text-[#2AA198]" />
+                <User className="w-4 h-4 text-[#8CB89C]" />
                 Buyer Information
               </h3>
             </div>
@@ -612,7 +612,7 @@ export default function SupplierOrderDetailPage() {
           >
             <div className="p-5 border-b border-gray-100">
               <h3 className="font-semibold text-[#1B2A4A] text-sm flex items-center gap-2">
-                <Truck className="w-4 h-4 text-[#2AA198]" />
+                <Truck className="w-4 h-4 text-[#8CB89C]" />
                 Delivery Information
               </h3>
             </div>
@@ -627,7 +627,7 @@ export default function SupplierOrderDetailPage() {
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-gray-500">Tracking ID</span>
-                <span className="font-mono text-xs text-[#2AA198] bg-[#2AA198]/5 px-2 py-0.5 rounded">
+                <span className="font-mono text-xs text-[#8CB89C] bg-[#8CB89C]/5 px-2 py-0.5 rounded">
                   {trackingId}
                 </span>
               </div>
@@ -659,7 +659,7 @@ export default function SupplierOrderDetailPage() {
           >
             <div className="p-5 border-b border-gray-100">
               <h3 className="font-semibold text-[#1B2A4A] text-sm flex items-center gap-2">
-                <FileText className="w-4 h-4 text-[#2AA198]" />
+                <FileText className="w-4 h-4 text-[#8CB89C]" />
                 Invoice
               </h3>
             </div>
@@ -674,9 +674,9 @@ export default function SupplierOrderDetailPage() {
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-gray-500">Total Amount</span>
-                <span className="font-bold text-[#2AA198] tabular-nums">{formatCurrency(order.amount)}</span>
+                <span className="font-bold text-[#8CB89C] tabular-nums">{formatCurrency(order.amount)}</span>
               </div>
-              <button className="w-full inline-flex items-center justify-center gap-2 bg-[#2AA198]/10 text-[#2AA198] hover:bg-[#2AA198]/20 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors mt-2">
+              <button className="w-full inline-flex items-center justify-center gap-2 bg-[#8CB89C]/10 text-[#8CB89C] hover:bg-[#8CB89C]/20 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors mt-2">
                 <Download className="w-4 h-4" />
                 Download PDF
               </button>
@@ -697,7 +697,7 @@ export default function SupplierOrderDetailPage() {
           {(currentStatus === 'new' || currentStatus === 'processing') && (
             <button
               onClick={handleMarkShipped}
-              className="inline-flex items-center gap-2 bg-[#2AA198] hover:bg-[#1A7A72] text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors shadow-sm"
+              className="inline-flex items-center gap-2 bg-[#8CB89C] hover:bg-[#729E82] text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors shadow-sm"
             >
               <Send className="w-4 h-4" />
               Mark as Shipped
@@ -706,7 +706,7 @@ export default function SupplierOrderDetailPage() {
           {currentStatus === 'shipped' && (
             <button
               onClick={handleMarkDelivered}
-              className="inline-flex items-center gap-2 bg-[#2AA198] hover:bg-[#1A7A72] text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors shadow-sm"
+              className="inline-flex items-center gap-2 bg-[#8CB89C] hover:bg-[#729E82] text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors shadow-sm"
             >
               <CheckCircle2 className="w-4 h-4" />
               Mark as Delivered

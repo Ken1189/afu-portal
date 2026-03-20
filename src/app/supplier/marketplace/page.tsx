@@ -168,8 +168,8 @@ export default function SupplierMarketplacePage() {
         className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
       >
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#2AA198]/10 flex items-center justify-center">
-            <Eye className="w-5 h-5 text-[#2AA198]" />
+          <div className="w-10 h-10 rounded-xl bg-[#8CB89C]/10 flex items-center justify-center">
+            <Eye className="w-5 h-5 text-[#8CB89C]" />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-[#1B2A4A]">Marketplace Preview</h1>
@@ -189,7 +189,7 @@ export default function SupplierMarketplacePage() {
       >
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-2">
-            <Users className="w-4 h-4 text-[#2AA198]" />
+            <Users className="w-4 h-4 text-[#8CB89C]" />
             <span className="text-sm font-semibold text-[#1B2A4A]">View as:</span>
           </div>
 
@@ -213,10 +213,10 @@ export default function SupplierMarketplacePage() {
           </div>
         </div>
 
-        <div className="mt-3 flex items-center gap-2 bg-[#2AA198]/5 rounded-lg px-4 py-2.5">
-          <Percent className="w-4 h-4 text-[#2AA198]" />
+        <div className="mt-3 flex items-center gap-2 bg-[#8CB89C]/5 rounded-lg px-4 py-2.5">
+          <Percent className="w-4 h-4 text-[#8CB89C]" />
           <p className="text-xs text-gray-600">
-            <span className="font-semibold text-[#2AA198]">{selectedTier} Tier:</span>{' '}
+            <span className="font-semibold text-[#8CB89C]">{selectedTier} Tier:</span>{' '}
             {tierDescriptions[selectedTier]}
           </p>
         </div>
@@ -250,7 +250,7 @@ export default function SupplierMarketplacePage() {
                 />
                 {/* Savings badge */}
                 <div className="absolute top-3 left-3">
-                  <span className="inline-flex items-center gap-1 bg-[#2AA198] text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-lg">
+                  <span className="inline-flex items-center gap-1 bg-[#8CB89C] text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-lg">
                     <Tag className="w-3 h-3" />
                     You save {savingsPercent}%
                   </span>
@@ -281,13 +281,13 @@ export default function SupplierMarketplacePage() {
               <div className="p-4">
                 {/* Supplier badge */}
                 <div className="flex items-center gap-1.5 mb-2">
-                  <div className="w-5 h-5 rounded bg-[#2AA198] flex items-center justify-center">
+                  <div className="w-5 h-5 rounded bg-[#8CB89C] flex items-center justify-center">
                     <span className="text-white text-[7px] font-bold">ZA</span>
                   </div>
                   <span className="text-[10px] text-gray-400 font-medium">
                     {product.supplierName}
                   </span>
-                  <CheckCircle2 className="w-3 h-3 text-[#2AA198]" />
+                  <CheckCircle2 className="w-3 h-3 text-[#8CB89C]" />
                 </div>
 
                 {/* Product name */}
@@ -318,7 +318,7 @@ export default function SupplierMarketplacePage() {
 
                 {/* Pricing */}
                 <div className="flex items-end gap-2 mb-3">
-                  <span className="text-lg font-bold text-[#2AA198] tabular-nums">
+                  <span className="text-lg font-bold text-[#8CB89C] tabular-nums">
                     ${discountedPrice.toFixed(2)}
                   </span>
                   <span className="text-sm text-gray-400 line-through tabular-nums mb-0.5">
@@ -361,7 +361,7 @@ export default function SupplierMarketplacePage() {
       >
         <div className="p-5 border-b border-gray-100">
           <h3 className="font-semibold text-[#1B2A4A] text-sm flex items-center gap-2">
-            <Tag className="w-4 h-4 text-[#2AA198]" />
+            <Tag className="w-4 h-4 text-[#8CB89C]" />
             Pricing Across Tiers
           </h3>
           <p className="text-xs text-gray-400 mt-1">

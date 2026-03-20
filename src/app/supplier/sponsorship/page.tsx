@@ -199,10 +199,10 @@ const tiers: TierDef[] = [
     label: 'Platinum',
     price: '$25,000/yr',
     priceValue: 25000,
-    color: '#2AA198',
-    bgColor: 'bg-[#2AA198]/5',
-    borderColor: 'border-[#2AA198]/30',
-    textColor: 'text-[#2AA198]',
+    color: '#8CB89C',
+    bgColor: 'bg-[#8CB89C]/5',
+    borderColor: 'border-[#8CB89C]/30',
+    textColor: 'text-[#8CB89C]',
   },
 ];
 
@@ -316,8 +316,8 @@ const impactMetrics = [
     value: '$847K',
     icon: <DollarSign className="w-5 h-5" />,
     change: '+22%',
-    bgColor: 'bg-[#2AA198]/10',
-    color: 'text-[#2AA198]',
+    bgColor: 'bg-[#8CB89C]/10',
+    color: 'text-[#8CB89C]',
   },
   {
     label: 'Products Listed',
@@ -478,7 +478,7 @@ export default function SponsorshipProgram() {
       ═════════════════════════════════════════════════════════════════ */}
       <motion.div variants={cardVariants} className="bg-white rounded-xl border border-gray-100 p-5">
         <h3 className="font-semibold text-[#1B2A4A] text-sm mb-4 flex items-center gap-2">
-          <Award className="w-4 h-4 text-[#2AA198]" />
+          <Award className="w-4 h-4 text-[#8CB89C]" />
           Current Benefits
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -491,7 +491,7 @@ export default function SponsorshipProgram() {
               whileHover={{ y: -2, boxShadow: '0 4px 12px rgba(27,42,74,0.06)' }}
               className="flex items-start gap-3 p-3 rounded-lg bg-gray-50 border border-gray-100 cursor-default"
             >
-              <div className="w-8 h-8 rounded-lg bg-[#2AA198]/10 flex items-center justify-center text-[#2AA198] flex-shrink-0 mt-0.5">
+              <div className="w-8 h-8 rounded-lg bg-[#8CB89C]/10 flex items-center justify-center text-[#8CB89C] flex-shrink-0 mt-0.5">
                 {benefit.icon}
               </div>
               <div className="min-w-0">
@@ -512,7 +512,7 @@ export default function SponsorshipProgram() {
       >
         <div className="p-5 border-b border-gray-100">
           <h3 className="font-semibold text-[#1B2A4A] text-sm flex items-center gap-2">
-            <Shield className="w-4 h-4 text-[#2AA198]" />
+            <Shield className="w-4 h-4 text-[#8CB89C]" />
             Tier Comparison
           </h3>
         </div>
@@ -528,7 +528,7 @@ export default function SponsorshipProgram() {
                     key={tier.id}
                     className={`text-center py-3 px-3 text-xs font-medium uppercase tracking-wider min-w-[100px] ${
                       tier.id === currentSupplier.sponsorshipTier
-                        ? 'bg-[#2AA198]/5'
+                        ? 'bg-[#8CB89C]/5'
                         : ''
                     }`}
                   >
@@ -536,7 +536,7 @@ export default function SponsorshipProgram() {
                       <span
                         className={`font-semibold ${
                           tier.id === currentSupplier.sponsorshipTier
-                            ? 'text-[#2AA198]'
+                            ? 'text-[#8CB89C]'
                             : 'text-gray-500'
                         }`}
                       >
@@ -546,7 +546,7 @@ export default function SponsorshipProgram() {
                         {tier.price}
                       </span>
                       {tier.id === currentSupplier.sponsorshipTier && (
-                        <span className="text-[9px] px-2 py-0.5 rounded-full bg-[#2AA198] text-white font-semibold">
+                        <span className="text-[9px] px-2 py-0.5 rounded-full bg-[#8CB89C] text-white font-semibold">
                           Current
                         </span>
                       )}
@@ -574,15 +574,15 @@ export default function SponsorshipProgram() {
                       <td
                         key={tierId}
                         className={`py-2.5 px-3 text-center ${
-                          isCurrentTier ? 'bg-[#2AA198]/5' : ''
+                          isCurrentTier ? 'bg-[#8CB89C]/5' : ''
                         }`}
                       >
                         {val === true ? (
-                          <Check className="w-4 h-4 text-[#2AA198] mx-auto" />
+                          <Check className="w-4 h-4 text-[#8CB89C] mx-auto" />
                         ) : val === false ? (
                           <X className="w-4 h-4 text-gray-300 mx-auto" />
                         ) : (
-                          <span className={`text-xs font-medium ${isCurrentTier ? 'text-[#2AA198]' : 'text-gray-600'}`}>
+                          <span className={`text-xs font-medium ${isCurrentTier ? 'text-[#8CB89C]' : 'text-gray-600'}`}>
                             {val}
                           </span>
                         )}
@@ -601,7 +601,7 @@ export default function SponsorshipProgram() {
       ═════════════════════════════════════════════════════════════════ */}
       <motion.div variants={cardVariants} className="bg-white rounded-xl border border-gray-100 p-5">
         <h3 className="font-semibold text-[#1B2A4A] text-sm mb-4 flex items-center gap-2">
-          <BarChart3 className="w-4 h-4 text-[#2AA198]" />
+          <BarChart3 className="w-4 h-4 text-[#8CB89C]" />
           Impact Metrics
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -639,7 +639,7 @@ export default function SponsorshipProgram() {
                 {monthlyPerformance.map((_, index) => (
                   <Cell
                     key={`cell-${index}`}
-                    fill={index === monthlyPerformance.length - 1 ? '#2AA198' : '#2AA198'}
+                    fill={index === monthlyPerformance.length - 1 ? '#8CB89C' : '#8CB89C'}
                     opacity={0.4 + (index / monthlyPerformance.length) * 0.6}
                   />
                 ))}
@@ -654,7 +654,7 @@ export default function SponsorshipProgram() {
       ═════════════════════════════════════════════════════════════════ */}
       <motion.div variants={cardVariants} className="bg-white rounded-xl border border-gray-100 p-5">
         <h3 className="font-semibold text-[#1B2A4A] text-sm mb-4 flex items-center gap-2">
-          <CalendarClock className="w-4 h-4 text-[#2AA198]" />
+          <CalendarClock className="w-4 h-4 text-[#8CB89C]" />
           Sponsorship Renewal
         </h3>
 
@@ -696,7 +696,7 @@ export default function SponsorshipProgram() {
                   transition={{ duration: 1.2, ease: 'easeOut' }}
                   className="h-3 rounded-full"
                   style={{
-                    background: 'linear-gradient(90deg, #2AA198 0%, #D4A843 100%)',
+                    background: 'linear-gradient(90deg, #8CB89C 0%, #D4A843 100%)',
                   }}
                 />
               </div>
@@ -707,7 +707,7 @@ export default function SponsorshipProgram() {
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
-                className="bg-[#2AA198]/5 border border-[#2AA198]/20 rounded-xl p-4"
+                className="bg-[#8CB89C]/5 border border-[#8CB89C]/20 rounded-xl p-4"
               >
                 <div className="flex items-start justify-between mb-3">
                   <h4 className="text-sm font-semibold text-[#1B2A4A]">Upgrade Options</h4>
@@ -728,7 +728,7 @@ export default function SponsorshipProgram() {
                       key={tier.id}
                       className={`px-3 py-2 rounded-lg text-xs font-medium ${
                         tier.id === currentSupplier.sponsorshipTier
-                          ? 'bg-[#2AA198] text-white'
+                          ? 'bg-[#8CB89C] text-white'
                           : 'bg-white border border-gray-200 text-gray-600'
                       }`}
                     >
@@ -745,7 +745,7 @@ export default function SponsorshipProgram() {
           <div className="space-y-3">
             <button
               className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-white text-sm font-medium transition-all hover:shadow-lg"
-              style={{ background: 'linear-gradient(135deg, #2AA198 0%, #1A7A72 100%)' }}
+              style={{ background: 'linear-gradient(135deg, #8CB89C 0%, #729E82 100%)' }}
             >
               <RefreshCcw className="w-4 h-4" />
               Renew Sponsorship
@@ -790,8 +790,8 @@ export default function SponsorshipProgram() {
         </p>
         <div className="flex items-center justify-center gap-4 mt-4">
           <div className="flex items-center gap-1">
-            <Shield className="w-3.5 h-3.5 text-[#2AA198]" />
-            <span className="text-xs font-medium text-[#2AA198]">Verified Supplier</span>
+            <Shield className="w-3.5 h-3.5 text-[#8CB89C]" />
+            <span className="text-xs font-medium text-[#8CB89C]">Verified Supplier</span>
           </div>
           <div className="flex items-center gap-1">
             <Star className="w-3.5 h-3.5 text-[#D4A843]" />

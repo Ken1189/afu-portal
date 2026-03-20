@@ -424,7 +424,7 @@ function BuyerCard({ buyer }: { buyer: Buyer }) {
         {buyer.products.map((product) => (
           <span
             key={product}
-            className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#2AA198]/10 text-[#2AA198]"
+            className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#8CB89C]/10 text-[#8CB89C]"
           >
             {product}
           </span>
@@ -445,7 +445,7 @@ function BuyerCard({ buyer }: { buyer: Buyer }) {
           <span className="text-xs text-gray-400 flex items-center gap-1">
             <DollarSign className="w-3 h-3" /> Price Range
           </span>
-          <span className="text-xs font-semibold text-[#2AA198]">
+          <span className="text-xs font-semibold text-[#8CB89C]">
             {buyer.priceRange}
           </span>
         </div>
@@ -499,7 +499,7 @@ function BuyerCard({ buyer }: { buyer: Buyer }) {
       <div className="flex items-center gap-2">
         <button
           onClick={() => setShowContact(!showContact)}
-          className="flex items-center gap-1 text-xs font-semibold text-[#2AA198] bg-[#2AA198]/10 hover:bg-[#2AA198]/20 px-3 py-1.5 rounded-lg transition-colors"
+          className="flex items-center gap-1 text-xs font-semibold text-[#8CB89C] bg-[#8CB89C]/10 hover:bg-[#8CB89C]/20 px-3 py-1.5 rounded-lg transition-colors"
         >
           <Mail className="w-3.5 h-3.5" />
           {showContact ? 'Hide Contact' : 'Contact'}
@@ -526,7 +526,7 @@ function PriceTrendCard({ trend }: { trend: PriceTrend }) {
           <h3 className="text-sm font-bold text-[#1B2A4A]">
             {trend.commodity}
           </h3>
-          <p className="text-lg font-bold text-[#2AA198]">
+          <p className="text-lg font-bold text-[#8CB89C]">
             {formatCurrency(trend.currentPrice)}
             <span className="text-xs text-gray-400 font-normal ml-1">
               {trend.unit}
@@ -703,7 +703,7 @@ export default function ExportMarketsPage() {
                 {/* Price Trends */}
                 <div className="mb-6">
                   <h3 className="text-sm font-bold text-[#1B2A4A] mb-3 flex items-center gap-1.5">
-                    <TrendingUp className="w-4 h-4 text-[#2AA198]" />
+                    <TrendingUp className="w-4 h-4 text-[#8CB89C]" />
                     Price Trends by Commodity
                   </h3>
                   <motion.div
@@ -794,14 +794,14 @@ export default function ExportMarketsPage() {
                         variants={cardVariants}
                         className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex items-start gap-3"
                       >
-                        <div className="p-2 rounded-xl bg-[#2AA198]/10 text-[#2AA198] shrink-0">
+                        <div className="p-2 rounded-xl bg-[#8CB89C]/10 text-[#8CB89C] shrink-0">
                           {window.icon}
                         </div>
                         <div>
                           <h4 className="text-sm font-bold text-[#1B2A4A]">
                             {window.product}
                           </h4>
-                          <p className="text-xs text-[#2AA198] font-semibold">
+                          <p className="text-xs text-[#8CB89C] font-semibold">
                             {window.peakMonths}
                           </p>
                           <p className="text-xs text-gray-400 mt-0.5">

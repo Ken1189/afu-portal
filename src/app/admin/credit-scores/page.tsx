@@ -47,7 +47,7 @@ type SortDir = 'asc' | 'desc';
 
 const scoringFactors = [
   { name: 'Payment History',       weight: 30, color: 'bg-[#1B2A4A]' },
-  { name: 'Loan Repayment',        weight: 25, color: 'bg-[#2AA198]' },
+  { name: 'Loan Repayment',        weight: 25, color: 'bg-[#8CB89C]' },
   { name: 'Farm Productivity',     weight: 15, color: 'bg-blue-500' },
   { name: 'Membership Tenure',     weight: 10, color: 'bg-indigo-500' },
   { name: 'Training Completion',   weight: 10, color: 'bg-[#D4A843]' },
@@ -57,7 +57,7 @@ const scoringFactors = [
 
 const scoreDistribution = [
   { label: 'Excellent', range: '800–1000', count: 84,  color: 'bg-green-500',        text: 'text-green-700',  badge: 'bg-green-100 text-green-700' },
-  { label: 'Good',      range: '600–799',  count: 101, color: 'bg-[#2AA198]',         text: 'text-[#2AA198]',  badge: 'bg-teal-100 text-teal-700' },
+  { label: 'Good',      range: '600–799',  count: 101, color: 'bg-[#8CB89C]',         text: 'text-[#8CB89C]',  badge: 'bg-teal-100 text-teal-700' },
   { label: 'Fair',      range: '400–599',  count: 45,  color: 'bg-[#D4A843]',         text: 'text-amber-700',  badge: 'bg-amber-100 text-amber-700' },
   { label: 'Poor',      range: '0–399',    count: 17,  color: 'bg-red-500',           text: 'text-red-700',    badge: 'bg-red-100 text-red-700' },
 ];
@@ -157,12 +157,12 @@ export default function CreditScoresPage() {
     else { setSortKey(key); setSortDir('desc'); }
   }
 
-  const SortIcon = ({ col }: { col: SortKey }) => {
+  function sortIcon(col: SortKey) {
     if (sortKey !== col) return <Minus className="w-3 h-3 text-gray-300" />;
     return sortDir === 'desc'
-      ? <ChevronDown className="w-3 h-3 text-[#2AA198]" />
-      : <ChevronUp   className="w-3 h-3 text-[#2AA198]" />;
-  };
+      ? <ChevronDown className="w-3 h-3 text-[#8CB89C]" />
+      : <ChevronUp   className="w-3 h-3 text-[#8CB89C]" />;
+  }
 
   return (
     <motion.div
@@ -202,9 +202,9 @@ export default function CreditScoresPage() {
             value: '712',
             sub: 'out of 1,000',
             icon: <Star className="w-5 h-5" />,
-            iconBg: 'bg-[#2AA198]/10',
-            iconColor: 'text-[#2AA198]',
-            accent: 'border-l-[#2AA198]',
+            iconBg: 'bg-[#8CB89C]/10',
+            iconColor: 'text-[#8CB89C]',
+            accent: 'border-l-[#8CB89C]',
           },
           {
             label: 'Members Scored',
@@ -256,7 +256,7 @@ export default function CreditScoresPage() {
         {/* ── Scoring Model Explanation ───────────────────────── */}
         <motion.div variants={cardVariants} className="bg-white rounded-xl border border-gray-100 p-6">
           <h2 className="text-sm font-semibold text-[#1B2A4A] mb-1 flex items-center gap-2">
-            <ListChecks className="w-4 h-4 text-[#2AA198]" />
+            <ListChecks className="w-4 h-4 text-[#8CB89C]" />
             Scoring Model — Factor Weights
           </h2>
           <p className="text-xs text-gray-400 mb-5">
@@ -287,7 +287,7 @@ export default function CreditScoresPage() {
         {/* ── Score Distribution ──────────────────────────────── */}
         <motion.div variants={cardVariants} className="bg-white rounded-xl border border-gray-100 p-6">
           <h2 className="text-sm font-semibold text-[#1B2A4A] mb-1 flex items-center gap-2">
-            <Users className="w-4 h-4 text-[#2AA198]" />
+            <Users className="w-4 h-4 text-[#8CB89C]" />
             Score Distribution
           </h2>
           <p className="text-xs text-gray-400 mb-5">
@@ -354,7 +354,7 @@ export default function CreditScoresPage() {
         <div className="p-5 border-b border-gray-100">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <h2 className="text-sm font-semibold text-[#1B2A4A] flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-[#2AA198]" />
+              <ShieldCheck className="w-4 h-4 text-[#8CB89C]" />
               Member Scores
             </h2>
             {/* Search */}
@@ -365,7 +365,7 @@ export default function CreditScoresPage() {
                 placeholder="Search by name or country…"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-8 pr-3 py-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2AA198]/40 text-gray-700 placeholder-gray-400"
+                className="w-full pl-8 pr-3 py-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/40 text-gray-700 placeholder-gray-400"
               />
             </div>
           </div>
@@ -409,7 +409,7 @@ export default function CreditScoresPage() {
                     onClick={() => toggleSort('name')}
                     className="flex items-center gap-1 hover:text-[#1B2A4A] transition-colors"
                   >
-                    Member <SortIcon col="name" />
+                    Member {sortIcon("name")}
                   </button>
                 </th>
                 <th className="px-2 py-3 text-left font-semibold">Country</th>
@@ -418,7 +418,7 @@ export default function CreditScoresPage() {
                     onClick={() => toggleSort('score')}
                     className="flex items-center gap-1 hover:text-[#1B2A4A] transition-colors"
                   >
-                    Score <SortIcon col="score" />
+                    Score {sortIcon("score")}
                   </button>
                 </th>
                 <th className="px-2 py-3 text-left font-semibold">Trend</th>
@@ -472,7 +472,7 @@ export default function CreditScoresPage() {
                       <div className="flex items-center gap-1.5">
                         <div className="w-16 bg-gray-100 rounded-full h-1.5">
                           <div
-                            className="h-1.5 rounded-full bg-[#2AA198]"
+                            className="h-1.5 rounded-full bg-[#8CB89C]"
                             style={{ width: `${m.paymentHistory}%` }}
                           />
                         </div>
@@ -528,9 +528,9 @@ export default function CreditScoresPage() {
         </div>
 
         {/* Info banner */}
-        <div className="flex items-start gap-2 bg-[#2AA198]/5 border border-[#2AA198]/20 rounded-lg p-3 mb-5">
-          <Info className="w-4 h-4 text-[#2AA198] mt-0.5 flex-shrink-0" />
-          <p className="text-xs text-[#2AA198]">
+        <div className="flex items-start gap-2 bg-[#8CB89C]/5 border border-[#8CB89C]/20 rounded-lg p-3 mb-5">
+          <Info className="w-4 h-4 text-[#8CB89C] mt-0.5 flex-shrink-0" />
+          <p className="text-xs text-[#8CB89C]">
             Overrides are reviewed by a second admin before taking effect. The original score is
             preserved and visible in the member audit log.
           </p>
@@ -575,7 +575,7 @@ export default function CreditScoresPage() {
       {/* ── Batch Operations Card ───────────────────────────────── */}
       <motion.div variants={cardVariants} className="bg-white rounded-xl border border-gray-100 p-6">
         <h2 className="text-sm font-semibold text-[#1B2A4A] flex items-center gap-2 mb-5">
-          <CalendarClock className="w-4 h-4 text-[#2AA198]" />
+          <CalendarClock className="w-4 h-4 text-[#8CB89C]" />
           Batch Scoring Operations
         </h2>
 
@@ -584,7 +584,7 @@ export default function CreditScoresPage() {
             { label: 'Last Run',          value: 'Today, 06:00 AM',      sub: 'Completed in 4m 12s',  color: 'bg-green-50',  text: 'text-green-700' },
             { label: 'Next Scheduled Run',value: 'Tomorrow, 06:00 AM',   sub: 'Daily at 06:00 UTC',   color: 'bg-blue-50',   text: 'text-blue-700' },
             { label: 'Members in Queue',  value: '0',                    sub: 'No pending jobs',      color: 'bg-gray-50',   text: 'text-gray-700' },
-            { label: 'Members Scored',    value: totalScored.toString(), sub: 'This batch cycle',     color: 'bg-[#2AA198]/5', text: 'text-[#2AA198]' },
+            { label: 'Members Scored',    value: totalScored.toString(), sub: 'This batch cycle',     color: 'bg-[#8CB89C]/5', text: 'text-[#8CB89C]' },
           ].map((item, i) => (
             <div key={i} className={`${item.color} rounded-xl p-4`}>
               <p className={`text-lg font-bold ${item.text}`}>{item.value}</p>

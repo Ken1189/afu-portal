@@ -187,7 +187,7 @@ function MiniSparkline({ data, positive }: { data: number[]; positive: boolean }
       <polyline
         points={points}
         fill="none"
-        stroke={positive ? '#2AA198' : '#ef4444'}
+        stroke={positive ? '#8CB89C' : '#ef4444'}
         strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -328,7 +328,7 @@ export default function MarketPricesPage() {
             >
               {tab.label}
               {tab.key === 'watchlist' && (
-                <span className="ml-1.5 text-xs bg-[#2AA198]/10 text-[#2AA198] px-1.5 py-0.5 rounded-full">
+                <span className="ml-1.5 text-xs bg-[#8CB89C]/10 text-[#8CB89C] px-1.5 py-0.5 rounded-full">
                   {watchlist.length}
                 </span>
               )}
@@ -361,7 +361,7 @@ export default function MarketPricesPage() {
                     placeholder="Search commodities..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-white text-[#1B2A4A] focus:outline-none focus:ring-2 focus:ring-[#2AA198]/20 focus:border-[#2AA198]"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-white text-[#1B2A4A] focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/20 focus:border-[#8CB89C]"
                   />
                 </div>
               </div>
@@ -519,7 +519,7 @@ export default function MarketPricesPage() {
                   </p>
                   <button
                     onClick={() => setActiveTab('commodities')}
-                    className="mt-4 px-4 py-2 bg-[#2AA198] text-white rounded-xl text-sm font-medium hover:bg-[#239189] transition-colors"
+                    className="mt-4 px-4 py-2 bg-[#8CB89C] text-white rounded-xl text-sm font-medium hover:bg-[#239189] transition-colors"
                   >
                     Browse Commodities
                   </button>
@@ -592,9 +592,9 @@ export default function MarketPricesPage() {
               {/* Active Alerts */}
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
                 <h3 className="text-sm font-bold text-[#1B2A4A] mb-4 flex items-center gap-2">
-                  <Bell className="w-4 h-4 text-[#2AA198]" />
+                  <Bell className="w-4 h-4 text-[#8CB89C]" />
                   Active Alerts
-                  <span className="text-xs bg-[#2AA198]/10 text-[#2AA198] px-2 py-0.5 rounded-full">{alerts.length}</span>
+                  <span className="text-xs bg-[#8CB89C]/10 text-[#8CB89C] px-2 py-0.5 rounded-full">{alerts.length}</span>
                 </h3>
                 {alerts.length > 0 ? (
                   <div className="space-y-2">

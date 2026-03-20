@@ -247,7 +247,7 @@ export default function AdminNotificationsPage() {
       <motion.div variants={cardVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { label: 'Total Notifications', value: totalNotifications, icon: <Bell className="w-5 h-5" />, color: 'text-[#1B2A4A]', iconBg: 'bg-[#1B2A4A]/10' },
-          { label: 'Unread', value: unreadCount, icon: <MailOpen className="w-5 h-5" />, color: 'text-[#2AA198]', iconBg: 'bg-[#2AA198]/10' },
+          { label: 'Unread', value: unreadCount, icon: <MailOpen className="w-5 h-5" />, color: 'text-[#8CB89C]', iconBg: 'bg-[#8CB89C]/10' },
           { label: 'Critical Alerts', value: criticalCount, icon: <ShieldAlert className="w-5 h-5" />, color: 'text-red-600', iconBg: 'bg-red-50' },
           { label: 'Sent Today', value: sentToday, icon: <Send className="w-5 h-5" />, color: 'text-[#D4A843]', iconBg: 'bg-[#D4A843]/10' },
         ].map((stat, i) => (
@@ -297,7 +297,7 @@ export default function AdminNotificationsPage() {
                     onClick={() => setInboxFilter(f.key)}
                     className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
                       inboxFilter === f.key
-                        ? 'bg-[#2AA198] text-white'
+                        ? 'bg-[#8CB89C] text-white'
                         : 'text-gray-500 hover:text-[#1B2A4A] hover:bg-gray-50'
                     }`}
                   >
@@ -312,14 +312,14 @@ export default function AdminNotificationsPage() {
                   placeholder="Search notifications..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2AA198]/50 w-56"
+                  className="pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/50 w-56"
                 />
               </div>
             </div>
             <div className="flex gap-2">
               <button
                 onClick={markAllRead}
-                className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-[#2AA198] bg-[#2AA198]/10 rounded-lg hover:bg-[#2AA198]/20 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-[#8CB89C] bg-[#8CB89C]/10 rounded-lg hover:bg-[#8CB89C]/20 transition-colors"
               >
                 <CheckCircle2 className="w-3.5 h-3.5" /> Mark All Read
               </button>
@@ -338,7 +338,7 @@ export default function AdminNotificationsPage() {
                   key={notif.id}
                   variants={cardVariants}
                   className={`bg-white rounded-xl border p-4 transition-all hover:shadow-sm ${
-                    notif.read ? 'border-gray-100' : 'border-l-4 border-l-[#2AA198] border-t border-r border-b border-t-gray-100 border-r-gray-100 border-b-gray-100'
+                    notif.read ? 'border-gray-100' : 'border-l-4 border-l-[#8CB89C] border-t border-r border-b border-t-gray-100 border-r-gray-100 border-b-gray-100'
                   }`}
                 >
                   <div className="flex items-start gap-3">
@@ -350,7 +350,7 @@ export default function AdminNotificationsPage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex items-center gap-2">
-                          {!notif.read && <div className="w-2 h-2 bg-[#2AA198] rounded-full flex-shrink-0" />}
+                          {!notif.read && <div className="w-2 h-2 bg-[#8CB89C] rounded-full flex-shrink-0" />}
                           <h4 className={`text-sm font-semibold ${notif.read ? 'text-gray-700' : 'text-[#1B2A4A]'}`}>{notif.title}</h4>
                           {priorityBadge(notif.priority)}
                         </div>
@@ -363,7 +363,7 @@ export default function AdminNotificationsPage() {
                           {!notif.read && (
                             <button
                               onClick={() => markAsRead(notif.id)}
-                              className="flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-[#2AA198] bg-[#2AA198]/10 rounded-md hover:bg-[#2AA198]/20 transition-colors"
+                              className="flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-[#8CB89C] bg-[#8CB89C]/10 rounded-md hover:bg-[#8CB89C]/20 transition-colors"
                             >
                               <Eye className="w-3 h-3" /> Mark Read
                             </button>
@@ -439,7 +439,7 @@ export default function AdminNotificationsPage() {
               <div className="flex items-start justify-between mb-3">
                 <div>
                   <h4 className="text-sm font-semibold text-[#1B2A4A]">{tpl.name}</h4>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#2AA198]/10 text-[#2AA198] font-medium mt-1 inline-block">
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#8CB89C]/10 text-[#8CB89C] font-medium mt-1 inline-block">
                     {tpl.category}
                   </span>
                 </div>
@@ -449,7 +449,7 @@ export default function AdminNotificationsPage() {
                 <button className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-[#1B2A4A] bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                   <Edit3 className="w-3 h-3" /> Edit
                 </button>
-                <button className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-[#2AA198] bg-[#2AA198]/10 rounded-lg hover:bg-[#2AA198]/20 transition-colors">
+                <button className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-[#8CB89C] bg-[#8CB89C]/10 rounded-lg hover:bg-[#8CB89C]/20 transition-colors">
                   <Copy className="w-3 h-3" /> Duplicate
                 </button>
                 <button className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-red-500 bg-red-50 rounded-lg hover:bg-red-100 transition-colors">
@@ -477,12 +477,12 @@ export default function AdminNotificationsPage() {
                 { key: 'inApp' as const, label: 'In-App', icon: <AppWindow className="w-5 h-5" />, desc: 'In-app alerts' },
               ].map((ch) => (
                 <div key={ch.key} className={`p-4 rounded-xl border-2 transition-all cursor-pointer ${
-                  prefs[ch.key] ? 'border-[#2AA198] bg-[#2AA198]/5' : 'border-gray-100 bg-gray-50'
+                  prefs[ch.key] ? 'border-[#8CB89C] bg-[#8CB89C]/5' : 'border-gray-100 bg-gray-50'
                 }`} onClick={() => setPrefs((p) => ({ ...p, [ch.key]: !p[ch.key] }))}>
                   <div className="flex items-center justify-between mb-2">
-                    <div className={`${prefs[ch.key] ? 'text-[#2AA198]' : 'text-gray-400'}`}>{ch.icon}</div>
+                    <div className={`${prefs[ch.key] ? 'text-[#8CB89C]' : 'text-gray-400'}`}>{ch.icon}</div>
                     <div className={`w-10 h-5 rounded-full transition-all flex items-center ${
-                      prefs[ch.key] ? 'bg-[#2AA198] justify-end' : 'bg-gray-300 justify-start'
+                      prefs[ch.key] ? 'bg-[#8CB89C] justify-end' : 'bg-gray-300 justify-start'
                     }`}>
                       <div className="w-4 h-4 bg-white rounded-full shadow mx-0.5" />
                     </div>
@@ -510,7 +510,7 @@ export default function AdminNotificationsPage() {
                   onClick={() => setPrefs((p) => ({ ...p, frequency: freq.key }))}
                   className={`flex-1 min-w-[180px] p-4 rounded-xl border-2 text-left transition-all ${
                     prefs.frequency === freq.key
-                      ? 'border-[#2AA198] bg-[#2AA198]/5'
+                      ? 'border-[#8CB89C] bg-[#8CB89C]/5'
                       : 'border-gray-100 hover:border-gray-200'
                   }`}
                 >
@@ -554,7 +554,7 @@ export default function AdminNotificationsPage() {
                               }))
                             }
                             className={`w-8 h-5 rounded-full transition-all flex items-center mx-auto ${
-                              channels[ch] ? 'bg-[#2AA198] justify-end' : 'bg-gray-300 justify-start'
+                              channels[ch] ? 'bg-[#8CB89C] justify-end' : 'bg-gray-300 justify-start'
                             }`}
                           >
                             <div className="w-3.5 h-3.5 bg-white rounded-full shadow mx-0.5" />

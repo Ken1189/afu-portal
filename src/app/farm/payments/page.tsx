@@ -52,8 +52,8 @@ import {
 // ---------------------------------------------------------------------------
 const COLORS = {
   navy: '#1B2A4A',
-  teal: '#2AA198',
-  tealDark: '#1A7A72',
+  teal: '#8CB89C',
+  tealDark: '#729E82',
   gold: '#D4A843',
   cream: '#F9FAFB',
 };
@@ -338,7 +338,7 @@ export default function PaymentHistoryPage() {
             <div className="relative">
               <button
                 onClick={() => setShowTimePicker(!showTimePicker)}
-                className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium shadow-sm transition-all hover:border-[#2AA198] hover:shadow-md"
+                className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium shadow-sm transition-all hover:border-[#8CB89C] hover:shadow-md"
                 style={{ color: COLORS.navy }}
               >
                 <Clock className="h-4 w-4 text-gray-400" />
@@ -360,7 +360,7 @@ export default function PaymentHistoryPage() {
                         onClick={() => { setTimePeriod(tp); setShowTimePicker(false); }}
                         className={`block w-full px-4 py-2.5 text-left text-sm transition-colors ${
                           timePeriod === tp
-                            ? 'bg-[#2AA198]/10 font-semibold text-[#1A7A72]'
+                            ? 'bg-[#8CB89C]/10 font-semibold text-[#729E82]'
                             : 'text-gray-600 hover:bg-gray-50'
                         }`}
                       >
@@ -529,7 +529,7 @@ export default function PaymentHistoryPage() {
                   placeholder="Search transactions..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full rounded-xl border border-gray-200 bg-gray-50 py-2 pl-9 pr-4 text-sm text-gray-700 placeholder-gray-400 outline-none transition-colors focus:border-[#2AA198] focus:bg-white focus:ring-2 focus:ring-[#2AA198]/20 sm:w-64"
+                  className="w-full rounded-xl border border-gray-200 bg-gray-50 py-2 pl-9 pr-4 text-sm text-gray-700 placeholder-gray-400 outline-none transition-colors focus:border-[#8CB89C] focus:bg-white focus:ring-2 focus:ring-[#8CB89C]/20 sm:w-64"
                 />
               </div>
             </div>

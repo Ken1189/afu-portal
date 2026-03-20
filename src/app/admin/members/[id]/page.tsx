@@ -296,7 +296,7 @@ function CustomTooltip({
 function CreditScoreGauge({ score }: { score: number }) {
   const getColor = (s: number) => {
     if (s >= 80) return '#22C55E';
-    if (s >= 60) return '#2AA198';
+    if (s >= 60) return '#8CB89C';
     if (s >= 40) return '#F59E0B';
     return '#EF4444';
   };
@@ -772,8 +772,8 @@ export default function MemberDetailPage() {
                       <AreaChart data={mockRepaymentData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
                         <defs>
                           <linearGradient id="paidGradient" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#2AA198" stopOpacity={0.3} />
-                            <stop offset="95%" stopColor="#2AA198" stopOpacity={0} />
+                            <stop offset="5%" stopColor="#8CB89C" stopOpacity={0.3} />
+                            <stop offset="95%" stopColor="#8CB89C" stopOpacity={0} />
                           </linearGradient>
                         </defs>
                         <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -781,7 +781,7 @@ export default function MemberDetailPage() {
                         <YAxis tick={{ fontSize: 11, fill: '#9CA3AF' }} axisLine={false} tickLine={false} tickFormatter={(v: number) => `$${v}`} />
                         <Tooltip content={<CustomTooltip />} />
                         <Area type="monotone" dataKey="expected" stroke="#D4A843" strokeWidth={2} fill="none" strokeDasharray="5 5" name="Expected" />
-                        <Area type="monotone" dataKey="paid" stroke="#2AA198" strokeWidth={2.5} fill="url(#paidGradient)" name="Paid" dot={{ fill: '#2AA198', r: 3, strokeWidth: 0 }} activeDot={{ fill: '#2AA198', r: 5, strokeWidth: 2, stroke: '#fff' }} />
+                        <Area type="monotone" dataKey="paid" stroke="#8CB89C" strokeWidth={2.5} fill="url(#paidGradient)" name="Paid" dot={{ fill: '#8CB89C', r: 3, strokeWidth: 0 }} activeDot={{ fill: '#8CB89C', r: 5, strokeWidth: 2, stroke: '#fff' }} />
                       </AreaChart>
                     </ResponsiveContainer>
                   </div>

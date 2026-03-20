@@ -298,9 +298,9 @@ function ProjectCard({ project }: { project: SustainabilityProject }) {
       className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow"
     >
       {/* Project header image placeholder */}
-      <div className="h-36 bg-gradient-to-br from-[#2AA198]/20 to-[#1B2A4A]/10 relative flex items-center justify-center">
+      <div className="h-36 bg-gradient-to-br from-[#8CB89C]/20 to-[#1B2A4A]/10 relative flex items-center justify-center">
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-        <TreePine size={48} className="text-[#2AA198]/40" />
+        <TreePine size={48} className="text-[#8CB89C]/40" />
         <div className="absolute top-3 left-3 flex items-center gap-2">
           <span
             className={`text-xs font-medium px-2.5 py-1 rounded-full border ${projectTypeColors[project.type]}`}
@@ -340,7 +340,7 @@ function ProjectCard({ project }: { project: SustainabilityProject }) {
               initial={{ width: 0 }}
               animate={{ width: `${progressPercent}%` }}
               transition={{ duration: 1, delay: 0.3, ease: 'easeOut' }}
-              className="h-full bg-gradient-to-r from-[#2AA198] to-[#D4A843] rounded-full"
+              className="h-full bg-gradient-to-r from-[#8CB89C] to-[#D4A843] rounded-full"
             />
           </div>
           <div className="flex items-center justify-between text-xs mt-1">
@@ -356,7 +356,7 @@ function ProjectCard({ project }: { project: SustainabilityProject }) {
         {/* Stats row */}
         <div className="flex items-center gap-4 mt-4 pt-3 border-t border-gray-50">
           <div className="flex items-center gap-1.5 text-xs text-gray-500">
-            <Users size={13} className="text-[#2AA198]" />
+            <Users size={13} className="text-[#8CB89C]" />
             <span className="font-medium text-[#1B2A4A]">{project.participatingFarmers}</span>
             <span>farmers</span>
           </div>
@@ -371,7 +371,7 @@ function ProjectCard({ project }: { project: SustainabilityProject }) {
         <div className="mt-3 pt-3 border-t border-gray-50">
           <button
             onClick={() => setExpanded(!expanded)}
-            className="flex items-center justify-between w-full text-xs text-[#2AA198] font-medium"
+            className="flex items-center justify-between w-full text-xs text-[#8CB89C] font-medium"
           >
             <span>
               Milestones ({completedMilestones}/{project.milestones.length})
@@ -395,14 +395,14 @@ function ProjectCard({ project }: { project: SustainabilityProject }) {
                       {idx < project.milestones.length - 1 && (
                         <div
                           className={`absolute left-[7px] top-[18px] w-0.5 h-[calc(100%)] ${
-                            milestone.completed ? 'bg-[#2AA198]/30' : 'bg-gray-200'
+                            milestone.completed ? 'bg-[#8CB89C]/30' : 'bg-gray-200'
                           }`}
                         />
                       )}
                       {/* Dot */}
                       <div className="relative z-10 mt-0.5 flex-shrink-0">
                         {milestone.completed ? (
-                          <CheckCircle2 size={15} className="text-[#2AA198]" />
+                          <CheckCircle2 size={15} className="text-[#8CB89C]" />
                         ) : (
                           <Circle size={15} className="text-gray-300" />
                         )}
@@ -438,7 +438,7 @@ function ScoreCircle({ score }: { score: number }) {
   const circumference = 2 * Math.PI * 58;
   const strokeDashoffset = circumference - (score / 100) * circumference;
   const color =
-    score >= 80 ? '#2AA198' : score >= 60 ? '#D4A843' : score >= 40 ? '#F59E0B' : '#EF4444';
+    score >= 80 ? '#8CB89C' : score >= 60 ? '#D4A843' : score >= 40 ? '#F59E0B' : '#EF4444';
 
   return (
     <div className="relative w-36 h-36 mx-auto">
@@ -503,7 +503,7 @@ function CategoryScoreBar({
             style={{
               background:
                 score >= 80
-                  ? '#2AA198'
+                  ? '#8CB89C'
                   : score >= 60
                     ? '#D4A843'
                     : score >= 40
@@ -543,7 +543,7 @@ function MarketplaceCreditCard({
       <h4 className="text-sm font-bold text-[#1B2A4A] leading-tight">{credit.projectName}</h4>
 
       <div className="flex items-center gap-1.5 mt-2 text-xs text-gray-500">
-        <ShieldCheck size={12} className="text-[#2AA198]" />
+        <ShieldCheck size={12} className="text-[#8CB89C]" />
         <span>{credit.verificationBody}</span>
       </div>
 
@@ -559,7 +559,7 @@ function MarketplaceCreditCard({
           </div>
           <div className="text-right">
             <p className="text-xs text-gray-400">Available</p>
-            <p className="text-lg font-bold text-[#2AA198]">
+            <p className="text-lg font-bold text-[#8CB89C]">
               {credit.credits} <span className="text-xs font-normal text-gray-400">tCO2e</span>
             </p>
           </div>
@@ -570,7 +570,7 @@ function MarketplaceCreditCard({
           <span className="font-semibold text-[#1B2A4A]">{formatCurrency(credit.totalValue)}</span>
         </div>
 
-        <button className="w-full py-2.5 rounded-xl bg-[#2AA198] text-white text-sm font-semibold hover:bg-[#2AA198]/90 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+        <button className="w-full py-2.5 rounded-xl bg-[#8CB89C] text-white text-sm font-semibold hover:bg-[#8CB89C]/90 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
           <ShoppingCart size={14} />
           Buy Credits
         </button>
@@ -616,7 +616,7 @@ function PriceTrendChart() {
                 transition={{ duration: 0.6, delay: idx * 0.06 }}
                 className={`w-full rounded-t-md ${
                   isLatest
-                    ? 'bg-gradient-to-t from-[#2AA198] to-[#2AA198]/70'
+                    ? 'bg-gradient-to-t from-[#8CB89C] to-[#8CB89C]/70'
                     : 'bg-gradient-to-t from-[#1B2A4A]/20 to-[#1B2A4A]/5'
                 }`}
               />
@@ -977,11 +977,11 @@ export default function SustainabilityPage() {
               variants={cardVariants}
               initial="hidden"
               animate="visible"
-              className="bg-gradient-to-r from-[#2AA198]/10 to-[#D4A843]/10 rounded-2xl border border-[#2AA198]/20 p-4"
+              className="bg-gradient-to-r from-[#8CB89C]/10 to-[#D4A843]/10 rounded-2xl border border-[#8CB89C]/20 p-4"
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#2AA198]/20 flex items-center justify-center flex-shrink-0">
-                  <BarChart3 size={20} className="text-[#2AA198]" />
+                <div className="w-10 h-10 rounded-xl bg-[#8CB89C]/20 flex items-center justify-center flex-shrink-0">
+                  <BarChart3 size={20} className="text-[#8CB89C]" />
                 </div>
                 <div>
                   <p className="text-sm font-bold text-[#1B2A4A]">Top 15% of AFU Farmers</p>
@@ -1024,8 +1024,8 @@ export default function SustainabilityPage() {
                           {rec.description}
                         </p>
                         <div className="flex items-center gap-1 mt-1.5">
-                          <ArrowRight size={10} className="text-[#2AA198]" />
-                          <span className="text-[10px] font-semibold text-[#2AA198]">
+                          <ArrowRight size={10} className="text-[#8CB89C]" />
+                          <span className="text-[10px] font-semibold text-[#8CB89C]">
                             {rec.impact}
                           </span>
                         </div>
@@ -1129,7 +1129,7 @@ export default function SustainabilityPage() {
               variants={cardVariants}
               initial="hidden"
               animate="visible"
-              className="bg-gradient-to-r from-[#1B2A4A]/5 to-[#2AA198]/5 rounded-2xl border border-[#1B2A4A]/10 p-4"
+              className="bg-gradient-to-r from-[#1B2A4A]/5 to-[#8CB89C]/5 rounded-2xl border border-[#1B2A4A]/10 p-4"
             >
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 rounded-xl bg-[#1B2A4A]/10 flex items-center justify-center flex-shrink-0">

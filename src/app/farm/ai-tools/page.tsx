@@ -208,7 +208,7 @@ const aiTools: AITool[] = [
     name: 'Credit Score Calculator',
     description: 'Calculate your agricultural credit score',
     icon: Calculator,
-    color: 'text-[#2AA198]',
+    color: 'text-[#8CB89C]',
     bgColor: 'bg-teal-50',
     borderColor: 'border-teal-200',
   },
@@ -337,7 +337,7 @@ function CropDoctorContent() {
             <div className="grid grid-cols-2 gap-3 mt-3">
               <div className="bg-white rounded-lg p-3">
                 <p className="text-xs text-gray-400">Confidence</p>
-                <p className="text-lg font-bold text-[#2AA198]">{mockDiagnosis.confidence}%</p>
+                <p className="text-lg font-bold text-[#8CB89C]">{mockDiagnosis.confidence}%</p>
               </div>
               <div className="bg-white rounded-lg p-3">
                 <p className="text-xs text-gray-400">Severity</p>
@@ -698,7 +698,7 @@ function PestAlertContent() {
           </p>
           <div className="bg-white rounded-lg p-2.5 border border-gray-100">
             <p className="text-xs text-gray-600">
-              <span className="font-medium text-[#2AA198]">Action:</span> {alert.action}
+              <span className="font-medium text-[#8CB89C]">Action:</span> {alert.action}
             </p>
           </div>
         </div>
@@ -738,7 +738,7 @@ function CreditScoreContent() {
               <input type="number" value={revenue} onChange={(e) => setRevenue(e.target.value)} className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm bg-white text-[#1B2A4A] focus:outline-none focus:ring-2 focus:ring-teal-200" />
             </div>
           </div>
-          <button onClick={() => setShowResult(true)} className="w-full py-2.5 bg-[#2AA198] text-white rounded-xl text-sm font-medium hover:bg-[#239189] transition-colors flex items-center justify-center gap-2">
+          <button onClick={() => setShowResult(true)} className="w-full py-2.5 bg-[#8CB89C] text-white rounded-xl text-sm font-medium hover:bg-[#239189] transition-colors flex items-center justify-center gap-2">
             <Calculator className="w-4 h-4" />
             Calculate Score
           </button>
@@ -763,7 +763,7 @@ function CreditScoreContent() {
             <p className="text-xs font-medium text-gray-500">Recommended Products</p>
             {mockCreditResult.recommendedProducts.map((product, idx) => (
               <div key={idx} className="flex items-center gap-2 bg-white rounded-lg p-2.5 border border-gray-100">
-                <CheckCircle className="w-4 h-4 text-[#2AA198] flex-shrink-0" />
+                <CheckCircle className="w-4 h-4 text-[#8CB89C] flex-shrink-0" />
                 <p className="text-xs text-[#1B2A4A]">{product}</p>
               </div>
             ))}

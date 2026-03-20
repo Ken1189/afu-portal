@@ -179,7 +179,7 @@ export default function AdminTrainingPage() {
             <p className="text-gray-500 text-sm mt-0.5">Manage programs, enrollments, and certifications</p>
           </div>
         </div>
-        <button className="flex items-center gap-2 px-5 py-2.5 bg-[#2AA198] text-white rounded-lg text-sm font-semibold hover:bg-[#2AA198]/90 transition-colors">
+        <button className="flex items-center gap-2 px-5 py-2.5 bg-[#8CB89C] text-white rounded-lg text-sm font-semibold hover:bg-[#8CB89C]/90 transition-colors">
           + Create Program
         </button>
       </motion.div>
@@ -188,7 +188,7 @@ export default function AdminTrainingPage() {
       <motion.div variants={cardVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { label: 'Active Programs', value: activePrograms, icon: <BookOpen className="w-5 h-5" />, color: 'text-[#1B2A4A]', iconBg: 'bg-[#1B2A4A]/10' },
-          { label: 'Enrolled Farmers', value: totalEnrolled, icon: <Users className="w-5 h-5" />, color: 'text-[#2AA198]', iconBg: 'bg-[#2AA198]/10' },
+          { label: 'Enrolled Farmers', value: totalEnrolled, icon: <Users className="w-5 h-5" />, color: 'text-[#8CB89C]', iconBg: 'bg-[#8CB89C]/10' },
           { label: 'Completion Rate', value: `${avgCompletion}%`, icon: <TrendingUp className="w-5 h-5" />, color: 'text-[#D4A843]', iconBg: 'bg-[#D4A843]/10' },
           { label: 'Certificates Issued', value: totalCerts, icon: <Award className="w-5 h-5" />, color: 'text-purple-600', iconBg: 'bg-purple-50' },
         ].map((stat, i) => (
@@ -231,7 +231,7 @@ export default function AdminTrainingPage() {
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-3">
                   <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                    prog.status === 'active' ? 'bg-[#2AA198]/10 text-[#2AA198]' :
+                    prog.status === 'active' ? 'bg-[#8CB89C]/10 text-[#8CB89C]' :
                     prog.status === 'upcoming' ? 'bg-blue-50 text-blue-600' :
                     'bg-gray-100 text-gray-400'
                   }`}>
@@ -278,7 +278,7 @@ export default function AdminTrainingPage() {
                   <div
                     className={`h-2 rounded-full transition-all ${
                       prog.completionRate >= 80 ? 'bg-green-500' :
-                      prog.completionRate >= 60 ? 'bg-[#2AA198]' :
+                      prog.completionRate >= 60 ? 'bg-[#8CB89C]' :
                       prog.completionRate >= 40 ? 'bg-[#D4A843]' :
                       'bg-red-400'
                     }`}
@@ -307,13 +307,13 @@ export default function AdminTrainingPage() {
                 placeholder="Search farmers..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2AA198]/50 w-56"
+                className="pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/50 w-56"
               />
             </div>
             <select
               value={programFilter}
               onChange={(e) => setProgramFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2AA198]/50"
+              className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/50"
             >
               <option value="all">All Programs</option>
               {programs.map((p) => (
@@ -327,7 +327,7 @@ export default function AdminTrainingPage() {
                   onClick={() => setEnrollmentFilter(s)}
                   className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
                     enrollmentFilter === s
-                      ? 'bg-[#2AA198] text-white'
+                      ? 'bg-[#8CB89C] text-white'
                       : 'text-gray-500 hover:text-[#1B2A4A]'
                   }`}
                 >
@@ -364,7 +364,7 @@ export default function AdminTrainingPage() {
                             <div
                               className={`h-1.5 rounded-full ${
                                 enr.progress === 100 ? 'bg-green-500' :
-                                enr.progress >= 60 ? 'bg-[#2AA198]' :
+                                enr.progress >= 60 ? 'bg-[#8CB89C]' :
                                 'bg-[#D4A843]'
                               }`}
                               style={{ width: `${enr.progress}%` }}
@@ -390,7 +390,7 @@ export default function AdminTrainingPage() {
                         )}
                       </td>
                       <td className="px-6 py-3">
-                        <button className="text-xs font-medium text-[#2AA198] hover:text-[#2AA198]/80 transition-colors">
+                        <button className="text-xs font-medium text-[#8CB89C] hover:text-[#8CB89C]/80 transition-colors">
                           View
                         </button>
                       </td>
@@ -412,7 +412,7 @@ export default function AdminTrainingPage() {
             <div className="bg-white rounded-xl border border-gray-100 p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-semibold text-[#1B2A4A]">Total Certificates Issued</h3>
-                <span className="text-3xl font-bold text-[#2AA198]">{totalCerts}</span>
+                <span className="text-3xl font-bold text-[#8CB89C]">{totalCerts}</span>
               </div>
               <p className="text-xs text-gray-400">Across all programs since inception</p>
             </div>
@@ -429,7 +429,7 @@ export default function AdminTrainingPage() {
                     </div>
                     <div className="w-full bg-gray-100 rounded-full h-1.5">
                       <div
-                        className="h-1.5 rounded-full bg-[#2AA198]"
+                        className="h-1.5 rounded-full bg-[#8CB89C]"
                         style={{ width: `${(cp.count / certsByProgram[0].count) * 100}%` }}
                       />
                     </div>
@@ -464,7 +464,7 @@ export default function AdminTrainingPage() {
                       <td className="px-6 py-3 text-sm text-gray-400">{cert.issueDate}</td>
                       <td className="px-6 py-3">
                         <div className="flex gap-1.5">
-                          <button className="flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-[#2AA198] bg-[#2AA198]/10 rounded-md hover:bg-[#2AA198]/20 transition-colors">
+                          <button className="flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-[#8CB89C] bg-[#8CB89C]/10 rounded-md hover:bg-[#8CB89C]/20 transition-colors">
                             <Download className="w-3 h-3" /> Download
                           </button>
                           <button className="flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-[#1B2A4A] bg-gray-50 rounded-md hover:bg-gray-100 transition-colors">

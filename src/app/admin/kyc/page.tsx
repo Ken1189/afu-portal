@@ -205,7 +205,7 @@ export default function KycManagementPage() {
             </Link>
             <span className="text-gray-300">/</span>
             <div className="flex items-center gap-2">
-              <ShieldCheck className="w-5 h-5 text-[#2AA198]" />
+              <ShieldCheck className="w-5 h-5 text-[#8CB89C]" />
               <h1 className="text-lg font-semibold text-[#1B2A4A]">KYC Management</h1>
             </div>
           </div>
@@ -280,8 +280,8 @@ export default function KycManagementPage() {
         <motion.div variants={fadeUp} initial="hidden" animate="visible">
           <div className="bg-[#1B2A4A] text-white rounded-xl p-5">
             <div className="flex items-center gap-2 mb-4">
-              <Info className="w-4 h-4 text-[#2AA198]" />
-              <span className="text-sm font-semibold text-[#2AA198] uppercase tracking-wide">KYC Tier Requirements</span>
+              <Info className="w-4 h-4 text-[#8CB89C]" />
+              <span className="text-sm font-semibold text-[#8CB89C] uppercase tracking-wide">KYC Tier Requirements</span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {[
@@ -315,7 +315,7 @@ export default function KycManagementPage() {
                   <ul className="space-y-1">
                     {t.reqs.map((req) => (
                       <li key={req} className="flex items-start gap-1.5 text-sm text-gray-200">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-[#2AA198] mt-0.5 shrink-0" />
+                        <CheckCircle2 className="w-3.5 h-3.5 text-[#8CB89C] mt-0.5 shrink-0" />
                         {req}
                       </li>
                     ))}
@@ -342,7 +342,7 @@ export default function KycManagementPage() {
                     placeholder="Search members…"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-8 pr-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2AA198]/30 focus:border-[#2AA198] w-52"
+                    className="pl-8 pr-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] w-52"
                   />
                 </div>
               </div>
@@ -423,7 +423,7 @@ export default function KycManagementPage() {
                             <div className="flex items-center gap-1.5">
                               <button
                                 onClick={(e) => { e.stopPropagation(); setSelectedRecord(record); }}
-                                className="p-1.5 rounded text-gray-400 hover:text-[#2AA198] hover:bg-teal-50 transition-colors"
+                                className="p-1.5 rounded text-gray-400 hover:text-[#8CB89C] hover:bg-teal-50 transition-colors"
                                 title="Preview"
                               >
                                 <Eye className="w-3.5 h-3.5" />
@@ -591,7 +591,7 @@ export default function KycManagementPage() {
               Last screening run: <span className="font-medium text-gray-600">2 hours ago</span>
             </div>
 
-            <button className="mt-3 w-full flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium border border-[#2AA198] text-[#2AA198] hover:bg-[#2AA198]/5 transition-colors">
+            <button className="mt-3 w-full flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium border border-[#8CB89C] text-[#8CB89C] hover:bg-[#8CB89C]/5 transition-colors">
               <RefreshCw className="w-3.5 h-3.5" />
               Run Screening Now
             </button>
@@ -600,8 +600,8 @@ export default function KycManagementPage() {
           {/* Country Compliance Status */}
           <div className="lg:col-span-2 bg-white rounded-xl shadow-sm p-5">
             <div className="flex items-center gap-2 mb-5">
-              <div className="p-2 bg-[#2AA198]/10 rounded-lg">
-                <ShieldCheck className="w-4 h-4 text-[#2AA198]" />
+              <div className="p-2 bg-[#8CB89C]/10 rounded-lg">
+                <ShieldCheck className="w-4 h-4 text-[#8CB89C]" />
               </div>
               <h2 className="text-base font-semibold text-[#1B2A4A]">Country Compliance Status</h2>
             </div>
@@ -610,7 +610,7 @@ export default function KycManagementPage() {
               {COUNTRIES.map((country) => (
                 <div
                   key={country.code}
-                  className="border border-gray-100 rounded-xl p-3.5 hover:border-[#2AA198]/30 hover:shadow-sm transition-all"
+                  className="border border-gray-100 rounded-xl p-3.5 hover:border-[#8CB89C]/30 hover:shadow-sm transition-all"
                 >
                   <div className="flex items-center gap-2.5 mb-3">
                     <img
@@ -635,7 +635,7 @@ export default function KycManagementPage() {
                     </div>
                     <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
                       <div
-                        className={`h-full rounded-full ${country.compliance >= 80 ? 'bg-[#2AA198]' : 'bg-amber-400'}`}
+                        className={`h-full rounded-full ${country.compliance >= 80 ? 'bg-[#8CB89C]' : 'bg-amber-400'}`}
                         style={{ width: `${country.compliance}%` }}
                       />
                     </div>

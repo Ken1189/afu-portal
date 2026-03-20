@@ -229,10 +229,10 @@ export default function CollectionsPage() {
     }
   };
 
-  const SortIcon = ({ field }: { field: SortField }) => {
+  function sortIcon(field: SortField) {
     if (sortField !== field) return <ArrowUpDown className="w-3 h-3 text-gray-300" />;
     return sortOrder === 'asc' ? <ChevronUp className="w-3 h-3 text-teal" /> : <ChevronDown className="w-3 h-3 text-teal" />;
-  };
+  }
 
   return (
     <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-6">
@@ -358,7 +358,7 @@ export default function CollectionsPage() {
                   onClick={() => toggleSort('memberName')}
                 >
                   <div className="flex items-center gap-1">
-                    Member <SortIcon field="memberName" />
+                    Member {sortIcon("memberName")}
                   </div>
                 </th>
                 <th className="text-left py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Loan ID</th>
@@ -367,7 +367,7 @@ export default function CollectionsPage() {
                   onClick={() => toggleSort('outstandingAmount')}
                 >
                   <div className="flex items-center justify-end gap-1">
-                    Outstanding <SortIcon field="outstandingAmount" />
+                    Outstanding {sortIcon("outstandingAmount")}
                   </div>
                 </th>
                 <th
@@ -375,7 +375,7 @@ export default function CollectionsPage() {
                   onClick={() => toggleSort('daysOverdue')}
                 >
                   <div className="flex items-center justify-end gap-1">
-                    Days Overdue <SortIcon field="daysOverdue" />
+                    Days Overdue {sortIcon("daysOverdue")}
                   </div>
                 </th>
                 <th
@@ -383,7 +383,7 @@ export default function CollectionsPage() {
                   onClick={() => toggleSort('lastPaymentDate')}
                 >
                   <div className="flex items-center gap-1">
-                    Last Payment <SortIcon field="lastPaymentDate" />
+                    Last Payment {sortIcon("lastPaymentDate")}
                   </div>
                 </th>
                 <th className="text-left py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
@@ -481,8 +481,8 @@ export default function CollectionsPage() {
             <AreaChart data={collectionTrendData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="collectedGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#2AA198" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#2AA198" stopOpacity={0} />
+                  <stop offset="5%" stopColor="#8CB89C" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#8CB89C" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -493,12 +493,12 @@ export default function CollectionsPage() {
               <Area
                 type="monotone"
                 dataKey="collected"
-                stroke="#2AA198"
+                stroke="#8CB89C"
                 strokeWidth={2.5}
                 fill="url(#collectedGradient)"
                 name="Collected"
-                dot={{ fill: '#2AA198', r: 3, strokeWidth: 0 }}
-                activeDot={{ fill: '#2AA198', r: 5, strokeWidth: 2, stroke: '#fff' }}
+                dot={{ fill: '#8CB89C', r: 3, strokeWidth: 0 }}
+                activeDot={{ fill: '#8CB89C', r: 5, strokeWidth: 2, stroke: '#fff' }}
               />
             </AreaChart>
           </ResponsiveContainer>

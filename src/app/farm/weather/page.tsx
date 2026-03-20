@@ -312,7 +312,7 @@ export default function WeatherPage() {
                   <p className="text-gray-500 text-sm mt-1">
                     Feels like <span className="font-semibold text-[#1B2A4A]">{currentConditions.feelsLike}&deg;C</span>
                   </p>
-                  <p className="text-[#2AA198] font-medium text-sm">{currentConditions.condition}</p>
+                  <p className="text-[#8CB89C] font-medium text-sm">{currentConditions.condition}</p>
                 </div>
               </div>
 
@@ -378,11 +378,11 @@ export default function WeatherPage() {
                   onClick={() => setSelectedDay(idx)}
                   className={`flex-shrink-0 w-[140px] rounded-2xl p-4 transition-all border-2 ${
                     selectedDay === idx
-                      ? 'border-[#2AA198] bg-[#2AA198]/5 shadow-sm'
+                      ? 'border-[#8CB89C] bg-[#8CB89C]/5 shadow-sm'
                       : 'border-transparent bg-gray-50 hover:bg-gray-100'
                   }`}
                 >
-                  <p className={`text-sm font-semibold mb-1 ${selectedDay === idx ? 'text-[#2AA198]' : 'text-[#1B2A4A]'}`}>
+                  <p className={`text-sm font-semibold mb-1 ${selectedDay === idx ? 'text-[#8CB89C]' : 'text-[#1B2A4A]'}`}>
                     {day.day}
                   </p>
                   <p className="text-xs text-gray-400 mb-3">{day.date}</p>
@@ -400,7 +400,7 @@ export default function WeatherPage() {
                     <span>{day.wind} km/h</span>
                   </div>
                   <div className={`text-[10px] font-medium rounded-lg px-2 py-1 text-center ${
-                    selectedDay === idx ? 'bg-[#2AA198]/10 text-[#2AA198]' : 'bg-gray-100 text-gray-500'
+                    selectedDay === idx ? 'bg-[#8CB89C]/10 text-[#8CB89C]' : 'bg-gray-100 text-gray-500'
                   }`}>
                     {day.advice}
                   </div>
@@ -414,7 +414,7 @@ export default function WeatherPage() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
-              className="mt-6 bg-gradient-to-r from-[#2AA198]/5 to-sky-50 rounded-2xl p-5 border border-[#2AA198]/10"
+              className="mt-6 bg-gradient-to-r from-[#8CB89C]/5 to-sky-50 rounded-2xl p-5 border border-[#8CB89C]/10"
             >
               <div className="flex items-center justify-between flex-wrap gap-3">
                 <div className="flex items-center gap-3">
@@ -440,9 +440,9 @@ export default function WeatherPage() {
                 </div>
               </div>
               <div className="mt-4 flex items-center gap-2 bg-white/70 rounded-xl px-4 py-3">
-                <Sprout className="w-5 h-5 text-[#2AA198]" />
+                <Sprout className="w-5 h-5 text-[#8CB89C]" />
                 <p className="text-sm font-medium text-[#1B2A4A]">
-                  Farm Advice: <span className="text-[#2AA198]">{sevenDayForecast[selectedDay].advice}</span>
+                  Farm Advice: <span className="text-[#8CB89C]">{sevenDayForecast[selectedDay].advice}</span>
                 </p>
               </div>
             </motion.div>
@@ -512,7 +512,7 @@ export default function WeatherPage() {
         <motion.div variants={cardVariants} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="p-6 lg:p-8">
             <div className="flex items-center gap-2 mb-6">
-              <BarChart3 className="w-5 h-5 text-[#2AA198]" />
+              <BarChart3 className="w-5 h-5 text-[#8CB89C]" />
               <h2 className="text-lg font-bold text-[#1B2A4A]">Agricultural Indices</h2>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -523,7 +523,7 @@ export default function WeatherPage() {
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">
                         <div className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center">
-                          <Icon className="w-4 h-4 text-[#2AA198]" />
+                          <Icon className="w-4 h-4 text-[#8CB89C]" />
                         </div>
                         <p className="text-sm font-medium text-[#1B2A4A]">{index.name}</p>
                       </div>

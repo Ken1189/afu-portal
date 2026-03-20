@@ -180,7 +180,7 @@ const DOC_TYPE_COLORS: Record<DocumentType, { bg: string; text: string }> = {
   'certificate-of-origin': { bg: 'bg-blue-50', text: 'text-blue-600' },
   'bill-of-lading': { bg: 'bg-[#1B2A4A]/10', text: 'text-[#1B2A4A]' },
   'packing-list': { bg: 'bg-amber-50', text: 'text-amber-600' },
-  'commercial-invoice': { bg: 'bg-[#2AA198]/10', text: 'text-[#2AA198]' },
+  'commercial-invoice': { bg: 'bg-[#8CB89C]/10', text: 'text-[#8CB89C]' },
   'fumigation-cert': { bg: 'bg-purple-50', text: 'text-purple-600' },
   'quality-cert': { bg: 'bg-[#D4A843]/10', text: 'text-[#D4A843]' },
   'customs-declaration': { bg: 'bg-rose-50', text: 'text-rose-600' },
@@ -379,7 +379,7 @@ function DocumentCard({ doc }: { doc: ExportDocument }) {
 
           {/* Actions */}
           <div className="flex items-center gap-2 mt-3">
-            <button className="flex items-center gap-1 text-xs font-semibold text-[#2AA198] bg-[#2AA198]/10 hover:bg-[#2AA198]/20 px-3 py-1.5 rounded-lg transition-colors">
+            <button className="flex items-center gap-1 text-xs font-semibold text-[#8CB89C] bg-[#8CB89C]/10 hover:bg-[#8CB89C]/20 px-3 py-1.5 rounded-lg transition-colors">
               <Eye className="w-3.5 h-3.5" /> View
             </button>
             {doc.status === 'approved' && (
@@ -508,7 +508,7 @@ function TemplateCard({ template }: { template: TemplateItem }) {
         <button className="flex items-center gap-1 text-xs font-semibold text-[#1B2A4A] bg-[#1B2A4A]/10 hover:bg-[#1B2A4A]/20 px-3 py-1.5 rounded-lg transition-colors">
           <Download className="w-3.5 h-3.5" /> Download
         </button>
-        <button className="flex items-center gap-1 text-xs font-semibold text-[#2AA198] bg-[#2AA198]/10 hover:bg-[#2AA198]/20 px-3 py-1.5 rounded-lg transition-colors">
+        <button className="flex items-center gap-1 text-xs font-semibold text-[#8CB89C] bg-[#8CB89C]/10 hover:bg-[#8CB89C]/20 px-3 py-1.5 rounded-lg transition-colors">
           <FilePlus className="w-3.5 h-3.5" /> Fill Online
         </button>
       </div>
@@ -571,7 +571,7 @@ export default function ExportDocumentsPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-gradient-to-br from-[#2AA198] via-[#2AA198] to-[#1B2A4A]/30 text-white">
+      <div className="bg-gradient-to-br from-[#8CB89C] via-[#8CB89C] to-[#1B2A4A]/30 text-white">
         <div className="max-w-7xl mx-auto px-4 lg:px-6 py-8">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
@@ -644,8 +644,8 @@ export default function ExportDocumentsPage() {
               onClick={() => setActiveTab(tab.key)}
               className={`flex-1 min-w-fit px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${
                 activeTab === tab.key
-                  ? 'bg-[#2AA198] text-white shadow-sm'
-                  : 'text-gray-500 hover:text-[#2AA198] hover:bg-gray-50'
+                  ? 'bg-[#8CB89C] text-white shadow-sm'
+                  : 'text-gray-500 hover:text-[#8CB89C] hover:bg-gray-50'
               }`}
             >
               {tab.label}
@@ -673,7 +673,7 @@ export default function ExportDocumentsPage() {
                     placeholder="Search documents by title, reference, or issuer..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-9 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#2AA198]/40 focus:border-[#2AA198]"
+                    className="w-full pl-9 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/40 focus:border-[#8CB89C]"
                   />
                 </div>
 
@@ -686,7 +686,7 @@ export default function ExportDocumentsPage() {
                     onClick={() => setTypeFilter('all')}
                     className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                       typeFilter === 'all'
-                        ? 'bg-[#2AA198] text-white'
+                        ? 'bg-[#8CB89C] text-white'
                         : 'bg-white border border-gray-200 text-gray-500 hover:bg-gray-50'
                     }`}
                   >
@@ -699,7 +699,7 @@ export default function ExportDocumentsPage() {
                         onClick={() => setTypeFilter(type)}
                         className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                           typeFilter === type
-                            ? 'bg-[#2AA198] text-white'
+                            ? 'bg-[#8CB89C] text-white'
                             : 'bg-white border border-gray-200 text-gray-500 hover:bg-gray-50'
                         }`}
                       >
@@ -718,7 +718,7 @@ export default function ExportDocumentsPage() {
                     onClick={() => setStatusFilter('all')}
                     className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                       statusFilter === 'all'
-                        ? 'bg-[#2AA198] text-white'
+                        ? 'bg-[#8CB89C] text-white'
                         : 'bg-white border border-gray-200 text-gray-500 hover:bg-gray-50'
                     }`}
                   >
@@ -732,7 +732,7 @@ export default function ExportDocumentsPage() {
                       onClick={() => setStatusFilter(status)}
                       className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                         statusFilter === status
-                          ? 'bg-[#2AA198] text-white'
+                          ? 'bg-[#8CB89C] text-white'
                           : 'bg-white border border-gray-200 text-gray-500 hover:bg-gray-50'
                       }`}
                     >

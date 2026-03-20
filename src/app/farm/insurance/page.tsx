@@ -363,7 +363,7 @@ const typeLabels: Record<InsuranceType, string> = {
 };
 
 const typeColors: Record<InsuranceType, string> = {
-  crop: '#2AA198',
+  crop: '#8CB89C',
   livestock: '#D4A843',
   equipment: '#1B2A4A',
   'weather-index': '#6366F1',

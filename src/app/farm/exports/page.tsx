@@ -224,8 +224,8 @@ const QUICK_ACTIONS: QuickAction[] = [
     icon: <Receipt className="w-6 h-6" />,
     label: 'Create Invoice',
     description: 'Generate a commercial invoice for export',
-    color: 'text-[#2AA198]',
-    bgColor: 'bg-[#2AA198]/10',
+    color: 'text-[#8CB89C]',
+    bgColor: 'bg-[#8CB89C]/10',
   },
   {
     icon: <Leaf className="w-6 h-6" />,
@@ -315,7 +315,7 @@ function TimelineEvent({
   return (
     <div className="flex gap-3">
       <div className="flex flex-col items-center">
-        <div className="w-2.5 h-2.5 rounded-full bg-[#2AA198] ring-4 ring-[#2AA198]/20 mt-1.5" />
+        <div className="w-2.5 h-2.5 rounded-full bg-[#8CB89C] ring-4 ring-[#8CB89C]/20 mt-1.5" />
         {!isLast && <div className="w-0.5 flex-1 bg-gray-200 mt-1" />}
       </div>
       <div className="pb-4">
@@ -386,14 +386,14 @@ function ShipmentCard({ shipment }: { shipment: ExportShipment }) {
               {shipment.originPort}
             </p>
           </div>
-          <div className="flex items-center gap-1 text-[#2AA198]">
-            <div className="w-8 h-px bg-[#2AA198]" />
+          <div className="flex items-center gap-1 text-[#8CB89C]">
+            <div className="w-8 h-px bg-[#8CB89C]" />
             {isAir ? (
               <Plane className="w-4 h-4" />
             ) : (
               <Ship className="w-4 h-4" />
             )}
-            <div className="w-8 h-px bg-[#2AA198]" />
+            <div className="w-8 h-px bg-[#8CB89C]" />
           </div>
           <div className="flex-1 text-right">
             <p className="text-xs text-gray-400 uppercase tracking-wide">
@@ -428,7 +428,7 @@ function ShipmentCard({ shipment }: { shipment: ExportShipment }) {
           </div>
           <div>
             <p className="text-xs text-gray-400">Value (FOB)</p>
-            <p className="text-sm font-bold text-[#2AA198]">
+            <p className="text-sm font-bold text-[#8CB89C]">
               {formatCurrency(shipment.value, shipment.currency)}
             </p>
           </div>
@@ -442,7 +442,7 @@ function ShipmentCard({ shipment }: { shipment: ExportShipment }) {
               {shipment.vessel}
             </span>
           )}
-          <span className="text-xs bg-[#2AA198]/10 text-[#2AA198] px-2 py-1 rounded-lg flex items-center gap-1">
+          <span className="text-xs bg-[#8CB89C]/10 text-[#8CB89C] px-2 py-1 rounded-lg flex items-center gap-1">
             <Timer className="w-3 h-3" />
             ETA: {formatDate(shipment.estimatedArrival)}{' '}
             {eta > 0 ? `(${eta} days)` : eta === 0 ? '(Today!)' : '(Arrived)'}
@@ -468,7 +468,7 @@ function ShipmentCard({ shipment }: { shipment: ExportShipment }) {
         {/* Expand toggle */}
         <button
           onClick={() => setExpanded(!expanded)}
-          className="mt-3 flex items-center gap-1 text-xs font-medium text-[#2AA198] hover:text-[#1B2A4A] transition-colors"
+          className="mt-3 flex items-center gap-1 text-xs font-medium text-[#8CB89C] hover:text-[#1B2A4A] transition-colors"
         >
           {expanded ? (
             <>
@@ -607,7 +607,7 @@ function HistoryCard({ shipment }: { shipment: ExportShipment }) {
             {STATUS_LABELS[shipment.status]}
           </span>
         </div>
-        <span className="text-sm font-bold text-[#2AA198]">
+        <span className="text-sm font-bold text-[#8CB89C]">
           {formatCurrency(shipment.value)}
         </span>
       </div>
@@ -714,7 +714,7 @@ export default function ExportHubPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-gradient-to-br from-[#1B2A4A] via-[#1B2A4A] to-[#2AA198]/30 text-white">
+      <div className="bg-gradient-to-br from-[#1B2A4A] via-[#1B2A4A] to-[#8CB89C]/30 text-white">
         <div className="max-w-7xl mx-auto px-4 lg:px-6 py-8">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
@@ -782,11 +782,11 @@ export default function ExportHubPage() {
             color="bg-amber-50"
           />
           <StatCard
-            icon={<DollarSign className="w-5 h-5 text-[#2AA198]" />}
+            icon={<DollarSign className="w-5 h-5 text-[#8CB89C]" />}
             label="Total Value (YTD)"
             value={formatCurrency(totalExportValue)}
             sub="All shipments"
-            color="bg-[#2AA198]/10"
+            color="bg-[#8CB89C]/10"
           />
           <StatCard
             icon={<Globe className="w-5 h-5 text-[#D4A843]" />}
@@ -862,7 +862,7 @@ export default function ExportHubPage() {
                     placeholder="Search shipments..."
                     value={historySearch}
                     onChange={(e) => setHistorySearch(e.target.value)}
-                    className="w-full pl-9 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#2AA198]/40 focus:border-[#2AA198]"
+                    className="w-full pl-9 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/40 focus:border-[#8CB89C]"
                   />
                 </div>
                 <div className="flex gap-1 flex-wrap">
@@ -901,7 +901,7 @@ export default function ExportHubPage() {
                     {filteredHistory.length} shipment
                     {filteredHistory.length !== 1 ? 's' : ''} found
                   </span>
-                  <span className="text-sm font-bold text-[#2AA198]">
+                  <span className="text-sm font-bold text-[#8CB89C]">
                     Total Value: {formatCurrency(historyTotalValue)}
                   </span>
                 </div>

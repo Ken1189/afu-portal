@@ -351,7 +351,7 @@ const commissionPending = supplierCommissions
   .reduce((sum, c) => sum + c.commissionAmount, 0);
 
 const commissionDonutData = [
-  { name: 'Paid', value: commissionPaid, color: '#2AA198' },
+  { name: 'Paid', value: commissionPaid, color: '#8CB89C' },
   { name: 'Approved', value: commissionApproved, color: '#D4A843' },
   { name: 'Pending', value: commissionPending, color: '#1B2A4A' },
 ];
@@ -430,8 +430,8 @@ export default function SupplierDashboard() {
       change: '+22%',
       changeType: 'up' as const,
       icon: <DollarSign className="w-5 h-5" />,
-      color: 'text-[#2AA198]',
-      bgColor: 'bg-[#2AA198]/10',
+      color: 'text-[#8CB89C]',
+      bgColor: 'bg-[#8CB89C]/10',
     },
     {
       label: 'Active Products',
@@ -457,8 +457,8 @@ export default function SupplierDashboard() {
       change: null,
       changeType: 'neutral' as const,
       icon: <Percent className="w-5 h-5" />,
-      color: 'text-[#2AA198]',
-      bgColor: 'bg-[#2AA198]/10',
+      color: 'text-[#8CB89C]',
+      bgColor: 'bg-[#8CB89C]/10',
     },
     {
       label: 'Ad Impressions',
@@ -494,7 +494,7 @@ export default function SupplierDashboard() {
         variants={fadeUp}
         className="rounded-xl p-6 text-white relative overflow-hidden"
         style={{
-          background: 'linear-gradient(135deg, #2AA198 0%, #1A7A72 100%)',
+          background: 'linear-gradient(135deg, #8CB89C 0%, #729E82 100%)',
         }}
       >
         <div className="absolute inset-0 opacity-10">
@@ -521,7 +521,7 @@ export default function SupplierDashboard() {
             </Link>
             <Link
               href="/supplier/orders"
-              className="flex items-center gap-2 bg-white text-[#1A7A72] hover:bg-white/90 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+              className="flex items-center gap-2 bg-white text-[#729E82] hover:bg-white/90 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
             >
               <ClipboardList className="w-4 h-4" />
               View Orders
@@ -579,7 +579,7 @@ export default function SupplierDashboard() {
       >
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-semibold text-navy text-sm flex items-center gap-2">
-            <BarChart3 className="w-4 h-4 text-[#2AA198]" />
+            <BarChart3 className="w-4 h-4 text-[#8CB89C]" />
             Sales Trend (12 Months)
           </h3>
           <span className="text-xs text-gray-400">
@@ -591,8 +591,8 @@ export default function SupplierDashboard() {
             <AreaChart data={salesTrendData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="salesGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#2AA198" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#2AA198" stopOpacity={0} />
+                  <stop offset="5%" stopColor="#8CB89C" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#8CB89C" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -607,12 +607,12 @@ export default function SupplierDashboard() {
               <Area
                 type="monotone"
                 dataKey="sales"
-                stroke="#2AA198"
+                stroke="#8CB89C"
                 strokeWidth={2.5}
                 fill="url(#salesGradient)"
                 name="Sales"
-                dot={{ fill: '#2AA198', r: 3, strokeWidth: 0 }}
-                activeDot={{ fill: '#2AA198', r: 5, strokeWidth: 2, stroke: '#fff' }}
+                dot={{ fill: '#8CB89C', r: 3, strokeWidth: 0 }}
+                activeDot={{ fill: '#8CB89C', r: 5, strokeWidth: 2, stroke: '#fff' }}
               />
             </AreaChart>
           </ResponsiveContainer>
@@ -635,7 +635,7 @@ export default function SupplierDashboard() {
             <h3 className="font-semibold text-navy text-sm">Recent Orders</h3>
             <Link
               href="/supplier/orders"
-              className="text-[#2AA198] text-xs font-medium hover:text-[#1A7A72] flex items-center gap-1 transition-colors"
+              className="text-[#8CB89C] text-xs font-medium hover:text-[#729E82] flex items-center gap-1 transition-colors"
             >
               View All Orders <ChevronRight className="w-3.5 h-3.5" />
             </Link>
@@ -756,7 +756,7 @@ export default function SupplierDashboard() {
                         initial={{ width: 0 }}
                         animate={{ width: `${(product.revenue / topProducts[0].revenue) * 100}%` }}
                         transition={{ duration: 0.4 }}
-                        className="h-1.5 rounded-full bg-[#2AA198]"
+                        className="h-1.5 rounded-full bg-[#8CB89C]"
                       />
                     </div>
                   </motion.div>
@@ -780,7 +780,7 @@ export default function SupplierDashboard() {
           className="bg-white rounded-xl border border-gray-100 p-5"
         >
           <h3 className="font-semibold text-navy text-sm mb-4 flex items-center gap-2">
-            <DollarSign className="w-4 h-4 text-[#2AA198]" />
+            <DollarSign className="w-4 h-4 text-[#8CB89C]" />
             Commission Summary
           </h3>
           <div className="flex flex-col sm:flex-row items-center gap-6">
@@ -821,7 +821,7 @@ export default function SupplierDashboard() {
               </ResponsiveContainer>
             </div>
             <div className="flex-1 space-y-4 w-full">
-              <div className="bg-[#2AA198]/5 rounded-lg p-3">
+              <div className="bg-[#8CB89C]/5 rounded-lg p-3">
                 <p className="text-xs text-gray-500 mb-0.5">Total All-Time</p>
                 <p className="text-xl font-bold text-navy tabular-nums">{formatCurrency(commissionTotal)}</p>
               </div>
@@ -855,12 +855,12 @@ export default function SupplierDashboard() {
         >
           <div className="p-5 border-b border-gray-100 flex items-center justify-between">
             <h3 className="font-semibold text-navy text-sm flex items-center gap-2">
-              <Megaphone className="w-4 h-4 text-[#2AA198]" />
+              <Megaphone className="w-4 h-4 text-[#8CB89C]" />
               Active Advertisements
             </h3>
             <Link
               href="/supplier/advertisements"
-              className="text-[#2AA198] text-xs font-medium hover:text-[#1A7A72] flex items-center gap-1 transition-colors"
+              className="text-[#8CB89C] text-xs font-medium hover:text-[#729E82] flex items-center gap-1 transition-colors"
             >
               Manage Ads <ChevronRight className="w-3.5 h-3.5" />
             </Link>
@@ -897,7 +897,7 @@ export default function SupplierDashboard() {
                       <MousePointerClick className="w-3 h-3" />
                       {formatCompact(ad.clicks)}
                     </span>
-                    <span className="flex items-center gap-1 font-medium text-[#2AA198]">
+                    <span className="flex items-center gap-1 font-medium text-[#8CB89C]">
                       CTR {ad.ctr}%
                     </span>
                   </div>
@@ -908,7 +908,7 @@ export default function SupplierDashboard() {
                         animate={{ width: `${budgetPct}%` }}
                         transition={{ duration: 0.8, delay: 0.3 + i * 0.1, ease: 'easeOut' }}
                         className={`h-2 rounded-full ${
-                          budgetPct >= 90 ? 'bg-red-400' : budgetPct >= 70 ? 'bg-[#D4A843]' : 'bg-[#2AA198]'
+                          budgetPct >= 90 ? 'bg-red-400' : budgetPct >= 70 ? 'bg-[#D4A843]' : 'bg-[#8CB89C]'
                         }`}
                       />
                     </div>

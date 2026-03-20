@@ -292,7 +292,7 @@ function CreditCard({ credit }: { credit: CarbonCredit }) {
 
         {/* Verification body */}
         <div className="flex items-center gap-1.5 mt-1.5 text-xs text-gray-500">
-          <ShieldCheck size={12} className="text-[#2AA198]" />
+          <ShieldCheck size={12} className="text-[#8CB89C]" />
           <span>{credit.verificationBody}</span>
         </div>
 
@@ -312,7 +312,7 @@ function CreditCard({ credit }: { credit: CarbonCredit }) {
           </div>
           <div>
             <p className="text-[10px] text-gray-400">Total Value</p>
-            <p className="text-sm font-bold text-[#2AA198]">
+            <p className="text-sm font-bold text-[#8CB89C]">
               {formatCurrency(credit.totalValue)}
             </p>
           </div>
@@ -344,7 +344,7 @@ function CreditCard({ credit }: { credit: CarbonCredit }) {
         <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-50">
           {credit.status === 'verified' && (
             <>
-              <button className="flex-1 py-2 rounded-lg bg-[#2AA198] text-white text-xs font-semibold hover:bg-[#2AA198]/90 active:scale-[0.98] transition-all flex items-center justify-center gap-1.5">
+              <button className="flex-1 py-2 rounded-lg bg-[#8CB89C] text-white text-xs font-semibold hover:bg-[#8CB89C]/90 active:scale-[0.98] transition-all flex items-center justify-center gap-1.5">
                 <Tag size={12} />
                 List for Sale
               </button>
@@ -569,14 +569,14 @@ function RetireSection({ credits }: { credits: CarbonCredit[] }) {
                   onClick={() => toggleCredit(credit.id)}
                   className={`w-full text-left p-3 rounded-xl border transition-all ${
                     isSelected
-                      ? 'border-[#2AA198] bg-[#2AA198]/5'
+                      ? 'border-[#8CB89C] bg-[#8CB89C]/5'
                       : 'border-gray-100 bg-gray-50 hover:bg-gray-100'
                   }`}
                 >
                   <div className="flex items-center gap-3">
                     <div
                       className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
-                        isSelected ? 'border-[#2AA198] bg-[#2AA198]' : 'border-gray-300'
+                        isSelected ? 'border-[#8CB89C] bg-[#8CB89C]' : 'border-gray-300'
                       }`}
                     >
                       {isSelected && <CheckCircle2 size={12} className="text-white" />}
@@ -623,7 +623,7 @@ function RetireSection({ credits }: { credits: CarbonCredit[] }) {
                 onClick={() => setRetireReason(reason)}
                 className={`text-left p-2.5 rounded-lg border text-xs transition-all ${
                   retireReason === reason
-                    ? 'border-[#2AA198] bg-[#2AA198]/5 text-[#2AA198] font-semibold'
+                    ? 'border-[#8CB89C] bg-[#8CB89C]/5 text-[#8CB89C] font-semibold'
                     : 'border-gray-100 text-gray-600 hover:bg-gray-50'
                 }`}
               >
@@ -655,7 +655,7 @@ function RetireSection({ credits }: { credits: CarbonCredit[] }) {
             </div>
             <div className="flex items-center justify-between text-xs">
               <span className="text-gray-500">Total value</span>
-              <span className="font-semibold text-[#2AA198]">{formatCurrency(totalValue)}</span>
+              <span className="font-semibold text-[#8CB89C]">{formatCurrency(totalValue)}</span>
             </div>
             <div className="flex items-center justify-between text-xs">
               <span className="text-gray-500">Reason</span>
@@ -665,7 +665,7 @@ function RetireSection({ credits }: { credits: CarbonCredit[] }) {
 
           <button
             onClick={() => setShowConfirm(true)}
-            className="w-full mt-4 py-3 rounded-xl bg-gradient-to-r from-[#1B2A4A] to-[#2AA198] text-white text-sm font-semibold hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+            className="w-full mt-4 py-3 rounded-xl bg-gradient-to-r from-[#1B2A4A] to-[#8CB89C] text-white text-sm font-semibold hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
           >
             <Trash2 size={14} />
             Retire {totalTonnes.toLocaleString()} tCO2e
@@ -760,7 +760,7 @@ function RetireSection({ credits }: { credits: CarbonCredit[] }) {
               className="bg-white rounded-2xl w-full max-w-md shadow-xl overflow-hidden"
             >
               {/* Certificate header */}
-              <div className="bg-gradient-to-br from-[#1B2A4A] to-[#2AA198] p-6 text-center text-white">
+              <div className="bg-gradient-to-br from-[#1B2A4A] to-[#8CB89C] p-6 text-center text-white">
                 <Award size={40} className="mx-auto mb-2 text-[#D4A843]" />
                 <h3 className="text-lg font-bold">Carbon Credit Retirement Certificate</h3>
                 <p className="text-xs text-white/70 mt-1">AFU Sustainability Platform</p>
@@ -802,7 +802,7 @@ function RetireSection({ credits }: { credits: CarbonCredit[] }) {
                 </div>
 
                 <div className="text-center pt-2">
-                  <div className="inline-flex items-center gap-1.5 text-[#2AA198]">
+                  <div className="inline-flex items-center gap-1.5 text-[#8CB89C]">
                     <Sparkles size={14} />
                     <span className="text-xs font-semibold">
                       Thank you for your climate commitment!
@@ -821,7 +821,7 @@ function RetireSection({ credits }: { credits: CarbonCredit[] }) {
                       setSelectedIds(new Set());
                       setRetireReason('');
                     }}
-                    className="flex-1 py-2.5 rounded-xl bg-[#2AA198] text-white text-sm font-semibold hover:bg-[#2AA198]/90 active:scale-[0.98] transition-all"
+                    className="flex-1 py-2.5 rounded-xl bg-[#8CB89C] text-white text-sm font-semibold hover:bg-[#8CB89C]/90 active:scale-[0.98] transition-all"
                   >
                     Done
                   </button>
@@ -904,7 +904,7 @@ export default function CarbonCreditsPage() {
       {/* 1. HEADER BANNER                                                  */}
       {/* ================================================================= */}
       <motion.section variants={itemVariants} className="px-4">
-        <div className="rounded-2xl bg-gradient-to-br from-emerald-600 via-[#2AA198] to-[#1B2A4A] p-5 text-white relative overflow-hidden">
+        <div className="rounded-2xl bg-gradient-to-br from-emerald-600 via-[#8CB89C] to-[#1B2A4A] p-5 text-white relative overflow-hidden">
           {/* Decorative elements */}
           <div className="absolute -top-10 -right-10 w-32 h-32 bg-white/5 rounded-full" />
           <div className="absolute -bottom-8 -right-6 w-24 h-24 bg-white/5 rounded-full" />
@@ -955,7 +955,7 @@ export default function CarbonCreditsPage() {
             label="Verified Credits"
             value={`${stats.verifiedCredits.toLocaleString()}`}
             subValue="tonnes CO2e"
-            color="bg-[#2AA198]/10 text-[#2AA198]"
+            color="bg-[#8CB89C]/10 text-[#8CB89C]"
           />
           <SummaryCard
             icon={Clock}

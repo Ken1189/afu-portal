@@ -187,7 +187,7 @@ function BadgeCard({ badge, earned, earnedAt }: { badge: Badge; earned: boolean;
       {/* Icon */}
       <div
         className={`mx-auto flex h-16 w-16 items-center justify-center rounded-2xl text-3xl ${
-          earned ? 'bg-gradient-to-br from-[#0B3D2C]/10 to-[#2AA198]/10' : 'bg-gray-100'
+          earned ? 'bg-gradient-to-br from-[#0B3D2C]/10 to-[#8CB89C]/10' : 'bg-gray-100'
         }`}
       >
         {earned ? (
@@ -312,7 +312,7 @@ export default function AchievementsPage() {
         {/* Back link */}
         <Link
           href="/dashboard"
-          className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-[#0B3D2C] hover:text-[#2AA198] transition-colors"
+          className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-[#0B3D2C] hover:text-[#8CB89C] transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to Dashboard
@@ -335,7 +335,7 @@ export default function AchievementsPage() {
                 Track your progress and unlock rewards as you grow on the AFU platform.
               </p>
             </div>
-            <div className="flex items-center gap-3 rounded-xl bg-gradient-to-r from-[#0B3D2C] to-[#2AA198] px-5 py-3 text-white shadow-lg">
+            <div className="flex items-center gap-3 rounded-xl bg-gradient-to-r from-[#0B3D2C] to-[#8CB89C] px-5 py-3 text-white shadow-lg">
               <Trophy className="h-6 w-6 text-[#D4A017]" />
               <div>
                 <p className="text-xs font-medium opacity-80">Total Points</p>
@@ -377,7 +377,7 @@ export default function AchievementsPage() {
               initial={{ width: 0 }}
               animate={{ width: `${Math.min(progressPercent, 100)}%` }}
               transition={{ duration: 1, ease: 'easeOut' }}
-              className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-[#0B3D2C] to-[#2AA198]"
+              className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-[#0B3D2C] to-[#8CB89C]"
             />
           </div>
           <p className="mt-2 text-xs text-gray-500">
@@ -401,8 +401,8 @@ export default function AchievementsPage() {
               label: 'Badges Earned',
               value: `${earnedCount} / ${badges.length}`,
               icon: Award,
-              color: 'text-[#2AA198]',
-              bg: 'bg-[#2AA198]/10',
+              color: 'text-[#8CB89C]',
+              bg: 'bg-[#8CB89C]/10',
             },
             {
               label: 'Points Earned',
@@ -487,8 +487,8 @@ export default function AchievementsPage() {
               onClick={() => setCategoryFilter(cat)}
               className={`rounded-full px-3 py-2 text-xs font-medium transition-all ${
                 categoryFilter === cat
-                  ? 'bg-[#2AA198] text-white shadow-sm'
-                  : 'bg-white text-gray-500 border border-gray-200 hover:border-[#2AA198]/30'
+                  ? 'bg-[#8CB89C] text-white shadow-sm'
+                  : 'bg-white text-gray-500 border border-gray-200 hover:border-[#8CB89C]/30'
               }`}
             >
               {cat === 'all' ? 'All Categories' : categoryLabels[cat]}
@@ -534,13 +534,13 @@ export default function AchievementsPage() {
           className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm"
         >
           <div className="mb-6 flex items-center gap-2">
-            <Clock className="h-5 w-5 text-[#2AA198]" />
+            <Clock className="h-5 w-5 text-[#8CB89C]" />
             <h2 className="text-lg font-bold text-[#0B3D2C]">Recent Achievements</h2>
           </div>
 
           <div className="relative space-y-6">
             {/* Timeline line */}
-            <div className="absolute left-[19px] top-2 bottom-2 w-0.5 bg-gradient-to-b from-[#2AA198] to-gray-200" />
+            <div className="absolute left-[19px] top-2 bottom-2 w-0.5 bg-gradient-to-b from-[#8CB89C] to-gray-200" />
 
             {recentAchievements.map((achievement, idx) => (
               <motion.div
@@ -551,7 +551,7 @@ export default function AchievementsPage() {
                 className="relative flex items-start gap-4 pl-1"
               >
                 {/* Timeline dot */}
-                <div className="relative z-10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-white border-2 border-[#2AA198] shadow-sm text-lg">
+                <div className="relative z-10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-white border-2 border-[#8CB89C] shadow-sm text-lg">
                   {achievement.badge.icon}
                 </div>
 

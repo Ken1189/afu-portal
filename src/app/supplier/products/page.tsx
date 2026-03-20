@@ -274,13 +274,13 @@ export default function SupplierProductsPage() {
         className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
       >
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#2AA198]/10 flex items-center justify-center">
-            <Package className="w-5 h-5 text-[#2AA198]" />
+          <div className="w-10 h-10 rounded-xl bg-[#8CB89C]/10 flex items-center justify-center">
+            <Package className="w-5 h-5 text-[#8CB89C]" />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-bold text-[#1B2A4A]">My Products</h1>
-              <span className="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#2AA198]/10 text-[#2AA198]">
+              <span className="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#8CB89C]/10 text-[#8CB89C]">
                 {myProducts.length}
               </span>
             </div>
@@ -289,7 +289,7 @@ export default function SupplierProductsPage() {
         </div>
         <Link
           href="/supplier/products/new"
-          className="inline-flex items-center gap-2 bg-[#2AA198] hover:bg-[#1A7A72] text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors shadow-sm"
+          className="inline-flex items-center gap-2 bg-[#8CB89C] hover:bg-[#729E82] text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors shadow-sm"
         >
           <Plus className="w-4 h-4" />
           Add Product
@@ -312,7 +312,7 @@ export default function SupplierProductsPage() {
               placeholder="Search products by name, description, or tags..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#2AA198]/30 focus:border-[#2AA198] transition-colors bg-gray-50 placeholder-gray-400"
+              className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition-colors bg-gray-50 placeholder-gray-400"
             />
           </div>
 
@@ -323,7 +323,7 @@ export default function SupplierProductsPage() {
               <select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
-                className="appearance-none pl-9 pr-8 py-2.5 rounded-lg border border-gray-200 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#2AA198]/30 focus:border-[#2AA198] transition-colors cursor-pointer"
+                className="appearance-none pl-9 pr-8 py-2.5 rounded-lg border border-gray-200 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition-colors cursor-pointer"
               >
                 <option value="all">All Categories</option>
                 {allCategories.map((cat) => (
@@ -341,7 +341,7 @@ export default function SupplierProductsPage() {
               <select
                 value={availabilityFilter}
                 onChange={(e) => setAvailabilityFilter(e.target.value)}
-                className="appearance-none pl-9 pr-8 py-2.5 rounded-lg border border-gray-200 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#2AA198]/30 focus:border-[#2AA198] transition-colors cursor-pointer"
+                className="appearance-none pl-9 pr-8 py-2.5 rounded-lg border border-gray-200 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition-colors cursor-pointer"
               >
                 <option value="all">All Availability</option>
                 <option value="in-stock">In Stock</option>
@@ -358,7 +358,7 @@ export default function SupplierProductsPage() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as SortKey)}
-                className="appearance-none pl-9 pr-8 py-2.5 rounded-lg border border-gray-200 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#2AA198]/30 focus:border-[#2AA198] transition-colors cursor-pointer"
+                className="appearance-none pl-9 pr-8 py-2.5 rounded-lg border border-gray-200 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition-colors cursor-pointer"
               >
                 {sortOptions.map((opt) => (
                   <option key={opt.value} value={opt.value}>
@@ -387,7 +387,7 @@ export default function SupplierProductsPage() {
                 onClick={() => setViewMode('grid')}
                 className={`p-2 rounded-md transition-all ${
                   viewMode === 'grid'
-                    ? 'bg-white text-[#2AA198] shadow-sm'
+                    ? 'bg-white text-[#8CB89C] shadow-sm'
                     : 'text-gray-400 hover:text-gray-600'
                 }`}
                 title="Grid View"
@@ -398,7 +398,7 @@ export default function SupplierProductsPage() {
                 onClick={() => setViewMode('table')}
                 className={`p-2 rounded-md transition-all ${
                   viewMode === 'table'
-                    ? 'bg-white text-[#2AA198] shadow-sm'
+                    ? 'bg-white text-[#8CB89C] shadow-sm'
                     : 'text-gray-400 hover:text-gray-600'
                 }`}
                 title="Table View"
@@ -421,7 +421,7 @@ export default function SupplierProductsPage() {
                 setCategoryFilter('all');
                 setAvailabilityFilter('all');
               }}
-              className="text-[#2AA198] hover:text-[#1A7A72] font-medium transition-colors"
+              className="text-[#8CB89C] hover:text-[#729E82] font-medium transition-colors"
             >
               Clear Filters
             </button>
@@ -490,13 +490,13 @@ export default function SupplierProductsPage() {
 
                 {/* Price */}
                 <div className="flex items-baseline gap-2">
-                  <span className="text-lg font-bold text-[#2AA198]">
+                  <span className="text-lg font-bold text-[#8CB89C]">
                     {formatCurrency(product.memberPrice)}
                   </span>
                   <span className="text-sm text-gray-400 line-through">
                     {formatCurrency(product.price)}
                   </span>
-                  <span className="text-[10px] font-medium text-[#2AA198] bg-[#2AA198]/10 px-1.5 py-0.5 rounded-full">
+                  <span className="text-[10px] font-medium text-[#8CB89C] bg-[#8CB89C]/10 px-1.5 py-0.5 rounded-full">
                     Member
                   </span>
                 </div>
@@ -531,7 +531,7 @@ export default function SupplierProductsPage() {
                 <div className="flex items-center gap-2 pt-2 border-t border-gray-100">
                   <Link
                     href={`/supplier/products/${product.id}`}
-                    className="flex-1 inline-flex items-center justify-center gap-1.5 bg-[#2AA198]/10 text-[#2AA198] hover:bg-[#2AA198]/20 px-3 py-2 rounded-lg text-xs font-medium transition-colors"
+                    className="flex-1 inline-flex items-center justify-center gap-1.5 bg-[#8CB89C]/10 text-[#8CB89C] hover:bg-[#8CB89C]/20 px-3 py-2 rounded-lg text-xs font-medium transition-colors"
                   >
                     <Eye className="w-3.5 h-3.5" />
                     View
@@ -619,7 +619,7 @@ export default function SupplierProductsPage() {
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.04 }}
-                    className="hover:bg-[#2AA198]/[0.02] transition-colors"
+                    className="hover:bg-[#8CB89C]/[0.02] transition-colors"
                   >
                     {/* Thumbnail */}
                     <td className="py-3 px-4">
@@ -657,7 +657,7 @@ export default function SupplierProductsPage() {
                       {formatCurrency(product.price)}
                     </td>
                     {/* Member Price */}
-                    <td className="py-3 px-4 text-right font-bold text-[#2AA198] tabular-nums text-sm">
+                    <td className="py-3 px-4 text-right font-bold text-[#8CB89C] tabular-nums text-sm">
                       {formatCurrency(product.memberPrice)}
                     </td>
                     {/* Stock Status */}
@@ -687,7 +687,7 @@ export default function SupplierProductsPage() {
                       <div className="flex items-center justify-center gap-1">
                         <Link
                           href={`/supplier/products/${product.id}`}
-                          className="p-2 rounded-lg text-[#2AA198] hover:bg-[#2AA198]/10 transition-colors"
+                          className="p-2 rounded-lg text-[#8CB89C] hover:bg-[#8CB89C]/10 transition-colors"
                           title="View"
                         >
                           <Eye className="w-4 h-4" />
@@ -743,14 +743,14 @@ export default function SupplierProductsPage() {
                 setCategoryFilter('all');
                 setAvailabilityFilter('all');
               }}
-              className="inline-flex items-center gap-2 bg-[#2AA198]/10 text-[#2AA198] hover:bg-[#2AA198]/20 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors"
+              className="inline-flex items-center gap-2 bg-[#8CB89C]/10 text-[#8CB89C] hover:bg-[#8CB89C]/20 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors"
             >
               Clear All Filters
             </button>
           ) : (
             <Link
               href="/supplier/products/new"
-              className="inline-flex items-center gap-2 bg-[#2AA198] hover:bg-[#1A7A72] text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors"
+              className="inline-flex items-center gap-2 bg-[#8CB89C] hover:bg-[#729E82] text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors"
             >
               <Plus className="w-4 h-4" />
               Add Your First Product

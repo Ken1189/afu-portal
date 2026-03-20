@@ -277,7 +277,7 @@ function FarmerCard({ farmer }: { farmer: FarmerProfile }) {
         ) : (
           <div
             className="w-full h-full flex items-center justify-center"
-            style={{ background: 'linear-gradient(135deg, #1B2A4A 0%, #2AA198 100%)' }}
+            style={{ background: 'linear-gradient(135deg, #1B2A4A 0%, #8CB89C 100%)' }}
           >
             <span className="text-white text-4xl font-bold opacity-60">{initials}</span>
           </div>

@@ -224,14 +224,14 @@ export default function SupplierProfilePage() {
         className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
       >
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#2AA198]/10 flex items-center justify-center">
-            <Building2 className="w-5 h-5 text-[#2AA198]" />
+          <div className="w-10 h-10 rounded-xl bg-[#8CB89C]/10 flex items-center justify-center">
+            <Building2 className="w-5 h-5 text-[#8CB89C]" />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-bold text-[#1B2A4A]">Company Profile</h1>
               {currentSupplier.verified && (
-                <span className="inline-flex items-center gap-1 bg-[#2AA198]/10 text-[#2AA198] text-xs font-semibold px-2.5 py-1 rounded-full">
+                <span className="inline-flex items-center gap-1 bg-[#8CB89C]/10 text-[#8CB89C] text-xs font-semibold px-2.5 py-1 rounded-full">
                   <CheckCircle2 className="w-3.5 h-3.5" />
                   Verified
                 </span>
@@ -254,7 +254,7 @@ export default function SupplierProfilePage() {
         <div className="flex flex-col sm:flex-row items-start gap-6">
           {/* Logo placeholder */}
           <div className="relative group">
-            <div className="w-24 h-24 rounded-2xl bg-[#2AA198] flex items-center justify-center text-white text-3xl font-bold shadow-lg">
+            <div className="w-24 h-24 rounded-2xl bg-[#8CB89C] flex items-center justify-center text-white text-3xl font-bold shadow-lg">
               ZA
             </div>
             <button className="absolute inset-0 w-24 h-24 rounded-2xl bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
@@ -314,7 +314,7 @@ export default function SupplierProfilePage() {
                   ({currentSupplier.reviewCount} reviews)
                 </span>
               </div>
-              <button className="text-xs text-[#2AA198] hover:text-[#1A7A72] font-medium flex items-center gap-1 transition-colors">
+              <button className="text-xs text-[#8CB89C] hover:text-[#729E82] font-medium flex items-center gap-1 transition-colors">
                 <Upload className="w-3.5 h-3.5" />
                 Upload Logo
               </button>
@@ -331,7 +331,7 @@ export default function SupplierProfilePage() {
         className="bg-white rounded-xl border border-gray-100 p-6"
       >
         <h3 className="font-semibold text-[#1B2A4A] text-base flex items-center gap-2 mb-5">
-          <FileText className="w-4.5 h-4.5 text-[#2AA198]" />
+          <FileText className="w-4.5 h-4.5 text-[#8CB89C]" />
           Company Details
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -344,7 +344,7 @@ export default function SupplierProfilePage() {
                 type="text"
                 value={companyName}
                 onChange={(e) => setCompanyName(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#2AA198]/30 focus:border-[#2AA198] transition-colors bg-gray-50"
+                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition-colors bg-gray-50"
               />
             </div>
           </div>
@@ -360,7 +360,7 @@ export default function SupplierProfilePage() {
                 type="text"
                 value={contactPerson}
                 onChange={(e) => setContactPerson(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#2AA198]/30 focus:border-[#2AA198] transition-colors bg-gray-50"
+                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition-colors bg-gray-50"
               />
             </div>
           </div>
@@ -374,7 +374,7 @@ export default function SupplierProfilePage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#2AA198]/30 focus:border-[#2AA198] transition-colors bg-gray-50"
+                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition-colors bg-gray-50"
               />
             </div>
           </div>
@@ -388,7 +388,7 @@ export default function SupplierProfilePage() {
                 type="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#2AA198]/30 focus:border-[#2AA198] transition-colors bg-gray-50"
+                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition-colors bg-gray-50"
               />
             </div>
           </div>
@@ -402,7 +402,7 @@ export default function SupplierProfilePage() {
                 type="url"
                 value={website}
                 onChange={(e) => setWebsite(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#2AA198]/30 focus:border-[#2AA198] transition-colors bg-gray-50"
+                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition-colors bg-gray-50"
               />
             </div>
           </div>
@@ -416,7 +416,7 @@ export default function SupplierProfilePage() {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={4}
-              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#2AA198]/30 focus:border-[#2AA198] transition-colors bg-gray-50 resize-none"
+              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition-colors bg-gray-50 resize-none"
             />
             <p className="text-[10px] text-gray-400 mt-1">{description.length}/500 characters</p>
           </div>
@@ -427,7 +427,7 @@ export default function SupplierProfilePage() {
             className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm ${
               companySaved
                 ? 'bg-green-500 text-white'
-                : 'bg-[#2AA198] hover:bg-[#1A7A72] text-white'
+                : 'bg-[#8CB89C] hover:bg-[#729E82] text-white'
             }`}
           >
             {companySaved ? (
@@ -453,7 +453,7 @@ export default function SupplierProfilePage() {
         className="bg-white rounded-xl border border-gray-100 p-6"
       >
         <h3 className="font-semibold text-[#1B2A4A] text-base flex items-center gap-2 mb-5">
-          <Briefcase className="w-4.5 h-4.5 text-[#2AA198]" />
+          <Briefcase className="w-4.5 h-4.5 text-[#8CB89C]" />
           Business Information
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -465,7 +465,7 @@ export default function SupplierProfilePage() {
               <select
                 value={country}
                 onChange={(e) => setCountry(e.target.value as typeof country)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#2AA198]/30 focus:border-[#2AA198] transition-colors bg-gray-50 appearance-none"
+                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition-colors bg-gray-50 appearance-none"
               >
                 <option value="Botswana">Botswana</option>
                 <option value="Zimbabwe">Zimbabwe</option>
@@ -483,7 +483,7 @@ export default function SupplierProfilePage() {
                 type="text"
                 value={region}
                 onChange={(e) => setRegion(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#2AA198]/30 focus:border-[#2AA198] transition-colors bg-gray-50"
+                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition-colors bg-gray-50"
               />
             </div>
           </div>
@@ -496,7 +496,7 @@ export default function SupplierProfilePage() {
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value as typeof category)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#2AA198]/30 focus:border-[#2AA198] transition-colors bg-gray-50 appearance-none"
+                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition-colors bg-gray-50 appearance-none"
               >
                 {categoryOptions.map((opt) => (
                   <option key={opt.value} value={opt.value}>
@@ -518,7 +518,7 @@ export default function SupplierProfilePage() {
                 type="text"
                 value={regNumber}
                 onChange={(e) => setRegNumber(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#2AA198]/30 focus:border-[#2AA198] transition-colors bg-gray-50"
+                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition-colors bg-gray-50"
               />
             </div>
           </div>
@@ -529,7 +529,7 @@ export default function SupplierProfilePage() {
             className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm ${
               businessSaved
                 ? 'bg-green-500 text-white'
-                : 'bg-[#2AA198] hover:bg-[#1A7A72] text-white'
+                : 'bg-[#8CB89C] hover:bg-[#729E82] text-white'
             }`}
           >
             {businessSaved ? (
@@ -556,10 +556,10 @@ export default function SupplierProfilePage() {
       >
         <div className="flex items-center justify-between mb-5">
           <h3 className="font-semibold text-[#1B2A4A] text-base flex items-center gap-2">
-            <CreditCard className="w-4.5 h-4.5 text-[#2AA198]" />
+            <CreditCard className="w-4.5 h-4.5 text-[#8CB89C]" />
             Banking Details
           </h3>
-          <button className="inline-flex items-center gap-1.5 bg-[#2AA198]/10 text-[#2AA198] hover:bg-[#2AA198]/20 px-4 py-2 rounded-lg text-xs font-medium transition-colors">
+          <button className="inline-flex items-center gap-1.5 bg-[#8CB89C]/10 text-[#8CB89C] hover:bg-[#8CB89C]/20 px-4 py-2 rounded-lg text-xs font-medium transition-colors">
             <Edit3 className="w-3.5 h-3.5" />
             Edit Banking
           </button>
@@ -605,12 +605,12 @@ export default function SupplierProfilePage() {
       >
         <div className="flex items-center justify-between mb-5">
           <h3 className="font-semibold text-[#1B2A4A] text-base flex items-center gap-2">
-            <Award className="w-4.5 h-4.5 text-[#2AA198]" />
+            <Award className="w-4.5 h-4.5 text-[#8CB89C]" />
             Certifications
           </h3>
           <button
             onClick={() => setShowAddCert(!showAddCert)}
-            className="inline-flex items-center gap-1.5 bg-[#2AA198]/10 text-[#2AA198] hover:bg-[#2AA198]/20 px-4 py-2 rounded-lg text-xs font-medium transition-colors"
+            className="inline-flex items-center gap-1.5 bg-[#8CB89C]/10 text-[#8CB89C] hover:bg-[#8CB89C]/20 px-4 py-2 rounded-lg text-xs font-medium transition-colors"
           >
             <Plus className="w-3.5 h-3.5" />
             Add Certification
@@ -625,13 +625,13 @@ export default function SupplierProfilePage() {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              className="inline-flex items-center gap-2 bg-[#2AA198]/10 text-[#2AA198] text-sm font-medium px-4 py-2 rounded-full"
+              className="inline-flex items-center gap-2 bg-[#8CB89C]/10 text-[#8CB89C] text-sm font-medium px-4 py-2 rounded-full"
             >
               <CheckCircle2 className="w-3.5 h-3.5" />
               {cert}
               <button
                 onClick={() => handleRemoveCertification(cert)}
-                className="hover:bg-[#2AA198]/20 rounded-full p-0.5 transition-colors"
+                className="hover:bg-[#8CB89C]/20 rounded-full p-0.5 transition-colors"
               >
                 <X className="w-3 h-3" />
               </button>
@@ -655,11 +655,11 @@ export default function SupplierProfilePage() {
               onChange={(e) => setNewCert(e.target.value)}
               placeholder="Enter certification name..."
               onKeyDown={(e) => e.key === 'Enter' && handleAddCertification()}
-              className="flex-1 px-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#2AA198]/30 focus:border-[#2AA198] transition-colors bg-gray-50"
+              className="flex-1 px-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition-colors bg-gray-50"
             />
             <button
               onClick={handleAddCertification}
-              className="bg-[#2AA198] hover:bg-[#1A7A72] text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors"
+              className="bg-[#8CB89C] hover:bg-[#729E82] text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors"
             >
               Add
             </button>
@@ -685,7 +685,7 @@ export default function SupplierProfilePage() {
       >
         <div className="flex items-center justify-between mb-5">
           <h3 className="font-semibold text-[#1B2A4A] text-base flex items-center gap-2">
-            <Eye className="w-4.5 h-4.5 text-[#2AA198]" />
+            <Eye className="w-4.5 h-4.5 text-[#8CB89C]" />
             Public Profile Preview
           </h3>
           <span className="text-xs text-gray-400">How your profile appears to buyers</span>
@@ -694,14 +694,14 @@ export default function SupplierProfilePage() {
         {/* Preview card */}
         <div className="border border-gray-200 rounded-xl p-5 bg-gradient-to-br from-gray-50 to-white max-w-md">
           <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-xl bg-[#2AA198] flex items-center justify-center text-white text-lg font-bold flex-shrink-0">
+            <div className="w-14 h-14 rounded-xl bg-[#8CB89C] flex items-center justify-center text-white text-lg font-bold flex-shrink-0">
               ZA
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
                 <h4 className="text-sm font-bold text-[#1B2A4A] truncate">{companyName}</h4>
                 {currentSupplier.verified && (
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#2AA198] flex-shrink-0" />
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#8CB89C] flex-shrink-0" />
                 )}
               </div>
               <div className="flex items-center gap-1 mb-1.5">
@@ -734,7 +734,7 @@ export default function SupplierProfilePage() {
                 {certifications.slice(0, 3).map((cert) => (
                   <span
                     key={cert}
-                    className="text-[9px] bg-[#2AA198]/10 text-[#2AA198] font-medium px-1.5 py-0.5 rounded-full"
+                    className="text-[9px] bg-[#8CB89C]/10 text-[#8CB89C] font-medium px-1.5 py-0.5 rounded-full"
                   >
                     {cert}
                   </span>

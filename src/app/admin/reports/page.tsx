@@ -72,7 +72,7 @@ interface ScheduledReport {
 // ── Mock Data ──
 const quickReports: QuickReport[] = [
   { id: 1, name: 'Monthly Summary', icon: <BarChart3 className="w-5 h-5" />, lastGenerated: 'Mar 1, 2026', color: 'text-[#1B2A4A]', bgColor: 'bg-[#1B2A4A]/10' },
-  { id: 2, name: 'Financial Overview', icon: <TrendingUp className="w-5 h-5" />, lastGenerated: 'Mar 5, 2026', color: 'text-[#2AA198]', bgColor: 'bg-[#2AA198]/10' },
+  { id: 2, name: 'Financial Overview', icon: <TrendingUp className="w-5 h-5" />, lastGenerated: 'Mar 5, 2026', color: 'text-[#8CB89C]', bgColor: 'bg-[#8CB89C]/10' },
   { id: 3, name: 'Member Growth', icon: <Users className="w-5 h-5" />, lastGenerated: 'Mar 3, 2026', color: 'text-blue-600', bgColor: 'bg-blue-50' },
   { id: 4, name: 'Export Performance', icon: <Ship className="w-5 h-5" />, lastGenerated: 'Feb 28, 2026', color: 'text-[#D4A843]', bgColor: 'bg-[#D4A843]/10' },
   { id: 5, name: 'Compliance Status', icon: <Shield className="w-5 h-5" />, lastGenerated: 'Mar 10, 2026', color: 'text-red-600', bgColor: 'bg-red-50' },
@@ -189,7 +189,7 @@ export default function AdminReportsPage() {
               <p className="text-[10px] text-gray-400 mb-3">Last: {qr.lastGenerated}</p>
               <button
                 onClick={() => { setReportType(qr.name); setActiveTab('generate'); }}
-                className="w-full py-1.5 text-xs font-medium text-[#2AA198] bg-[#2AA198]/10 rounded-lg hover:bg-[#2AA198]/20 transition-colors opacity-80 group-hover:opacity-100"
+                className="w-full py-1.5 text-xs font-medium text-[#8CB89C] bg-[#8CB89C]/10 rounded-lg hover:bg-[#8CB89C]/20 transition-colors opacity-80 group-hover:opacity-100"
               >
                 Generate
               </button>
@@ -228,7 +228,7 @@ export default function AdminReportsPage() {
                 <select
                   value={reportType}
                   onChange={(e) => setReportType(e.target.value)}
-                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2AA198]/50"
+                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/50"
                 >
                   {reportTypes.map((t) => (
                     <option key={t} value={t}>{t}</option>
@@ -242,7 +242,7 @@ export default function AdminReportsPage() {
                 <select
                   value={dateRange}
                   onChange={(e) => setDateRange(e.target.value)}
-                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2AA198]/50"
+                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/50"
                 >
                   <option value="this-month">This Month</option>
                   <option value="last-quarter">Last Quarter</option>
@@ -261,7 +261,7 @@ export default function AdminReportsPage() {
                       onClick={() => setExportFormat(fmt)}
                       className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg border-2 text-sm font-medium transition-all ${
                         exportFormat === fmt
-                          ? 'border-[#2AA198] bg-[#2AA198]/5 text-[#2AA198]'
+                          ? 'border-[#8CB89C] bg-[#8CB89C]/5 text-[#8CB89C]'
                           : 'border-gray-200 text-gray-500 hover:border-gray-300'
                       }`}
                     >
@@ -278,7 +278,7 @@ export default function AdminReportsPage() {
                 <select
                   value={filterCountry}
                   onChange={(e) => setFilterCountry(e.target.value)}
-                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2AA198]/50"
+                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/50"
                 >
                   <option value="all">All Countries</option>
                   <option value="zw">Zimbabwe</option>
@@ -295,7 +295,7 @@ export default function AdminReportsPage() {
                 <select
                   value={filterRegion}
                   onChange={(e) => setFilterRegion(e.target.value)}
-                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2AA198]/50"
+                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/50"
                 >
                   <option value="all">All Regions</option>
                   <option value="southern">Southern Africa</option>
@@ -310,7 +310,7 @@ export default function AdminReportsPage() {
                 <select
                   value={filterTier}
                   onChange={(e) => setFilterTier(e.target.value)}
-                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2AA198]/50"
+                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/50"
                 >
                   <option value="all">All Tiers</option>
                   <option value="a">Tier A - Commercial</option>
@@ -325,7 +325,7 @@ export default function AdminReportsPage() {
               {!generating && !generated && (
                 <button
                   onClick={handleGenerate}
-                  className="flex items-center gap-2 px-6 py-2.5 bg-[#2AA198] text-white rounded-lg text-sm font-semibold hover:bg-[#2AA198]/90 transition-colors shadow-sm"
+                  className="flex items-center gap-2 px-6 py-2.5 bg-[#8CB89C] text-white rounded-lg text-sm font-semibold hover:bg-[#8CB89C]/90 transition-colors shadow-sm"
                 >
                   <Play className="w-4 h-4" /> Generate Report
                 </button>
@@ -333,13 +333,13 @@ export default function AdminReportsPage() {
               {generating && (
                 <div className="flex-1 max-w-md">
                   <div className="flex items-center gap-2 mb-2">
-                    <Loader2 className="w-4 h-4 text-[#2AA198] animate-spin" />
+                    <Loader2 className="w-4 h-4 text-[#8CB89C] animate-spin" />
                     <span className="text-sm text-gray-600">Generating report...</span>
                     <span className="text-sm font-medium text-[#1B2A4A]">{Math.min(Math.round(progress), 100)}%</span>
                   </div>
                   <div className="w-full bg-gray-100 rounded-full h-2">
                     <div
-                      className="h-2 rounded-full bg-[#2AA198] transition-all duration-300"
+                      className="h-2 rounded-full bg-[#8CB89C] transition-all duration-300"
                       style={{ width: `${Math.min(progress, 100)}%` }}
                     />
                   </div>
@@ -400,7 +400,7 @@ export default function AdminReportsPage() {
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex gap-1.5">
-                          <button className="p-1.5 text-[#2AA198] bg-[#2AA198]/10 rounded-md hover:bg-[#2AA198]/20 transition-colors" title="Download">
+                          <button className="p-1.5 text-[#8CB89C] bg-[#8CB89C]/10 rounded-md hover:bg-[#8CB89C]/20 transition-colors" title="Download">
                             <Download className="w-3.5 h-3.5" />
                           </button>
                           <button className="p-1.5 text-blue-500 bg-blue-50 rounded-md hover:bg-blue-100 transition-colors" title="Share">
@@ -428,7 +428,7 @@ export default function AdminReportsPage() {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
                   <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                    sched.active ? 'bg-[#2AA198]/10 text-[#2AA198]' : 'bg-gray-100 text-gray-400'
+                    sched.active ? 'bg-[#8CB89C]/10 text-[#8CB89C]' : 'bg-gray-100 text-gray-400'
                   }`}>
                     <Clock className="w-5 h-5" />
                   </div>
@@ -451,7 +451,7 @@ export default function AdminReportsPage() {
                   <button
                     onClick={() => toggleSchedule(sched.id)}
                     className={`w-12 h-6 rounded-full transition-all flex items-center ${
-                      sched.active ? 'bg-[#2AA198] justify-end' : 'bg-gray-300 justify-start'
+                      sched.active ? 'bg-[#8CB89C] justify-end' : 'bg-gray-300 justify-start'
                     }`}
                   >
                     <div className="w-5 h-5 bg-white rounded-full shadow mx-0.5" />

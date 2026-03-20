@@ -174,8 +174,8 @@ function Chip({
       onClick={onClick}
       className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 border ${
         selected
-          ? 'bg-[#2AA198] text-white border-[#2AA198] shadow-md shadow-teal-500/20'
-          : 'bg-white text-gray-600 border-gray-200 hover:border-[#2AA198] hover:text-[#2AA198]'
+          ? 'bg-[#8CB89C] text-white border-[#8CB89C] shadow-md shadow-teal-500/20'
+          : 'bg-white text-gray-600 border-gray-200 hover:border-[#8CB89C] hover:text-[#8CB89C]'
       }`}
     >
       {label}
@@ -283,14 +283,14 @@ export default function OnboardingPage() {
               onClick={() => update('role', role.key)}
               className={`relative p-6 rounded-2xl border-2 transition-all duration-300 text-left ${
                 selected
-                  ? 'border-[#2AA198] bg-teal-50/50 shadow-lg shadow-teal-500/10'
+                  ? 'border-[#8CB89C] bg-teal-50/50 shadow-lg shadow-teal-500/10'
                   : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-md'
               }`}
             >
               {selected && (
                 <motion.div
                   layoutId="role-check"
-                  className="absolute top-3 right-3 w-6 h-6 rounded-full bg-[#2AA198] flex items-center justify-center"
+                  className="absolute top-3 right-3 w-6 h-6 rounded-full bg-[#8CB89C] flex items-center justify-center"
                 >
                   <Check className="w-4 h-4 text-white" />
                 </motion.div>
@@ -330,7 +330,7 @@ export default function OnboardingPage() {
           <select
             value={data.country}
             onChange={(e) => handleCountryChange(e.target.value)}
-            className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#2AA198] focus:border-transparent bg-white"
+            className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C] focus:border-transparent bg-white"
           >
             <option value="">Select your country</option>
             {COUNTRIES.map((c) => (
@@ -352,7 +352,7 @@ export default function OnboardingPage() {
             value={data.fullName}
             onChange={(e) => update('fullName', e.target.value)}
             placeholder="Enter your full name"
-            className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#2AA198] focus:border-transparent"
+            className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C] focus:border-transparent"
           />
         </div>
 
@@ -367,7 +367,7 @@ export default function OnboardingPage() {
             value={data.phone}
             onChange={(e) => update('phone', e.target.value)}
             placeholder="+263 7XX XXX XXX"
-            className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#2AA198] focus:border-transparent"
+            className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C] focus:border-transparent"
           />
         </div>
       </div>
@@ -380,7 +380,7 @@ export default function OnboardingPage() {
           className="space-y-4 pt-4 border-t border-gray-100"
         >
           <h3 className="font-semibold text-[#1B2A4A] flex items-center gap-2">
-            <Sprout className="w-5 h-5 text-[#2AA198]" />
+            <Sprout className="w-5 h-5 text-[#8CB89C]" />
             Farm Details
           </h3>
           <div className="grid gap-4 md:grid-cols-2">
@@ -391,12 +391,12 @@ export default function OnboardingPage() {
                 value={data.farmName}
                 onChange={(e) => update('farmName', e.target.value)}
                 placeholder="e.g. Green Valley Farm"
-                className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#2AA198] focus:border-transparent"
+                className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C] focus:border-transparent"
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Farm Size: <span className="text-[#2AA198] font-bold">{data.farmSize} ha</span>
+                Farm Size: <span className="text-[#8CB89C] font-bold">{data.farmSize} ha</span>
               </label>
               <input
                 type="range"
@@ -404,7 +404,7 @@ export default function OnboardingPage() {
                 max={500}
                 value={data.farmSize}
                 onChange={(e) => update('farmSize', Number(e.target.value))}
-                className="w-full h-2 rounded-lg appearance-none cursor-pointer accent-[#2AA198]"
+                className="w-full h-2 rounded-lg appearance-none cursor-pointer accent-[#8CB89C]"
               />
               <div className="flex justify-between text-xs text-gray-400 mt-1">
                 <span>1 ha</span>
@@ -433,7 +433,7 @@ export default function OnboardingPage() {
               type="button"
               onClick={() => update('hasLivestock', !data.hasLivestock)}
               className={`relative w-12 h-6 rounded-full transition-colors duration-200 ${
-                data.hasLivestock ? 'bg-[#2AA198]' : 'bg-gray-300'
+                data.hasLivestock ? 'bg-[#8CB89C]' : 'bg-gray-300'
               }`}
             >
               <span
@@ -454,7 +454,7 @@ export default function OnboardingPage() {
           className="space-y-4 pt-4 border-t border-gray-100"
         >
           <h3 className="font-semibold text-[#1B2A4A] flex items-center gap-2">
-            <Store className="w-5 h-5 text-[#2AA198]" />
+            <Store className="w-5 h-5 text-[#8CB89C]" />
             Company Details
           </h3>
           <div>
@@ -464,7 +464,7 @@ export default function OnboardingPage() {
               value={data.companyName}
               onChange={(e) => update('companyName', e.target.value)}
               placeholder="Your company name"
-              className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#2AA198] focus:border-transparent"
+              className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C] focus:border-transparent"
             />
           </div>
           <div>
@@ -490,7 +490,7 @@ export default function OnboardingPage() {
           className="space-y-4 pt-4 border-t border-gray-100"
         >
           <h3 className="font-semibold text-[#1B2A4A] flex items-center gap-2">
-            <Users className="w-5 h-5 text-[#2AA198]" />
+            <Users className="w-5 h-5 text-[#8CB89C]" />
             Organization Details
           </h3>
           <div>
@@ -500,7 +500,7 @@ export default function OnboardingPage() {
               value={data.organizationName}
               onChange={(e) => update('organizationName', e.target.value)}
               placeholder="Your organization"
-              className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#2AA198] focus:border-transparent"
+              className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C] focus:border-transparent"
             />
           </div>
           <div>
@@ -508,7 +508,7 @@ export default function OnboardingPage() {
             <select
               value={data.partnershipType}
               onChange={(e) => update('partnershipType', e.target.value)}
-              className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#2AA198] focus:border-transparent bg-white"
+              className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C] focus:border-transparent bg-white"
             >
               <option value="">Select type</option>
               {PARTNERSHIP_TYPES.map((pt) => (
@@ -542,7 +542,7 @@ export default function OnboardingPage() {
         <select
           value={data.preferredLanguage}
           onChange={(e) => update('preferredLanguage', e.target.value)}
-          className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#2AA198] focus:border-transparent bg-white"
+          className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C] focus:border-transparent bg-white"
         >
           {LANGUAGES.map((lang) => (
             <option key={lang} value={lang}>
@@ -569,7 +569,7 @@ export default function OnboardingPage() {
                 onClick={() => toggleArrayItem('notifications', ch.key)}
                 className={`flex items-center gap-2 px-4 py-3 rounded-xl border-2 transition-all duration-200 text-sm font-medium ${
                   selected
-                    ? 'border-[#2AA198] bg-teal-50 text-[#2AA198]'
+                    ? 'border-[#8CB89C] bg-teal-50 text-[#8CB89C]'
                     : 'border-gray-200 text-gray-500 hover:border-gray-300'
                 }`}
               >
@@ -595,7 +595,7 @@ export default function OnboardingPage() {
           type="text"
           value={data.currency}
           onChange={(e) => update('currency', e.target.value)}
-          className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#2AA198] focus:border-transparent"
+          className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C] focus:border-transparent"
         />
       </div>
     </div>
@@ -632,7 +632,7 @@ export default function OnboardingPage() {
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-          className="w-16 h-16 rounded-full bg-gradient-to-br from-[#2AA198] to-emerald-500 flex items-center justify-center mx-auto mb-4"
+          className="w-16 h-16 rounded-full bg-gradient-to-br from-[#8CB89C] to-emerald-500 flex items-center justify-center mx-auto mb-4"
         >
           <Check className="w-8 h-8 text-white" />
         </motion.div>
@@ -655,17 +655,17 @@ export default function OnboardingPage() {
             >
               <Link
                 href={rec.href}
-                className="flex items-center gap-4 p-4 rounded-2xl border border-gray-200 hover:border-[#2AA198] hover:shadow-md transition-all duration-200 group bg-white"
+                className="flex items-center gap-4 p-4 rounded-2xl border border-gray-200 hover:border-[#8CB89C] hover:shadow-md transition-all duration-200 group bg-white"
               >
                 <div
                   className={`w-10 h-10 rounded-xl bg-gradient-to-br ${rec.color} flex items-center justify-center shrink-0`}
                 >
                   <Icon className="w-5 h-5 text-white" />
                 </div>
-                <span className="text-sm font-medium text-[#1B2A4A] group-hover:text-[#2AA198] transition-colors">
+                <span className="text-sm font-medium text-[#1B2A4A] group-hover:text-[#8CB89C] transition-colors">
                   {rec.label}
                 </span>
-                <ChevronRight className="w-4 h-4 text-gray-400 ml-auto group-hover:text-[#2AA198] transition-colors" />
+                <ChevronRight className="w-4 h-4 text-gray-400 ml-auto group-hover:text-[#8CB89C] transition-colors" />
               </Link>
             </motion.div>
           );
@@ -677,7 +677,7 @@ export default function OnboardingPage() {
           type="button"
           onClick={handleComplete}
           disabled={submitting}
-          className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#1B2A4A] to-[#2AA198] text-white font-semibold text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2 disabled:opacity-60"
+          className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#1B2A4A] to-[#8CB89C] text-white font-semibold text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2 disabled:opacity-60"
         >
           {submitting ? (
             <>
@@ -714,7 +714,7 @@ export default function OnboardingPage() {
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${
                     idx < step
-                      ? 'bg-[#2AA198] text-white'
+                      ? 'bg-[#8CB89C] text-white'
                       : idx === step
                       ? 'bg-[#1B2A4A] text-white ring-4 ring-[#1B2A4A]/10'
                       : 'bg-gray-200 text-gray-500'
@@ -735,7 +735,7 @@ export default function OnboardingPage() {
           {/* Progress bar */}
           <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
             <motion.div
-              className="h-full bg-gradient-to-r from-[#1B2A4A] to-[#2AA198] rounded-full"
+              className="h-full bg-gradient-to-r from-[#1B2A4A] to-[#8CB89C] rounded-full"
               initial={false}
               animate={{ width: `${((step + 1) / 4) * 100}%` }}
               transition={{ duration: 0.4, ease: 'easeInOut' }}
@@ -792,7 +792,7 @@ export default function OnboardingPage() {
                   type="button"
                   onClick={goNext}
                   disabled={!canAdvance()}
-                  className="flex items-center gap-1.5 px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#1B2A4A] to-[#2AA198] text-white text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="flex items-center gap-1.5 px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#1B2A4A] to-[#8CB89C] text-white text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   Next
                   <ChevronRight className="w-4 h-4" />
@@ -805,7 +805,7 @@ export default function OnboardingPage() {
         {/* Footer */}
         <p className="text-center text-xs text-gray-400 mt-6">
           You can always update these settings later in your{' '}
-          <Link href="/dashboard/settings" className="text-[#2AA198] hover:underline">
+          <Link href="/dashboard/settings" className="text-[#8CB89C] hover:underline">
             account settings
           </Link>
           .

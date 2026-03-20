@@ -222,7 +222,7 @@ const topSellingData = [
 ];
 
 const demographicsData = [
-  { name: 'Smallholder', value: 45, color: '#2AA198' },
+  { name: 'Smallholder', value: 45, color: '#8CB89C' },
   { name: 'Commercial', value: 30, color: '#1B2A4A' },
   { name: 'Enterprise', value: 15, color: '#D4A843' },
   { name: 'Cooperative', value: 10, color: '#2D4A7A' },
@@ -707,8 +707,8 @@ export default function SupplierDetailPage() {
                       <AreaChart data={monthlySales} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
                         <defs>
                           <linearGradient id="salesGradient" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#2AA198" stopOpacity={0.3} />
-                            <stop offset="95%" stopColor="#2AA198" stopOpacity={0} />
+                            <stop offset="5%" stopColor="#8CB89C" stopOpacity={0.3} />
+                            <stop offset="95%" stopColor="#8CB89C" stopOpacity={0} />
                           </linearGradient>
                         </defs>
                         <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -718,12 +718,12 @@ export default function SupplierDetailPage() {
                         <Area
                           type="monotone"
                           dataKey="sales"
-                          stroke="#2AA198"
+                          stroke="#8CB89C"
                           strokeWidth={2.5}
                           fill="url(#salesGradient)"
                           name="Sales"
-                          dot={{ fill: '#2AA198', r: 3, strokeWidth: 0 }}
-                          activeDot={{ fill: '#2AA198', r: 5, strokeWidth: 2, stroke: '#fff' }}
+                          dot={{ fill: '#8CB89C', r: 3, strokeWidth: 0 }}
+                          activeDot={{ fill: '#8CB89C', r: 5, strokeWidth: 2, stroke: '#fff' }}
                         />
                       </AreaChart>
                     </ResponsiveContainer>

@@ -331,7 +331,7 @@ function RecordCard({ record, defaultExpanded = false }: { record: VetRecord; de
               <div className="mt-2">
                 <button
                   onClick={() => setExpanded(!expanded)}
-                  className="flex items-center gap-1 text-[11px] text-[#2AA198] font-medium hover:text-[#1A7A72] transition-colors"
+                  className="flex items-center gap-1 text-[11px] text-[#8CB89C] font-medium hover:text-[#729E82] transition-colors"
                 >
                   {expanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
                   {expanded ? 'Hide notes' : 'Show notes'}
@@ -439,7 +439,7 @@ function ScheduleItem({ record, isOverdue }: { record: VetRecord; isOverdue: boo
           <span className="text-[9px] text-gray-400">{daysLeft}d away</span>
         )}
       </div>
-      <button className="text-[10px] font-semibold text-[#2AA198] hover:text-[#1A7A72] px-2 py-1 rounded-lg hover:bg-teal-50 transition-colors shrink-0">
+      <button className="text-[10px] font-semibold text-[#8CB89C] hover:text-[#729E82] px-2 py-1 rounded-lg hover:bg-teal-50 transition-colors shrink-0">
         + Schedule
       </button>
     </motion.div>
@@ -666,7 +666,7 @@ export default function LivestockHealthPage() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="bg-gradient-to-br from-[#2AA198] via-[#2AA198] to-[#1B2A4A]/30 text-white"
+        className="bg-gradient-to-br from-[#8CB89C] via-[#8CB89C] to-[#1B2A4A]/30 text-white"
       >
         <div className="max-w-6xl mx-auto px-4 lg:px-6 py-8">
           <div className="flex items-start justify-between gap-4">
@@ -714,7 +714,7 @@ export default function LivestockHealthPage() {
             {
               label: 'Total Vet Visits',
               value: stats.totalVisits.toString(),
-              icon: <Activity size={20} className="text-[#2AA198]" />,
+              icon: <Activity size={20} className="text-[#8CB89C]" />,
               accent: 'bg-teal-50',
             },
             {
@@ -803,7 +803,7 @@ export default function LivestockHealthPage() {
                     <select
                       value={typeFilter}
                       onChange={(e) => setTypeFilter(e.target.value as RecordTypeFilter)}
-                      className="w-full text-xs border border-gray-200 rounded-lg px-3 py-2 text-gray-700 bg-white focus:border-[#2AA198] focus:ring-1 focus:ring-[#2AA198] outline-none transition-colors"
+                      className="w-full text-xs border border-gray-200 rounded-lg px-3 py-2 text-gray-700 bg-white focus:border-[#8CB89C] focus:ring-1 focus:ring-[#8CB89C] outline-none transition-colors"
                     >
                       {typeFilterOptions.map((opt) => (
                         <option key={opt.key} value={opt.key}>
@@ -821,7 +821,7 @@ export default function LivestockHealthPage() {
                     <select
                       value={animalFilter}
                       onChange={(e) => setAnimalFilter(e.target.value)}
-                      className="w-full text-xs border border-gray-200 rounded-lg px-3 py-2 text-gray-700 bg-white focus:border-[#2AA198] focus:ring-1 focus:ring-[#2AA198] outline-none transition-colors"
+                      className="w-full text-xs border border-gray-200 rounded-lg px-3 py-2 text-gray-700 bg-white focus:border-[#8CB89C] focus:ring-1 focus:ring-[#8CB89C] outline-none transition-colors"
                     >
                       <option value="all">All Animals</option>
                       {uniqueAnimals.map((a) => (
@@ -845,7 +845,7 @@ export default function LivestockHealthPage() {
                           className={`flex-1 text-[10px] font-medium py-2 px-1 rounded-lg border transition-all ${
                             dateRange === opt.key
                               ? 'bg-[#1B2A4A] text-white border-[#1B2A4A]'
-                              : 'bg-white text-gray-600 border-gray-200 hover:border-[#2AA198]'
+                              : 'bg-white text-gray-600 border-gray-200 hover:border-[#8CB89C]'
                           }`}
                         >
                           {opt.label}
@@ -866,7 +866,7 @@ export default function LivestockHealthPage() {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="Search records..."
-                        className="w-full text-xs border border-gray-200 rounded-lg pl-8 pr-3 py-2 text-gray-700 bg-white focus:border-[#2AA198] focus:ring-1 focus:ring-[#2AA198] outline-none transition-colors placeholder:text-gray-400"
+                        className="w-full text-xs border border-gray-200 rounded-lg pl-8 pr-3 py-2 text-gray-700 bg-white focus:border-[#8CB89C] focus:ring-1 focus:ring-[#8CB89C] outline-none transition-colors placeholder:text-gray-400"
                       />
                     </div>
                   </div>
@@ -945,7 +945,7 @@ export default function LivestockHealthPage() {
                   return (
                     <motion.div key={monthKey} variants={cardVariants}>
                       <div className="flex items-center gap-2 mb-3">
-                        <Calendar size={16} className="text-[#2AA198]" />
+                        <Calendar size={16} className="text-[#8CB89C]" />
                         <h3 className="text-sm font-bold text-[#1B2A4A]">{getMonthLabel(monthKey)}</h3>
                         <span className="text-[10px] bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full font-medium">
                           {items.length} record{items.length > 1 ? 's' : ''}
@@ -997,7 +997,7 @@ export default function LivestockHealthPage() {
                     className={`text-xs font-semibold px-4 py-2 rounded-xl border transition-all ${
                       treatmentFilter === f
                         ? 'bg-[#1B2A4A] text-white border-[#1B2A4A]'
-                        : 'bg-white text-gray-600 border-gray-200 hover:border-[#2AA198]'
+                        : 'bg-white text-gray-600 border-gray-200 hover:border-[#8CB89C]'
                     }`}
                   >
                     {f === 'active' ? 'Active Treatments' : 'Completed'}
@@ -1169,7 +1169,7 @@ export default function LivestockHealthPage() {
               {/* Calendar View */}
               <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm mb-6">
                 <h3 className="text-sm font-bold text-[#1B2A4A] mb-3 flex items-center gap-2">
-                  <Calendar size={16} className="text-[#2AA198]" />
+                  <Calendar size={16} className="text-[#8CB89C]" />
                   Upcoming Schedule (Next 90 Days)
                 </h3>
                 <div className="grid grid-cols-7 gap-1">
@@ -1195,7 +1195,7 @@ export default function LivestockHealthPage() {
                         key={dateStr}
                         className={`relative h-10 rounded-lg flex flex-col items-center justify-center gap-0.5 ${
                           isToday
-                            ? 'bg-[#2AA198]/10 border border-[#2AA198]'
+                            ? 'bg-[#8CB89C]/10 border border-[#8CB89C]'
                             : isPast
                               ? 'bg-gray-50 text-gray-300'
                               : 'hover:bg-gray-50'
@@ -1203,7 +1203,7 @@ export default function LivestockHealthPage() {
                       >
                         <span
                           className={`text-[10px] font-medium ${
-                            isToday ? 'text-[#2AA198] font-bold' : isPast ? 'text-gray-300' : 'text-gray-600'
+                            isToday ? 'text-[#8CB89C] font-bold' : isPast ? 'text-gray-300' : 'text-gray-600'
                           }`}
                         >
                           {date.getDate()}

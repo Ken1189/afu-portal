@@ -947,7 +947,7 @@ function EquipmentCard({
         <div className="mt-4 pt-3 border-t border-gray-100">
           <div className="text-xs text-gray-500 mb-1">Rental pricing</div>
           <div className="flex items-baseline gap-1 flex-wrap">
-            <span className="text-lg font-bold text-[#2AA198]">
+            <span className="text-lg font-bold text-[#8CB89C]">
               ${item.dailyRate}
             </span>
             <span className="text-xs text-gray-400">/day</span>
@@ -969,7 +969,7 @@ function EquipmentCard({
           {item.availability === 'available' ? (
             <Link
               href={`/farm/equipment/booking?id=${item.id}`}
-              className="w-full h-10 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 bg-[#2AA198] text-white hover:bg-[#1A7A72] active:scale-[0.97] transition-all"
+              className="w-full h-10 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 bg-[#8CB89C] text-white hover:bg-[#729E82] active:scale-[0.97] transition-all"
             >
               Book Now
               <ArrowRight size={16} />
@@ -1085,7 +1085,7 @@ function BookingCard({
           {booking.status === 'active' && (
             <button
               onClick={() => onExtend(booking.id)}
-              className="flex-1 h-9 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 bg-[#2AA198] text-white hover:bg-[#1A7A72] transition-colors"
+              className="flex-1 h-9 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 bg-[#8CB89C] text-white hover:bg-[#729E82] transition-colors"
             >
               <CalendarDays size={14} />
               Extend Rental
@@ -1240,7 +1240,7 @@ export default function EquipmentHirePage() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="bg-gradient-to-br from-[#1B2A4A] via-[#1B2A4A] to-[#2AA198]/30 text-white"
+        className="bg-gradient-to-br from-[#1B2A4A] via-[#1B2A4A] to-[#8CB89C]/30 text-white"
       >
         <div className="max-w-6xl mx-auto px-4 lg:px-6 py-8">
           <div className="flex items-start justify-between gap-4">
@@ -1282,7 +1282,7 @@ export default function EquipmentHirePage() {
             {
               label: 'Available Equipment',
               value: stats.availableCount.toString(),
-              icon: <Package size={20} className="text-[#2AA198]" />,
+              icon: <Package size={20} className="text-[#8CB89C]" />,
               accent: 'bg-teal-50',
             },
             {
@@ -1391,7 +1391,7 @@ export default function EquipmentHirePage() {
                       className={`flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-xl whitespace-nowrap transition-all border ${
                         isActive
                           ? 'bg-[#1B2A4A] text-white border-[#1B2A4A] shadow-sm'
-                          : 'bg-white text-gray-600 border-gray-200 hover:border-[#2AA198] hover:text-[#2AA198]'
+                          : 'bg-white text-gray-600 border-gray-200 hover:border-[#8CB89C] hover:text-[#8CB89C]'
                       }`}
                     >
                       {cat.icon}
@@ -1423,7 +1423,7 @@ export default function EquipmentHirePage() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search equipment, location, owner..."
-                    className="w-full h-10 pl-9 pr-4 rounded-xl border border-gray-200 bg-white text-sm text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#2AA198]/30 focus:border-[#2AA198] transition"
+                    className="w-full h-10 pl-9 pr-4 rounded-xl border border-gray-200 bg-white text-sm text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition"
                   />
                   {searchQuery && (
                     <button
@@ -1439,7 +1439,7 @@ export default function EquipmentHirePage() {
                 <div className="relative">
                   <button
                     onClick={() => setShowSortDropdown(!showSortDropdown)}
-                    className="flex items-center gap-2 h-10 px-4 rounded-xl border border-gray-200 bg-white text-sm text-gray-600 hover:border-[#2AA198] transition-colors"
+                    className="flex items-center gap-2 h-10 px-4 rounded-xl border border-gray-200 bg-white text-sm text-gray-600 hover:border-[#8CB89C] transition-colors"
                   >
                     <TrendingUp size={14} />
                     <span className="hidden sm:inline">
@@ -1464,7 +1464,7 @@ export default function EquipmentHirePage() {
                             }}
                             className={`w-full text-left text-sm px-4 py-2.5 hover:bg-gray-50 transition-colors ${
                               sortKey === opt.key
-                                ? 'text-[#2AA198] font-semibold bg-teal-50/50'
+                                ? 'text-[#8CB89C] font-semibold bg-teal-50/50'
                                 : 'text-gray-600'
                             }`}
                           >
@@ -1519,7 +1519,7 @@ export default function EquipmentHirePage() {
                       setSearchQuery('');
                       setSelectedCategory('all');
                     }}
-                    className="mt-4 text-xs font-semibold text-[#2AA198] hover:underline"
+                    className="mt-4 text-xs font-semibold text-[#8CB89C] hover:underline"
                   >
                     Clear all filters
                   </button>
@@ -1554,7 +1554,7 @@ export default function EquipmentHirePage() {
                       className={`flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-xl whitespace-nowrap transition-all border ${
                         isActive
                           ? 'bg-[#1B2A4A] text-white border-[#1B2A4A] shadow-sm'
-                          : 'bg-white text-gray-600 border-gray-200 hover:border-[#2AA198] hover:text-[#2AA198]'
+                          : 'bg-white text-gray-600 border-gray-200 hover:border-[#8CB89C] hover:text-[#8CB89C]'
                       }`}
                     >
                       {opt.label}
@@ -1608,7 +1608,7 @@ export default function EquipmentHirePage() {
                   </p>
                   <button
                     onClick={() => setActiveTab('browse')}
-                    className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-[#2AA198] hover:underline"
+                    className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-[#8CB89C] hover:underline"
                   >
                     Browse Equipment
                     <ArrowRight size={12} />
@@ -1680,7 +1680,7 @@ export default function EquipmentHirePage() {
                   </p>
                   <button
                     onClick={() => setActiveTab('browse')}
-                    className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-[#2AA198] hover:underline"
+                    className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-[#8CB89C] hover:underline"
                   >
                     Browse Equipment
                     <ArrowRight size={12} />

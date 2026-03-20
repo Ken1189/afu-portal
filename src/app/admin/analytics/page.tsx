@@ -46,7 +46,7 @@ type TabKey = 'overview' | 'members' | 'financial' | 'operations';
 // KPI data
 const kpis = [
   { label: 'Total Members', value: '342', change: '+12%', up: true, icon: <Users className="w-5 h-5" />, color: 'text-[#1B2A4A]', iconBg: 'bg-[#1B2A4A]/10' },
-  { label: 'Revenue (MTD)', value: '$487K', change: '+8.3%', up: true, icon: <DollarSign className="w-5 h-5" />, color: 'text-[#2AA198]', iconBg: 'bg-[#2AA198]/10' },
+  { label: 'Revenue (MTD)', value: '$487K', change: '+8.3%', up: true, icon: <DollarSign className="w-5 h-5" />, color: 'text-[#8CB89C]', iconBg: 'bg-[#8CB89C]/10' },
   { label: 'Active Loans', value: '89', change: '+5', up: true, icon: <CreditCard className="w-5 h-5" />, color: 'text-blue-600', iconBg: 'bg-blue-50' },
   { label: 'Marketplace GMV', value: '$1.2M', change: '+23%', up: true, icon: <Store className="w-5 h-5" />, color: 'text-purple-600', iconBg: 'bg-purple-50' },
   { label: 'Export Value', value: '$2.8M', change: '-3.1%', up: false, icon: <Ship className="w-5 h-5" />, color: 'text-[#D4A843]', iconBg: 'bg-[#D4A843]/10' },
@@ -89,7 +89,7 @@ const membersByCountry = [
 // Tier distribution
 const tierDistribution = [
   { tier: 'Tier A - Commercial', count: 145, percent: 42, color: 'bg-[#1B2A4A]' },
-  { tier: 'Tier B - Smallholder', count: 128, percent: 38, color: 'bg-[#2AA198]' },
+  { tier: 'Tier B - Smallholder', count: 128, percent: 38, color: 'bg-[#8CB89C]' },
   { tier: 'Tier C - Enterprise', count: 45, percent: 13, color: 'bg-[#D4A843]' },
   { tier: 'Partners', count: 24, percent: 7, color: 'bg-gray-400' },
 ];
@@ -238,7 +238,7 @@ export default function AdminAnalyticsPage() {
                   <div key={i} className="flex-1 flex flex-col items-center gap-1">
                     <span className="text-[10px] font-medium text-[#1B2A4A]">{m.count}</span>
                     <div
-                      className="w-full bg-[#2AA198] rounded-t-md transition-all hover:bg-[#2AA198]/80"
+                      className="w-full bg-[#8CB89C] rounded-t-md transition-all hover:bg-[#8CB89C]/80"
                       style={{ height: `${(m.count / maxMemberCount) * 100}%` }}
                     />
                     <span className="text-[9px] text-gray-400">{m.month}</span>
@@ -273,7 +273,7 @@ export default function AdminAnalyticsPage() {
               </h3>
               <div className="grid grid-cols-3 gap-4">
                 {[
-                  { label: 'Daily', value: activeUsers.daily, percent: Math.round((activeUsers.daily / 342) * 100), color: 'bg-[#2AA198]' },
+                  { label: 'Daily', value: activeUsers.daily, percent: Math.round((activeUsers.daily / 342) * 100), color: 'bg-[#8CB89C]' },
                   { label: 'Weekly', value: activeUsers.weekly, percent: Math.round((activeUsers.weekly / 342) * 100), color: 'bg-[#1B2A4A]' },
                   { label: 'Monthly', value: activeUsers.monthly, percent: Math.round((activeUsers.monthly / 342) * 100), color: 'bg-[#D4A843]' },
                 ].map((u, i) => (
@@ -281,7 +281,7 @@ export default function AdminAnalyticsPage() {
                     <div className="relative w-20 h-20 mx-auto mb-2">
                       <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 36 36">
                         <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#E5E7EB" strokeWidth="3" />
-                        <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke={u.color === 'bg-[#2AA198]' ? '#2AA198' : u.color === 'bg-[#1B2A4A]' ? '#1B2A4A' : '#D4A843'} strokeWidth="3" strokeDasharray={`${u.percent}, 100`} />
+                        <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke={u.color === 'bg-[#8CB89C]' ? '#8CB89C' : u.color === 'bg-[#1B2A4A]' ? '#1B2A4A' : '#D4A843'} strokeWidth="3" strokeDasharray={`${u.percent}, 100`} />
                       </svg>
                       <span className="absolute inset-0 flex items-center justify-center text-sm font-bold text-[#1B2A4A]">{u.percent}%</span>
                     </div>
@@ -306,7 +306,7 @@ export default function AdminAnalyticsPage() {
                     </div>
                     <div className="w-full bg-gray-100 rounded-full h-2">
                       <div
-                        className="h-2 rounded-full bg-[#2AA198]"
+                        className="h-2 rounded-full bg-[#8CB89C]"
                         style={{ width: `${f.usage}%` }}
                       />
                     </div>
@@ -355,7 +355,7 @@ export default function AdminAnalyticsPage() {
                 <div className="relative w-32 h-32 flex-shrink-0">
                   <svg viewBox="0 0 36 36" className="w-32 h-32 transform -rotate-90">
                     {tierDistribution.reduce<{ elements: React.ReactNode[], offset: number }>((acc, tier, i) => {
-                      const strokeColor = tier.color === 'bg-[#1B2A4A]' ? '#1B2A4A' : tier.color === 'bg-[#2AA198]' ? '#2AA198' : tier.color === 'bg-[#D4A843]' ? '#D4A843' : '#9CA3AF';
+                      const strokeColor = tier.color === 'bg-[#1B2A4A]' ? '#1B2A4A' : tier.color === 'bg-[#8CB89C]' ? '#8CB89C' : tier.color === 'bg-[#D4A843]' ? '#D4A843' : '#9CA3AF';
                       acc.elements.push(
                         <path
                           key={i}
@@ -402,7 +402,7 @@ export default function AdminAnalyticsPage() {
                   <div key={i} className="flex-1 flex flex-col items-center gap-1">
                     <span className="text-[10px] font-medium text-[#1B2A4A]">{g.rate}%</span>
                     <div
-                      className="w-full bg-[#2AA198] rounded-t-md transition-all"
+                      className="w-full bg-[#8CB89C] rounded-t-md transition-all"
                       style={{ height: `${(g.rate / Math.max(...growthRates.map((r) => r.rate))) * 100}%` }}
                     />
                     <span className="text-[9px] text-gray-400">{g.month}</span>
@@ -448,7 +448,7 @@ export default function AdminAnalyticsPage() {
                       <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 36 36">
                         <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#E5E7EB" strokeWidth="3" />
                         <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none"
-                          stroke={e.score >= 70 ? '#2AA198' : e.score >= 50 ? '#D4A843' : '#EF4444'}
+                          stroke={e.score >= 70 ? '#8CB89C' : e.score >= 50 ? '#D4A843' : '#EF4444'}
                           strokeWidth="3"
                           strokeDasharray={`${e.score}, 100`}
                         />
@@ -486,7 +486,7 @@ export default function AdminAnalyticsPage() {
                     </div>
                     <div className="w-full bg-gray-100 rounded-full h-2">
                       <div
-                        className="h-2 rounded-full bg-[#2AA198]"
+                        className="h-2 rounded-full bg-[#8CB89C]"
                         style={{ width: `${(loan.amount / totalLoanAmount) * 100}%` }}
                       />
                     </div>
@@ -558,7 +558,7 @@ export default function AdminAnalyticsPage() {
                   <p className="text-[10px] text-gray-500 mt-1">Outstanding Amount</p>
                 </div>
                 <div className="p-4 bg-gray-50 rounded-xl text-center">
-                  <p className="text-2xl font-bold text-[#2AA198]">$4.2M</p>
+                  <p className="text-2xl font-bold text-[#8CB89C]">$4.2M</p>
                   <p className="text-[10px] text-gray-500 mt-1">Total Deployed</p>
                 </div>
                 <div className="p-4 bg-green-50 rounded-xl text-center">
@@ -591,7 +591,7 @@ export default function AdminAnalyticsPage() {
                 </div>
                 <div className="p-3 bg-gray-50 rounded-lg">
                   <p className="text-xs text-gray-500">GMV</p>
-                  <p className="text-xl font-bold text-[#2AA198] mt-1">${(marketplaceMetrics.gmv / 1000000).toFixed(1)}M</p>
+                  <p className="text-xl font-bold text-[#8CB89C] mt-1">${(marketplaceMetrics.gmv / 1000000).toFixed(1)}M</p>
                 </div>
                 <div className="p-3 bg-gray-50 rounded-lg">
                   <p className="text-xs text-gray-500">Avg Order Value</p>
@@ -616,7 +616,7 @@ export default function AdminAnalyticsPage() {
                 </div>
                 <div className="p-3 bg-gray-50 rounded-lg">
                   <p className="text-xs text-gray-500">Avg Delivery (days)</p>
-                  <p className="text-xl font-bold text-[#2AA198] mt-1">{logisticsMetrics.avgDeliveryDays}</p>
+                  <p className="text-xl font-bold text-[#8CB89C] mt-1">{logisticsMetrics.avgDeliveryDays}</p>
                 </div>
                 <div className="p-3 bg-gray-50 rounded-lg">
                   <p className="text-xs text-gray-500">On-Time Rate</p>

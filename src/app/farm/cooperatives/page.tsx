@@ -446,7 +446,7 @@ export default function CooperativesPage() {
       {/* HEADER BANNER                                                     */}
       {/* ================================================================= */}
       <motion.section variants={itemVariants} className="px-4 lg:px-6">
-        <div className="rounded-2xl bg-gradient-to-br from-[#1B2A4A] to-[#2AA198] p-5 lg:p-8 text-white relative overflow-hidden">
+        <div className="rounded-2xl bg-gradient-to-br from-[#1B2A4A] to-[#8CB89C] p-5 lg:p-8 text-white relative overflow-hidden">
           {/* Decorative circles */}
           <div className="absolute -top-10 -right-10 w-36 h-36 bg-white/5 rounded-full" />
           <div className="absolute -bottom-8 -right-6 w-24 h-24 bg-white/5 rounded-full" />
@@ -550,8 +550,8 @@ export default function CooperativesPage() {
                 </div>
               </div>
               <div className="flex items-center gap-2.5 text-sm text-gray-600">
-                <div className="w-8 h-8 rounded-lg bg-[#2AA198]/10 flex items-center justify-center">
-                  <Phone size={15} className="text-[#2AA198]" />
+                <div className="w-8 h-8 rounded-lg bg-[#8CB89C]/10 flex items-center justify-center">
+                  <Phone size={15} className="text-[#8CB89C]" />
                 </div>
                 <div>
                   <p className="text-[11px] text-gray-400">Contact</p>
@@ -610,8 +610,8 @@ export default function CooperativesPage() {
             </div>
             <div className="p-4 lg:p-5 text-center">
               <div className="flex items-center justify-center mb-1.5">
-                <div className="w-8 h-8 rounded-lg bg-[#2AA198]/10 flex items-center justify-center">
-                  <Landmark size={16} className="text-[#2AA198]" />
+                <div className="w-8 h-8 rounded-lg bg-[#8CB89C]/10 flex items-center justify-center">
+                  <Landmark size={16} className="text-[#8CB89C]" />
                 </div>
               </div>
               <p className="text-xl lg:text-2xl font-bold text-[#1B2A4A]">
@@ -772,7 +772,7 @@ export default function CooperativesPage() {
           {activityLimit < myActivities.length && (
             <button
               onClick={() => setActivityLimit((prev) => prev + 5)}
-              className="w-full py-3 text-sm font-medium text-[#2AA198] hover:bg-[#2AA198]/5 active:bg-[#2AA198]/10 transition-colors border-t border-gray-50 flex items-center justify-center gap-1.5 min-h-[44px]"
+              className="w-full py-3 text-sm font-medium text-[#8CB89C] hover:bg-[#8CB89C]/5 active:bg-[#8CB89C]/10 transition-colors border-t border-gray-50 flex items-center justify-center gap-1.5 min-h-[44px]"
             >
               Load More
               <ChevronDown size={16} />
@@ -842,7 +842,7 @@ export default function CooperativesPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search cooperatives, regions, crops..."
-            className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 text-sm text-[#1B2A4A] placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#2AA198]/30 focus:border-[#2AA198] transition-all bg-white min-h-[44px]"
+            className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 text-sm text-[#1B2A4A] placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition-all bg-white min-h-[44px]"
           />
           {searchQuery && (
             <button
@@ -918,7 +918,7 @@ export default function CooperativesPage() {
                   {/* Stats row */}
                   <div className="flex items-center gap-4 mt-3 text-xs text-gray-500">
                     <span className="flex items-center gap-1">
-                      <Users size={12} className="text-[#2AA198]" />
+                      <Users size={12} className="text-[#8CB89C]" />
                       <span className="font-semibold text-[#1B2A4A]">
                         {coop.memberCount}
                       </span>{' '}
@@ -985,7 +985,7 @@ export default function CooperativesPage() {
                               <span>{coop.region}</span>
                             </div>
                             <div className="flex items-center gap-2 text-xs text-gray-500">
-                              <Mail size={12} className="text-[#2AA198]" />
+                              <Mail size={12} className="text-[#8CB89C]" />
                               <span className="truncate">{coop.contactEmail}</span>
                             </div>
                             <div className="flex items-center gap-2 text-xs text-gray-500">
@@ -1024,7 +1024,7 @@ export default function CooperativesPage() {
                     onClick={() =>
                       setExpandedCard(expandedCard === coop.id ? null : coop.id)
                     }
-                    className="flex items-center justify-center gap-1.5 w-full mt-3 py-2.5 rounded-xl text-xs font-semibold text-[#2AA198] bg-[#2AA198]/5 hover:bg-[#2AA198]/10 active:bg-[#2AA198]/15 transition-colors min-h-[40px]"
+                    className="flex items-center justify-center gap-1.5 w-full mt-3 py-2.5 rounded-xl text-xs font-semibold text-[#8CB89C] bg-[#8CB89C]/5 hover:bg-[#8CB89C]/10 active:bg-[#8CB89C]/15 transition-colors min-h-[40px]"
                   >
                     {expandedCard === coop.id ? 'Show Less' : 'Learn More'}
                     <ChevronDown
@@ -1059,7 +1059,7 @@ export default function CooperativesPage() {
                 setSearchQuery('');
                 setActiveFilter('All');
               }}
-              className="mt-3 text-xs font-medium text-[#2AA198] hover:underline"
+              className="mt-3 text-xs font-medium text-[#8CB89C] hover:underline"
             >
               Clear all filters
             </button>

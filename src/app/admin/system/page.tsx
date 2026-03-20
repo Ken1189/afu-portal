@@ -119,7 +119,7 @@ const statusStyles = {
 
 const jobStatusStyles = {
   completed: { label: 'Completed', color: 'text-emerald-400', icon: CheckCircle2 },
-  running:   { label: 'Running',   color: 'text-[#2AA198]',   icon: RefreshCw },
+  running:   { label: 'Running',   color: 'text-[#8CB89C]',   icon: RefreshCw },
   failed:    { label: 'Failed',    color: 'text-red-400',     icon: XCircle },
 };
 
@@ -143,7 +143,7 @@ export default function SystemHealthPage() {
       {/* Back link */}
       <Link
         href="/admin"
-        className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-[#2AA198] transition-colors"
+        className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-[#8CB89C] transition-colors"
       >
         <ArrowLeft className="w-4 h-4" />
         Back to Admin
@@ -158,7 +158,7 @@ export default function SystemHealthPage() {
       >
         <div>
           <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-            <Activity className="w-8 h-8 text-[#2AA198]" />
+            <Activity className="w-8 h-8 text-[#8CB89C]" />
             System Health
           </h1>
           <p className="text-slate-400 mt-1">Real-time infrastructure monitoring and diagnostics</p>
@@ -167,7 +167,7 @@ export default function SystemHealthPage() {
           onClick={handleRefresh}
           className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
             refreshing
-              ? 'bg-[#2AA198]/20 border-[#2AA198]/40 text-[#2AA198]'
+              ? 'bg-[#8CB89C]/20 border-[#8CB89C]/40 text-[#8CB89C]'
               : 'bg-[#1B2A4A]/60 border-white/10 text-slate-300 hover:text-white hover:border-white/20'
           }`}
         >
@@ -193,10 +193,10 @@ export default function SystemHealthPage() {
               <motion.div
                 key={svc.name}
                 variants={cardVariants}
-                className="bg-[#1B2A4A]/60 backdrop-blur border border-white/5 rounded-xl p-5 hover:border-[#2AA198]/20 transition-colors"
+                className="bg-[#1B2A4A]/60 backdrop-blur border border-white/5 rounded-xl p-5 hover:border-[#8CB89C]/20 transition-colors"
               >
                 <div className="flex items-center justify-between mb-4">
-                  <svc.icon className="w-5 h-5 text-[#2AA198]" />
+                  <svc.icon className="w-5 h-5 text-[#8CB89C]" />
                   <span className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full ${st.bg} ${st.color}`}>
                     <span className={`w-1.5 h-1.5 rounded-full ${st.dot} animate-pulse`} />
                     {st.label}
@@ -230,7 +230,7 @@ export default function SystemHealthPage() {
         >
           {storageMetrics.map((item) => {
             const pct = Math.round((item.used / item.total) * 100);
-            const barColor = pct > 80 ? 'bg-red-400' : pct > 60 ? 'bg-amber-400' : 'bg-[#2AA198]';
+            const barColor = pct > 80 ? 'bg-red-400' : pct > 60 ? 'bg-amber-400' : 'bg-[#8CB89C]';
             return (
               <motion.div
                 key={item.label}
@@ -287,7 +287,7 @@ export default function SystemHealthPage() {
                       <Clock className="w-3 h-3 inline mr-1.5 opacity-50" />
                       {err.timestamp}
                     </td>
-                    <td className="px-5 py-3 font-mono text-xs text-[#2AA198] whitespace-nowrap">{err.endpoint}</td>
+                    <td className="px-5 py-3 font-mono text-xs text-[#8CB89C] whitespace-nowrap">{err.endpoint}</td>
                     <td className="px-5 py-3">
                       <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-mono font-medium ${
                         err.status >= 500
@@ -349,7 +349,7 @@ export default function SystemHealthPage() {
                       <span className="text-slate-500">Queue</span>
                       <span className="text-slate-300">
                         <span className="text-[#D4A843]">{job.pending}</span> pending &middot;{' '}
-                        <span className="text-[#2AA198]">{job.processing}</span> processing
+                        <span className="text-[#8CB89C]">{job.processing}</span> processing
                       </span>
                     </div>
                   )}
@@ -397,7 +397,7 @@ export default function SystemHealthPage() {
                         animate={{ width: `${pct}%` }}
                         transition={{ duration: 0.6, ease: 'easeOut' }}
                         className={`h-full rounded-full ${
-                          pct > 80 ? 'bg-red-400' : pct > 60 ? 'bg-amber-400' : 'bg-[#2AA198]'
+                          pct > 80 ? 'bg-red-400' : pct > 60 ? 'bg-amber-400' : 'bg-[#8CB89C]'
                         }`}
                       />
                     </div>

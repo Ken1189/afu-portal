@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     "AFU is a vertically integrated agriculture development platform providing financing, inputs, processing, offtake, trade finance, and training across Africa.",
   keywords: ["agriculture", "Africa", "farming", "financing", "trade finance", "agri-bank"],
   manifest: "/manifest.json",
-  themeColor: "#2AA198",
+  themeColor: "#8CB89C",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",

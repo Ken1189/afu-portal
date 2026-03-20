@@ -228,7 +228,7 @@ const mockReviews: Review[] = [
 // -- Sentiment data -----------------------------------------------------------
 
 const sentimentData = [
-  { label: 'Positive', percentage: 78, color: 'bg-[#2AA198]' },
+  { label: 'Positive', percentage: 78, color: 'bg-[#8CB89C]' },
   { label: 'Neutral', percentage: 15, color: 'bg-[#D4A843]' },
   { label: 'Negative', percentage: 7, color: 'bg-red-400' },
 ];
@@ -277,8 +277,8 @@ export default function SupplierReviewsPage() {
         className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
       >
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#2AA198]/10 flex items-center justify-center">
-            <MessageSquare className="w-5 h-5 text-[#2AA198]" />
+          <div className="w-10 h-10 rounded-xl bg-[#8CB89C]/10 flex items-center justify-center">
+            <MessageSquare className="w-5 h-5 text-[#8CB89C]" />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-[#1B2A4A]">Reviews &amp; Ratings</h1>
@@ -324,8 +324,8 @@ export default function SupplierReviewsPage() {
           className="bg-white rounded-xl p-5 border border-gray-100"
         >
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-9 h-9 rounded-lg bg-[#2AA198]/10 flex items-center justify-center">
-              <MessageSquare className="w-5 h-5 text-[#2AA198]" />
+            <div className="w-9 h-9 rounded-lg bg-[#8CB89C]/10 flex items-center justify-center">
+              <MessageSquare className="w-5 h-5 text-[#8CB89C]" />
             </div>
           </div>
           <p className="text-3xl font-bold text-[#1B2A4A] tabular-nums">{totalReviews}</p>
@@ -377,7 +377,7 @@ export default function SupplierReviewsPage() {
                 setFilterStars(filterStars === item.stars ? null : item.stars)
               }
               className={`w-full flex items-center gap-3 group rounded-lg p-1.5 transition-colors ${
-                filterStars === item.stars ? 'bg-[#2AA198]/5' : 'hover:bg-gray-50'
+                filterStars === item.stars ? 'bg-[#8CB89C]/5' : 'hover:bg-gray-50'
               }`}
             >
               <div className="flex items-center gap-0.5 w-20 flex-shrink-0">
@@ -392,7 +392,7 @@ export default function SupplierReviewsPage() {
                   animate={{ width: `${item.percentage}%` }}
                   transition={{ duration: 0.8, delay: 0.1, ease: 'easeOut' }}
                   className={`h-3 rounded-full ${
-                    filterStars === item.stars ? 'bg-[#2AA198]' : 'bg-[#D4A843]'
+                    filterStars === item.stars ? 'bg-[#8CB89C]' : 'bg-[#D4A843]'
                   }`}
                 />
               </div>
@@ -408,7 +408,7 @@ export default function SupplierReviewsPage() {
         {filterStars && (
           <button
             onClick={() => setFilterStars(null)}
-            className="mt-3 text-xs text-[#2AA198] hover:text-[#1A7A72] font-medium transition-colors"
+            className="mt-3 text-xs text-[#8CB89C] hover:text-[#729E82] font-medium transition-colors"
           >
             Clear filter
           </button>
@@ -423,7 +423,7 @@ export default function SupplierReviewsPage() {
         className="bg-white rounded-xl border border-gray-100 p-5"
       >
         <h3 className="font-semibold text-[#1B2A4A] text-sm mb-4 flex items-center gap-2">
-          <ThumbsUp className="w-4 h-4 text-[#2AA198]" />
+          <ThumbsUp className="w-4 h-4 text-[#8CB89C]" />
           Sentiment Analysis
         </h3>
         <div className="space-y-3">
@@ -432,7 +432,7 @@ export default function SupplierReviewsPage() {
               <div className="flex items-center justify-between mb-1">
                 <div className="flex items-center gap-2">
                   {item.label === 'Positive' && (
-                    <ThumbsUp className="w-3.5 h-3.5 text-[#2AA198]" />
+                    <ThumbsUp className="w-3.5 h-3.5 text-[#8CB89C]" />
                   )}
                   {item.label === 'Neutral' && (
                     <Minus className="w-3.5 h-3.5 text-[#D4A843]" />
@@ -518,16 +518,16 @@ export default function SupplierReviewsPage() {
               {/* Product link */}
               <div className="flex items-center gap-1.5 mb-3">
                 <Package className="w-3.5 h-3.5 text-gray-400" />
-                <span className="text-xs text-[#2AA198] font-medium hover:text-[#1A7A72] cursor-pointer transition-colors">
+                <span className="text-xs text-[#8CB89C] font-medium hover:text-[#729E82] cursor-pointer transition-colors">
                   {review.productName}
                 </span>
               </div>
 
               {/* Existing response */}
               {review.response && (
-                <div className="bg-[#2AA198]/5 rounded-lg p-4 border-l-3 border-[#2AA198] mt-3">
+                <div className="bg-[#8CB89C]/5 rounded-lg p-4 border-l-3 border-[#8CB89C] mt-3">
                   <div className="flex items-center gap-2 mb-1.5">
-                    <div className="w-5 h-5 rounded bg-[#2AA198] flex items-center justify-center">
+                    <div className="w-5 h-5 rounded bg-[#8CB89C] flex items-center justify-center">
                       <span className="text-white text-[8px] font-bold">ZA</span>
                     </div>
                     <span className="text-xs font-semibold text-[#1B2A4A]">
@@ -543,7 +543,7 @@ export default function SupplierReviewsPage() {
               {!review.response && respondingTo !== review.id && (
                 <button
                   onClick={() => setRespondingTo(review.id)}
-                  className="inline-flex items-center gap-1.5 bg-[#2AA198]/10 text-[#2AA198] hover:bg-[#2AA198]/20 px-3.5 py-2 rounded-lg text-xs font-medium transition-colors mt-1"
+                  className="inline-flex items-center gap-1.5 bg-[#8CB89C]/10 text-[#8CB89C] hover:bg-[#8CB89C]/20 px-3.5 py-2 rounded-lg text-xs font-medium transition-colors mt-1"
                 >
                   <Send className="w-3.5 h-3.5" />
                   Respond
@@ -562,14 +562,14 @@ export default function SupplierReviewsPage() {
                     onChange={(e) => setResponseText(e.target.value)}
                     placeholder="Write your response..."
                     rows={3}
-                    className="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#2AA198]/30 focus:border-[#2AA198] transition-colors bg-gray-50 resize-none"
+                    className="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition-colors bg-gray-50 resize-none"
                     autoFocus
                   />
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => handleSubmitResponse(review.id)}
                       disabled={!responseText.trim()}
-                      className="inline-flex items-center gap-1.5 bg-[#2AA198] hover:bg-[#1A7A72] disabled:bg-gray-200 disabled:text-gray-400 text-white px-4 py-2 rounded-lg text-xs font-semibold transition-colors"
+                      className="inline-flex items-center gap-1.5 bg-[#8CB89C] hover:bg-[#729E82] disabled:bg-gray-200 disabled:text-gray-400 text-white px-4 py-2 rounded-lg text-xs font-semibold transition-colors"
                     >
                       <Send className="w-3.5 h-3.5" />
                       Submit Response
@@ -633,7 +633,7 @@ export default function SupplierReviewsPage() {
             {filterStars && (
               <button
                 onClick={() => setFilterStars(null)}
-                className="inline-flex items-center gap-2 bg-[#2AA198]/10 text-[#2AA198] hover:bg-[#2AA198]/20 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors"
+                className="inline-flex items-center gap-2 bg-[#8CB89C]/10 text-[#8CB89C] hover:bg-[#8CB89C]/20 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors"
               >
                 Clear Filter
               </button>

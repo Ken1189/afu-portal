@@ -535,13 +535,13 @@ export default function SupplierOrdersPage() {
         className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
       >
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#2AA198]/10 flex items-center justify-center">
-            <ShoppingCart className="w-5 h-5 text-[#2AA198]" />
+          <div className="w-10 h-10 rounded-xl bg-[#8CB89C]/10 flex items-center justify-center">
+            <ShoppingCart className="w-5 h-5 text-[#8CB89C]" />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-bold text-[#1B2A4A]">Orders</h1>
-              <span className="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#2AA198]/10 text-[#2AA198]">
+              <span className="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#8CB89C]/10 text-[#8CB89C]">
                 {orders.length}
               </span>
             </div>
@@ -572,7 +572,7 @@ export default function SupplierOrdersPage() {
             placeholder="Search by order ID, product, or buyer..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#2AA198]/30 focus:border-[#2AA198] transition-colors bg-gray-50 placeholder-gray-400"
+            className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition-colors bg-gray-50 placeholder-gray-400"
           />
         </div>
 
@@ -587,7 +587,7 @@ export default function SupplierOrdersPage() {
                 onClick={() => setActiveTab(tab.key)}
                 className={`relative flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
                   isActive
-                    ? 'bg-[#2AA198] text-white shadow-sm'
+                    ? 'bg-[#8CB89C] text-white shadow-sm'
                     : 'bg-gray-50 text-gray-500 hover:bg-gray-100 hover:text-[#1B2A4A]'
                 }`}
               >
@@ -658,7 +658,7 @@ export default function SupplierOrdersPage() {
 
                   {/* Amount */}
                   <div className="flex items-center lg:flex-col lg:items-end gap-3 lg:gap-1">
-                    <span className="text-xl font-bold text-[#2AA198] tabular-nums">
+                    <span className="text-xl font-bold text-[#8CB89C] tabular-nums">
                       {formatCurrency(order.amount)}
                     </span>
                     {order.deliveryDate && (
@@ -683,7 +683,7 @@ export default function SupplierOrdersPage() {
                   <div className="flex items-center gap-2">
                     <Link
                       href={`/supplier/orders/${order.id}`}
-                      className="inline-flex items-center gap-1.5 bg-[#2AA198]/10 text-[#2AA198] hover:bg-[#2AA198]/20 px-3.5 py-2 rounded-lg text-xs font-medium transition-colors"
+                      className="inline-flex items-center gap-1.5 bg-[#8CB89C]/10 text-[#8CB89C] hover:bg-[#8CB89C]/20 px-3.5 py-2 rounded-lg text-xs font-medium transition-colors"
                     >
                       <Eye className="w-3.5 h-3.5" />
                       View Details
@@ -770,7 +770,7 @@ export default function SupplierOrdersPage() {
                 setSearchQuery('');
                 setActiveTab('all');
               }}
-              className="inline-flex items-center gap-2 bg-[#2AA198]/10 text-[#2AA198] hover:bg-[#2AA198]/20 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors"
+              className="inline-flex items-center gap-2 bg-[#8CB89C]/10 text-[#8CB89C] hover:bg-[#8CB89C]/20 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors"
             >
               Clear Filters
             </button>
@@ -832,12 +832,12 @@ export default function SupplierOrdersPage() {
           className="bg-white rounded-xl border border-gray-100 p-4"
         >
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-8 h-8 rounded-lg bg-[#2AA198]/10 flex items-center justify-center">
-              <DollarSign className="w-4 h-4 text-[#2AA198]" />
+            <div className="w-8 h-8 rounded-lg bg-[#8CB89C]/10 flex items-center justify-center">
+              <DollarSign className="w-4 h-4 text-[#8CB89C]" />
             </div>
             <span className="text-xs text-gray-500">Total Revenue</span>
           </div>
-          <p className="text-2xl font-bold text-[#2AA198] tabular-nums">
+          <p className="text-2xl font-bold text-[#8CB89C] tabular-nums">
             {formatCurrency(orders.filter((o) => o.status !== 'cancelled').reduce((sum, o) => sum + o.amount, 0))}
           </p>
           <p className="text-[10px] text-gray-400 mt-0.5">Excl. cancelled orders</p>

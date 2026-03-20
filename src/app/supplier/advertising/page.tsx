@@ -260,8 +260,8 @@ export default function AdvertisingDashboard() {
       label: 'Active Campaigns',
       value: activeCampaigns.toString(),
       icon: <Megaphone className="w-5 h-5" />,
-      color: 'text-[#2AA198]',
-      bgColor: 'bg-[#2AA198]/10',
+      color: 'text-[#8CB89C]',
+      bgColor: 'bg-[#8CB89C]/10',
     },
     {
       label: 'Total Impressions',
@@ -355,7 +355,7 @@ export default function AdvertisingDashboard() {
         className="bg-white rounded-xl border border-gray-100 p-5"
       >
         <h3 className="font-semibold text-[#1B2A4A] text-sm mb-4 flex items-center gap-2">
-          <TrendingUp className="w-4 h-4 text-[#2AA198]" />
+          <TrendingUp className="w-4 h-4 text-[#8CB89C]" />
           Campaign Performance Overview
         </h3>
         <div className="h-64">
@@ -365,7 +365,7 @@ export default function AdvertisingDashboard() {
               <XAxis dataKey="name" tick={{ fontSize: 10, fill: '#9CA3AF' }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 11, fill: '#9CA3AF' }} axisLine={false} tickLine={false} tickFormatter={(v: number) => formatCompact(v)} />
               <Tooltip content={<CustomTooltip />} />
-              <Bar dataKey="impressions" fill="#2AA198" radius={[4, 4, 0, 0]} name="Impressions" />
+              <Bar dataKey="impressions" fill="#8CB89C" radius={[4, 4, 0, 0]} name="Impressions" />
               <Bar dataKey="clicks" fill="#D4A843" radius={[4, 4, 0, 0]} name="Clicks" />
             </BarChart>
           </ResponsiveContainer>
@@ -377,7 +377,7 @@ export default function AdvertisingDashboard() {
       ═════════════════════════════════════════════════════════════════ */}
       <motion.div variants={containerVariants} className="space-y-4">
         <h3 className="font-semibold text-[#1B2A4A] text-sm flex items-center gap-2">
-          <Megaphone className="w-4 h-4 text-[#2AA198]" />
+          <Megaphone className="w-4 h-4 text-[#8CB89C]" />
           Your Campaigns ({supplierAds.length})
         </h3>
 
@@ -494,7 +494,7 @@ export default function AdvertisingDashboard() {
                   <Target className="w-4 h-4 text-gray-400" />
                   <div>
                     <p className="text-xs text-gray-500">CTR</p>
-                    <p className="text-sm font-semibold text-[#2AA198] tabular-nums">{ad.ctr}%</p>
+                    <p className="text-sm font-semibold text-[#8CB89C] tabular-nums">{ad.ctr}%</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -534,7 +534,7 @@ export default function AdvertisingDashboard() {
                     animate={{ width: `${budgetPct}%` }}
                     transition={{ duration: 0.8, delay: 0.2 + i * 0.05, ease: 'easeOut' }}
                     className={`h-2.5 rounded-full ${
-                      budgetPct >= 90 ? 'bg-red-400' : budgetPct >= 70 ? 'bg-[#D4A843]' : 'bg-[#2AA198]'
+                      budgetPct >= 90 ? 'bg-red-400' : budgetPct >= 70 ? 'bg-[#D4A843]' : 'bg-[#8CB89C]'
                     }`}
                   />
                 </div>

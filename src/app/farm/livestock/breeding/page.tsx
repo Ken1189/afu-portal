@@ -315,8 +315,8 @@ function ActiveBreedingCard({ record }: { record: BreedingRecord }) {
                     progress >= 90
                       ? 'bg-gradient-to-r from-purple-500 to-pink-500'
                       : progress >= 50
-                        ? 'bg-gradient-to-r from-[#2AA198] to-purple-500'
-                        : 'bg-gradient-to-r from-[#2AA198] to-[#2AA198]'
+                        ? 'bg-gradient-to-r from-[#8CB89C] to-purple-500'
+                        : 'bg-gradient-to-r from-[#8CB89C] to-[#8CB89C]'
                   }`}
                 />
               </div>
@@ -341,7 +341,7 @@ function ActiveBreedingCard({ record }: { record: BreedingRecord }) {
           <button className="flex-1 h-9 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
             Update Status
           </button>
-          <button className="flex-1 h-9 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 bg-[#2AA198] text-white hover:bg-[#1A7A72] transition-colors">
+          <button className="flex-1 h-9 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 bg-[#8CB89C] text-white hover:bg-[#729E82] transition-colors">
             <Baby size={14} />
             Record Birth
           </button>
@@ -415,7 +415,7 @@ function HistoryCard({ record, defaultExpanded = false }: { record: BreedingReco
             {/* Expandable details */}
             <button
               onClick={() => setExpanded(!expanded)}
-              className="flex items-center gap-1 mt-2 text-[11px] text-[#2AA198] font-medium hover:text-[#1A7A72] transition-colors"
+              className="flex items-center gap-1 mt-2 text-[11px] text-[#8CB89C] font-medium hover:text-[#729E82] transition-colors"
             >
               {expanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
               {expanded ? 'Hide details' : 'Show details'}
@@ -462,7 +462,7 @@ function HistoryCard({ record, defaultExpanded = false }: { record: BreedingReco
                               {off.id && off.id.startsWith('ANM-') && (
                                 <Link
                                   href="/farm/livestock"
-                                  className="text-[10px] text-[#2AA198] hover:underline"
+                                  className="text-[10px] text-[#8CB89C] hover:underline"
                                 >
                                   View in herd
                                 </Link>
@@ -557,7 +557,7 @@ function OffspringGroupCard({
               {off.id && off.id.startsWith('ANM-') && (
                 <Link
                   href="/farm/livestock"
-                  className="text-[10px] font-semibold text-[#2AA198] hover:text-[#1A7A72] px-2 py-1 rounded-lg hover:bg-teal-50 transition-colors shrink-0"
+                  className="text-[10px] font-semibold text-[#8CB89C] hover:text-[#729E82] px-2 py-1 rounded-lg hover:bg-teal-50 transition-colors shrink-0"
                 >
                   View
                 </Link>
@@ -746,7 +746,7 @@ export default function LivestockBreedingPage() {
             {
               label: 'Success Rate',
               value: `${stats.successRate}%`,
-              icon: <TrendingUp size={20} className="text-[#2AA198]" />,
+              icon: <TrendingUp size={20} className="text-[#8CB89C]" />,
               accent: 'bg-teal-50',
             },
             {
@@ -873,7 +873,7 @@ export default function LivestockBreedingPage() {
                       className={`flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-xl whitespace-nowrap transition-all border ${
                         historyStatusFilter === opt.key
                           ? 'bg-[#1B2A4A] text-white border-[#1B2A4A] shadow-sm'
-                          : 'bg-white text-gray-600 border-gray-200 hover:border-[#2AA198] hover:text-[#2AA198]'
+                          : 'bg-white text-gray-600 border-gray-200 hover:border-[#8CB89C] hover:text-[#8CB89C]'
                       }`}
                     >
                       {opt.key !== 'all' && (
