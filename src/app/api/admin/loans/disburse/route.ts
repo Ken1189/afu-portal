@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 import { sendNotification } from '@/lib/notifications/engine';
 import { paymentReceivedTemplate } from '@/lib/notifications/templates';
+import { loanDisburseSchema } from '@/lib/validation/schemas';
 
 export async function POST(request: NextRequest) {
   try {
@@ -40,17 +41,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const body = await request.json();
-    const { loanId, amount, method, currency } = body as {
-      loanId: string;
-      amount: number;
-      method: string;
-      currency?: string;
-    };
-
-    if (!loanId || !amount || !method) {
-      return NextResponse.json({ error: 'loanId, amount, and method are required' }, { status: 400 });
+    const raw = await request.json();
+    const parsed = loanDisburseSchema.safeParse(raw);
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
     }
+    const { loanId, amount, method, currency } = parsed.data;
 
     // Verify loan exists and is approved
     const { data: loan, error: loanError } = await svc

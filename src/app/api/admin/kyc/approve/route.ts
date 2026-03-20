@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 import { sendNotification } from '@/lib/notifications/engine';
 import { kycVerifiedTemplate } from '@/lib/notifications/templates';
+import { kycApproveSchema } from '@/lib/validation/schemas';
 
 export async function POST(request: NextRequest) {
   try {
@@ -40,18 +41,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const body = await request.json();
-    const { memberId, action, tier, notes, documentId } = body as {
-      memberId: string;
-      action: 'approve' | 'reject';
-      tier?: number;
-      notes?: string;
-      documentId?: string;
-    };
-
-    if (!memberId || !['approve', 'reject'].includes(action)) {
-      return NextResponse.json({ error: 'memberId and action (approve|reject) required' }, { status: 400 });
+    const raw = await request.json();
+    const parsed = kycApproveSchema.safeParse(raw);
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
     }
+    const { memberId, action, tier, notes, documentId } = parsed.data;
 
     const newStatus = action === 'approve' ? 'verified' : 'rejected';
 

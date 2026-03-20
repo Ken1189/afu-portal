@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 import { sendNotification } from '@/lib/notifications/engine';
 import { loanApprovedTemplate } from '@/lib/notifications/templates';
+import { loanApproveSchema } from '@/lib/validation/schemas';
 
 export async function POST(request: NextRequest) {
   try {
@@ -40,16 +41,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const body = await request.json();
-    const { loanId, action, notes } = body as {
-      loanId: string;
-      action: 'approve' | 'reject';
-      notes?: string;
-    };
-
-    if (!loanId || !['approve', 'reject'].includes(action)) {
-      return NextResponse.json({ error: 'Invalid request: loanId and action (approve|reject) required' }, { status: 400 });
+    const raw = await request.json();
+    const parsed = loanApproveSchema.safeParse(raw);
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
     }
+    const { loanId, action, notes } = parsed.data;
 
     const newStatus = action === 'approve' ? 'approved' : 'rejected';
 

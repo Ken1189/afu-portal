@@ -7,6 +7,9 @@ export {
   createApplicationSchema,
   listApplicationsParams,
   updateSettingSchema,
+  loanApproveSchema,
+  loanDisburseSchema,
+  kycApproveSchema,
   validate,
   validateSearchParams,
 } from './schemas';

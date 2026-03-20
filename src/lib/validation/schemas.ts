@@ -88,6 +88,33 @@ export const updateSettingSchema = z.object({
   value: z.unknown(),
 });
 
+// ─── Admin: Loan Approve/Reject ─────────────────────────────
+
+export const loanApproveSchema = z.object({
+  loanId: uuid,
+  action: z.enum(['approve', 'reject']),
+  notes: z.string().max(1000).optional(),
+});
+
+// ─── Admin: Loan Disburse ───────────────────────────────────
+
+export const loanDisburseSchema = z.object({
+  loanId: uuid,
+  amount: z.number().positive('Amount must be positive'),
+  method: z.string().min(1, 'Disbursement method is required'),
+  currency: z.string().length(3).default('USD'),
+});
+
+// ─── Admin: KYC Approve/Reject ──────────────────────────────
+
+export const kycApproveSchema = z.object({
+  memberId: uuid,
+  action: z.enum(['approve', 'reject']),
+  tier: z.number().int().min(1).max(3).optional(),
+  notes: z.string().max(1000).optional(),
+  documentId: z.string().uuid().optional(),
+});
+
 // ─── Validation helper ───────────────────────────────────────
 
 export type ValidationResult<T> =
