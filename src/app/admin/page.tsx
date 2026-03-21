@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { createClient } from '@/lib/supabase/client';
 import {
   BarChart,
   Bar,
@@ -47,50 +48,50 @@ import {
 // ── Inline fallback data (replaces former @/lib/data/* mock imports) ─────────
 
 const FALLBACK_STATS = {
-  totalMembers: 247,
-  membersByCountry: { Botswana: 48, Zimbabwe: 112, Tanzania: 87 } as Record<string, number>,
-  totalLoansDeployed: 4_200_000,
-  activeLoans: 89,
-  defaultRate: 2.3,
-  monthlyRevenue: 127_000,
-  revenueGrowth: 18.5,
-  pendingApplications: 15,
-  memberGrowth: [45, 62, 78, 95, 112, 134, 152, 170, 189, 210, 231, 247],
+  totalMembers: 0,
+  membersByCountry: { Botswana: 0, Zimbabwe: 0, Tanzania: 0 } as Record<string, number>,
+  totalLoansDeployed: 0,
+  activeLoans: 0,
+  defaultRate: 0,
+  monthlyRevenue: 0,
+  revenueGrowth: 0,
+  pendingApplications: 0,
+  memberGrowth: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   memberGrowthLabels: ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'],
   loanPortfolio: [
-    { month: 'Apr', workingCapital: 180000, invoiceFinance: 95000, equipment: 45000, inputBundle: 22000 },
-    { month: 'May', workingCapital: 210000, invoiceFinance: 110000, equipment: 52000, inputBundle: 28000 },
-    { month: 'Jun', workingCapital: 245000, invoiceFinance: 125000, equipment: 60000, inputBundle: 35000 },
-    { month: 'Jul', workingCapital: 280000, invoiceFinance: 140000, equipment: 68000, inputBundle: 42000 },
-    { month: 'Aug', workingCapital: 310000, invoiceFinance: 155000, equipment: 75000, inputBundle: 48000 },
-    { month: 'Sep', workingCapital: 340000, invoiceFinance: 170000, equipment: 82000, inputBundle: 55000 },
-    { month: 'Oct', workingCapital: 370000, invoiceFinance: 185000, equipment: 88000, inputBundle: 60000 },
-    { month: 'Nov', workingCapital: 395000, invoiceFinance: 198000, equipment: 92000, inputBundle: 65000 },
-    { month: 'Dec', workingCapital: 420000, invoiceFinance: 210000, equipment: 98000, inputBundle: 70000 },
-    { month: 'Jan', workingCapital: 450000, invoiceFinance: 225000, equipment: 105000, inputBundle: 75000 },
-    { month: 'Feb', workingCapital: 480000, invoiceFinance: 240000, equipment: 110000, inputBundle: 80000 },
-    { month: 'Mar', workingCapital: 510000, invoiceFinance: 255000, equipment: 115000, inputBundle: 85000 },
+    { month: 'Apr', workingCapital: 0, invoiceFinance: 0, equipment: 0, inputBundle: 0 },
+    { month: 'May', workingCapital: 0, invoiceFinance: 0, equipment: 0, inputBundle: 0 },
+    { month: 'Jun', workingCapital: 0, invoiceFinance: 0, equipment: 0, inputBundle: 0 },
+    { month: 'Jul', workingCapital: 0, invoiceFinance: 0, equipment: 0, inputBundle: 0 },
+    { month: 'Aug', workingCapital: 0, invoiceFinance: 0, equipment: 0, inputBundle: 0 },
+    { month: 'Sep', workingCapital: 0, invoiceFinance: 0, equipment: 0, inputBundle: 0 },
+    { month: 'Oct', workingCapital: 0, invoiceFinance: 0, equipment: 0, inputBundle: 0 },
+    { month: 'Nov', workingCapital: 0, invoiceFinance: 0, equipment: 0, inputBundle: 0 },
+    { month: 'Dec', workingCapital: 0, invoiceFinance: 0, equipment: 0, inputBundle: 0 },
+    { month: 'Jan', workingCapital: 0, invoiceFinance: 0, equipment: 0, inputBundle: 0 },
+    { month: 'Feb', workingCapital: 0, invoiceFinance: 0, equipment: 0, inputBundle: 0 },
+    { month: 'Mar', workingCapital: 0, invoiceFinance: 0, equipment: 0, inputBundle: 0 },
   ],
   revenueBreakdown: [
-    { source: 'Interest Income', amount: 68000, color: '#8CB89C' },
-    { source: 'Membership Fees', amount: 24000, color: '#1B2A4A' },
-    { source: 'Origination Fees', amount: 18000, color: '#D4A843' },
-    { source: 'Partner Fees', amount: 12000, color: '#2D4A7A' },
-    { source: 'Training Revenue', amount: 5000, color: '#729E82' },
+    { source: 'Interest Income', amount: 0, color: '#8CB89C' },
+    { source: 'Membership Fees', amount: 0, color: '#1B2A4A' },
+    { source: 'Origination Fees', amount: 0, color: '#D4A843' },
+    { source: 'Partner Fees', amount: 0, color: '#2D4A7A' },
+    { source: 'Training Revenue', amount: 0, color: '#729E82' },
   ],
   applicationPipeline: [
-    { stage: 'New', count: 4, color: '#60A5FA' },
-    { stage: 'Documents Review', count: 3, color: '#FBBF24' },
-    { stage: 'Credit Assessment', count: 3, color: '#F97316' },
-    { stage: 'Approved', count: 3, color: '#34D399' },
-    { stage: 'Disbursed', count: 2, color: '#8CB89C' },
+    { stage: 'New', count: 0, color: '#60A5FA' },
+    { stage: 'Documents Review', count: 0, color: '#FBBF24' },
+    { stage: 'Credit Assessment', count: 0, color: '#F97316' },
+    { stage: 'Approved', count: 0, color: '#34D399' },
+    { stage: 'Disbursed', count: 0, color: '#8CB89C' },
   ],
   milestones: [
-    { label: '500 Members', target: 500, current: 247, deadline: 'Q4 2026' },
-    { label: '$10M Deployed', target: 10_000_000, current: 4_200_000, deadline: 'Q2 2027' },
-    { label: '3 Countries', target: 3, current: 3, deadline: 'Q1 2026' },
-    { label: 'Default Rate <5%', target: 5, current: 2.3, deadline: 'Ongoing', inverted: true },
-    { label: '60% Training Rate', target: 60, current: 60.3, deadline: 'Q1 2026' },
+    { label: '500 Members', target: 500, current: 0, deadline: 'Q4 2026' },
+    { label: '$10M Deployed', target: 10_000_000, current: 0, deadline: 'Q2 2027' },
+    { label: '3 Countries', target: 3, current: 0, deadline: 'Q1 2026' },
+    { label: 'Default Rate <5%', target: 5, current: 0, deadline: 'Ongoing', inverted: true },
+    { label: '60% Training Rate', target: 60, current: 0, deadline: 'Q1 2026' },
   ],
 };
 
@@ -104,16 +105,7 @@ interface FallbackActivity {
   icon: string;
 }
 
-const FALLBACK_ACTIVITIES: FallbackActivity[] = [
-  { id: 'ACT-001', memberId: 'AFU-2024-005', memberName: 'Grace Moyo', type: 'application', description: 'Submitted financing application for $45,000 working capital', timestamp: '2026-03-13T09:15:00Z', icon: 'FileText' },
-  { id: 'ACT-002', memberId: 'AFU-2024-025', memberName: 'Rumbidzai Chikore', type: 'application', description: 'Submitted financing application for $6,500', timestamp: '2026-03-13T08:42:00Z', icon: 'FileText' },
-  { id: 'ACT-003', memberId: 'AFU-2024-018', memberName: 'Amina Salim', type: 'document', description: 'Uploaded invoice from EuroFruit GmbH', timestamp: '2026-03-12T16:30:00Z', icon: 'Upload' },
-  { id: 'ACT-004', memberId: 'AFU-2024-022', memberName: 'Farai Ndlovu', type: 'training', description: 'Completed "Drip Irrigation Setup & Management" course', timestamp: '2026-03-12T14:20:00Z', icon: 'GraduationCap' },
-  { id: 'ACT-005', memberId: 'AFU-2024-033', memberName: 'Nyasha Mutasa', type: 'application', description: 'Submitted financing application for $38,000 working capital', timestamp: '2026-03-12T11:00:00Z', icon: 'FileText' },
-  { id: 'ACT-006', memberId: 'AFU-2024-041', memberName: 'Baraka Mushi', type: 'contract', description: 'Logged delivery: 15,000kg sesame to Dubai Fresh Markets', timestamp: '2026-03-12T08:30:00Z', icon: 'Truck' },
-  { id: 'ACT-007', memberId: 'AFU-2024-012', memberName: 'Tendai Chirwa', type: 'document', description: 'Uploaded farm photos (3 images)', timestamp: '2026-03-11T15:45:00Z', icon: 'Image' },
-  { id: 'ACT-008', memberId: 'AFU-2024-003', memberName: 'John Maseko', type: 'payment', description: 'Payment of $1,800 received for loan FIN-2026-002', timestamp: '2026-03-11T10:20:00Z', icon: 'DollarSign' },
-];
+const FALLBACK_ACTIVITIES: FallbackActivity[] = [];
 
 interface FallbackApplication {
   id: string;
@@ -127,16 +119,7 @@ interface FallbackApplication {
   crop: string;
 }
 
-const FALLBACK_APPLICATIONS: FallbackApplication[] = [
-  { id: 'APP-2026-001', memberId: 'AFU-2024-005', memberName: 'Grace Moyo', type: 'working-capital', amount: 45000, status: 'new', submittedDate: '2026-03-11', assignedOfficer: 'Unassigned', crop: 'Blueberries' },
-  { id: 'APP-2026-002', memberId: 'AFU-2024-012', memberName: 'Tendai Chirwa', type: 'input-bundle', amount: 3500, status: 'documents-review', submittedDate: '2026-03-08', assignedOfficer: 'Lebo Molefe', crop: 'Cassava' },
-  { id: 'APP-2026-003', memberId: 'AFU-2024-018', memberName: 'Amina Salim', type: 'invoice-finance', amount: 78000, status: 'credit-assessment', submittedDate: '2026-03-05', assignedOfficer: 'David Nkomo', crop: 'Sesame' },
-  { id: 'APP-2026-004', memberId: 'AFU-2024-003', memberName: 'John Maseko', type: 'working-capital', amount: 8000, status: 'approved', submittedDate: '2026-02-28', assignedOfficer: 'Lebo Molefe', crop: 'Sorghum' },
-  { id: 'APP-2026-005', memberId: 'AFU-2024-022', memberName: 'Farai Ndlovu', type: 'equipment', amount: 12000, status: 'new', submittedDate: '2026-03-12', assignedOfficer: 'Unassigned', crop: 'Blueberries' },
-  { id: 'APP-2026-006', memberId: 'AFU-2024-031', memberName: 'Halima Mwanga', type: 'working-capital', amount: 95000, status: 'documents-review', submittedDate: '2026-03-06', assignedOfficer: 'David Nkomo', crop: 'Cassava' },
-  { id: 'APP-2026-007', memberId: 'AFU-2024-009', memberName: 'Kago Setshedi', type: 'input-bundle', amount: 2200, status: 'approved', submittedDate: '2026-03-01', assignedOfficer: 'Lebo Molefe', crop: 'Groundnuts' },
-  { id: 'APP-2026-008', memberId: 'AFU-2024-015', memberName: 'Tinashe Gumbo', type: 'working-capital', amount: 5000, status: 'rejected', submittedDate: '2026-02-20', assignedOfficer: 'David Nkomo', crop: 'Maize' },
-];
+const FALLBACK_APPLICATIONS: FallbackApplication[] = [];
 
 // Types for live API data
 interface LiveStats {
@@ -318,6 +301,7 @@ function CustomTooltip({
 export default function AdminDashboard() {
   const [selectedPipelineStage, setSelectedPipelineStage] = useState<string | null>(null);
   const [live, setLive] = useState<LiveStats | null>(null);
+  const [realApplications, setRealApplications] = useState<FallbackApplication[] | null>(null);
 
   // Fetch live stats from API
   useEffect(() => {
@@ -327,8 +311,58 @@ export default function AdminDashboard() {
       .catch(() => { /* fallback to mock */ });
   }, []);
 
-  // ── Country distribution — use mock fallback (API doesn't break out by country yet) ──
-  const countryData = defaultCountryData;
+  // Fetch recent applications directly from Supabase
+  useEffect(() => {
+    const supabase = createClient();
+    (async () => {
+      const { data, error } = await supabase
+        .from('membership_applications')
+        .select('id, status, created_at, full_name, email, country, membership_tier')
+        .order('created_at', { ascending: false })
+        .limit(8);
+      if (!error && data && data.length > 0) {
+        setRealApplications(data.map((a: Record<string, unknown>, i: number) => ({
+          id: `APP-${String(i + 1).padStart(3, '0')}`,
+          memberId: '',
+          memberName: (a.full_name as string) || (a.email as string) || 'Unknown',
+          type: (a.membership_tier as string) || 'membership',
+          amount: 0,
+          status: (a.status as string) || 'pending',
+          submittedDate: (a.created_at as string)?.slice(0, 10) || '',
+          assignedOfficer: 'Unassigned',
+          crop: (a.country as string) || '',
+        })));
+      }
+    })();
+  }, []);
+
+  // ── Country distribution — fetch real data from profiles table ──
+  const [liveCountryData, setLiveCountryData] = useState<{ country: string; count: number; flag: string }[] | null>(null);
+  useEffect(() => {
+    const supabase = createClient();
+    (async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('country');
+      if (!error && data && data.length > 0) {
+        const countryFlags: Record<string, string> = {
+          'Zimbabwe': '\u{1F1FF}\u{1F1FC}', 'Tanzania': '\u{1F1F9}\u{1F1FF}', 'Botswana': '\u{1F1E7}\u{1F1FC}',
+          'Kenya': '\u{1F1F0}\u{1F1EA}', 'South Africa': '\u{1F1FF}\u{1F1E6}', 'Zambia': '\u{1F1FF}\u{1F1F2}',
+          'Mozambique': '\u{1F1F2}\u{1F1FF}', 'Malawi': '\u{1F1F2}\u{1F1FC}', 'Namibia': '\u{1F1F3}\u{1F1E6}',
+        };
+        const counts: Record<string, number> = {};
+        data.forEach((p: { country: string | null }) => {
+          const c = p.country || 'Unknown';
+          counts[c] = (counts[c] || 0) + 1;
+        });
+        const sorted = Object.entries(counts)
+          .sort((a, b) => b[1] - a[1])
+          .map(([country, count]) => ({ country, count, flag: countryFlags[country] || '\u{1F30D}' }));
+        setLiveCountryData(sorted);
+      }
+    })();
+  }, []);
+  const countryData = liveCountryData ?? defaultCountryData;
   const maxCountryCount = Math.max(...countryData.map((c) => c.count), 1);
   const totalMemberCount = live?.members.total ?? FALLBACK_STATS.totalMembers;
 
@@ -337,7 +371,7 @@ export default function AdminDashboard() {
     {
       label: 'Total Members',
       value: (live?.members.total ?? FALLBACK_STATS.totalMembers).toString(),
-      change: live ? `${live.members.active} active` : '+15%',
+      change: live ? `${live.members.active} active` : null,
       changeType: 'up' as const,
       icon: <Users className="w-5 h-5" />,
       color: 'text-teal',
@@ -390,7 +424,7 @@ export default function AdminDashboard() {
     },
   ];
 
-  const first8Apps = FALLBACK_APPLICATIONS.slice(0, 8);
+  const first8Apps = realApplications ?? FALLBACK_APPLICATIONS.slice(0, 8);
 
   // Map live audit log entries to activity format, fall back to mock
   const first8Activities: FallbackActivity[] = (live?.recentActivity && live.recentActivity.length > 0)
@@ -598,44 +632,53 @@ export default function AdminDashboard() {
       >
         <h3 className="font-semibold text-navy text-sm mb-4">Application Pipeline</h3>
         <div className="flex items-center justify-center gap-2 overflow-x-auto py-2">
-          {FALLBACK_STATS.applicationPipeline.map((stage, i) => (
-            <div key={stage.stage} className="flex items-center">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.97 }}
-                onClick={() =>
-                  setSelectedPipelineStage(
-                    selectedPipelineStage === stage.stage ? null : stage.stage
-                  )
-                }
-                className={`flex flex-col items-center px-5 py-3 rounded-xl transition-all cursor-pointer ${
-                  selectedPipelineStage === stage.stage
-                    ? 'ring-2 ring-offset-1'
-                    : 'hover:bg-gray-50'
-                }`}
-                style={{
-                  // @ts-expect-error Tailwind ring-color via CSS variable
-                  '--tw-ring-color': selectedPipelineStage === stage.stage ? stage.color : undefined,
-                }}
-              >
-                <span
-                  className="text-xl font-bold mb-1 tabular-nums"
-                  style={{ color: stage.color }}
+          {(() => {
+            const pipeline = live?.applications
+              ? [
+                  { stage: 'New', count: live.applications.pending, color: '#60A5FA' },
+                  { stage: 'Approved', count: live.applications.approved, color: '#34D399' },
+                  { stage: 'Rejected', count: live.applications.rejected, color: '#F97316' },
+                ]
+              : FALLBACK_STATS.applicationPipeline;
+            return pipeline.map((stage, i) => (
+              <div key={stage.stage} className="flex items-center">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() =>
+                    setSelectedPipelineStage(
+                      selectedPipelineStage === stage.stage ? null : stage.stage
+                    )
+                  }
+                  className={`flex flex-col items-center px-5 py-3 rounded-xl transition-all cursor-pointer ${
+                    selectedPipelineStage === stage.stage
+                      ? 'ring-2 ring-offset-1'
+                      : 'hover:bg-gray-50'
+                  }`}
+                  style={{
+                    // @ts-expect-error Tailwind ring-color via CSS variable
+                    '--tw-ring-color': selectedPipelineStage === stage.stage ? stage.color : undefined,
+                  }}
                 >
-                  {stage.count}
-                </span>
-                <span
-                  className="text-xs font-medium px-3 py-1 rounded-full text-white whitespace-nowrap"
-                  style={{ backgroundColor: stage.color }}
-                >
-                  {stage.stage}
-                </span>
-              </motion.button>
-              {i < FALLBACK_STATS.applicationPipeline.length - 1 && (
-                <ChevronRight className="w-5 h-5 text-gray-300 flex-shrink-0 mx-1" />
-              )}
-            </div>
-          ))}
+                  <span
+                    className="text-xl font-bold mb-1 tabular-nums"
+                    style={{ color: stage.color }}
+                  >
+                    {stage.count}
+                  </span>
+                  <span
+                    className="text-xs font-medium px-3 py-1 rounded-full text-white whitespace-nowrap"
+                    style={{ backgroundColor: stage.color }}
+                  >
+                    {stage.stage}
+                  </span>
+                </motion.button>
+                {i < pipeline.length - 1 && (
+                  <ChevronRight className="w-5 h-5 text-gray-300 flex-shrink-0 mx-1" />
+                )}
+              </div>
+            ));
+          })()}
         </div>
         <div className="text-center mt-2">
           <span className="text-xs text-gray-400">
@@ -788,7 +831,13 @@ export default function AdminDashboard() {
             Milestones &amp; KPI Tracker
           </h3>
           <div className="space-y-4">
-            {FALLBACK_STATS.milestones.map((ms, i) => {
+            {[
+              { label: '500 Members', target: 500, current: live?.members.total ?? FALLBACK_STATS.milestones[0].current, deadline: 'Q4 2026' },
+              { label: '$10M Deployed', target: 10_000_000, current: live?.loans.totalAmount ?? FALLBACK_STATS.milestones[1].current, deadline: 'Q2 2027' },
+              { label: '3 Countries', target: 3, current: FALLBACK_STATS.milestones[2].current, deadline: 'Q1 2026' },
+              { label: 'Default Rate <5%', target: 5, current: FALLBACK_STATS.milestones[3].current, deadline: 'Ongoing', inverted: true },
+              { label: '60% Training Rate', target: 60, current: FALLBACK_STATS.milestones[4].current, deadline: 'Q1 2026' },
+            ].map((ms, i) => {
               const isCompleted = ms.inverted
                 ? ms.current <= ms.target
                 : ms.current >= ms.target;

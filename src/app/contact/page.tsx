@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -11,11 +12,85 @@ export default function ContactPage() {
     message: "",
   });
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const validateEmail = (email: string) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In production, this would send to an API
-    setSubmitted(true);
+    setError(null);
+
+    // Client-side validation
+    if (!formData.name.trim()) {
+      setError("Please enter your full name.");
+      return;
+    }
+    if (!formData.email.trim() || !validateEmail(formData.email)) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+    if (!formData.subject) {
+      setError("Please select a subject.");
+      return;
+    }
+    if (!formData.message.trim()) {
+      setError("Please enter a message.");
+      return;
+    }
+
+    setSubmitting(true);
+
+    try {
+      const supabase = createClient();
+
+      // Try inserting into contact_submissions table first.
+      // If that table doesn't exist, fall back to applications table with type='contact'.
+      const { error: insertError } = await supabase
+        .from("contact_submissions")
+        .insert({
+          full_name: formData.name.trim(),
+          email: formData.email.trim(),
+          organization: formData.organization.trim() || null,
+          subject: formData.subject,
+          message: formData.message.trim(),
+        });
+
+      if (insertError) {
+        // If contact_submissions table doesn't exist, try applications table
+        if (
+          insertError.message?.includes("does not exist") ||
+          insertError.code === "42P01"
+        ) {
+          const { error: fallbackError } = await supabase
+            .from("membership_applications")
+            .insert({
+              full_name: formData.name.trim(),
+              email: formData.email.trim(),
+              status: "pending",
+              membership_tier: "contact",
+              country: formData.subject,
+              notes: `[Contact Form] Subject: ${formData.subject}\nOrganization: ${formData.organization || "N/A"}\n\n${formData.message.trim()}`,
+            });
+
+          if (fallbackError) {
+            throw fallbackError;
+          }
+        } else {
+          throw insertError;
+        }
+      }
+
+      setSubmitted(true);
+    } catch (err) {
+      console.error("Contact form submission error:", err);
+      setError(
+        "Something went wrong submitting your message. Please try again or email us directly at info@africanfarmunion.com."
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -85,6 +160,11 @@ export default function ContactPage() {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
+                  {error && (
+                    <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                      {error}
+                    </div>
+                  )}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-sm font-medium text-navy mb-2">Full Name *</label>
@@ -146,9 +226,10 @@ export default function ContactPage() {
                   </div>
                   <button
                     type="submit"
-                    className="bg-[#5DB347] hover:bg-[#449933] text-white px-8 py-3 rounded-lg font-semibold transition-colors"
+                    disabled={submitting}
+                    className="bg-[#5DB347] hover:bg-[#449933] disabled:opacity-50 disabled:cursor-not-allowed text-white px-8 py-3 rounded-lg font-semibold transition-colors"
                   >
-                    Send Message
+                    {submitting ? "Sending..." : "Send Message"}
                   </button>
                 </form>
               )}

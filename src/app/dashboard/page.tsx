@@ -55,6 +55,7 @@ import {
 import type { LucideIcon } from 'lucide-react';
 
 import { useAuth } from '@/lib/supabase/auth-context';
+import { createClient } from '@/lib/supabase/client';
 import { ProgramBanner } from '@/components/programs/ProgramBanner';
 
 // ---------------------------------------------------------------------------
@@ -75,11 +76,11 @@ const WEATHER_DATA = {
 
 /** Fallback scalar stats used when the API hasn't responded yet. */
 const FALLBACK_STATS = {
-  activeLoans: 89,
-  totalLoansDeployed: 4200000,
-  revenueGrowth: 18.5,
-  trainingCompletionRate: 60.3,
-  defaultRate: 2.3,
+  activeLoans: 0,
+  totalLoansDeployed: 0,
+  revenueGrowth: 0,
+  trainingCompletionRate: 0,
+  defaultRate: 0,
 };
 
 /** Loan portfolio chart data (static — no live DB source yet). */
@@ -148,13 +149,8 @@ interface Notification {
   priority: 'high' | 'medium' | 'low';
 }
 
-/** Fallback notifications shown when the API hasn't loaded yet. */
-const FALLBACK_NOTIFICATIONS: Notification[] = [
-  { id: 'NTF-001', type: 'payment', title: 'Payment Due in 5 Days', message: 'Your loan repayment of $2,100 for FIN-2026-003 is due on March 20, 2026.', timestamp: '2026-03-13T08:00:00Z', read: false, link: '/dashboard/financing', priority: 'high' },
-  { id: 'NTF-002', type: 'application', title: 'Application Under Review', message: 'Your financing application APP-2026-010 is now being reviewed by our credit team.', timestamp: '2026-03-12T14:30:00Z', read: false, link: '/dashboard/financing', priority: 'medium' },
-  { id: 'NTF-003', type: 'training', title: 'New Course Available', message: 'Drone Technology in Agriculture is now available. Recommended for your farm profile.', timestamp: '2026-03-12T09:00:00Z', read: false, link: '/dashboard/training', priority: 'low' },
-  { id: 'NTF-009', type: 'document', title: 'Document Expiring Soon', message: 'Your passport expires in 60 days (May 12, 2026). Please renew to maintain your KYC status.', timestamp: '2026-03-07T08:00:00Z', read: false, link: '/dashboard/documents', priority: 'high' },
-];
+/** Fallback notifications — empty until real data loads from API. */
+const FALLBACK_NOTIFICATIONS: Notification[] = [];
 
 interface Activity {
   id: string;
@@ -166,15 +162,8 @@ interface Activity {
   icon: string;
 }
 
-/** Recent activities (static until audit_log integration in Sprint 11). */
-const FALLBACK_ACTIVITIES: Activity[] = [
-  { id: 'ACT-001', memberId: 'AFU-2024-005', memberName: 'Grace Moyo', type: 'application', description: 'Submitted financing application for $45,000 working capital', timestamp: '2026-03-13T09:15:00Z', icon: 'FileText' },
-  { id: 'ACT-002', memberId: 'AFU-2024-025', memberName: 'Rumbidzai Chikore', type: 'application', description: 'Submitted financing application for $6,500', timestamp: '2026-03-13T08:42:00Z', icon: 'FileText' },
-  { id: 'ACT-003', memberId: 'AFU-2024-018', memberName: 'Amina Salim', type: 'document', description: 'Uploaded invoice from EuroFruit GmbH', timestamp: '2026-03-12T16:30:00Z', icon: 'Upload' },
-  { id: 'ACT-004', memberId: 'AFU-2024-022', memberName: 'Farai Ndlovu', type: 'training', description: 'Completed "Drip Irrigation Setup & Management" course', timestamp: '2026-03-12T14:20:00Z', icon: 'GraduationCap' },
-  { id: 'ACT-005', memberId: 'AFU-2024-033', memberName: 'Nyasha Mutasa', type: 'application', description: 'Submitted financing application for $38,000 working capital', timestamp: '2026-03-12T11:00:00Z', icon: 'FileText' },
-  { id: 'ACT-006', memberId: 'AFU-2024-041', memberName: 'Baraka Mushi', type: 'contract', description: 'Logged delivery: 15,000kg sesame to Dubai Fresh Markets', timestamp: '2026-03-12T08:30:00Z', icon: 'Truck' },
-];
+/** Recent activities — empty until audit_log integration. */
+const FALLBACK_ACTIVITIES: Activity[] = [];
 
 // Real dashboard data from API
 interface DashboardData {
@@ -356,6 +345,7 @@ export default function DashboardPage() {
   const [showProgramBanner, setShowProgramBanner] = useState(true);
   const [availablePrograms, setAvailablePrograms] = useState<{ id: string; country: string; status: string; [key: string]: unknown }[]>([]);
   const userName = profile?.full_name || user?.email?.split('@')[0] || 'Member';
+  const memberRole = profile?.role || 'member';
 
   // Fetch real dashboard data from API
   useEffect(() => {
@@ -372,6 +362,25 @@ export default function DashboardPage() {
       .then(data => { setAvailablePrograms(data.programs || []); })
       .catch(() => { /* silent — banner just won't show */ });
   }, []);
+
+  // Fetch training stats directly from Supabase
+  const [trainingStats, setTrainingStats] = useState<{ completed: number; total: number }>({ completed: 0, total: 0 });
+  useEffect(() => {
+    if (!user) return;
+    const supabase = createClient();
+    (async () => {
+      const { data, error } = await supabase
+        .from('course_enrollments')
+        .select('id, status')
+        .eq('user_id', user.id);
+      if (!error && data) {
+        setTrainingStats({
+          total: data.length,
+          completed: data.filter((e: { status: string }) => e.status === 'completed').length,
+        });
+      }
+    })();
+  }, [user]);
 
   // Use real notifications if available, otherwise fallback
   const notifications = dashData?.notifications?.length
@@ -431,29 +440,8 @@ export default function DashboardPage() {
         statusColor: statusMap[l.status]?.color || 'bg-gray-100 text-gray-600',
       }));
     }
-    return [
-    {
-      id: 'FIN-2024-012',
-      type: 'Working Capital',
-      amount: '$75,000',
-      status: 'Active',
-      statusColor: 'bg-green-100 text-green-700',
-    },
-    {
-      id: 'FIN-2024-018',
-      type: 'Invoice Finance',
-      amount: '$50,000',
-      status: 'Active',
-      statusColor: 'bg-green-100 text-green-700',
-    },
-    {
-      id: 'FIN-2024-024',
-      type: 'Equipment Finance',
-      amount: '$30,000',
-      status: 'Under Review',
-      statusColor: 'bg-amber-100 text-amber-700',
-    },
-  ];
+    // No real loan data available — show empty state
+    return [];
   }, [dashData]);
 
   // Training courses in progress
@@ -536,11 +524,11 @@ export default function DashboardPage() {
               <div>
                 <h1 className="text-xl md:text-2xl font-bold">{greeting}, {userName}</h1>
                 <div className="flex items-center gap-2 mt-0.5">
-                  <span className="text-sm text-gray-300">AFU-2024-001</span>
+                  <span className="text-sm text-gray-300">{dashData?.member?.member_id || 'Member'}</span>
                   <span className="text-gray-500">|</span>
                   <span className="inline-flex items-center gap-1 text-sm bg-gold/20 text-gold px-2 py-0.5 rounded-full font-medium">
                     <BadgeCheck className="w-3.5 h-3.5" />
-                    Commercial Tier
+                    {(dashData?.member?.tier || dashData?.stats?.tier || memberRole).replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase())} Tier
                   </span>
                 </div>
               </div>
@@ -605,7 +593,7 @@ export default function DashboardPage() {
               <DollarSign className="w-5 h-5 text-blue-600" />
             </div>
             <span className="inline-flex items-center gap-1 text-xs font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
-              <TrendingUp className="w-3 h-3" /> +{FALLBACK_STATS.revenueGrowth}%
+              <TrendingUp className="w-3 h-3" /> {dashData ? `$${(dashData.stats.totalRepaid || 0).toLocaleString()} repaid` : '—'}
             </span>
           </div>
           <p className="text-2xl font-bold text-navy">{formatCurrency(dashData?.stats?.totalLoanAmount ?? FALLBACK_STATS.totalLoansDeployed)}</p>
@@ -626,13 +614,13 @@ export default function DashboardPage() {
             </span>
           </div>
           <div className="flex items-end gap-2">
-            <p className="text-2xl font-bold text-navy">{FALLBACK_STATS.trainingCompletionRate}%</p>
+            <p className="text-2xl font-bold text-navy">{trainingStats.total > 0 ? Math.round((trainingStats.completed / trainingStats.total) * 100) : 0}%</p>
           </div>
-          <p className="text-xs text-gray-500 mt-0.5">Training Completion</p>
+          <p className="text-xs text-gray-500 mt-0.5">Training Completion ({trainingStats.completed}/{trainingStats.total})</p>
           <div className="w-full bg-gray-100 rounded-full h-1.5 mt-2">
             <div
               className="bg-purple-500 h-1.5 rounded-full"
-              style={{ width: `${FALLBACK_STATS.trainingCompletionRate}%` }}
+              style={{ width: `${trainingStats.total > 0 ? (trainingStats.completed / trainingStats.total) * 100 : 0}%` }}
             />
           </div>
         </motion.div>
@@ -667,12 +655,12 @@ export default function DashboardPage() {
               <TrendingDown className="w-3 h-3" /> Low
             </span>
           </div>
-          <p className="text-2xl font-bold text-navy">{FALLBACK_STATS.defaultRate}%</p>
-          <p className="text-xs text-gray-500 mt-0.5">Default Rate</p>
+          <p className="text-2xl font-bold text-navy">{dashData?.stats?.creditScore ? `${dashData.stats.creditScore}` : '—'}</p>
+          <p className="text-xs text-gray-500 mt-0.5">Credit Score</p>
           <div className="w-full bg-gray-100 rounded-full h-1.5 mt-2">
             <div
               className="bg-green-500 h-1.5 rounded-full"
-              style={{ width: `${(FALLBACK_STATS.defaultRate / 5) * 100}%` }}
+              style={{ width: `${dashData?.stats?.creditScore ? Math.min((dashData.stats.creditScore / 850) * 100, 100) : 0}%` }}
             />
           </div>
         </motion.div>

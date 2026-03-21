@@ -2,7 +2,28 @@ import Link from "next/link";
 
 export const metadata = {
   title: "Our Countries - AFU",
-  description: "AFU operates across 10 African countries: Botswana, Kenya, Mozambique, Nigeria, Sierra Leone, South Africa, Tanzania, Uganda, Zambia, and Zimbabwe.",
+  description:
+    "AFU operates across 10 African countries: Botswana, Kenya, Mozambique, Nigeria, Sierra Leone, South Africa, Tanzania, Uganda, Zambia, and Zimbabwe.",
+  openGraph: {
+    title: "Our Countries - AFU",
+    description:
+      "Ten strategic markets across Africa, each serving a distinct purpose in the AFU agricultural development platform.",
+    url: "https://afu-portal.vercel.app/countries",
+    images: [
+      {
+        url: "https://afu-portal.vercel.app/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "AFU Countries - 10 African Nations",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Our Countries - AFU",
+    description:
+      "Ten strategic markets across Africa, each serving a distinct purpose in the AFU agricultural development platform.",
+  },
 };
 
 const countries = [

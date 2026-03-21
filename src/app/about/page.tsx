@@ -3,7 +3,28 @@ import LeadershipSection from "@/components/LeadershipSection";
 
 export const metadata = {
   title: "About AFU - African Farming Union",
-  description: "Learn about AFU's mission to transform African agriculture through integrated financing, inputs, processing, and offtake.",
+  description:
+    "Learn about AFU's mission to transform African agriculture through integrated financing, inputs, processing, and offtake across 10 countries.",
+  openGraph: {
+    title: "About AFU - African Farming Union",
+    description:
+      "Learn about AFU's mission to transform African agriculture through integrated financing, inputs, processing, and offtake across 10 countries.",
+    url: "https://afu-portal.vercel.app/about",
+    images: [
+      {
+        url: "https://afu-portal.vercel.app/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "About the African Farming Union",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "About AFU - African Farming Union",
+    description:
+      "Learn about AFU's mission to transform African agriculture through integrated financing, inputs, processing, and offtake across 10 countries.",
+  },
 };
 
 export default function AboutPage() {

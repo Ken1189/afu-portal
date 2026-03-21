@@ -15,10 +15,34 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "African Farming Union (AFU) - Africa's Agriculture Development Platform",
   description:
-    "AFU is a vertically integrated agriculture development platform providing financing, inputs, processing, offtake, trade finance, and training across Africa.",
-  keywords: ["agriculture", "Africa", "farming", "financing", "trade finance", "agri-bank"],
+    "Pan-African agriculture development bank and operating platform. Financing, insurance, training, and market access for farmers across 10 countries.",
+  keywords: ["agriculture", "Africa", "farming", "financing", "trade finance", "agri-bank", "insurance", "training", "market access"],
   manifest: "/manifest.json",
-  themeColor: "#8CB89C",
+  themeColor: "#5DB347",
+  openGraph: {
+    title: "African Farming Union (AFU) - Africa's Agriculture Development Platform",
+    description:
+      "Pan-African agriculture development bank and operating platform. Financing, insurance, training, and market access for farmers across 10 countries.",
+    url: "https://afu-portal.vercel.app",
+    siteName: "African Farming Union",
+    images: [
+      {
+        url: "https://afu-portal.vercel.app/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "African Farming Union - Pan-African Agriculture Development Platform",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "African Farming Union (AFU) - Africa's Agriculture Development Platform",
+    description:
+      "Pan-African agriculture development bank and operating platform. Financing, insurance, training, and market access for farmers across 10 countries.",
+    images: ["https://afu-portal.vercel.app/og-image.png"],
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
