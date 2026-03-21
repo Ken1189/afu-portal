@@ -865,8 +865,8 @@ export default function Home() {
                 </span>
               </h2>
               <p className="text-gray-300 max-w-3xl mx-auto text-lg">
-                Join a generational investment opportunity. Africa&apos;s agriculture sector is projected to reach
-                $1 trillion by 2030. AFU is the integrated platform positioned to capture this growth.
+                AFU is raising a $100M seed round to build Africa&apos;s first vertically integrated agriculture
+                development bank and operating platform. A $1 trillion market by 2030 — and we&apos;re the execution layer.
               </p>
             </div>
           </FadeInWhenVisible>
@@ -874,8 +874,8 @@ export default function Home() {
           {/* Investment metrics */}
           <StaggerChildren className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-16">
             {[
-              { icon: Target, value: '$1T', label: 'African Agri Market by 2030', color: 'from-gold to-amber-500' },
-              { icon: TrendingUp, value: '32%', label: 'Projected Annual ROI', color: 'from-green-400 to-emerald-500' },
+              { icon: Target, value: '$100M', label: 'Seed Round Target', color: 'from-gold to-amber-500' },
+              { icon: TrendingUp, value: '$1T', label: 'African Agri Market by 2030', color: 'from-green-400 to-emerald-500' },
               { icon: PieChart, value: '$50B+', label: 'Annual Food Import Gap', color: 'from-[#8CB89C] to-cyan-400' },
               { icon: LineChart, value: '10x', label: 'Value-Chain Multiplier', color: 'from-purple-400 to-indigo-400' },
             ].map((item) => {
@@ -950,7 +950,7 @@ export default function Home() {
                 {[
                   {
                     tier: 'Seed Investor',
-                    min: '$10,000',
+                    min: '$250,000',
                     returns: '18-24% target',
                     features: ['Quarterly distributions', 'Annual impact report', 'Investor portal access'],
                     color: 'border-[#5DB347]/40 bg-[#5DB347]/5',
@@ -958,7 +958,7 @@ export default function Home() {
                   },
                   {
                     tier: 'Growth Partner',
-                    min: '$100,000',
+                    min: '$1,000,000',
                     returns: '24-32% target',
                     features: ['Monthly distributions', 'Advisory board seat', 'Direct deal co-investment', 'Priority pipeline access'],
                     color: 'border-gold/40 bg-gold/5 ring-1 ring-gold/20',
@@ -966,7 +966,7 @@ export default function Home() {
                   },
                   {
                     tier: 'Strategic Partner',
-                    min: '$1,000,000+',
+                    min: '$5,000,000+',
                     returns: 'Custom structure',
                     features: ['Board observer rights', 'Country exclusivity options', 'Joint venture structures', 'Equity participation option', 'Dedicated relationship manager'],
                     color: 'border-purple-400/40 bg-purple-500/5',

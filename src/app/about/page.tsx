@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Sprout, Tractor, Building2, ShieldCheck, Settings, Globe, BarChart3, Lock } from "lucide-react";
 import LeadershipSection from "@/components/LeadershipSection";
 import CountryTeams from "@/components/CountryTeams";
 
@@ -103,8 +104,8 @@ export default function AboutPage() {
                 className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 text-center shadow-lg shadow-[#5DB347]/5 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 border-l-4 border-[#5DB347]"
               >
                 <div
-                  className="w-10 h-10 text-white rounded-full flex items-center justify-center mx-auto mb-3 text-sm font-bold shadow-lg shadow-[#5DB347]/30"
-                  style={{ background: 'linear-gradient(135deg, #5DB347, #449933)' }}
+                  className="w-14 h-14 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-lg font-bold shadow-lg shadow-[#5DB347]/30 hover:scale-110 transition-transform duration-300"
+                  style={{ background: 'linear-gradient(135deg, #5DB347, #3d8a2e)' }}
                 >
                   {i + 1}
                 </div>
@@ -141,7 +142,7 @@ export default function AboutPage() {
               {
                 tier: "Tier A",
                 name: "Smallholder & SME",
-                icon: "🌱",
+                icon: <Sprout className="w-6 h-6 text-white" />,
                 items: [
                   "Input bundles + seasonal working capital",
                   "Training + compliance onboarding",
@@ -151,7 +152,7 @@ export default function AboutPage() {
               {
                 tier: "Tier B",
                 name: "Commercial Farms",
-                icon: "🚜",
+                icon: <Tractor className="w-6 h-6 text-white" />,
                 items: [
                   "Equipment finance, irrigation, high-value crop financing",
                   "Structured contracts + processing access",
@@ -161,7 +162,7 @@ export default function AboutPage() {
               {
                 tier: "Tier C",
                 name: "Large Projects",
-                icon: "🏗️",
+                icon: <Building2 className="w-6 h-6 text-white" />,
                 items: [
                   "Project finance + infrastructure",
                   "Anchor processing hubs",
@@ -173,7 +174,12 @@ export default function AboutPage() {
                 key={i}
                 className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-lg shadow-[#5DB347]/5 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 border-l-4 border-[#5DB347]"
               >
-                <div className="text-3xl mb-3 drop-shadow-md">{item.icon}</div>
+                <div
+                  className="w-14 h-14 rounded-full flex items-center justify-center mb-4 shadow-lg shadow-[#5DB347]/30 hover:scale-110 transition-transform duration-300"
+                  style={{ background: 'linear-gradient(135deg, #5DB347, #3d8a2e)' }}
+                >
+                  {item.icon}
+                </div>
                 <div className="text-sm font-semibold uppercase tracking-wider mb-1" style={{ color: '#5DB347' }}>
                   {item.tier}
                 </div>
@@ -213,17 +219,22 @@ export default function AboutPage() {
           </div>
           <div className="space-y-4">
             {[
-              { risk: "Credit Risk", mitigation: "Offtake contracts, tranche releases, input-in-kind financing, aggregation control", icon: "🛡️" },
-              { risk: "Execution Risk", mitigation: "Commercial farmer operators + phased rollout", icon: "⚙️" },
-              { risk: "FX / Regulatory Risk", mitigation: "Structured trade routes + multi-country diversification", icon: "🌐" },
-              { risk: "Commodity Price Risk", mitigation: "Processing/value-add + contract pricing mechanisms", icon: "📊" },
-              { risk: "Fraud / Leakage", mitigation: "Controlled procurement + field verification + audit trail", icon: "🔒" },
+              { risk: "Credit Risk", mitigation: "Offtake contracts, tranche releases, input-in-kind financing, aggregation control", icon: <ShieldCheck className="w-6 h-6 text-white" /> },
+              { risk: "Execution Risk", mitigation: "Commercial farmer operators + phased rollout", icon: <Settings className="w-6 h-6 text-white" /> },
+              { risk: "FX / Regulatory Risk", mitigation: "Structured trade routes + multi-country diversification", icon: <Globe className="w-6 h-6 text-white" /> },
+              { risk: "Commodity Price Risk", mitigation: "Processing/value-add + contract pricing mechanisms", icon: <BarChart3 className="w-6 h-6 text-white" /> },
+              { risk: "Fraud / Leakage", mitigation: "Controlled procurement + field verification + audit trail", icon: <Lock className="w-6 h-6 text-white" /> },
             ].map((item, i) => (
               <div
                 key={i}
-                className="flex flex-col md:flex-row md:items-center gap-3 md:gap-8 bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-lg shadow-[#5DB347]/5 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 border-l-4 border-[#5DB347]"
+                className="flex flex-col md:flex-row md:items-center gap-4 md:gap-8 bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-lg shadow-[#5DB347]/5 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 border-l-4 border-[#5DB347]"
               >
-                <div className="text-2xl drop-shadow-md">{item.icon}</div>
+                <div
+                  className="w-14 h-14 rounded-full flex items-center justify-center shrink-0 shadow-lg shadow-[#5DB347]/30 hover:scale-110 transition-transform duration-300"
+                  style={{ background: 'linear-gradient(135deg, #5DB347, #3d8a2e)' }}
+                >
+                  {item.icon}
+                </div>
                 <div className="font-bold text-[#1B2A4A] min-w-[200px]">{item.risk}</div>
                 <div className="text-gray-600 text-sm">{item.mitigation}</div>
               </div>

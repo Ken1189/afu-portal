@@ -45,6 +45,7 @@ const insuranceLinks = [
 ];
 
 const moreServicesLinks = [
+  { label: "Insurance", href: "/services/insurance", icon: ShieldCheck },
   { label: "Marketplace", href: "/supplier", icon: ShoppingCart },
   { label: "Technology", href: "/services/technology", icon: Cpu },
   { label: "Energy", href: "/services/energy", icon: Zap },

@@ -126,8 +126,8 @@ export default function Footer() {
             &copy; {new Date().getFullYear()} African Farming Union (AFU). All rights reserved.
           </p>
           <div className="flex items-center gap-6">
-            <Link href="#" className="text-gray-500 hover:text-[#5DB347] text-sm transition-colors duration-300">Privacy Policy</Link>
-            <Link href="#" className="text-gray-500 hover:text-[#5DB347] text-sm transition-colors duration-300">Terms of Service</Link>
+            <Link href="/legal/privacy" className="text-gray-500 hover:text-[#5DB347] text-sm transition-colors duration-300">Privacy Policy</Link>
+            <Link href="/legal/terms" className="text-gray-500 hover:text-[#5DB347] text-sm transition-colors duration-300">Terms of Service</Link>
             <button
               onClick={scrollToTop}
               className="w-10 h-10 rounded-full border border-gray-600 flex items-center justify-center text-gray-400 hover:text-white hover:bg-[#5DB347] hover:border-[#5DB347] transition-all duration-300"
