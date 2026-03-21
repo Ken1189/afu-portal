@@ -28,6 +28,8 @@ import {
   Search,
   ChevronDown,
   ChevronRight,
+  Users,
+  Trash2,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
@@ -93,7 +95,22 @@ interface Broadcast {
   created_at: string;
 }
 
-type TabId = 'content' | 'flags' | 'config' | 'templates' | 'broadcasts';
+interface CountryTeamMember {
+  name: string;
+  title: string;
+  bio: string;
+  avatar_url: string;
+}
+
+interface CountryTeamData {
+  code: string;
+  name: string;
+  flag: string;
+  tagline: string;
+  members: CountryTeamMember[];
+}
+
+type TabId = 'content' | 'flags' | 'config' | 'templates' | 'broadcasts' | 'country_teams';
 
 // ═══════════════════════════════════════════════════════
 //  CONSTANTS
@@ -105,6 +122,7 @@ const TABS: { id: TabId; label: string; icon: React.ReactNode }[] = [
   { id: 'config', label: 'Site Config', icon: <Settings className="w-4 h-4" /> },
   { id: 'templates', label: 'Notifications', icon: <Bell className="w-4 h-4" /> },
   { id: 'broadcasts', label: 'Broadcasts', icon: <Megaphone className="w-4 h-4" /> },
+  { id: 'country_teams', label: 'Country Teams', icon: <Users className="w-4 h-4" /> },
 ];
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -153,6 +171,19 @@ const COUNTRY_NAMES: Record<string, string> = {
 };
 
 const ALL_COUNTRIES = Object.keys(COUNTRY_NAMES);
+
+const COUNTRY_TEAMS_COUNTRIES: { code: string; name: string; flag: string }[] = [
+  { code: 'BW', name: 'Botswana', flag: '\ud83c\udde7\ud83c\uddfc' },
+  { code: 'ZW', name: 'Zimbabwe', flag: '\ud83c\uddff\ud83c\uddfc' },
+  { code: 'TZ', name: 'Tanzania', flag: '\ud83c\uddf9\ud83c\uddff' },
+  { code: 'KE', name: 'Kenya', flag: '\ud83c\uddf0\ud83c\uddea' },
+  { code: 'NG', name: 'Nigeria', flag: '\ud83c\uddf3\ud83c\uddec' },
+  { code: 'ZM', name: 'Zambia', flag: '\ud83c\uddff\ud83c\uddf2' },
+  { code: 'MZ', name: 'Mozambique', flag: '\ud83c\uddf2\ud83c\uddff' },
+  { code: 'ZA', name: 'South Africa', flag: '\ud83c\uddff\ud83c\udde6' },
+  { code: 'GH', name: 'Ghana', flag: '\ud83c\uddec\ud83c\udded' },
+  { code: 'UG', name: 'Uganda', flag: '\ud83c\uddfa\ud83c\uddec' },
+];
 
 // ═══════════════════════════════════════════════════════
 //  TOAST COMPONENT
@@ -211,7 +242,7 @@ export default function AdminContentPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-navy">Site Content & Configuration</h1>
-        <p className="text-sm text-gray-500 mt-0.5">Manage site content, feature flags, configuration, notifications, and broadcasts</p>
+        <p className="text-sm text-gray-500 mt-0.5">Manage site content, feature flags, configuration, notifications, broadcasts, and country teams</p>
       </div>
 
       {/* Tabs */}
@@ -238,6 +269,7 @@ export default function AdminContentPage() {
       {activeTab === 'config' && <SiteConfigTab showToast={showToast} />}
       {activeTab === 'templates' && <NotificationTemplatesTab showToast={showToast} />}
       {activeTab === 'broadcasts' && <BroadcastsTab showToast={showToast} />}
+      {activeTab === 'country_teams' && <CountryTeamsTab showToast={showToast} />}
 
       {/* Toast */}
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
@@ -1363,6 +1395,333 @@ function BroadcastsTab({ showToast }: { showToast: (m: string, t?: 'success' | '
               </tbody>
             </table>
           </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════
+//  TAB 6: COUNTRY TEAMS
+// ═══════════════════════════════════════════════════════
+
+function CountryTeamsTab({ showToast }: { showToast: (m: string, t?: 'success' | 'error') => void }) {
+  const supabase = createClient();
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState<string>('');
+  const [teamData, setTeamData] = useState<CountryTeamData | null>(null);
+  const [allTeams, setAllTeams] = useState<Record<string, CountryTeamData>>({});
+
+  // Load all country team data from site_content
+  async function loadAllTeams() {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('site_content')
+      .select('*')
+      .eq('section', 'country_teams');
+
+    if (error) {
+      showToast('Failed to load country teams', 'error');
+      setLoading(false);
+      return;
+    }
+
+    const teams: Record<string, CountryTeamData> = {};
+    for (const row of data || []) {
+      try {
+        teams[row.key] = JSON.parse(row.value);
+      } catch {
+        // skip invalid JSON
+      }
+    }
+    setAllTeams(teams);
+    setLoading(false);
+  }
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { loadAllTeams(); }, []);
+
+  // When country changes, load that country's team
+  useEffect(() => {
+    if (!selectedCountry) {
+      setTeamData(null);
+      return;
+    }
+    if (allTeams[selectedCountry]) {
+      setTeamData(JSON.parse(JSON.stringify(allTeams[selectedCountry])));
+    } else {
+      // Initialize with default empty team for this country
+      const info = COUNTRY_TEAMS_COUNTRIES.find((c) => c.code === selectedCountry);
+      if (info) {
+        setTeamData({
+          code: info.code,
+          name: info.name,
+          flag: info.flag,
+          tagline: '',
+          members: [
+            { name: '', title: 'Country Director', bio: '', avatar_url: '' },
+            { name: '', title: 'Agricultural Officer', bio: '', avatar_url: '' },
+            { name: '', title: 'Finance & Operations', bio: '', avatar_url: '' },
+          ],
+        });
+      }
+    }
+  }, [selectedCountry, allTeams]);
+
+  function updateMember(index: number, field: keyof CountryTeamMember, value: string) {
+    if (!teamData) return;
+    const updated = { ...teamData };
+    updated.members = [...updated.members];
+    updated.members[index] = { ...updated.members[index], [field]: value };
+    setTeamData(updated);
+  }
+
+  function addMember() {
+    if (!teamData) return;
+    setTeamData({
+      ...teamData,
+      members: [...teamData.members, { name: '', title: '', bio: '', avatar_url: '' }],
+    });
+  }
+
+  function removeMember(index: number) {
+    if (!teamData || teamData.members.length <= 1) return;
+    const updated = { ...teamData };
+    updated.members = updated.members.filter((_, i) => i !== index);
+    setTeamData(updated);
+  }
+
+  async function saveTeam() {
+    if (!teamData || !selectedCountry) return;
+    setSaving(true);
+
+    const jsonValue = JSON.stringify(teamData);
+
+    // Check if row exists
+    const { data: existing } = await supabase
+      .from('site_content')
+      .select('id')
+      .eq('section', 'country_teams')
+      .eq('key', selectedCountry)
+      .single();
+
+    let error;
+    if (existing) {
+      ({ error } = await supabase
+        .from('site_content')
+        .update({ value: jsonValue, updated_at: new Date().toISOString() })
+        .eq('id', existing.id));
+    } else {
+      ({ error } = await supabase
+        .from('site_content')
+        .insert({
+          page: 'about',
+          section: 'country_teams',
+          key: selectedCountry,
+          value: jsonValue,
+          content_type: 'json',
+        }));
+    }
+
+    if (error) {
+      showToast('Failed to save team data', 'error');
+    } else {
+      showToast(`${teamData.name} team saved successfully`);
+      await loadAllTeams();
+    }
+    setSaving(false);
+  }
+
+  if (loading) return <LoadingState />;
+
+  return (
+    <div className="space-y-6">
+      {/* Country Selector */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+          <div className="flex-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Select Country</label>
+            <select
+              value={selectedCountry}
+              onChange={(e) => setSelectedCountry(e.target.value)}
+              className="w-full sm:w-72 px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#5DB347]/20 focus:border-[#5DB347] transition-all"
+            >
+              <option value="">Choose a country...</option>
+              {COUNTRY_TEAMS_COUNTRIES.map((c) => {
+                const hasData = !!allTeams[c.code];
+                return (
+                  <option key={c.code} value={c.code}>
+                    {c.flag} {c.name} {hasData ? '(configured)' : ''}
+                  </option>
+                );
+              })}
+            </select>
+          </div>
+          <div className="text-sm text-gray-500">
+            <span className="font-medium text-[#5DB347]">{Object.keys(allTeams).length}</span> of {COUNTRY_TEAMS_COUNTRIES.length} countries configured
+          </div>
+        </div>
+
+        {/* Quick status grid */}
+        <div className="mt-4 grid grid-cols-5 sm:grid-cols-10 gap-2">
+          {COUNTRY_TEAMS_COUNTRIES.map((c) => {
+            const hasData = !!allTeams[c.code];
+            const isSelected = selectedCountry === c.code;
+            return (
+              <button
+                key={c.code}
+                onClick={() => setSelectedCountry(c.code)}
+                className={`flex flex-col items-center p-2 rounded-lg text-xs transition-all border-2
+                  ${isSelected
+                    ? 'border-[#5DB347] bg-[#EBF7E5]'
+                    : hasData
+                    ? 'border-green-200 bg-green-50 hover:border-[#5DB347]'
+                    : 'border-gray-100 bg-gray-50 hover:border-gray-300'
+                  }`}
+              >
+                <span className="text-lg">{c.flag}</span>
+                <span className={`mt-0.5 font-medium ${isSelected ? 'text-[#5DB347]' : 'text-gray-600'}`}>
+                  {c.code}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Team Editor */}
+      {teamData && (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">{teamData.flag}</span>
+              <div>
+                <h3 className="font-semibold text-navy">{teamData.name} Team</h3>
+                <p className="text-xs text-gray-500">{teamData.members.length} team members</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={addMember}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                Add Member
+              </button>
+              <button
+                onClick={saveTeam}
+                disabled={saving}
+                className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-medium bg-[#5DB347] text-white hover:bg-[#4a9a38] shadow-sm transition-colors disabled:opacity-50"
+              >
+                {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+                Save Team
+              </button>
+            </div>
+          </div>
+
+          {/* Tagline */}
+          <div className="px-6 py-4 border-b border-gray-50 bg-gray-50/50">
+            <label className="block text-xs font-medium text-gray-600 mb-1">Country Tagline</label>
+            <input
+              type="text"
+              value={teamData.tagline}
+              onChange={(e) => setTeamData({ ...teamData, tagline: e.target.value })}
+              placeholder="e.g. Innovation-driven agricultural finance"
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#5DB347]/20 focus:border-[#5DB347] transition-all"
+            />
+          </div>
+
+          {/* Member Cards */}
+          <div className="p-6 space-y-4">
+            {teamData.members.map((member, i) => (
+              <div key={i} className="bg-gray-50 rounded-xl p-5 border border-gray-100 relative group">
+                {teamData.members.length > 1 && (
+                  <button
+                    onClick={() => removeMember(i)}
+                    className="absolute top-3 right-3 p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all"
+                    title="Remove member"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                )}
+
+                <div className="flex items-start gap-4">
+                  {/* Avatar preview */}
+                  <div className="flex-shrink-0">
+                    <img
+                      src={
+                        member.avatar_url ||
+                        (member.name
+                          ? `https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&background=1B2A4A&color=5DB347&size=128&bold=true`
+                          : `https://ui-avatars.com/api/?name=?&background=1B2A4A&color=5DB347&size=128&bold=true`)
+                      }
+                      alt={member.name || 'Avatar'}
+                      className="w-14 h-14 rounded-full"
+                    />
+                  </div>
+
+                  {/* Fields */}
+                  <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[11px] font-medium text-gray-500 mb-0.5">Full Name</label>
+                      <input
+                        type="text"
+                        value={member.name}
+                        onChange={(e) => updateMember(i, 'name', e.target.value)}
+                        placeholder="e.g. James Otieno"
+                        className="w-full px-3 py-1.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#5DB347]/20 focus:border-[#5DB347] transition-all"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-medium text-gray-500 mb-0.5">Job Title</label>
+                      <input
+                        type="text"
+                        value={member.title}
+                        onChange={(e) => updateMember(i, 'title', e.target.value)}
+                        placeholder="e.g. Country Director"
+                        className="w-full px-3 py-1.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#5DB347]/20 focus:border-[#5DB347] transition-all"
+                      />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <label className="block text-[11px] font-medium text-gray-500 mb-0.5">Bio</label>
+                      <textarea
+                        value={member.bio}
+                        onChange={(e) => updateMember(i, 'bio', e.target.value)}
+                        rows={2}
+                        placeholder="Brief description of role and expertise..."
+                        className="w-full px-3 py-1.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#5DB347]/20 focus:border-[#5DB347] transition-all resize-y"
+                      />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <label className="block text-[11px] font-medium text-gray-500 mb-0.5">
+                        Custom Avatar URL <span className="text-gray-400">(optional - auto-generated from name)</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={member.avatar_url}
+                        onChange={(e) => updateMember(i, 'avatar_url', e.target.value)}
+                        placeholder="https://... (leave blank for auto-avatar)"
+                        className="w-full px-3 py-1.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#5DB347]/20 focus:border-[#5DB347] transition-all"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Empty State */}
+      {!selectedCountry && (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
+          <Users className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+          <h3 className="text-lg font-semibold text-navy mb-1">Select a Country</h3>
+          <p className="text-sm text-gray-500 max-w-md mx-auto">
+            Choose a country above to view and edit its leadership team. Team data is stored in
+            site_content and displayed on the About page.
+          </p>
         </div>
       )}
     </div>
