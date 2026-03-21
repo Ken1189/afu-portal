@@ -698,7 +698,7 @@ export default function QuotePage() {
                 <h2 className="text-base font-bold text-navy">{ti.estimatedPremium}</h2>
               </div>
 
-              <div className="bg-gradient-to-br from-navy via-navy to-teal rounded-2xl p-5 sm:p-6 text-white shadow-lg overflow-hidden relative">
+              <div className="bg-gradient-to-br from-navy via-navy to-[#8CB89C] rounded-2xl p-5 sm:p-6 text-white shadow-lg overflow-hidden relative">
                 {/* Decorative elements */}
                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-10 -mt-10" />
                 <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full -ml-8 -mb-8" />

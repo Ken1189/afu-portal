@@ -566,7 +566,7 @@ export default function CropScannerPage() {
               <div>
                 <h1 className="text-2xl font-bold text-navy">AI Crop Health Scanner</h1>
                 <div className="flex items-center gap-2 mt-0.5">
-                  <span className="inline-flex items-center gap-1.5 text-xs font-medium bg-gradient-to-r from-teal/10 to-gold/10 text-teal px-2.5 py-1 rounded-full border border-teal/20">
+                  <span className="inline-flex items-center gap-1.5 text-xs font-medium bg-gradient-to-r from-[#8CB89C]/10 to-gold/10 text-teal px-2.5 py-1 rounded-full border border-teal/20">
                     <Sparkles className="w-3 h-3 text-gold" />
                     Powered by Mkulima AI
                   </span>
@@ -744,7 +744,7 @@ export default function CropScannerPage() {
                     </div>
                     <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
                       <motion.div
-                        className="h-3 rounded-full bg-gradient-to-r from-teal to-gold"
+                        className="h-3 rounded-full bg-gradient-to-r from-[#8CB89C] to-gold"
                         initial={{ width: '0%' }}
                         animate={{ width: `${analysisProgress}%` }}
                         transition={{ duration: 0.5, ease: 'easeOut' as const }}

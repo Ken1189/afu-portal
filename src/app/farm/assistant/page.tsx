@@ -588,7 +588,7 @@ export default function AssistantPage() {
       {/* ─── Header Enhancement ─── */}
       <div className="bg-white border-b border-gray-100 px-4 py-2">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-teal to-teal-dark flex items-center justify-center">
+          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#8CB89C] to-[#729E82] flex items-center justify-center">
             <Bot size={18} className="text-white" />
           </div>
           <div className="flex-1">

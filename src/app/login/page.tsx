@@ -237,7 +237,7 @@ export default function LoginPage() {
         />
 
         {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-navy/90 via-navy/80 to-teal/70" />
+        <div className="absolute inset-0 bg-gradient-to-br from-navy/90 via-navy/80 to-[#8CB89C]/70" />
 
         {/* Decorative background shapes */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">

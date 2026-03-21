@@ -73,7 +73,7 @@ const initialFormData: FormData = {
 
 /* ─── Shared input styles ─── */
 const inputCls =
-  'w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal/50 focus:border-teal transition-colors bg-white text-navy placeholder:text-gray-400';
+  'w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/50 focus:border-[#8CB89C] transition-colors bg-white text-navy placeholder:text-gray-400';
 const labelCls = 'block text-sm font-medium text-navy mb-2';
 const errorCls = 'text-red-500 text-xs mt-1 flex items-center gap-1';
 
@@ -173,7 +173,7 @@ export default function FinancingApplyPage() {
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.4 }}
-          className="bg-gradient-to-br from-teal-light to-white rounded-2xl p-12 border border-teal/20"
+          className="bg-gradient-to-br from-[#EDF4EF] to-white rounded-2xl p-12 border border-[#8CB89C]/20"
         >
           <motion.div
             initial={{ scale: 0 }}
@@ -751,7 +751,7 @@ export default function FinancingApplyPage() {
             <button
               type="button"
               onClick={handleSubmit}
-              className="flex items-center gap-2 bg-teal hover:bg-teal-dark text-white px-10 py-3 rounded-xl font-semibold transition-colors shadow-lg shadow-teal/25"
+              className="flex items-center gap-2 bg-teal hover:bg-teal-dark text-white px-10 py-3 rounded-xl font-semibold transition-colors shadow-lg shadow-[#8CB89C]/25"
             >
               <CheckCircle2 className="w-5 h-5" />
               Submit Application

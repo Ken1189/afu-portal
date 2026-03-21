@@ -557,7 +557,7 @@ function OffspringGroupCard({
               {off.id && off.id.startsWith('ANM-') && (
                 <Link
                   href="/farm/livestock"
-                  className="text-[10px] font-semibold text-[#8CB89C] hover:text-[#729E82] px-2 py-1 rounded-lg hover:bg-teal-50 transition-colors shrink-0"
+                  className="text-[10px] font-semibold text-[#8CB89C] hover:text-[#729E82] px-2 py-1 rounded-lg hover:bg-[#EDF4EF] transition-colors shrink-0"
                 >
                   View
                 </Link>
@@ -747,7 +747,7 @@ export default function LivestockBreedingPage() {
               label: 'Success Rate',
               value: `${stats.successRate}%`,
               icon: <TrendingUp size={20} className="text-[#8CB89C]" />,
-              accent: 'bg-teal-50',
+              accent: 'bg-[#EDF4EF]',
             },
             {
               label: 'Next Due Date',
@@ -944,7 +944,7 @@ export default function LivestockBreedingPage() {
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="bg-gradient-to-r from-green-50 to-teal-50 border border-green-200 rounded-xl p-4 mb-6 flex items-center gap-3"
+                className="bg-gradient-to-r from-green-50 to-[#EDF4EF] border border-green-200 rounded-xl p-4 mb-6 flex items-center gap-3"
               >
                 <div className="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center">
                   <Users size={20} className="text-green-600" />

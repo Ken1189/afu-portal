@@ -85,7 +85,7 @@ const activityConfig: Record<
   spraying: { label: 'Spraying', icon: Bug, color: 'text-orange-600', bgColor: 'bg-orange-100', borderColor: 'border-orange-500' },
   weeding: { label: 'Weeding', icon: Flower2, color: 'text-yellow-600', bgColor: 'bg-yellow-100', borderColor: 'border-yellow-500' },
   harvesting: { label: 'Harvesting', icon: Package, color: 'text-amber-600', bgColor: 'bg-amber-100', borderColor: 'border-amber-500' },
-  scouting: { label: 'Scouting', icon: Search, color: 'text-teal-600', bgColor: 'bg-teal-100', borderColor: 'border-teal-500' },
+  scouting: { label: 'Scouting', icon: Search, color: 'text-[#729E82]', bgColor: 'bg-[#EDF4EF]', borderColor: 'border-[#8CB89C]' },
   'soil-test': { label: 'Soil Test', icon: TestTube, color: 'text-amber-800', bgColor: 'bg-amber-50', borderColor: 'border-amber-800' },
   pruning: { label: 'Pruning', icon: Scissors, color: 'text-pink-600', bgColor: 'bg-pink-100', borderColor: 'border-pink-500' },
   other: { label: 'Other', icon: MoreHorizontal, color: 'text-gray-600', bgColor: 'bg-gray-100', borderColor: 'border-gray-400' },
@@ -757,7 +757,7 @@ function NewEntryForm({ onClose, onSave }: { onClose: () => void; onSave: (entry
             disabled={!canSave}
             className={`w-full py-3.5 rounded-2xl text-sm font-bold transition-all min-h-[48px] ${
               canSave
-                ? 'bg-teal text-white active:bg-teal-dark shadow-lg shadow-teal/25'
+                ? 'bg-teal text-white active:bg-teal-dark shadow-lg shadow-[#8CB89C]/25'
                 : 'bg-gray-200 text-gray-400 cursor-not-allowed'
             }`}
           >
@@ -849,7 +849,7 @@ export default function FarmJournalPage() {
         <motion.button
           whileTap={{ scale: 0.97 }}
           onClick={() => setShowNewEntry(true)}
-          className="w-full bg-gradient-to-r from-teal to-teal-dark text-white py-3.5 rounded-2xl text-sm font-bold shadow-lg shadow-teal/25 active:shadow-md transition-shadow flex items-center justify-center gap-2 min-h-[48px]"
+          className="w-full bg-gradient-to-r from-[#8CB89C] to-[#729E82] text-white py-3.5 rounded-2xl text-sm font-bold shadow-lg shadow-[#8CB89C]/25 active:shadow-md transition-shadow flex items-center justify-center gap-2 min-h-[48px]"
         >
           <Plus className="w-5 h-5" />
           {t.farmJournal.whatDidYouDo}

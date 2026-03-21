@@ -338,7 +338,7 @@ function ScanningOverlay() {
       />
       {/* Scanning line */}
       <motion.div
-        className="absolute left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-teal to-transparent"
+        className="absolute left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-[#8CB89C] to-transparent"
         style={{ boxShadow: '0 0 20px 4px rgba(42, 161, 152, 0.4)' }}
         initial={{ top: '0%' }}
         animate={{ top: ['0%', '100%', '0%'] }}
@@ -595,7 +595,7 @@ export default function CropDoctorPage() {
               />
               <button
                 onClick={() => cameraInputRef.current?.click()}
-                className="w-full h-24 sm:h-32 bg-gradient-to-br from-teal to-teal-dark text-white rounded-2xl flex flex-col items-center justify-center gap-2 shadow-lg shadow-teal/20 active:scale-[0.98] transition-transform"
+                className="w-full h-24 sm:h-32 bg-gradient-to-br from-[#8CB89C] to-[#729E82] text-white rounded-2xl flex flex-col items-center justify-center gap-2 shadow-lg shadow-[#8CB89C]/20 active:scale-[0.98] transition-transform"
               >
                 <Camera className="w-10 h-10" />
                 <span className="text-base font-bold">{t.cropDoctor.takePhoto}</span>
@@ -951,7 +951,7 @@ export default function CropDoctorPage() {
             >
               <button
                 onClick={resetScan}
-                className="w-full h-14 bg-gradient-to-br from-teal to-teal-dark text-white rounded-2xl flex items-center justify-center gap-2 font-bold shadow-lg shadow-teal/20 active:scale-[0.98] transition-transform"
+                className="w-full h-14 bg-gradient-to-br from-[#8CB89C] to-[#729E82] text-white rounded-2xl flex items-center justify-center gap-2 font-bold shadow-lg shadow-[#8CB89C]/20 active:scale-[0.98] transition-transform"
               >
                 <RotateCcw className="w-5 h-5" />
                 {t.cropDoctor.scanAnother}

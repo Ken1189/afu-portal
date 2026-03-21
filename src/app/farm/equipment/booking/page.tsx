@@ -1002,7 +1002,7 @@ function BookingContent() {
                 Pricing
               </h2>
               <div className="grid grid-cols-3 gap-3">
-                <div className="bg-teal-50/50 rounded-xl p-4 text-center border border-teal-100">
+                <div className="bg-[#EDF4EF]/50 rounded-xl p-4 text-center border border-[#EDF4EF]">
                   <div className="text-[10px] text-gray-400 uppercase tracking-wider mb-1">
                     Daily
                   </div>
@@ -1151,7 +1151,7 @@ function BookingContent() {
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
-                    className="bg-teal-50/50 rounded-xl p-4 border border-teal-100"
+                    className="bg-[#EDF4EF]/50 rounded-xl p-4 border border-[#EDF4EF]"
                   >
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-xs text-gray-500">Duration</span>
@@ -1293,7 +1293,7 @@ function BookingContent() {
                   }
                   className={`w-full h-12 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all ${
                     startDate && endDate && days > 0 && minDaysValid
-                      ? 'bg-[#8CB89C] text-white hover:bg-[#729E82] active:scale-[0.97] shadow-lg shadow-teal-200/40'
+                      ? 'bg-[#8CB89C] text-white hover:bg-[#729E82] active:scale-[0.97] shadow-lg shadow-[#8CB89C]/40'
                       : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                   }`}
                 >

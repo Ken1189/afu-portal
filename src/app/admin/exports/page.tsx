@@ -551,7 +551,7 @@ export default function AdminExportsPage() {
   // ── Filtered & sorted shipments ───────────────────────────────────────
 
   const filteredShipments = useMemo(() => {
-    let results = mockShipments.filter((s) => {
+    const results = mockShipments.filter((s) => {
       if (statusFilter !== 'all' && s.status !== statusFilter) return false;
       if (destinationFilter !== 'all' && s.destination !== destinationFilter) return false;
       if (productFilter !== 'all' && s.product !== productFilter) return false;
@@ -1108,7 +1108,7 @@ export default function AdminExportsPage() {
                             initial={{ height: 0 }}
                             animate={{ height: `${heightPct}%` }}
                             transition={{ duration: 0.8, delay: 0.2 }}
-                            className="absolute bottom-0 w-full rounded-t-md bg-gradient-to-t from-teal to-teal/70"
+                            className="absolute bottom-0 w-full rounded-t-md bg-gradient-to-t from-[#8CB89C] to-[#8CB89C]/70"
                           />
                         </div>
                         <span className="text-[10px] text-gray-500 font-medium">{month.month}</span>
@@ -1177,7 +1177,7 @@ export default function AdminExportsPage() {
                               initial={{ width: 0 }}
                               animate={{ width: `${widthPct}%` }}
                               transition={{ duration: 0.6, delay: 0.05 * i }}
-                              className="h-2 rounded-full bg-gradient-to-r from-navy to-teal"
+                              className="h-2 rounded-full bg-gradient-to-r from-navy to-[#8CB89C]"
                             />
                           </div>
                         </div>

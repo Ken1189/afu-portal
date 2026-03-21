@@ -388,7 +388,7 @@ export default function InputsMarketplacePage() {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => setCartOpen(true)}
-          className="relative inline-flex items-center gap-2 bg-teal text-white px-5 py-2.5 rounded-xl font-semibold text-sm shadow-md shadow-teal/20 hover:bg-teal-dark transition-colors self-start sm:self-auto"
+          className="relative inline-flex items-center gap-2 bg-teal text-white px-5 py-2.5 rounded-xl font-semibold text-sm shadow-md shadow-[#8CB89C]/20 hover:bg-teal-dark transition-colors self-start sm:self-auto"
         >
           <ShoppingCart className="w-5 h-5" />
           <span>Cart</span>
@@ -451,7 +451,7 @@ export default function InputsMarketplacePage() {
               onClick={() => setSelectedCategory(cat.value)}
               className={`relative flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${
                 isActive
-                  ? 'bg-teal text-white shadow-md shadow-teal/20'
+                  ? 'bg-teal text-white shadow-md shadow-[#8CB89C]/20'
                   : 'bg-white text-gray-600 border border-gray-200 hover:border-teal/30 hover:text-teal'
               }`}
             >
@@ -803,7 +803,7 @@ export default function InputsMarketplacePage() {
                   </div>
 
                   {/* Request Quote */}
-                  <button className="w-full flex items-center justify-center gap-2 bg-teal text-white py-3.5 rounded-xl font-semibold text-sm shadow-md shadow-teal/20 hover:bg-teal-dark transition-colors">
+                  <button className="w-full flex items-center justify-center gap-2 bg-teal text-white py-3.5 rounded-xl font-semibold text-sm shadow-md shadow-[#8CB89C]/20 hover:bg-teal-dark transition-colors">
                     <FileText className="w-4 h-4" />
                     Request Quote
                   </button>

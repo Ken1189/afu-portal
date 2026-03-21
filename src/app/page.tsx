@@ -178,11 +178,11 @@ const services = [
 const flywheelSteps = [
   { step: 1, label: 'Capital', icon: Banknote, bg: 'linear-gradient(135deg, #1B2A4A, #2D4A7A)' },
   { step: 2, label: 'Inputs', icon: Sprout, bg: 'linear-gradient(135deg, #5DB347, #449933)' },
-  { step: 3, label: 'Production', icon: Tractor, bg: 'linear-gradient(135deg, #2AA198, #1A7A72)' },
+  { step: 3, label: 'Production', icon: Tractor, bg: 'linear-gradient(135deg, #8CB89C, #729E82)' },
   { step: 4, label: 'Processing', icon: Factory, bg: 'linear-gradient(135deg, #4A9E35, #449933)' },
   { step: 5, label: 'Offtake', icon: ShieldCheck, bg: 'linear-gradient(135deg, #2D4A7A, #1B2A4A)' },
   { step: 6, label: 'Trade Finance', icon: Scale, bg: 'linear-gradient(135deg, #6ABF4B, #5DB347)' },
-  { step: 7, label: 'Cash Recycle', icon: TrendingUp, bg: 'linear-gradient(135deg, #5DB347, #2AA198)' },
+  { step: 7, label: 'Cash Recycle', icon: TrendingUp, bg: 'linear-gradient(135deg, #5DB347, #8CB89C)' },
 ];
 
 /* ─── Testimonials ─── */
@@ -866,7 +866,7 @@ export default function Home() {
             {[
               { icon: Target, value: '$1T', label: 'African Agri Market by 2030', color: 'from-gold to-amber-500' },
               { icon: TrendingUp, value: '32%', label: 'Projected Annual ROI', color: 'from-green-400 to-emerald-500' },
-              { icon: PieChart, value: '$50B+', label: 'Annual Food Import Gap', color: 'from-teal to-cyan-400' },
+              { icon: PieChart, value: '$50B+', label: 'Annual Food Import Gap', color: 'from-[#8CB89C] to-cyan-400' },
               { icon: LineChart, value: '10x', label: 'Value-Chain Multiplier', color: 'from-purple-400 to-indigo-400' },
             ].map((item) => {
               const Icon = item.icon;

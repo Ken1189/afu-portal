@@ -230,7 +230,7 @@ const categoryGradients: Record<string, string> = {
   fertilizer: 'from-amber-400 to-orange-600',
   pesticides: 'from-red-400 to-rose-600',
   equipment: 'from-blue-400 to-indigo-600',
-  irrigation: 'from-cyan-400 to-teal-600',
+  irrigation: 'from-cyan-400 to-[#729E82]',
   technology: 'from-purple-400 to-violet-600',
   packaging: 'from-orange-400 to-amber-600',
   storage: 'from-gray-400 to-slate-600',

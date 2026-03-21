@@ -448,7 +448,7 @@ export default function MoneyTrackerPage() {
         {/* 1. PROFIT SUMMARY CARD                                            */}
         {/* ================================================================= */}
         <motion.section variants={itemVariants} className="px-4">
-          <div className="rounded-2xl bg-gradient-to-br from-teal to-teal-dark p-5 text-white relative overflow-hidden">
+          <div className="rounded-2xl bg-gradient-to-br from-[#8CB89C] to-[#729E82] p-5 text-white relative overflow-hidden">
             {/* Decorative circles */}
             <div className="absolute -top-8 -right-8 w-32 h-32 bg-white/5 rounded-full" />
             <div className="absolute -bottom-6 -left-6 w-24 h-24 bg-white/5 rounded-full" />
@@ -762,7 +762,7 @@ export default function MoneyTrackerPage() {
         {/* 7. AI INSIGHT CARD                                                */}
         {/* ================================================================= */}
         <motion.section variants={itemVariants} className="px-4 pb-2">
-          <div className="rounded-2xl bg-gradient-to-br from-teal to-teal-dark p-4 text-white relative overflow-hidden">
+          <div className="rounded-2xl bg-gradient-to-br from-[#8CB89C] to-[#729E82] p-4 text-white relative overflow-hidden">
             {/* Decorative */}
             <div className="absolute -top-6 -right-6 w-24 h-24 bg-white/10 rounded-full" />
             <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-white/5 rounded-full" />

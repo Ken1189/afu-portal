@@ -707,8 +707,8 @@ export default function DashboardPage() {
                 <AreaChart data={LOAN_PORTFOLIO} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
                   <defs>
                     <linearGradient id="gradWC" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#2AA198" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#2AA198" stopOpacity={0} />
+                      <stop offset="5%" stopColor="#8CB89C" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#8CB89C" stopOpacity={0} />
                     </linearGradient>
                     <linearGradient id="gradIF" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#1B2A4A" stopOpacity={0.3} />
@@ -742,7 +742,7 @@ export default function DashboardPage() {
                     dataKey="workingCapital"
                     name="Working Capital"
                     stackId="1"
-                    stroke="#2AA198"
+                    stroke="#8CB89C"
                     fill="url(#gradWC)"
                     strokeWidth={2}
                   />

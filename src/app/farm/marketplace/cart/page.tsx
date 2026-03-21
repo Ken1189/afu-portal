@@ -105,7 +105,7 @@ const categoryGradients: Record<string, string> = {
   fertilizer: 'from-amber-400 to-orange-600',
   pesticides: 'from-red-400 to-rose-600',
   equipment: 'from-blue-400 to-indigo-600',
-  irrigation: 'from-cyan-400 to-teal-600',
+  irrigation: 'from-cyan-400 to-[#729E82]',
   technology: 'from-purple-400 to-violet-600',
   packaging: 'from-orange-400 to-amber-600',
   storage: 'from-gray-400 to-slate-600',
@@ -398,7 +398,7 @@ export default function CartPage() {
         className="space-y-4 py-4"
       >
         <motion.section variants={itemVariants} className="px-4 lg:px-6">
-          <div className="rounded-2xl bg-gradient-to-br from-teal to-teal-dark py-20 px-6 flex flex-col items-center text-center relative overflow-hidden">
+          <div className="rounded-2xl bg-gradient-to-br from-[#8CB89C] to-[#729E82] py-20 px-6 flex flex-col items-center text-center relative overflow-hidden">
             {/* Decorative */}
             <div className="absolute -top-8 -right-8 w-28 h-28 bg-white/10 rounded-full" />
             <div className="absolute -bottom-6 -left-6 w-20 h-20 bg-white/5 rounded-full" />
@@ -636,7 +636,7 @@ export default function CartPage() {
                 <button
                   onClick={handlePlaceOrder}
                   disabled={isPlacing}
-                  className="w-full mt-2 h-12 rounded-xl bg-teal text-white text-sm font-bold flex items-center justify-center gap-2 hover:bg-teal-dark active:scale-[0.98] transition-all shadow-sm shadow-teal/20 min-h-[48px] disabled:opacity-60"
+                  className="w-full mt-2 h-12 rounded-xl bg-teal text-white text-sm font-bold flex items-center justify-center gap-2 hover:bg-teal-dark active:scale-[0.98] transition-all shadow-sm shadow-[#8CB89C]/20 min-h-[48px] disabled:opacity-60"
                 >
                   {isPlacing ? (
                     <>

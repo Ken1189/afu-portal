@@ -399,7 +399,7 @@ export default function MemberDetailPage() {
       >
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 bg-gradient-to-br from-teal to-navy rounded-2xl flex items-center justify-center shadow-lg">
+            <div className="w-16 h-16 bg-gradient-to-br from-[#8CB89C] to-navy rounded-2xl flex items-center justify-center shadow-lg">
               <span className="text-white text-xl font-bold">
                 {member.firstName[0]}{member.lastName[0]}
               </span>

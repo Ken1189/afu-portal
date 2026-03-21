@@ -123,7 +123,7 @@ const roleCards: { key: Role; label: string; description: string; icon: React.El
     label: 'Farmer',
     description: 'I grow crops or raise livestock',
     icon: Sprout,
-    gradient: 'from-emerald-500 to-teal-600',
+    gradient: 'from-emerald-500 to-[#729E82]',
   },
   {
     key: 'supplier',
@@ -174,7 +174,7 @@ function Chip({
       onClick={onClick}
       className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 border ${
         selected
-          ? 'bg-[#8CB89C] text-white border-[#8CB89C] shadow-md shadow-teal-500/20'
+          ? 'bg-[#8CB89C] text-white border-[#8CB89C] shadow-md shadow-[#8CB89C]/20'
           : 'bg-white text-gray-600 border-gray-200 hover:border-[#8CB89C] hover:text-[#8CB89C]'
       }`}
     >
@@ -283,7 +283,7 @@ export default function OnboardingPage() {
               onClick={() => update('role', role.key)}
               className={`relative p-6 rounded-2xl border-2 transition-all duration-300 text-left ${
                 selected
-                  ? 'border-[#8CB89C] bg-teal-50/50 shadow-lg shadow-teal-500/10'
+                  ? 'border-[#8CB89C] bg-[#EDF4EF]/50 shadow-lg shadow-[#8CB89C]/10'
                   : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-md'
               }`}
             >
@@ -569,7 +569,7 @@ export default function OnboardingPage() {
                 onClick={() => toggleArrayItem('notifications', ch.key)}
                 className={`flex items-center gap-2 px-4 py-3 rounded-xl border-2 transition-all duration-200 text-sm font-medium ${
                   selected
-                    ? 'border-[#8CB89C] bg-teal-50 text-[#8CB89C]'
+                    ? 'border-[#8CB89C] bg-[#EDF4EF] text-[#8CB89C]'
                     : 'border-gray-200 text-gray-500 hover:border-gray-300'
                 }`}
               >
@@ -704,7 +704,7 @@ export default function OnboardingPage() {
   /*  Main render                                                      */
   /* ---------------------------------------------------------------- */
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-teal-50/30 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-[#EDF4EF]/30 flex items-center justify-center p-4">
       <div className="w-full max-w-2xl">
         {/* Progress indicator */}
         <div className="mb-8">

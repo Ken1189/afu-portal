@@ -129,7 +129,7 @@ const categoryConfig: Record<
   'Insurance Premium': { icon: Shield, color: 'text-purple-600', bg: 'bg-purple-100' },
   'Loan Repayment': { icon: Landmark, color: 'text-orange-600', bg: 'bg-orange-100' },
   'Equipment Rental': { icon: Wrench, color: 'text-slate-600', bg: 'bg-slate-100' },
-  Cooperative: { icon: Users, color: 'text-teal-600', bg: 'bg-teal-100' },
+  Cooperative: { icon: Users, color: 'text-[#729E82]', bg: 'bg-[#EDF4EF]' },
   Transport: { icon: Truck, color: 'text-indigo-600', bg: 'bg-indigo-100' },
   'Input Purchase': { icon: Sprout, color: 'text-green-600', bg: 'bg-green-100' },
   'Harvest Sale': { icon: Leaf, color: 'text-amber-600', bg: 'bg-amber-100' },
@@ -206,7 +206,7 @@ const barColors = [COLORS.navy, '#7C3AED', COLORS.gold, '#64748B', '#6366F1', CO
 // ---------------------------------------------------------------------------
 const paymentMethods = [
   { name: 'EcoCash', icon: Smartphone, balance: '$1,240', lastUsed: 'Today', gradient: 'from-green-500 to-green-700' },
-  { name: 'M-Pesa', icon: Smartphone, balance: '$860', lastUsed: '2 days ago', gradient: 'from-emerald-500 to-teal-600' },
+  { name: 'M-Pesa', icon: Smartphone, balance: '$860', lastUsed: '2 days ago', gradient: 'from-emerald-500 to-[#729E82]' },
   { name: 'Bank Transfer', icon: Building2, balance: '$4,320', lastUsed: 'Yesterday', gradient: 'from-blue-500 to-blue-700' },
   { name: 'Card', icon: CreditCard, balance: '****4821', lastUsed: '5 days ago', gradient: 'from-purple-500 to-purple-700' },
   { name: 'Cash', icon: Banknote, balance: '-', lastUsed: '3 days ago', gradient: 'from-amber-500 to-orange-600' },
@@ -448,18 +448,18 @@ export default function PaymentHistoryPage() {
             whileHover={{ y: -4, transition: { duration: 0.2 } }}
             className="group relative overflow-hidden rounded-2xl border border-teal-100 bg-white p-5 shadow-sm transition-shadow hover:shadow-lg"
           >
-            <div className="absolute -right-4 -top-4 h-20 w-20 rounded-full bg-teal-50 opacity-60 transition-transform group-hover:scale-125" />
+            <div className="absolute -right-4 -top-4 h-20 w-20 rounded-full bg-[#EDF4EF] opacity-60 transition-transform group-hover:scale-125" />
             <div className="relative">
               <div className="mb-3 flex items-center justify-between">
-                <span className="text-xs font-semibold uppercase tracking-wider text-teal-500">Net Balance</span>
+                <span className="text-xs font-semibold uppercase tracking-wider text-[#8CB89C]">Net Balance</span>
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-teal-100">
-                  <CircleDollarSign className="h-5 w-5 text-teal-600" />
+                  <CircleDollarSign className="h-5 w-5 text-[#729E82]" />
                 </div>
               </div>
               <p className="text-2xl font-bold" style={{ color: COLORS.tealDark }}>
                 {formatCurrency(summary.net)}
               </p>
-              <p className="mt-1 flex items-center gap-1 text-xs text-teal-500">
+              <p className="mt-1 flex items-center gap-1 text-xs text-[#8CB89C]">
                 <TrendingUp className="h-3 w-3" /> Credits minus debits
               </p>
             </div>
@@ -692,7 +692,7 @@ export default function PaymentHistoryPage() {
                   { label: 'Pay Premium', icon: Shield, gradient: 'from-purple-500 to-purple-700', desc: 'Insurance payment' },
                   { label: 'Repay Loan', icon: Landmark, gradient: 'from-orange-500 to-red-500', desc: 'Loan installment' },
                   { label: 'Download Statement', icon: Download, gradient: 'from-blue-500 to-indigo-600', desc: 'PDF / CSV export' },
-                  { label: 'Request Receipt', icon: Receipt, gradient: 'from-teal-500 to-emerald-600', desc: 'Transaction proof' },
+                  { label: 'Request Receipt', icon: Receipt, gradient: 'from-[#8CB89C] to-emerald-600', desc: 'Transaction proof' },
                 ].map((action) => {
                   const Icon = action.icon;
                   return (

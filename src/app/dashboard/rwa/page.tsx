@@ -245,7 +245,7 @@ export default function RwaPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="bg-gradient-to-br from-navy to-teal rounded-2xl p-5 sm:p-6 text-white"
+        className="bg-gradient-to-br from-navy to-[#8CB89C] rounded-2xl p-5 sm:p-6 text-white"
       >
         <div className="flex items-start gap-4">
           <div className="w-12 h-12 bg-white/15 rounded-xl flex items-center justify-center flex-shrink-0">

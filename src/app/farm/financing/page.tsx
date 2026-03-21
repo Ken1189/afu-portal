@@ -259,7 +259,7 @@ export default function FinancingPage() {
             )}
 
             {/* AFU Benefits */}
-            <div className="bg-gradient-to-br from-navy to-teal rounded-xl p-5 text-white">
+            <div className="bg-gradient-to-br from-navy to-[#8CB89C] rounded-xl p-5 text-white">
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
                   <Star className="w-5 h-5" />
@@ -333,7 +333,7 @@ export default function FinancingPage() {
               /* ── Application Form ── */
               <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
                 {/* Form Header */}
-                <div className="bg-gradient-to-r from-teal to-navy p-5 text-white">
+                <div className="bg-gradient-to-r from-[#8CB89C] to-navy p-5 text-white">
                   <h2 className="font-bold text-lg">{tf.applyTitle}</h2>
                   <p className="text-sm opacity-80 mt-1">{tf.applySubtitle}</p>
                   {/* Step indicator */}

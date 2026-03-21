@@ -52,7 +52,7 @@ const TIER_CONFIG = [
     name: 'Standard',
     limit: '$5,000/month',
     requirements: ['National ID or Passport', 'Selfie with ID', 'Proof of Address'],
-    color: 'from-teal/10 to-teal/5',
+    color: 'from-[#8CB89C]/10 to-[#8CB89C]/5',
     borderColor: 'border-teal/30',
   },
   {
@@ -183,7 +183,7 @@ export default function KycPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-br from-navy to-teal rounded-2xl p-5 text-white"
+          className="bg-gradient-to-br from-navy to-[#8CB89C] rounded-2xl p-5 text-white"
         >
           <div className="flex items-center justify-between">
             <div>

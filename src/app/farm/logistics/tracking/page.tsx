@@ -945,7 +945,7 @@ export default function TrackingPage() {
       {/* HEADER                                                            */}
       {/* ================================================================= */}
       <motion.section variants={cardVariants} className="px-4 lg:px-6">
-        <div className="rounded-2xl bg-gradient-to-br from-teal to-teal/80 p-5 text-white relative overflow-hidden">
+        <div className="rounded-2xl bg-gradient-to-br from-[#8CB89C] to-[#8CB89C]/80 p-5 text-white relative overflow-hidden">
           {/* Decorative circles */}
           <div className="absolute -top-10 -right-10 w-32 h-32 bg-white/5 rounded-full" />
           <div className="absolute -bottom-8 -right-6 w-24 h-24 bg-white/5 rounded-full" />

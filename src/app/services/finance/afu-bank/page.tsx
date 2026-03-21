@@ -103,7 +103,7 @@ export default function AFUBankPage() {
       </section>
 
       {/* Gradient Banner */}
-      <section className="bg-gradient-to-r from-teal to-teal-dark text-white py-10">
+      <section className="bg-gradient-to-r from-[#8CB89C] to-[#729E82] text-white py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-center gap-10 text-center">
           <div>
             <div className="text-2xl font-bold">12,000+</div>

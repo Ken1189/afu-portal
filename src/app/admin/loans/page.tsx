@@ -249,7 +249,7 @@ const recentActivity: RecentActivity[] = [
 const pipelineColumns = [
   { label: 'Applied', count: 12, color: 'bg-blue-500', lightColor: 'bg-blue-50', textColor: 'text-blue-700' },
   { label: 'Under Review', count: 5, color: 'bg-amber-500', lightColor: 'bg-amber-50', textColor: 'text-amber-700' },
-  { label: 'Approved', count: 3, color: 'bg-teal-500', lightColor: 'bg-teal-50', textColor: 'text-teal-700' },
+  { label: 'Approved', count: 3, color: 'bg-[#8CB89C]', lightColor: 'bg-[#EDF4EF]', textColor: 'text-teal-700' },
   { label: 'Disbursed', count: 187, color: 'bg-navy', lightColor: 'bg-navy/5', textColor: 'text-navy' },
 ];
 
@@ -257,7 +257,7 @@ const pipelineColumns = [
 
 const creditDistribution = [
   { label: 'Excellent', range: '800–1000', pct: 34, color: 'bg-green-500' },
-  { label: 'Good', range: '600–799', pct: 41, color: 'bg-teal-500' },
+  { label: 'Good', range: '600–799', pct: 41, color: 'bg-[#8CB89C]' },
   { label: 'Fair', range: '400–599', pct: 18, color: 'bg-amber-400' },
   { label: 'Poor', range: '<400', pct: 7, color: 'bg-red-400' },
 ];
@@ -277,7 +277,7 @@ function formatDate(dateStr: string): string {
 
 function getCreditScoreColor(score: number): string {
   if (score >= 800) return 'text-green-600 bg-green-50';
-  if (score >= 600) return 'text-teal-600 bg-teal-50';
+  if (score >= 600) return 'text-[#729E82] bg-[#EDF4EF]';
   if (score >= 400) return 'text-amber-600 bg-amber-50';
   return 'text-red-600 bg-red-50';
 }
@@ -304,7 +304,7 @@ const statusConfig: Record<ApplicationStatus, { label: string; color: string }> 
 };
 
 const activityTypeConfig: Record<RecentActivity['type'], { icon: React.ReactNode; color: string }> = {
-  disbursed: { icon: <Send className="w-3.5 h-3.5" />, color: 'bg-teal-100 text-teal-600' },
+  disbursed: { icon: <Send className="w-3.5 h-3.5" />, color: 'bg-teal-100 text-[#729E82]' },
   approved: { icon: <CheckCircle className="w-3.5 h-3.5" />, color: 'bg-green-100 text-green-600' },
   repaid: { icon: <DollarSign className="w-3.5 h-3.5" />, color: 'bg-blue-100 text-blue-600' },
   applied: { icon: <ArrowUpRight className="w-3.5 h-3.5" />, color: 'bg-purple-100 text-purple-600' },
@@ -773,7 +773,7 @@ export default function LoansPage() {
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => handleDisburse(entry.loanId)}
-                            className="flex items-center gap-1 mx-auto px-3 py-1 bg-teal-500 text-white text-[11px] font-medium rounded-lg hover:bg-teal-600 transition-colors"
+                            className="flex items-center gap-1 mx-auto px-3 py-1 bg-[#8CB89C] text-white text-[11px] font-medium rounded-lg hover:bg-[#729E82] transition-colors"
                           >
                             <Send className="w-3 h-3" />
                             Disburse
@@ -832,7 +832,7 @@ export default function LoansPage() {
             </div>
             <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
               <motion.div
-                className="h-full rounded-full bg-gradient-to-r from-teal-500 to-green-500"
+                className="h-full rounded-full bg-gradient-to-r from-[#8CB89C] to-green-500"
                 initial={{ width: 0 }}
                 animate={{ width: '50%' }}
                 transition={{ duration: 1, ease: 'easeOut' }}
@@ -876,7 +876,7 @@ export default function LoansPage() {
             })}
           </div>
           <div className="mt-4 pt-4 border-t border-gray-100">
-            <button className="w-full text-xs text-center text-teal-600 hover:text-teal-700 font-medium transition-colors">
+            <button className="w-full text-xs text-center text-[#729E82] hover:text-teal-700 font-medium transition-colors">
               View all activity &rarr;
             </button>
           </div>
