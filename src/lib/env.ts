@@ -1,15 +1,17 @@
 import { z } from 'zod';
 
-const envSchema = z.object({
-  // Supabase
-  NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(30),
-  SUPABASE_SERVICE_ROLE_KEY: z.string().min(30),
+// ─── Server-side env vars (only validated on the server) ────────────────────
 
-  // Sentry (optional)
+const serverSchema = z.object({
+  // Supabase — required
+  SUPABASE_SERVICE_ROLE_KEY: z.string().min(1, 'Missing SUPABASE_SERVICE_ROLE_KEY'),
+
+  // Sentry — optional for dev
+  SENTRY_ORG: z.string().optional(),
+  SENTRY_PROJECT: z.string().optional(),
   NEXT_PUBLIC_SENTRY_DSN: z.string().url().optional(),
 
-  // Notifications (optional — only needed when channels are active)
+  // Notifications — optional (only needed when channels are active)
   RESEND_API_KEY: z.string().optional(),
   EMAIL_FROM: z.string().email().optional(),
   TWILIO_ACCOUNT_SID: z.string().optional(),
@@ -18,36 +20,81 @@ const envSchema = z.object({
   WHATSAPP_TOKEN: z.string().optional(),
   WHATSAPP_PHONE_NUMBER_ID: z.string().optional(),
 
-  // Blockchain (optional)
-  NEXT_PUBLIC_EDMA_RPC_URL: z.string().url().optional(),
-
-  // Stripe (optional)
+  // Stripe — optional
   STRIPE_SECRET_KEY: z.string().optional(),
-  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().optional(),
 
   // App
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
 });
 
-export type Env = z.infer<typeof envSchema>;
+// ─── Client-side env vars (validated everywhere) ────────────────────────────
 
-function validateEnv(): Env {
-  const result = envSchema.safeParse(process.env);
+const clientSchema = z.object({
+  NEXT_PUBLIC_SUPABASE_URL: z.string().url('Invalid NEXT_PUBLIC_SUPABASE_URL'),
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1, 'Missing NEXT_PUBLIC_SUPABASE_ANON_KEY'),
+  NEXT_PUBLIC_APP_URL: z.string().url().optional(),
+  NEXT_PUBLIC_APP_NAME: z.string().optional(),
+  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().optional(),
+  NEXT_PUBLIC_EDMA_RPC_URL: z.string().url().optional(),
+});
 
-  if (!result.success) {
-    const formatted = result.error.issues
-      .map((i) => `  ${i.path.join('.')}: ${i.message}`)
-      .join('\n');
-    console.error(`❌ Invalid environment variables:\n${formatted}`);
+// ─── Validation ─────────────────────────────────────────────────────────────
 
-    // In production, fail hard. In dev, warn but continue.
-    if (process.env.NODE_ENV === 'production') {
-      throw new Error('Invalid environment variables');
+function validateEnv() {
+  // Client vars — always validated (explicitly pick NEXT_PUBLIC_ vars so
+  // Next.js includes them in the client bundle via static analysis)
+  const clientResult = clientSchema.safeParse({
+    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+    NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME,
+    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
+    NEXT_PUBLIC_EDMA_RPC_URL: process.env.NEXT_PUBLIC_EDMA_RPC_URL,
+  });
+
+  // Server vars — only validate on the server side (not in client bundles)
+  const isServer = typeof window === 'undefined';
+  const serverResult = isServer
+    ? serverSchema.safeParse(process.env)
+    : null;
+
+  // Collect ALL errors before throwing
+  const errors: string[] = [];
+
+  if (!clientResult.success) {
+    for (const issue of clientResult.error.issues) {
+      errors.push(`  ${issue.path.join('.')}: ${issue.message}`);
     }
   }
 
-  return (result.success ? result.data : process.env) as Env;
+  if (serverResult && !serverResult.success) {
+    for (const issue of serverResult.error.issues) {
+      errors.push(`  ${issue.path.join('.')}: ${issue.message}`);
+    }
+  }
+
+  if (errors.length > 0) {
+    const message = `Invalid environment variables:\n${errors.join('\n')}`;
+    console.error(`\u274c ${message}`);
+
+    // In production, fail hard. In dev, warn but continue.
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error(message);
+    }
+  }
+
+  const clientEnv = clientResult.success
+    ? clientResult.data
+    : ({} as z.infer<typeof clientSchema>);
+
+  const serverEnv = isServer && serverResult?.success
+    ? serverResult.data
+    : ({} as z.infer<typeof serverSchema>);
+
+  return { ...serverEnv, ...clientEnv };
 }
+
+export type Env = z.infer<typeof serverSchema> & z.infer<typeof clientSchema>;
 
 export const env = validateEnv();

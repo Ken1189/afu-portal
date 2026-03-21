@@ -2,11 +2,20 @@ import { z } from 'zod';
 
 // ─── Shared primitives ───────────────────────────────────────
 
-const uuid = z.string().uuid();
-const email = z.string().email();
-const phone = z.string().max(30).optional().nullable();
-const country = z.string().min(2).max(50);
-const paginationParams = z.object({
+export const uuid = z.string().uuid();
+export const email = z.string().email();
+export const phone = z.string().max(30).optional().nullable();
+export const country = z.string().min(2).max(50);
+
+export const currency = z.enum([
+  'BWP', 'ZWG', 'TZS', 'KES', 'ZAR', 'NGN', 'ZMW', 'MZN', 'SLL', 'USD',
+]);
+
+export const membershipTier = z.enum([
+  'student', 'new_enterprise', 'smallholder', 'farmer_grower', 'commercial',
+]);
+
+export const paginationParams = z.object({
   page: z.coerce.number().int().positive().default(1),
   limit: z.coerce.number().int().min(1).max(100).default(50),
   sort: z.string().optional(),
@@ -17,8 +26,8 @@ const paginationParams = z.object({
 
 export const createMemberSchema = z.object({
   profile_id: uuid,
-  tier: z.enum(['student', 'new_enterprise', 'smallholder', 'farmer_grower', 'commercial']).default('new_enterprise'),
-  status: z.enum(['active', 'suspended', 'inactive']).default('active'),
+  tier: membershipTier.default('new_enterprise'),
+  status: z.enum(['pending', 'active', 'suspended', 'expired']).default('active'),
   farm_name: z.string().max(200).optional().nullable(),
   farm_size_ha: z.coerce.number().min(0).optional().nullable(),
   primary_crops: z.array(z.string()).default([]),
@@ -43,7 +52,7 @@ export const createSupplierSchema = z.object({
   website: z.string().url().optional().nullable(),
   logo_url: z.string().url().optional().nullable(),
   category: z.string().min(1).max(100),
-  status: z.enum(['active', 'pending', 'suspended', 'inactive']).default('pending'),
+  status: z.enum(['active', 'pending', 'suspended']).default('pending'),
   country: country,
   region: z.string().max(100).optional().nullable(),
   description: z.string().max(5000).optional().nullable(),
@@ -74,12 +83,63 @@ export const createApplicationSchema = z.object({
   farm_name: z.string().max(200).optional().nullable(),
   farm_size_ha: z.coerce.number().min(0).optional().nullable(),
   primary_crops: z.array(z.string()).default([]),
-  requested_tier: z.enum(['student', 'new_enterprise', 'smallholder', 'farmer_grower', 'commercial']).default('smallholder'),
+  requested_tier: membershipTier.default('smallholder'),
+  notes: z.string().max(5000).optional().nullable(),
 });
 
 export const listApplicationsParams = paginationParams.extend({
   status: z.string().optional(),
 });
+
+// ─── Payments ────────────────────────────────────────────────
+
+export const paymentMethod = z.enum(['card', 'mobile-money', 'bank-transfer', 'ussd']);
+
+export const paymentProvider = z.enum([
+  'stripe', 'mpesa', 'ecocash', 'orange_money', 'mtn_momo', 'airtel_money', 'bank_transfer',
+]);
+
+export const paymentPurpose = z.enum([
+  'loan_repayment', 'membership_fee', 'input_purchase', 'insurance_premium',
+  'equipment_rental', 'transport', 'commission_payout', 'subscription',
+  'marketplace_purchase', 'staking_deposit', 'other',
+]);
+
+export const initiatePaymentSchema = z.object({
+  amount: z.number().positive('Amount must be positive'),
+  currency: z.string().min(2).max(5),
+  method: paymentMethod,
+  provider: paymentProvider,
+  purpose: paymentPurpose,
+  description: z.string().max(500).optional().nullable(),
+  phoneNumber: z.string().max(30).optional().nullable(),
+  relatedEntityType: z.string().max(100).optional().nullable(),
+  relatedEntityId: z.string().uuid().optional().nullable(),
+  metadata: z.record(z.unknown()).optional().nullable(),
+});
+
+// ─── Farm Plots ──────────────────────────────────────────────
+
+export const cropStage = z.enum([
+  'planning', 'planted', 'germinating', 'growing', 'flowering',
+  'fruiting', 'harvesting', 'post_harvest', 'fallow',
+]);
+
+export const createFarmPlotSchema = z.object({
+  name: z.string().min(1).max(200),
+  size_ha: z.coerce.number().positive().optional().nullable(),
+  crop: z.string().max(100).optional().nullable(),
+  variety: z.string().max(100).optional().nullable(),
+  stage: cropStage.default('planning'),
+  planting_date: z.string().optional().nullable(),      // ISO date string
+  expected_harvest: z.string().optional().nullable(),    // ISO date string
+  health_score: z.coerce.number().int().min(0).max(100).optional().nullable(),
+  soil_ph: z.coerce.number().min(0).max(14).optional().nullable(),
+  location: z.string().max(500).optional().nullable(),
+  notes: z.string().max(5000).optional().nullable(),
+});
+
+export const updateFarmPlotSchema = createFarmPlotSchema.partial();
 
 // ─── Admin Settings ──────────────────────────────────────────
 
