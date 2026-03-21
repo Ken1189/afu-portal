@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import { useState } from 'react';
+import 'leaflet/dist/leaflet.css';
 import { MapFilters, MapLegend, type MapFilterState } from '@/components/map';
 import { useMapData } from '@/components/map/useMapData';
 import { MapPin, Wrench, Users, Globe } from 'lucide-react';
