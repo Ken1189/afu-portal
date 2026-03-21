@@ -22,6 +22,7 @@ const serverSchema = z.object({
 
   // Stripe — optional
   STRIPE_SECRET_KEY: z.string().optional(),
+  STRIPE_WEBHOOK_SECRET: z.string().optional(),
 
   // App
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
