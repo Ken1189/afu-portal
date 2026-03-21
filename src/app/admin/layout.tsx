@@ -39,6 +39,7 @@ import {
   Beef,
   Wrench,
   Heart,
+  MapPin,
 } from 'lucide-react';
 
 // ── Navigation structure with collapsible groups ──
@@ -84,6 +85,7 @@ const navGroups: NavGroup[] = [
       { href: '/admin/crops', label: 'Crops', icon: <Sprout className="w-4 h-4" /> },
       { href: '/admin/livestock', label: 'Livestock', icon: <Beef className="w-4 h-4" /> },
       { href: '/admin/equipment', label: 'Equipment', icon: <Wrench className="w-4 h-4" /> },
+      { href: '/admin/map', label: 'Farm Map', icon: <MapPin className="w-4 h-4" /> },
       { href: '/admin/insurance', label: 'Insurance', icon: <Shield className="w-4 h-4" /> },
     ],
   },
