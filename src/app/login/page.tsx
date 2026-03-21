@@ -247,7 +247,7 @@ export default function LoginPage() {
             animate="animate"
             className="absolute -top-32 -right-32 w-96 h-96 rounded-full border border-white/10"
           />
-          <div className="absolute top-1/4 -left-16 w-64 h-64 rounded-full bg-teal/10 blur-3xl" />
+          <div className="absolute top-1/4 -left-16 w-64 h-64 rounded-full bg-[#8CB89C]/10 blur-3xl" />
           <div className="absolute bottom-1/4 right-8 w-48 h-48 rounded-full bg-white/5 blur-2xl" />
           <motion.div
             animate={{ rotate: 360 }}
@@ -275,7 +275,7 @@ export default function LoginPage() {
                 <span className="text-white font-bold text-lg tracking-tight sr-only">
                   African Farming Union
                 </span>
-                <span className="block text-teal-light/70 text-xs tracking-widest uppercase">
+                <span className="block text-[#8CB89C]/70 text-xs tracking-widest uppercase">
                   Member Portal
                 </span>
               </div>
@@ -285,7 +285,7 @@ export default function LoginPage() {
           {/* Center: Testimonial carousel */}
           <div className="flex-1 flex flex-col justify-center max-w-lg">
             <div className="mb-6">
-              <Shield className="w-8 h-8 text-teal-light/60 mb-4" />
+              <Shield className="w-8 h-8 text-[#8CB89C]/60 mb-4" />
               <h2 className="text-white/90 text-2xl xl:text-3xl font-semibold leading-snug">
                 Empowering Africa&apos;s farmers with finance, inputs &amp; market access.
               </h2>
@@ -306,7 +306,7 @@ export default function LoginPage() {
                     &ldquo;{testimonials[activeTestimonial].quote}&rdquo;
                   </p>
                   <footer className="mt-5 flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-teal/30 flex items-center justify-center text-white font-semibold text-sm">
+                    <div className="w-10 h-10 rounded-full bg-[#5DB347]/30 flex items-center justify-center text-white font-semibold text-sm">
                       {testimonials[activeTestimonial].name.charAt(0)}
                     </div>
                     <div>
@@ -353,7 +353,7 @@ export default function LoginPage() {
                 transition={{ delay: 0.8 + i * 0.15, duration: 0.5 }}
                 className="text-center"
               >
-                <stat.icon className="w-5 h-5 text-teal-light/60 mx-auto mb-1.5" />
+                <stat.icon className="w-5 h-5 text-[#8CB89C]/60 mx-auto mb-1.5" />
                 <p className="text-white font-bold text-lg">{stat.value}</p>
                 <p className="text-white/40 text-xs uppercase tracking-wider">
                   {stat.label}
@@ -411,7 +411,7 @@ export default function LoginPage() {
           {/* Form card */}
           <motion.div
             variants={formItem}
-            className="bg-white rounded-2xl p-6 sm:p-8 card-elevated"
+            className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 sm:p-8 shadow-lg shadow-[#5DB347]/5 border border-white/60"
           >
             {/* Error */}
             <AnimatePresence>
@@ -545,10 +545,7 @@ export default function LoginPage() {
                 disabled={isLoading}
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.98 }}
-                className="relative w-full disabled:opacity-70 disabled:cursor-not-allowed text-white py-3 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2 group"
-                style={{ background: '#5DB347' }}
-                onMouseEnter={e => { if (!isLoading) (e.currentTarget as HTMLButtonElement).style.background = '#449933'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#5DB347'; }}
+                className="relative w-full disabled:opacity-70 disabled:cursor-not-allowed text-white py-3 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 group bg-gradient-to-r from-[#5DB347] to-[#449933] hover:shadow-lg hover:shadow-[#5DB347]/20 hover:scale-[1.01]"
               >
                 {isLoading ? (
                   <div className="flex items-center gap-2">
@@ -598,7 +595,7 @@ export default function LoginPage() {
               type="button"
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.98 }}
-              className="w-full flex items-center justify-center gap-2 py-3 border-2 border-[#5DB347] text-[#5DB347] rounded-xl font-semibold hover:bg-[#EBF7E5] transition-colors"
+              className="w-full flex items-center justify-center gap-2 py-3 border-2 border-[#5DB347] text-[#5DB347] rounded-xl font-semibold hover:bg-[#EBF7E5] transition-all duration-300"
             >
               <MessageCircle className="w-5 h-5" />
               Continue with WhatsApp

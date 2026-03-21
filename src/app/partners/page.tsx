@@ -305,7 +305,7 @@ export default function PartnersPage() {
             <span className="inline-block bg-[#EBF7E5] text-[#5DB347] text-sm font-medium px-4 py-1.5 rounded-full mb-6">
               Our Network
             </span>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight text-glow">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight bg-gradient-to-r from-[#6ABF4B] via-[#5DB347] to-[#8CB89C] bg-clip-text text-transparent">
               Our Partners &amp; Network
             </h1>
             <p className="text-xl text-gray-300 leading-relaxed">
@@ -329,10 +329,10 @@ export default function PartnersPage() {
                 <button
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key)}
-                  className={`flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-medium transition-all ${
+                  className={`flex items-center gap-2 px-6 py-3 rounded-full text-sm font-medium transition-all duration-300 ${
                     activeTab === tab.key
-                      ? "bg-[#5DB347] text-white shadow-md"
-                      : "bg-cream text-navy hover:bg-[#EBF7E5]"
+                      ? "bg-gradient-to-r from-[#5DB347] to-[#449933] text-white shadow-lg shadow-[#5DB347]/25"
+                      : "bg-white/80 backdrop-blur-sm text-[#1B2A4A] hover:bg-[#EBF7E5] border border-gray-200 hover:border-[#5DB347]/30"
                   }`}
                 >
                   <Icon className="w-4 h-4" />
@@ -355,17 +355,17 @@ export default function PartnersPage() {
               {partners[activeTab].map((partner, i) => (
                 <div
                   key={i}
-                  className="card-polished bg-cream rounded-2xl p-6 border border-gray-100 hover:shadow-lg hover:border-[#5DB347]/20 transition-all"
+                  className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-lg shadow-[#5DB347]/5 border-l-4 border-[#5DB347] hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
                 >
                   {/* Header with Logo + Name */}
                   <div className="flex items-start gap-4 mb-4">
                     <div
-                      className={`w-12 h-12 ${partner.color} rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0`}
+                      className={`w-14 h-14 ${partner.color} rounded-2xl flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-lg`}
                     >
                       {partner.initials}
                     </div>
                     <div className="min-w-0">
-                      <h3 className="text-base font-bold text-navy leading-snug">
+                      <h3 className="text-base font-bold text-[#1B2A4A] leading-snug">
                         {partner.name}
                       </h3>
                       <span className="inline-block text-xs text-gray-400 mt-0.5">
@@ -388,9 +388,9 @@ export default function PartnersPage() {
                   </p>
 
                   {/* Focus */}
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-1.5 bg-[#EBF7E5] rounded-full px-3 py-1.5 w-fit">
                     <Target className="w-3.5 h-3.5 text-[#5DB347]" />
-                    <span className="text-xs font-medium text-navy">
+                    <span className="text-xs font-medium text-[#449933]">
                       {partner.focus}
                     </span>
                   </div>
@@ -404,8 +404,10 @@ export default function PartnersPage() {
       {/* Become a Partner CTA */}
       <section className="py-20 bg-cream">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-br from-navy to-navy-dark rounded-2xl p-10 md:p-16 text-center text-white">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+          <div className="bg-gradient-to-br from-[#1B2A4A] to-[#1B2A4A]/90 rounded-3xl p-10 md:p-16 text-center text-white relative overflow-hidden">
+            {/* Decorative gradient accent */}
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#5DB347] via-[#6ABF4B] to-[#8CB89C]" />
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent">
               Become an AFU Partner
             </h2>
             <p className="text-gray-300 text-lg mb-4 max-w-2xl mx-auto">
@@ -419,7 +421,7 @@ export default function PartnersPage() {
             </p>
             <Link
               href="/apply"
-              className="inline-flex items-center gap-2 bg-[#5DB347] hover:bg-[#449933] text-white px-8 py-3.5 rounded-lg font-semibold transition-colors"
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-[#5DB347] to-[#449933] hover:shadow-lg hover:shadow-[#5DB347]/25 hover:-translate-y-1 text-white px-8 py-3.5 rounded-full font-semibold transition-all duration-300"
             >
               Apply as Partner
               <ArrowRight className="w-5 h-5" />

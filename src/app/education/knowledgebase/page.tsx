@@ -11,9 +11,6 @@ const categories = [
     articles: 280,
     link: '/education/knowledgebase/agronomy',
     icon: 'M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25',
-    color: 'bg-emerald-50 border-emerald-200 hover:border-emerald-400',
-    iconBg: 'bg-emerald-100',
-    iconColor: 'text-emerald-600',
   },
   {
     title: 'Animal Husbandry',
@@ -21,9 +18,6 @@ const categories = [
     articles: 195,
     link: '/education/knowledgebase/animal',
     icon: 'M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418',
-    color: 'bg-orange-50 border-orange-200 hover:border-orange-400',
-    iconBg: 'bg-orange-100',
-    iconColor: 'text-orange-600',
   },
   {
     title: 'Finance',
@@ -31,9 +25,6 @@ const categories = [
     articles: 145,
     link: '/education/knowledgebase',
     icon: 'M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z',
-    color: 'bg-blue-50 border-blue-200 hover:border-blue-400',
-    iconBg: 'bg-blue-100',
-    iconColor: 'text-blue-600',
   },
   {
     title: 'Technology',
@@ -41,9 +32,6 @@ const categories = [
     articles: 120,
     link: '/education/knowledgebase',
     icon: 'M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5',
-    color: 'bg-purple-50 border-purple-200 hover:border-purple-400',
-    iconBg: 'bg-purple-100',
-    iconColor: 'text-purple-600',
   },
   {
     title: 'Climate',
@@ -51,9 +39,6 @@ const categories = [
     articles: 98,
     link: '/education/knowledgebase',
     icon: 'M2.25 15a4.5 4.5 0 004.5 4.5H18a3.75 3.75 0 001.332-7.257 3 3 0 00-3.758-3.848 5.25 5.25 0 00-10.233 2.33A4.502 4.502 0 002.25 15z',
-    color: 'bg-sky-50 border-sky-200 hover:border-sky-400',
-    iconBg: 'bg-sky-100',
-    iconColor: 'text-sky-600',
   },
   {
     title: 'Business',
@@ -61,9 +46,6 @@ const categories = [
     articles: 162,
     link: '/education/knowledgebase',
     icon: 'M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21',
-    color: 'bg-amber-50 border-amber-200 hover:border-amber-400',
-    iconBg: 'bg-amber-100',
-    iconColor: 'text-amber-600',
   },
 ];
 
@@ -138,7 +120,7 @@ export default function KnowledgebasePage() {
           <div className="inline-block bg-[#5DB347]/20 text-[#5DB347] px-4 py-1.5 rounded-full text-sm font-medium mb-4">
             Education
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">
+          <h1 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-[#5DB347] to-[#6ABF4B] bg-clip-text text-transparent">
             Agricultural Knowledgebase
           </h1>
           <p className="text-xl text-gray-300 max-w-3xl leading-relaxed mb-8">
@@ -168,7 +150,7 @@ export default function KnowledgebasePage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search articles, topics, or keywords..."
-                className="w-full pl-12 pr-4 py-4 rounded-xl bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#5DB347] focus:border-transparent text-lg"
+                className="w-full pl-12 pr-4 py-4 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#5DB347] focus:border-transparent text-lg"
               />
             </div>
           </div>
@@ -176,9 +158,9 @@ export default function KnowledgebasePage() {
       </section>
 
       {/* Category Cards */}
-      <section className="py-20 bg-white">
+      <section className="py-16 bg-[#EBF7E5]/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-navy mb-10">
+          <h2 className="text-3xl font-bold text-[#1B2A4A] mb-10">
             Browse by Category
           </h2>
           <motion.div
@@ -195,14 +177,12 @@ export default function KnowledgebasePage() {
               >
                 <Link
                   href={cat.link}
-                  className={`block rounded-2xl p-8 border-2 transition-all ${cat.color}`}
+                  className="block bg-white/80 backdrop-blur-sm rounded-3xl p-8 border-l-4 border-[#5DB347] shadow-lg shadow-[#5DB347]/5 hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
                 >
                   <div className="flex items-center gap-3 mb-4">
-                    <div
-                      className={`w-12 h-12 ${cat.iconBg} rounded-xl flex items-center justify-center`}
-                    >
+                    <div className="w-12 h-12 bg-gradient-to-br from-[#5DB347] to-[#449933] rounded-xl flex items-center justify-center shadow-md">
                       <svg
-                        className={`w-6 h-6 ${cat.iconColor}`}
+                        className="w-6 h-6 text-white"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -216,10 +196,10 @@ export default function KnowledgebasePage() {
                       </svg>
                     </div>
                     <div>
-                      <h3 className="text-lg font-bold text-navy">
+                      <h3 className="text-lg font-bold text-[#1B2A4A]">
                         {cat.title}
                       </h3>
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-[#5DB347] font-medium">
                         {cat.articles} articles
                       </span>
                     </div>
@@ -235,19 +215,19 @@ export default function KnowledgebasePage() {
       </section>
 
       {/* Featured Articles */}
-      <section className="py-20 bg-cream">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-navy mb-10">
+          <h2 className="text-3xl font-bold text-[#1B2A4A] mb-10">
             Featured Articles
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {featuredArticles.map((article, i) => (
               <div
                 key={i}
-                className="bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow"
+                className="bg-white/80 backdrop-blur-sm rounded-3xl overflow-hidden border border-gray-100 shadow-lg shadow-[#5DB347]/5 hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
               >
                 {/* Thumbnail Placeholder */}
-                <div className="h-40 bg-gradient-to-br from-[#5DB347]/20 to-navy/20 flex items-center justify-center">
+                <div className="h-40 bg-gradient-to-br from-[#5DB347]/20 to-[#1B2A4A]/20 flex items-center justify-center">
                   <svg
                     className="w-12 h-12 text-[#5DB347]/40"
                     fill="none"
@@ -263,10 +243,10 @@ export default function KnowledgebasePage() {
                   </svg>
                 </div>
                 <div className="p-5">
-                  <span className="inline-block bg-[#5DB347]/10 text-[#5DB347] text-xs font-medium px-2.5 py-0.5 rounded-full mb-3">
+                  <span className="inline-block bg-[#EBF7E5] text-[#5DB347] text-xs font-medium px-2.5 py-0.5 rounded-full mb-3">
                     {article.category}
                   </span>
-                  <h3 className="text-sm font-bold text-navy mb-3 leading-snug line-clamp-2">
+                  <h3 className="text-sm font-bold text-[#1B2A4A] mb-3 leading-snug line-clamp-2">
                     {article.title}
                   </h3>
                   <div className="flex items-center justify-between text-xs text-gray-400">
@@ -284,16 +264,16 @@ export default function KnowledgebasePage() {
       </section>
 
       {/* Popular Topics */}
-      <section className="py-20 bg-white">
+      <section className="py-16 bg-[#EBF7E5]/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-navy mb-10">
+          <h2 className="text-3xl font-bold text-[#1B2A4A] mb-10">
             Popular Topics
           </h2>
           <div className="flex flex-wrap gap-3">
             {popularTopics.map((topic, i) => (
               <span
                 key={i}
-                className="bg-cream text-navy text-sm font-medium px-4 py-2 rounded-full border border-gray-200 hover:border-[#5DB347] hover:text-[#5DB347] transition-colors cursor-pointer"
+                className="bg-white/80 backdrop-blur-sm text-[#1B2A4A] text-sm font-medium px-4 py-2 rounded-full border border-[#5DB347]/20 hover:border-[#5DB347] hover:text-[#5DB347] hover:shadow-md transition-all duration-300 cursor-pointer"
               >
                 {topic}
               </span>
@@ -303,7 +283,7 @@ export default function KnowledgebasePage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-[#5DB347]">
+      <section className="py-16 bg-gradient-to-r from-[#5DB347] to-[#449933]">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">
             Can&apos;t Find What You&apos;re Looking For?
@@ -316,13 +296,13 @@ export default function KnowledgebasePage() {
           <div className="flex gap-4 justify-center flex-wrap">
             <Link
               href="/contact"
-              className="inline-block bg-white text-[#5DB347] hover:bg-gray-100 px-8 py-3.5 rounded-lg font-semibold text-lg transition-colors"
+              className="inline-block bg-white text-[#5DB347] hover:bg-gray-100 hover:scale-105 px-8 py-3.5 rounded-xl font-semibold text-lg transition-all duration-300"
             >
               Ask an Expert
             </Link>
             <Link
               href="/education"
-              className="inline-block border-2 border-white text-white hover:bg-white/10 px-8 py-3.5 rounded-lg font-semibold text-lg transition-colors"
+              className="inline-block border-2 border-white text-white hover:bg-white/10 px-8 py-3.5 rounded-xl font-semibold text-lg transition-all duration-300"
             >
               Back to Education Hub
             </Link>

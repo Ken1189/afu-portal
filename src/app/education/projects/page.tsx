@@ -106,7 +106,7 @@ const projects = [
 ];
 
 const statusColors: Record<string, string> = {
-  Active: 'bg-green-100 text-green-700',
+  Active: 'bg-[#EBF7E5] text-[#5DB347]',
   Completed: 'bg-blue-100 text-blue-700',
   Planning: 'bg-amber-100 text-amber-700',
 };
@@ -134,7 +134,7 @@ export default function ProjectsPage() {
           <div className="inline-block bg-[#5DB347]/20 text-[#5DB347] px-4 py-1.5 rounded-full text-sm font-medium mb-4">
             Education
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">Active Projects</h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-[#5DB347] to-[#6ABF4B] bg-clip-text text-transparent">Active Projects</h1>
           <p className="text-xl text-gray-300 max-w-3xl leading-relaxed">
             Research and development projects tackling Africa&apos;s most pressing
             agricultural challenges. From drought-resistant crops to precision
@@ -144,7 +144,7 @@ export default function ProjectsPage() {
       </section>
 
       {/* Filter Tabs + Projects */}
-      <section className="py-20 bg-white">
+      <section className="py-16 bg-[#EBF7E5]/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Filter Tabs */}
           <div className="flex flex-wrap gap-2 mb-12">
@@ -152,10 +152,10 @@ export default function ProjectsPage() {
               <button
                 key={cat}
                 onClick={() => setActiveFilter(cat)}
-                className={`px-5 py-2 rounded-full text-sm font-medium transition-colors ${
+                className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
                   activeFilter === cat
-                    ? 'bg-[#5DB347] text-white'
-                    : 'bg-cream text-navy hover:bg-[#EBF7E5]'
+                    ? 'bg-gradient-to-r from-[#5DB347] to-[#449933] text-white shadow-md shadow-[#5DB347]/30'
+                    : 'bg-white/80 backdrop-blur-sm text-[#1B2A4A] hover:bg-[#EBF7E5] border border-gray-200/60'
                 }`}
               >
                 {cat}
@@ -176,11 +176,11 @@ export default function ProjectsPage() {
               {filtered.map((project, i) => (
                 <div
                   key={i}
-                  className="bg-cream rounded-2xl p-8 border border-gray-100 hover:shadow-lg transition-shadow"
+                  className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 border-l-4 border-[#5DB347] shadow-lg shadow-[#5DB347]/5 hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
                 >
                   {/* Header */}
                   <div className="flex items-start justify-between gap-4 mb-4">
-                    <h3 className="text-lg font-bold text-navy">
+                    <h3 className="text-lg font-bold text-[#1B2A4A]">
                       {project.name}
                     </h3>
                     <div className="flex gap-2 shrink-0">
@@ -204,7 +204,7 @@ export default function ProjectsPage() {
                   {/* Meta */}
                   <div className="flex flex-wrap gap-4 text-sm text-gray-500 mb-4">
                     <span>{project.duration}</span>
-                    <span className="font-medium text-navy">
+                    <span className="font-medium text-[#5DB347]">
                       {project.funding}
                     </span>
                     <span>Lead: {project.lead}</span>
@@ -221,7 +221,7 @@ export default function ProjectsPage() {
                       {project.partners.map((p, j) => (
                         <span
                           key={j}
-                          className="bg-white text-navy text-xs font-medium px-3 py-1 rounded-full border border-gray-200"
+                          className="bg-[#EBF7E5] text-[#1B2A4A] text-xs font-medium px-3 py-1 rounded-full border border-[#5DB347]/20"
                         >
                           {p}
                         </span>
@@ -233,13 +233,13 @@ export default function ProjectsPage() {
                   <div>
                     <div className="flex items-center justify-between text-sm mb-2">
                       <span className="text-gray-500">Progress</span>
-                      <span className="font-semibold text-navy">
+                      <span className="font-semibold text-[#5DB347]">
                         {project.progress}%
                       </span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2.5">
                       <div
-                        className="bg-[#5DB347] rounded-full h-2.5 transition-all duration-500"
+                        className="bg-gradient-to-r from-[#5DB347] to-[#6ABF4B] rounded-full h-2.5 transition-all duration-500"
                         style={{ width: `${project.progress}%` }}
                       />
                     </div>
@@ -252,7 +252,7 @@ export default function ProjectsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-[#5DB347]">
+      <section className="py-16 bg-gradient-to-r from-[#5DB347] to-[#449933]">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">
             Get Involved in Our Research
@@ -265,13 +265,13 @@ export default function ProjectsPage() {
           <div className="flex gap-4 justify-center flex-wrap">
             <Link
               href="/contact"
-              className="inline-block bg-white text-[#5DB347] hover:bg-gray-100 px-8 py-3.5 rounded-lg font-semibold text-lg transition-colors"
+              className="inline-block bg-white text-[#5DB347] hover:bg-gray-100 hover:scale-105 px-8 py-3.5 rounded-xl font-semibold text-lg transition-all duration-300"
             >
               Contact Us
             </Link>
             <Link
               href="/education"
-              className="inline-block border-2 border-white text-white hover:bg-white/10 px-8 py-3.5 rounded-lg font-semibold text-lg transition-colors"
+              className="inline-block border-2 border-white text-white hover:bg-white/10 px-8 py-3.5 rounded-xl font-semibold text-lg transition-all duration-300"
             >
               Back to Education Hub
             </Link>

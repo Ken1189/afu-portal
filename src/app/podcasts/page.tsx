@@ -150,7 +150,7 @@ const episodes = [
 const categoryColors: Record<string, string> = {
   Agronomy: 'bg-[#EBF7E5] text-[#449933]',
   Markets: 'bg-[#EBF7E5] text-[#5DB347]',
-  Technology: 'bg-purple-100 text-purple-700',
+  Technology: 'bg-[#EBF7E5] text-[#449933]',
   Finance: 'bg-amber-100 text-amber-700',
   'Success Stories': 'bg-pink-100 text-pink-700',
 };
@@ -171,7 +171,9 @@ export default function PodcastsPage() {
           <div className="inline-block bg-[#EBF7E5] text-[#5DB347] px-4 py-1.5 rounded-full text-sm font-medium mb-4">
             Media
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">AFU Podcasts</h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-[#6ABF4B] via-[#5DB347] to-[#8CB89C] bg-clip-text text-transparent">
+            AFU Podcasts
+          </h1>
           <p className="text-xl text-gray-300 max-w-3xl leading-relaxed">
             Daily insights on African agriculture. Market updates, agronomy tips,
             technology news, financing guidance, and inspiring success stories
@@ -183,13 +185,17 @@ export default function PodcastsPage() {
       {/* Featured Episode */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl font-bold text-navy mb-6">Latest Episode</h2>
-          <div className="bg-gradient-to-r from-navy to-navy-light rounded-2xl p-8 md:p-10 text-white">
+          <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-[#5DB347] to-[#449933] bg-clip-text text-transparent">
+            Latest Episode
+          </h2>
+          <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 md:p-10 shadow-lg shadow-[#5DB347]/5 border border-white/20 relative overflow-hidden">
+            {/* Gradient accent bar */}
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#5DB347] via-[#6ABF4B] to-[#8CB89C]" />
             <div className="flex flex-col md:flex-row gap-8 items-start">
-              {/* Play Button Placeholder */}
-              <div className="w-24 h-24 md:w-32 md:h-32 bg-[#EBF7E5] rounded-2xl flex items-center justify-center shrink-0">
-                <div className="w-14 h-14 bg-[#5DB347] rounded-full flex items-center justify-center cursor-pointer hover:bg-[#449933] transition-colors">
-                  <svg className="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+              {/* Play Button */}
+              <div className="w-28 h-28 md:w-36 md:h-36 bg-gradient-to-br from-[#EBF7E5] to-white rounded-3xl flex items-center justify-center shrink-0 shadow-lg shadow-[#5DB347]/10">
+                <div className="w-16 h-16 bg-gradient-to-br from-[#5DB347] to-[#449933] rounded-full flex items-center justify-center cursor-pointer hover:scale-110 transition-all duration-300 shadow-lg shadow-[#5DB347]/30">
+                  <svg className="w-7 h-7 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M8 5v14l11-7z" />
                   </svg>
                 </div>
@@ -209,10 +215,10 @@ export default function PodcastsPage() {
                     {featured.date}
                   </span>
                 </div>
-                <h3 className="text-xl md:text-2xl font-bold mb-3">
+                <h3 className="text-xl md:text-2xl font-bold text-[#1B2A4A] mb-3">
                   {featured.title}
                 </h3>
-                <p className="text-gray-300 text-sm leading-relaxed">
+                <p className="text-gray-500 text-sm leading-relaxed">
                   {featured.description}
                 </p>
               </div>
@@ -227,7 +233,7 @@ export default function PodcastsPage() {
           <div className="flex flex-col lg:flex-row gap-12">
             {/* Main Content */}
             <div className="flex-1">
-              <h2 className="text-2xl font-bold text-navy mb-6">
+              <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-[#5DB347] to-[#449933] bg-clip-text text-transparent">
                 All Episodes
               </h2>
 
@@ -237,10 +243,10 @@ export default function PodcastsPage() {
                   <button
                     key={cat}
                     onClick={() => setActiveFilter(cat)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                    className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${
                       activeFilter === cat
-                        ? 'bg-[#5DB347] text-white'
-                        : 'bg-white text-navy hover:bg-[#EBF7E5] border border-gray-200'
+                        ? 'bg-gradient-to-r from-[#5DB347] to-[#449933] text-white shadow-lg shadow-[#5DB347]/25'
+                        : 'bg-white/80 backdrop-blur-sm text-[#1B2A4A] hover:bg-[#EBF7E5] border border-gray-200 hover:border-[#5DB347]/30'
                     }`}
                   >
                     {cat}
@@ -261,13 +267,13 @@ export default function PodcastsPage() {
                   {filtered.map((ep, i) => (
                     <div
                       key={i}
-                      className="card-polished bg-white rounded-2xl p-6 border border-gray-100 hover:shadow-md transition-shadow"
+                      className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-lg shadow-[#5DB347]/5 hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
                     >
                       <div className="flex items-center gap-3 mb-3">
                         {/* Mini Play Button */}
-                        <div className="w-10 h-10 bg-[#EBF7E5] rounded-full flex items-center justify-center shrink-0 cursor-pointer hover:bg-[#EBF7E5]/80 transition-colors">
+                        <div className="w-11 h-11 bg-gradient-to-br from-[#5DB347] to-[#449933] rounded-full flex items-center justify-center shrink-0 cursor-pointer hover:scale-110 transition-all duration-300 shadow-md shadow-[#5DB347]/20">
                           <svg
-                            className="w-4 h-4 text-[#5DB347] ml-0.5"
+                            className="w-4 h-4 text-white ml-0.5"
                             fill="currentColor"
                             viewBox="0 0 24 24"
                           >
@@ -282,7 +288,7 @@ export default function PodcastsPage() {
                             <span>{ep.duration}</span>
                             <span>{ep.date}</span>
                           </div>
-                          <h3 className="text-sm font-bold text-navy leading-snug truncate">
+                          <h3 className="text-sm font-bold text-[#1B2A4A] leading-snug truncate">
                             {ep.title}
                           </h3>
                         </div>
@@ -306,20 +312,20 @@ export default function PodcastsPage() {
             {/* Sidebar */}
             <aside className="lg:w-80 shrink-0 space-y-8">
               {/* Subscribe */}
-              <div className="card-polished bg-white rounded-2xl p-6 border border-gray-100">
-                <h3 className="text-lg font-bold text-navy mb-4">
+              <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-lg shadow-[#5DB347]/5 border-l-4 border-[#5DB347]">
+                <h3 className="text-lg font-bold text-[#1B2A4A] mb-4">
                   Subscribe
                 </h3>
                 <div className="space-y-3">
                   {[
-                    { name: 'Spotify', color: 'bg-[#EBF7E5] text-[#449933] border-green-200' },
-                    { name: 'Apple Podcasts', color: 'bg-purple-50 text-purple-700 border-purple-200' },
-                    { name: 'Google Podcasts', color: 'bg-blue-50 text-blue-700 border-blue-200' },
-                    { name: 'RSS Feed', color: 'bg-orange-50 text-orange-700 border-orange-200' },
+                    { name: 'Spotify', color: 'bg-[#EBF7E5] text-[#449933] border-[#5DB347]/20' },
+                    { name: 'Apple Podcasts', color: 'bg-[#EBF7E5] text-[#449933] border-[#5DB347]/20' },
+                    { name: 'Google Podcasts', color: 'bg-[#EBF7E5] text-[#449933] border-[#5DB347]/20' },
+                    { name: 'RSS Feed', color: 'bg-[#EBF7E5] text-[#449933] border-[#5DB347]/20' },
                   ].map((platform, i) => (
                     <button
                       key={i}
-                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border text-sm font-medium transition-colors hover:shadow-sm ${platform.color}`}
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border text-sm font-medium transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 ${platform.color}`}
                     >
                       <svg
                         className="w-5 h-5 shrink-0"
@@ -341,16 +347,16 @@ export default function PodcastsPage() {
               </div>
 
               {/* Hosts */}
-              <div className="card-polished bg-white rounded-2xl p-6 border border-gray-100">
-                <h3 className="text-lg font-bold text-navy mb-4">
+              <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-lg shadow-[#5DB347]/5 border-l-4 border-[#5DB347]">
+                <h3 className="text-lg font-bold text-[#1B2A4A] mb-4">
                   Your Hosts
                 </h3>
                 <div className="space-y-5">
                   {hosts.map((host, i) => (
                     <div key={i}>
                       <div className="flex items-center gap-3 mb-2">
-                        <div className="w-10 h-10 bg-[#EBF7E5] rounded-full flex items-center justify-center">
-                          <span className="text-[#5DB347] font-bold text-sm">
+                        <div className="w-12 h-12 bg-gradient-to-br from-[#5DB347] to-[#449933] rounded-full flex items-center justify-center shadow-md shadow-[#5DB347]/20">
+                          <span className="text-white font-bold text-sm">
                             {host.name
                               .split(' ')
                               .map((n) => n[0])
@@ -358,7 +364,7 @@ export default function PodcastsPage() {
                           </span>
                         </div>
                         <div>
-                          <div className="text-sm font-semibold text-navy">
+                          <div className="text-sm font-semibold text-[#1B2A4A]">
                             {host.name}
                           </div>
                           <div className="text-xs text-gray-400">
@@ -390,7 +396,7 @@ export default function PodcastsPage() {
           </p>
           <Link
             href="/contact"
-            className="inline-block bg-white text-[#5DB347] hover:bg-gray-100 px-8 py-3.5 rounded-lg font-semibold text-lg transition-smooth"
+            className="inline-block bg-gradient-to-r from-[#5DB347] to-[#449933] text-white hover:shadow-lg hover:shadow-[#5DB347]/25 hover:-translate-y-1 px-8 py-3.5 rounded-full font-semibold text-lg transition-all duration-300"
           >
             Get in Touch
           </Link>

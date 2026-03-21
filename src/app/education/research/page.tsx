@@ -25,8 +25,6 @@ const centres = [
       "CIMMYT",
       "Zimbabwe Agricultural Research Council",
     ],
-    color: "border-green-200 bg-green-50",
-    accent: "bg-green-100 text-green-700",
   },
   {
     name: "Gaborone Soil Research Institute",
@@ -46,8 +44,6 @@ const centres = [
       "ICRISAT",
       "Botswana Ministry of Agriculture",
     ],
-    color: "border-blue-200 bg-blue-50",
-    accent: "bg-blue-100 text-blue-700",
   },
   {
     name: "Dodoma Agricultural Innovation Centre",
@@ -67,8 +63,6 @@ const centres = [
       "Tanzania Agricultural Research Institute",
       "Google.org",
     ],
-    color: "border-amber-200 bg-amber-50",
-    accent: "bg-amber-100 text-amber-700",
   },
   {
     name: "Masvingo Livestock Research Station",
@@ -88,8 +82,6 @@ const centres = [
       "ILRI",
       "Zimbabwe Herd Book Authority",
     ],
-    color: "border-green-200 bg-green-50",
-    accent: "bg-green-100 text-green-700",
   },
   {
     name: "Francistown Water Management Centre",
@@ -109,8 +101,6 @@ const centres = [
       "IWMI",
       "WaterAid Southern Africa",
     ],
-    color: "border-blue-200 bg-blue-50",
-    accent: "bg-blue-100 text-blue-700",
   },
   {
     name: "Arusha Climate Adaptation Lab",
@@ -130,8 +120,6 @@ const centres = [
       "CCAFS",
       "Tanzania Meteorological Authority",
     ],
-    color: "border-amber-200 bg-amber-50",
-    accent: "bg-amber-100 text-amber-700",
   },
 ];
 
@@ -144,7 +132,7 @@ export default function ResearchCentresPage() {
           <div className="inline-block bg-[#5DB347]/20 text-[#5DB347] px-4 py-1.5 rounded-full text-sm font-medium mb-4">
             Education
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">
+          <h1 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-[#5DB347] to-[#6ABF4B] bg-clip-text text-transparent">
             Research Centres
           </h1>
           <p className="text-xl text-gray-300 max-w-3xl leading-relaxed">
@@ -156,26 +144,24 @@ export default function ResearchCentresPage() {
       </section>
 
       {/* Research Centres Grid */}
-      <section className="py-20 bg-white">
+      <section className="py-16 bg-[#EBF7E5]/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {centres.map((centre, i) => (
               <div
                 key={i}
-                className={`rounded-2xl p-8 border-2 ${centre.color}`}
+                className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 border-l-4 border-[#5DB347] shadow-lg shadow-[#5DB347]/5 hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
               >
                 <div className="flex items-start justify-between mb-4">
                   <div>
-                    <h3 className="text-xl font-bold text-navy">
+                    <h3 className="text-xl font-bold text-[#1B2A4A]">
                       {centre.name}
                     </h3>
                     <p className="text-gray-500 text-sm">
                       {centre.city}, {centre.country}
                     </p>
                   </div>
-                  <span
-                    className={`text-xs font-semibold px-3 py-1 rounded-full ${centre.accent}`}
-                  >
+                  <span className="text-xs font-semibold px-3 py-1 rounded-full bg-[#EBF7E5] text-[#5DB347]">
                     Est. {centre.established}
                   </span>
                 </div>
@@ -189,7 +175,7 @@ export default function ResearchCentresPage() {
                 </p>
 
                 <div className="mb-5">
-                  <h4 className="text-sm font-semibold text-navy mb-3">
+                  <h4 className="text-sm font-semibold text-[#1B2A4A] mb-3">
                     Key Achievements
                   </h4>
                   <ul className="space-y-2">
@@ -218,14 +204,14 @@ export default function ResearchCentresPage() {
                 </div>
 
                 <div>
-                  <h4 className="text-sm font-semibold text-navy mb-2">
+                  <h4 className="text-sm font-semibold text-[#1B2A4A] mb-2">
                     Partner Institutions
                   </h4>
                   <div className="flex flex-wrap gap-2">
                     {centre.partners.map((p, j) => (
                       <span
                         key={j}
-                        className="bg-white text-navy text-xs font-medium px-3 py-1 rounded-full border border-gray-200"
+                        className="bg-[#EBF7E5] text-[#1B2A4A] text-xs font-medium px-3 py-1 rounded-full border border-[#5DB347]/20"
                       >
                         {p}
                       </span>
@@ -239,7 +225,7 @@ export default function ResearchCentresPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-[#5DB347]">
+      <section className="py-16 bg-gradient-to-r from-[#5DB347] to-[#449933]">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">
             Partner With Our Research Network
@@ -252,13 +238,13 @@ export default function ResearchCentresPage() {
           <div className="flex gap-4 justify-center flex-wrap">
             <Link
               href="/contact"
-              className="inline-block bg-white text-[#5DB347] hover:bg-gray-100 px-8 py-3.5 rounded-lg font-semibold text-lg transition-colors"
+              className="inline-block bg-white text-[#5DB347] hover:bg-gray-100 hover:scale-105 px-8 py-3.5 rounded-xl font-semibold text-lg transition-all duration-300"
             >
               Contact Us
             </Link>
             <Link
               href="/education"
-              className="inline-block border-2 border-white text-white hover:bg-white/10 px-8 py-3.5 rounded-lg font-semibold text-lg transition-colors"
+              className="inline-block border-2 border-white text-white hover:bg-white/10 px-8 py-3.5 rounded-xl font-semibold text-lg transition-all duration-300"
             >
               Back to Education Hub
             </Link>
