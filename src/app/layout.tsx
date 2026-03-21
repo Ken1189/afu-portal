@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { SiteNavbar, SiteFooter } from "@/components/SiteChrome";
+import AnnouncementBanner from "@/components/AnnouncementBanner";
 import { AuthProvider } from "@/lib/supabase/auth-context";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 
@@ -37,6 +38,7 @@ export default function RootLayout({
       <body className={`${inter.variable} font-sans antialiased`}>
         <AuthProvider>
           <ServiceWorkerRegister />
+          <AnnouncementBanner />
           <SiteNavbar />
           <main className="min-h-screen">{children}</main>
           <SiteFooter />

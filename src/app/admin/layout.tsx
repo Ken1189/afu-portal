@@ -41,6 +41,11 @@ import {
   Heart,
   MapPin,
   FileEdit,
+  MessageSquare,
+  Handshake,
+  Gift,
+  HelpCircle,
+  Scale,
 } from 'lucide-react';
 
 // ── Navigation structure with collapsible groups ──
@@ -117,6 +122,9 @@ const navGroups: NavGroup[] = [
       { href: '/admin/suppliers', label: 'Suppliers', icon: <Store className="w-4 h-4" /> },
       { href: '/admin/suppliers/sponsorships', label: 'Sponsorships', icon: <Award className="w-4 h-4" /> },
       { href: '/admin/sponsor', label: 'Sponsor a Farmer', icon: <Heart className="w-4 h-4" /> },
+      { href: '/admin/testimonials', label: 'Testimonials', icon: <MessageSquare className="w-4 h-4" /> },
+      { href: '/admin/partnerships', label: 'Partners', icon: <Handshake className="w-4 h-4" /> },
+      { href: '/admin/sponsor-tiers', label: 'Sponsor Tiers', icon: <Gift className="w-4 h-4" /> },
     ],
   },
   {
@@ -124,6 +132,8 @@ const navGroups: NavGroup[] = [
     defaultOpen: false,
     links: [
       { href: '/admin/content', label: 'Site Content', icon: <FileEdit className="w-4 h-4" /> },
+      { href: '/admin/faq', label: 'FAQ Manager', icon: <HelpCircle className="w-4 h-4" /> },
+      { href: '/admin/legal', label: 'Legal Pages', icon: <Scale className="w-4 h-4" /> },
       { href: '/admin/countries', label: 'Countries', icon: <Globe className="w-4 h-4" /> },
       { href: '/admin/system', label: 'System Health', icon: <Server className="w-4 h-4" /> },
       { href: '/admin/audit', label: 'Audit Trail', icon: <ScrollText className="w-4 h-4" /> },
