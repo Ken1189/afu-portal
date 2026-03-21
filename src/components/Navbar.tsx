@@ -156,8 +156,19 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* ── Logo ── */}
-          <Link href="/" className="flex items-center shrink-0">
-            <img src="/afu-logo.svg" alt="African Farming Union" className="h-11 w-auto object-contain" />
+          <Link href="/" className="flex items-center gap-2.5 shrink-0">
+            <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: '#5DB347' }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2C8 8 4 14 4 18c0 2.5 3.5 4 8 4s8-1.5 8-4c0-4-4-10-8-16z" fill="white" opacity="0.9"/>
+                <path d="M12 8v12" stroke="white" strokeWidth="1.5" opacity="0.6"/>
+                <path d="M12 12c-2 0-4 2-4 4" stroke="white" strokeWidth="1.2" fill="none" opacity="0.5"/>
+                <path d="M12 14c2 0 3 1.5 3 3" stroke="white" strokeWidth="1.2" fill="none" opacity="0.5"/>
+              </svg>
+            </div>
+            <div className="hidden sm:block leading-tight">
+              <div className="text-lg font-extrabold tracking-tight" style={{ color: '#1B2A4A' }}>AFU</div>
+              <div className="text-[9px] font-semibold tracking-[0.12em] uppercase" style={{ color: '#5DB347' }}>African Farming Union</div>
+            </div>
           </Link>
 
           {/* ── Desktop Nav ── */}
@@ -375,13 +386,13 @@ export default function Navbar() {
             </Link>
             <Link
               href="/sponsor"
-              className="text-white font-semibold text-sm px-4 py-2 rounded-lg transition-colors flex items-center gap-1.5"
+              className="text-white font-semibold text-xs px-3 py-1.5 rounded-md transition-colors flex items-center gap-1 whitespace-nowrap"
               style={{ background: '#5DB347' }}
               onMouseEnter={(e) => (e.currentTarget.style.background = '#449933')}
               onMouseLeave={(e) => (e.currentTarget.style.background = '#5DB347')}
             >
-              <span>❤️</span>
-              Sponsor a Farmer
+              <span className="text-sm">❤️</span>
+              Sponsor
             </Link>
           </div>
 
