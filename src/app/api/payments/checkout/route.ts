@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { stripe, MEMBERSHIP_PRICES, SPONSOR_PRICES } from '@/lib/stripe';
+import { getStripe, MEMBERSHIP_PRICES, SPONSOR_PRICES } from '@/lib/stripe';
 
 const checkoutSchema = z.object({
   type: z.enum(['membership', 'sponsorship']),
@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
     const cancel = cancelUrl || `${origin}/payments/cancel`;
 
     // Create Stripe Checkout Session
-    const session = await stripe.checkout.sessions.create({
+    const session = await getStripe().checkout.sessions.create({
       mode: 'subscription',
       payment_method_types: ['card'],
       line_items: [

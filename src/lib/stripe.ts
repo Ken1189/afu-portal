@@ -1,13 +1,25 @@
 import Stripe from 'stripe';
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  console.warn('STRIPE_SECRET_KEY not set — payments will not work');
-}
+let _stripe: Stripe | null = null;
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2026-02-25.clover',
-  typescript: true,
-});
+/** Lazily initialise Stripe so the build never crashes when the key is absent. */
+export function getStripe(): Stripe {
+  if (_stripe) return _stripe;
+
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) {
+    throw new Error(
+      'STRIPE_SECRET_KEY is not set. Add it in Vercel → Settings → Environment Variables.'
+    );
+  }
+
+  _stripe = new Stripe(key, {
+    apiVersion: '2024-12-18.acacia' as Stripe.LatestApiVersion,
+    typescript: true,
+  });
+
+  return _stripe;
+}
 
 // Membership tier pricing (amounts in cents)
 export const MEMBERSHIP_PRICES = {
