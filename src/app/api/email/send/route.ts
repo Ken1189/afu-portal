@@ -10,7 +10,7 @@ import { sendTemplatedEmail } from '@/lib/email';
 const sendEmailSchema = z.object({
   to: z.string().email('Invalid recipient email address'),
   templateKey: z.string().min(1, 'templateKey is required'),
-  variables: z.record(z.string()).default({}),
+  variables: z.record(z.string(), z.string()).default({}),
 });
 
 // ---------------------------------------------------------------------------
