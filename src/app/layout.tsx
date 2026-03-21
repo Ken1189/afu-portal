@@ -5,6 +5,7 @@ import { SiteNavbar, SiteFooter } from "@/components/SiteChrome";
 import AnnouncementBanner from "@/components/AnnouncementBanner";
 import { AuthProvider } from "@/lib/supabase/auth-context";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
+import CookieConsent from "@/components/CookieConsent";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -42,6 +43,7 @@ export default function RootLayout({
           <SiteNavbar />
           <main className="min-h-screen">{children}</main>
           <SiteFooter />
+          <CookieConsent />
         </AuthProvider>
       </body>
     </html>
