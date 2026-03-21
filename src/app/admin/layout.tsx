@@ -229,7 +229,7 @@ function SidebarContent({
     <>
       <div className="p-5 border-b border-white/10">
         <Link href="/admin" className="flex items-center gap-2.5" onClick={onLinkClick}>
-          <img src="/afu-logo.jpeg" alt="African Farming Union" className="h-10 w-auto object-contain rounded-md bg-white p-1" />
+          <img src="/afu-logo.svg" alt="African Farming Union" className="h-10 w-auto object-contain rounded-md bg-white p-1" />
         </Link>
       </div>
 

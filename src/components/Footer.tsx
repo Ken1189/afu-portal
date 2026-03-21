@@ -8,7 +8,7 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <div className="mb-4">
-              <img src="/afu-logo.jpeg" alt="African Farming Union" className="h-12 w-auto object-contain rounded-lg bg-white p-1" />
+              <img src="/afu-logo.svg" alt="African Farming Union" className="h-12 w-auto object-contain rounded-lg bg-white p-1" />
             </div>
             <p className="text-gray-300 text-sm leading-relaxed">
               Africa&apos;s Agriculture Development Bank + Operating Platform.

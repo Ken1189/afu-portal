@@ -46,7 +46,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Gradient Header — matches farm layout style */}
         <div className="gradient-navy p-5 text-white">
           <Link href="/" className="block mb-4">
-            <img src="/afu-logo.jpeg" alt="African Farming Union" className="h-10 w-auto object-contain rounded-md bg-white p-1" />
+            <img src="/afu-logo.svg" alt="African Farming Union" className="h-10 w-auto object-contain rounded-md bg-white p-1" />
           </Link>
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center font-bold">
@@ -109,7 +109,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <div className="gradient-navy p-5 text-white">
               <div className="flex items-center justify-between mb-4">
                 <Link href="/" className="flex items-center" onClick={() => setMobileNavOpen(false)}>
-                  <img src="/afu-logo.jpeg" alt="African Farming Union" className="h-9 w-auto object-contain rounded-md bg-white p-1" />
+                  <img src="/afu-logo.svg" alt="African Farming Union" className="h-9 w-auto object-contain rounded-md bg-white p-1" />
                 </Link>
                 <button
                   onClick={() => setMobileNavOpen(false)}

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 56" fill="none">
+  <!-- Leaf/Shield icon -->
+  <g transform="translate(4, 4)">
+    <!-- Shield shape -->
+    <path d="M24 0C24 0 28 2 36 2C44 2 48 0 48 0C48 0 48 16 48 24C48 36 36 44 24 48C12 44 0 36 0 24C0 16 0 0 0 0C0 0 4 2 12 2C20 2 24 0 24 0Z" fill="#5DB347"/>
+    <!-- Leaf inside shield -->
+    <path d="M24 10C18 16 14 24 14 32C14 32 18 28 24 28C30 28 34 32 34 32C34 24 30 16 24 10Z" fill="white" opacity="0.95"/>
+    <path d="M24 18V36" stroke="white" stroke-width="1.5" opacity="0.7"/>
+  </g>
+  <!-- AFU text -->
+  <text x="64" y="24" font-family="system-ui, -apple-system, Arial, sans-serif" font-size="22" font-weight="800" fill="#1B2A4A" letter-spacing="-0.5">AFU</text>
+  <!-- Full name -->
+  <text x="64" y="42" font-family="system-ui, -apple-system, Arial, sans-serif" font-size="11" font-weight="500" fill="#5DB347" letter-spacing="1.5">AFRICAN FARMING UNION</text>
+</svg>

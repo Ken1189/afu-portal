@@ -157,7 +157,7 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-16">
           {/* ── Logo ── */}
           <Link href="/" className="flex items-center shrink-0">
-            <img src="/afu-logo.jpeg" alt="African Farming Union" className="h-11 w-auto object-contain" />
+            <img src="/afu-logo.svg" alt="African Farming Union" className="h-11 w-auto object-contain" />
           </Link>
 
           {/* ── Desktop Nav ── */}
@@ -375,9 +375,12 @@ export default function Navbar() {
             </Link>
             <Link
               href="/sponsor"
-              className="text-green-700 font-semibold text-sm px-3 py-2 rounded-lg border border-green-600/30 bg-green-50 hover:bg-green-100 transition-colors flex items-center gap-1.5"
+              className="text-white font-semibold text-sm px-4 py-2 rounded-lg transition-colors flex items-center gap-1.5"
+              style={{ background: '#5DB347' }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = '#449933')}
+              onMouseLeave={(e) => (e.currentTarget.style.background = '#5DB347')}
             >
-              <span>🤝</span>
+              <span>❤️</span>
               Sponsor a Farmer
             </Link>
           </div>
@@ -745,10 +748,11 @@ export default function Navbar() {
                 </Link>
                 <Link
                   href="/sponsor"
-                  className="text-green-700 font-semibold text-base py-3 px-3 rounded-lg border border-green-600/30 bg-green-50 hover:bg-green-100 transition-colors flex items-center gap-2"
+                  className="text-white font-semibold text-base py-3 px-3 rounded-lg transition-colors flex items-center gap-2"
+                  style={{ background: '#5DB347' }}
                   onClick={closeMobile}
                 >
-                  <span>🤝</span>
+                  <span>❤️</span>
                   Sponsor a Farmer
                 </Link>
 
