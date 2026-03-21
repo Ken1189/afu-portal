@@ -152,7 +152,7 @@ const placementOptions = [
   { id: 'training', label: 'Training', icon: <GraduationCap className="w-5 h-5" />, reach: '~1,400 daily views' },
 ];
 
-const countryOptions = ['Botswana', 'Kenya', 'Mozambique', 'Nigeria', 'Sierra Leone', 'South Africa', 'Tanzania', 'Zambia', 'Zimbabwe'];
+const countryOptions = ['Botswana', 'Kenya', 'Mozambique', 'Nigeria', 'Sierra Leone', 'South Africa', 'Tanzania', 'Uganda', 'Zambia', 'Zimbabwe'];
 
 const tierOptions = [
   { id: 'smallholder', label: 'Smallholder', count: 834 },

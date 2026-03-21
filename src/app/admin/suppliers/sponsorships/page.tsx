@@ -41,7 +41,7 @@ import {
 
 type SponsorshipTier = 'platinum' | 'gold' | 'silver' | 'bronze';
 type SupplierCategory = 'input-supplier' | 'equipment' | 'logistics' | 'processing' | 'technology' | 'financial-services';
-type SupplierCountry = 'Botswana' | 'Kenya' | 'Mozambique' | 'Nigeria' | 'Sierra Leone' | 'South Africa' | 'Tanzania' | 'Zambia' | 'Zimbabwe';
+type SupplierCountry = 'Botswana' | 'Kenya' | 'Mozambique' | 'Nigeria' | 'Sierra Leone' | 'South Africa' | 'Tanzania' | 'Uganda' | 'Zambia' | 'Zimbabwe';
 
 interface Supplier {
   id: string;

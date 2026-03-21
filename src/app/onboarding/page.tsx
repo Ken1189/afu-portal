@@ -87,6 +87,7 @@ const COUNTRIES = [
   { name: 'Kenya', currency: 'KES' },
   { name: 'South Africa', currency: 'ZAR' },
   { name: 'Nigeria', currency: 'NGN' },
+  { name: 'Uganda', currency: 'UGX' },
   { name: 'Zambia', currency: 'ZMW' },
   { name: 'Mozambique', currency: 'MZN' },
   { name: 'Sierra Leone', currency: 'SLL' },
@@ -104,7 +105,7 @@ const SUPPLIER_CATEGORIES = [
   'Logistics',
 ];
 
-const LANGUAGES = ['English', 'Shona', 'Ndebele', 'Swahili', 'Setswana', 'Portuguese', 'Hausa'];
+const LANGUAGES = ['English', 'Shona', 'Ndebele', 'Swahili', 'Setswana', 'Portuguese', 'Hausa', 'Luganda'];
 
 const NOTIFICATION_CHANNELS = [
   { key: 'SMS', icon: Phone },

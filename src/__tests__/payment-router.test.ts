@@ -24,14 +24,20 @@ describe('Payment Router', () => {
     });
 
     it('returns card support for all countries', () => {
-      const countries = ['BW', 'ZW', 'TZ', 'KE', 'ZA', 'NG', 'ZM', 'MZ', 'SL'];
+      const countries = ['BW', 'ZW', 'TZ', 'KE', 'ZA', 'NG', 'ZM', 'MZ', 'SL', 'UG'];
       for (const country of countries) {
         expect(getAvailableProviders(country).card).toBe(true);
       }
     });
 
+    it('returns MTN MoMo and Airtel Money for Uganda', () => {
+      const providers = getAvailableProviders('UG');
+      expect(providers.mobileMoney).toContain('mtn-momo');
+      expect(providers.mobileMoney).toContain('airtel-money');
+    });
+
     it('returns bank transfer for all countries', () => {
-      const countries = ['BW', 'ZW', 'TZ', 'KE', 'ZA', 'NG', 'ZM', 'MZ', 'SL'];
+      const countries = ['BW', 'ZW', 'TZ', 'KE', 'ZA', 'NG', 'ZM', 'MZ', 'SL', 'UG'];
       for (const country of countries) {
         expect(getAvailableProviders(country).bankTransfer).toBe(true);
       }

@@ -49,7 +49,7 @@ import {
 type MemberTier = 'smallholder' | 'commercial' | 'enterprise' | 'partner';
 type MemberStatus = 'active' | 'pending' | 'suspended';
 type KycStatus = 'complete' | 'partial' | 'pending';
-type MemberCountry = 'Botswana' | 'Kenya' | 'Mozambique' | 'Nigeria' | 'Sierra Leone' | 'South Africa' | 'Tanzania' | 'Zambia' | 'Zimbabwe';
+type MemberCountry = 'Botswana' | 'Kenya' | 'Mozambique' | 'Nigeria' | 'Sierra Leone' | 'South Africa' | 'Tanzania' | 'Uganda' | 'Zambia' | 'Zimbabwe';
 
 interface Member {
   id: string;

@@ -26,6 +26,7 @@ const ALL_COUNTRIES = [
   'Sierra Leone',
   'South Africa',
   'Tanzania',
+  'Uganda',
   'Zambia',
   'Zimbabwe',
 ];

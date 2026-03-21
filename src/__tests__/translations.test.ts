@@ -1,19 +1,19 @@
 import { describe, it, expect } from 'vitest';
 import { getTranslations, localeNames, localeFlags, type Locale } from '@/lib/i18n/translations';
 
-const ALL_LOCALES: Locale[] = ['en', 'sn', 'nd', 'sw', 'tn', 'pt', 'ha', 'yo', 'zu', 'af', 'bem', 'kri'];
+const ALL_LOCALES: Locale[] = ['en', 'sn', 'nd', 'sw', 'tn', 'pt', 'ha', 'yo', 'zu', 'af', 'bem', 'kri', 'lg'];
 
 describe('Translations', () => {
-  it('has all 12 locales defined in localeNames', () => {
-    expect(Object.keys(localeNames)).toHaveLength(12);
+  it('has all 13 locales defined in localeNames', () => {
+    expect(Object.keys(localeNames)).toHaveLength(13);
     for (const locale of ALL_LOCALES) {
       expect(localeNames[locale]).toBeDefined();
       expect(localeNames[locale].length).toBeGreaterThan(0);
     }
   });
 
-  it('has all 12 locales defined in localeFlags', () => {
-    expect(Object.keys(localeFlags)).toHaveLength(12);
+  it('has all 13 locales defined in localeFlags', () => {
+    expect(Object.keys(localeFlags)).toHaveLength(13);
     for (const locale of ALL_LOCALES) {
       expect(localeFlags[locale]).toBeDefined();
     }

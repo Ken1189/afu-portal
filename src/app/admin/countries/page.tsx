@@ -95,6 +95,11 @@ const countries: Country[] = [
     paymentProviders: ['Orange Money'], languages: ['Krio', 'English'],
     status: 'planned', members: 210, activeLoans: 0, revenueThisMonth: 0,
   },
+  {
+    iso: 'UG', name: 'Uganda', flag: '🇺🇬', currency: 'UGX',
+    paymentProviders: ['MTN Mobile Money', 'Airtel Money'], languages: ['English', 'Luganda', 'Swahili'],
+    status: 'pilot', members: 620, activeLoans: 45, revenueThisMonth: 9800,
+  },
 ];
 
 // ── Helpers ─────────────────────────────────────────────────────────────────

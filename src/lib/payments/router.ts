@@ -1,7 +1,7 @@
 /**
  * Payment Router
  * Smart routing of payments by country and payment method.
- * Maps each of the 9 AFU countries to their available payment providers.
+ * Maps each of the 10 AFU countries to their available payment providers.
  */
 
 import {
@@ -31,7 +31,7 @@ interface CountryPaymentConfig {
 /**
  * Payment providers available per country.
  * BW = Botswana, ZW = Zimbabwe, TZ = Tanzania, KE = Kenya,
- * ZA = South Africa, NG = Nigeria, ZM = Zambia, MZ = Mozambique, SL = Sierra Leone
+ * ZA = South Africa, NG = Nigeria, ZM = Zambia, MZ = Mozambique, SL = Sierra Leone, UG = Uganda
  */
 const COUNTRY_PROVIDERS: Record<string, CountryPaymentConfig> = {
   BW: { mobileMoney: ['orange-money'], bankTransfer: true, card: true },
@@ -43,6 +43,7 @@ const COUNTRY_PROVIDERS: Record<string, CountryPaymentConfig> = {
   ZM: { mobileMoney: ['mtn-momo', 'airtel-money'], bankTransfer: true, card: true },
   MZ: { mobileMoney: ['mpesa'], bankTransfer: true, card: true },
   SL: { mobileMoney: ['orange-money'], bankTransfer: true, card: true },
+  UG: { mobileMoney: ['mtn-momo', 'airtel-money'], bankTransfer: true, card: true },
 };
 
 /**

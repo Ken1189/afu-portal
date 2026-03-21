@@ -36,7 +36,7 @@ const categories: { value: SupplierCategory; label: string }[] = [
   { value: 'financial-services', label: 'Financial Services' },
 ];
 
-const countries = ['Botswana', 'Kenya', 'Mozambique', 'Nigeria', 'Sierra Leone', 'South Africa', 'Tanzania', 'Zambia', 'Zimbabwe'];
+const countries = ['Botswana', 'Kenya', 'Mozambique', 'Nigeria', 'Sierra Leone', 'South Africa', 'Tanzania', 'Uganda', 'Zambia', 'Zimbabwe'];
 
 export default function AddSupplierPage() {
   const router = useRouter();

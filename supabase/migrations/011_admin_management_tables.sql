@@ -176,8 +176,8 @@ INSERT INTO testimonials (name, role, country, quote, rating, is_featured, displ
 
 -- ── FAQ Items ─────────────────────────────────────────────
 INSERT INTO faq_items (category, question, answer, display_order) VALUES
-('general', 'What is the African Farming Union (AFU)?', 'AFU is a vertically integrated agriculture development platform that provides financing, inputs, processing, offtake, trade finance, and training to farmers across Africa. We operate as both an agri-development bank and an execution engine across 9 countries.', 1),
-('general', 'Which countries does AFU operate in?', 'AFU currently operates in 9 African countries: Botswana, Zimbabwe, Tanzania, Kenya, Zambia, Sierra Leone, Nigeria, Mozambique, and South Africa. Phase 1 launched in Botswana, Zimbabwe, and Tanzania.', 2),
+('general', 'What is the African Farming Union (AFU)?', 'AFU is a vertically integrated agriculture development platform that provides financing, inputs, processing, offtake, trade finance, and training to farmers across Africa. We operate as both an agri-development bank and an execution engine across 10 countries.', 1),
+('general', 'Which countries does AFU operate in?', 'AFU currently operates in 10 African countries: Botswana, Zimbabwe, Tanzania, Kenya, Uganda, Zambia, Sierra Leone, Nigeria, Mozambique, and South Africa. Phase 1 launched in Botswana, Zimbabwe, and Tanzania.', 2),
 ('membership', 'How do I become an AFU member?', 'Click "Become a Member" on the homepage and complete the application form. You will need to provide your farm details, identification documents, and choose a membership tier. Applications are reviewed within 5 business days.', 3),
 ('membership', 'What are the membership tiers and costs?', 'We offer three tiers: Smallholder ($5/month) for farms under 10 hectares, Commercial ($50/month) for 10-500 hectares, and Enterprise ($200/month) for large-scale operations over 500 hectares. Each tier includes increasing levels of services and financing.', 4),
 ('payments', 'What payment methods are accepted?', 'We accept M-Pesa, EcoCash, MTN Mobile Money, Orange Money, bank transfers, and international card payments via Stripe. Available methods vary by country to match local payment preferences.', 5),
@@ -243,7 +243,7 @@ ON CONFLICT (page, section, key) DO NOTHING;
 -- ── Site Content: SEO Metadata ────────────────────────────
 INSERT INTO site_content (page, section, key, value, content_type) VALUES
 ('homepage', 'seo', 'title', 'AFU - Africa''s Agriculture Development Platform', 'text'),
-('homepage', 'seo', 'description', 'The vertically integrated agri dev bank and execution engine transforming African agriculture across 9 countries.', 'text'),
+('homepage', 'seo', 'description', 'The vertically integrated agri dev bank and execution engine transforming African agriculture across 10 countries.', 'text'),
 ('about', 'seo', 'title', 'About AFU - Pan-African Agriculture Development', 'text'),
 ('sponsor', 'seo', 'title', 'Sponsor an African Farmer - AFU', 'text')
 ON CONFLICT (page, section, key) DO NOTHING;

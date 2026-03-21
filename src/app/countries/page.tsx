@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export const metadata = {
   title: "Our Countries - AFU",
-  description: "AFU operates across 9 African countries: Botswana, Kenya, Mozambique, Nigeria, Sierra Leone, South Africa, Tanzania, Zambia, and Zimbabwe.",
+  description: "AFU operates across 10 African countries: Botswana, Kenya, Mozambique, Nigeria, Sierra Leone, South Africa, Tanzania, Uganda, Zambia, and Zimbabwe.",
 };
 
 const countries = [
@@ -63,6 +63,14 @@ const countries = [
     color: "bg-[#EBF7E5] border-[#5DB347]/20",
   },
   {
+    flag: "🇺🇬",
+    country: "Uganda",
+    role: "East African Breadbasket",
+    desc: "Major coffee exporter and food producer. Strong mobile money ecosystem with MTN and Airtel driving financial inclusion.",
+    highlights: ["Coffee & tea exports", "MTN Mobile Money", "Maize & banana production", "EAC trade hub"],
+    color: "bg-[#EBF7E5] border-[#5DB347]/20",
+  },
+  {
     flag: "🇿🇲",
     country: "Zambia",
     role: "Processing Hub",
@@ -87,7 +95,7 @@ export default function CountriesPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl md:text-5xl font-bold mb-6 text-glow">Our Countries</h1>
           <p className="text-xl text-gray-300 max-w-3xl">
-            Nine strategic markets across Africa, each serving a distinct purpose in the AFU flywheel.
+            Ten strategic markets across Africa, each serving a distinct purpose in the AFU flywheel.
           </p>
           <div className="flex flex-wrap gap-3 mt-6">
             {countries.map((c) => (
@@ -124,7 +132,7 @@ export default function CountriesPage() {
 
           <div className="mt-16 bg-[#EBF7E5] rounded-2xl p-10 text-center">
             <h3 className="text-2xl font-bold text-navy mb-4">Join the Pan-African Agricultural Revolution</h3>
-            <p className="text-gray-600 mb-6">9 countries. One integrated platform. Apply for membership or become a supplier today.</p>
+            <p className="text-gray-600 mb-6">10 countries. One integrated platform. Apply for membership or become a supplier today.</p>
             <div className="flex flex-wrap gap-4 justify-center">
               <Link href="/apply" className="inline-block bg-[#5DB347] hover:bg-[#449933] text-white px-8 py-3 rounded-lg font-semibold transition-colors">
                 Apply for Membership

@@ -416,7 +416,13 @@ INSERT INTO payment_gateways (name, provider, country, config, is_active) VALUES
   -- Sierra Leone (SL)
   ('SL Orange Money',   'orange_money',   'SL', '{"channel": "mobile_money"}', true),
   ('SL Bank Transfer',  'bank_transfer',  'SL', '{"channel": "bank_transfer"}', true),
-  ('SL Stripe',         'stripe',         'SL', '{"channel": "card"}', true)
+  ('SL Stripe',         'stripe',         'SL', '{"channel": "card"}', true),
+
+  -- Uganda (UG)
+  ('UG MTN MoMo',       'mtn_momo',       'UG', '{"channel": "mobile_money"}', true),
+  ('UG Airtel Money',   'airtel_money',   'UG', '{"channel": "mobile_money"}', true),
+  ('UG Bank Transfer',  'bank_transfer',  'UG', '{"channel": "bank_transfer"}', true),
+  ('UG Stripe',         'stripe',         'UG', '{"channel": "card"}', true)
 ON CONFLICT DO NOTHING;
 
 COMMIT;

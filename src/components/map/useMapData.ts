@@ -80,6 +80,22 @@ const DEMO_DATA: MapDataPoint[] = [
     cooperativeName: 'Ethiopian Highlands Coop', memberCount: 412,
     region: 'Addis Ababa', country: 'Ethiopia',
   },
+  // Uganda
+  {
+    id: 'demo-farm-7', type: 'farm', latitude: 0.35, longitude: 32.58,
+    farmerName: 'Sarah Namukasa', farmName: 'Namukasa Coffee Estate', crop: 'Coffee',
+    healthScore: 78, farmSize: 10, stage: 'growing', country: 'Uganda', slug: 'sarah-namukasa',
+  },
+  {
+    id: 'demo-eq-5', type: 'equipment', latitude: 0.31, longitude: 32.61,
+    equipmentName: 'Mahindra 575 DI', equipmentType: 'Tractor', dailyRate: 110,
+    equipmentStatus: 'available', country: 'Uganda',
+  },
+  {
+    id: 'demo-coop-5', type: 'cooperative', latitude: 0.70, longitude: 30.27,
+    cooperativeName: 'Uganda Coffee Growers Alliance', memberCount: 385,
+    region: 'Fort Portal', country: 'Uganda',
+  },
 ];
 
 // ── Hook ───────────────────────────────────────────────────────────────────

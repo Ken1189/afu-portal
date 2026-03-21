@@ -42,7 +42,7 @@ interface Cooperative {
   name: string;
   type: 'crop' | 'livestock' | 'mixed' | 'processing' | 'marketing';
   region: string;
-  country: 'Botswana' | 'Zimbabwe' | 'Tanzania';
+  country: 'Botswana' | 'Kenya' | 'Mozambique' | 'Nigeria' | 'Sierra Leone' | 'South Africa' | 'Tanzania' | 'Uganda' | 'Zambia' | 'Zimbabwe';
   description: string;
   established: number;
   memberCount: number;

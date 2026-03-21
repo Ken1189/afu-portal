@@ -230,14 +230,14 @@ export default function AdminSuppliersPage() {
     }
   }
 
-  function SortIcon({ field }: { field: SortField }) {
+  const sortIcon = (field: SortField) => {
     if (sortField !== field) return <ArrowUpDown className="w-3 h-3 text-gray-300" />;
     return sortDir === 'asc' ? (
       <ChevronUp className="w-3 h-3 text-teal" />
     ) : (
       <ChevronDown className="w-3 h-3 text-teal" />
     );
-  }
+  };
 
   return (
     <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-6">
@@ -349,6 +349,7 @@ export default function AdminSuppliersPage() {
               <option value="Sierra Leone">Sierra Leone</option>
               <option value="South Africa">South Africa</option>
               <option value="Tanzania">Tanzania</option>
+              <option value="Uganda">Uganda</option>
               <option value="Zambia">Zambia</option>
               <option value="Zimbabwe">Zimbabwe</option>
             </select>
@@ -436,7 +437,7 @@ export default function AdminSuppliersPage() {
                       onClick={() => toggleSort('companyName')}
                     >
                       <div className="flex items-center gap-1">
-                        Company <SortIcon field="companyName" />
+                        Company {sortIcon("companyName")}
                       </div>
                     </th>
                     <th
@@ -444,7 +445,7 @@ export default function AdminSuppliersPage() {
                       onClick={() => toggleSort('category')}
                     >
                       <div className="flex items-center gap-1">
-                        Category <SortIcon field="category" />
+                        Category {sortIcon("category")}
                       </div>
                     </th>
                     <th
@@ -452,7 +453,7 @@ export default function AdminSuppliersPage() {
                       onClick={() => toggleSort('country')}
                     >
                       <div className="flex items-center gap-1">
-                        Country <SortIcon field="country" />
+                        Country {sortIcon("country")}
                       </div>
                     </th>
                     <th
@@ -460,7 +461,7 @@ export default function AdminSuppliersPage() {
                       onClick={() => toggleSort('status')}
                     >
                       <div className="flex items-center gap-1">
-                        Status <SortIcon field="status" />
+                        Status {sortIcon("status")}
                       </div>
                     </th>
                     <th
@@ -468,7 +469,7 @@ export default function AdminSuppliersPage() {
                       onClick={() => toggleSort('productsCount')}
                     >
                       <div className="flex items-center justify-end gap-1">
-                        Products <SortIcon field="productsCount" />
+                        Products {sortIcon("productsCount")}
                       </div>
                     </th>
                     <th
@@ -476,7 +477,7 @@ export default function AdminSuppliersPage() {
                       onClick={() => toggleSort('totalSales')}
                     >
                       <div className="flex items-center justify-end gap-1">
-                        Total Sales <SortIcon field="totalSales" />
+                        Total Sales {sortIcon("totalSales")}
                       </div>
                     </th>
                     <th
@@ -484,7 +485,7 @@ export default function AdminSuppliersPage() {
                       onClick={() => toggleSort('rating')}
                     >
                       <div className="flex items-center gap-1">
-                        Rating <SortIcon field="rating" />
+                        Rating {sortIcon("rating")}
                       </div>
                     </th>
                     <th
@@ -492,7 +493,7 @@ export default function AdminSuppliersPage() {
                       onClick={() => toggleSort('sponsorshipTier')}
                     >
                       <div className="flex items-center gap-1">
-                        Tier <SortIcon field="sponsorshipTier" />
+                        Tier {sortIcon("sponsorshipTier")}
                       </div>
                     </th>
                     <th className="text-right py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">

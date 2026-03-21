@@ -1,6 +1,6 @@
 /**
  * Stripe Payment Gateway
- * Card payments for all 9 AFU countries.
+ * Card payments for all 10 AFU countries.
  * Uses dynamic import so the stripe package is only loaded when needed.
  */
 

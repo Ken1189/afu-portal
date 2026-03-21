@@ -403,7 +403,7 @@ export default function LoansPage() {
           </div>
           <p className="text-2xl font-bold text-navy">187</p>
           <p className="text-xs text-gray-500 mt-0.5">Active Loans</p>
-          <p className="text-[10px] text-gray-400 mt-0.5">Across 9 countries</p>
+          <p className="text-[10px] text-gray-400 mt-0.5">Across 10 countries</p>
         </motion.div>
 
         {/* Repayment Rate */}

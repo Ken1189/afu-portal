@@ -1,9 +1,9 @@
 // ---------------------------------------------------------------------------
 // AFU Portal — Internationalization (i18n)
-// 12 Languages across 9 African countries
+// 14 Languages across 10 African countries
 // ---------------------------------------------------------------------------
 
-export type Locale = 'en' | 'sn' | 'nd' | 'sw' | 'tn' | 'pt' | 'ha' | 'yo' | 'zu' | 'af' | 'bem' | 'kri';
+export type Locale = 'en' | 'sn' | 'nd' | 'sw' | 'tn' | 'pt' | 'ha' | 'yo' | 'zu' | 'af' | 'bem' | 'kri' | 'lg';
 
 export const localeNames: Record<Locale, string> = {
   en: 'English',
@@ -18,6 +18,7 @@ export const localeNames: Record<Locale, string> = {
   af: 'Afrikaans',
   bem: 'Bemba',
   kri: 'Krio',
+  lg: 'Luganda',
 };
 
 export const localeFlags: Record<Locale, string> = {
@@ -33,6 +34,7 @@ export const localeFlags: Record<Locale, string> = {
   af: '🇿🇦',
   bem: '🇿🇲',
   kri: '🇸🇱',
+  lg: '🇺🇬',
 };
 
 /** ISO country code per locale — used for flag image URLs */
@@ -49,6 +51,7 @@ export const localeCountryCodes: Record<Locale, string> = {
   af: 'za',
   bem: 'zm',
   kri: 'sl',
+  lg: 'ug',
 };
 
 /** Get flag image URL for a locale (uses flagcdn.com SVGs) */
@@ -1779,10 +1782,41 @@ export const kri: Translations = withOverrides({
   },
 });
 
+// ─── Luganda (Uganda) ────────────────────────────────────────────────────────
+
+export const lg: Translations = withOverrides({
+  common: {
+    home: 'Awaka', crops: 'Ebirime', doctor: 'Omusawo', money: 'Ssente', journal: 'Ekitabo',
+    financing: 'Okuwola', insurance: 'Yinshuwa', marketplace: 'Akatale',
+    logistics: 'Entambula', cooperatives: 'Ebibiina', equipment: 'Ebyuma',
+    livestock: 'Ebisolo', sustainability: 'Obukuumi', exports: 'Ebitundibwa ebweru',
+    weather: 'Embeera y\'obudde', aiTools: 'Ebyuma bya AI', marketPrices: 'Emiwendo',
+    payments: 'Okusasula', assistant: 'Omuyambi wa AI', save: 'Tereka', cancel: 'Sazaamu',
+    back: 'Dda emabega', next: 'Ekiddako', submit: 'Waayo', loading: 'Kiteekedwa...',
+    viewAll: 'Laba Byonna', addNew: 'Gattako Ekipya', search: 'Noonya', filter: 'Londoola',
+    today: 'Leero', yesterday: 'Jjo', language: 'Olulimi', settings: 'Entegeka',
+    signOut: 'Fuluma', farmPortal: 'Woomu w\'Okulima', backToPortal: 'Ddayo ku AFU',
+  },
+  dashboard: {
+    greeting: 'Tukusanyukira', goodMorning: 'Wasuze otya', goodAfternoon: 'Osiibye otya',
+    goodEvening: 'Oli otya akawungeezi', myPlots: 'Ennimiro Zange', totalIncome: 'Ssente Ezijja',
+    totalExpenses: 'Ssente Ezigenda', profit: 'Amagoba',
+  },
+  financing: {
+    title: 'Okuwola', subtitle: 'Funa ssente z\'weetaaga okulimisa',
+    applyNow: 'Saba Looni',
+  },
+  aiAssistant: {
+    title: 'Omuyambi wa AI', poweredBy: 'AFU yakola',
+    online: 'Ku mutimbagano — Nzetegefu okuyamba',
+    askAnything: 'Mbuuza ekikufaako ku bulimi bwo...',
+  },
+});
+
 // ---------------------------------------------------------------------------
 // Translation accessor
 // ---------------------------------------------------------------------------
-const translations: Record<Locale, Translations> = { en, sn, nd, sw, tn, pt, ha, yo, zu, af, bem, kri };
+const translations: Record<Locale, Translations> = { en, sn, nd, sw, tn, pt, ha, yo, zu, af, bem, kri, lg };
 
 export function getTranslations(locale: Locale): Translations {
   return translations[locale] || translations.en;

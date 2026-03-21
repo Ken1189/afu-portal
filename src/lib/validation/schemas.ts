@@ -8,7 +8,7 @@ export const phone = z.string().max(30).optional().nullable();
 export const country = z.string().min(2).max(50);
 
 export const currency = z.enum([
-  'BWP', 'ZWG', 'TZS', 'KES', 'ZAR', 'NGN', 'ZMW', 'MZN', 'SLL', 'USD',
+  'BWP', 'ZWG', 'TZS', 'KES', 'ZAR', 'NGN', 'ZMW', 'MZN', 'SLL', 'UGX', 'USD',
 ]);
 
 export const membershipTier = z.enum([

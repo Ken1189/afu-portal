@@ -149,7 +149,7 @@ const STATUS_COLORS: Record<string, string> = {
 
 const COUNTRY_NAMES: Record<string, string> = {
   KE: 'Kenya', TZ: 'Tanzania', ZW: 'Zimbabwe', BW: 'Botswana',
-  NG: 'Nigeria', ZM: 'Zambia', SL: 'Sierra Leone', MW: 'Malawi', MZ: 'Mozambique',
+  NG: 'Nigeria', ZM: 'Zambia', SL: 'Sierra Leone', UG: 'Uganda', MW: 'Malawi', MZ: 'Mozambique',
 };
 
 const ALL_COUNTRIES = Object.keys(COUNTRY_NAMES);

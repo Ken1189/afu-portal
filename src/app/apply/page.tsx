@@ -216,6 +216,7 @@ export default function ApplyPage() {
                       <option value="SL">Sierra Leone</option>
                       <option value="ZA">South Africa</option>
                       <option value="TZ">Tanzania</option>
+                      <option value="UG">Uganda</option>
                       <option value="ZM">Zambia</option>
                       <option value="ZW">Zimbabwe</option>
                       <option value="other">Other</option>

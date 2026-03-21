@@ -518,7 +518,7 @@ INSERT INTO courses (title, description, category, difficulty, duration_minutes,
 );
 
 -- ----------------------------------------------------------------------------
--- 6b. MARKET PRICES — 15 prices across all 9 AFU countries
+-- 6b. MARKET PRICES — market prices across all 10 AFU countries
 -- ----------------------------------------------------------------------------
 
 INSERT INTO market_prices (commodity, market_location, country, price, currency, unit, date, source) VALUES

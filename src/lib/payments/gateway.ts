@@ -1,7 +1,7 @@
 /**
  * Payment Gateway Infrastructure for AFU Portal
  * Abstract interfaces and types for multi-country payment processing
- * Serving 9 African countries: BW, ZW, TZ, KE, ZA, NG, ZM, MZ, SL
+ * Serving 10 African countries: BW, ZW, TZ, KE, ZA, NG, ZM, MZ, SL, UG
  */
 
 export type PaymentProvider =
@@ -33,7 +33,8 @@ export type Currency =
   | 'NGN'
   | 'ZMW'
   | 'MZN'
-  | 'SLE';
+  | 'SLE'
+  | 'UGX';
 
 export interface PaymentRequest {
   amount: number;

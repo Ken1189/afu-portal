@@ -135,6 +135,7 @@ export default function AdminMembersPage() {
               <option value="Sierra Leone">Sierra Leone</option>
               <option value="South Africa">South Africa</option>
               <option value="Tanzania">Tanzania</option>
+              <option value="Uganda">Uganda</option>
               <option value="Zambia">Zambia</option>
               <option value="Zimbabwe">Zimbabwe</option>
             </select>

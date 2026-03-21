@@ -43,7 +43,8 @@ INSERT INTO equipment (name, type, description, daily_rate, currency, location, 
 ('Seed Drill Planter', 'planter', 'Precision seed drill for row crops with fertilizer attachment.', 90.00, 'USD', 'Francistown', 'Botswana', 'available', 'https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=600', '{"rows": 6, "row_spacing_cm": 75}'),
 ('Grain Dryer 10T', 'dryer', 'Batch grain dryer with 10 tonne capacity for post-harvest processing.', 120.00, 'USD', 'Maputo', 'Mozambique', 'available', 'https://images.unsplash.com/photo-1560693225-b8507d6f3aa9?w=600', '{"capacity_tonnes": 10, "fuel": "lpg"}'),
 ('Knapsack Sprayer 20L', 'sprayer', 'Manual knapsack sprayer for smallholder pest and weed management.', 5.00, 'USD', 'Freetown', 'Sierra Leone', 'available', 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=600', '{"capacity_l": 20, "type": "manual"}'),
-('Water Tanker 5000L', 'irrigation', 'Mobile water tanker for irrigation and livestock watering.', 60.00, 'USD', 'Abuja', 'Nigeria', 'available', 'https://images.unsplash.com/photo-1519003722824-194d4455a60c?w=600', '{"capacity_l": 5000}');
+('Water Tanker 5000L', 'irrigation', 'Mobile water tanker for irrigation and livestock watering.', 60.00, 'USD', 'Abuja', 'Nigeria', 'available', 'https://images.unsplash.com/photo-1519003722824-194d4455a60c?w=600', '{"capacity_l": 5000}'),
+('Mahindra 575 DI Tractor', 'tractor', '45HP compact tractor ideal for smallholder and medium farms.', 110.00, 'USD', 'Kampala', 'Uganda', 'available', 'https://images.unsplash.com/photo-1530267981375-f0de937f5f13?w=600', '{"hp": 45, "fuel": "diesel", "hours": 800}');
 
 -- ── MARKET PRICES ────────────────────────────────────────────────────────────
 
@@ -80,7 +81,11 @@ INSERT INTO market_prices (commodity, market_location, country, price, currency,
 ('Rice', 'Maputo', 'Mozambique', 580.00, 'USD', 'tonne', CURRENT_DATE, 'SIMA'),
 -- Sierra Leone
 ('Rice', 'Freetown', 'Sierra Leone', 750.00, 'USD', 'tonne', CURRENT_DATE, 'MAFFS'),
-('Cocoa', 'Freetown', 'Sierra Leone', 7.80, 'USD', 'kg', CURRENT_DATE, 'SLPMB');
+('Cocoa', 'Freetown', 'Sierra Leone', 7.80, 'USD', 'kg', CURRENT_DATE, 'SLPMB'),
+-- Uganda
+('Coffee', 'Kampala', 'Uganda', 4.80, 'USD', 'kg', CURRENT_DATE, 'UCDA'),
+('Tea', 'Kampala', 'Uganda', 2.50, 'USD', 'kg', CURRENT_DATE, 'UTGA'),
+('Maize', 'Kampala', 'Uganda', 290.00, 'USD', 'tonne', CURRENT_DATE, 'UNBS');
 
 -- ── COOPERATIVES ─────────────────────────────────────────────────────────────
 
@@ -93,7 +98,8 @@ INSERT INTO cooperatives (name, country, region, member_count, established_date,
 ('Niger Delta Rice Growers', 'Nigeria', 'Rivers State', 450, '2014-07-22', 'Rice paddy farmers with shared milling and drying infrastructure.', 'ndrice@coops.ng', 'active'),
 ('Kafue Flats Livestock', 'Zambia', 'Southern Province', 210, '2017-11-30', 'Cattle ranchers managing communal grazing and veterinary services.', 'kafuelivestock@coops.zm', 'active'),
 ('Gaza Province Cashew Cooperative', 'Mozambique', 'Gaza', 320, '2013-05-18', 'Cashew nut producers with shared processing and export coordination.', 'gazacashew@coops.mz', 'active'),
-('Kono Diamond District Cocoa Farmers', 'Sierra Leone', 'Kono', 175, '2020-02-28', 'Cocoa farmers transitioning from artisanal mining to sustainable agriculture.', 'konofarmer@coops.sl', 'active');
+('Kono Diamond District Cocoa Farmers', 'Sierra Leone', 'Kono', 175, '2020-02-28', 'Cocoa farmers transitioning from artisanal mining to sustainable agriculture.', 'konofarmer@coops.sl', 'active'),
+('Mount Elgon Coffee Cooperative', 'Uganda', 'Mbale', 410, '2016-04-10', 'Arabica coffee growers on the slopes of Mount Elgon pooling processing and export resources.', 'elgoncoffee@coops.ug', 'active');
 
 -- ── Historical market prices (last 7 days for trend data) ────────────────────
 

@@ -63,6 +63,7 @@ const COUNTRIES = [
   { code: 'SL', name: 'Sierra Leone' },
   { code: 'NG', name: 'Nigeria' },
   { code: 'MZ', name: 'Mozambique' },
+  { code: 'UG', name: 'Uganda' },
   { code: 'ZA', name: 'South Africa' },
 ];
 

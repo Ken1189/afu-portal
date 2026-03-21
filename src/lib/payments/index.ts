@@ -1,17 +1,17 @@
 /**
  * AFU Portal Payment Gateway Infrastructure
  *
- * Multi-country payment processing for 9 African countries:
+ * Multi-country payment processing for 10 African countries:
  * Botswana, Zimbabwe, Tanzania, Kenya, South Africa,
- * Nigeria, Zambia, Mozambique, Sierra Leone.
+ * Nigeria, Zambia, Mozambique, Sierra Leone, Uganda.
  *
  * Supported providers:
  * - Stripe (card payments, all countries)
  * - M-Pesa (KE, TZ, MZ)
  * - EcoCash via Paynow (ZW)
- * - MTN MoMo (NG, ZM)
+ * - MTN MoMo (NG, ZM, UG)
  * - Orange Money (BW, SL)
- * - Airtel Money (TZ, ZM, KE)
+ * - Airtel Money (TZ, ZM, KE, UG)
  */
 
 // Types and interfaces

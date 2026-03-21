@@ -73,6 +73,7 @@ const FALLBACK_COUNTRY_PRODUCTION: CountryProduction[] = [
   { country: 'South Africa', flag: '\uD83C\uDDFF\uD83C\uDDE6', tonnes: 9_800 },
   { country: 'Mozambique', flag: '\uD83C\uDDF2\uD83C\uDDFF', tonnes: 7_200 },
   { country: 'Sierra Leone', flag: '\uD83C\uDDF8\uD83C\uDDF1', tonnes: 4_600 },
+  { country: 'Uganda', flag: '\uD83C\uDDFA\uD83C\uDDEC', tonnes: 11_500 },
 ];
 
 // ── Animation ────────────────────────────────────────────────────────────────

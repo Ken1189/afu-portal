@@ -1,4 +1,5 @@
 import Link from "next/link";
+import LeadershipSection from "@/components/LeadershipSection";
 
 export const metadata = {
   title: "About AFU - African Farming Union",
@@ -188,6 +189,9 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
+
+      {/* ─── LEADERSHIP ─── */}
+      <LeadershipSection />
 
       {/* ─── FINAL CTA ─── */}
       <section

@@ -57,12 +57,12 @@ const METHOD_ICONS = {
 
 const COUNTRY_CURRENCIES: Record<string, string> = {
   BW: 'BWP', ZW: 'USD', TZ: 'TZS', KE: 'KES', ZA: 'ZAR',
-  NG: 'NGN', ZM: 'ZMW', MZ: 'MZN', SL: 'SLE',
+  NG: 'NGN', ZM: 'ZMW', MZ: 'MZN', SL: 'SLE', UG: 'UGX',
 };
 
 const COUNTRY_NAMES: Record<string, string> = {
   BW: 'Botswana', ZW: 'Zimbabwe', TZ: 'Tanzania', KE: 'Kenya', ZA: 'South Africa',
-  NG: 'Nigeria', ZM: 'Zambia', MZ: 'Mozambique', SL: 'Sierra Leone',
+  NG: 'Nigeria', ZM: 'Zambia', MZ: 'Mozambique', SL: 'Sierra Leone', UG: 'Uganda',
 };
 
 /* ------------------------------------------------------------------ */

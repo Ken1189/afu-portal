@@ -29,7 +29,7 @@ import {
 
 type SupplierCategory = 'input-supplier' | 'equipment' | 'logistics' | 'processing' | 'technology' | 'financial-services';
 type SponsorshipTier = 'platinum' | 'gold' | 'silver' | 'bronze';
-type Country = 'Botswana' | 'Kenya' | 'Mozambique' | 'Nigeria' | 'Sierra Leone' | 'South Africa' | 'Tanzania' | 'Zambia' | 'Zimbabwe';
+type Country = 'Botswana' | 'Kenya' | 'Mozambique' | 'Nigeria' | 'Sierra Leone' | 'South Africa' | 'Tanzania' | 'Uganda' | 'Zambia' | 'Zimbabwe';
 
 interface Supplier {
   id: string;
@@ -468,8 +468,15 @@ export default function SupplierProfilePage() {
                 className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition-colors bg-gray-50 appearance-none"
               >
                 <option value="Botswana">Botswana</option>
-                <option value="Zimbabwe">Zimbabwe</option>
+                <option value="Kenya">Kenya</option>
+                <option value="Mozambique">Mozambique</option>
+                <option value="Nigeria">Nigeria</option>
+                <option value="Sierra Leone">Sierra Leone</option>
+                <option value="South Africa">South Africa</option>
                 <option value="Tanzania">Tanzania</option>
+                <option value="Uganda">Uganda</option>
+                <option value="Zambia">Zambia</option>
+                <option value="Zimbabwe">Zimbabwe</option>
               </select>
             </div>
           </div>

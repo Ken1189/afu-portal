@@ -28,7 +28,7 @@ UPDATE equipment SET latitude = -1.2921, longitude = 36.8219 WHERE location = 'N
 UPDATE equipment SET latitude = -6.7924, longitude = 39.2083 WHERE location = 'Dar es Salaam';
 UPDATE equipment SET latitude = -13.9626, longitude = 33.7741 WHERE location = 'Lilongwe';
 UPDATE equipment SET latitude = -15.3875, longitude = 28.3228 WHERE location = 'Lusaka';
-UPDATE equipment SET latitude = 0.3476, longitude = 32.5825 WHERE location = 'Kampala';
+UPDATE equipment SET latitude = 0.3476, longitude = 32.5825 WHERE location = 'Kampala';  -- Uganda
 UPDATE equipment SET latitude = -19.8436, longitude = 34.8389 WHERE location = 'Beira';
 UPDATE equipment SET latitude = 12.0022, longitude = 8.5920 WHERE location = 'Kano';
 UPDATE equipment SET latitude = -6.8235, longitude = 37.6617 WHERE location = 'Morogoro';
@@ -42,6 +42,7 @@ UPDATE cooperatives SET latitude = -0.09, longitude = 34.77 WHERE country = 'Ken
 UPDATE cooperatives SET latitude = -6.82, longitude = 37.66 WHERE country = 'Tanzania';
 UPDATE cooperatives SET latitude = 6.15, longitude = 38.40 WHERE country = 'Ethiopia';
 UPDATE cooperatives SET latitude = -13.65, longitude = 32.65 WHERE country = 'Zambia';
+UPDATE cooperatives SET latitude = 1.05, longitude = 34.23 WHERE country = 'Uganda';
 
 -- ── Seed coordinates for demo farmer profiles ────────────────
 UPDATE farmer_public_profiles SET latitude = -21.0, longitude = 29.0 WHERE slug = 'grace-moyo';

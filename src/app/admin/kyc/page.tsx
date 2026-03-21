@@ -102,6 +102,7 @@ const COUNTRIES: CountryCompliance[] = [
   { code: 'zm', name: 'Zambia', members: 11, compliance: 82, status: 'compliant' },
   { code: 'mz', name: 'Mozambique', members: 8, compliance: 75, status: 'action_needed' },
   { code: 'sl', name: 'Sierra Leone', members: 6, compliance: 83, status: 'compliant' },
+  { code: 'ug', name: 'Uganda', members: 9, compliance: 79, status: 'action_needed' },
 ];
 
 const DOC_TYPE_LABELS: Record<DocType, string> = {
