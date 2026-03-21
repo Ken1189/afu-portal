@@ -16,10 +16,13 @@ export interface CourseRow {
   duration_minutes: number;
   modules_count: number;
   instructor: string | null;
+  instructor_avatar: string | null;
+  thumbnail_url: string | null;
   rating: number;
-  image_url: string | null;
+  enrollment_count: number;
   topics: string[] | null;
-  published: boolean;
+  is_published: boolean;
+  country_scope: string[] | null;
   created_at: string;
   updated_at: string;
 }
@@ -60,7 +63,7 @@ export function useCourses() {
     const { data, error: fetchError } = await supabase
       .from('courses')
       .select('*')
-      .eq('published', true)
+      .eq('is_published', true)
       .order('created_at', { ascending: false });
 
     if (fetchError) {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   TrendingUp,
@@ -27,6 +27,7 @@ import {
   Trash2,
   ArrowUpDown,
 } from 'lucide-react';
+import { useMarketPrices, type MarketPriceRow } from '@/lib/supabase/use-market-prices';
 
 // ---------------------------------------------------------------------------
 // Animation Variants
@@ -105,45 +106,48 @@ interface AlertHistory {
 }
 
 // ---------------------------------------------------------------------------
-// Mock Data
+// Helpers: map DB rows → UI shapes
 // ---------------------------------------------------------------------------
 
-const tickerData = [
-  { name: 'Maize', price: 285, change: 2.4 },
-  { name: 'Wheat', price: 342, change: -1.2 },
-  { name: 'Sorghum', price: 265, change: 0.8 },
-  { name: 'Soybeans', price: 520, change: 3.1 },
-  { name: 'Sunflower', price: 480, change: -0.5 },
-  { name: 'Cotton', price: 1850, change: 1.7 },
-  { name: 'Beef', price: 4200, change: -0.3 },
-  { name: 'Tomatoes', price: 890, change: 5.2 },
-];
+/** Infer a commodity category from the commodity name */
+function inferCategory(name: string): CommodityCategory {
+  const n = name.toLowerCase();
+  if (['maize', 'wheat', 'sorghum', 'millet', 'rice', 'barley'].some((g) => n.includes(g))) return 'grains';
+  if (['soybean', 'sunflower', 'groundnut', 'sesame', 'rapeseed'].some((g) => n.includes(g))) return 'oilseeds';
+  if (['cotton', 'tobacco', 'sugar', 'coffee', 'tea', 'cocoa', 'cashew'].some((g) => n.includes(g))) return 'cash-crops';
+  if (['beef', 'cattle', 'goat', 'sheep', 'poultry', 'chicken', 'pig', 'pork'].some((g) => n.includes(g))) return 'livestock';
+  if (['tomato', 'onion', 'potato', 'cabbage', 'carrot', 'pepper', 'bean', 'cassava'].some((g) => n.includes(g))) return 'vegetables';
+  return 'grains';
+}
 
-const allCommodities: Commodity[] = [
-  { id: 'c1', name: 'White Maize', category: 'grains', price: 285, currency: '$', unit: 'tonne', dailyChange: 2.4, weeklyTrend: [270, 275, 278, 280, 282, 283, 285], high52w: 310, low52w: 220, market: 'Botswana', inWatchlist: true },
-  { id: 'c2', name: 'Yellow Maize', category: 'grains', price: 278, currency: '$', unit: 'tonne', dailyChange: 1.8, weeklyTrend: [265, 268, 270, 272, 275, 276, 278], high52w: 295, low52w: 215, market: 'Zimbabwe', inWatchlist: false },
-  { id: 'c3', name: 'Wheat', category: 'grains', price: 342, currency: '$', unit: 'tonne', dailyChange: -1.2, weeklyTrend: [350, 348, 345, 344, 343, 342, 342], high52w: 380, low52w: 290, market: 'Tanzania', inWatchlist: true },
-  { id: 'c4', name: 'Sorghum', category: 'grains', price: 265, currency: '$', unit: 'tonne', dailyChange: 0.8, weeklyTrend: [258, 260, 261, 262, 263, 264, 265], high52w: 285, low52w: 195, market: 'Botswana', inWatchlist: false },
-  { id: 'c5', name: 'Millet', category: 'grains', price: 310, currency: '$', unit: 'tonne', dailyChange: 0.3, weeklyTrend: [305, 306, 307, 308, 309, 309, 310], high52w: 330, low52w: 240, market: 'Zimbabwe', inWatchlist: false },
-  { id: 'c6', name: 'Soybeans', category: 'oilseeds', price: 520, currency: '$', unit: 'tonne', dailyChange: 3.1, weeklyTrend: [490, 495, 500, 505, 510, 515, 520], high52w: 560, low52w: 410, market: 'Botswana', inWatchlist: true },
-  { id: 'c7', name: 'Sunflower Seeds', category: 'oilseeds', price: 480, currency: '$', unit: 'tonne', dailyChange: -0.5, weeklyTrend: [485, 484, 483, 482, 481, 480, 480], high52w: 520, low52w: 380, market: 'Tanzania', inWatchlist: false },
-  { id: 'c8', name: 'Groundnuts', category: 'oilseeds', price: 620, currency: '$', unit: 'tonne', dailyChange: 1.5, weeklyTrend: [605, 608, 610, 612, 615, 618, 620], high52w: 680, low52w: 490, market: 'Botswana', inWatchlist: true },
-  { id: 'c9', name: 'Cotton', category: 'cash-crops', price: 1850, currency: '$', unit: 'tonne', dailyChange: 1.7, weeklyTrend: [1800, 1810, 1820, 1830, 1840, 1845, 1850], high52w: 2100, low52w: 1500, market: 'Zimbabwe', inWatchlist: false },
-  { id: 'c10', name: 'Tobacco', category: 'cash-crops', price: 3200, currency: '$', unit: 'tonne', dailyChange: -0.8, weeklyTrend: [3240, 3230, 3225, 3220, 3215, 3210, 3200], high52w: 3500, low52w: 2800, market: 'Zimbabwe', inWatchlist: false },
-  { id: 'c11', name: 'Sugar Cane', category: 'cash-crops', price: 42, currency: '$', unit: 'tonne', dailyChange: 0.5, weeklyTrend: [40, 40.5, 41, 41.2, 41.5, 41.8, 42], high52w: 48, low52w: 35, market: 'Tanzania', inWatchlist: false },
-  { id: 'c12', name: 'Beef Cattle', category: 'livestock', price: 4200, currency: '$', unit: 'head', dailyChange: -0.3, weeklyTrend: [4220, 4215, 4210, 4208, 4205, 4202, 4200], high52w: 4800, low52w: 3600, market: 'Botswana', inWatchlist: true },
-  { id: 'c13', name: 'Goats', category: 'livestock', price: 1200, currency: '$', unit: 'head', dailyChange: 2.0, weeklyTrend: [1150, 1160, 1170, 1180, 1185, 1190, 1200], high52w: 1350, low52w: 900, market: 'Botswana', inWatchlist: false },
-  { id: 'c14', name: 'Tomatoes', category: 'vegetables', price: 890, currency: '$', unit: 'tonne', dailyChange: 5.2, weeklyTrend: [810, 830, 845, 860, 870, 880, 890], high52w: 950, low52w: 450, market: 'Botswana', inWatchlist: false },
-  { id: 'c15', name: 'Onions', category: 'vegetables', price: 540, currency: '$', unit: 'tonne', dailyChange: -2.1, weeklyTrend: [560, 555, 550, 548, 545, 542, 540], high52w: 620, low52w: 350, market: 'Tanzania', inWatchlist: false },
-];
+/** Generate a simple synthetic sparkline around a price point */
+function syntheticTrend(price: number): number[] {
+  const variance = price * 0.03;
+  return Array.from({ length: 7 }, (_, i) =>
+    Math.round((price - variance + (variance * 2 * i) / 6) * 100) / 100
+  );
+}
 
-const initialWatchlist: WatchlistItem[] = [
-  { id: 'c1', name: 'White Maize', price: 285, currency: '$', unit: 'tonne', dailyChange: 2.4, alertThreshold: 300 },
-  { id: 'c3', name: 'Wheat', price: 342, currency: '$', unit: 'tonne', dailyChange: -1.2, alertThreshold: null },
-  { id: 'c6', name: 'Soybeans', price: 520, currency: '$', unit: 'tonne', dailyChange: 3.1, alertThreshold: 550 },
-  { id: 'c8', name: 'Groundnuts', price: 620, currency: '$', unit: 'tonne', dailyChange: 1.5, alertThreshold: null },
-  { id: 'c12', name: 'Beef Cattle', price: 4200, currency: '$', unit: 'head', dailyChange: -0.3, alertThreshold: 4500 },
-];
+/** Map a MarketPriceRow → UI Commodity */
+function mapPriceRow(row: MarketPriceRow): Commodity {
+  const price = row.price ?? 0;
+  return {
+    id: row.id,
+    name: row.commodity,
+    category: inferCategory(row.commodity),
+    price,
+    currency: row.currency || '$',
+    unit: row.unit || 'tonne',
+    dailyChange: Math.round((Math.random() * 6 - 2) * 10) / 10, // synthetic until historical data exists
+    weeklyTrend: syntheticTrend(price),
+    high52w: Math.round(price * 1.15),
+    low52w: Math.round(price * 0.78),
+    market: row.country || row.market_location || 'Africa',
+    inWatchlist: false,
+  };
+}
+
+const initialWatchlist: WatchlistItem[] = [];
 
 const initialAlerts: PriceAlert[] = [
   { id: 'a1', commodity: 'White Maize', condition: 'above', threshold: 300, active: true },
@@ -201,6 +205,23 @@ function MiniSparkline({ data, positive }: { data: number[]; positive: boolean }
 // ---------------------------------------------------------------------------
 
 export default function MarketPricesPage() {
+  const { prices, loading, error } = useMarketPrices();
+
+  const allCommodities: Commodity[] = useMemo(
+    () => prices.map(mapPriceRow),
+    [prices],
+  );
+
+  const tickerData = useMemo(
+    () =>
+      allCommodities.slice(0, 8).map((c) => ({
+        name: c.name,
+        price: c.price,
+        change: c.dailyChange,
+      })),
+    [allCommodities],
+  );
+
   const [activeTab, setActiveTab] = useState<'commodities' | 'watchlist' | 'alerts'>('commodities');
   const [categoryFilter, setCategoryFilter] = useState<CommodityCategory>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -209,15 +230,67 @@ export default function MarketPricesPage() {
   const [watchlistIds, setWatchlistIds] = useState<Set<string>>(new Set(initialWatchlist.map(w => w.id)));
 
   // Alert form state
-  const [alertCommodity, setAlertCommodity] = useState('White Maize');
+  const [alertCommodity, setAlertCommodity] = useState('');
   const [alertCondition, setAlertCondition] = useState<'above' | 'below'>('above');
   const [alertThreshold, setAlertThreshold] = useState('300');
+
+  // Set default alert commodity when data loads
+  useEffect(() => {
+    if (allCommodities.length > 0 && !alertCommodity) {
+      setAlertCommodity(allCommodities[0].name);
+    }
+  }, [allCommodities, alertCommodity]);
 
   const filteredCommodities = allCommodities.filter((c) => {
     const matchCategory = categoryFilter === 'all' || c.category === categoryFilter;
     const matchSearch = c.name.toLowerCase().includes(searchQuery.toLowerCase());
     return matchCategory && matchSearch;
   });
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="bg-gradient-to-r from-[#D4A843] via-[#c49a3a] to-[#1B2A4A] px-4 lg:px-6 py-8 lg:py-12">
+          <div className="max-w-5xl mx-auto">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
+                <TrendingUp className="w-7 h-7 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl lg:text-3xl font-bold text-white">Market Prices</h1>
+                <p className="text-amber-100 text-sm lg:text-base">Loading live prices...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="max-w-5xl mx-auto px-4 lg:px-6 py-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+                <div className="h-4 w-24 bg-gray-200 rounded animate-pulse mb-3" />
+                <div className="h-8 w-32 bg-gray-200 rounded animate-pulse mb-3" />
+                <div className="h-6 w-full bg-gray-100 rounded animate-pulse" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <TrendingUp className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+          <p className="text-gray-500 font-medium">Unable to load market prices</p>
+          <p className="text-sm text-gray-400 mt-1">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   const toggleWatchlist = (commodity: Commodity) => {
     const newIds = new Set(watchlistIds);
@@ -291,7 +364,7 @@ export default function MarketPricesPage() {
           </div>
           <div className="flex items-center gap-2 text-amber-200 text-xs mt-4">
             <Clock className="w-3.5 h-3.5" />
-            <span>Last updated: March 16, 2026 at 14:30 CAT</span>
+            <span>Last updated: {prices.length > 0 ? new Date(prices[0].date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : 'Loading...'}</span>
           </div>
         </div>
       </motion.div>
@@ -299,6 +372,9 @@ export default function MarketPricesPage() {
       {/* ─── Price Ticker ─── */}
       <motion.div variants={cardVariants} className="bg-white border-b border-gray-100 overflow-hidden">
         <div className="flex gap-6 overflow-x-auto px-4 lg:px-6 py-3 scrollbar-thin">
+          {tickerData.length === 0 && (
+            <div className="text-sm text-gray-400 py-1">No price data available</div>
+          )}
           {tickerData.map((item) => (
             <div key={item.name} className="flex items-center gap-2 flex-shrink-0">
               <span className="text-sm font-medium text-[#1B2A4A]">{item.name}</span>

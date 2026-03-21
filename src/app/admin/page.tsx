@@ -327,17 +327,10 @@ export default function AdminDashboard() {
       .catch(() => { /* fallback to mock */ });
   }, []);
 
-  // ── Country distribution — real with mock fallback ────────────────────
-  const countryData = live ? [
-    { country: 'Botswana', count: live.suppliers.total, flag: '🇧🇼' },
-    { country: 'Kenya', count: live.suppliers.active, flag: '🇰🇪' },
-    { country: 'Nigeria', count: live.members.total, flag: '🇳🇬' },
-    { country: 'South Africa', count: live.members.active, flag: '🇿🇦' },
-    { country: 'Tanzania', count: live.orders.total, flag: '🇹🇿' },
-    { country: 'Zambia', count: live.products.total, flag: '🇿🇲' },
-    { country: 'Zimbabwe', count: live.applications.total, flag: '🇿🇼' },
-  ].filter(c => c.count > 0) : defaultCountryData;
+  // ── Country distribution — use mock fallback (API doesn't break out by country yet) ──
+  const countryData = defaultCountryData;
   const maxCountryCount = Math.max(...countryData.map((c) => c.count), 1);
+  const totalMemberCount = live?.members.total ?? FALLBACK_STATS.totalMembers;
 
   // ── Top-level stat cards data — real with mock fallback ───────────────
   const statCards = [
@@ -398,7 +391,29 @@ export default function AdminDashboard() {
   ];
 
   const first8Apps = FALLBACK_APPLICATIONS.slice(0, 8);
-  const first8Activities = FALLBACK_ACTIVITIES.slice(0, 8);
+
+  // Map live audit log entries to activity format, fall back to mock
+  const first8Activities: FallbackActivity[] = (live?.recentActivity && live.recentActivity.length > 0)
+    ? live.recentActivity.slice(0, 8).map((entry) => {
+        // Choose icon based on entity type / action
+        const iconName = entry.entity_type === 'application' ? 'FileText'
+          : entry.entity_type === 'payment' ? 'DollarSign'
+          : entry.entity_type === 'document' ? 'Upload'
+          : entry.entity_type === 'training' ? 'GraduationCap'
+          : entry.entity_type === 'order' ? 'Truck'
+          : entry.entity_type === 'member' ? 'LogIn'
+          : 'Edit';
+        return {
+          id: entry.id,
+          memberId: (entry.details as Record<string, string>)?.member_id || '',
+          memberName: (entry.details as Record<string, string>)?.member_name || 'System',
+          type: entry.entity_type || 'profile',
+          description: entry.action + (entry.details ? ` — ${JSON.stringify(entry.details).slice(0, 80)}` : ''),
+          timestamp: entry.created_at,
+          icon: iconName,
+        };
+      })
+    : FALLBACK_ACTIVITIES.slice(0, 8);
 
   return (
     <motion.div
@@ -846,7 +861,7 @@ export default function AdminDashboard() {
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-bold text-navy tabular-nums">{c.count}</span>
                     <span className="text-xs text-gray-400">
-                      ({Math.round((c.count / FALLBACK_STATS.totalMembers) * 100)}%)
+                      ({Math.round((c.count / totalMemberCount) * 100)}%)
                     </span>
                   </div>
                 </div>
@@ -867,7 +882,7 @@ export default function AdminDashboard() {
           {/* Country total summary */}
           <div className="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between">
             <span className="text-xs text-gray-400">Total across 3 countries</span>
-            <span className="text-sm font-bold text-navy">{FALLBACK_STATS.totalMembers} members</span>
+            <span className="text-sm font-bold text-navy">{totalMemberCount} members</span>
           </div>
         </motion.div>
       </motion.div>

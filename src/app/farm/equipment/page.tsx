@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useEquipment, EquipmentRow } from '@/lib/supabase/use-equipment';
 import {
   Wrench,
   Search,
@@ -48,7 +49,7 @@ interface Equipment {
   monthlyRate: number;
   availability: 'available' | 'booked' | 'maintenance';
   location: string;
-  country: 'Botswana' | 'Zimbabwe' | 'Tanzania';
+  country: string;
   owner: string;
   condition: 'excellent' | 'good' | 'fair';
   image: string;
@@ -645,7 +646,72 @@ const FALLBACK_EQUIPMENT_BOOKINGS: EquipmentBooking[] = [
   },
 ];
 
-const equipment = FALLBACK_EQUIPMENT;
+// ---------------------------------------------------------------------------
+// Map Supabase rows to local Equipment shape (with sensible defaults for
+// fields that don't exist in the DB schema yet)
+// ---------------------------------------------------------------------------
+
+function mapRowToEquipment(row: EquipmentRow): Equipment {
+  const specs: Record<string, string> = {};
+  if (row.specifications && typeof row.specifications === 'object') {
+    for (const [k, v] of Object.entries(row.specifications)) {
+      specs[k] = String(v);
+    }
+  }
+
+  // Map DB type to local category (best-effort match)
+  const typeMap: Record<string, EquipmentCategory> = {
+    tractor: 'tractor',
+    harvester: 'harvester',
+    irrigation: 'irrigation',
+    sprayer: 'sprayer',
+    planter: 'planter',
+    trailer: 'trailer',
+    processing: 'processing',
+    drone: 'drone',
+  };
+  const category: EquipmentCategory =
+    typeMap[(row.type || '').toLowerCase()] || 'tractor';
+
+  // Map DB status to local availability
+  const statusMap: Record<string, Equipment['availability']> = {
+    available: 'available',
+    booked: 'booked',
+    maintenance: 'maintenance',
+    rented: 'booked',
+    unavailable: 'maintenance',
+  };
+  const availability: Equipment['availability'] =
+    statusMap[(row.status || '').toLowerCase()] || 'available';
+
+  const dailyRate = row.daily_rate ?? 0;
+
+  return {
+    id: row.id,
+    name: row.name,
+    category,
+    description: row.description || '',
+    specs,
+    dailyRate,
+    weeklyRate: Math.round(dailyRate * 6),
+    monthlyRate: Math.round(dailyRate * 25),
+    availability,
+    location: row.location || 'Unknown',
+    country: (row.country || 'Unknown') as Equipment['country'],
+    owner: 'AFU Equipment Pool',
+    condition: 'good',
+    image:
+      row.image_url ||
+      'https://images.unsplash.com/photo-1530267981375-f0de937f5f13?w=400&h=300&fit=crop',
+    rating: 4.5,
+    reviewCount: 0,
+    minBookingDays: 1,
+    deliveryAvailable: true,
+    deliveryFee: Math.round(dailyRate * 0.5),
+    insuranceIncluded: false,
+  };
+}
+
 const equipmentBookings = FALLBACK_EQUIPMENT_BOOKINGS;
 
 // ---------------------------------------------------------------------------
@@ -765,9 +831,9 @@ const countryFlags: Record<string, string> = {
 // Helpers
 // ---------------------------------------------------------------------------
 
-function getCategoryCount(cat: CategoryFilter): number {
-  if (cat === 'all') return equipment.length;
-  return equipment.filter((e) => e.category === cat).length;
+function getCategoryCount(cat: CategoryFilter, equipmentList: Equipment[]): number {
+  if (cat === 'all') return equipmentList.length;
+  return equipmentList.filter((e) => e.category === cat).length;
 }
 
 function sortEquipment(items: Equipment[], key: SortKey): Equipment[] {
@@ -1102,6 +1168,20 @@ function BookingCard({
 // ---------------------------------------------------------------------------
 
 export default function EquipmentHirePage() {
+  // --- Supabase data ---
+  const {
+    equipment: dbEquipment,
+    loading: dbLoading,
+    error: dbError,
+  } = useEquipment();
+
+  // Map DB rows to local shape; fall back to mock when DB returns nothing
+  const equipment: Equipment[] = useMemo(() => {
+    if (dbEquipment.length > 0) return dbEquipment.map(mapRowToEquipment);
+    if (dbLoading) return []; // will show skeleton
+    return FALLBACK_EQUIPMENT; // fallback when DB is empty / errored
+  }, [dbEquipment, dbLoading]);
+
   // --- State ---
   const [activeTab, setActiveTab] = useState<TabKey>('browse');
   const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>('all');
@@ -1109,9 +1189,7 @@ export default function EquipmentHirePage() {
   const [sortKey, setSortKey] = useState<SortKey>('rating');
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [bookingFilter, setBookingFilter] = useState<BookingFilter>('all');
-  const [savedIds, setSavedIds] = useState<Set<string>>(
-    new Set(['EQP-001', 'EQP-009', 'EQP-015']),
-  );
+  const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
   const [bookings, setBookings] = useState<EquipmentBooking[]>(equipmentBookings);
 
   // --- Derived ---
@@ -1141,7 +1219,7 @@ export default function EquipmentHirePage() {
     items = sortEquipment(items, sortKey);
 
     return items;
-  }, [selectedCategory, searchQuery, sortKey]);
+  }, [equipment, selectedCategory, searchQuery, sortKey]);
 
   const filteredBookings = useMemo(() => {
     if (bookingFilter === 'all') return bookings;
@@ -1150,7 +1228,7 @@ export default function EquipmentHirePage() {
 
   const savedEquipment = useMemo(
     () => equipment.filter((e) => savedIds.has(e.id)),
-    [savedIds],
+    [equipment, savedIds],
   );
 
   // --- Stats ---
@@ -1169,10 +1247,12 @@ export default function EquipmentHirePage() {
       )
       .reduce((sum, b) => sum + b.totalCost, 0);
     const avgRating =
-      equipment.reduce((sum, e) => sum + e.rating, 0) / equipment.length;
+      equipment.length > 0
+        ? equipment.reduce((sum, e) => sum + e.rating, 0) / equipment.length
+        : 0;
 
     return { availableCount, activeRentals, thisMonthSpent, avgRating };
-  }, [bookings]);
+  }, [equipment, bookings]);
 
   // --- Handlers ---
   const handleToggleSaved = (id: string) => {
@@ -1382,7 +1462,7 @@ export default function EquipmentHirePage() {
               {/* Category filter pills */}
               <div className="flex items-center gap-2 overflow-x-auto pb-2 mb-4 scrollbar-hide">
                 {categories.map((cat) => {
-                  const count = getCategoryCount(cat.key);
+                  const count = getCategoryCount(cat.key, equipment);
                   const isActive = selectedCategory === cat.key;
                   return (
                     <button
@@ -1479,11 +1559,37 @@ export default function EquipmentHirePage() {
 
               {/* Results count */}
               <div className="text-xs text-gray-400 mb-4">
-                Showing {filteredEquipment.length} of {equipment.length} items
+                {dbLoading ? 'Loading equipment...' : `Showing ${filteredEquipment.length} of ${equipment.length} items`}
               </div>
 
-              {/* Equipment grid */}
-              {filteredEquipment.length > 0 ? (
+              {/* Loading skeleton */}
+              {dbLoading ? (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="rounded-2xl bg-white border border-gray-100 overflow-hidden animate-pulse"
+                    >
+                      <div className="h-48 bg-gray-200" />
+                      <div className="p-4 space-y-3">
+                        <div className="h-4 bg-gray-200 rounded w-3/4" />
+                        <div className="h-3 bg-gray-100 rounded w-1/2" />
+                        <div className="h-3 bg-gray-100 rounded w-full" />
+                        <div className="h-3 bg-gray-100 rounded w-5/6" />
+                        <div className="flex gap-2 mt-3">
+                          <div className="h-6 bg-gray-100 rounded-lg w-20" />
+                          <div className="h-6 bg-gray-100 rounded-lg w-20" />
+                        </div>
+                        <div className="border-t border-gray-100 pt-3 mt-3">
+                          <div className="h-5 bg-gray-200 rounded w-1/3" />
+                        </div>
+                        <div className="h-10 bg-gray-200 rounded-xl w-full" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : /* Equipment grid */
+              filteredEquipment.length > 0 ? (
                 <motion.div
                   variants={containerVariants}
                   initial="hidden"

@@ -160,6 +160,34 @@ export default function AdminAnalyticsPage() {
   const liveSuppliers = (liveStats?.suppliers as Record<string, number>)?.total;
   const liveProducts = (liveStats?.products as Record<string, number>)?.total;
   const liveOrders = (liveStats?.orders as Record<string, number>)?.total;
+  const liveLoansActive = (liveStats?.loans as Record<string, number>)?.active;
+  const liveRevenue = (liveStats?.orders as Record<string, number>)?.revenue;
+
+  // Build KPI list with live overrides
+  const liveKpis = kpis.map((kpi) => {
+    if (kpi.label === 'Total Members' && liveMembers != null) {
+      return { ...kpi, value: liveMembers.toLocaleString() };
+    }
+    if (kpi.label === 'Active Loans' && liveLoansActive != null) {
+      return { ...kpi, value: liveLoansActive.toString() };
+    }
+    if (kpi.label === 'Marketplace GMV' && liveOrders != null) {
+      return { ...kpi, value: `${liveOrders} orders` };
+    }
+    if (kpi.label === 'NPS Score' && liveProducts != null) {
+      return { ...kpi, value: liveProducts.toString(), label: 'Products' };
+    }
+    if (kpi.label === 'Revenue (MTD)' && liveRevenue != null) {
+      const formatted = liveRevenue >= 1_000_000 ? `$${(liveRevenue / 1_000_000).toFixed(1)}M`
+        : liveRevenue >= 1_000 ? `$${(liveRevenue / 1_000).toFixed(0)}K`
+        : `$${liveRevenue}`;
+      return { ...kpi, value: formatted };
+    }
+    if (kpi.label === 'Export Value' && liveSuppliers != null) {
+      return { ...kpi, value: liveSuppliers.toString(), label: 'Total Suppliers' };
+    }
+    return kpi;
+  });
 
   const tabs: { key: TabKey; label: string }[] = [
     { key: 'overview', label: 'Overview' },
@@ -190,7 +218,7 @@ export default function AdminAnalyticsPage() {
 
       {/* ── KPI Row ── */}
       <motion.div variants={cardVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
-        {kpis.map((kpi, i) => (
+        {liveKpis.map((kpi, i) => (
           <div key={i} className="bg-white rounded-xl p-4 border border-gray-100">
             <div className="flex items-center justify-between mb-2">
               <div className={`w-8 h-8 ${kpi.iconBg} rounded-lg flex items-center justify-center ${kpi.color}`}>

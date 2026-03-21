@@ -27,10 +27,10 @@ import {
   FileCheck,
   Trophy,
 } from 'lucide-react';
-// Live hook available: useCourses from '@/lib/supabase/use-courses'
+import { useCourses, type CourseRow } from '@/lib/supabase/use-courses';
 
 /* ------------------------------------------------------------------ */
-/*  Course type & data (inlined from @/lib/data/courses)                */
+/*  Course type — UI shape mapped from CourseRow                        */
 /* ------------------------------------------------------------------ */
 
 interface Course {
@@ -49,20 +49,42 @@ interface Course {
   topics: string[];
 }
 
-const courses: Course[] = [
-  { id: 'CRS-001', title: 'Introduction to Blueberry Cultivation', description: 'Learn the fundamentals of growing export-quality blueberries in sub-Saharan Africa, from site selection to first harvest.', category: 'Crop-Specific', difficulty: 'Beginner', duration: '3 hours', modules: 6, instructor: 'Dr. Chipo Madziva', rating: 4.8, enrollmentCount: 142, image: 'https://images.unsplash.com/photo-1498579809087-ef1e558fd1da?w=400&h=300&fit=crop', completionRate: 72, topics: ['Site Selection', 'Soil Preparation', 'Planting', 'Irrigation', 'Pruning', 'First Harvest'] },
-  { id: 'CRS-002', title: 'Financial Record Keeping for Farmers', description: 'Master basic financial records, cash flow tracking, and budgeting to make your farm bankable and ready for financing.', category: 'Financial Literacy', difficulty: 'Beginner', duration: '2 hours', modules: 5, instructor: 'Lebo Molefe', rating: 4.6, enrollmentCount: 198, image: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=400&h=300&fit=crop', completionRate: 65, topics: ['Income Tracking', 'Expense Management', 'Cash Flow', 'Budgeting', 'Tax Basics'] },
-  { id: 'CRS-003', title: 'Export Quality Standards \u2014 EU Market', description: 'Understand GlobalGAP, MRL requirements, and traceability systems needed to export fresh produce to European markets.', category: 'Export Compliance', difficulty: 'Intermediate', duration: '4 hours', modules: 8, instructor: 'Prof. Tendai Mukasa', rating: 4.7, enrollmentCount: 87, image: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=400&h=300&fit=crop', completionRate: 58, topics: ['GlobalGAP Certification', 'MRL Compliance', 'Traceability', 'Packaging Standards', 'Cold Chain', 'Documentation', 'Inspections', 'Market Access'] },
-  { id: 'CRS-004', title: 'Cassava Processing & Value Addition', description: 'Transform raw cassava into high-value products including starch, flour, and chips for domestic and export markets.', category: 'Post-Harvest', difficulty: 'Intermediate', duration: '3.5 hours', modules: 7, instructor: 'Dr. Amina Hassan', rating: 4.5, enrollmentCount: 156, image: 'https://images.unsplash.com/photo-1590682680695-43b964a3ae17?w=400&h=300&fit=crop', completionRate: 61, topics: ['Harvest Timing', 'Storage Methods', 'Peeling & Washing', 'Drying Techniques', 'Starch Extraction', 'Quality Control', 'Packaging'] },
-  { id: 'CRS-005', title: 'Drip Irrigation Setup & Management', description: 'Design, install, and maintain efficient drip irrigation systems to maximize water use and crop yields.', category: 'Technology', difficulty: 'Intermediate', duration: '2.5 hours', modules: 5, instructor: 'Eng. Kabo Mothibi', rating: 4.9, enrollmentCount: 113, image: 'https://images.unsplash.com/photo-1622383563227-04401ab4e5ea?w=400&h=300&fit=crop', completionRate: 70, topics: ['System Design', 'Installation', 'Scheduling', 'Maintenance', 'Troubleshooting'] },
-  { id: 'CRS-006', title: 'Understanding Agricultural Finance', description: 'Learn how working capital, invoice finance, and trade finance work so you can choose the right product for your farm.', category: 'Financial Literacy', difficulty: 'Beginner', duration: '1.5 hours', modules: 4, instructor: 'Lebo Molefe', rating: 4.4, enrollmentCount: 210, image: 'https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=400&h=300&fit=crop', completionRate: 78, topics: ['Working Capital', 'Invoice Finance', 'Interest Rates', 'Loan Applications'] },
-  { id: 'CRS-007', title: 'Sesame Farming \u2014 Seed to Sale', description: 'Complete guide to sesame cultivation in East Africa, covering varieties, planting, pest management, and market access.', category: 'Crop-Specific', difficulty: 'Beginner', duration: '2.5 hours', modules: 6, instructor: 'Dr. Juma Bakari', rating: 4.6, enrollmentCount: 134, image: 'https://images.unsplash.com/photo-1595855759920-86582396756a?w=400&h=300&fit=crop', completionRate: 67, topics: ['Variety Selection', 'Land Preparation', 'Planting', 'Pest Management', 'Harvesting', 'Marketing'] },
-  { id: 'CRS-008', title: 'Post-Harvest Handling & Cold Chain', description: 'Reduce losses by 30%+ through proper post-harvest handling, cooling, storage, and transport of fresh produce.', category: 'Post-Harvest', difficulty: 'Advanced', duration: '4 hours', modules: 8, instructor: 'Prof. Tendai Mukasa', rating: 4.8, enrollmentCount: 76, image: 'https://images.unsplash.com/photo-1560493676-04071c5f467b?w=400&h=300&fit=crop', completionRate: 52, topics: ['Harvest Techniques', 'Cooling Methods', 'Cold Storage', 'Temperature Monitoring', 'Transport Logistics', 'Quality Grading', 'Loss Prevention', 'Documentation'] },
-  { id: 'CRS-009', title: 'Soil Health & Fertility Management', description: 'Test, understand, and improve your soil to build long-term fertility and sustainable crop production.', category: 'Farm Management', difficulty: 'Intermediate', duration: '3 hours', modules: 6, instructor: 'Dr. Chipo Madziva', rating: 4.7, enrollmentCount: 165, image: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop', completionRate: 63, topics: ['Soil Testing', 'pH Management', 'Organic Matter', 'Fertilizer Types', 'Application Methods', 'Cover Cropping'] },
-  { id: 'CRS-010', title: 'Farm Business Planning', description: 'Create a professional business plan for your farm, including financial projections, market analysis, and growth strategy.', category: 'Farm Management', difficulty: 'Advanced', duration: '5 hours', modules: 10, instructor: 'Lebo Molefe', rating: 4.5, enrollmentCount: 98, image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&h=300&fit=crop', completionRate: 45, topics: ['Executive Summary', 'Market Analysis', 'Operations Plan', 'Financial Projections', 'Risk Assessment', 'Funding Strategy', 'Marketing Plan', 'HR Planning', 'Implementation Timeline', 'Monitoring & Evaluation'] },
-  { id: 'CRS-011', title: 'Integrated Pest Management', description: 'Protect your crops using biological, cultural, and chemical methods while meeting export quality standards.', category: 'Farm Management', difficulty: 'Intermediate', duration: '2.5 hours', modules: 5, instructor: 'Dr. Amina Hassan', rating: 4.6, enrollmentCount: 121, image: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=400&h=300&fit=crop', completionRate: 59, topics: ['Pest Identification', 'Biological Control', 'Cultural Methods', 'Chemical Options', 'Record Keeping'] },
-  { id: 'CRS-012', title: 'Drone Technology in Agriculture', description: 'Introduction to agricultural drones for crop monitoring, spraying, and precision farming applications.', category: 'Technology', difficulty: 'Advanced', duration: '3 hours', modules: 6, instructor: 'Eng. Kabo Mothibi', rating: 4.9, enrollmentCount: 64, image: 'https://images.unsplash.com/photo-1508614589041-895b88991e3e?w=400&h=300&fit=crop', completionRate: 48, topics: ['Drone Types', 'Flight Planning', 'Crop Monitoring', 'NDVI Analysis', 'Spray Applications', 'Regulations'] },
-];
+/** Map a Supabase CourseRow → UI Course shape */
+function mapCourseRow(row: CourseRow): Course {
+  const mins = row.duration_minutes ?? 0;
+  const hrs = mins / 60;
+  const duration =
+    hrs >= 1
+      ? `${Number.isInteger(hrs) ? hrs : hrs.toFixed(1)} hour${hrs !== 1 ? 's' : ''}`
+      : `${mins} min`;
+
+  const VALID_CATEGORIES = ['Farm Management', 'Export Compliance', 'Financial Literacy', 'Crop-Specific', 'Post-Harvest', 'Technology'] as const;
+  const VALID_DIFFICULTIES = ['Beginner', 'Intermediate', 'Advanced'] as const;
+
+  const category = (VALID_CATEGORIES.includes(row.category as typeof VALID_CATEGORIES[number])
+    ? row.category
+    : 'Farm Management') as Course['category'];
+
+  const difficulty = (VALID_DIFFICULTIES.includes(row.difficulty as typeof VALID_DIFFICULTIES[number])
+    ? row.difficulty
+    : 'Beginner') as Course['difficulty'];
+
+  return {
+    id: row.id,
+    title: row.title,
+    description: row.description ?? '',
+    category,
+    difficulty,
+    duration,
+    modules: row.modules_count ?? 0,
+    instructor: row.instructor ?? 'AFU Instructor',
+    rating: row.rating ?? 0,
+    enrollmentCount: row.enrollment_count ?? 0,
+    image: row.thumbnail_url ?? 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop',
+    completionRate: 0,
+    topics: row.topics ?? [],
+  };
+}
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -232,26 +254,8 @@ const categoryColors: Record<Course['category'], string> = {
 /*  Mock Data                                                          */
 /* ------------------------------------------------------------------ */
 
-const inProgressCourses: InProgressCourse[] = [
-  {
-    course: courses[2],  // Export Quality Standards
-    completedModules: 3,
-    totalModules: courses[2].modules,
-    timeLeft: '~2 hrs left',
-  },
-  {
-    course: courses[3],  // Cassava Processing
-    completedModules: 5,
-    totalModules: courses[3].modules,
-    timeLeft: '~1 hr left',
-  },
-  {
-    course: courses[8],  // Soil Health
-    completedModules: 2,
-    totalModules: courses[8].modules,
-    timeLeft: '~2.5 hrs left',
-  },
-];
+/* Static mock data for in-progress, certificates, and recommendations
+   are derived from the live courses inside the component below. */
 
 const certificates: Certificate[] = [
   {
@@ -277,21 +281,6 @@ const certificates: Certificate[] = [
     dateEarned: '05 Mar 2026',
     instructor: 'Lebo Molefe',
     credentialId: 'AFU-FR-2026-0198',
-  },
-];
-
-const recommendations: Recommendation[] = [
-  {
-    course: courses[7],  // Post-Harvest Handling
-    reason: 'Based on your blueberry farm profile -- reduce post-harvest losses',
-  },
-  {
-    course: courses[4],  // Drip Irrigation
-    reason: 'Recommended for your region -- optimize water usage in dry season',
-  },
-  {
-    course: courses[9],  // Farm Business Planning
-    reason: 'You completed financial courses -- take your planning to the next level',
   },
 ];
 
@@ -365,8 +354,34 @@ function ProgressBar({
 /* ------------------------------------------------------------------ */
 
 export default function TrainingPage() {
+  const { courses: courseRows, loading, error } = useCourses();
   const [activeCategory, setActiveCategory] = useState<CategoryFilter>('All');
   const [activeDifficulty, setActiveDifficulty] = useState<DifficultyFilter>('All');
+
+  /* -- Map DB rows → UI courses ------------------------------------ */
+  const courses: Course[] = useMemo(
+    () => courseRows.map(mapCourseRow),
+    [courseRows],
+  );
+
+  /* -- Derived mock sections from live data ------------------------ */
+  const inProgressCourses: InProgressCourse[] = useMemo(() => {
+    if (courses.length < 3) return [];
+    return [
+      { course: courses[Math.min(2, courses.length - 1)], completedModules: 3, totalModules: courses[Math.min(2, courses.length - 1)].modules || 8, timeLeft: '~2 hrs left' },
+      { course: courses[Math.min(3, courses.length - 1)], completedModules: 5, totalModules: courses[Math.min(3, courses.length - 1)].modules || 7, timeLeft: '~1 hr left' },
+      { course: courses[Math.min(5, courses.length - 1)], completedModules: 2, totalModules: courses[Math.min(5, courses.length - 1)].modules || 6, timeLeft: '~2.5 hrs left' },
+    ];
+  }, [courses]);
+
+  const recommendations: Recommendation[] = useMemo(() => {
+    if (courses.length < 4) return [];
+    return [
+      { course: courses[Math.min(4, courses.length - 1)], reason: 'Based on your farm profile — reduce post-harvest losses' },
+      { course: courses[Math.min(3, courses.length - 1)], reason: 'Recommended for your region — optimize water usage in dry season' },
+      { course: courses[Math.min(6, courses.length - 1)], reason: 'You completed financial courses — take your planning to the next level' },
+    ];
+  }, [courses]);
 
   /* -- Derived data ------------------------------------------------ */
 
@@ -376,7 +391,7 @@ export default function TrainingPage() {
       counts[c.category] = (counts[c.category] || 0) + 1;
     }
     return counts;
-  }, []);
+  }, [courses]);
 
   const filteredCourses = useMemo(() => {
     return courses.filter((c) => {
@@ -386,11 +401,76 @@ export default function TrainingPage() {
         activeDifficulty === 'All' || c.difficulty === activeDifficulty;
       return catMatch && diffMatch;
     });
-  }, [activeCategory, activeDifficulty]);
+  }, [courses, activeCategory, activeDifficulty]);
 
-  const coursesStarted = 6;
-  const coursesCompleted = 3;
+  const coursesStarted = Math.min(6, courses.length);
+  const coursesCompleted = certificates.length;
   const totalLearningHours = 18.5;
+
+  /* -- Loading state ----------------------------------------------- */
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto space-y-8 pb-12">
+        {/* Header skeleton */}
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-10 h-10 rounded-xl bg-gray-200 animate-pulse" />
+          <div className="space-y-2">
+            <div className="h-7 w-64 bg-gray-200 rounded-lg animate-pulse" />
+            <div className="h-4 w-48 bg-gray-100 rounded-lg animate-pulse" />
+          </div>
+        </div>
+        {/* Stat cards skeleton */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+              <div className="flex items-center justify-between mb-3">
+                <div className="h-4 w-24 bg-gray-100 rounded animate-pulse" />
+                <div className="w-9 h-9 rounded-lg bg-gray-200 animate-pulse" />
+              </div>
+              <div className="h-8 w-16 bg-gray-200 rounded animate-pulse" />
+            </div>
+          ))}
+        </div>
+        {/* Course cards skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+              <div className="h-44 bg-gray-200 animate-pulse" />
+              <div className="p-5 space-y-3">
+                <div className="h-5 w-3/4 bg-gray-200 rounded animate-pulse" />
+                <div className="h-3 w-1/3 bg-gray-100 rounded animate-pulse" />
+                <div className="h-4 w-full bg-gray-100 rounded animate-pulse" />
+                <div className="h-4 w-2/3 bg-gray-100 rounded animate-pulse" />
+                <div className="h-10 w-full bg-gray-200 rounded-lg animate-pulse" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  /* -- Error state ------------------------------------------------- */
+  if (error) {
+    return (
+      <div className="max-w-7xl mx-auto py-16 text-center">
+        <BookOpen className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+        <p className="text-gray-500 font-medium">Unable to load courses</p>
+        <p className="text-sm text-gray-400 mt-1">{error}</p>
+      </div>
+    );
+  }
+
+  /* -- Empty state ------------------------------------------------- */
+  if (courses.length === 0) {
+    return (
+      <div className="max-w-7xl mx-auto py-16 text-center">
+        <GraduationCap className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+        <p className="text-gray-500 font-medium">No courses available yet</p>
+        <p className="text-sm text-gray-400 mt-1">Check back soon — new training content is on the way.</p>
+      </div>
+    );
+  }
 
   /* -- Render ------------------------------------------------------ */
 
