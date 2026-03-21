@@ -187,10 +187,13 @@ export default function MembershipsPage() {
   return (
     <>
       {/* Hero */}
-      <section className="gradient-navy text-white py-20">
+      <section className="gradient-navy text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6 text-glow">
-            Join the African Farming Union
+          <h1 className="text-5xl md:text-6xl font-bold mb-6 text-glow">
+            Join the{' '}
+            <span className="text-transparent bg-clip-text" style={{ backgroundImage: 'linear-gradient(135deg, #6ABF4B, #5DB347, #449933)' }}>
+              African Farming Union
+            </span>
           </h1>
           <p className="text-xl text-gray-300 max-w-3xl leading-relaxed">
             Empowering farmers at every level &mdash; from students and aspiring
@@ -201,17 +204,21 @@ export default function MembershipsPage() {
       </section>
 
       {/* Tier Cards */}
-      <section className="py-20 bg-white">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
             {tiers.map((tier, i) => (
               <div
                 key={i}
-                className={`card-polished stat-card relative rounded-2xl p-6 border-2 ${tier.accent} flex flex-col`}
+                className={`relative rounded-3xl p-6 flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${
+                  tier.popular
+                    ? 'bg-white/80 backdrop-blur-sm shadow-xl shadow-[#5DB347]/10 scale-[1.02] border-2 border-[#5DB347]'
+                    : 'bg-white shadow-lg shadow-[#5DB347]/5 border-0'
+                }`}
               >
                 {tier.popular && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <span className="bg-[#5DB347] text-white text-xs font-bold px-4 py-1 rounded-full">
+                    <span className="animate-pulse text-white text-xs font-bold px-4 py-1 rounded-full shadow-lg" style={{ background: 'linear-gradient(135deg, #5DB347, #449933)' }}>
                       Most Popular
                     </span>
                   </div>
@@ -224,7 +231,7 @@ export default function MembershipsPage() {
                 </div>
 
                 <div className="mb-2">
-                  <span className="text-3xl font-bold text-navy">
+                  <span className="text-4xl font-bold text-navy">
                     {tier.price}
                   </span>
                   {tier.priceNote !== 'No cost' && (
@@ -271,11 +278,12 @@ export default function MembershipsPage() {
 
                 <Link
                   href="/apply"
-                  className={`block text-center px-4 py-2.5 rounded-lg text-sm font-semibold transition-smooth ${
+                  className={`block text-center px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 hover:scale-105 ${
                     tier.popular
-                      ? 'bg-[#5DB347] hover:bg-[#449933] text-white'
+                      ? 'text-white shadow-md shadow-[#5DB347]/20'
                       : 'bg-navy/10 hover:bg-navy/20 text-navy'
                   }`}
+                  style={tier.popular ? { background: 'linear-gradient(135deg, #5DB347, #449933)' } : undefined}
                 >
                   Get Started
                 </Link>
@@ -286,10 +294,10 @@ export default function MembershipsPage() {
       </section>
 
       {/* Feature Comparison Matrix */}
-      <section className="py-20 bg-cream">
+      <section className="py-16 bg-cream">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-10">
-            <h2 className="text-3xl font-bold text-navy">Feature Comparison</h2>
+            <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#1B2A4A] to-[#5DB347]">Feature Comparison</h2>
             <button
               onClick={() => setShowComparison(!showComparison)}
               className="lg:hidden bg-[#5DB347] text-white px-4 py-2 rounded-lg text-sm font-medium"
@@ -301,7 +309,7 @@ export default function MembershipsPage() {
           <div className={`${showComparison ? 'block' : 'hidden'} lg:block overflow-x-auto`}>
             <table className="w-full min-w-[700px]">
               <thead>
-                <tr className="border-b border-gray-200">
+                <tr className="border-b-2 border-[#5DB347]/20 bg-[#EBF7E5]/50">
                   <th className="text-left py-4 pr-4 text-sm font-semibold text-navy w-48">
                     Feature
                   </th>
@@ -342,16 +350,16 @@ export default function MembershipsPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-20 bg-white">
+      <section className="py-16 bg-white">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-navy mb-10 text-center">
+          <h2 className="text-3xl font-bold mb-10 text-center text-transparent bg-clip-text bg-gradient-to-r from-[#1B2A4A] to-[#5DB347]">
             Frequently Asked Questions
           </h2>
           <div className="space-y-4">
             {faqs.map((faq, i) => (
               <div
                 key={i}
-                className="bg-cream rounded-xl border border-gray-100 overflow-hidden"
+                className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-lg shadow-[#5DB347]/5 overflow-hidden hover:-translate-y-0.5 transition-all duration-300"
               >
                 <button
                   onClick={() =>
@@ -398,9 +406,9 @@ export default function MembershipsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 gradient-teal">
+      <section className="py-16" style={{ background: 'linear-gradient(135deg, #5DB347, #449933)' }}>
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4 text-glow">
+          <h2 className="text-3xl font-bold text-white mb-4">
             Ready to Transform Your Farming?
           </h2>
           <p className="text-white/80 mb-8 max-w-2xl mx-auto">
@@ -411,13 +419,13 @@ export default function MembershipsPage() {
           <div className="flex gap-4 justify-center flex-wrap">
             <Link
               href="/apply"
-              className="inline-block bg-white text-[#5DB347] hover:bg-gray-100 px-8 py-3.5 rounded-lg font-semibold text-lg transition-colors"
+              className="inline-block bg-white text-[#5DB347] hover:bg-gray-100 px-8 py-3.5 rounded-xl font-semibold text-lg transition-all duration-300 hover:scale-105 shadow-lg shadow-black/10"
             >
               Apply for Membership
             </Link>
             <Link
               href="/contact"
-              className="inline-block border-2 border-white text-white hover:bg-white/10 px-8 py-3.5 rounded-lg font-semibold text-lg transition-colors"
+              className="inline-block border-2 border-white text-white hover:bg-white/10 px-8 py-3.5 rounded-xl font-semibold text-lg transition-all duration-300 hover:scale-105"
             >
               Talk to Sales
             </Link>

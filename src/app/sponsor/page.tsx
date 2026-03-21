@@ -265,7 +265,7 @@ function FarmerCard({ farmer }: { farmer: FarmerProfile }) {
     .toUpperCase();
 
   return (
-    <div className="card-polished overflow-hidden flex flex-col group">
+    <div className="bg-white/80 backdrop-blur-sm rounded-3xl overflow-hidden flex flex-col group shadow-lg shadow-[#5DB347]/5 hover:-translate-y-1 hover:shadow-xl transition-all duration-300">
       {/* Hero Photo */}
       <div className="relative h-48 overflow-hidden">
         {farmer.hero_photo_url ? (
@@ -316,7 +316,7 @@ function FarmerCard({ farmer }: { farmer: FarmerProfile }) {
             {farmer.crops.slice(0, 4).map((crop) => (
               <span
                 key={crop}
-                className="inline-flex items-center gap-1 bg-teal-light text-teal text-xs font-medium px-2.5 py-1 rounded-full"
+                className="inline-flex items-center gap-1 bg-[#EBF7E5] text-[#5DB347] text-xs font-medium px-2.5 py-1 rounded-full"
               >
                 {getCropEmoji(crop)} {crop}
               </span>
@@ -334,17 +334,19 @@ function FarmerCard({ farmer }: { farmer: FarmerProfile }) {
                   ${farmer.monthly_funding_received ?? 0} of ${farmer.monthly_funding_needed}/month
                 </span>
               </div>
-              <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+              <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
                 <div
-                  className="h-full rounded-full transition-all duration-700"
+                  className="h-full rounded-full transition-all duration-700 relative overflow-hidden"
                   style={{
                     width: `${funded}%`,
                     background:
                       funded >= 100
                         ? '#5DB347'
-                        : 'linear-gradient(90deg, #5DB347, #449933)',
+                        : 'linear-gradient(90deg, #5DB347, #6ABF4B)',
                   }}
-                />
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent animate-pulse" />
+                </div>
               </div>
             </>
           ) : (
@@ -358,10 +360,10 @@ function FarmerCard({ farmer }: { farmer: FarmerProfile }) {
             </span>
             <Link
               href={`/farmers/${farmer.slug}`}
-              className="inline-flex items-center gap-1.5 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
-              style={{ background: '#5DB347' }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = '#449933')}
-              onMouseLeave={(e) => (e.currentTarget.style.background = '#5DB347')}
+              className="inline-flex items-center gap-1.5 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-all duration-300 hover:scale-105 shadow-md shadow-[#5DB347]/20"
+              style={{ background: 'linear-gradient(135deg, #5DB347, #449933)' }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = 'linear-gradient(135deg, #449933, #3A8829)')}
+              onMouseLeave={(e) => (e.currentTarget.style.background = 'linear-gradient(135deg, #5DB347, #449933)')}
             >
               Sponsor {farmer.display_name.split(' ')[0]} →
             </Link>
@@ -406,20 +408,20 @@ function TierCard({
 
   return (
     <div
-      className={`relative flex flex-col rounded-2xl border-2 p-6 transition-all duration-200 ${
+      className={`relative flex flex-col rounded-3xl p-6 transition-all duration-300 ${
         isPopular
-          ? 'shadow-lg scale-[1.02]'
+          ? 'bg-white/80 backdrop-blur-sm shadow-xl shadow-[#5DB347]/10 scale-[1.03] border-2'
           : isCorporate
-          ? 'border-navy/20 bg-navy text-white'
-          : 'border-gray-200 bg-white hover:shadow-md'
+          ? 'bg-[#1B2A4A] text-white shadow-lg shadow-[#1B2A4A]/20 border-0'
+          : 'bg-white shadow-lg shadow-[#5DB347]/5 hover:-translate-y-1 hover:shadow-xl border-0'
       }`}
       style={isPopular ? { borderColor: '#5DB347' } : undefined}
     >
       {isPopular && (
         <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
           <span
-            className="text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md whitespace-nowrap"
-            style={{ background: '#5DB347' }}
+            className="animate-pulse text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg whitespace-nowrap"
+            style={{ background: 'linear-gradient(135deg, #5DB347, #449933)' }}
           >
             Most Popular
           </span>
@@ -477,7 +479,7 @@ function TierCard({
 
       <a
         href="#farmers"
-        className="block text-center font-semibold py-3 rounded-xl transition-colors text-white"
+        className="block text-center font-semibold py-3 rounded-xl transition-all duration-300 text-white hover:scale-105 shadow-md"
         style={{
           background: isCorporate ? '#C9A84C' : isPopular ? '#5DB347' : '#1B2A4A',
         }}
@@ -562,11 +564,11 @@ export default function SponsorPage() {
               <span>🌍</span>
               <span>Supporting African smallholder farmers</span>
             </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6">
               Sponsor an{' '}
               <span
                 className="text-transparent bg-clip-text"
-                style={{ backgroundImage: 'linear-gradient(90deg, #6ABF4B, #5DB347)' }}
+                style={{ backgroundImage: 'linear-gradient(135deg, #6ABF4B, #5DB347, #449933)' }}
               >
                 African Farmer
               </span>
@@ -580,10 +582,10 @@ export default function SponsorPage() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
               <button
                 onClick={() => scrollTo(farmersRef)}
-                className="w-full sm:w-auto text-white font-bold px-8 py-4 rounded-xl text-lg transition-colors shadow-lg"
-                style={{ background: '#5DB347' }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = '#449933')}
-                onMouseLeave={(e) => (e.currentTarget.style.background = '#5DB347')}
+                className="w-full sm:w-auto text-white font-bold px-8 py-4 rounded-xl text-lg transition-all duration-300 shadow-lg shadow-[#5DB347]/30 hover:scale-105 hover:shadow-xl"
+                style={{ background: 'linear-gradient(135deg, #5DB347, #449933)' }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = 'linear-gradient(135deg, #449933, #3A8829)')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = 'linear-gradient(135deg, #5DB347, #449933)')}
               >
                 Sponsor a Farmer →
               </button>
@@ -611,10 +613,10 @@ export default function SponsorPage() {
       </section>
 
       {/* ── How It Works ── */}
-      <section className="bg-white py-20">
+      <section className="bg-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-navy mb-3">How It Works</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-[#1B2A4A] to-[#5DB347]">How It Works</h2>
             <p className="text-gray-500 text-lg">Three simple steps from sponsor to impact.</p>
           </div>
 
@@ -639,7 +641,7 @@ export default function SponsorPage() {
                 desc: 'Receive monthly updates, harvest photos, and impact reports directly from your farmer. See your money at work.',
               },
             ].map((item, i) => (
-              <div key={i} className="card-polished p-8 text-center relative overflow-hidden">
+              <div key={i} className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 text-center relative overflow-hidden shadow-lg shadow-[#5DB347]/5 hover:-translate-y-1 hover:shadow-xl transition-all duration-300">
                 <div
                   className="absolute top-4 right-4 text-7xl font-black opacity-5 select-none"
                   aria-hidden
@@ -656,10 +658,10 @@ export default function SponsorPage() {
       </section>
 
       {/* ── Sponsorship Tiers ── */}
-      <section ref={tiersRef} id="tiers" style={{ background: '#F5F0E8' }} className="py-20">
+      <section ref={tiersRef} id="tiers" style={{ background: '#F5F0E8' }} className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
-            <h2 className="text-3xl md:text-4xl font-bold text-navy mb-3">Sponsorship Tiers</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-[#1B2A4A] to-[#5DB347]">Sponsorship Tiers</h2>
             <p className="text-gray-600 text-lg mb-6">
               Choose the level of support that works for you.
             </p>
@@ -756,10 +758,10 @@ export default function SponsorPage() {
       </section>
 
       {/* ── Browse Farmers ── */}
-      <section ref={farmersRef} id="farmers" className="bg-white py-20">
+      <section ref={farmersRef} id="farmers" className="bg-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
-            <h2 className="text-3xl md:text-4xl font-bold text-navy mb-3">Meet the Farmers</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-[#1B2A4A] to-[#5DB347]">Meet the Farmers</h2>
             <p className="text-gray-500 text-lg">Real people, real farms, real impact.</p>
           </div>
 
@@ -835,7 +837,7 @@ export default function SponsorPage() {
       </section>
 
       {/* ── Impact Section ── */}
-      <section className="gradient-navy py-20">
+      <section className="gradient-navy py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
@@ -853,7 +855,7 @@ export default function SponsorPage() {
             ].map((stat) => (
               <div
                 key={stat.label}
-                className="bg-white/5 border border-white/10 rounded-2xl p-8 text-center"
+                className="bg-white/5 border border-white/10 rounded-3xl p-8 text-center hover:-translate-y-1 hover:bg-white/10 transition-all duration-300"
               >
                 <div className="text-4xl md:text-5xl font-black mb-2" style={{ color: stat.color }}>
                   {stat.value}
@@ -866,7 +868,7 @@ export default function SponsorPage() {
       </section>
 
       {/* ── Corporate CTA ── */}
-      <section className="bg-white py-20">
+      <section className="bg-white py-16">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="text-4xl mb-4">🏢</div>
           <h2 className="text-3xl md:text-4xl font-bold text-navy mb-4">
@@ -882,10 +884,10 @@ export default function SponsorPage() {
           </p>
           <a
             href="mailto:partners@afu.org"
-            className="inline-flex items-center gap-2 text-white font-bold px-8 py-4 rounded-xl text-lg transition-colors shadow-lg"
-            style={{ background: '#1B2A4A' }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = '#0F1A30')}
-            onMouseLeave={(e) => (e.currentTarget.style.background = '#1B2A4A')}
+            className="inline-flex items-center gap-2 text-white font-bold px-8 py-4 rounded-xl text-lg transition-all duration-300 shadow-lg shadow-[#1B2A4A]/30 hover:scale-105 hover:shadow-xl"
+            style={{ background: 'linear-gradient(135deg, #1B2A4A, #0F1A30)' }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = 'linear-gradient(135deg, #0F1A30, #060D1A)')}
+            onMouseLeave={(e) => (e.currentTarget.style.background = 'linear-gradient(135deg, #1B2A4A, #0F1A30)')}
           >
             Contact Us About Corporate Sponsorship →
           </a>

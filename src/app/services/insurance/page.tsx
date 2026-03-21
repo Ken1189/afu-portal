@@ -89,13 +89,13 @@ export default function InsuranceHubPage() {
   return (
     <>
       {/* Hero */}
-      <section className="bg-navy text-white py-20">
+      <section className="bg-navy text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="inline-block bg-gold/20 text-gold px-4 py-1.5 rounded-full text-sm font-medium mb-4">
+          <div className="inline-block bg-[#5DB347]/20 text-[#5DB347] px-4 py-1.5 rounded-full text-sm font-medium mb-4">
             Insurance
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">
-            Farm Insurance
+          <h1 className="text-5xl md:text-6xl font-bold mb-6">
+            <span className="text-transparent bg-clip-text" style={{ backgroundImage: 'linear-gradient(135deg, #6ABF4B, #5DB347)' }}>Farm Insurance</span>
           </h1>
           <p className="text-xl text-gray-300 max-w-3xl">
             Protect what matters most. Comprehensive agricultural insurance
@@ -106,7 +106,7 @@ export default function InsuranceHubPage() {
       </section>
 
       {/* Stats */}
-      <section className="bg-gold text-white py-12">
+      <section className="text-white py-12" style={{ background: 'linear-gradient(135deg, #5DB347, #449933)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             {stats.map((stat, i) => (
@@ -122,10 +122,10 @@ export default function InsuranceHubPage() {
       </section>
 
       {/* Product Cards */}
-      <section className="py-20 bg-white">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14">
-            <h2 className="text-3xl font-bold text-navy mb-4">
+            <h2 className="text-3xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-[#1B2A4A] to-[#5DB347]">
               Our Insurance Products
             </h2>
             <p className="text-gray-500 max-w-2xl mx-auto">
@@ -138,7 +138,7 @@ export default function InsuranceHubPage() {
               <Link
                 key={i}
                 href={product.link}
-                className="card-polished bg-cream rounded-2xl p-8 hover:shadow-lg transition-all group border border-transparent hover:border-gold/20"
+                className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-lg shadow-[#5DB347]/5 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 group"
               >
                 <div className="text-4xl mb-4">{product.icon}</div>
                 <h3 className="text-xl font-bold text-navy mb-3 group-hover:text-[#5DB347] transition-colors">
@@ -148,7 +148,7 @@ export default function InsuranceHubPage() {
                   {product.description}
                 </p>
                 <div className="flex items-center justify-between">
-                  <span className="bg-gold/10 text-gold text-xs font-semibold px-3 py-1 rounded-full">
+                  <span className="bg-[#EBF7E5] text-[#5DB347] text-xs font-semibold px-3 py-1 rounded-full">
                     {product.premium}
                   </span>
                   <span className="text-[#5DB347] text-sm font-medium group-hover:translate-x-1 transition-transform inline-block">
@@ -162,10 +162,10 @@ export default function InsuranceHubPage() {
       </section>
 
       {/* How Insurance Works */}
-      <section className="py-20 bg-cream">
+      <section className="py-16 bg-cream">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14">
-            <h2 className="text-3xl font-bold text-navy mb-4">
+            <h2 className="text-3xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-[#1B2A4A] to-[#5DB347]">
               How It Works
             </h2>
             <p className="text-gray-500 max-w-2xl mx-auto">
@@ -176,7 +176,7 @@ export default function InsuranceHubPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {steps.map((item, i) => (
               <div key={i} className="text-center">
-                <div className="w-16 h-16 bg-gold rounded-2xl flex items-center justify-center text-white font-bold text-xl mx-auto mb-4">
+                <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-white font-bold text-xl mx-auto mb-4" style={{ background: 'linear-gradient(135deg, #5DB347, #449933)' }}>
                   {item.step}
                 </div>
                 <h3 className="font-bold text-navy mb-2 text-lg">
@@ -192,11 +192,11 @@ export default function InsuranceHubPage() {
       </section>
 
       {/* Why AFU Insurance */}
-      <section className="py-20 bg-white">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-3xl font-bold text-navy mb-4">
+              <h2 className="text-3xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-[#1B2A4A] to-[#5DB347]">
                 Why AFU Insurance?
               </h2>
               <p className="text-gray-500 mb-6 leading-relaxed">
@@ -223,7 +223,7 @@ export default function InsuranceHubPage() {
                 ))}
               </ul>
             </div>
-            <div className="card-elevated bg-navy rounded-2xl p-8 text-white">
+            <div className="bg-[#1B2A4A] rounded-3xl p-8 text-white shadow-lg shadow-[#1B2A4A]/20">
               <h3 className="text-xl font-bold mb-4">
                 Bundle &amp; Save
               </h3>
@@ -240,7 +240,7 @@ export default function InsuranceHubPage() {
                   <div key={i} className="bg-navy-light rounded-xl p-4">
                     <div className="flex items-center justify-between mb-1">
                       <span className="font-semibold">{bundle.name}</span>
-                      <span className="bg-gold text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                      <span className="bg-[#5DB347] text-white text-xs font-bold px-2 py-0.5 rounded-full">
                         {bundle.saving}
                       </span>
                     </div>
@@ -256,7 +256,7 @@ export default function InsuranceHubPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-navy text-white">
+      <section className="py-16 bg-navy text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold mb-4">
             Protect Your Farm Today
@@ -268,13 +268,14 @@ export default function InsuranceHubPage() {
           <div className="flex gap-4 justify-center flex-wrap">
             <Link
               href="/farm/insurance/quote"
-              className="bg-gold hover:bg-gold/90 text-white px-8 py-3 rounded-lg font-semibold transition-smooth"
+              className="text-white px-8 py-3 rounded-xl font-semibold transition-all duration-300 hover:scale-105 shadow-md shadow-[#5DB347]/20"
+              style={{ background: 'linear-gradient(135deg, #5DB347, #449933)' }}
             >
               Get a Quote
             </Link>
             <Link
               href="/contact"
-              className="border-2 border-white/20 hover:border-white/40 text-white px-8 py-3 rounded-lg font-semibold transition-smooth"
+              className="border-2 border-white/20 hover:border-white/40 text-white px-8 py-3 rounded-xl font-semibold transition-all duration-300 hover:scale-105"
             >
               Talk to an Agent
             </Link>

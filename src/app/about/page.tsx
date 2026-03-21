@@ -47,19 +47,19 @@ export default function AboutPage() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <span
-              className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-sm font-medium mb-6"
+              className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5 text-sm font-medium mb-6"
               style={{ color: '#6ABF4B' }}
             >
               🌍 Pan-African Agriculture Development Platform
             </span>
             <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
-              About <span style={{ color: '#6ABF4B' }}>AFU</span>
+              About <span className="bg-gradient-to-r from-[#5DB347] to-[#6ABF4B] bg-clip-text text-transparent">AFU</span>
             </h1>
             <p className="text-xl text-white/80 leading-relaxed mb-10">
               The African Farming Union is a vertically integrated agriculture development platform —
               functioning as a specialized agri dev bank and full-stack execution engine for African farmers.
             </p>
-            {/* 3 stat pills */}
+            {/* 3 stat pills — glassmorphism */}
             <div className="flex flex-wrap gap-4">
               {[
                 { value: '9', label: 'Countries' },
@@ -68,7 +68,7 @@ export default function AboutPage() {
               ].map((s) => (
                 <div
                   key={s.label}
-                  className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-5 py-3 text-center"
+                  className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl px-6 py-4 text-center hover:-translate-y-1 hover:bg-white/15 transition-all duration-300 shadow-lg shadow-black/10"
                 >
                   <div className="text-2xl font-bold text-white">{s.value}</div>
                   <div className="text-xs text-white/70">{s.label}</div>
@@ -80,13 +80,15 @@ export default function AboutPage() {
       </section>
 
       {/* ─── THE PROBLEM ─── */}
-      <section className="py-20 bg-white">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-10">
             <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#5DB347' }}>
               The Problem
             </span>
-            <h2 className="text-3xl font-bold text-navy mt-2 mb-2">The Broken Cash Cycle</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mt-2 mb-2">
+              <span className="bg-gradient-to-r from-[#1B2A4A] to-[#5DB347] bg-clip-text text-transparent">The Broken Cash Cycle</span>
+            </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
             {[
@@ -96,35 +98,40 @@ export default function AboutPage() {
               { title: "Payments Delayed", desc: "Next season underfunded" },
               { title: "Repeat", desc: "The cycle continues" },
             ].map((step, i) => (
-              <div key={i} className="bg-[#EBF7E5] rounded-xl p-6 text-center">
+              <div
+                key={i}
+                className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 text-center shadow-lg shadow-[#5DB347]/5 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 border-l-4 border-[#5DB347]"
+              >
                 <div
-                  className="w-8 h-8 text-white rounded-full flex items-center justify-center mx-auto mb-3 text-sm font-bold"
-                  style={{ background: '#5DB347' }}
+                  className="w-10 h-10 text-white rounded-full flex items-center justify-center mx-auto mb-3 text-sm font-bold shadow-lg shadow-[#5DB347]/30"
+                  style={{ background: 'linear-gradient(135deg, #5DB347, #449933)' }}
                 >
                   {i + 1}
                 </div>
-                <h3 className="font-bold text-navy mb-1">{step.title}</h3>
+                <h3 className="font-bold text-[#1B2A4A] mb-1">{step.title}</h3>
                 <p className="text-gray-500 text-sm">{step.desc}</p>
               </div>
             ))}
           </div>
-          <div className="bg-[#EBF7E5] rounded-xl p-6 mt-8">
-            <p className="text-navy text-center font-medium">
+          <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 mt-8 shadow-lg shadow-[#5DB347]/5 border-l-4 border-[#5DB347]">
+            <p className="text-[#1B2A4A] text-center font-medium">
               Africa&apos;s agriculture doesn&apos;t fail at farming &mdash; it fails at{' '}
-              <strong>finance + offtake + processing</strong>.
+              <strong style={{ color: '#5DB347' }}>finance + offtake + processing</strong>.
             </p>
           </div>
         </div>
       </section>
 
       {/* ─── OPERATING MODEL ─── */}
-      <section className="py-20 bg-cream">
+      <section className="py-16" style={{ background: '#EDF4EF' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-10">
             <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#5DB347' }}>
               How We Work
             </span>
-            <h2 className="text-3xl font-bold text-navy mt-2 mb-2">Operating Model</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mt-2 mb-2">
+              <span className="bg-gradient-to-r from-[#1B2A4A] to-[#5DB347] bg-clip-text text-transparent">Operating Model</span>
+            </h2>
             <p className="text-gray-500 max-w-2xl">
               AFU operates as a portfolio of programs + projects across three tiers:
             </p>
@@ -134,6 +141,7 @@ export default function AboutPage() {
               {
                 tier: "Tier A",
                 name: "Smallholder & SME",
+                icon: "🌱",
                 items: [
                   "Input bundles + seasonal working capital",
                   "Training + compliance onboarding",
@@ -143,6 +151,7 @@ export default function AboutPage() {
               {
                 tier: "Tier B",
                 name: "Commercial Farms",
+                icon: "🚜",
                 items: [
                   "Equipment finance, irrigation, high-value crop financing",
                   "Structured contracts + processing access",
@@ -152,6 +161,7 @@ export default function AboutPage() {
               {
                 tier: "Tier C",
                 name: "Large Projects",
+                icon: "🏗️",
                 items: [
                   "Project finance + infrastructure",
                   "Anchor processing hubs",
@@ -159,11 +169,15 @@ export default function AboutPage() {
                 ],
               },
             ].map((item, i) => (
-              <div key={i} className="card-polished bg-white rounded-2xl p-8 border border-gray-100">
+              <div
+                key={i}
+                className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-lg shadow-[#5DB347]/5 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 border-l-4 border-[#5DB347]"
+              >
+                <div className="text-3xl mb-3 drop-shadow-md">{item.icon}</div>
                 <div className="text-sm font-semibold uppercase tracking-wider mb-1" style={{ color: '#5DB347' }}>
                   {item.tier}
                 </div>
-                <h3 className="text-xl font-bold text-navy mb-4">{item.name}</h3>
+                <h3 className="text-xl font-bold text-[#1B2A4A] mb-4">{item.name}</h3>
                 <ul className="space-y-3">
                   {item.items.map((li, j) => (
                     <li key={j} className="flex items-start gap-2 text-gray-600 text-sm">
@@ -187,24 +201,30 @@ export default function AboutPage() {
       </section>
 
       {/* ─── RISK CONTROL ─── */}
-      <section className="py-20 bg-white">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-10">
             <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#5DB347' }}>
               Risk Management
             </span>
-            <h2 className="text-3xl font-bold text-navy mt-2">Risk &amp; How We Control It</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mt-2">
+              <span className="bg-gradient-to-r from-[#1B2A4A] to-[#5DB347] bg-clip-text text-transparent">Risk &amp; How We Control It</span>
+            </h2>
           </div>
           <div className="space-y-4">
             {[
-              { risk: "Credit Risk", mitigation: "Offtake contracts, tranche releases, input-in-kind financing, aggregation control" },
-              { risk: "Execution Risk", mitigation: "Commercial farmer operators + phased rollout" },
-              { risk: "FX / Regulatory Risk", mitigation: "Structured trade routes + multi-country diversification" },
-              { risk: "Commodity Price Risk", mitigation: "Processing/value-add + contract pricing mechanisms" },
-              { risk: "Fraud / Leakage", mitigation: "Controlled procurement + field verification + audit trail" },
+              { risk: "Credit Risk", mitigation: "Offtake contracts, tranche releases, input-in-kind financing, aggregation control", icon: "🛡️" },
+              { risk: "Execution Risk", mitigation: "Commercial farmer operators + phased rollout", icon: "⚙️" },
+              { risk: "FX / Regulatory Risk", mitigation: "Structured trade routes + multi-country diversification", icon: "🌐" },
+              { risk: "Commodity Price Risk", mitigation: "Processing/value-add + contract pricing mechanisms", icon: "📊" },
+              { risk: "Fraud / Leakage", mitigation: "Controlled procurement + field verification + audit trail", icon: "🔒" },
             ].map((item, i) => (
-              <div key={i} className="flex flex-col md:flex-row md:items-center gap-2 md:gap-8 bg-cream rounded-xl p-6">
-                <div className="font-bold text-navy min-w-[200px]">{item.risk}</div>
+              <div
+                key={i}
+                className="flex flex-col md:flex-row md:items-center gap-3 md:gap-8 bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-lg shadow-[#5DB347]/5 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 border-l-4 border-[#5DB347]"
+              >
+                <div className="text-2xl drop-shadow-md">{item.icon}</div>
+                <div className="font-bold text-[#1B2A4A] min-w-[200px]">{item.risk}</div>
                 <div className="text-gray-600 text-sm">{item.mitigation}</div>
               </div>
             ))}
@@ -220,22 +240,27 @@ export default function AboutPage() {
 
       {/* ─── FINAL CTA ─── */}
       <section
-        className="py-16 text-white"
+        className="py-16 text-white relative overflow-hidden"
         style={{ background: 'linear-gradient(135deg, #0F1A30 0%, #1B2A4A 60%, #1e3a3a 100%)' }}
       >
-        <div className="max-w-4xl mx-auto px-4 text-center">
+        {/* Green glow effect */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] rounded-full opacity-15 blur-3xl" style={{ background: '#5DB347' }} />
+        <div className="relative max-w-4xl mx-auto px-4 text-center">
           <span className="text-sm font-semibold uppercase tracking-wider mb-4 block" style={{ color: '#6ABF4B' }}>
             Join the Movement
           </span>
-          <h2 className="text-3xl font-bold text-white mb-6">Join the AFU Ecosystem</h2>
-          <p className="text-white/70 mb-8 max-w-xl mx-auto">
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+            Join the <span className="bg-gradient-to-r from-[#5DB347] to-[#6ABF4B] bg-clip-text text-transparent">AFU Ecosystem</span>
+          </h2>
+          <p className="text-lg text-white/70 mb-10 max-w-xl mx-auto">
             Whether you&apos;re a farmer, investor, partner, or sponsor — there&apos;s a place for you in the AFU platform.
           </p>
           <Link
             href="/apply"
-            className="inline-block font-semibold text-lg px-8 py-3.5 rounded-lg transition-colors bg-[#5DB347] hover:bg-[#449933] text-white"
+            className="inline-block font-semibold text-lg px-10 py-4 rounded-2xl transition-all duration-300 text-white shadow-xl shadow-[#5DB347]/30 hover:-translate-y-1 hover:shadow-2xl hover:shadow-[#5DB347]/40"
+            style={{ background: 'linear-gradient(135deg, #5DB347, #449933)' }}
           >
-            Apply for Membership
+            Apply for Membership →
           </Link>
         </div>
       </section>
