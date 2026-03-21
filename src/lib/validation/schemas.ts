@@ -115,7 +115,7 @@ export const initiatePaymentSchema = z.object({
   phoneNumber: z.string().max(30).optional().nullable(),
   relatedEntityType: z.string().max(100).optional().nullable(),
   relatedEntityId: z.string().uuid().optional().nullable(),
-  metadata: z.record(z.unknown()).optional().nullable(),
+  metadata: z.record(z.string(), z.unknown()).optional().nullable(),
 });
 
 // ─── Farm Plots ──────────────────────────────────────────────
