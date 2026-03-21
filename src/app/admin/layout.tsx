@@ -40,6 +40,7 @@ import {
   Wrench,
   Heart,
   MapPin,
+  FileEdit,
 } from 'lucide-react';
 
 // ── Navigation structure with collapsible groups ──
@@ -122,6 +123,7 @@ const navGroups: NavGroup[] = [
     label: 'System',
     defaultOpen: false,
     links: [
+      { href: '/admin/content', label: 'Site Content', icon: <FileEdit className="w-4 h-4" /> },
       { href: '/admin/countries', label: 'Countries', icon: <Globe className="w-4 h-4" /> },
       { href: '/admin/system', label: 'System Health', icon: <Server className="w-4 h-4" /> },
       { href: '/admin/audit', label: 'Audit Trail', icon: <ScrollText className="w-4 h-4" /> },
