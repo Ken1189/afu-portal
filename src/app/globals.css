@@ -272,3 +272,9 @@ html {
 .table-striped tbody tr:hover {
   background: var(--color-teal-light);
 }
+
+/* Shimmer animation for progress bars */
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
