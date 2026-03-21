@@ -165,7 +165,7 @@ export default function Navbar() {
             {/* About Us */}
             <Link
               href="/about"
-              className="text-navy hover:text-teal transition-colors text-sm font-medium px-3 py-2 rounded-lg hover:bg-teal-light/50"
+              className="text-navy hover:text-[#5DB347] transition-colors text-sm font-medium px-3 py-2 rounded-lg hover:bg-[#EBF7E5]/50"
             >
               About Us
             </Link>
@@ -179,8 +179,8 @@ export default function Navbar() {
               <button
                 className={`flex items-center gap-1 text-sm font-medium px-3 py-2 rounded-lg transition-colors ${
                   openDropdown === "education"
-                    ? "text-teal bg-teal-light/50"
-                    : "text-navy hover:text-teal hover:bg-teal-light/50"
+                    ? "text-[#5DB347] bg-[#EBF7E5]/50"
+                    : "text-navy hover:text-[#5DB347] hover:bg-[#EBF7E5]/50"
                 }`}
                 onClick={() =>
                   setOpenDropdown(
@@ -214,7 +214,7 @@ export default function Navbar() {
                         <Link
                           key={link.href}
                           href={link.href}
-                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-navy hover:bg-teal-light hover:text-teal transition-colors"
+                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-navy hover:bg-[#EBF7E5] hover:text-[#5DB347] transition-colors"
                           onClick={() => setOpenDropdown(null)}
                         >
                           <Icon className="w-4 h-4 text-gray-400" />
@@ -236,8 +236,8 @@ export default function Navbar() {
               <button
                 className={`flex items-center gap-1 text-sm font-medium px-3 py-2 rounded-lg transition-colors ${
                   openDropdown === "services"
-                    ? "text-teal bg-teal-light/50"
-                    : "text-navy hover:text-teal hover:bg-teal-light/50"
+                    ? "text-[#5DB347] bg-[#EBF7E5]/50"
+                    : "text-navy hover:text-[#5DB347] hover:bg-[#EBF7E5]/50"
                 }`}
                 onClick={() =>
                   setOpenDropdown(
@@ -270,8 +270,8 @@ export default function Navbar() {
                         {/* Finance Column */}
                         <div>
                           <div className="flex items-center gap-2 mb-3">
-                            <Landmark className="w-4 h-4 text-teal" />
-                            <span className="text-xs font-semibold text-teal uppercase tracking-wider">
+                            <Landmark className="w-4 h-4 text-[#5DB347]" />
+                            <span className="text-xs font-semibold text-[#5DB347] uppercase tracking-wider">
                               Finance
                             </span>
                           </div>
@@ -280,7 +280,7 @@ export default function Navbar() {
                               <Link
                                 key={link.href}
                                 href={link.href}
-                                className="block px-3 py-2 text-sm text-navy hover:bg-teal-light hover:text-teal rounded-lg transition-colors"
+                                className="block px-3 py-2 text-sm text-navy hover:bg-[#EBF7E5] hover:text-[#5DB347] rounded-lg transition-colors"
                                 onClick={() => setOpenDropdown(null)}
                               >
                                 {link.label}
@@ -292,8 +292,8 @@ export default function Navbar() {
                         {/* Insurance Column */}
                         <div>
                           <div className="flex items-center gap-2 mb-3">
-                            <ShieldCheck className="w-4 h-4 text-teal" />
-                            <span className="text-xs font-semibold text-teal uppercase tracking-wider">
+                            <ShieldCheck className="w-4 h-4 text-[#5DB347]" />
+                            <span className="text-xs font-semibold text-[#5DB347] uppercase tracking-wider">
                               Insurance
                             </span>
                           </div>
@@ -302,7 +302,7 @@ export default function Navbar() {
                               <Link
                                 key={link.href}
                                 href={link.href}
-                                className="block px-3 py-2 text-sm text-navy hover:bg-teal-light hover:text-teal rounded-lg transition-colors"
+                                className="block px-3 py-2 text-sm text-navy hover:bg-[#EBF7E5] hover:text-[#5DB347] rounded-lg transition-colors"
                                 onClick={() => setOpenDropdown(null)}
                               >
                                 {link.label}
@@ -314,7 +314,7 @@ export default function Navbar() {
                         {/* More Column */}
                         <div>
                           <div className="flex items-center gap-2 mb-3">
-                            <span className="text-xs font-semibold text-teal uppercase tracking-wider">
+                            <span className="text-xs font-semibold text-[#5DB347] uppercase tracking-wider">
                               More
                             </span>
                           </div>
@@ -325,7 +325,7 @@ export default function Navbar() {
                                 <Link
                                   key={link.href}
                                   href={link.href}
-                                  className="flex items-center gap-3 px-3 py-2 text-sm text-navy hover:bg-teal-light hover:text-teal rounded-lg transition-colors"
+                                  className="flex items-center gap-3 px-3 py-2 text-sm text-navy hover:bg-[#EBF7E5] hover:text-[#5DB347] rounded-lg transition-colors"
                                   onClick={() => setOpenDropdown(null)}
                                 >
                                   <Icon className="w-4 h-4 text-gray-400" />
@@ -345,31 +345,31 @@ export default function Navbar() {
             {/* Simple Links */}
             <Link
               href="/memberships"
-              className="text-navy hover:text-teal transition-colors text-sm font-medium px-3 py-2 rounded-lg hover:bg-teal-light/50"
+              className="text-navy hover:text-[#5DB347] transition-colors text-sm font-medium px-3 py-2 rounded-lg hover:bg-[#EBF7E5]/50"
             >
               Memberships
             </Link>
             <Link
               href="/podcasts"
-              className="text-navy hover:text-teal transition-colors text-sm font-medium px-3 py-2 rounded-lg hover:bg-teal-light/50"
+              className="text-navy hover:text-[#5DB347] transition-colors text-sm font-medium px-3 py-2 rounded-lg hover:bg-[#EBF7E5]/50"
             >
               Podcasts
             </Link>
             <Link
               href="/partners"
-              className="text-navy hover:text-teal transition-colors text-sm font-medium px-3 py-2 rounded-lg hover:bg-teal-light/50"
+              className="text-navy hover:text-[#5DB347] transition-colors text-sm font-medium px-3 py-2 rounded-lg hover:bg-[#EBF7E5]/50"
             >
               Partnerships
             </Link>
             <Link
               href="/projects"
-              className="text-navy hover:text-teal transition-colors text-sm font-medium px-3 py-2 rounded-lg hover:bg-teal-light/50"
+              className="text-navy hover:text-[#5DB347] transition-colors text-sm font-medium px-3 py-2 rounded-lg hover:bg-[#EBF7E5]/50"
             >
               Projects
             </Link>
             <Link
               href="/countries"
-              className="text-navy hover:text-teal transition-colors text-sm font-medium px-3 py-2 rounded-lg hover:bg-teal-light/50"
+              className="text-navy hover:text-[#5DB347] transition-colors text-sm font-medium px-3 py-2 rounded-lg hover:bg-[#EBF7E5]/50"
             >
               Countries
             </Link>
@@ -391,7 +391,7 @@ export default function Navbar() {
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
                   className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-cream transition-colors"
                 >
-                  <div className="w-8 h-8 rounded-full bg-teal/15 flex items-center justify-center text-teal font-semibold text-sm">
+                  <div className="w-8 h-8 rounded-full bg-[#5DB347]/15 flex items-center justify-center text-[#5DB347] font-semibold text-sm">
                     {profile?.full_name?.charAt(0)?.toUpperCase() || user.email?.charAt(0)?.toUpperCase() || 'U'}
                   </div>
                   <div className="text-left">
@@ -457,7 +457,7 @@ export default function Navbar() {
               <>
                 <Link
                   href="/login"
-                  className="text-navy hover:text-teal transition-colors text-sm font-medium"
+                  className="text-navy hover:text-[#5DB347] transition-colors text-sm font-medium"
                 >
                   Sign In
                 </Link>
@@ -505,7 +505,7 @@ export default function Navbar() {
                 {/* About */}
                 <Link
                   href="/about"
-                  className="text-navy hover:text-teal text-base font-medium py-3 px-3 rounded-lg hover:bg-teal-light/50 transition-colors"
+                  className="text-navy hover:text-[#5DB347] text-base font-medium py-3 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors"
                   onClick={closeMobile}
                 >
                   About Us
@@ -514,7 +514,7 @@ export default function Navbar() {
                 {/* Education Accordion */}
                 <div>
                   <button
-                    className="flex items-center justify-between w-full text-navy text-base font-medium py-3 px-3 rounded-lg hover:bg-teal-light/50 transition-colors"
+                    className="flex items-center justify-between w-full text-navy text-base font-medium py-3 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors"
                     onClick={() => setMobileEducationOpen(!mobileEducationOpen)}
                   >
                     Education
@@ -540,7 +540,7 @@ export default function Navbar() {
                               <Link
                                 key={link.href}
                                 href={link.href}
-                                className="flex items-center gap-3 text-navy/70 hover:text-teal text-sm py-2.5 px-3 rounded-lg hover:bg-teal-light/50 transition-colors"
+                                className="flex items-center gap-3 text-navy/70 hover:text-[#5DB347] text-sm py-2.5 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors"
                                 onClick={closeMobile}
                               >
                                 <Icon className="w-4 h-4" />
@@ -557,7 +557,7 @@ export default function Navbar() {
                 {/* Services Accordion */}
                 <div>
                   <button
-                    className="flex items-center justify-between w-full text-navy text-base font-medium py-3 px-3 rounded-lg hover:bg-teal-light/50 transition-colors"
+                    className="flex items-center justify-between w-full text-navy text-base font-medium py-3 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors"
                     onClick={() => setMobileServicesOpen(!mobileServicesOpen)}
                   >
                     Services
@@ -579,13 +579,13 @@ export default function Navbar() {
                         <div className="pl-4 py-1 space-y-1">
                           {/* Finance sub-accordion */}
                           <button
-                            className="flex items-center justify-between w-full text-navy/80 text-sm font-semibold py-2.5 px-3 rounded-lg hover:bg-teal-light/50 transition-colors"
+                            className="flex items-center justify-between w-full text-navy/80 text-sm font-semibold py-2.5 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors"
                             onClick={() =>
                               setMobileFinanceOpen(!mobileFinanceOpen)
                             }
                           >
                             <span className="flex items-center gap-2">
-                              <Landmark className="w-4 h-4 text-teal" />
+                              <Landmark className="w-4 h-4 text-[#5DB347]" />
                               Finance
                             </span>
                             <ChevronDown
@@ -608,7 +608,7 @@ export default function Navbar() {
                                     <Link
                                       key={link.href}
                                       href={link.href}
-                                      className="block text-navy/60 hover:text-teal text-sm py-2 px-3 rounded-lg hover:bg-teal-light/50 transition-colors"
+                                      className="block text-navy/60 hover:text-[#5DB347] text-sm py-2 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors"
                                       onClick={closeMobile}
                                     >
                                       {link.label}
@@ -621,13 +621,13 @@ export default function Navbar() {
 
                           {/* Insurance sub-accordion */}
                           <button
-                            className="flex items-center justify-between w-full text-navy/80 text-sm font-semibold py-2.5 px-3 rounded-lg hover:bg-teal-light/50 transition-colors"
+                            className="flex items-center justify-between w-full text-navy/80 text-sm font-semibold py-2.5 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors"
                             onClick={() =>
                               setMobileInsuranceOpen(!mobileInsuranceOpen)
                             }
                           >
                             <span className="flex items-center gap-2">
-                              <ShieldCheck className="w-4 h-4 text-teal" />
+                              <ShieldCheck className="w-4 h-4 text-[#5DB347]" />
                               Insurance
                             </span>
                             <ChevronDown
@@ -650,7 +650,7 @@ export default function Navbar() {
                                     <Link
                                       key={link.href}
                                       href={link.href}
-                                      className="block text-navy/60 hover:text-teal text-sm py-2 px-3 rounded-lg hover:bg-teal-light/50 transition-colors"
+                                      className="block text-navy/60 hover:text-[#5DB347] text-sm py-2 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors"
                                       onClick={closeMobile}
                                     >
                                       {link.label}
@@ -663,7 +663,7 @@ export default function Navbar() {
 
                           {/* More sub-accordion */}
                           <button
-                            className="flex items-center justify-between w-full text-navy/80 text-sm font-semibold py-2.5 px-3 rounded-lg hover:bg-teal-light/50 transition-colors"
+                            className="flex items-center justify-between w-full text-navy/80 text-sm font-semibold py-2.5 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors"
                             onClick={() => setMobileMoreOpen(!mobileMoreOpen)}
                           >
                             <span>More Services</span>
@@ -689,7 +689,7 @@ export default function Navbar() {
                                       <Link
                                         key={link.href}
                                         href={link.href}
-                                        className="flex items-center gap-3 text-navy/60 hover:text-teal text-sm py-2 px-3 rounded-lg hover:bg-teal-light/50 transition-colors"
+                                        className="flex items-center gap-3 text-navy/60 hover:text-[#5DB347] text-sm py-2 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors"
                                         onClick={closeMobile}
                                       >
                                         <Icon className="w-4 h-4" />
@@ -710,35 +710,35 @@ export default function Navbar() {
                 {/* Flat links */}
                 <Link
                   href="/memberships"
-                  className="text-navy hover:text-teal text-base font-medium py-3 px-3 rounded-lg hover:bg-teal-light/50 transition-colors"
+                  className="text-navy hover:text-[#5DB347] text-base font-medium py-3 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors"
                   onClick={closeMobile}
                 >
                   Memberships
                 </Link>
                 <Link
                   href="/podcasts"
-                  className="text-navy hover:text-teal text-base font-medium py-3 px-3 rounded-lg hover:bg-teal-light/50 transition-colors"
+                  className="text-navy hover:text-[#5DB347] text-base font-medium py-3 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors"
                   onClick={closeMobile}
                 >
                   Podcasts
                 </Link>
                 <Link
                   href="/partners"
-                  className="text-navy hover:text-teal text-base font-medium py-3 px-3 rounded-lg hover:bg-teal-light/50 transition-colors"
+                  className="text-navy hover:text-[#5DB347] text-base font-medium py-3 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors"
                   onClick={closeMobile}
                 >
                   Partnerships
                 </Link>
                 <Link
                   href="/projects"
-                  className="text-navy hover:text-teal text-base font-medium py-3 px-3 rounded-lg hover:bg-teal-light/50 transition-colors"
+                  className="text-navy hover:text-[#5DB347] text-base font-medium py-3 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors"
                   onClick={closeMobile}
                 >
                   Projects
                 </Link>
                 <Link
                   href="/countries"
-                  className="text-navy hover:text-teal text-base font-medium py-3 px-3 rounded-lg hover:bg-teal-light/50 transition-colors"
+                  className="text-navy hover:text-[#5DB347] text-base font-medium py-3 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors"
                   onClick={closeMobile}
                 >
                   Countries
@@ -757,7 +757,7 @@ export default function Navbar() {
                 {!authLoading && user ? (
                   <>
                     <div className="flex items-center gap-3 px-3 py-2">
-                      <div className="w-10 h-10 rounded-full bg-teal/15 flex items-center justify-center text-teal font-semibold">
+                      <div className="w-10 h-10 rounded-full bg-[#5DB347]/15 flex items-center justify-center text-[#5DB347] font-semibold">
                         {profile?.full_name?.charAt(0)?.toUpperCase() || 'U'}
                       </div>
                       <div>
@@ -767,7 +767,7 @@ export default function Navbar() {
                     </div>
                     <Link
                       href="/dashboard"
-                      className="flex items-center gap-2 text-navy hover:text-teal text-base font-medium py-3 px-3 rounded-lg hover:bg-teal-light/50 transition-colors"
+                      className="flex items-center gap-2 text-navy hover:text-[#5DB347] text-base font-medium py-3 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors"
                       onClick={closeMobile}
                     >
                       <LayoutDashboard className="w-4 h-4" />
@@ -776,7 +776,7 @@ export default function Navbar() {
                     {isAdmin && (
                       <Link
                         href="/admin"
-                        className="flex items-center gap-2 text-navy hover:text-teal text-base font-medium py-3 px-3 rounded-lg hover:bg-teal-light/50 transition-colors"
+                        className="flex items-center gap-2 text-navy hover:text-[#5DB347] text-base font-medium py-3 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors"
                         onClick={closeMobile}
                       >
                         <Settings className="w-4 h-4" />
@@ -795,7 +795,7 @@ export default function Navbar() {
                   <>
                     <Link
                       href="/login"
-                      className="text-navy hover:text-teal text-base font-medium py-3 px-3 rounded-lg hover:bg-teal-light/50 transition-colors"
+                      className="text-navy hover:text-[#5DB347] text-base font-medium py-3 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors"
                       onClick={closeMobile}
                     >
                       Sign In
