@@ -309,18 +309,18 @@ export default function Home() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6, delay: 0.7 }}
-              className="mt-12 flex flex-wrap items-center gap-6 text-white/60 text-sm"
+              className="mt-12 flex flex-wrap items-center gap-4 text-sm"
             >
-              <div className="flex items-center gap-2">
-                <ShieldPlus className="w-4 h-4" />
+              <div className="flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/10 px-4 py-2 rounded-full text-white/70">
+                <ShieldPlus className="w-4 h-4 text-[#5DB347]" />
                 <span>Licensed & Regulated</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Globe2 className="w-4 h-4" />
+              <div className="flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/10 px-4 py-2 rounded-full text-white/70">
+                <Globe2 className="w-4 h-4 text-[#5DB347]" />
                 <span>3 Countries Active</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Users className="w-4 h-4" />
+              <div className="flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/10 px-4 py-2 rounded-full text-white/70">
+                <Users className="w-4 h-4 text-[#5DB347]" />
                 <span>247+ Active Members</span>
               </div>
             </motion.div>
@@ -339,8 +339,9 @@ export default function Home() {
       </section>
 
       {/* ─── IMPACT STATS (Animated counters) ─── */}
-      <section className="py-20 bg-white relative overflow-hidden">
+      <section className="py-16 bg-gradient-to-b from-white via-[#f8fdf6] to-white relative overflow-hidden">
         <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#5DB347]/30 to-transparent" />
+        <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, #5DB347 1px, transparent 0)', backgroundSize: '40px 40px' }} />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeInWhenVisible>
             <div className="text-center mb-14">
@@ -356,22 +357,22 @@ export default function Home() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             <FadeInWhenVisible delay={0}>
-              <div className="card-polished stat-card bg-gradient-to-br from-[#EBF7E5] to-white rounded-2xl p-8 border border-[#5DB347]/10">
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border-l-4 border-[#5DB347] shadow-lg shadow-[#5DB347]/5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                 <CountStat target={60} suffix="%" label="of world's uncultivated arable land is in Africa" />
               </div>
             </FadeInWhenVisible>
             <FadeInWhenVisible delay={0.1}>
-              <div className="card-polished stat-card bg-gradient-to-br from-[#EBF7E5] to-white rounded-2xl p-8 border border-[#5DB347]/10">
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border-l-4 border-[#5DB347] shadow-lg shadow-[#5DB347]/5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                 <CountStat target={50} prefix="$" suffix="B+" label="of food imported annually across Africa" />
               </div>
             </FadeInWhenVisible>
             <FadeInWhenVisible delay={0.2}>
-              <div className="card-polished stat-card bg-gradient-to-br from-[#EBF7E5] to-white rounded-2xl p-8 border border-[#5DB347]/10">
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border-l-4 border-[#5DB347] shadow-lg shadow-[#5DB347]/5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                 <CountStat target={40} suffix="%" label="of food lost post-harvest due to weak infrastructure" />
               </div>
             </FadeInWhenVisible>
             <FadeInWhenVisible delay={0.3}>
-              <div className="card-polished stat-card bg-gradient-to-br from-[#EBF7E5] to-white rounded-2xl p-8 border border-[#5DB347]/10">
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border-l-4 border-[#5DB347] shadow-lg shadow-[#5DB347]/5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                 <CountStat target={247} suffix="+" label="active AFU members across 3 countries" />
               </div>
             </FadeInWhenVisible>
@@ -380,10 +381,10 @@ export default function Home() {
       </section>
 
       {/* ─── WHAT AFU PROVIDES (Services Grid) ─── */}
-      <section className="py-24 bg-cream">
+      <section className="py-16 bg-cream">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeInWhenVisible>
-            <div className="text-center mb-16">
+            <div className="text-center mb-14">
               <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#5DB347' }}>Our Services</span>
               <h2 className="text-3xl md:text-4xl font-bold text-navy mt-2 mb-4 text-gradient-green">
                 One Platform, Complete Value Chain
@@ -401,30 +402,34 @@ export default function Home() {
                 <motion.div key={svc.title} variants={fadeUpChild}>
                   <Link
                     href={svc.link}
-                    className="group block bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-[#5DB347]/30 hover:shadow-xl transition-all duration-300 card-polished"
+                    className="group block bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
                   >
                     {/* Card image */}
-                    <div className="relative h-48 overflow-hidden">
+                    <div className="relative h-52 overflow-hidden">
                       <Image
                         src={svc.img}
                         alt={svc.title}
                         fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-navy/60 to-transparent" />
-                      <div className="absolute bottom-4 left-4">
-                        <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg" style={{ background: '#5DB347' }}>
-                          <Icon className="w-5 h-5 text-white" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-navy-dark/80 via-navy/20 to-transparent" />
+                      {/* Floating icon over image bottom */}
+                      <div className="absolute -bottom-5 left-6">
+                        <div className="w-14 h-14 rounded-full bg-white flex items-center justify-center shadow-xl shadow-black/10">
+                          <Icon className="w-7 h-7" style={{ color: '#5DB347' }} />
                         </div>
                       </div>
                     </div>
                     {/* Card body */}
-                    <div className="p-6">
-                      <h3 className="text-lg font-bold text-navy mb-2 group-hover:text-[#5DB347] transition-colors flex items-center gap-2">
+                    <div className="p-6 pt-8">
+                      <h3 className="text-lg font-bold text-navy mb-2 group-hover:text-[#5DB347] transition-colors">
                         {svc.title}
-                        <ArrowRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                       </h3>
-                      <p className="text-gray-500 text-sm leading-relaxed">{svc.desc}</p>
+                      <p className="text-gray-500 text-sm leading-relaxed mb-4">{svc.desc}</p>
+                      <span className="inline-flex items-center gap-1.5 text-sm font-semibold group-hover:gap-2.5 transition-all" style={{ color: '#5DB347' }}>
+                        Learn More
+                        <ArrowRight className="w-4 h-4" />
+                      </span>
                     </div>
                   </Link>
                 </motion.div>
@@ -435,7 +440,7 @@ export default function Home() {
       </section>
 
       {/* ─── THE AFU FLYWHEEL ─── */}
-      <section className="py-24 bg-navy text-white overflow-hidden">
+      <section className="py-16 bg-navy text-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeInWhenVisible>
             <div className="text-center mb-16">
@@ -462,18 +467,18 @@ export default function Home() {
                   >
                     <div className="flex flex-col items-center text-center">
                       <div
-                        className="w-16 h-16 rounded-2xl flex items-center justify-center mb-3 shadow-lg group-hover:scale-110 transition-transform"
+                        className="w-20 h-20 rounded-2xl flex items-center justify-center mb-3 shadow-lg group-hover:scale-110 group-hover:shadow-[0_0_20px_rgba(93,179,71,0.3)] transition-all duration-300"
                         style={{ background: item.bg }}
                       >
-                        <Icon className="w-7 h-7 text-white" />
+                        <Icon className="w-9 h-9 text-white" />
                       </div>
                       <span className="text-xs font-bold mb-1" style={{ color: '#5DB347' }}>Step {item.step}</span>
                       <span className="text-sm font-semibold text-white">{item.label}</span>
                     </div>
                     {/* Connector arrow (hidden on last item and small screens) */}
                     {item.step < 7 && (
-                      <div className="hidden lg:flex absolute top-8 -right-2 w-4 items-center justify-center">
-                        <ArrowRight className="w-4 h-4 text-[#5DB347]/50" />
+                      <div className="hidden lg:flex absolute top-10 -right-2 w-4 items-center justify-center">
+                        <ArrowRight className="w-4 h-4 text-[#5DB347]/60" />
                       </div>
                     )}
                   </motion.div>
@@ -494,10 +499,11 @@ export default function Home() {
       </section>
 
       {/* ─── HOW IT WORKS ─── */}
-      <section className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-16 bg-white relative">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#f8fdf6]/50 to-transparent" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <FadeInWhenVisible>
-            <div className="text-center mb-16">
+            <div className="text-center mb-14">
               <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#5DB347' }}>Getting Started</span>
               <h2 className="text-3xl md:text-4xl font-bold text-navy mt-2 mb-4 text-gradient-green">
                 Four Steps to Growth
@@ -516,13 +522,16 @@ export default function Home() {
                   <div className="relative group">
                     {/* Connector line */}
                     {i < 3 && (
-                      <div className="hidden lg:block absolute top-12 left-[calc(100%+0.5rem)] w-[calc(100%-1rem)] h-px bg-gray-200">
-                        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full" style={{ background: '#5DB347' }} />
+                      <div className="hidden lg:block absolute top-8 left-[calc(100%+0.25rem)] w-[calc(100%-0.5rem)] h-0.5 border-t-2 border-dashed border-[#5DB347]/25">
+                        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full shadow-sm" style={{ background: '#5DB347' }} />
                       </div>
                     )}
-                    <div className="card-polished bg-cream rounded-2xl p-8 h-full group-hover:shadow-lg transition-shadow border border-transparent group-hover:border-[#5DB347]/20">
-                      <div className="text-5xl font-bold text-[#5DB347]/15 mb-4">{item.step}</div>
-                      <div className="w-12 h-12 bg-[#EBF7E5] rounded-xl flex items-center justify-center mb-4">
+                    <div className="bg-white rounded-3xl p-8 h-full shadow-md group-hover:shadow-xl group-hover:-translate-y-1 transition-all duration-300 border border-gray-100 group-hover:border-[#5DB347]/20">
+                      {/* Step number with gradient circle */}
+                      <div className="w-14 h-14 rounded-full flex items-center justify-center mb-5 shadow-lg" style={{ background: 'linear-gradient(135deg, #5DB347, #449933)' }}>
+                        <span className="text-white text-lg font-bold">{item.step}</span>
+                      </div>
+                      <div className="w-12 h-12 bg-[#EBF7E5] rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                         <Icon className="w-6 h-6" style={{ color: '#5DB347' }} />
                       </div>
                       <h3 className="text-lg font-bold text-navy mb-2">{item.title}</h3>
@@ -537,12 +546,12 @@ export default function Home() {
       </section>
 
       {/* ─── IMAGE FEATURE SPLIT ─── */}
-      <section className="py-24 bg-cream overflow-hidden">
+      <section className="py-16 bg-cream overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             {/* Image */}
             <FadeInWhenVisible direction="right">
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+              <div className="relative rounded-3xl overflow-hidden shadow-2xl">
                 <Image
                   src="https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=800&h=600&fit=crop"
                   alt="African farmer inspecting crops"
@@ -603,10 +612,11 @@ export default function Home() {
       </section>
 
       {/* ─── TESTIMONIALS ─── */}
-      <section className="py-24 bg-white">
+      <section className="py-16 bg-white relative">
+        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#5DB347]/20 to-transparent" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeInWhenVisible>
-            <div className="text-center mb-16">
+            <div className="text-center mb-14">
               <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#5DB347' }}>Success Stories</span>
               <h2 className="text-3xl md:text-4xl font-bold text-navy mt-2 mb-4 text-gradient-green">
                 Hear From Our Members
@@ -622,7 +632,7 @@ export default function Home() {
               <motion.div
                 key={t.name}
                 variants={fadeUpChild}
-                className="card-polished bg-cream rounded-2xl p-8 border border-gray-100 hover:shadow-lg transition-shadow"
+                className="bg-cream rounded-3xl p-8 border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
               >
                 {/* Stars */}
                 <div className="flex gap-1 mb-4">
@@ -670,7 +680,7 @@ export default function Home() {
               {[...partners, ...partners].map((name, i) => (
                 <div
                   key={`${name}-${i}`}
-                  className="flex-shrink-0 px-6 py-3 bg-white rounded-lg border border-gray-100 shadow-sm"
+                  className="flex-shrink-0 px-6 py-3 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md hover:border-[#5DB347]/20 transition-all"
                 >
                   <span className="text-navy/60 font-semibold text-sm">{name}</span>
                 </div>
@@ -681,7 +691,7 @@ export default function Home() {
       </section>
 
       {/* ─── MEMBERSHIP TIERS ─── */}
-      <section className="py-24 bg-white">
+      <section className="py-16 bg-gradient-to-b from-white to-[#f8fdf6]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeInWhenVisible>
             <div className="text-center mb-16">
@@ -760,14 +770,14 @@ export default function Home() {
             ].map((item) => (
               <motion.div key={item.name} variants={fadeUpChild}>
                 <div
-                  className={`rounded-2xl p-8 h-full flex flex-col transition-all duration-300 hover:shadow-xl ${
+                  className={`rounded-3xl p-8 h-full flex flex-col transition-all duration-300 hover:-translate-y-1 ${
                     item.highlight
-                      ? 'bg-navy text-white ring-2 ring-[#5DB347] shadow-xl relative'
-                      : 'card-polished bg-white border border-gray-200 hover:border-[#5DB347]/30'
+                      ? 'bg-navy/95 backdrop-blur-sm text-white ring-2 ring-[#5DB347] shadow-2xl shadow-[#5DB347]/10 relative scale-[1.02]'
+                      : 'bg-white border border-gray-200 hover:border-[#5DB347]/30 shadow-md hover:shadow-xl'
                   }`}
                 >
                   {item.highlight && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-white text-xs font-bold px-4 py-1 rounded-full shadow-lg" style={{ background: '#5DB347' }}>
+                    <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 text-white text-xs font-bold px-5 py-1.5 rounded-full shadow-lg shadow-[#5DB347]/30 animate-pulse-soft" style={{ background: 'linear-gradient(135deg, #5DB347, #449933)' }}>
                       Most Popular
                     </div>
                   )}
@@ -786,7 +796,7 @@ export default function Home() {
                   </h3>
                   <div className="mb-6">
                     <span
-                      className={`text-3xl font-bold ${
+                      className={`text-4xl md:text-5xl font-extrabold ${
                         item.highlight ? 'text-white' : 'text-navy'
                       }`}
                     >
@@ -837,7 +847,7 @@ export default function Home() {
       </section>
 
       {/* ─── INVESTOR SECTION ─── */}
-      <section className="py-24 bg-gradient-to-br from-navy-dark via-navy to-[#1e3a5f] text-white overflow-hidden relative">
+      <section className="py-16 bg-gradient-to-br from-navy-dark via-navy to-[#1e3a5f] text-white overflow-hidden relative">
         {/* Subtle pattern overlay */}
         <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'1\' fill-rule=\'evenodd\'%3E%3Ccircle cx=\'30\' cy=\'30\' r=\'1.5\'/%3E%3C/g%3E%3C/svg%3E")' }} />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
@@ -1024,7 +1034,7 @@ export default function Home() {
       </section>
 
       {/* ─── COUNTRIES MAP / COVERAGE ─── */}
-      <section className="py-24 bg-cream">
+      <section className="py-16 bg-cream">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <FadeInWhenVisible direction="right">
@@ -1060,7 +1070,7 @@ export default function Home() {
                   ].map((c) => (
                     <div
                       key={c.name}
-                      className="card-polished flex items-center gap-4 bg-white rounded-xl p-4 border border-gray-100 hover:border-[#5DB347]/20 hover:shadow-md transition-smooth"
+                      className="flex items-center gap-4 bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:border-[#5DB347]/20 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
                     >
                       <span className="text-3xl">{c.flag}</span>
                       <div className="flex-1">
@@ -1086,7 +1096,7 @@ export default function Home() {
             </FadeInWhenVisible>
 
             <FadeInWhenVisible direction="left">
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+              <div className="relative rounded-3xl overflow-hidden shadow-2xl">
                 <Image
                   src="https://images.unsplash.com/photo-1489392191049-fc10c97e64b6?w=800&h=600&fit=crop"
                   alt="Map of Africa"
@@ -1102,7 +1112,7 @@ export default function Home() {
       </section>
 
       {/* ── Sponsor a Farmer Section ─────────────────────────────────── */}
-      <section className="py-20 bg-cream">
+      <section className="py-16 bg-cream">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
             <span className="inline-block bg-[#5DB347]/10 text-sm font-semibold px-4 py-1.5 rounded-full mb-4" style={{ color: '#5DB347' }}>
@@ -1124,7 +1134,7 @@ export default function Home() {
               { emoji: '🥈', tier: 'Silver', price: '$100/mo', desc: 'Fund a full season of crop inputs — seeds, fertiliser, pest control', color: 'border-gray-400', featured: true },
               { emoji: '🥇', tier: 'Gold', price: '$500/mo', desc: 'Full program sponsorship — inputs, insurance, and working capital', color: 'border-yellow-500' },
             ].map((item) => (
-              <div key={item.tier} className={`card-polished p-6 border-t-4 ${item.color} relative`}>
+              <div key={item.tier} className={`bg-white rounded-2xl p-6 border-t-4 ${item.color} relative shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300`}>
                 {item.featured && (
                   <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-white text-xs font-bold px-3 py-1 rounded-full" style={{ background: '#5DB347' }}>Most Popular</span>
                 )}
@@ -1148,7 +1158,7 @@ export default function Home() {
       </section>
 
       {/* ─── FINAL CTA ─── */}
-      <section className="relative py-28 overflow-hidden">
+      <section className="relative py-32 overflow-hidden">
         <div className="absolute inset-0">
           <Image
             src="https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?w=1920&h=800&fit=crop"
@@ -1157,29 +1167,33 @@ export default function Home() {
             className="object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-navy-dark/95 via-navy/90 to-[#1e3a3a]/85" />
+          {/* Subtle radial glow */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(93,179,71,0.08)_0%,transparent_70%)]" />
         </div>
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <FadeInWhenVisible>
-            <Droplets className="w-12 h-12 text-white/30 mx-auto mb-6" />
-            <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 leading-tight text-glow">
+            <Droplets className="w-14 h-14 text-[#5DB347]/40 mx-auto mb-6" />
+            <h2 className="text-4xl md:text-6xl font-extrabold text-white mb-6 leading-tight text-glow">
               Ready to Join the Future of African Agriculture?
             </h2>
-            <p className="text-white/80 text-lg mb-10 max-w-2xl mx-auto">
+            <p className="text-white/80 text-xl mb-12 max-w-2xl mx-auto leading-relaxed">
               AFU is building the agriculture development bank Africa has been missing.
               Not just capital — a full execution loop from seed to sale.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/apply"
-                className="group bg-white hover:bg-gray-50 px-8 py-4 rounded-xl font-semibold text-lg transition-smooth flex items-center justify-center gap-2 shadow-lg"
-                style={{ color: '#5DB347' }}
+                className="group px-10 py-5 rounded-2xl font-bold text-lg transition-all duration-300 flex items-center justify-center gap-2 text-white shadow-lg shadow-[#5DB347]/30 hover:shadow-xl hover:shadow-[#5DB347]/40 hover:scale-105"
+                style={{ background: 'linear-gradient(135deg, #5DB347, #449933)' }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = 'linear-gradient(135deg, #6ABF4B, #5DB347)')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = 'linear-gradient(135deg, #5DB347, #449933)')}
               >
                 Apply for Membership
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
                 href="/contact"
-                className="border-2 border-white/50 hover:border-white text-white px-8 py-4 rounded-xl font-semibold text-lg transition-smooth flex items-center justify-center"
+                className="border-2 border-white/50 hover:border-white hover:bg-white/10 text-white px-10 py-5 rounded-2xl font-bold text-lg transition-all duration-300 flex items-center justify-center"
               >
                 Get in Touch
               </Link>
