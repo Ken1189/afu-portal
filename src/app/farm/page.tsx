@@ -34,6 +34,7 @@ import {
 import { useFarmPlots } from '@/lib/supabase/use-farm-plots';
 import type { FarmPlotRow } from '@/lib/supabase/use-farm-plots';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
+import { QuickStartCard } from '@/components/farm/QuickStartCard';
 
 // ---------------------------------------------------------------------------
 // Types (inlined from @/lib/data/farm)
@@ -438,6 +439,13 @@ export default function FarmDashboardPage() {
             </Link>
           </div>
         </div>
+      </motion.section>
+
+      {/* ================================================================= */}
+      {/* QUICK START CARD (shown for new farmers)                          */}
+      {/* ================================================================= */}
+      <motion.section variants={itemVariants}>
+        <QuickStartCard />
       </motion.section>
 
       {/* ================================================================= */}

@@ -30,6 +30,7 @@ import {
   Lock,
   GraduationCap,
   Coins,
+  HelpCircle,
 } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
@@ -40,6 +41,7 @@ import { FlagIcon } from '@/components/FlagIcon';
 import { useAuth } from '@/lib/supabase/auth-context';
 import { createClient } from '@/lib/supabase/client';
 import { TierProgress } from '@/components/farm/TierProgress';
+import { GuidedTour } from '@/components/farm/GuidedTour';
 import {
   FARMER_TIERS,
   TIER_ORDER,
@@ -109,6 +111,21 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
   const [totalXp, setTotalXp] = useState(0);
   const [totalCoursesCompleted, setTotalCoursesCompleted] = useState(0);
   const [tierLoading, setTierLoading] = useState(true);
+
+  // Guided tour state
+  const [showTour, setShowTour] = useState(false);
+
+  // Check if tour should show on mount
+  useEffect(() => {
+    const tourCompleted = localStorage.getItem('afu_farm_tour_completed');
+    if (!tourCompleted) {
+      setShowTour(true);
+    }
+  }, []);
+
+  const handleTourComplete = useCallback(() => {
+    setShowTour(false);
+  }, []);
 
   const supabase = createClient();
 
@@ -427,6 +444,13 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
                 2
               </span>
             </button>
+            <button
+              onClick={() => setShowTour(true)}
+              className="w-9 h-9 flex items-center justify-center rounded-xl bg-[#EBF7E5] text-[#5DB347] active:bg-[#5DB347]/20 transition-colors"
+              title="Replay onboarding tour"
+            >
+              <HelpCircle className="w-5 h-5" />
+            </button>
           </div>
         </header>
 
@@ -481,6 +505,14 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
               <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
                 2
               </span>
+            </button>
+            <button
+              onClick={() => setShowTour(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-[#5DB347] hover:bg-[#EBF7E5] transition-colors border border-[#5DB347]/20"
+              title="Replay onboarding tour"
+            >
+              <HelpCircle className="w-4 h-4" />
+              <span className="hidden xl:inline">Tour</span>
             </button>
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 bg-[#5DB347] rounded-full flex items-center justify-center">
@@ -629,6 +661,14 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
           })}
         </div>
       </nav>
+
+      {/* ─── Guided Onboarding Tour ─── */}
+      {showTour && (
+        <GuidedTour
+          onComplete={handleTourComplete}
+          userId={user?.id}
+        />
+      )}
     </div>
   );
 }
