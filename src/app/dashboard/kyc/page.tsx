@@ -23,6 +23,8 @@ import {
 } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 import { useKyc, useCreditScore, type DocumentType } from '@/lib/supabase/use-kyc';
+import { useFarmerReferences, RELATIONSHIP_OPTIONS } from '@/lib/supabase/use-farmer-references';
+import { Phone, UserCheck, Users } from 'lucide-react';
 
 /* ------------------------------------------------------------------ */
 /* Config                                                              */
@@ -87,9 +89,43 @@ export default function KycPage() {
   const { documents, currentTier, loading: kycLoading, uploadDocument } = useKyc();
   const { creditScore, loading: scoreLoading } = useCreditScore();
 
+  const { references, loading: refsLoading, addReference, deleteReference } = useFarmerReferences();
+
   const [uploadingType, setUploadingType] = useState<DocumentType | null>(null);
   const [uploadForm, setUploadForm] = useState({ documentNumber: '', fileUrl: '' });
   const [submitting, setSubmitting] = useState(false);
+
+  // Reference form
+  const [showRefForm, setShowRefForm] = useState(false);
+  const [refSubmitting, setRefSubmitting] = useState(false);
+  const [refForm, setRefForm] = useState({
+    reference_name: '',
+    relationship: '',
+    relationship_other: '',
+    phone_number: '',
+    location: '',
+    years_known: '',
+    statement: '',
+  });
+
+  const handleAddReference = async () => {
+    setRefSubmitting(true);
+    const { error } = await addReference({
+      reference_name: refForm.reference_name,
+      relationship: refForm.relationship,
+      relationship_other: refForm.relationship_other || undefined,
+      phone_number: refForm.phone_number,
+      location: refForm.location || undefined,
+      years_known: refForm.years_known ? Number(refForm.years_known) : undefined,
+      statement: refForm.statement || undefined,
+      is_primary: references.length === 0,
+    });
+    setRefSubmitting(false);
+    if (!error) {
+      setShowRefForm(false);
+      setRefForm({ reference_name: '', relationship: '', relationship_other: '', phone_number: '', location: '', years_known: '', statement: '' });
+    }
+  };
 
   const handleUpload = async () => {
     if (!uploadingType || !uploadForm.fileUrl) return;
@@ -290,6 +326,195 @@ export default function KycPage() {
               </div>
             );
           })}
+        </div>
+      </div>
+
+      {/* Character References */}
+      <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+        <div className="p-4 sm:p-5 border-b border-gray-100">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-[#5DB347]/10 flex items-center justify-center">
+                <Users className="w-5 h-5 text-[#5DB347]" />
+              </div>
+              <div>
+                <h2 className="text-base font-bold text-navy">Character References</h2>
+                <p className="text-xs text-gray-500 mt-0.5">Community leaders or established farmers who can vouch for you</p>
+              </div>
+            </div>
+            {!showRefForm && references.length < 3 && (
+              <button
+                onClick={() => setShowRefForm(true)}
+                className="bg-[#5DB347] hover:bg-[#449933] text-white px-4 py-2 rounded-lg text-xs font-semibold transition-colors"
+              >
+                + Add Reference
+              </button>
+            )}
+          </div>
+        </div>
+
+        <div className="p-4 sm:p-5 space-y-3">
+          {/* Existing references */}
+          {refsLoading ? (
+            <div className="flex items-center justify-center py-6">
+              <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
+            </div>
+          ) : references.length > 0 ? (
+            references.map((ref) => {
+              const relLabel = RELATIONSHIP_OPTIONS.find(r => r.value === ref.relationship)?.label || ref.relationship;
+              const StatusIcon = ref.verification_status === 'verified' ? CheckCircle2 :
+                ref.verification_status === 'failed' ? XCircle :
+                ref.verification_status === 'contacted' ? Phone : Clock;
+              const statusColor = ref.verification_status === 'verified' ? 'text-green-600 bg-green-50' :
+                ref.verification_status === 'failed' ? 'text-red-500 bg-red-50' :
+                ref.verification_status === 'contacted' ? 'text-blue-500 bg-blue-50' : 'text-amber-500 bg-amber-50';
+
+              return (
+                <div key={ref.id} className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
+                  <div className="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center flex-shrink-0">
+                    <UserCheck className="w-5 h-5 text-gray-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <p className="font-semibold text-navy text-sm">{ref.reference_name}</p>
+                        <p className="text-xs text-gray-500">{relLabel}{ref.years_known ? ` \u2022 Known ${ref.years_known} years` : ''}</p>
+                        {ref.location && <p className="text-xs text-gray-400">{ref.location}</p>}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className={`text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1 ${statusColor}`}>
+                          <StatusIcon className="w-3 h-3" />
+                          {ref.verification_status}
+                        </span>
+                        {ref.is_primary && (
+                          <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-[#5DB347]/10 text-[#5DB347]">Primary</span>
+                        )}
+                      </div>
+                    </div>
+                    {ref.statement && <p className="text-xs text-gray-500 mt-1 italic">&quot;{ref.statement}&quot;</p>}
+                    <p className="text-xs text-gray-400 mt-1">Phone: {ref.phone_number}</p>
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            <div className="text-center py-6">
+              <Users className="w-10 h-10 text-gray-300 mx-auto mb-2" />
+              <p className="text-sm font-medium text-gray-500">No references added yet</p>
+              <p className="text-xs text-gray-400 mt-1">Add at least one character reference to strengthen your application</p>
+            </div>
+          )}
+
+          {/* Add reference form */}
+          {showRefForm && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              className="bg-white border border-[#5DB347]/20 rounded-xl p-4 space-y-3"
+            >
+              <h3 className="text-sm font-bold text-navy flex items-center gap-2">
+                <UserCheck className="w-4 h-4 text-[#5DB347]" />
+                Add Character Reference
+              </h3>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-medium text-gray-600 block mb-1">Full Name *</label>
+                  <input
+                    type="text"
+                    value={refForm.reference_name}
+                    onChange={(e) => setRefForm(f => ({ ...f, reference_name: e.target.value }))}
+                    placeholder="e.g., Chief Moyo"
+                    className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347] outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-gray-600 block mb-1">Relationship *</label>
+                  <select
+                    value={refForm.relationship}
+                    onChange={(e) => setRefForm(f => ({ ...f, relationship: e.target.value }))}
+                    className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347] outline-none"
+                  >
+                    <option value="">Select relationship</option>
+                    {RELATIONSHIP_OPTIONS.map(opt => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </select>
+                </div>
+                {refForm.relationship === 'other' && (
+                  <div className="sm:col-span-2">
+                    <label className="text-xs font-medium text-gray-600 block mb-1">Specify Relationship</label>
+                    <input
+                      type="text"
+                      value={refForm.relationship_other}
+                      onChange={(e) => setRefForm(f => ({ ...f, relationship_other: e.target.value }))}
+                      placeholder="Describe the relationship"
+                      className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347] outline-none"
+                    />
+                  </div>
+                )}
+                <div>
+                  <label className="text-xs font-medium text-gray-600 block mb-1">Phone Number *</label>
+                  <input
+                    type="tel"
+                    value={refForm.phone_number}
+                    onChange={(e) => setRefForm(f => ({ ...f, phone_number: e.target.value }))}
+                    placeholder="+267 7X XXX XXXX"
+                    className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347] outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-gray-600 block mb-1">Location</label>
+                  <input
+                    type="text"
+                    value={refForm.location}
+                    onChange={(e) => setRefForm(f => ({ ...f, location: e.target.value }))}
+                    placeholder="Village / District"
+                    className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347] outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-gray-600 block mb-1">Years Known</label>
+                  <input
+                    type="number"
+                    value={refForm.years_known}
+                    onChange={(e) => setRefForm(f => ({ ...f, years_known: e.target.value }))}
+                    placeholder="e.g., 5"
+                    min="1"
+                    max="50"
+                    className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347] outline-none"
+                  />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="text-xs font-medium text-gray-600 block mb-1">Reference Statement (optional)</label>
+                  <textarea
+                    value={refForm.statement}
+                    onChange={(e) => setRefForm(f => ({ ...f, statement: e.target.value }))}
+                    placeholder="Brief statement about the farmer's character, reliability, and farming capability..."
+                    rows={2}
+                    className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347] outline-none resize-none"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-2 pt-1">
+                <button
+                  onClick={() => setShowRefForm(false)}
+                  className="px-4 py-2 rounded-lg text-xs font-medium text-gray-500 border border-gray-200 hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleAddReference}
+                  disabled={!refForm.reference_name || !refForm.relationship || !refForm.phone_number || refSubmitting}
+                  className="flex-1 bg-[#5DB347] hover:bg-[#449933] disabled:bg-gray-200 disabled:text-gray-400 text-white px-4 py-2 rounded-lg text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
+                >
+                  {refSubmitting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <UserCheck className="w-3.5 h-3.5" />}
+                  Save Reference
+                </button>
+              </div>
+            </motion.div>
+          )}
         </div>
       </div>
 
