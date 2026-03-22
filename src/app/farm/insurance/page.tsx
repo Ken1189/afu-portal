@@ -14,9 +14,11 @@ import {
   Calculator,
   ChevronRight,
   TrendingUp,
+  Loader2,
 } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
+import { useInsurancePolicies, useInsuranceClaims } from '@/lib/supabase/use-insurance';
 
 // ---------------------------------------------------------------------------
 // Inlined types & data (previously from @/lib/data/insurance)
@@ -403,8 +405,57 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<
 export default function InsuranceHomePage() {
   const { t } = useLanguage();
 
-  const insurancePolicies = mockInsurancePolicies;
-  const insuranceClaims = mockInsuranceClaims;
+  // --- Supabase data ---
+  const { policies: dbPolicies, loading: policiesLoading } = useInsurancePolicies();
+  const { claims: dbClaims, loading: claimsLoading } = useInsuranceClaims();
+  const loading = policiesLoading || claimsLoading;
+
+  // Map DB rows → local shape, fall back to mock when DB returns nothing
+  const insurancePolicies: InsurancePolicy[] = useMemo(() => {
+    if (dbPolicies.length > 0) {
+      return dbPolicies.map((p) => ({
+        id: p.policy_number || p.id,
+        productId: p.product_id,
+        productName: p.product?.name || 'Insurance Policy',
+        type: (p.product?.type || 'crop') as InsuranceType,
+        status: p.status as PolicyStatus,
+        startDate: p.start_date,
+        endDate: p.end_date,
+        premiumAmount: p.premium,
+        premiumFrequency: 'monthly' as const,
+        nextPremiumDue: p.end_date,
+        coverageAmount: p.coverage_amount,
+        deductible: p.product?.deductible_percent || 10,
+        coveredItems: [],
+        claimsCount: 0,
+        lastClaimDate: null,
+      }));
+    }
+    if (policiesLoading) return [];
+    return mockInsurancePolicies;
+  }, [dbPolicies, policiesLoading]);
+
+  const insuranceClaims: InsuranceClaim[] = useMemo(() => {
+    if (dbClaims.length > 0) {
+      return dbClaims.map((c) => ({
+        id: c.id,
+        policyId: c.policy_id,
+        policyName: '',
+        type: 'crop' as InsuranceType,
+        status: c.status as ClaimStatus,
+        submittedDate: c.submitted_at,
+        incidentDate: c.submitted_at,
+        description: c.description || '',
+        estimatedLoss: c.claim_amount,
+        approvedAmount: c.approved_amount,
+        paidDate: c.reviewed_at,
+        photos: c.evidence_urls?.length || 0,
+        timeline: [],
+      }));
+    }
+    if (claimsLoading) return [];
+    return mockInsuranceClaims;
+  }, [dbClaims, claimsLoading]);
 
   // Compute stats from data
   const stats = useMemo(() => {
@@ -424,7 +475,7 @@ export default function InsuranceHomePage() {
       pendingClaims,
       activePolicies,
     };
-  }, []);
+  }, [insurancePolicies, insuranceClaims]);
 
   // Coverage by type for pie chart
   const coverageByType = useMemo(() => {
@@ -438,7 +489,7 @@ export default function InsuranceHomePage() {
       value,
       fill: typeColors[type as InsuranceType],
     }));
-  }, []);
+  }, [insurancePolicies]);
 
   // Quick links
   const quickLinks = [
@@ -471,6 +522,15 @@ export default function InsuranceHomePage() {
       iconBg: 'bg-green-100',
     },
   ];
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-24">
+        <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+        <span className="ml-2 text-sm text-gray-500">Loading insurance data...</span>
+      </div>
+    );
+  }
 
   return (
     <motion.div

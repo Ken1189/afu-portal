@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useEquipment, EquipmentRow } from '@/lib/supabase/use-equipment';
+import { useEquipment, useEquipmentBookings, EquipmentRow } from '@/lib/supabase/use-equipment';
 import {
   Wrench,
   Search,
@@ -712,7 +712,7 @@ function mapRowToEquipment(row: EquipmentRow): Equipment {
   };
 }
 
-const equipmentBookings = FALLBACK_EQUIPMENT_BOOKINGS;
+// equipmentBookings is now resolved dynamically inside the component via useEquipmentBookings
 
 // ---------------------------------------------------------------------------
 // Animation variants
@@ -1190,7 +1190,29 @@ export default function EquipmentHirePage() {
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [bookingFilter, setBookingFilter] = useState<BookingFilter>('all');
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
-  const [bookings, setBookings] = useState<EquipmentBooking[]>(equipmentBookings);
+
+  // --- Supabase bookings ---
+  const { bookings: dbBookings, loading: bookingsLoading, cancelBooking } = useEquipmentBookings();
+
+  const bookings: EquipmentBooking[] = useMemo(() => {
+    if (dbBookings.length > 0) {
+      return dbBookings.map((b) => ({
+        id: b.id,
+        equipmentId: b.equipment_id,
+        equipmentName: b.equipment?.name || 'Equipment',
+        farmerId: b.member_id,
+        farmerName: '',
+        startDate: b.start_date,
+        endDate: b.end_date,
+        status: b.status as EquipmentBooking['status'],
+        totalCost: b.total_cost,
+        deliveryRequested: false,
+        notes: b.notes || '',
+      }));
+    }
+    if (bookingsLoading) return [];
+    return FALLBACK_EQUIPMENT_BOOKINGS;
+  }, [dbBookings, bookingsLoading]);
 
   // --- Derived ---
   const filteredEquipment = useMemo(() => {
@@ -1267,28 +1289,14 @@ export default function EquipmentHirePage() {
     });
   };
 
-  const handleCancelBooking = (id: string) => {
-    setBookings((prev) =>
-      prev.map((b) =>
-        b.id === id ? { ...b, status: 'cancelled' as const } : b,
-      ),
-    );
+  const handleCancelBooking = async (id: string) => {
+    await cancelBooking(id);
   };
 
-  const handleExtendBooking = (id: string) => {
-    setBookings((prev) =>
-      prev.map((b) => {
-        if (b.id !== id) return b;
-        const end = new Date(b.endDate);
-        end.setDate(end.getDate() + 7);
-        return {
-          ...b,
-          endDate: end.toISOString().split('T')[0],
-          totalCost: b.totalCost + 350,
-          notes: b.notes + ' (Extended +7 days)',
-        };
-      }),
-    );
+  const handleExtendBooking = (_id: string) => {
+    // Extension requires backend support — no-op for now
+    // In a full implementation this would call an update endpoint
+    void _id;
   };
 
   // --- Tabs ---

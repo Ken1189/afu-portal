@@ -9,7 +9,7 @@ import {
   DollarSign,
   BookOpen,
   Bot,
-  Bell,
+  // Bell replaced by NotificationBell component
   ChevronLeft,
   Menu,
   X,
@@ -40,6 +40,7 @@ import { localeNames, type Locale } from '@/lib/i18n/translations';
 import { FlagIcon } from '@/components/FlagIcon';
 import { useAuth } from '@/lib/supabase/auth-context';
 import { createClient } from '@/lib/supabase/client';
+import NotificationBell from '@/components/farm/NotificationBell';
 import { TierProgress } from '@/components/farm/TierProgress';
 import { GuidedTour } from '@/components/farm/GuidedTour';
 import {
@@ -443,12 +444,7 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
               <Bot className="w-5 h-5" />
               <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-gold rounded-full border-2 border-white" />
             </Link>
-            <button className="w-9 h-9 flex items-center justify-center rounded-xl bg-gray-50 text-gray-500 active:bg-gray-100 transition-colors relative">
-              <Bell className="w-5 h-5" />
-              <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center border-2 border-white">
-                2
-              </span>
-            </button>
+            <NotificationBell />
             <button
               onClick={() => setShowTour(true)}
               className="w-9 h-9 flex items-center justify-center rounded-xl bg-[#EBF7E5] text-[#5DB347] active:bg-[#5DB347]/20 transition-colors"
@@ -505,12 +501,7 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
               {t.common.assistant}
               <span className="w-2 h-2 bg-green-400 rounded-full" />
             </Link>
-            <button className="relative text-gray-400 hover:text-navy transition-colors">
-              <Bell className="w-5 h-5" />
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
-                2
-              </span>
-            </button>
+            <NotificationBell />
             <button
               onClick={() => setShowTour(true)}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-[#5DB347] hover:bg-[#EBF7E5] transition-colors border border-[#5DB347]/20"

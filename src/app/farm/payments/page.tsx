@@ -35,7 +35,9 @@ import {
   Plus,
   Minus,
   RefreshCw,
+  Loader2,
 } from 'lucide-react';
+import { usePayments } from '@/lib/supabase/use-payments';
 import {
   BarChart,
   Bar,
@@ -245,12 +247,42 @@ export default function PaymentHistoryPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showTimePicker, setShowTimePicker] = useState(false);
 
+  // --- Supabase data ---
+  const { payments: dbPayments, loading: paymentsLoading } = usePayments();
+
+  // Map DB rows → local Transaction shape; fall back to mock when DB returns nothing
+  const allTransactions: Transaction[] = useMemo(() => {
+    if (dbPayments.length > 0) {
+      return dbPayments.map((p) => ({
+        id: p.id,
+        date: p.created_at?.slice(0, 10) || '',
+        description: p.description || p.purpose || 'Payment',
+        amount: p.amount,
+        type: (p.purpose === 'sale' || p.purpose === 'refund' ? 'credit' : 'debit') as TransactionType,
+        category: (p.related_entity_type === 'order' ? 'Marketplace' :
+                   p.related_entity_type === 'insurance' ? 'Insurance Premium' :
+                   p.related_entity_type === 'loan' ? 'Loan Repayment' :
+                   p.related_entity_type === 'equipment' ? 'Equipment Rental' :
+                   'Marketplace') as TransactionCategory,
+        paymentMethod: (p.method === 'mobile_money' ? 'EcoCash' :
+                       p.method === 'bank_transfer' ? 'Bank Transfer' :
+                       p.method === 'card' ? 'Card' :
+                       p.method === 'cash' ? 'Cash' :
+                       'EcoCash') as PaymentMethod,
+        status: p.status as TransactionStatus,
+        reference: p.provider_reference || p.id.slice(0, 16),
+      }));
+    }
+    if (paymentsLoading) return [];
+    return mockTransactions;
+  }, [dbPayments, paymentsLoading]);
+
   // Filter transactions based on time, tab, and search
   const filteredTransactions = useMemo(() => {
-    let txns = [...mockTransactions];
+    let txns = [...allTransactions];
 
     // Time period filter
-    const now = new Date('2026-03-16');
+    const now = new Date();
     if (timePeriod === 'This Month') {
       txns = txns.filter((t) => {
         const d = new Date(t.date);
@@ -281,19 +313,28 @@ export default function PaymentHistoryPage() {
     }
 
     return txns;
-  }, [timePeriod, filterTab, searchQuery]);
+  }, [timePeriod, filterTab, searchQuery, allTransactions]);
 
   // Summary KPIs
   const summary = useMemo(() => {
-    const all = mockTransactions;
+    const all = allTransactions;
     const totalSpent = all.filter((t) => t.type === 'debit').reduce((s, t) => s + t.amount, 0);
     const totalReceived = all.filter((t) => t.type === 'credit').reduce((s, t) => s + t.amount, 0);
     const pending = all.filter((t) => t.status === 'pending').reduce((s, t) => s + t.amount, 0);
     return { totalSpent, totalReceived, pending, net: totalReceived - totalSpent };
-  }, []);
+  }, [allTransactions]);
 
   const timePeriods: TimePeriod[] = ['This Month', 'Last 3 Months', 'This Year', 'All Time'];
   const filterTabs: FilterTab[] = ['All', 'Credits', 'Debits', 'Pending'];
+
+  if (paymentsLoading) {
+    return (
+      <div className="flex items-center justify-center py-24">
+        <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+        <span className="ml-2 text-sm text-gray-500">Loading payment history...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#F9FAFB] via-white to-[#F0FDFA]">
@@ -619,7 +660,7 @@ export default function PaymentHistoryPage() {
 
             {/* Footer count */}
             <div className="border-t border-gray-100 px-5 py-3 text-xs text-gray-400">
-              Showing {filteredTransactions.length} of {mockTransactions.length} transactions
+              Showing {filteredTransactions.length} of {allTransactions.length} transactions
             </div>
           </div>
         </motion.div>

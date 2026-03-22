@@ -28,6 +28,7 @@ import {
   Ruler,
   CircleDot,
   Check,
+  Loader2,
 } from 'lucide-react';
 import { useFarmPlots, type FarmPlotRow } from '@/lib/supabase/use-farm-plots';
 import { useFarmActivities } from '@/lib/supabase/use-farm-activities';
@@ -443,14 +444,32 @@ function GrowthTimeline({ currentStage }: { currentStage: CropStage }) {
 // ─── Component: Activity Log ─────────────────────────────────────────────────
 
 function ActivityLog({ plotId }: { plotId: string }) {
-  const activities = useMemo(
-    () =>
-      mockFarmActivities
-        .filter((a) => a.plotId === plotId)
-        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-        .slice(0, 5),
-    [plotId]
-  );
+  const { activities: dbActivities, loading: activitiesLoading } = useFarmActivities();
+
+  const activities = useMemo(() => {
+    // Use real data if available, else fall back to mock
+    const source: FarmActivity[] =
+      dbActivities.length > 0
+        ? dbActivities.map((a) => ({
+            id: a.id,
+            plotId: a.plot_id || '',
+            plotName: '',
+            type: a.type as ActivityType,
+            date: a.date,
+            time: '',
+            description: a.description || a.notes || '',
+            notes: a.notes || undefined,
+            photo: a.photo_url || undefined,
+            cost: a.cost || undefined,
+            currency: a.currency || 'USD',
+          }))
+        : mockFarmActivities;
+
+    return source
+      .filter((a) => a.plotId === plotId)
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      .slice(0, 5);
+  }, [plotId, dbActivities]);
 
   if (activities.length === 0) {
     return (
@@ -982,6 +1001,15 @@ export default function CropsPage() {
   const [addPlotOpen, setAddPlotOpen] = useState(false);
   const { plots: livePlots, loading } = useFarmPlots();
   const farmPlots: FarmPlot[] = livePlots.length > 0 ? livePlots.map(adaptFarmPlot) as FarmPlot[] : mockFarmPlots;
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-24">
+        <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+        <span className="ml-2 text-sm text-gray-500">Loading crops data...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="relative min-h-full">
