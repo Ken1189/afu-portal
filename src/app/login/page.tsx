@@ -531,12 +531,23 @@ export default function LoginPage() {
                   />
                   <span className="text-sm text-gray-500">Remember me</span>
                 </label>
-                <a
-                  href="#"
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (!email) { setError('Enter your email first, then click Forgot Password'); return; }
+                    setIsLoading(true);
+                    const supabase = (await import('@/lib/supabase/client')).createClient();
+                    const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+                      redirectTo: `${window.location.origin}/login`,
+                    });
+                    setIsLoading(false);
+                    if (resetError) { setError(resetError.message); }
+                    else { setError(''); alert('Password reset link sent to ' + email + '. Check your inbox.'); }
+                  }}
                   className="text-sm text-[#5DB347] hover:text-[#449933] font-medium transition-colors"
                 >
                   Forgot password?
-                </a>
+                </button>
               </div>
 
               {/* Submit */}
@@ -595,10 +606,12 @@ export default function LoginPage() {
               type="button"
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.98 }}
-              className="w-full flex items-center justify-center gap-2 py-3 border-2 border-[#5DB347] text-[#5DB347] rounded-xl font-semibold hover:bg-[#EBF7E5] transition-all duration-300"
+              className="w-full flex items-center justify-center gap-2 py-3 border-2 border-gray-200 text-gray-400 rounded-xl font-semibold cursor-not-allowed relative"
+              disabled
             >
               <MessageCircle className="w-5 h-5" />
               Continue with WhatsApp
+              <span className="absolute -top-2 right-3 text-[10px] font-bold bg-[#5DB347] text-white px-2 py-0.5 rounded-full">Coming Soon</span>
             </motion.button>
           </motion.div>
 
