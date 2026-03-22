@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { createClient } from '@/lib/supabase/client';
 import {
   ChevronLeft,
   DollarSign,
@@ -20,6 +21,9 @@ import {
   BarChart3,
   ArrowUpRight,
   Send,
+  Loader2,
+  ThumbsUp,
+  ThumbsDown,
 } from 'lucide-react';
 
 // ── Animation variants ─────────────────────────────────────────────────────
@@ -62,7 +66,7 @@ const fadeUp = {
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
-type ApplicationStatus = 'pending' | 'approved' | 'rejected' | 'disbursed';
+type ApplicationStatus = 'pending' | 'submitted' | 'under_review' | 'approved' | 'rejected' | 'disbursed' | 'repaying' | 'completed';
 type LoanPurpose = 'working capital' | 'equipment' | 'inputs' | 'trade finance';
 type PaymentMethod = 'M-Pesa' | 'EcoCash' | 'Bank Transfer';
 
@@ -296,11 +300,15 @@ const purposeColors: Record<LoanPurpose, string> = {
   'trade finance': 'bg-orange-100 text-orange-700',
 };
 
-const statusConfig: Record<ApplicationStatus, { label: string; color: string }> = {
+const statusConfig: Record<string, { label: string; color: string }> = {
   pending: { label: 'Pending', color: 'bg-amber-100 text-amber-700' },
+  submitted: { label: 'Submitted', color: 'bg-blue-100 text-blue-700' },
+  under_review: { label: 'Under Review', color: 'bg-purple-100 text-purple-700' },
   approved: { label: 'Approved', color: 'bg-green-100 text-green-700' },
   rejected: { label: 'Rejected', color: 'bg-red-100 text-red-700' },
   disbursed: { label: 'Disbursed', color: 'bg-navy/10 text-navy' },
+  repaying: { label: 'Repaying', color: 'bg-teal-100 text-teal-700' },
+  completed: { label: 'Completed', color: 'bg-gray-100 text-gray-600' },
 };
 
 const activityTypeConfig: Record<RecentActivity['type'], { icon: React.ReactNode; color: string }> = {
@@ -324,6 +332,42 @@ const methodIcons: Record<PaymentMethod, React.ReactNode> = {
 export default function LoansPage() {
   const [activeTab, setActiveTab] = useState<'all' | ApplicationStatus>('all');
   const [disbursedIds, setDisbursedIds] = useState<Set<string>>(new Set());
+  const [realLoans, setRealLoans] = useState<LoanApplication[]>([]);
+  const [dbLoading, setDbLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+  // Fetch real loans from Supabase
+  const fetchLoans = useCallback(async () => {
+    setDbLoading(true);
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from('loans')
+      .select('*, members!inner(id, profile_id, profiles!inner(full_name, email))')
+      .order('created_at', { ascending: false });
+
+    if (!error && data && data.length > 0) {
+      setRealLoans(data.map((loan: Record<string, unknown>) => {
+        const members = loan.members as Record<string, unknown> | null;
+        const profiles = members?.profiles as Record<string, unknown> | null;
+        return {
+          id: String(loan.id),
+          memberName: String(profiles?.full_name || 'Unknown'),
+          amountRequested: Number(loan.amount),
+          purpose: (String(loan.loan_type || loan.purpose || 'working capital')) as LoanPurpose,
+          creditScore: 650, // Will be replaced when credit scoring is wired
+          country: '-',
+          appliedDate: String(loan.created_at),
+          status: String(loan.status) as ApplicationStatus,
+        };
+      }));
+    }
+    setDbLoading(false);
+  }, []);
+
+  useEffect(() => { fetchLoans(); }, [fetchLoans]);
+
+  // Use real data if available, fall back to mock for demo
+  const applications = realLoans.length > 0 ? realLoans : mockApplications;
 
   const tabs: { key: 'all' | ApplicationStatus; label: string }[] = [
     { key: 'all', label: 'All' },
@@ -335,11 +379,30 @@ export default function LoansPage() {
 
   const filteredApplications =
     activeTab === 'all'
-      ? mockApplications
-      : mockApplications.filter((a) => a.status === activeTab);
+      ? applications
+      : applications.filter((a) => a.status === activeTab);
 
   const handleDisburse = (loanId: string) => {
     setDisbursedIds((prev) => new Set([...prev, loanId]));
+  };
+
+  // Approve or reject a loan via the real API
+  const handleLoanAction = async (loanId: string, action: 'approve' | 'reject') => {
+    setActionLoading(loanId);
+    try {
+      const res = await fetch('/api/admin/loans/approve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ loanId, action }),
+      });
+      if (res.ok) {
+        // Refresh the list
+        await fetchLoans();
+      }
+    } catch {
+      // Silently fail — real error handling in Sprint 4
+    }
+    setActionLoading(null);
   };
 
   return (
@@ -619,22 +682,26 @@ export default function LoansPage() {
                     </td>
                     <td className="py-3 px-4">
                       <div className="flex items-center justify-center gap-1">
-                        {app.status === 'pending' ? (
+                        {app.status === 'pending' || app.status === 'submitted' ? (
                           <>
                             <motion.button
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
-                              className="flex items-center gap-1 px-2.5 py-1 bg-green-500 text-white text-[11px] font-medium rounded-lg hover:bg-green-600 transition-colors"
+                              onClick={() => handleLoanAction(app.id, 'approve')}
+                              disabled={actionLoading === app.id}
+                              className="flex items-center gap-1 px-2.5 py-1 bg-green-500 text-white text-[11px] font-medium rounded-lg hover:bg-green-600 transition-colors disabled:opacity-50"
                             >
-                              <CheckCircle className="w-3 h-3" />
+                              {actionLoading === app.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <ThumbsUp className="w-3 h-3" />}
                               Approve
                             </motion.button>
                             <motion.button
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
-                              className="flex items-center gap-1 px-2.5 py-1 bg-red-500 text-white text-[11px] font-medium rounded-lg hover:bg-red-600 transition-colors"
+                              onClick={() => handleLoanAction(app.id, 'reject')}
+                              disabled={actionLoading === app.id}
+                              className="flex items-center gap-1 px-2.5 py-1 bg-red-500 text-white text-[11px] font-medium rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50"
                             >
-                              <XCircle className="w-3 h-3" />
+                              {actionLoading === app.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <ThumbsDown className="w-3 h-3" />}
                               Reject
                             </motion.button>
                             <motion.button
