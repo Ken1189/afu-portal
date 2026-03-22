@@ -46,6 +46,7 @@ import {
   Gift,
   HelpCircle,
   Scale,
+  Upload,
 } from 'lucide-react';
 
 // ── Navigation structure with collapsible groups ──
@@ -77,6 +78,7 @@ const navGroups: NavGroup[] = [
     links: [
       { href: '/admin/members', label: 'Members', icon: <Users className="w-4 h-4" /> },
       { href: '/admin/applications', label: 'Applications', icon: <FileText className="w-4 h-4" /> },
+      { href: '/admin/farmers', label: 'Bulk Import', icon: <Upload className="w-4 h-4" /> },
       { href: '/admin/kyc', label: 'KYC / References', icon: <ScanEye className="w-4 h-4" /> },
     ],
   },
