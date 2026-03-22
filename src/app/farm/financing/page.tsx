@@ -18,36 +18,27 @@ import {
   Send,
   Info,
   X,
+  Loader2,
 } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
+import { useLoans } from '@/lib/supabase/use-loans';
 
 /* ------------------------------------------------------------------ */
-/* Mock loan data                                                      */
+/* Interest rates by loan type (used in application form)              */
 /* ------------------------------------------------------------------ */
-const mockLoans = [
-  {
-    id: 'L-2024-001',
-    type: 'inputFinance' as const,
-    amount: 4500,
-    outstanding: 1875,
-    interestRate: 8.5,
-    nextPayment: '2024-02-15',
-    status: 'active' as const,
-    disbursed: '2024-01-10',
-    repaidPercent: 58,
-  },
-  {
-    id: 'L-2023-014',
-    type: 'workingCapital' as const,
-    amount: 2000,
-    outstanding: 0,
-    interestRate: 9.0,
-    nextPayment: '-',
-    status: 'completed' as const,
-    disbursed: '2023-06-01',
-    repaidPercent: 100,
-  },
-];
+const INTEREST_RATES: Record<string, number> = {
+  workingCapital: 14.0,
+  inputFinance: 8.5,
+  equipmentLease: 12.0,
+  tradeFinance: 10.0,
+};
+
+const TERM_MONTHS: Record<string, number> = {
+  workingCapital: 12,
+  inputFinance: 6,
+  equipmentLease: 24,
+  tradeFinance: 3,
+};
 
 const loanTypeIcons: Record<string, typeof Wallet> = {
   workingCapital: DollarSign,
@@ -73,9 +64,12 @@ const seasonOptions = ['2024/2025 Rain', '2025 Dry', '2025/2026 Rain'];
 export default function FinancingPage() {
   const { t } = useLanguage();
   const tf = t.financing;
+  const { loans, loading, stats, applyForLoan } = useLoans();
 
   const [tab, setTab] = useState<'loans' | 'apply'>('loans');
   const [step, setStep] = useState(0);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   // Application form state
   const [formData, setFormData] = useState({
@@ -92,11 +86,30 @@ export default function FinancingPage() {
     setTab('apply');
     setStep(0);
     setSubmitted(false);
+    setSubmitError(null);
     setFormData({ loanType: '', amount: 0, season: '', farmSize: '', experience: '', notes: '' });
   };
 
-  const handleSubmit = () => {
-    setSubmitted(true);
+  const handleSubmit = async () => {
+    setSubmitting(true);
+    setSubmitError(null);
+
+    const { error } = await applyForLoan({
+      loan_type: formData.loanType,
+      amount: formData.amount,
+      interest_rate: INTEREST_RATES[formData.loanType] || 10.0,
+      term_months: TERM_MONTHS[formData.loanType] || 12,
+      purpose: `${formData.season} season — Farm: ${formData.farmSize}ha, ${formData.experience} years experience`,
+      collateral: formData.notes || undefined,
+    });
+
+    setSubmitting(false);
+
+    if (error) {
+      setSubmitError(error.message || "Failed to submit application. Please try again.");
+    } else {
+      setSubmitted(true);
+    }
   };
 
   const canProceed = () => {
@@ -159,10 +172,10 @@ export default function FinancingPage() {
             {/* Loan Summary Cards */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[
-                { label: tf.active, value: '1', color: 'bg-green-50 text-green-600', icon: CheckCircle2 },
-                { label: tf.completed, value: '1', color: 'bg-blue-50 text-blue-600', icon: Star },
-                { label: tf.outstanding, value: 'P 1,875', color: 'bg-gold/10 text-gold', icon: Clock },
-                { label: tf.repaid, value: 'P 6,625', color: 'bg-teal/10 text-teal', icon: TrendingUp },
+                { label: tf.active, value: String(stats.active), color: 'bg-green-50 text-green-600', icon: CheckCircle2 },
+                { label: tf.completed, value: String(stats.completed), color: 'bg-blue-50 text-blue-600', icon: Star },
+                { label: tf.outstanding, value: `P ${(stats.totalAmount - stats.totalRepaid).toLocaleString()}`, color: 'bg-gold/10 text-gold', icon: Clock },
+                { label: tf.repaid, value: `P ${stats.totalRepaid.toLocaleString()}`, color: 'bg-teal/10 text-teal', icon: TrendingUp },
               ].map((stat) => {
                 const Icon = stat.icon;
                 return (
@@ -178,10 +191,17 @@ export default function FinancingPage() {
             </div>
 
             {/* Loan List */}
-            {mockLoans.length > 0 ? (
+            {loading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+                <span className="ml-2 text-sm text-gray-500">Loading your loans...</span>
+              </div>
+            ) : loans.length > 0 ? (
               <div className="space-y-3">
-                {mockLoans.map((loan) => {
-                  const Icon = loanTypeIcons[loan.type] || Wallet;
+                {loans.map((loan) => {
+                  const Icon = loanTypeIcons[loan.loan_type] || Wallet;
+                  const repaidPercent = loan.amount > 0 ? Math.round((loan.amount_repaid / loan.amount) * 100) : 0;
+                  const outstanding = loan.amount - loan.amount_repaid;
                   return (
                     <div key={loan.id} className="bg-white rounded-xl border border-gray-100 p-4 sm:p-5">
                       <div className="flex items-start justify-between mb-3">
@@ -191,13 +211,13 @@ export default function FinancingPage() {
                           </div>
                           <div>
                             <p className="font-semibold text-navy text-sm">
-                              {tf.loanTypes[loan.type]}
+                              {(tf.loanTypes as Record<string, string>)[loan.loan_type] || loan.loan_type}
                             </p>
-                            <p className="text-xs text-gray-400">{loan.id}</p>
+                            <p className="text-xs text-gray-400">{loan.loan_number || loan.id.slice(0, 12)}</p>
                           </div>
                         </div>
-                        <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full ${statusColors[loan.status]}`}>
-                          {tf[loan.status]}
+                        <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full ${statusColors[loan.status] || 'bg-gray-100 text-gray-600'}`}>
+                          {(tf as unknown as Record<string, string>)[loan.status] || loan.status}
                         </span>
                       </div>
 
@@ -205,14 +225,14 @@ export default function FinancingPage() {
                       <div className="mb-3">
                         <div className="flex justify-between text-xs mb-1">
                           <span className="text-gray-500">{tf.repaid}</span>
-                          <span className="font-medium text-navy">{loan.repaidPercent}%</span>
+                          <span className="font-medium text-navy">{repaidPercent}%</span>
                         </div>
                         <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                           <div
                             className={`h-full rounded-full transition-all ${
-                              loan.repaidPercent >= 100 ? 'bg-blue-500' : 'bg-teal'
+                              repaidPercent >= 100 ? 'bg-blue-500' : 'bg-teal'
                             }`}
-                            style={{ width: `${loan.repaidPercent}%` }}
+                            style={{ width: `${Math.min(repaidPercent, 100)}%` }}
                           />
                         </div>
                       </div>
@@ -221,20 +241,20 @@ export default function FinancingPage() {
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
                         <div>
                           <p className="text-[11px] text-gray-400">{tf.loanAmount}</p>
-                          <p className="font-semibold text-navy">P {loan.amount.toLocaleString()}</p>
+                          <p className="font-semibold text-navy">P {Number(loan.amount).toLocaleString()}</p>
                         </div>
                         <div>
                           <p className="text-[11px] text-gray-400">{tf.outstanding}</p>
-                          <p className="font-semibold text-navy">P {loan.outstanding.toLocaleString()}</p>
+                          <p className="font-semibold text-navy">P {outstanding.toLocaleString()}</p>
                         </div>
                         <div>
                           <p className="text-[11px] text-gray-400">{tf.interestRate}</p>
-                          <p className="font-semibold text-navy">{loan.interestRate}%</p>
+                          <p className="font-semibold text-navy">{loan.interest_rate}%</p>
                         </div>
                         <div>
                           <p className="text-[11px] text-gray-400">{tf.nextPayment}</p>
                           <p className="font-semibold text-navy">
-                            {loan.nextPayment === '-' ? '-' : new Date(loan.nextPayment).toLocaleDateString()}
+                            {loan.due_date ? new Date(loan.due_date).toLocaleDateString() : '-'}
                           </p>
                         </div>
                       </div>
@@ -499,16 +519,28 @@ export default function FinancingPage() {
                     ) : (
                       <button
                         onClick={handleSubmit}
-                        disabled={!canProceed()}
+                        disabled={!canProceed() || submitting}
                         className={`flex-1 py-2.5 min-h-[44px] rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-2 ${
-                          canProceed()
+                          canProceed() && !submitting
                             ? 'bg-teal text-white hover:bg-teal-dark active:bg-teal-dark'
                             : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                         }`}
                       >
-                        <Send className="w-4 h-4" />
-                        {t.common.submit}
+                        {submitting ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            Submitting...
+                          </>
+                        ) : (
+                          <>
+                            <Send className="w-4 h-4" />
+                            {t.common.submit}
+                          </>
+                        )}
                       </button>
+                    )}
+                    {submitError && (
+                      <p className="text-xs text-red-500 mt-2 text-center">{submitError}</p>
                     )}
                   </div>
                 </div>
