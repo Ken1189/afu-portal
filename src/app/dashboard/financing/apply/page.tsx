@@ -1,8 +1,10 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useLoans } from '@/lib/supabase/use-loans';
 import {
   ArrowLeft,
   ArrowRight,
@@ -95,12 +97,25 @@ const slideVariants = {
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 export default function FinancingApplyPage() {
+  const router = useRouter();
+  const { applyForLoan } = useLoans();
   const [step, setStep] = useState(1);
   const [direction, setDirection] = useState(1);
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [errors, setErrors] = useState<FieldError>({});
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [applicationRef, setApplicationRef] = useState('');
   const [autoSaved, setAutoSaved] = useState(false);
+  const redirectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Clean up redirect timer on unmount
+  useEffect(() => {
+    return () => {
+      if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current);
+    };
+  }, []);
 
   /* ─── Updater ─── */
   const update = useCallback(
@@ -154,8 +169,56 @@ export default function FinancingApplyPage() {
     setStep((s) => Math.max(s - 1, 1));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    setSubmitting(true);
+    setSubmitError(null);
+
+    // Map tenor string to months
+    const tenorDays = Number(formData.tenor) || 90;
+    const termMonths = Math.max(1, Math.round(tenorDays / 30));
+
+    // Parse amount
+    const amount = Number(formData.amount.replace(/,/g, '')) || 0;
+
+    const result = await applyForLoan({
+      loan_type: formData.type || 'working-capital',
+      amount,
+      interest_rate: 0, // Determined by credit team
+      term_months: termMonths,
+      purpose: [
+        formData.purpose,
+        formData.cropType ? `Crop: ${formData.cropType}` : '',
+        formData.hectares ? `Farm size: ${formData.hectares} ha` : '',
+        formData.buyerName ? `Buyer: ${formData.buyerName}` : '',
+        formData.buyerCountry ? `Buyer country: ${formData.buyerCountry}` : '',
+        formData.contractValue ? `Contract value: $${formData.contractValue}` : '',
+        formData.yieldEstimate ? `Expected yield: ${formData.yieldEstimate} tons` : '',
+        formData.notes || '',
+      ].filter(Boolean).join(' | '),
+      collateral: formData.collateral || undefined,
+    });
+
+    setSubmitting(false);
+
+    if (result.error) {
+      setSubmitError(
+        typeof result.error === 'object' && 'message' in result.error
+          ? (result.error as { message: string }).message
+          : 'Failed to submit application. Please try again.'
+      );
+      return;
+    }
+
+    // Generate reference from the returned loan data
+    const loanData = result.data as { loan_number?: string; id?: string } | undefined;
+    const refNumber = loanData?.loan_number || `APP-${Date.now().toString(36).toUpperCase()}`;
+    setApplicationRef(refNumber);
     setSubmitted(true);
+
+    // Redirect after 3 seconds
+    redirectTimerRef.current = setTimeout(() => {
+      router.push('/dashboard/financing');
+    }, 3000);
   };
 
   /* ─── Format amount display ─── */
@@ -186,9 +249,12 @@ export default function FinancingApplyPage() {
           <p className="text-gray-600 mb-2">
             Your {formData.type.replace(/-/g, ' ')} application for {fmtAmt(formData.amount)} has been received.
           </p>
-          <p className="text-gray-500 text-sm mb-8">
-            Reference: <span className="font-semibold text-navy">APP-2026-{String(Math.floor(Math.random() * 900) + 100)}</span>
+          <p className="text-gray-500 text-sm mb-2">
+            Reference: <span className="font-semibold text-navy">{applicationRef}</span>
             <br />Our credit team will review it within 3-5 business days.
+          </p>
+          <p className="text-gray-400 text-xs mb-8">
+            Redirecting to financing dashboard in a few seconds...
           </p>
           <div className="flex gap-4 justify-center">
             <Link
@@ -738,6 +804,12 @@ export default function FinancingApplyPage() {
           <span className="text-xs text-gray-400">
             Step {step} of {STEPS.length}
           </span>
+          {submitError && (
+            <p className="text-red-500 text-sm flex items-center gap-1.5 mr-2">
+              <AlertCircle className="w-4 h-4" />
+              {submitError}
+            </p>
+          )}
           {step < 5 ? (
             <button
               type="button"
@@ -751,10 +823,23 @@ export default function FinancingApplyPage() {
             <button
               type="button"
               onClick={handleSubmit}
-              className="flex items-center gap-2 bg-teal hover:bg-teal-dark text-white px-10 py-3 rounded-xl font-semibold transition-colors shadow-lg shadow-[#8CB89C]/25"
+              disabled={submitting}
+              className="flex items-center gap-2 bg-teal hover:bg-teal-dark text-white px-10 py-3 rounded-xl font-semibold transition-colors shadow-lg shadow-[#8CB89C]/25 disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              <CheckCircle2 className="w-5 h-5" />
-              Submit Application
+              {submitting ? (
+                <>
+                  <svg className="animate-spin w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  Submitting...
+                </>
+              ) : (
+                <>
+                  <CheckCircle2 className="w-5 h-5" />
+                  Submit Application
+                </>
+              )}
             </button>
           )}
         </div>

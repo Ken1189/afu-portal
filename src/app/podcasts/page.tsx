@@ -155,16 +155,51 @@ const categoryColors: Record<string, string> = {
   'Success Stories': 'bg-pink-100 text-pink-700',
 };
 
+const subscribeLinks: Record<string, string> = {
+  Spotify: 'https://open.spotify.com',
+  'Apple Podcasts': 'https://podcasts.apple.com',
+  'Google Podcasts': 'https://podcasts.google.com',
+  'RSS Feed': '#',
+};
+
 export default function PodcastsPage() {
   const [activeFilter, setActiveFilter] = useState('All');
+  const [toast, setToast] = useState<string | null>(null);
 
   const filtered =
     activeFilter === 'All'
       ? episodes
       : episodes.filter((ep) => ep.category === activeFilter);
 
+  function handlePlay() {
+    setToast('Episode coming soon — subscribe to be notified when new episodes drop!');
+    setTimeout(() => setToast(null), 4000);
+  }
+
   return (
     <>
+      {/* Toast notification */}
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            initial={{ opacity: 0, y: -40 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -40 }}
+            className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-[#1B2A4A] text-white px-6 py-3.5 rounded-2xl shadow-xl shadow-black/20 text-sm font-medium flex items-center gap-3 max-w-md"
+          >
+            <svg className="w-5 h-5 text-[#5DB347] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15.536a5 5 0 001.414 1.414m2.828-9.9a9 9 0 012.728-2.728" />
+            </svg>
+            {toast}
+            <button onClick={() => setToast(null)} className="ml-2 text-white/60 hover:text-white">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Hero */}
       <section className="bg-navy text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -194,11 +229,14 @@ export default function PodcastsPage() {
             <div className="flex flex-col md:flex-row gap-8 items-start">
               {/* Play Button */}
               <div className="w-28 h-28 md:w-36 md:h-36 bg-gradient-to-br from-[#EBF7E5] to-white rounded-3xl flex items-center justify-center shrink-0 shadow-lg shadow-[#5DB347]/10">
-                <div className="w-16 h-16 bg-gradient-to-br from-[#5DB347] to-[#449933] rounded-full flex items-center justify-center cursor-pointer hover:scale-110 transition-all duration-300 shadow-lg shadow-[#5DB347]/30">
+                <button
+                  onClick={handlePlay}
+                  className="w-16 h-16 bg-gradient-to-br from-[#5DB347] to-[#449933] rounded-full flex items-center justify-center cursor-pointer hover:scale-110 transition-all duration-300 shadow-lg shadow-[#5DB347]/30"
+                >
                   <svg className="w-7 h-7 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M8 5v14l11-7z" />
                   </svg>
-                </div>
+                </button>
               </div>
               <div className="flex-1">
                 <div className="flex flex-wrap items-center gap-3 mb-3">
@@ -271,7 +309,10 @@ export default function PodcastsPage() {
                     >
                       <div className="flex items-center gap-3 mb-3">
                         {/* Mini Play Button */}
-                        <div className="w-11 h-11 bg-gradient-to-br from-[#5DB347] to-[#449933] rounded-full flex items-center justify-center shrink-0 cursor-pointer hover:scale-110 transition-all duration-300 shadow-md shadow-[#5DB347]/20">
+                        <button
+                          onClick={handlePlay}
+                          className="w-11 h-11 bg-gradient-to-br from-[#5DB347] to-[#449933] rounded-full flex items-center justify-center shrink-0 cursor-pointer hover:scale-110 transition-all duration-300 shadow-md shadow-[#5DB347]/20"
+                        >
                           <svg
                             className="w-4 h-4 text-white ml-0.5"
                             fill="currentColor"
@@ -279,7 +320,7 @@ export default function PodcastsPage() {
                           >
                             <path d="M8 5v14l11-7z" />
                           </svg>
-                        </div>
+                        </button>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 text-xs text-gray-400 mb-0.5">
                             <span className="font-bold text-[#5DB347]">
@@ -323,8 +364,11 @@ export default function PodcastsPage() {
                     { name: 'Google Podcasts', color: 'bg-[#EBF7E5] text-[#449933] border-[#5DB347]/20' },
                     { name: 'RSS Feed', color: 'bg-[#EBF7E5] text-[#449933] border-[#5DB347]/20' },
                   ].map((platform, i) => (
-                    <button
+                    <a
                       key={i}
+                      href={subscribeLinks[platform.name]}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border text-sm font-medium transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 ${platform.color}`}
                     >
                       <svg
@@ -341,7 +385,10 @@ export default function PodcastsPage() {
                         />
                       </svg>
                       {platform.name}
-                    </button>
+                      <svg className="w-4 h-4 ml-auto opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </a>
                   ))}
                 </div>
               </div>

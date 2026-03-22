@@ -211,11 +211,20 @@ const testimonials = [
   },
 ];
 
-/* ─── Partner logos (text-based placeholders) ─── */
+/* ─── Partner logos (styled brand-color cards) ─── */
 const partners = [
-  'World Bank', 'African Dev Bank', 'Netafim', 'Bayer CropScience',
-  'DHL Supply Chain', 'Tesco', 'Woolworths', 'Standard Chartered',
-  'USAID', 'Gates Foundation', 'IFC', 'Rabobank',
+  { name: 'World Bank', initials: 'WB', color: '#009FDA' },
+  { name: 'AfDB', initials: 'AfDB', color: '#00A651' },
+  { name: 'FAO', initials: 'FAO', color: '#004B87' },
+  { name: 'AGRA', initials: 'AG', color: '#6DB33F' },
+  { name: 'Stanbic', initials: 'SB', color: '#003DA5' },
+  { name: 'FNB', initials: 'FNB', color: '#009681' },
+  { name: 'Safaricom', initials: 'SC', color: '#66BE29' },
+  { name: 'MTN', initials: 'MTN', color: '#FFCC00' },
+  { name: 'Corteva', initials: 'CV', color: '#00843D' },
+  { name: 'Syngenta', initials: 'SY', color: '#007934' },
+  { name: 'John Deere', initials: 'JD', color: '#367C2B' },
+  { name: 'Bayer', initials: 'BY', color: '#10384F' },
 ];
 
 /* ─── How it works ─── */
@@ -733,13 +742,21 @@ export default function Home() {
           <div className="overflow-hidden relative">
             <div className="absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-cream to-transparent z-10" />
             <div className="absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-cream to-transparent z-10" />
-            <div className="animate-marquee flex gap-12 items-center whitespace-nowrap">
-              {[...partners, ...partners].map((name, i) => (
+            <div className="animate-marquee flex gap-8 items-center whitespace-nowrap">
+              {[...partners, ...partners].map((partner, i) => (
                 <div
-                  key={`${name}-${i}`}
-                  className="flex-shrink-0 px-6 py-3 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md hover:border-[#5DB347]/20 transition-all"
+                  key={`${partner.name}-${i}`}
+                  className="flex-shrink-0 flex items-center gap-3 px-5 py-3 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md hover:border-[#5DB347]/20 transition-all"
                 >
-                  <span className="text-navy/60 font-semibold text-sm">{name}</span>
+                  <div
+                    className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-sm"
+                    style={{ backgroundColor: partner.color }}
+                  >
+                    <span className={`font-bold text-xs ${partner.color === '#FFCC00' ? 'text-[#1B2A4A]' : 'text-white'}`}>
+                      {partner.initials}
+                    </span>
+                  </div>
+                  <span className="text-navy/70 font-semibold text-sm">{partner.name}</span>
                 </div>
               ))}
             </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Variants } from 'framer-motion';
 import {
@@ -327,6 +327,58 @@ export default function SettingsPage() {
   const [cookiePrefs, setCookiePrefs] = useState(true);
   const [marketingConsent, setMarketingConsent] = useState(false);
 
+  // ---- Save state ---------------------------------------------------------
+  const [saveToast, setSaveToast] = useState(false);
+  const [settingsLoaded, setSettingsLoaded] = useState(false);
+
+  // ---- Load settings from localStorage on mount ---------------------------
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('afu_user_settings');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.emailNotifs) setEmailNotifs(parsed.emailNotifs);
+        if (parsed.smsNotifs) setSmsNotifs(parsed.smsNotifs);
+        if (parsed.pushNotifs) setPushNotifs(parsed.pushNotifs);
+        if (parsed.language) setLanguage(parsed.language);
+        if (parsed.currency) setCurrency(parsed.currency);
+        if (parsed.timezone) setTimezone(parsed.timezone);
+        if (parsed.dateFormat) setDateFormat(parsed.dateFormat);
+        if (parsed.theme) setTheme(parsed.theme);
+        if (parsed.defaultView) setDefaultView(parsed.defaultView);
+        if (typeof parsed.cookiePrefs === 'boolean') setCookiePrefs(parsed.cookiePrefs);
+        if (typeof parsed.marketingConsent === 'boolean') setMarketingConsent(parsed.marketingConsent);
+      }
+    } catch {
+      // Ignore parse errors
+    }
+    setSettingsLoaded(true);
+  }, []);
+
+  // ---- Save settings to localStorage --------------------------------------
+  const handleSaveSettings = useCallback(() => {
+    const settings = {
+      emailNotifs,
+      smsNotifs,
+      pushNotifs,
+      language,
+      currency,
+      timezone,
+      dateFormat,
+      theme,
+      defaultView,
+      cookiePrefs,
+      marketingConsent,
+    };
+    try {
+      localStorage.setItem('afu_user_settings', JSON.stringify(settings));
+    } catch {
+      // Ignore storage errors
+    }
+    setSaveToast(true);
+    setTimeout(() => setSaveToast(false), 2500);
+  }, [emailNotifs, smsNotifs, pushNotifs, language, currency, timezone, dateFormat, theme, defaultView, cookiePrefs, marketingConsent]);
+
   // ---- Helpers ------------------------------------------------------------
   const toggleEmail = (key: keyof typeof emailNotifs) =>
     setEmailNotifs((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -380,6 +432,32 @@ export default function SettingsPage() {
           );
         })}
       </div>
+
+      {/* Save button */}
+      <div className="max-w-4xl flex justify-end mb-4">
+        <button
+          onClick={handleSaveSettings}
+          className="inline-flex items-center gap-2 bg-[#5DB347] hover:bg-[#449933] text-white text-sm font-semibold px-6 py-2.5 rounded-lg transition-colors shadow-sm"
+        >
+          <Check size={16} />
+          Save Settings
+        </button>
+      </div>
+
+      {/* Save toast */}
+      <AnimatePresence>
+        {saveToast && (
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="fixed bottom-6 right-6 z-50 bg-[#5DB347] text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-2 text-sm font-semibold"
+          >
+            <Check size={18} />
+            Settings saved
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Tab content */}
       <div className="max-w-4xl">

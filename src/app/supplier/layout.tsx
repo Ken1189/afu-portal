@@ -21,7 +21,7 @@ import {
   X,
   ChevronLeft,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const supplierLinks = [
@@ -42,8 +42,43 @@ const supplierLinks = [
 export default function SupplierLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { profile, signOut } = useAuth();
+  const { profile, signOut, user, isLoading: authLoading, isSupplier } = useAuth();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [roleChecked, setRoleChecked] = useState(false);
+  const [authorized, setAuthorized] = useState(false);
+
+  // ── Role guard: only supplier, admin, super_admin can access ──
+  useEffect(() => {
+    if (authLoading) return;
+
+    if (!user) {
+      router.replace('/login?redirect=/supplier');
+      return;
+    }
+
+    const role = profile?.role;
+    if (role === 'supplier' || role === 'admin' || role === 'super_admin') {
+      setAuthorized(true);
+    } else {
+      router.replace('/dashboard');
+    }
+    setRoleChecked(true);
+  }, [user, profile, authLoading, router]);
+
+  // Show loading while checking auth
+  if (authLoading || !roleChecked || !authorized) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <svg className="animate-spin h-8 w-8 text-[#5DB347] mx-auto mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+          </svg>
+          <p className="text-gray-500 text-sm">Checking access...</p>
+        </div>
+      </div>
+    );
+  }
 
   const displayName = profile?.full_name || profile?.email?.split('@')[0] || 'Supplier';
   const initials = displayName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
