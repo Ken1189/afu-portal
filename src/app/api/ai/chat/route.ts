@@ -3,13 +3,24 @@ import { NextRequest, NextResponse } from 'next/server';
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
 
-const SYSTEM_PROMPT =
+const FARMING_PROMPT =
   'You are an expert African agriculture AI assistant for the African Farming Union (AFU). ' +
   'You help farmers across 10 African countries (Botswana, Zimbabwe, Tanzania, Kenya, Nigeria, Zambia, Mozambique, South Africa, Ghana, Uganda) ' +
   'with crop health diagnosis, pest identification, farming advice, weather interpretation, market guidance, and financial literacy. ' +
   'Always give practical, actionable advice suitable for smallholder farmers. ' +
   'When analyzing crop images, identify the disease/pest/deficiency, explain the cause, and recommend treatment options including both organic and chemical solutions. ' +
   'Respond in clear, simple English.';
+
+const BUSINESS_PROMPT =
+  'You are a professional AI assistant for the African Farming Union (AFU) website. ' +
+  'AFU is a pan-African agriculture development bank and operating platform raising a $100M seed round. ' +
+  'We operate across 10 countries: Botswana, Zimbabwe, Tanzania, Kenya, Nigeria, Zambia, Mozambique, South Africa, Ghana, Uganda. ' +
+  'Our services: Financing (working capital, invoice finance), Inputs & Equipment (bulk procurement), Processing Hubs, ' +
+  'Guaranteed Offtake (buyer contracts), Trade Finance (export support), and Training & Capacity Building. ' +
+  'Membership tiers: Smallholder ($5/mo), Commercial ($25/mo), Enterprise ($99/mo), Partner ($250/mo). ' +
+  'Help visitors understand our services, membership options, investment opportunities, sponsorship program, and how to get involved. ' +
+  'Be professional, concise, and helpful. Direct users to /apply for membership, /contact for inquiries, /investors for investment, /sponsor to sponsor a farmer. ' +
+  'Keep responses brief (2-3 short paragraphs max). Do NOT give farming advice — that is handled by the farm portal AI.';
 
 export async function POST(request: NextRequest) {
   try {
@@ -40,10 +51,11 @@ export async function POST(request: NextRequest) {
       | { inline_data: { mime_type: string; data: string } }
     > = [];
 
-    // Add system prompt as the first text part
+    // Select system prompt based on context
+    const systemPrompt = context === 'business_website_chat' ? BUSINESS_PROMPT : FARMING_PROMPT;
     const contextLabel = context ? ` (Context: ${context})` : '';
     parts.push({
-      text: `${SYSTEM_PROMPT}${contextLabel}\n\nUser: ${message || 'Please analyze this image.'}`,
+      text: `${systemPrompt}${contextLabel}\n\nUser: ${message || 'Please analyze this image.'}`,
     });
 
     // Add image if provided

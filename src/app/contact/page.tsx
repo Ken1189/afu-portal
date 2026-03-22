@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 export default function ContactPage() {
+  const searchParams = useSearchParams();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -11,6 +13,14 @@ export default function ContactPage() {
     subject: "",
     message: "",
   });
+
+  // Pre-fill subject from URL query param (e.g., /contact?subject=investor)
+  useEffect(() => {
+    const subjectParam = searchParams.get("subject");
+    if (subjectParam) {
+      setFormData((prev) => ({ ...prev, subject: subjectParam }));
+    }
+  }, [searchParams]);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -217,10 +227,13 @@ export default function ContactPage() {
                           onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                         >
                           <option value="">Select a subject</option>
+                          <option value="investor">Investor Inquiry / Request Investor Pack</option>
                           <option value="membership">Membership Inquiry</option>
                           <option value="financing">Financing</option>
                           <option value="partnership">Partnership</option>
+                          <option value="sponsorship">Sponsor a Farmer</option>
                           <option value="training">Training</option>
+                          <option value="media">Media / Press</option>
                           <option value="general">General Inquiry</option>
                         </select>
                       </div>

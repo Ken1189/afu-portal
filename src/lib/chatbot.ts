@@ -20,8 +20,8 @@ export function getInitialGreeting(userName?: string): ChatMessage {
   return {
     id: generateMessageId(),
     role: 'bot',
-    text: `Hello ${name}! I'm Mkulima, AFU's AI Farming Assistant. 🌱\n\nI can help you with crop advice, financing, market prices, weather forecasts, training courses, and more.\n\nWhat would you like to know today?`,
-    suggestions: ['Crop advice', 'Loan info', 'Market prices', 'Weather forecast', 'Training courses', 'Upload documents'],
+    text: `Hello ${name}! Welcome to AFU — Africa\u2019s Agriculture Development Platform. \ud83c\udf0d\n\nI can help you learn about our services, membership options, investment opportunities, and how AFU works.\n\nWhat would you like to know?`,
+    suggestions: ['How does AFU work?', 'Membership options', 'Investment opportunity', 'Sponsor a farmer', 'Contact us', 'Our countries'],
     timestamp: new Date(),
   };
 }
@@ -30,7 +30,30 @@ export async function getChatResponse(
   message: string,
   context?: { page?: string; userName?: string; tier?: string }
 ): Promise<ChatResponse> {
-  // Simulate typing delay (1-2 seconds)
+  // Try Gemini AI first for real responses
+  try {
+    const res = await fetch('/api/ai/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message,
+        context: 'business_website_chat',
+      }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.response) {
+        return {
+          text: data.response,
+          suggestions: ['Membership options', 'Our services', 'Investment opportunity', 'Contact us'],
+        };
+      }
+    }
+  } catch {
+    // Fall through to keyword matching
+  }
+
+  // Fallback: keyword matching
   const delay = 1000 + Math.random() * 1000;
   await new Promise((resolve) => setTimeout(resolve, delay));
 
