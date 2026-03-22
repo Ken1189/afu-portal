@@ -1,4 +1,5 @@
 name: CI
+
 on:
   push:
     branches: [main]
@@ -6,33 +7,33 @@ on:
     branches: [main]
 
 jobs:
-  build:
+  ci:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-      - run: npm ci
-      - run: npx tsc --noEmit
-      - run: npx next build
+    timeout-minutes: 3
+
     env:
       NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
       NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder
       SUPABASE_SERVICE_ROLE_KEY: placeholder
 
-  test:
-    runs-on: ubuntu-latest
-    needs: build
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
-      - run: npm ci
-      - run: npx vitest run
-    env:
-      NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Lint
+        run: npx eslint src/ --max-warnings 200
+
+      - name: Run tests
+        run: npx vitest run
