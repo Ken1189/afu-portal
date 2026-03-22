@@ -143,29 +143,34 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
     if (!user) return;
     setTierLoading(true);
 
-    const { data, error } = await supabase
-      .from('farmer_tiers')
-      .select('*')
-      .eq('user_id', user.id)
-      .single();
-
-    if (error && error.code === 'PGRST116') {
-      // No record found — auto-create seedling tier
-      const { data: newTier } = await supabase
+    try {
+      const { data, error } = await supabase
         .from('farmer_tiers')
-        .insert({ user_id: user.id, current_tier: 'seedling', total_xp: 0, total_courses_completed: 0 })
-        .select()
+        .select('*')
+        .eq('user_id', user.id)
         .single();
 
-      if (newTier) {
-        setCurrentTier(newTier.current_tier as FarmerTier);
-        setTotalXp(newTier.total_xp);
-        setTotalCoursesCompleted(newTier.total_courses_completed);
+      if (error && error.code === 'PGRST116') {
+        // No record found — auto-create seedling tier
+        const { data: newTier } = await supabase
+          .from('farmer_tiers')
+          .insert({ user_id: user.id, current_tier: 'seedling', total_xp: 0, total_courses_completed: 0 })
+          .select()
+          .single();
+
+        if (newTier) {
+          setCurrentTier(newTier.current_tier as FarmerTier);
+          setTotalXp(newTier.total_xp);
+          setTotalCoursesCompleted(newTier.total_courses_completed);
+        }
+      } else if (data) {
+        setCurrentTier(data.current_tier as FarmerTier);
+        setTotalXp(data.total_xp);
+        setTotalCoursesCompleted(data.total_courses_completed);
       }
-    } else if (data) {
-      setCurrentTier(data.current_tier as FarmerTier);
-      setTotalXp(data.total_xp);
-      setTotalCoursesCompleted(data.total_courses_completed);
+    } catch {
+      // Table may not exist yet — default to seedling
+      console.warn('farmer_tiers table not available, defaulting to seedling');
     }
 
     setTierLoading(false);
