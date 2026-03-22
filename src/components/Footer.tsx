@@ -162,8 +162,8 @@ export default function Footer() {
               Phase 1 Countries
             </h4>
             <div className="flex flex-col gap-1.5 text-gray-400 text-sm">
-              <span>&#x1F1E7;&#x1F1FC; Botswana (Bank Base)</span>
               <span>&#x1F1FF;&#x1F1FC; Zimbabwe (Export Lane)</span>
+              <span>&#x1F1E7;&#x1F1FC; Botswana (Bank Base)</span>
               <span>&#x1F1F9;&#x1F1FF; Tanzania (Scale Lane)</span>
             </div>
           </div>

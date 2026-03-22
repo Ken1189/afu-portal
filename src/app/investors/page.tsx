@@ -435,7 +435,7 @@ export default function InvestorsPage() {
               {
                 value: "10",
                 label: "Countries",
-                desc: "Operational frameworks established across Botswana, Zimbabwe, Tanzania, Kenya, Zambia, Malawi, Mozambique, Ghana, DRC, and Rwanda",
+                desc: "Operational frameworks established across Zimbabwe, Botswana, Tanzania, Kenya, Zambia, Malawi, Mozambique, Ghana, DRC, and Rwanda",
                 icon: Globe2,
               },
               {

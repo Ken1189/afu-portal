@@ -263,7 +263,7 @@ export default function Home() {
               className="inline-flex items-center gap-2 bg-[#5DB347]/20 backdrop-blur-sm border border-[#5DB347]/30 text-[#EBF7E5] px-4 py-1.5 rounded-full text-sm font-medium mb-6"
             >
               <span className="w-2 h-2 bg-[#5DB347] rounded-full animate-pulse-soft" />
-              Phase 1: Botswana &bull; Zimbabwe &bull; Tanzania
+              Phase 1: Zimbabwe &bull; Botswana &bull; Tanzania
             </motion.div>
 
             <motion.h1
@@ -1124,16 +1124,16 @@ export default function Home() {
                 <div className="space-y-6">
                   {[
                     {
-                      flag: '🇧🇼',
-                      name: 'Botswana',
-                      crops: 'Sorghum, Sesame, Groundnuts',
-                      members: 82,
-                    },
-                    {
                       flag: '🇿🇼',
                       name: 'Zimbabwe',
                       crops: 'Blueberries, Macadamia, Maize',
                       members: 98,
+                    },
+                    {
+                      flag: '🇧🇼',
+                      name: 'Botswana',
+                      crops: 'Sorghum, Sesame, Groundnuts',
+                      members: 82,
                     },
                     {
                       flag: '🇹🇿',

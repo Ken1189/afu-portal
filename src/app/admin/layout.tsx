@@ -47,6 +47,7 @@ import {
   HelpCircle,
   Scale,
   Upload,
+  Database,
 } from 'lucide-react';
 
 // ── Navigation structure with collapsible groups ──
@@ -142,6 +143,7 @@ const navGroups: NavGroup[] = [
       { href: '/admin/compliance', label: 'Compliance', icon: <Shield className="w-4 h-4" /> },
       { href: '/admin/notifications', label: 'Notifications', icon: <Bell className="w-4 h-4" /> },
       { href: '/admin/settings', label: 'Settings', icon: <Settings className="w-4 h-4" /> },
+      { href: '/admin/run-migration', label: 'Run Migrations', icon: <Database className="w-4 h-4" /> },
     ],
   },
 ];
