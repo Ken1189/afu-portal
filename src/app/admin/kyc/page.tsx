@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+import { createClient } from '@/lib/supabase/client';
 import {
   ArrowLeft,
   ShieldCheck,
@@ -155,6 +156,35 @@ export default function KycManagementPage() {
   const [filterTab, setFilterTab] = useState<'all' | KycStatus>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRecord, setSelectedRecord] = useState<KycRecord | null>(null);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+  // Fetch real KYC documents from Supabase
+  const fetchKycRecords = useCallback(async () => {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from('kyc_documents')
+      .select('*, profiles!inner(full_name, email)')
+      .order('created_at', { ascending: false });
+
+    if (!error && data && data.length > 0) {
+      const mapped: KycRecord[] = data.map((doc: Record<string, unknown>) => {
+        const profiles = doc.profiles as Record<string, unknown> | null;
+        return {
+          id: String(doc.id),
+          name: String(profiles?.full_name || 'Unknown'),
+          email: String(profiles?.email || ''),
+          country: '-',
+          docType: (String(doc.document_type || 'national_id')) as DocType,
+          submittedDate: String(doc.created_at),
+          tier: (Number(doc.kyc_tier) || 1) as KycTier,
+          status: (String(doc.status) === 'verified' ? 'verified' : String(doc.status) === 'rejected' ? 'rejected' : 'pending') as KycStatus,
+        };
+      });
+      setRecords(mapped);
+    }
+  }, []);
+
+  useEffect(() => { fetchKycRecords(); }, [fetchKycRecords]);
 
   const filtered = records.filter((r) => {
     const matchTab = filterTab === 'all' || r.status === filterTab;
@@ -167,14 +197,36 @@ export default function KycManagementPage() {
     return matchTab && matchSearch;
   });
 
-  function handleApprove(id: string) {
-    setRecords((prev) => prev.map((r) => (r.id === id ? { ...r, status: 'verified' } : r)));
-    if (selectedRecord?.id === id) setSelectedRecord((r) => r ? { ...r, status: 'verified' } : r);
+  async function handleApprove(id: string) {
+    setActionLoading(id);
+    try {
+      const res = await fetch('/api/admin/kyc/approve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ documentId: id, action: 'approve' }),
+      });
+      if (res.ok) {
+        setRecords((prev) => prev.map((r) => (r.id === id ? { ...r, status: 'verified' as KycStatus } : r)));
+        if (selectedRecord?.id === id) setSelectedRecord((r) => r ? { ...r, status: 'verified' as KycStatus } : r);
+      }
+    } catch { /* Sprint 4: proper error handling */ }
+    setActionLoading(null);
   }
 
-  function handleReject(id: string) {
-    setRecords((prev) => prev.map((r) => (r.id === id ? { ...r, status: 'rejected' } : r)));
-    if (selectedRecord?.id === id) setSelectedRecord((r) => r ? { ...r, status: 'rejected' } : r);
+  async function handleReject(id: string) {
+    setActionLoading(id);
+    try {
+      const res = await fetch('/api/admin/kyc/approve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ documentId: id, action: 'reject' }),
+      });
+      if (res.ok) {
+        setRecords((prev) => prev.map((r) => (r.id === id ? { ...r, status: 'rejected' as KycStatus } : r)));
+        if (selectedRecord?.id === id) setSelectedRecord((r) => r ? { ...r, status: 'rejected' as KycStatus } : r);
+      }
+    } catch { /* Sprint 4: proper error handling */ }
+    setActionLoading(null);
   }
 
   const stats = {
