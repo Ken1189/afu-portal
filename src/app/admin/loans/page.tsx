@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
+import FilterBar, { LOAN_STATUS_FILTER, COUNTRY_FILTER, DATE_RANGE_FILTER } from '@/components/admin/FilterBar';
+import type { FilterValues } from '@/components/admin/FilterBar';
 import {
   ChevronLeft,
   DollarSign,
@@ -335,6 +337,12 @@ export default function LoansPage() {
   const [realLoans, setRealLoans] = useState<LoanApplication[]>([]);
   const [dbLoading, setDbLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [filterValues, setFilterValues] = useState<FilterValues>({
+    search: '',
+    status: 'all',
+    country: 'all',
+    dateRange: 'all',
+  });
 
   // Fetch real loans from Supabase
   const fetchLoans = useCallback(async () => {
@@ -377,10 +385,27 @@ export default function LoansPage() {
     { key: 'disbursed', label: 'Disbursed' },
   ];
 
-  const filteredApplications =
-    activeTab === 'all'
-      ? applications
-      : applications.filter((a) => a.status === activeTab);
+  const filteredApplications = applications.filter((a) => {
+    // Tab filter
+    if (activeTab !== 'all' && a.status !== activeTab) return false;
+    // Search filter
+    if (filterValues.search) {
+      const q = filterValues.search.toLowerCase();
+      if (!a.memberName.toLowerCase().includes(q) && !a.id.toLowerCase().includes(q)) return false;
+    }
+    // Country filter
+    if (filterValues.country && filterValues.country !== 'all' && a.country !== filterValues.country) return false;
+    // Date range
+    if (filterValues.dateRange && filterValues.dateRange !== 'all') {
+      const daysMap: Record<string, number> = { '7d': 7, '30d': 30, '90d': 90, '365d': 365 };
+      const days = daysMap[filterValues.dateRange as string];
+      if (days) {
+        const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+        if (new Date(a.appliedDate) < cutoff) return false;
+      }
+    }
+    return true;
+  });
 
   const handleDisburse = (loanId: string) => {
     setDisbursedIds((prev) => new Set([...prev, loanId]));
@@ -568,6 +593,23 @@ export default function LoansPage() {
         </div>
       </motion.div>
 
+      {/* ── Filter Bar ──────────────────────────────────────────────────── */}
+      <motion.div variants={fadeUp}>
+        <FilterBar
+          filters={[LOAN_STATUS_FILTER, COUNTRY_FILTER, DATE_RANGE_FILTER]}
+          values={filterValues}
+          onChange={(v) => {
+            setFilterValues(v);
+            // Sync status filter with tab
+            if (v.status && v.status !== filterValues.status) {
+              setActiveTab(v.status as 'all' | ApplicationStatus);
+            }
+          }}
+          searchPlaceholder="Search by name or loan ID..."
+          resultCount={filteredApplications.length}
+        />
+      </motion.div>
+
       {/* ── Applications Table ───────────────────────────────────────────── */}
       <motion.div variants={fadeUp} className="bg-white rounded-xl border border-gray-100 overflow-hidden">
         <div className="p-5 border-b border-gray-100">
@@ -582,8 +624,8 @@ export default function LoansPage() {
             {tabs.map((tab) => {
               const count =
                 tab.key === 'all'
-                  ? mockApplications.length
-                  : mockApplications.filter((a) => a.status === tab.key).length;
+                  ? applications.length
+                  : applications.filter((a) => a.status === tab.key).length;
               return (
                 <button
                   key={tab.key}
