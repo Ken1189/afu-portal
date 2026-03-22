@@ -24,6 +24,7 @@ import {
   Phone,
   Calendar,
 } from "lucide-react";
+import VideoCard from "@/components/VideoCard";
 
 export const metadata = {
   title: "Invest in AFU - $100M Seed Round | African Farming Union",
@@ -137,6 +138,30 @@ export default function InvestorsPage() {
               ))}
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ─── INVESTOR OVERVIEW VIDEO ─── */}
+      <section
+        className="py-16 relative overflow-hidden"
+        style={{ background: 'linear-gradient(135deg, #0F1A30 0%, #1B2A4A 60%, #1e3a3a 100%)' }}
+      >
+        <div
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] rounded-full opacity-10 blur-3xl"
+          style={{ background: '#5DB347' }}
+        />
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-8">
+            <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#6ABF4B' }}>
+              Investor Overview
+            </span>
+          </div>
+          <VideoCard
+            title="AFU Investment Thesis"
+            duration="5 min"
+            thumbnailUrl="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1200&h=675&fit=crop"
+            size="large"
+          />
         </div>
       </section>
 

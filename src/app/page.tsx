@@ -35,6 +35,7 @@ import {
   BadgeDollarSign,
 } from 'lucide-react';
 import { useCountUp } from '@/hooks/useCountUp';
+import VideoCard from '@/components/VideoCard';
 
 /* ─── Animation helpers ─── */
 function FadeInWhenVisible({
@@ -541,6 +542,62 @@ export default function Home() {
                 </FadeInWhenVisible>
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── SEE AFU IN ACTION ─── */}
+      <section className="py-16" style={{ background: '#EDF4EF' }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <FadeInWhenVisible>
+            <div className="text-center mb-14">
+              <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#5DB347' }}>See AFU in Action</span>
+              <h2 className="text-3xl md:text-4xl font-bold text-navy mt-2 mb-4 text-gradient-green">
+                Watch How We&apos;re Transforming African Agriculture
+              </h2>
+            </div>
+          </FadeInWhenVisible>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Left: Featured video */}
+            <FadeInWhenVisible direction="right">
+              <VideoCard
+                title="AFU Platform Demo"
+                duration="3 min"
+                thumbnailUrl="https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=800&h=450&fit=crop"
+                size="large"
+              />
+            </FadeInWhenVisible>
+
+            {/* Right: Stacked smaller videos */}
+            <div className="flex flex-col gap-4 justify-center">
+              {[
+                {
+                  title: 'How Farmers Use AFU',
+                  duration: '2 min',
+                  thumb: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400&h=300&fit=crop',
+                },
+                {
+                  title: 'Sponsor a Farmer Story',
+                  duration: '4 min',
+                  thumb: 'https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?w=400&h=300&fit=crop',
+                },
+                {
+                  title: 'Investor Overview',
+                  duration: '5 min',
+                  thumb: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=400&h=300&fit=crop',
+                },
+              ].map((v, i) => (
+                <FadeInWhenVisible key={v.title} delay={i * 0.12}>
+                  <VideoCard
+                    title={v.title}
+                    duration={v.duration}
+                    thumbnailUrl={v.thumb}
+                    size="small"
+                  />
+                </FadeInWhenVisible>
+              ))}
+            </div>
           </div>
         </div>
       </section>

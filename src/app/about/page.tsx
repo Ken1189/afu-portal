@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Sprout, Tractor, Building2, ShieldCheck, Settings, Globe, BarChart3, Lock } from "lucide-react";
 import LeadershipSection from "@/components/LeadershipSection";
 import CountryTeams from "@/components/CountryTeams";
+import VideoCard from "@/components/VideoCard";
 
 export const metadata = {
   title: "About AFU - African Farming Union",
@@ -77,6 +78,23 @@ export default function AboutPage() {
               ))}
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ─── OUR STORY VIDEO ─── */}
+      <section className="py-16 bg-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-8">
+            <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#5DB347' }}>
+              Our Story
+            </span>
+          </div>
+          <VideoCard
+            title="The AFU Story — From Vision to Platform"
+            duration="6 min"
+            thumbnailUrl="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1200&h=675&fit=crop"
+            size="large"
+          />
         </div>
       </section>
 

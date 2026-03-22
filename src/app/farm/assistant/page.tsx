@@ -522,7 +522,7 @@ export default function AssistantPage() {
 
   // Send a message (from input or chip)
   const sendMessage = useCallback(
-    (text: string) => {
+    async (text: string) => {
       if (!text.trim() || isTyping) return;
 
       const userMessage: AIMessage = {
@@ -537,10 +537,21 @@ export default function AssistantPage() {
       setInputValue('');
       setIsTyping(true);
 
-      // Simulate AI response after 1-2s delay
-      const delay = 1000 + Math.random() * 1000;
-      setTimeout(() => {
-        const responseContent = generateMockResponse(text);
+      try {
+        const res = await fetch('/api/ai/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: text.trim(),
+            context: 'farming assistant',
+          }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || 'Failed to get response');
+        }
 
         // Determine type based on content
         let responseType: AIMessage['type'] = 'text';
@@ -560,14 +571,24 @@ export default function AssistantPage() {
         const aiMessage: AIMessage = {
           id: `AI-${Date.now()}`,
           role: 'assistant',
-          content: responseContent,
+          content: data.response,
           timestamp: new Date().toISOString(),
           type: responseType,
         };
 
         setIsTyping(false);
         setMessages((prev) => [...prev, aiMessage]);
-      }, delay);
+      } catch {
+        setIsTyping(false);
+        const errorMessage: AIMessage = {
+          id: `AI-${Date.now()}`,
+          role: 'assistant',
+          content: "I'm having trouble connecting. Please try again.",
+          timestamp: new Date().toISOString(),
+          type: 'text',
+        };
+        setMessages((prev) => [...prev, errorMessage]);
+      }
     },
     [isTyping]
   );
