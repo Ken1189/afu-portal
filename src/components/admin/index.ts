@@ -1,4 +1,6 @@
 export { default as FilterBar } from './FilterBar';
+export { default as CaseDetailPanel } from './CaseDetailPanel';
+export type { CaseRecord } from './CaseDetailPanel';
 export type { FilterConfig, FilterOption, FilterValues } from './FilterBar';
 export {
   STATUS_FILTER,

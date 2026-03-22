@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import FilterBar, { LOAN_STATUS_FILTER, COUNTRY_FILTER, DATE_RANGE_FILTER } from '@/components/admin/FilterBar';
 import type { FilterValues } from '@/components/admin/FilterBar';
+import CaseDetailPanel from '@/components/admin/CaseDetailPanel';
+import type { CaseRecord } from '@/components/admin/CaseDetailPanel';
 import {
   ChevronLeft,
   DollarSign,
@@ -343,6 +345,7 @@ export default function LoansPage() {
     country: 'all',
     dateRange: 'all',
   });
+  const [selectedCase, setSelectedCase] = useState<CaseRecord | null>(null);
 
   // Fetch real loans from Supabase
   const fetchLoans = useCallback(async () => {
@@ -688,7 +691,17 @@ export default function LoansPage() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="hover:bg-gray-50/50 transition-colors"
+                    onClick={() => setSelectedCase({
+                      id: app.id,
+                      type: 'loan',
+                      status: app.status,
+                      memberName: app.memberName,
+                      amount: app.amountRequested,
+                      purpose: app.purpose,
+                      country: app.country,
+                      createdAt: app.appliedDate,
+                    })}
+                    className="hover:bg-gray-50/50 transition-colors cursor-pointer"
                   >
                     <td className="py-3 px-4">
                       <span className="font-mono text-xs text-gray-500">{app.id}</span>
@@ -991,6 +1004,20 @@ export default function LoansPage() {
           </div>
         </motion.div>
       </motion.div>
+
+      {/* Case Detail Slide-out Panel */}
+      <CaseDetailPanel
+        record={selectedCase}
+        onClose={() => setSelectedCase(null)}
+        onApprove={async (id, panelNotes) => {
+          await handleLoanAction(id, 'approve');
+          setSelectedCase(null);
+        }}
+        onReject={async (id, panelNotes) => {
+          await handleLoanAction(id, 'reject');
+          setSelectedCase(null);
+        }}
+      />
     </motion.div>
   );
 }
