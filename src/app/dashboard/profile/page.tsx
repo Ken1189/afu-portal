@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -34,86 +34,87 @@ import {
   ChevronRight,
   Copy,
   ExternalLink,
+  Loader2,
 } from 'lucide-react';
+import { useAuth } from '@/lib/supabase/auth-context';
+import { createClient } from '@/lib/supabase/client';
+
 /* ------------------------------------------------------------------ */
-/*  Member type & data (inlined from @/lib/data/members)                */
+/*  Types                                                              */
 /* ------------------------------------------------------------------ */
 
-type MemberTier = 'smallholder' | 'commercial' | 'enterprise' | 'partner';
-type MemberStatus = 'active' | 'pending' | 'suspended';
-type KycStatus = 'complete' | 'partial' | 'pending';
-type Country = 'Botswana' | 'Kenya' | 'Mozambique' | 'Nigeria' | 'Sierra Leone' | 'South Africa' | 'Tanzania' | 'Uganda' | 'Zambia' | 'Zimbabwe';
-
-interface Member {
+interface MemberRecord {
   id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  tier: MemberTier;
-  country: Country;
-  region: string;
-  status: MemberStatus;
-  kycStatus: KycStatus;
-  profileCompleteness: number;
-  farmName: string;
-  farmSize: number;
-  primaryCrops: string[];
-  joinDate: string;
-  lastActive: string;
-  avatar: null;
-  creditScore: number;
+  member_id: string;
+  tier: string;
+  status: string;
+  farm_name: string | null;
+  farm_size_ha: number | null;
+  primary_crops: string[] | null;
+  credit_score: number;
+  join_date: string;
+  bio: string | null;
+  certifications: string[] | null;
 }
 
-const members: Member[] = [
-  { id: 'AFU-2024-001', firstName: 'Kgosi', lastName: 'Mosweu', email: 'kgosi.mosweu@email.com', phone: '+267 71 234 567', tier: 'smallholder', country: 'Botswana', region: 'North-West', status: 'active', kycStatus: 'complete', profileCompleteness: 92, farmName: 'Mosweu Family Fields', farmSize: 4.5, primaryCrops: ['Maize', 'Groundnuts'], joinDate: '2024-10-15', lastActive: '2026-03-12', avatar: null, creditScore: 72 },
-  { id: 'AFU-2024-002', firstName: 'Naledi', lastName: 'Sekgoma', email: 'naledi.sekgoma@email.com', phone: '+267 72 345 678', tier: 'smallholder', country: 'Botswana', region: 'Central', status: 'active', kycStatus: 'complete', profileCompleteness: 88, farmName: 'Sunrise Lands', farmSize: 3.2, primaryCrops: ['Sorghum', 'Groundnuts'], joinDate: '2024-11-02', lastActive: '2026-03-11', avatar: null, creditScore: 65 },
-  { id: 'AFU-2024-003', firstName: 'Tendai', lastName: 'Moyo', email: 'tendai.moyo@email.com', phone: '+263 77 123 4567', tier: 'smallholder', country: 'Zimbabwe', region: 'Mashonaland East', status: 'active', kycStatus: 'complete', profileCompleteness: 95, farmName: 'Moyo Heritage Farm', farmSize: 6.0, primaryCrops: ['Maize', 'Soybeans'], joinDate: '2024-09-20', lastActive: '2026-03-13', avatar: null, creditScore: 78 },
-  { id: 'AFU-2024-004', firstName: 'Baraka', lastName: 'Mwakasege', email: 'baraka.mwakasege@email.com', phone: '+255 754 123 456', tier: 'smallholder', country: 'Tanzania', region: 'Arusha', status: 'active', kycStatus: 'partial', profileCompleteness: 74, farmName: 'Kilimanjaro Roots', farmSize: 2.8, primaryCrops: ['Cassava', 'Maize'], joinDate: '2025-01-10', lastActive: '2026-03-10', avatar: null, creditScore: 58 },
-  { id: 'AFU-2024-005', firstName: 'Mpho', lastName: 'Kgosidintsi', email: 'mpho.kgosidintsi@email.com', phone: '+267 73 456 789', tier: 'smallholder', country: 'Botswana', region: 'Southern', status: 'active', kycStatus: 'complete', profileCompleteness: 85, farmName: 'Tshwaragano Farms', farmSize: 5.5, primaryCrops: ['Sunflower', 'Maize'], joinDate: '2024-12-05', lastActive: '2026-03-09', avatar: null, creditScore: 69 },
-];
+interface KycRecord {
+  id: string;
+  status: string;
+  created_at: string;
+}
 
 /* ------------------------------------------------------------------ */
-/*  Use first member as the logged-in user for demo                    */
+/*  Tier / KYC display configs                                         */
 /* ------------------------------------------------------------------ */
-const me: Member = members[0];
 
 const tierConfig: Record<string, { label: string; cls: string; badge: string }> = {
-  smallholder: { label: 'Tier A: Smallholder', cls: 'from-emerald-500 to-[#5DB347]', badge: 'bg-emerald-500' },
-  commercial: { label: 'Tier B: Commercial', cls: 'from-blue-600 to-[#5DB347]', badge: 'bg-blue-600' },
-  enterprise: { label: 'Tier C: Enterprise', cls: 'from-purple-600 to-indigo-600', badge: 'bg-purple-600' },
-  partner: { label: 'Tier D: Partner', cls: 'from-gold to-amber-600', badge: 'bg-gold' },
+  student:        { label: 'Student',            cls: 'from-sky-500 to-blue-600',       badge: 'bg-sky-500' },
+  new_enterprise: { label: 'New Enterprise',     cls: 'from-amber-500 to-orange-600',   badge: 'bg-amber-500' },
+  smallholder:    { label: 'Tier A: Smallholder', cls: 'from-emerald-500 to-[#5DB347]', badge: 'bg-emerald-500' },
+  farmer_grower:  { label: 'Tier B: Farmer Grower', cls: 'from-blue-600 to-[#5DB347]',  badge: 'bg-blue-600' },
+  commercial:     { label: 'Tier C: Commercial',  cls: 'from-purple-600 to-indigo-600', badge: 'bg-purple-600' },
 };
 
 const kycConfig: Record<string, { label: string; cls: string; icon: React.ElementType }> = {
-  complete: { label: 'Verified', cls: 'bg-green-50 text-green-700', icon: CheckCircle2 },
-  partial: { label: 'Partial', cls: 'bg-amber-50 text-amber-700', icon: Clock },
-  pending: { label: 'Pending', cls: 'bg-red-50 text-red-700', icon: AlertCircle },
+  approved:  { label: 'Verified',    cls: 'bg-green-50 text-green-700', icon: CheckCircle2 },
+  pending:   { label: 'Pending',     cls: 'bg-amber-50 text-amber-700', icon: Clock },
+  rejected:  { label: 'Rejected',    cls: 'bg-red-50 text-red-700',     icon: AlertCircle },
+  not_started: { label: 'Not started', cls: 'bg-gray-50 text-gray-500', icon: AlertCircle },
 };
 
 type Tab = 'personal' | 'farm' | 'security' | 'activity';
 
 const tabs: { key: Tab; label: string; icon: React.ElementType }[] = [
   { key: 'personal', label: 'Personal Info', icon: User },
-  { key: 'farm', label: 'Farm Details', icon: Sprout },
-  { key: 'security', label: 'Security', icon: Lock },
-  { key: 'activity', label: 'Activity', icon: History },
+  { key: 'farm',     label: 'Farm Details',  icon: Sprout },
+  { key: 'security', label: 'Security',      icon: Lock },
+  { key: 'activity', label: 'Activity',      icon: History },
 ];
 
-/* ---------- Input helper ---------- */
+/* ------------------------------------------------------------------ */
+/*  Editable field component                                           */
+/* ------------------------------------------------------------------ */
+
 function Field({
   label,
   value,
+  name,
   editing,
   type = 'text',
   icon: Icon,
+  onChange,
 }: {
   label: string;
   value: string;
+  name?: string;
   editing: boolean;
   type?: string;
   icon?: React.ElementType;
+  onChange?: (val: string) => void;
 }) {
+  const display = value || 'Not set — click to edit';
+  const isEmpty = !value;
+
   return (
     <div>
       <label className="block text-xs font-medium text-gray-500 mb-1.5">{label}</label>
@@ -121,51 +122,146 @@ function Field({
         {Icon && (
           <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
         )}
-        <input
-          type={type}
-          disabled={!editing}
-          defaultValue={value}
-          className={`w-full ${Icon ? 'pl-10' : 'pl-4'} pr-4 py-2.5 border border-gray-200 rounded-lg text-sm disabled:bg-cream/70 disabled:text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#5DB347]/50 transition-colors`}
-        />
+        {editing && onChange ? (
+          <input
+            type={type}
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder="Not set — click to edit"
+            className={`w-full ${Icon ? 'pl-10' : 'pl-4'} pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#5DB347]/50 transition-colors`}
+          />
+        ) : (
+          <div
+            className={`w-full ${Icon ? 'pl-10' : 'pl-4'} pr-4 py-2.5 border border-gray-200 rounded-lg text-sm bg-cream/70 ${
+              isEmpty ? 'text-gray-400 italic' : 'text-gray-700'
+            }`}
+          >
+            {display}
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
+/* ------------------------------------------------------------------ */
+/*  Profile page component                                             */
+/* ------------------------------------------------------------------ */
+
 export default function ProfilePage() {
+  const { user, profile, refreshProfile } = useAuth();
+  const supabase = createClient();
+
   const [editing, setEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>('personal');
   const [copied, setCopied] = useState(false);
 
-  const tier = tierConfig[me.tier] || tierConfig.smallholder;
-  const kyc = kycConfig[me.kycStatus] || kycConfig.pending;
-  const KycIcon = kyc.icon;
-  const initials = `${me.firstName[0]}${me.lastName[0]}`;
+  // Editable fields (local state while editing)
+  const [editName, setEditName] = useState('');
+  const [editPhone, setEditPhone] = useState('');
+  const [editCountry, setEditCountry] = useState('');
 
+  // Extra data from members + kyc tables
+  const [member, setMember] = useState<MemberRecord | null>(null);
+  const [kycStatus, setKycStatus] = useState<string>('not_started');
+  const [loading, setLoading] = useState(true);
+
+  // ── Fetch member record + KYC ──
+  const fetchExtras = useCallback(async () => {
+    if (!user) return;
+    setLoading(true);
+
+    const [memberRes, kycRes] = await Promise.all([
+      supabase
+        .from('members')
+        .select('*')
+        .eq('profile_id', user.id)
+        .maybeSingle(),
+      supabase
+        .from('kyc_verifications')
+        .select('id, status, created_at')
+        .eq('profile_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(1),
+    ]);
+
+    if (memberRes.data) setMember(memberRes.data as MemberRecord);
+    if (kycRes.data && kycRes.data.length > 0) {
+      setKycStatus((kycRes.data[0] as KycRecord).status);
+    }
+
+    setLoading(false);
+  }, [user, supabase]);
+
+  useEffect(() => {
+    fetchExtras();
+  }, [fetchExtras]);
+
+  // Sync edit fields when profile loads or editing starts
+  useEffect(() => {
+    if (profile) {
+      setEditName(profile.full_name || '');
+      setEditPhone(profile.phone || '');
+      setEditCountry(profile.country || '');
+    }
+  }, [profile, editing]);
+
+  // ── Save handler ──
+  const handleSave = async () => {
+    if (!user) return;
+    setSaving(true);
+
+    await supabase
+      .from('profiles')
+      .update({
+        full_name: editName,
+        phone: editPhone || null,
+        country: editCountry || null,
+      })
+      .eq('id', user.id);
+
+    await refreshProfile();
+    setSaving(false);
+    setEditing(false);
+  };
+
+  // ── Copy member ID ──
+  const memberId = member?.member_id || profile?.id?.slice(0, 13).toUpperCase() || '';
   const handleCopyId = () => {
-    navigator.clipboard.writeText(me.id);
+    navigator.clipboard.writeText(memberId);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const completionItems = [
-    { label: 'Personal Info', done: true },
-    { label: 'Farm Details', done: true },
-    { label: 'KYC Documents', done: me.kycStatus === 'complete' },
-    { label: 'Bank Account', done: true },
-    { label: 'Farm Photos', done: false },
-    { label: 'Certifications', done: me.profileCompleteness > 85 },
-  ];
+  // ── Derived values ──
+  const displayName = profile?.full_name || profile?.email?.split('@')[0] || 'Member';
+  const initials = displayName
+    .split(' ')
+    .map((n: string) => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
 
+  const tierKey = member?.tier || 'smallholder';
+  const tier = tierConfig[tierKey] || tierConfig.smallholder;
+  const kyc = kycConfig[kycStatus] || kycConfig.not_started;
+  const KycIcon = kyc.icon;
+  const creditScore = member?.credit_score ?? null;
+  const joinDate = member?.join_date || user?.created_at || '';
+
+  // ── Loading state ──
+  if (loading && !profile) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="w-8 h-8 text-[#5DB347] animate-spin" />
+      </div>
+    );
+  }
+
+  // ── Activity log (placeholder — would come from activity table) ──
   const activityLog = [
-    { date: 'Mar 12, 2026', action: 'Logged in from Gaborone, BW', type: 'login' as const },
-    { date: 'Mar 10, 2026', action: 'Updated farm size details', type: 'edit' as const },
-    { date: 'Mar 8, 2026', action: 'Submitted financing application FIN-2026-028', type: 'finance' as const },
-    { date: 'Mar 5, 2026', action: 'Uploaded Farm Inspection Report Q1', type: 'document' as const },
-    { date: 'Mar 1, 2026', action: 'Completed "Pest Management" training course', type: 'training' as const },
-    { date: 'Feb 28, 2026', action: 'Changed password successfully', type: 'security' as const },
-    { date: 'Feb 20, 2026', action: 'Logged delivery for OFT-001 (2,500 kg)', type: 'delivery' as const },
-    { date: 'Feb 15, 2026', action: 'Updated profile photo', type: 'edit' as const },
+    { date: joinDate ? new Date(joinDate).toLocaleDateString('en-GB', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A', action: 'Joined AFU', type: 'login' as const },
   ];
 
   const activityIcons: Record<string, { icon: React.ElementType; color: string }> = {
@@ -189,7 +285,15 @@ export default function ProfilePage() {
           </p>
         </div>
         <button
-          onClick={() => setEditing(!editing)}
+          onClick={() => {
+            if (editing) {
+              // cancel — reset fields
+              setEditName(profile?.full_name || '');
+              setEditPhone(profile?.phone || '');
+              setEditCountry(profile?.country || '');
+            }
+            setEditing(!editing);
+          }}
           className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors shadow-sm ${
             editing
               ? 'bg-gray-200 text-navy hover:bg-gray-300'
@@ -226,7 +330,7 @@ export default function ProfilePage() {
                   )}
                 </div>
                 <div>
-                  <h2 className="text-lg font-bold">{me.firstName} {me.lastName}</h2>
+                  <h2 className="text-lg font-bold">{displayName}</h2>
                   <p className="text-white/70 text-sm">{tier.label}</p>
                 </div>
               </div>
@@ -235,7 +339,7 @@ export default function ProfilePage() {
               <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 flex items-center justify-between mb-4">
                 <div>
                   <p className="text-white/60 text-xs">Member ID</p>
-                  <p className="font-mono font-bold text-sm">{me.id}</p>
+                  <p className="font-mono font-bold text-sm">{memberId || 'N/A'}</p>
                 </div>
                 <button
                   onClick={handleCopyId}
@@ -254,51 +358,17 @@ export default function ProfilePage() {
               <div className="grid grid-cols-2 gap-3">
                 <div className="bg-white/10 rounded-lg p-3">
                   <p className="text-white/60 text-xs">Credit Score</p>
-                  <p className="text-lg font-bold">{me.creditScore}/100</p>
+                  <p className="text-lg font-bold">{creditScore !== null ? `${creditScore}/100` : 'N/A'}</p>
                 </div>
                 <div className="bg-white/10 rounded-lg p-3">
                   <p className="text-white/60 text-xs">Member Since</p>
                   <p className="text-lg font-bold">
-                    {new Date(me.joinDate).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}
+                    {joinDate
+                      ? new Date(joinDate).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
+                      : 'N/A'}
                   </p>
                 </div>
               </div>
-            </div>
-          </div>
-
-          {/* Profile Completion */}
-          <div className="bg-white rounded-xl border border-gray-100 p-5">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-navy text-sm">Profile Completion</h3>
-              <span className="text-sm font-bold text-[#5DB347]">{me.profileCompleteness}%</span>
-            </div>
-            {/* Progress bar */}
-            <div className="h-2 bg-gray-100 rounded-full mb-4">
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: `${me.profileCompleteness}%` }}
-                transition={{ duration: 1, ease: 'easeOut' }}
-                className="h-2 bg-gradient-to-r from-[#5DB347] to-emerald-400 rounded-full"
-              />
-            </div>
-            <div className="space-y-2.5">
-              {completionItems.map((item) => (
-                <div key={item.label} className="flex items-center gap-2.5">
-                  {item.done ? (
-                    <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0" />
-                  ) : (
-                    <div className="w-4 h-4 rounded-full border-2 border-gray-300 shrink-0" />
-                  )}
-                  <span className={`text-sm ${item.done ? 'text-gray-700' : 'text-gray-400'}`}>
-                    {item.label}
-                  </span>
-                  {!item.done && (
-                    <button className="ml-auto text-xs text-[#5DB347] font-medium hover:text-[#449933]">
-                      Complete
-                    </button>
-                  )}
-                </div>
-              ))}
             </div>
           </div>
 
@@ -309,28 +379,36 @@ export default function ProfilePage() {
               <h3 className="font-semibold text-navy text-sm">Verification Status</h3>
             </div>
             <div className="space-y-3">
-              {[
-                { label: 'Identity (KYC)', status: me.kycStatus === 'complete' ? 'verified' : 'pending' },
-                { label: 'Bank Account', status: 'verified' },
-                { label: 'Farm Registration', status: 'verified' },
-                { label: 'Address Proof', status: me.profileCompleteness > 85 ? 'verified' : 'pending' },
-              ].map((item) => (
-                <div key={item.label} className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">{item.label}</span>
-                  <span className={`inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-medium ${
-                    item.status === 'verified'
-                      ? 'bg-green-50 text-green-700'
-                      : 'bg-amber-50 text-amber-700'
-                  }`}>
-                    {item.status === 'verified' ? (
-                      <CheckCircle2 className="w-3 h-3" />
-                    ) : (
-                      <Clock className="w-3 h-3" />
-                    )}
-                    {item.status === 'verified' ? 'Verified' : 'Pending'}
-                  </span>
-                </div>
-              ))}
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600">Identity (KYC)</span>
+                <span className={`inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-medium ${kyc.cls}`}>
+                  <KycIcon className="w-3 h-3" />
+                  {kyc.label}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Info */}
+          <div className="bg-white rounded-xl border border-gray-100 p-5">
+            <h3 className="font-semibold text-navy text-sm mb-4">Account Details</h3>
+            <div className="space-y-3 text-sm">
+              <div className="flex justify-between">
+                <span className="text-gray-500">Role</span>
+                <span className="font-medium text-navy capitalize">{profile?.role || 'N/A'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500">Email</span>
+                <span className="font-medium text-navy">{profile?.email || 'N/A'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500">Created</span>
+                <span className="font-medium text-navy">
+                  {user?.created_at
+                    ? new Date(user.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+                    : 'N/A'}
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -376,29 +454,48 @@ export default function ProfilePage() {
                       Personal Information
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      <Field label="First Name" value={me.firstName} editing={editing} icon={User} />
-                      <Field label="Last Name" value={me.lastName} editing={editing} icon={User} />
-                      <Field label="Email Address" value={me.email} editing={editing} type="email" icon={Mail} />
-                      <Field label="Phone Number" value={me.phone} editing={editing} type="tel" icon={Phone} />
-                      <Field label="Country" value={me.country} editing={editing} icon={Globe2} />
-                      <Field label="Region" value={me.region} editing={editing} icon={MapPin} />
+                      <Field
+                        label="Full Name"
+                        value={editing ? editName : (profile?.full_name || '')}
+                        editing={editing}
+                        icon={User}
+                        onChange={setEditName}
+                      />
+                      <Field
+                        label="Email Address"
+                        value={profile?.email || ''}
+                        editing={false}
+                        type="email"
+                        icon={Mail}
+                      />
+                      <Field
+                        label="Phone Number"
+                        value={editing ? editPhone : (profile?.phone || '')}
+                        editing={editing}
+                        type="tel"
+                        icon={Phone}
+                        onChange={setEditPhone}
+                      />
+                      <Field
+                        label="Country"
+                        value={editing ? editCountry : (profile?.country || '')}
+                        editing={editing}
+                        icon={Globe2}
+                        onChange={setEditCountry}
+                      />
+                      <Field
+                        label="Region"
+                        value={profile?.region || ''}
+                        editing={false}
+                        icon={MapPin}
+                      />
+                      <Field
+                        label="Role"
+                        value={profile?.role || ''}
+                        editing={false}
+                        icon={ShieldCheck}
+                      />
                     </div>
-                  </div>
-
-                  <div className="bg-white rounded-xl border border-gray-100 p-6">
-                    <h3 className="font-semibold text-navy mb-5 flex items-center gap-2">
-                      <CreditCard className="w-4 h-4 text-[#5DB347]" />
-                      Banking Details
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      <Field label="Bank Name" value="First National Bank" editing={editing} icon={Banknote} />
-                      <Field label="Account Holder" value={`${me.firstName} ${me.lastName}`} editing={editing} icon={User} />
-                      <Field label="Account Number" value="••••••4567" editing={false} icon={CreditCard} />
-                      <Field label="Branch Code" value="260051" editing={editing} icon={Key} />
-                    </div>
-                    <p className="text-xs text-gray-400 mt-4">
-                      Bank account details are used for payment disbursements. Contact support to update account number.
-                    </p>
                   </div>
 
                   {editing && (
@@ -408,14 +505,20 @@ export default function ProfilePage() {
                       className="flex gap-3"
                     >
                       <button
-                        onClick={() => setEditing(false)}
-                        className="flex items-center gap-2 bg-[#5DB347] hover:bg-[#449933] text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition-colors shadow-sm"
+                        onClick={handleSave}
+                        disabled={saving}
+                        className="flex items-center gap-2 bg-[#5DB347] hover:bg-[#449933] text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition-colors shadow-sm disabled:opacity-60"
                       >
-                        <Save className="w-4 h-4" />
-                        Save Changes
+                        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                        {saving ? 'Saving...' : 'Save Changes'}
                       </button>
                       <button
-                        onClick={() => setEditing(false)}
+                        onClick={() => {
+                          setEditing(false);
+                          setEditName(profile?.full_name || '');
+                          setEditPhone(profile?.phone || '');
+                          setEditCountry(profile?.country || '');
+                        }}
                         className="px-6 py-2.5 rounded-xl font-semibold text-sm border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
                       >
                         Cancel
@@ -434,26 +537,26 @@ export default function ProfilePage() {
                       Farm Information
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      <Field label="Farm Name" value={me.farmName} editing={editing} icon={Sprout} />
-                      <Field label="Farm Size (hectares)" value={String(me.farmSize)} editing={editing} icon={Ruler} />
-                      <Field label="Primary Crops" value={me.primaryCrops.join(', ')} editing={editing} icon={Leaf} />
-                      <Field label="Location" value={`${me.region}, ${me.country}`} editing={editing} icon={MapPin} />
+                      <Field label="Farm Name" value={member?.farm_name || ''} editing={false} icon={Sprout} />
+                      <Field label="Farm Size (hectares)" value={member?.farm_size_ha != null ? String(member.farm_size_ha) : ''} editing={false} icon={Ruler} />
+                      <Field label="Primary Crops" value={member?.primary_crops?.join(', ') || ''} editing={false} icon={Leaf} />
+                      <Field label="Location" value={[profile?.region, profile?.country].filter(Boolean).join(', ') || ''} editing={false} icon={MapPin} />
                     </div>
                   </div>
 
                   {/* Farm Stats */}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {[
-                      { label: 'Farm Size', value: `${me.farmSize} ha`, icon: Ruler, color: 'text-[#5DB347]', bg: 'bg-[#5DB347]/10' },
-                      { label: 'Crops', value: String(me.primaryCrops.length), icon: Leaf, color: 'text-green-600', bg: 'bg-green-50' },
-                      { label: 'Credit Score', value: `${me.creditScore}/100`, icon: TrendingUp, color: 'text-gold', bg: 'bg-gold/10' },
-                      { label: 'Status', value: me.status === 'active' ? 'Active' : 'Inactive', icon: Star, color: 'text-navy', bg: 'bg-navy/5' },
+                      { label: 'Farm Size', value: member?.farm_size_ha != null ? `${member.farm_size_ha} ha` : 'N/A', icon: Ruler, color: 'text-[#5DB347]', bg: 'bg-[#5DB347]/10' },
+                      { label: 'Crops', value: member?.primary_crops ? String(member.primary_crops.length) : '0', icon: Leaf, color: 'text-green-600', bg: 'bg-green-50' },
+                      { label: 'Credit Score', value: creditScore !== null ? `${creditScore}/100` : 'N/A', icon: TrendingUp, color: 'text-gold', bg: 'bg-gold/10' },
+                      { label: 'Status', value: member?.status === 'active' ? 'Active' : (member?.status || 'N/A'), icon: Star, color: 'text-navy', bg: 'bg-navy/5' },
                     ].map((s) => {
-                      const Icon = s.icon;
+                      const SIcon = s.icon;
                       return (
                         <div key={s.label} className="bg-white rounded-xl p-4 border border-gray-100">
                           <div className={`w-9 h-9 ${s.bg} rounded-lg flex items-center justify-center mb-2`}>
-                            <Icon className={`w-4 h-4 ${s.color}`} />
+                            <SIcon className={`w-4 h-4 ${s.color}`} />
                           </div>
                           <p className="text-xs text-gray-500">{s.label}</p>
                           <p className={`text-lg font-bold ${s.color}`}>{s.value}</p>
@@ -462,74 +565,28 @@ export default function ProfilePage() {
                     })}
                   </div>
 
-                  {/* Farm Photos Placeholder */}
-                  <div className="bg-white rounded-xl border border-gray-100 p-6">
-                    <h3 className="font-semibold text-navy mb-4 flex items-center gap-2">
-                      <Camera className="w-4 h-4 text-[#5DB347]" />
-                      Farm Gallery
-                    </h3>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                      {[
-                        'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400&h=300&fit=crop',
-                        'https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=400&h=300&fit=crop',
-                        'https://images.unsplash.com/photo-1592982537447-6f2a6a0c7c18?w=400&h=300&fit=crop',
-                      ].map((src, i) => (
-                        <div key={i} className="relative aspect-[4/3] rounded-lg overflow-hidden group">
-                          <Image src={src} alt={`Farm photo ${i + 1}`} fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
-                        </div>
-                      ))}
-                      <button className="aspect-[4/3] rounded-lg border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-2 text-gray-400 hover:text-[#5DB347] hover:border-[#5DB347]/30 transition-colors">
-                        <Camera className="w-6 h-6" />
-                        <span className="text-xs font-medium">Add Photo</span>
-                      </button>
-                    </div>
-                  </div>
-
                   {/* Certifications */}
                   <div className="bg-white rounded-xl border border-gray-100 p-6">
                     <h3 className="font-semibold text-navy mb-4 flex items-center gap-2">
                       <Award className="w-4 h-4 text-[#5DB347]" />
                       Certifications & Badges
                     </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                      {[
-                        { label: 'AFU Verified Member', earned: true, date: 'Oct 2024', color: 'bg-[#5DB347]/10 border-[#5DB347]/20 text-[#5DB347]' },
-                        { label: 'Farm Management Basics', earned: true, date: 'Feb 2026', color: 'bg-blue-50 border-blue-200 text-blue-700' },
-                        { label: 'Export Ready', earned: false, date: 'In progress', color: 'bg-gray-50 border-gray-200 text-gray-400' },
-                      ].map((cert) => (
-                        <div
-                          key={cert.label}
-                          className={`flex items-center gap-3 p-3 rounded-lg border ${cert.color}`}
-                        >
-                          {cert.earned ? (
+                    {member?.certifications && member.certifications.length > 0 ? (
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        {member.certifications.map((cert) => (
+                          <div
+                            key={cert}
+                            className="flex items-center gap-3 p-3 rounded-lg border bg-[#5DB347]/10 border-[#5DB347]/20 text-[#5DB347]"
+                          >
                             <Award className="w-5 h-5 shrink-0" />
-                          ) : (
-                            <div className="w-5 h-5 rounded-full border-2 border-current shrink-0 opacity-50" />
-                          )}
-                          <div>
-                            <p className="text-sm font-medium">{cert.label}</p>
-                            <p className="text-xs opacity-70">{cert.date}</p>
+                            <p className="text-sm font-medium">{cert}</p>
                           </div>
-                        </div>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-gray-400 italic">No certifications yet</p>
+                    )}
                   </div>
-
-                  {editing && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="flex gap-3"
-                    >
-                      <button
-                        onClick={() => setEditing(false)}
-                        className="flex items-center gap-2 bg-[#5DB347] hover:bg-[#449933] text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition-colors shadow-sm"
-                      >
-                        <Save className="w-4 h-4" />
-                        Save Changes
-                      </button>
-                    </motion.div>
-                  )}
                 </div>
               )}
 
@@ -542,7 +599,6 @@ export default function ProfilePage() {
                       Account Security
                     </h3>
                     <div className="space-y-4">
-                      {/* Password */}
                       <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center border border-gray-200">
@@ -550,7 +606,7 @@ export default function ProfilePage() {
                           </div>
                           <div>
                             <p className="text-sm font-medium text-navy">Password</p>
-                            <p className="text-xs text-gray-400">Last changed 14 days ago</p>
+                            <p className="text-xs text-gray-400">Manage your password</p>
                           </div>
                         </div>
                         <button className="text-sm text-[#5DB347] font-medium hover:text-[#449933] flex items-center gap-1">
@@ -558,7 +614,6 @@ export default function ProfilePage() {
                         </button>
                       </div>
 
-                      {/* 2FA */}
                       <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center border border-gray-200">
@@ -575,7 +630,6 @@ export default function ProfilePage() {
                         </span>
                       </div>
 
-                      {/* Login Sessions */}
                       <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center border border-gray-200">
@@ -583,47 +637,13 @@ export default function ProfilePage() {
                           </div>
                           <div>
                             <p className="text-sm font-medium text-navy">Active Sessions</p>
-                            <p className="text-xs text-gray-400">2 active sessions</p>
+                            <p className="text-xs text-gray-400">Manage your login sessions</p>
                           </div>
                         </div>
                         <button className="text-sm text-[#5DB347] font-medium hover:text-[#449933] flex items-center gap-1">
                           Manage <ChevronRight className="w-4 h-4" />
                         </button>
                       </div>
-                    </div>
-                  </div>
-
-                  {/* Connected Services */}
-                  <div className="bg-white rounded-xl border border-gray-100 p-6">
-                    <h3 className="font-semibold text-navy mb-4 flex items-center gap-2">
-                      <ExternalLink className="w-4 h-4 text-[#5DB347]" />
-                      Connected Services
-                    </h3>
-                    <div className="space-y-3">
-                      {[
-                        { name: 'WhatsApp Notifications', connected: true, desc: 'Receive delivery and payment alerts' },
-                        { name: 'Weather Station API', connected: true, desc: 'Automated weather data for your farm' },
-                        { name: 'Bank Account (FNB)', connected: true, desc: 'Automatic payment processing' },
-                      ].map((service) => (
-                        <div key={service.name} className="flex items-center justify-between p-3 border border-gray-100 rounded-lg">
-                          <div>
-                            <p className="text-sm font-medium text-navy">{service.name}</p>
-                            <p className="text-xs text-gray-400">{service.desc}</p>
-                          </div>
-                          <span className={`inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-medium ${
-                            service.connected ? 'bg-green-50 text-green-700' : 'bg-gray-50 text-gray-500'
-                          }`}>
-                            {service.connected ? (
-                              <>
-                                <CheckCircle2 className="w-3 h-3" />
-                                Connected
-                              </>
-                            ) : (
-                              'Not Connected'
-                            )}
-                          </span>
-                        </div>
-                      ))}
                     </div>
                   </div>
 
@@ -648,9 +668,7 @@ export default function ProfilePage() {
                     Recent Activity
                   </h3>
                   <div className="relative">
-                    {/* Timeline line */}
                     <div className="absolute left-5 top-2 bottom-2 w-px bg-gray-200" />
-
                     <div className="space-y-1">
                       {activityLog.map((entry, i) => {
                         const config = activityIcons[entry.type] || activityIcons.edit;
@@ -669,10 +687,6 @@ export default function ProfilePage() {
                       })}
                     </div>
                   </div>
-
-                  <button className="mt-4 w-full text-sm text-[#5DB347] font-medium hover:text-[#449933] py-2 text-center rounded-lg hover:bg-[#5DB347]/5 transition-colors">
-                    View Full Activity History
-                  </button>
                 </div>
               )}
             </motion.div>

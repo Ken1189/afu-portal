@@ -129,7 +129,7 @@ const countries: CountryData[] = [
     slug: "kenya",
     flag: "\u{1F1F0}\u{1F1EA}",
     role: "East African Gateway",
-    heroImage: "https://images.unsplash.com/photo-1489392191049-fc10c97e64b6?w=1600&q=80",
+    heroImage: "https://images.unsplash.com/photo-1582719508461-905c673771fd?w=1600&q=80",
     description:
       "Kenya is East Africa's agricultural powerhouse and AFU's gateway to the region. With world-leading mobile money infrastructure (M-Pesa), a thriving agri-tech ecosystem, and strong horticulture exports to the EU, Kenya offers unmatched digital payment and trade infrastructure.",
     stats: {
@@ -162,7 +162,7 @@ const countries: CountryData[] = [
     slug: "nigeria",
     flag: "\u{1F1F3}\u{1F1EC}",
     role: "West African Scale",
-    heroImage: "https://images.unsplash.com/photo-1580128637001-5b85e5a67f86?w=1600&q=80",
+    heroImage: "https://images.unsplash.com/photo-1592982537447-6f2a6a0c8b8b?w=1600&q=80",
     description:
       "Nigeria is Africa's largest economy and most populous nation, offering a massive domestic market for agricultural inputs, equipment, and processing. With a booming fintech ecosystem and enormous food import bill, Nigeria represents the single largest opportunity for agricultural development on the continent.",
     stats: {
@@ -295,7 +295,7 @@ const countries: CountryData[] = [
     slug: "ghana",
     flag: "\u{1F1EC}\u{1F1ED}",
     role: "West African Cocoa Belt",
-    heroImage: "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=1600&q=80",
+    heroImage: "https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=1600&q=80",
     description:
       "Ghana is the world's second-largest cocoa producer and a beacon of democratic stability in West Africa. With a growing tech scene, strong agricultural traditions, and government-backed cocoa buying programmes, Ghana offers structured commodity trade and digital payment infrastructure.",
     stats: {
@@ -328,7 +328,7 @@ const countries: CountryData[] = [
     slug: "uganda",
     flag: "\u{1F1FA}\u{1F1EC}",
     role: "East African Breadbasket",
-    heroImage: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1600&q=80",
+    heroImage: "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=1600&q=80",
     description:
       "Uganda is East Africa's breadbasket and a major coffee exporter, with strong mobile money ecosystems driven by MTN and Airtel. The country's fertile soils, reliable rainfall, and strategic EAC position make it a cornerstone of AFU's East African food production network.",
     stats: {

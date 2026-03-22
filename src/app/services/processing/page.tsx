@@ -101,7 +101,7 @@ export default function ProcessingServicePage() {
           className="absolute inset-0 bg-cover bg-center"
           style={{
             backgroundImage:
-              "url('https://images.unsplash.com/photo-1595855759920-86582396756a?w=1920&q=80')",
+              "url('https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=1920&q=80')",
           }}
         />
         <div

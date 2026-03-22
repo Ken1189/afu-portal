@@ -149,21 +149,21 @@ const services = [
     title: 'Processing Hubs',
     desc: 'Milling, drying, cold chain, and packaging. Value-addition at source.',
     link: '/services/processing',
-    img: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=800&h=500&fit=crop',
+    img: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&q=80',
   },
   {
     icon: ShieldCheck,
     title: 'Guaranteed Offtake',
     desc: 'Pre-arranged buyers and distribution. No more selling cheap or wasting crops.',
     link: '/services/offtake',
-    img: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=800&h=500&fit=crop',
+    img: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=800&q=80',
   },
   {
     icon: CircleDollarSign,
     title: 'Trade Finance',
     desc: 'Letters of credit, invoice finance, and commodities partner distribution.',
     link: '/services/trade-finance',
-    img: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&h=500&fit=crop',
+    img: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800&q=80',
   },
   {
     icon: GraduationCap,
@@ -1098,8 +1098,8 @@ export default function Home() {
             <FadeInWhenVisible direction="left">
               <div className="relative rounded-3xl overflow-hidden shadow-2xl">
                 <Image
-                  src="https://images.unsplash.com/photo-1489392191049-fc10c97e64b6?w=800&h=600&fit=crop"
-                  alt="Map of Africa"
+                  src="https://images.unsplash.com/photo-1592982537447-6f2a6a0c8b8b?w=800&q=80"
+                  alt="African farmer in field"
                   width={800}
                   height={600}
                   className="w-full h-auto"
@@ -1161,8 +1161,8 @@ export default function Home() {
       <section className="relative py-32 overflow-hidden">
         <div className="absolute inset-0">
           <Image
-            src="https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?w=1920&h=800&fit=crop"
-            alt="Agricultural landscape"
+            src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=1920&q=80"
+            alt="Green crop field"
             fill
             className="object-cover"
           />
