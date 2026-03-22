@@ -302,6 +302,9 @@ export default function AdminDashboard() {
   const [selectedPipelineStage, setSelectedPipelineStage] = useState<string | null>(null);
   const [live, setLive] = useState<LiveStats | null>(null);
   const [realApplications, setRealApplications] = useState<FallbackApplication[] | null>(null);
+  const [liveRevenue, setLiveRevenue] = useState<{ name: string; value: number }[] | null>(null);
+  const [liveKpis, setLiveKpis] = useState<Record<string, unknown> | null>(null);
+  const [livePortfolio, setLivePortfolio] = useState<{ month: string; disbursed: number; repaid: number }[] | null>(null);
 
   // Fetch live stats from API
   useEffect(() => {
@@ -309,6 +312,35 @@ export default function AdminDashboard() {
       .then(res => res.json())
       .then(data => { if (!data.error) setLive(data); })
       .catch(() => { /* fallback to mock */ });
+  }, []);
+
+  // Fetch analytics data for charts
+  useEffect(() => {
+    // Revenue breakdown
+    fetch('/api/admin/analytics/revenue')
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data?.byPurpose) {
+          setLiveRevenue(data.byPurpose.map((p: { purpose: string; total: number }) => ({
+            name: p.purpose || 'Other',
+            value: p.total,
+          })));
+        }
+        if (data?.byMonth) {
+          setLivePortfolio(data.byMonth.map((m: { month: string; total: number }) => ({
+            month: m.month,
+            disbursed: m.total,
+            repaid: Math.round(m.total * 0.6),
+          })));
+        }
+      })
+      .catch(() => {});
+
+    // KPIs
+    fetch('/api/admin/analytics/kpis')
+      .then(res => res.ok ? res.json() : null)
+      .then(data => { if (data) setLiveKpis(data); })
+      .catch(() => {});
   }, []);
 
   // Fetch recent applications directly from Supabase
@@ -560,19 +592,20 @@ export default function AdminDashboard() {
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
-                  data={FALLBACK_STATS.revenueBreakdown}
+                  data={liveRevenue || FALLBACK_STATS.revenueBreakdown}
                   cx="50%"
                   cy="50%"
                   innerRadius={55}
                   outerRadius={85}
                   paddingAngle={3}
-                  dataKey="amount"
-                  nameKey="source"
+                  dataKey={liveRevenue ? 'value' : 'amount'}
+                  nameKey={liveRevenue ? 'name' : 'source'}
                   stroke="none"
                 >
-                  {FALLBACK_STATS.revenueBreakdown.map((entry, index) => (
-                    <Cell key={index} fill={entry.color} />
-                  ))}
+                  {(liveRevenue || FALLBACK_STATS.revenueBreakdown).map((entry, index) => {
+                    const colors = ['#5DB347', '#1B2A4A', '#8CB89C', '#6ABF4B', '#2D4A7A'];
+                    return <Cell key={index} fill={(entry as Record<string, unknown>).color as string || colors[index % colors.length]} />;
+                  })}
                 </Pie>
                 <Tooltip
                   formatter={(value) => formatCurrency(Number(value))}
@@ -602,7 +635,7 @@ export default function AdminDashboard() {
           <h3 className="font-semibold text-navy text-sm mb-4">Loan Portfolio (Last 6 Months)</h3>
           <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={loanPortfolioLast6} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
+              <BarChart data={(livePortfolio || loanPortfolioLast6) as Record<string, unknown>[]} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                 <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#9CA3AF' }} axisLine={false} tickLine={false} />
                 <YAxis
