@@ -46,6 +46,7 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [roleChecked, setRoleChecked] = useState(false);
   const [authorized, setAuthorized] = useState(false);
+  const [denied, setDenied] = useState(false);
 
   // ── Role guard: only supplier, admin, super_admin can access ──
   useEffect(() => {
@@ -60,10 +61,36 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
     if (role === 'supplier' || role === 'admin' || role === 'super_admin') {
       setAuthorized(true);
     } else {
-      router.replace('/dashboard');
+      setDenied(true);
     }
     setRoleChecked(true);
   }, [user, profile, authLoading, router]);
+
+  // Show access denied state
+  if (denied) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto px-4">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+            </svg>
+          </div>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Access Denied</h2>
+          <p className="text-gray-500 text-sm mb-6">
+            You do not have permission to access the Supplier Portal. This area is restricted to supplier accounts.
+          </p>
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center gap-2 bg-[#5DB347] hover:bg-[#449933] text-white text-sm font-semibold px-6 py-2.5 rounded-lg transition-colors"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            Back to Dashboard
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   // Show loading while checking auth
   if (authLoading || !roleChecked || !authorized) {

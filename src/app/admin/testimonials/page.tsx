@@ -314,7 +314,7 @@ export default function TestimonialsAdmin() {
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-11 h-11 rounded-full bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center text-green-700 font-bold text-sm flex-shrink-0">
                   {t.photo_url ? (
-                    <img src={t.photo_url} alt={t.name} className="w-full h-full rounded-full object-cover" />
+                    <img src={t.photo_url} alt={t.name} loading="lazy" className="w-full h-full rounded-full object-cover" />
                   ) : (
                     t.name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()
                   )}

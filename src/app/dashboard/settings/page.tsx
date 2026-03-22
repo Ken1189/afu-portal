@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Variants } from 'framer-motion';
+import { useAuth } from '@/lib/supabase/auth-context';
+import { createClient } from '@/lib/supabase/client';
 import {
   Bell,
   MessageSquare,
@@ -292,6 +294,8 @@ const tierData = [
 // PAGE COMPONENT
 // ===========================================================================
 export default function SettingsPage() {
+  const { user } = useAuth();
+
   // ---- Tab state ----------------------------------------------------------
   const [activeTab, setActiveTab] = useState<TabId>('notifications');
 
@@ -355,8 +359,11 @@ export default function SettingsPage() {
     setSettingsLoaded(true);
   }, []);
 
-  // ---- Save settings to localStorage --------------------------------------
-  const handleSaveSettings = useCallback(() => {
+  // ---- Save state for button -----------------------------------------------
+  const [saving, setSaving] = useState(false);
+
+  // ---- Save settings to localStorage + Supabase ---------------------------
+  const handleSaveSettings = useCallback(async () => {
     const settings = {
       emailNotifs,
       smsNotifs,
@@ -370,14 +377,47 @@ export default function SettingsPage() {
       cookiePrefs,
       marketingConsent,
     };
+
+    // Save to localStorage
     try {
       localStorage.setItem('afu_user_settings', JSON.stringify(settings));
     } catch {
       // Ignore storage errors
     }
+
+    // Persist to Supabase profiles table
+    if (user) {
+      setSaving(true);
+      try {
+        const supabase = createClient();
+        await supabase
+          .from('profiles')
+          .update({
+            preferences: {
+              email_notifications: emailNotifs,
+              sms_notifications: smsNotifs,
+              push_notifications: pushNotifs,
+              currency,
+              dateFormat,
+              theme,
+              defaultView,
+              cookiePrefs,
+              marketingConsent,
+            },
+            language,
+            timezone,
+          })
+          .eq('id', user.id);
+      } catch {
+        // Silently fail — localStorage is the fallback
+      } finally {
+        setSaving(false);
+      }
+    }
+
     setSaveToast(true);
     setTimeout(() => setSaveToast(false), 2500);
-  }, [emailNotifs, smsNotifs, pushNotifs, language, currency, timezone, dateFormat, theme, defaultView, cookiePrefs, marketingConsent]);
+  }, [emailNotifs, smsNotifs, pushNotifs, language, currency, timezone, dateFormat, theme, defaultView, cookiePrefs, marketingConsent, user]);
 
   // ---- Helpers ------------------------------------------------------------
   const toggleEmail = (key: keyof typeof emailNotifs) =>
@@ -437,10 +477,11 @@ export default function SettingsPage() {
       <div className="max-w-4xl flex justify-end mb-4">
         <button
           onClick={handleSaveSettings}
-          className="inline-flex items-center gap-2 bg-[#5DB347] hover:bg-[#449933] text-white text-sm font-semibold px-6 py-2.5 rounded-lg transition-colors shadow-sm"
+          disabled={saving}
+          className="inline-flex items-center gap-2 bg-[#5DB347] hover:bg-[#449933] text-white text-sm font-semibold px-6 py-2.5 rounded-lg transition-colors shadow-sm disabled:opacity-60"
         >
           <Check size={16} />
-          Save Settings
+          {saving ? 'Saving...' : 'Save Settings'}
         </button>
       </div>
 
@@ -454,7 +495,7 @@ export default function SettingsPage() {
             className="fixed bottom-6 right-6 z-50 bg-[#5DB347] text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-2 text-sm font-semibold"
           >
             <Check size={18} />
-            Settings saved
+            Saved!
           </motion.div>
         )}
       </AnimatePresence>

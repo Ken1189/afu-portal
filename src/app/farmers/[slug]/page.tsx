@@ -381,7 +381,7 @@ function UpdateCard({ update }: { update: FarmerUpdate }) {
               key={i}
               className="relative w-20 h-20 rounded-lg overflow-hidden bg-gray-100"
             >
-              <img src={url} alt="" className="absolute inset-0 w-full h-full object-cover" />
+              <img src={url} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
             </div>
           ))}
         </div>

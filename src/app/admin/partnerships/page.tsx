@@ -289,7 +289,7 @@ export default function PartnershipsAdmin() {
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center text-gray-500 font-bold text-sm flex-shrink-0 overflow-hidden">
                   {p.logo_url ? (
-                    <img src={p.logo_url} alt={p.name} className="w-full h-full object-contain p-1" />
+                    <img src={p.logo_url} alt={p.name} loading="lazy" className="w-full h-full object-contain p-1" />
                   ) : (
                     p.name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()
                   )}

@@ -653,7 +653,7 @@ export default function AdminSuppliersPage() {
                 >
                   <div className="flex items-start gap-3 mb-3">
                     <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
-                      <img src={supplier.logo_url || '/placeholder-logo.png'} alt={supplier.company_name} className="w-full h-full object-cover" />
+                      <img src={supplier.logo_url || '/placeholder-logo.png'} alt={supplier.company_name} loading="lazy" className="w-full h-full object-cover" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5">
