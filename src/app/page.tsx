@@ -317,7 +317,7 @@ export default function Home() {
               </div>
               <div className="flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/10 px-4 py-2 rounded-full text-white/70">
                 <Globe2 className="w-4 h-4 text-[#5DB347]" />
-                <span>3 Countries Active</span>
+                <span>10 Countries Active</span>
               </div>
               <div className="flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/10 px-4 py-2 rounded-full text-white/70">
                 <Users className="w-4 h-4 text-[#5DB347]" />
@@ -373,7 +373,7 @@ export default function Home() {
             </FadeInWhenVisible>
             <FadeInWhenVisible delay={0.3}>
               <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border-l-4 border-[#5DB347] shadow-lg shadow-[#5DB347]/5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                <CountStat target={247} suffix="+" label="active AFU members across 3 countries" />
+                <CountStat target={247} suffix="+" label="active AFU members across 10 countries" />
               </div>
             </FadeInWhenVisible>
           </div>

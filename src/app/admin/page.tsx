@@ -89,7 +89,7 @@ const FALLBACK_STATS = {
   milestones: [
     { label: '500 Members', target: 500, current: 0, deadline: 'Q4 2026' },
     { label: '$10M Deployed', target: 10_000_000, current: 0, deadline: 'Q2 2027' },
-    { label: '3 Countries', target: 3, current: 0, deadline: 'Q1 2026' },
+    { label: '10 Countries', target: 10, current: 10, deadline: 'Q1 2026' },
     { label: 'Default Rate <5%', target: 5, current: 0, deadline: 'Ongoing', inverted: true },
     { label: '60% Training Rate', target: 60, current: 0, deadline: 'Q1 2026' },
   ],
@@ -834,7 +834,7 @@ export default function AdminDashboard() {
             {[
               { label: '500 Members', target: 500, current: live?.members.total ?? FALLBACK_STATS.milestones[0].current, deadline: 'Q4 2026' },
               { label: '$10M Deployed', target: 10_000_000, current: live?.loans.totalAmount ?? FALLBACK_STATS.milestones[1].current, deadline: 'Q2 2027' },
-              { label: '3 Countries', target: 3, current: FALLBACK_STATS.milestones[2].current, deadline: 'Q1 2026' },
+              { label: '10 Countries', target: 10, current: FALLBACK_STATS.milestones[2].current, deadline: 'Q1 2026' },
               { label: 'Default Rate <5%', target: 5, current: FALLBACK_STATS.milestones[3].current, deadline: 'Ongoing', inverted: true },
               { label: '60% Training Rate', target: 60, current: FALLBACK_STATS.milestones[4].current, deadline: 'Q1 2026' },
             ].map((ms, i) => {
@@ -930,7 +930,7 @@ export default function AdminDashboard() {
 
           {/* Country total summary */}
           <div className="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between">
-            <span className="text-xs text-gray-400">Total across 3 countries</span>
+            <span className="text-xs text-gray-400">Total across 10 countries</span>
             <span className="text-sm font-bold text-navy">{totalMemberCount} members</span>
           </div>
         </motion.div>

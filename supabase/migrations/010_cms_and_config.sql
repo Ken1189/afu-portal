@@ -123,7 +123,7 @@ INSERT INTO site_content (page, section, key, value, content_type) VALUES
 ('homepage', 'stats', 'stat_2_label', 'of food imported annually across Africa', 'text'),
 ('homepage', 'stats', 'stat_3_value', '40%', 'text'),
 ('homepage', 'stats', 'stat_3_label', 'of food lost post-harvest due to weak infrastructure', 'text'),
-('homepage', 'stats', 'stat_4_label', 'active AFU members across 3 countries', 'text'),
+('homepage', 'stats', 'stat_4_label', 'active AFU members across 10 countries', 'text'),
 ('homepage', 'services', 'title', 'One Platform, Complete Value Chain', 'text'),
 ('homepage', 'services', 'subtitle', 'A vertically integrated agriculture development platform — the specialized agri dev bank and execution engine Africa has been missing.', 'text'),
 ('homepage', 'sponsor', 'title', 'Sponsor an African Farmer', 'text'),

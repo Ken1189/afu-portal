@@ -24,8 +24,9 @@ export function getStripe(): Stripe {
 // Membership tier pricing (amounts in cents)
 export const MEMBERSHIP_PRICES = {
   smallholder: { amount: 500, currency: 'usd', name: 'Smallholder Membership', interval: 'month' as const },
-  commercial: { amount: 5000, currency: 'usd', name: 'Commercial Membership', interval: 'month' as const },
-  enterprise: { amount: 20000, currency: 'usd', name: 'Enterprise Membership', interval: 'month' as const },
+  commercial: { amount: 2500, currency: 'usd', name: 'Commercial Membership', interval: 'month' as const },
+  enterprise: { amount: 9900, currency: 'usd', name: 'Enterprise Membership', interval: 'month' as const },
+  partner: { amount: 25000, currency: 'usd', name: 'Partner Membership', interval: 'month' as const },
 };
 
 // Sponsor tier pricing (amounts in cents)

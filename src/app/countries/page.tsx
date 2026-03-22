@@ -3,7 +3,7 @@ import Link from "next/link";
 export const metadata = {
   title: "Our Countries - AFU",
   description:
-    "AFU operates across 10 African countries: Botswana, Kenya, Mozambique, Nigeria, Sierra Leone, South Africa, Tanzania, Uganda, Zambia, and Zimbabwe.",
+    "AFU operates across 10 African countries: Botswana, Ghana, Kenya, Mozambique, Nigeria, South Africa, Tanzania, Uganda, Zambia, and Zimbabwe.",
   openGraph: {
     title: "Our Countries - AFU",
     description:
@@ -60,12 +60,12 @@ const countries = [
     stat: "200M+",
   },
   {
-    flag: "🇸🇱",
-    country: "Sierra Leone",
-    role: "West African Frontier",
-    desc: "Emerging agricultural sector with untapped potential. Rice, cocoa, and oil palm production ready for modernisation.",
-    highlights: ["Rice self-sufficiency drive", "Cocoa & palm oil exports", "Development capital inflows", "Smallholder focus"],
-    stat: "Frontier",
+    flag: "🇬🇭",
+    country: "Ghana",
+    role: "West African Cocoa Belt",
+    desc: "World's second-largest cocoa producer with strong democratic stability. Growing tech scene, structured commodity trade, and mobile money infrastructure.",
+    highlights: ["World's #2 cocoa producer", "COCOBOD structured buying", "MTN Mobile Money dominance", "Stable democracy"],
+    stat: "$2B+",
   },
   {
     flag: "🇿🇦",

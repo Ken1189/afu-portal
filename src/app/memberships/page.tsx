@@ -6,60 +6,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const tiers = [
   {
-    name: 'Student & Research',
-    price: 'Free',
-    priceNote: 'No cost',
-    audience: 'Students, researchers, and academics',
-    accent: 'border-green-300 bg-green-50',
-    accentBadge: 'bg-green-100 text-green-700',
-    popular: false,
-    features: {
-      'Crop Tracking': false,
-      'Financing Access': false,
-      Insurance: false,
-      Marketplace: false,
-      'Training Courses': true,
-      'AI Assistant': 'Limited',
-      'Export Support': false,
-      'Dedicated Officer': false,
-      'API Access': false,
-      'Priority Support': false,
-      'Research Library': true,
-      'Community Forum': true,
-      'Newsletter & Reports': true,
-      'Event Invitations': true,
-    },
-  },
-  {
-    name: 'New Enterprise',
-    price: '$5',
-    priceNote: 'per month',
-    audience: 'Aspiring farmers starting their first venture',
-    accent: 'border-blue-300 bg-blue-50',
-    accentBadge: 'bg-blue-100 text-blue-700',
-    popular: false,
-    features: {
-      'Crop Tracking': 'Basic',
-      'Financing Access': false,
-      Insurance: false,
-      Marketplace: 'View Only',
-      'Training Courses': true,
-      'AI Assistant': 'Limited',
-      'Export Support': false,
-      'Dedicated Officer': false,
-      'API Access': false,
-      'Priority Support': false,
-      'Research Library': true,
-      'Community Forum': true,
-      'Newsletter & Reports': true,
-      'Event Invitations': true,
-    },
-  },
-  {
     name: 'Smallholder',
-    price: '$15',
+    priceMonthly: '$5',
+    priceAnnual: '$48',
     priceNote: 'per month',
-    audience: 'Smallholder farmers under 10 hectares',
+    audience: 'Farms under 10 hectares',
     accent: 'border-[#5DB347] bg-[#EBF7E5]',
     accentBadge: 'bg-[#5DB347]/10 text-[#5DB347]',
     popular: true,
@@ -81,15 +32,16 @@ const tiers = [
     },
   },
   {
-    name: 'Farmer Grower',
-    price: '$35',
+    name: 'Commercial',
+    priceMonthly: '$25',
+    priceAnnual: '$240',
     priceNote: 'per month',
-    audience: 'Established farmers with 10-100 hectares',
-    accent: 'border-gold bg-amber-50',
+    audience: 'Farms 10-500 hectares',
+    accent: 'border-amber-400 bg-amber-50',
     accentBadge: 'bg-amber-100 text-amber-700',
     popular: false,
     features: {
-      'Crop Tracking': true,
+      'Crop Tracking': 'Advanced',
       'Financing Access': 'Up to $50K',
       Insurance: 'Full',
       Marketplace: true,
@@ -106,10 +58,11 @@ const tiers = [
     },
   },
   {
-    name: 'Commercial',
-    price: '$99',
+    name: 'Enterprise',
+    priceMonthly: '$99',
+    priceAnnual: '$950',
     priceNote: 'per month',
-    audience: 'Commercial operations with 100+ hectares',
+    audience: 'Large-scale operations + cooperatives',
     accent: 'border-navy bg-slate-50',
     accentBadge: 'bg-navy/10 text-navy',
     popular: false,
@@ -117,6 +70,32 @@ const tiers = [
       'Crop Tracking': 'Advanced',
       'Financing Access': 'Unlimited',
       Insurance: 'Comprehensive',
+      Marketplace: 'Priority',
+      'Training Courses': true,
+      'AI Assistant': 'Priority',
+      'Export Support': 'Full',
+      'Dedicated Officer': 'Dedicated',
+      'API Access': 'Full',
+      'Priority Support': true,
+      'Research Library': true,
+      'Community Forum': true,
+      'Newsletter & Reports': true,
+      'Event Invitations': 'VIP',
+    },
+  },
+  {
+    name: 'Partner',
+    priceMonthly: '$250',
+    priceAnnual: '$2,400',
+    priceNote: 'per month',
+    audience: 'Suppliers, offtakers, investors',
+    accent: 'border-purple-400 bg-purple-50',
+    accentBadge: 'bg-purple-100 text-purple-700',
+    popular: false,
+    features: {
+      'Crop Tracking': 'Full',
+      'Financing Access': 'Custom',
+      Insurance: 'Custom',
       Marketplace: 'Priority',
       'Training Courses': true,
       'AI Assistant': 'Priority',
@@ -160,7 +139,7 @@ const faqs = [
   },
   {
     q: 'Can I try before committing to a paid plan?',
-    a: 'Absolutely. The Student & Research tier is completely free and gives you access to our training courses, research library, and community forum. You can explore the platform and upgrade when you are ready to access farming tools, financing, and marketplace features.',
+    a: 'Yes. When you apply for any membership, our team reviews your application and you can discuss the best tier for your needs. The Smallholder plan at $5 per month is an affordable entry point, and you can upgrade as your operation grows.',
   },
 ];
 
@@ -183,6 +162,7 @@ function FeatureCell({ value }: { value: boolean | string }) {
 export default function MembershipsPage() {
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [showComparison, setShowComparison] = useState(false);
+  const [isAnnual, setIsAnnual] = useState(false);
 
   return (
     <>
@@ -206,7 +186,28 @@ export default function MembershipsPage() {
       {/* Tier Cards */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+          {/* Billing Toggle */}
+          <div className="flex items-center justify-center gap-4 mb-10">
+            <span className={`text-sm font-medium ${!isAnnual ? 'text-navy' : 'text-gray-400'}`}>Monthly</span>
+            <button
+              onClick={() => setIsAnnual(!isAnnual)}
+              className={`relative w-14 h-7 rounded-full transition-colors duration-300 ${isAnnual ? 'bg-[#5DB347]' : 'bg-gray-300'}`}
+            >
+              <motion.div
+                className="absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow-md"
+                animate={{ x: isAnnual ? 28 : 0 }}
+                transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+              />
+            </button>
+            <span className={`text-sm font-medium ${isAnnual ? 'text-navy' : 'text-gray-400'}`}>
+              Annual
+              <span className="ml-1.5 text-xs font-bold text-[#5DB347] bg-[#5DB347]/10 px-2 py-0.5 rounded-full">
+                Save 20%
+              </span>
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {tiers.map((tier, i) => (
               <div
                 key={i}
@@ -232,13 +233,11 @@ export default function MembershipsPage() {
 
                 <div className="mb-2">
                   <span className="text-4xl font-bold text-navy">
-                    {tier.price}
+                    {isAnnual ? tier.priceAnnual : tier.priceMonthly}
                   </span>
-                  {tier.priceNote !== 'No cost' && (
-                    <span className="text-sm text-gray-500 ml-1">
-                      /{tier.priceNote.replace('per ', '')}
-                    </span>
-                  )}
+                  <span className="text-sm text-gray-500 ml-1">
+                    /{isAnnual ? 'year' : 'month'}
+                  </span>
                 </div>
                 <p className="text-xs text-gray-500 mb-5">{tier.audience}</p>
 

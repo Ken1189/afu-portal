@@ -7,10 +7,10 @@ import { useApplications } from "@/lib/supabase/use-applications";
 type Tier = "smallholder" | "commercial" | "enterprise" | "partner";
 
 const tiers = {
-  smallholder: { name: "Tier A: Smallholder", price: "$50/year", desc: "For farms under 10 hectares" },
-  commercial: { name: "Tier B: Commercial", price: "$500/year", desc: "For farms 10-500+ hectares" },
-  enterprise: { name: "Tier C: Enterprise", price: "Custom pricing", desc: "For large-scale projects" },
-  partner: { name: "Partner", price: "$250/year", desc: "Tech, suppliers, offtakers, colleges" },
+  smallholder: { name: "Smallholder", price: "$48/year", priceNote: "or $5/mo", desc: "For farms under 10 hectares" },
+  commercial: { name: "Commercial", price: "$240/year", priceNote: "or $25/mo", desc: "For farms 10-500 hectares" },
+  enterprise: { name: "Enterprise", price: "$950/year", priceNote: "or $99/mo", desc: "For large-scale operations + cooperatives" },
+  partner: { name: "Partner", price: "$2,400/year", priceNote: "or $250/mo", desc: "Suppliers, offtakers, investors" },
 };
 
 export default function ApplyPage() {
@@ -47,8 +47,8 @@ export default function ApplyPage() {
       farm_size_ha: formData.farmSize ? parseFloat(formData.farmSize) : undefined,
       primary_crops: formData.crops ? formData.crops.split(',').map((c: string) => c.trim()) : undefined,
       requested_tier: (selectedTier === 'smallholder' ? 'smallholder' :
-                       selectedTier === 'commercial' ? 'farmer_grower' :
-                       selectedTier === 'enterprise' ? 'commercial' : 'new_enterprise') as any,
+                       selectedTier === 'commercial' ? 'commercial' :
+                       selectedTier === 'enterprise' ? 'enterprise' : 'partner') as any,
     });
 
     setSubmitting(false);
@@ -138,6 +138,7 @@ export default function ApplyPage() {
                       </div>
                       <div className="text-right">
                         <div className="font-bold text-[#5DB347] text-lg">{tier.price}</div>
+                        <div className="text-xs text-gray-400">{tier.priceNote}</div>
                       </div>
                     </div>
                     {selectedTier === key && (

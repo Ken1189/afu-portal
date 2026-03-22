@@ -5,9 +5,50 @@ import { useState } from "react";
 
 export default function Footer() {
   const [email, setEmail] = useState("");
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [message, setMessage] = useState("");
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailRegex.test(email)) {
+      setStatus("error");
+      setMessage("Please enter a valid email address.");
+      return;
+    }
+
+    setStatus("loading");
+    setMessage("");
+
+    try {
+      const res = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setStatus("success");
+        setMessage("Thanks for subscribing!");
+        setEmail("");
+        // Reset after 4 seconds
+        setTimeout(() => { setStatus("idle"); setMessage(""); }, 4000);
+      } else {
+        setStatus("error");
+        setMessage(data.error || "Something went wrong. Please try again.");
+      }
+    } catch {
+      setStatus("error");
+      setMessage("Network error. Please try again.");
+    }
   };
 
   return (
@@ -36,13 +77,15 @@ export default function Footer() {
             {/* Social icons */}
             <div className="flex gap-3">
               {[
-                { label: "LinkedIn", icon: "M4.98 3.5c0 1.381-1.11 2.5-2.48 2.5s-2.48-1.119-2.48-2.5c0-1.38 1.11-2.5 2.48-2.5s2.48 1.12 2.48 2.5zM.02 23h4.96V7.5H.02V23zM17.27 7.17c-2.68 0-3.88 1.47-4.55 2.5V7.5H7.76V23h4.96v-8.63c0-2.28 1.05-3.64 3.07-3.64s2.68 1.64 2.68 3.77V23H23.5v-9.5c0-4.64-2.63-6.33-6.23-6.33z", viewBox: "0 0 24 24" },
-                { label: "Twitter", icon: "M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z", viewBox: "0 0 24 24" },
-                { label: "Facebook", icon: "M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z", viewBox: "0 0 24 24" },
+                { label: "LinkedIn", href: "https://linkedin.com/company/african-farming-union", icon: "M4.98 3.5c0 1.381-1.11 2.5-2.48 2.5s-2.48-1.119-2.48-2.5c0-1.38 1.11-2.5 2.48-2.5s2.48 1.12 2.48 2.5zM.02 23h4.96V7.5H.02V23zM17.27 7.17c-2.68 0-3.88 1.47-4.55 2.5V7.5H7.76V23h4.96v-8.63c0-2.28 1.05-3.64 3.07-3.64s2.68 1.64 2.68 3.77V23H23.5v-9.5c0-4.64-2.63-6.33-6.23-6.33z", viewBox: "0 0 24 24" },
+                { label: "Twitter", href: "https://x.com/africanfarming", icon: "M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z", viewBox: "0 0 24 24" },
+                { label: "Facebook", href: "https://facebook.com/africanfarmingunion", icon: "M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z", viewBox: "0 0 24 24" },
               ].map((social) => (
                 <a
                   key={social.label}
-                  href="#"
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   aria-label={social.label}
                   className="w-10 h-10 rounded-full border border-gray-600 flex items-center justify-center text-gray-400 hover:text-white hover:bg-[#5DB347] hover:border-[#5DB347] transition-all duration-300"
                 >
@@ -90,32 +133,38 @@ export default function Footer() {
             </h4>
             <p className="text-gray-400 text-sm mb-3">Get the latest from AFU delivered to your inbox.</p>
             <form
-              onSubmit={(e) => { e.preventDefault(); setEmail(""); }}
-              className="flex gap-2 mb-6"
+              onSubmit={handleSubscribe}
+              className="flex gap-2 mb-2"
             >
               <input
                 type="email"
                 placeholder="Your email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => { setEmail(e.target.value); if (status === "error") { setStatus("idle"); setMessage(""); } }}
                 className="flex-1 bg-white/5 border border-gray-600 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#5DB347] transition-colors duration-300"
               />
               <button
                 type="submit"
-                className="px-4 py-2.5 rounded-xl text-white text-sm font-semibold transition-all duration-300 hover:-translate-y-0.5 shadow-lg shadow-[#5DB347]/20"
+                disabled={status === "loading"}
+                className="px-4 py-2.5 rounded-xl text-white text-sm font-semibold transition-all duration-300 hover:-translate-y-0.5 shadow-lg shadow-[#5DB347]/20 disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ background: 'linear-gradient(135deg, #5DB347, #449933)' }}
               >
-                →
+                {status === "loading" ? "..." : "\u2192"}
               </button>
             </form>
+            {message && (
+              <p className={`text-xs mb-4 ${status === "success" ? "text-[#5DB347]" : "text-red-400"}`}>
+                {message}
+              </p>
+            )}
 
-            <h4 className="font-semibold text-sm uppercase tracking-wider text-white mb-3">
+            <h4 className="font-semibold text-sm uppercase tracking-wider text-white mb-3 mt-4">
               Phase 1 Countries
             </h4>
             <div className="flex flex-col gap-1.5 text-gray-400 text-sm">
-              <span>🇧🇼 Botswana (Bank Base)</span>
-              <span>🇿🇼 Zimbabwe (Export Lane)</span>
-              <span>🇹🇿 Tanzania (Scale Lane)</span>
+              <span>&#x1F1E7;&#x1F1FC; Botswana (Bank Base)</span>
+              <span>&#x1F1FF;&#x1F1FC; Zimbabwe (Export Lane)</span>
+              <span>&#x1F1F9;&#x1F1FF; Tanzania (Scale Lane)</span>
             </div>
           </div>
         </div>
