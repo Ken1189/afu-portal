@@ -120,7 +120,7 @@ export default function CountriesPage() {
           <span className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5 text-sm font-medium mb-6" style={{ color: '#6ABF4B' }}>
             🌍 Pan-African Reach
           </span>
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6">
             Our <span className="bg-gradient-to-r from-[#5DB347] to-[#6ABF4B] bg-clip-text text-transparent">Countries</span>
           </h1>
           <p className="text-xl text-gray-300 max-w-3xl">

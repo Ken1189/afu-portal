@@ -58,7 +58,7 @@ export default function EducationPage() {
           <div className="inline-block bg-[#5DB347]/20 text-[#5DB347] px-4 py-1.5 rounded-full text-sm font-medium mb-4">
             Education Hub
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6">
             Education &amp; Knowledge
           </h1>
           <p className="text-xl text-gray-300 max-w-3xl leading-relaxed">

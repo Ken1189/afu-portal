@@ -171,7 +171,7 @@ export default function PodcastsPage() {
           <div className="inline-block bg-[#EBF7E5] text-[#5DB347] px-4 py-1.5 rounded-full text-sm font-medium mb-4">
             Media
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-[#6ABF4B] via-[#5DB347] to-[#8CB89C] bg-clip-text text-transparent">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-[#6ABF4B] via-[#5DB347] to-[#8CB89C] bg-clip-text text-transparent">
             AFU Podcasts
           </h1>
           <p className="text-xl text-gray-300 max-w-3xl leading-relaxed">

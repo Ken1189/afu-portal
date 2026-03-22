@@ -97,7 +97,7 @@ export default function ContactPage() {
     <>
       <section className="bg-navy text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-[#5DB347] to-[#6ABF4B] bg-clip-text text-transparent">Contact Us</h1>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-[#5DB347] to-[#6ABF4B] bg-clip-text text-transparent">Contact Us</h1>
           <p className="text-xl text-gray-300 max-w-3xl">
             Have questions about AFU? Want to explore partnership opportunities? Get in touch.
           </p>

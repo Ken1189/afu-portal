@@ -53,7 +53,7 @@ export default function AboutPage() {
             >
               🌍 Pan-African Agriculture Development Platform
             </span>
-            <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
               About <span className="bg-gradient-to-r from-[#5DB347] to-[#6ABF4B] bg-clip-text text-transparent">AFU</span>
             </h1>
             <p className="text-xl text-white/80 leading-relaxed mb-10">
@@ -91,7 +91,7 @@ export default function AboutPage() {
               <span className="bg-gradient-to-r from-[#1B2A4A] to-[#5DB347] bg-clip-text text-transparent">The Broken Cash Cycle</span>
             </h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
             {[
               { title: "Inputs Needed", desc: "Capital arrives late" },
               { title: "Yields Stay Low", desc: "No guaranteed buyers" },
@@ -235,7 +235,7 @@ export default function AboutPage() {
                 >
                   {item.icon}
                 </div>
-                <div className="font-bold text-[#1B2A4A] min-w-[200px]">{item.risk}</div>
+                <div className="font-bold text-[#1B2A4A] md:min-w-[200px]">{item.risk}</div>
                 <div className="text-gray-600 text-sm">{item.mitigation}</div>
               </div>
             ))}
@@ -260,7 +260,7 @@ export default function AboutPage() {
           <span className="text-sm font-semibold uppercase tracking-wider mb-4 block" style={{ color: '#6ABF4B' }}>
             Join the Movement
           </span>
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6">
             Join the <span className="bg-gradient-to-r from-[#5DB347] to-[#6ABF4B] bg-clip-text text-transparent">AFU Ecosystem</span>
           </h2>
           <p className="text-lg text-white/70 mb-10 max-w-xl mx-auto">

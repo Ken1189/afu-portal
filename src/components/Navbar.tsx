@@ -273,7 +273,7 @@ export default function Navbar() {
                     animate="visible"
                     exit="exit"
                     transition={{ duration: 0.15 }}
-                    className="absolute top-full -left-40 mt-1 bg-white rounded-xl shadow-xl border border-gray-100 z-50 w-[700px]"
+                    className="absolute top-full -left-40 mt-1 bg-white rounded-xl shadow-xl border border-gray-100 z-50 w-[700px] max-w-[calc(100vw-2rem)]"
                     onMouseEnter={() => handleMouseEnter("services")}
                     onMouseLeave={handleMouseLeave}
                   >

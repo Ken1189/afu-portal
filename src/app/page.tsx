@@ -858,7 +858,7 @@ export default function Home() {
                 <Landmark className="w-4 h-4" />
                 Investment Opportunity
               </div>
-              <h2 className="text-3xl md:text-5xl font-bold mt-2 mb-4">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mt-2 mb-4">
                 Invest in Africa&apos;s Agricultural{' '}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold to-amber-300">
                   Transformation
@@ -1173,7 +1173,7 @@ export default function Home() {
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <FadeInWhenVisible>
             <Droplets className="w-14 h-14 text-[#5DB347]/40 mx-auto mb-6" />
-            <h2 className="text-4xl md:text-6xl font-extrabold text-white mb-6 leading-tight text-glow">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 leading-tight text-glow">
               Ready to Join the Future of African Agriculture?
             </h2>
             <p className="text-white/80 text-xl mb-12 max-w-2xl mx-auto leading-relaxed">

@@ -62,7 +62,7 @@ export default function ApplyPage() {
       <>
         <section className="bg-navy text-white py-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white via-[#5DB347] to-[#6ABF4B] bg-clip-text text-transparent">Application Submitted</h1>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-white via-[#5DB347] to-[#6ABF4B] bg-clip-text text-transparent">Application Submitted</h1>
           </div>
         </section>
         <section className="py-16 bg-[#EBF7E5]/30">
@@ -92,7 +92,7 @@ export default function ApplyPage() {
     <>
       <section className="bg-navy text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-[#5DB347] to-[#6ABF4B] bg-clip-text text-transparent">Become a Member</h1>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-[#5DB347] to-[#6ABF4B] bg-clip-text text-transparent">Become a Member</h1>
           <p className="text-xl text-gray-300 max-w-3xl">
             Join the AFU ecosystem. Select your membership tier and complete your application.
           </p>

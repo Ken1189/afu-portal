@@ -433,11 +433,11 @@ export default function CountryPage({ params }: { params: { slug: string } }) {
           </Link>
 
           <div className="flex items-center gap-4 mb-6">
-            <span className="text-7xl md:text-8xl drop-shadow-lg">
+            <span className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl drop-shadow-lg">
               {country.flag}
             </span>
             <div>
-              <h1 className="text-4xl md:text-6xl font-bold">{country.name}</h1>
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold">{country.name}</h1>
               <span
                 className="inline-block mt-2 text-sm font-semibold uppercase tracking-wider px-4 py-1.5 rounded-full"
                 style={{
