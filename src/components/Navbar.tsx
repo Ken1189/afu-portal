@@ -376,6 +376,12 @@ export default function Navbar() {
             >
               Countries
             </Link>
+            <Link
+              href="/investors"
+              className="text-navy hover:text-[#5DB347] transition-colors text-sm font-medium px-3 py-2 rounded-lg hover:bg-[#EBF7E5]/50"
+            >
+              Investors
+            </Link>
 
             {/* Community dropdown */}
             <div className="relative">
@@ -766,6 +772,13 @@ export default function Navbar() {
                   onClick={closeMobile}
                 >
                   Countries
+                </Link>
+                <Link
+                  href="/investors"
+                  className="text-navy hover:text-[#5DB347] text-base font-medium py-3 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors"
+                  onClick={closeMobile}
+                >
+                  Investors
                 </Link>
 
                 {/* Community section */}

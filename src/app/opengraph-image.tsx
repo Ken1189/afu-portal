@@ -156,7 +156,7 @@ export default async function Image() {
                 letterSpacing: '1px',
               }}
             >
-              10 Countries &nbsp;•&nbsp; $100M Seed Round
+              10 Countries &nbsp;•&nbsp; $500M Seed Round
             </span>
           </div>
 

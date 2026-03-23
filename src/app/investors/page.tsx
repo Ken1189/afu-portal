@@ -29,11 +29,11 @@ import {
 import VideoCard from "@/components/VideoCard";
 
 export const metadata = {
-  title: "Invest in AFU - $100M Seed Round | African Farming Union",
+  title: "Invest in AFU - $500M Seed Round | African Farming Union",
   description:
-    "Join AFU's $100M seed round to build Africa's first vertically integrated agriculture development bank. $1T market opportunity. De-risked, technology-enabled model across 10 countries.",
+    "Join AFU's $500M seed round to build Africa's first vertically integrated agriculture development bank. $1T market opportunity. De-risked, technology-enabled model across 10 countries.",
   openGraph: {
-    title: "Invest in AFU - $100M Seed Round",
+    title: "Invest in AFU - $500M Seed Round",
     description:
       "Africa's agriculture is a $1T market by 2030. AFU is the execution layer — financing, inputs, processing, offtake, trade finance, and training in one integrated platform.",
     url: "https://afu-portal.vercel.app/investors",
@@ -42,13 +42,13 @@ export const metadata = {
         url: "https://afu-portal.vercel.app/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Invest in AFU - $100M Seed Round",
+        alt: "Invest in AFU - $500M Seed Round",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Invest in AFU - $100M Seed Round",
+    title: "Invest in AFU - $500M Seed Round",
     description:
       "Africa's agriculture is a $1T market by 2030. AFU is the execution layer — financing, inputs, processing, offtake, trade finance, and training in one integrated platform.",
   },
@@ -84,7 +84,7 @@ export default function InvestorsPage() {
             {/* Badge */}
             <div className="inline-flex items-center gap-2 bg-gold/20 border border-gold/30 text-gold px-5 py-2 rounded-full text-sm font-bold mb-8">
               <Landmark className="w-4 h-4" />
-              $100M Seed Round
+              $500M Seed Round
             </div>
 
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] text-white mb-8">
@@ -303,7 +303,7 @@ export default function InvestorsPage() {
                     { value: "10", label: "Countries" },
                     { value: "37+", label: "Database Tables" },
                     { value: "247+", label: "Active Members" },
-                    { value: "$100M", label: "Target Raise" },
+                    { value: "$500M", label: "Target Raise" },
                     { value: "6", label: "Service Pillars" },
                     { value: "12", label: "Languages" },
                   ].map((stat) => (
@@ -453,7 +453,7 @@ export default function InvestorsPage() {
                 icon: Building2,
               },
               {
-                value: "$100M",
+                value: "$500M",
                 label: "Target Raise",
                 desc: "Seed round to fund first-wave deployments across Phase 1 countries and begin live farming operations",
                 icon: Target,
@@ -702,7 +702,7 @@ export default function InvestorsPage() {
                   </div>
                   <h3 className="text-xl font-bold text-white">Farmer Portal Demo</h3>
                   <p className="text-white/80 text-sm mt-2">
-                    See what 22,000+ smallholder farmers experience
+                    See what 1,000,000+ smallholder farmers will experience
                   </p>
                 </div>
               </div>
@@ -776,7 +776,7 @@ export default function InvestorsPage() {
         <div className="relative max-w-4xl mx-auto px-4 text-center">
           <div className="inline-flex items-center gap-2 bg-gold/20 border border-gold/30 text-gold px-5 py-2 rounded-full text-sm font-bold mb-8">
             <Landmark className="w-4 h-4" />
-            $100M Seed Round — Now Open
+            $500M Seed Round — Now Open
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 leading-tight">
             Ready to Build the Future of{" "}

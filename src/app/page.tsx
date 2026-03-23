@@ -939,7 +939,7 @@ export default function Home() {
                 </span>
               </h2>
               <p className="text-gray-300 max-w-3xl mx-auto text-lg">
-                AFU is raising a $100M seed round to build Africa&apos;s first vertically integrated agriculture
+                AFU is raising a $500M seed round to build Africa&apos;s first vertically integrated agriculture
                 development bank and operating platform. A $1 trillion market by 2030 — and we&apos;re the execution layer.
               </p>
             </div>
@@ -948,7 +948,7 @@ export default function Home() {
           {/* Investment metrics */}
           <StaggerChildren className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-16">
             {[
-              { icon: Target, value: '$100M', label: 'Seed Round Target', color: 'from-gold to-amber-500' },
+              { icon: Target, value: '$500M', label: 'Seed Round Target', color: 'from-gold to-amber-500' },
               { icon: TrendingUp, value: '$1T', label: 'African Agri Market by 2030', color: 'from-green-400 to-emerald-500' },
               { icon: PieChart, value: '$50B+', label: 'Annual Food Import Gap', color: 'from-[#8CB89C] to-cyan-400' },
               { icon: LineChart, value: '10x', label: 'Value-Chain Multiplier', color: 'from-purple-400 to-indigo-400' },
