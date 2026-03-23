@@ -58,7 +58,16 @@ const educationLinks = [
   { label: "Knowledgebase", href: "/education/knowledgebase", icon: BookOpen },
 ];
 
-type OpenDropdown = null | "services" | "education";
+const communityLinks = [
+  { label: "Jobs Board", href: "/jobs", desc: "Agricultural positions" },
+  { label: "Ambassadors", href: "/ambassadors", desc: "Meet our farmers" },
+  { label: "Partner Farms", href: "/farms", desc: "Showcase farms" },
+  { label: "Partners", href: "/partners", desc: "Our network" },
+  { label: "Projects", href: "/projects", desc: "Development projects" },
+  { label: "Podcasts", href: "/podcasts", desc: "Listen & learn" },
+];
+
+type OpenDropdown = null | "services" | "education" | "community";
 
 /* ─── Dropdown animation variants ─── */
 
@@ -354,7 +363,7 @@ export default function Navbar() {
               </AnimatePresence>
             </div>
 
-            {/* Simple Links */}
+            {/* Clean nav: 3 links + 1 dropdown */}
             <Link
               href="/memberships"
               className="text-navy hover:text-[#5DB347] transition-colors text-sm font-medium px-3 py-2 rounded-lg hover:bg-[#EBF7E5]/50"
@@ -362,41 +371,50 @@ export default function Navbar() {
               Memberships
             </Link>
             <Link
-              href="/podcasts"
-              className="text-navy hover:text-[#5DB347] transition-colors text-sm font-medium px-3 py-2 rounded-lg hover:bg-[#EBF7E5]/50"
-            >
-              Podcasts
-            </Link>
-            <Link
-              href="/partners"
-              className="text-navy hover:text-[#5DB347] transition-colors text-sm font-medium px-3 py-2 rounded-lg hover:bg-[#EBF7E5]/50"
-            >
-              Partnerships
-            </Link>
-            <Link
-              href="/projects"
-              className="text-navy hover:text-[#5DB347] transition-colors text-sm font-medium px-3 py-2 rounded-lg hover:bg-[#EBF7E5]/50"
-            >
-              Projects
-            </Link>
-            <Link
-              href="/jobs"
-              className="text-navy hover:text-[#5DB347] transition-colors text-sm font-medium px-3 py-2 rounded-lg hover:bg-[#EBF7E5]/50"
-            >
-              Jobs
-            </Link>
-            <Link
-              href="/ambassadors"
-              className="text-navy hover:text-[#5DB347] transition-colors text-sm font-medium px-3 py-2 rounded-lg hover:bg-[#EBF7E5]/50"
-            >
-              Ambassadors
-            </Link>
-            <Link
               href="/countries"
               className="text-navy hover:text-[#5DB347] transition-colors text-sm font-medium px-3 py-2 rounded-lg hover:bg-[#EBF7E5]/50"
             >
               Countries
             </Link>
+
+            {/* Community dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setOpenDropdown(openDropdown === "community" ? null : "community")}
+                className={`flex items-center gap-1 text-sm font-medium px-3 py-2 rounded-lg transition-colors ${
+                  openDropdown === "community"
+                    ? "text-[#5DB347] bg-[#EBF7E5]/50"
+                    : "text-navy hover:text-[#5DB347] hover:bg-[#EBF7E5]/50"
+                }`}
+              >
+                Community
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${openDropdown === "community" ? "rotate-180" : ""}`} />
+              </button>
+              <AnimatePresence>
+                {openDropdown === "community" && (
+                  <motion.div
+                    variants={dropdownVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    transition={{ duration: 0.15 }}
+                    className="absolute top-full left-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50"
+                  >
+                    {communityLinks.map((link) => (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        onClick={() => setOpenDropdown(null)}
+                        className="flex flex-col px-4 py-2.5 hover:bg-[#EBF7E5]/50 transition-colors"
+                      >
+                        <span className="text-sm font-medium text-navy">{link.label}</span>
+                        <span className="text-[10px] text-gray-400">{link.desc}</span>
+                      </Link>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
             <Link
               href="/sponsor"
               className="text-white font-semibold text-xs px-3 py-1.5 rounded-md transition-colors flex items-center gap-1 whitespace-nowrap"
@@ -734,7 +752,7 @@ export default function Navbar() {
                   </AnimatePresence>
                 </div>
 
-                {/* Flat links */}
+                {/* Clean mobile nav */}
                 <Link
                   href="/memberships"
                   className="text-navy hover:text-[#5DB347] text-base font-medium py-3 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors"
@@ -743,47 +761,28 @@ export default function Navbar() {
                   Memberships
                 </Link>
                 <Link
-                  href="/podcasts"
-                  className="text-navy hover:text-[#5DB347] text-base font-medium py-3 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors"
-                  onClick={closeMobile}
-                >
-                  Podcasts
-                </Link>
-                <Link
-                  href="/partners"
-                  className="text-navy hover:text-[#5DB347] text-base font-medium py-3 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors"
-                  onClick={closeMobile}
-                >
-                  Partnerships
-                </Link>
-                <Link
-                  href="/projects"
-                  className="text-navy hover:text-[#5DB347] text-base font-medium py-3 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors"
-                  onClick={closeMobile}
-                >
-                  Projects
-                </Link>
-                <Link
-                  href="/jobs"
-                  className="text-navy hover:text-[#5DB347] text-base font-medium py-3 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors"
-                  onClick={closeMobile}
-                >
-                  Jobs
-                </Link>
-                <Link
-                  href="/ambassadors"
-                  className="text-navy hover:text-[#5DB347] text-base font-medium py-3 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors"
-                  onClick={closeMobile}
-                >
-                  Ambassadors
-                </Link>
-                <Link
                   href="/countries"
                   className="text-navy hover:text-[#5DB347] text-base font-medium py-3 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors"
                   onClick={closeMobile}
                 >
                   Countries
                 </Link>
+
+                {/* Community section */}
+                <div className="pt-2 mt-2 border-t border-gray-100">
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider px-3 mb-2">Community</p>
+                  {communityLinks.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className="text-navy/80 hover:text-[#5DB347] text-sm font-medium py-2.5 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors block"
+                      onClick={closeMobile}
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
+                </div>
+
                 <Link
                   href="/sponsor"
                   className="text-white font-semibold text-base py-3 px-3 rounded-lg transition-colors flex items-center gap-2"
