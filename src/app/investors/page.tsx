@@ -23,6 +23,8 @@ import {
   Mail,
   Phone,
   Calendar,
+  Sprout,
+  Monitor,
 } from "lucide-react";
 import VideoCard from "@/components/VideoCard";
 
@@ -664,6 +666,98 @@ export default function InvestorsPage() {
                     </div>
                   );
                 })}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── LIVE PRODUCT DEMOS ─── */}
+      <section className="py-20 bg-white relative overflow-hidden">
+        <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: "radial-gradient(circle at 1px 1px, #5DB347 1px, transparent 0)", backgroundSize: "40px 40px" }} />
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: "#5DB347" }}>
+              See It In Action
+            </span>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mt-2 mb-4">
+              <span className="bg-gradient-to-r from-[#1B2A4A] to-[#5DB347] bg-clip-text text-transparent">
+                Live Product Demos
+              </span>
+            </h2>
+            <p className="text-gray-500 max-w-2xl mx-auto text-lg">
+              Explore the actual platform farmers and commercial operators use &mdash; no login required.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Farmer Portal Demo Card */}
+            <div className="bg-white rounded-3xl border border-gray-100 shadow-lg shadow-[#5DB347]/5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden group">
+              <div className="bg-gradient-to-br from-[#5DB347] to-[#449933] p-8 relative overflow-hidden">
+                <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-white/10" />
+                <div className="absolute -right-2 -bottom-8 w-32 h-32 rounded-full bg-white/5" />
+                <div className="relative">
+                  <div className="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center mb-4">
+                    <Sprout className="w-7 h-7 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white">Farmer Portal Demo</h3>
+                  <p className="text-white/80 text-sm mt-2">
+                    See what 22,000+ smallholder farmers experience
+                  </p>
+                </div>
+              </div>
+              <div className="p-6">
+                <ul className="space-y-2 mb-6">
+                  {["Dashboard & farm overview", "AI Crop Doctor diagnosis", "Loan tracking & repayments", "Training & market prices"].map((f) => (
+                    <li key={f} className="flex items-center gap-2 text-sm text-gray-600">
+                      <CheckCircle2 className="w-4 h-4 shrink-0" style={{ color: "#5DB347" }} />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  href="/demo/farm"
+                  className="group/btn w-full flex items-center justify-center gap-2 py-4 rounded-xl font-bold text-white transition-all duration-300 shadow-lg shadow-[#5DB347]/20 hover:shadow-xl hover:shadow-[#5DB347]/30"
+                  style={{ background: "linear-gradient(135deg, #5DB347, #449933)" }}
+                >
+                  Launch Demo
+                  <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Commercial Dashboard Demo Card */}
+            <div className="bg-white rounded-3xl border border-gray-100 shadow-lg shadow-[#5DB347]/5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden group">
+              <div className="bg-gradient-to-br from-[#1B2A4A] to-[#0F1A30] p-8 relative overflow-hidden">
+                <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-white/10" />
+                <div className="absolute -right-2 -bottom-8 w-32 h-32 rounded-full bg-white/5" />
+                <div className="relative">
+                  <div className="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center mb-4">
+                    <Monitor className="w-7 h-7 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white">Commercial Dashboard Demo</h3>
+                  <p className="text-white/80 text-sm mt-2">
+                    Enterprise-grade farm management tools
+                  </p>
+                </div>
+              </div>
+              <div className="p-6">
+                <ul className="space-y-2 mb-6">
+                  {["Multi-plot management", "Offtake contracts & financing", "Equipment booking & co-ops", "Export readiness tracking"].map((f) => (
+                    <li key={f} className="flex items-center gap-2 text-sm text-gray-600">
+                      <CheckCircle2 className="w-4 h-4 shrink-0" style={{ color: "#5DB347" }} />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  href="/demo/commercial"
+                  className="group/btn w-full flex items-center justify-center gap-2 py-4 rounded-xl font-bold text-white transition-all duration-300 shadow-lg shadow-[#1B2A4A]/20 hover:shadow-xl hover:shadow-[#1B2A4A]/30"
+                  style={{ background: "linear-gradient(135deg, #1B2A4A, #2D4A7A)" }}
+                >
+                  Launch Demo
+                  <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
+                </Link>
               </div>
             </div>
           </div>
