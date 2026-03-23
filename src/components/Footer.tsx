@@ -121,6 +121,9 @@ export default function Footer() {
               <Link href="/about" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">About AFU</Link>
               <Link href="/countries" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">Countries</Link>
               <Link href="/partners" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">Partners</Link>
+              <Link href="/jobs" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">Jobs</Link>
+              <Link href="/ambassadors" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">Ambassadors</Link>
+              <Link href="/farms" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">Farms</Link>
               <Link href="/contact" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">Contact</Link>
               <Link href="/apply" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">Become a Member</Link>
             </div>

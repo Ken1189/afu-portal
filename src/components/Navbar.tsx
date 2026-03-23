@@ -380,6 +380,18 @@ export default function Navbar() {
               Projects
             </Link>
             <Link
+              href="/jobs"
+              className="text-navy hover:text-[#5DB347] transition-colors text-sm font-medium px-3 py-2 rounded-lg hover:bg-[#EBF7E5]/50"
+            >
+              Jobs
+            </Link>
+            <Link
+              href="/ambassadors"
+              className="text-navy hover:text-[#5DB347] transition-colors text-sm font-medium px-3 py-2 rounded-lg hover:bg-[#EBF7E5]/50"
+            >
+              Ambassadors
+            </Link>
+            <Link
               href="/countries"
               className="text-navy hover:text-[#5DB347] transition-colors text-sm font-medium px-3 py-2 rounded-lg hover:bg-[#EBF7E5]/50"
             >
@@ -750,6 +762,20 @@ export default function Navbar() {
                   onClick={closeMobile}
                 >
                   Projects
+                </Link>
+                <Link
+                  href="/jobs"
+                  className="text-navy hover:text-[#5DB347] text-base font-medium py-3 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors"
+                  onClick={closeMobile}
+                >
+                  Jobs
+                </Link>
+                <Link
+                  href="/ambassadors"
+                  className="text-navy hover:text-[#5DB347] text-base font-medium py-3 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors"
+                  onClick={closeMobile}
+                >
+                  Ambassadors
                 </Link>
                 <Link
                   href="/countries"

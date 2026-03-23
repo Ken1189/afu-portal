@@ -48,6 +48,8 @@ import {
   Scale,
   Upload,
   Database,
+  Briefcase,
+  Megaphone,
 } from 'lucide-react';
 
 // ── Navigation structure with collapsible groups ──
@@ -113,6 +115,7 @@ const navGroups: NavGroup[] = [
       { href: '/admin/programs', label: 'Programs', icon: <Sprout className="w-4 h-4" /> },
       { href: '/admin/sponsor', label: 'Sponsor a Farmer', icon: <Heart className="w-4 h-4" /> },
       { href: '/admin/sponsor-tiers', label: 'Sponsor Tiers', icon: <Gift className="w-4 h-4" /> },
+      { href: '/admin/jobs', label: 'Jobs Board', icon: <Briefcase className="w-4 h-4" /> },
     ],
   },
   {
@@ -129,6 +132,7 @@ const navGroups: NavGroup[] = [
     defaultOpen: false,
     links: [
       { href: '/admin/content', label: 'Site Content', icon: <FileEdit className="w-4 h-4" /> },
+      { href: '/admin/ambassadors', label: 'Ambassadors', icon: <Megaphone className="w-4 h-4" /> },
       { href: '/admin/faq', label: 'FAQ Manager', icon: <HelpCircle className="w-4 h-4" /> },
       { href: '/admin/legal', label: 'Legal Pages', icon: <Scale className="w-4 h-4" /> },
       { href: '/admin/countries', label: 'Countries', icon: <Globe className="w-4 h-4" /> },
