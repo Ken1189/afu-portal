@@ -74,8 +74,8 @@ const TIER_CONFIG = [
   },
 ];
 
-// Demo farmer's current tier — show Sprout unlocked, rest locked
-const DEMO_TIER_INDEX = 1; // sprout
+// Demo: all tiers unlocked so investors see every feature
+const DEMO_TIER_INDEX = 4; // all unlocked
 
 export default function DemoLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -119,12 +119,12 @@ export default function DemoLayout({ children }: { children: React.ReactNode }) 
         <div className="mt-3">
           <div className="flex items-center justify-between text-[10px] mb-1">
             <span className="text-gray-500">Tier Progress</span>
-            <span className="font-bold text-[#5DB347]">{isFarm ? '40%' : '80%'}</span>
+            <span className="font-bold text-[#5DB347]">100%</span>
           </div>
           <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
             <div
               className="h-full bg-gradient-to-r from-[#8CB89C] to-[#5DB347] rounded-full transition-all"
-              style={{ width: isFarm ? '40%' : '80%' }}
+              style={{ width: '100%' }}
             />
           </div>
           <div className="flex justify-between mt-1">
@@ -132,7 +132,7 @@ export default function DemoLayout({ children }: { children: React.ReactNode }) 
               <div
                 key={t}
                 className={`w-2 h-2 rounded-full ${
-                  i <= (isFarm ? DEMO_TIER_INDEX : 3)
+                  i <= DEMO_TIER_INDEX
                     ? 'bg-[#5DB347]'
                     : 'bg-gray-200'
                 }`}
@@ -154,7 +154,7 @@ export default function DemoLayout({ children }: { children: React.ReactNode }) 
       {/* Tier-grouped navigation */}
       <div className="flex-1 overflow-y-auto py-2">
         {TIER_CONFIG.map((tierGroup, tierIdx) => {
-          const unlocked = tierIdx <= (isFarm ? DEMO_TIER_INDEX : 3);
+          const unlocked = tierIdx <= DEMO_TIER_INDEX;
           const expanded = expandedTiers[tierGroup.tier];
 
           return (
