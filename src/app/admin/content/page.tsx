@@ -30,6 +30,8 @@ import {
   ChevronRight,
   Users,
   Trash2,
+  ImageIcon,
+  Upload,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
@@ -110,7 +112,7 @@ interface CountryTeamData {
   members: CountryTeamMember[];
 }
 
-type TabId = 'content' | 'flags' | 'config' | 'templates' | 'broadcasts' | 'country_teams';
+type TabId = 'content' | 'flags' | 'config' | 'templates' | 'broadcasts' | 'country_teams' | 'branding';
 
 // ═══════════════════════════════════════════════════════
 //  CONSTANTS
@@ -123,6 +125,7 @@ const TABS: { id: TabId; label: string; icon: React.ReactNode }[] = [
   { id: 'templates', label: 'Notifications', icon: <Bell className="w-4 h-4" /> },
   { id: 'broadcasts', label: 'Broadcasts', icon: <Megaphone className="w-4 h-4" /> },
   { id: 'country_teams', label: 'Country Teams', icon: <Users className="w-4 h-4" /> },
+  { id: 'branding', label: 'Branding', icon: <ImageIcon className="w-4 h-4" /> },
 ];
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -270,6 +273,7 @@ export default function AdminContentPage() {
       {activeTab === 'templates' && <NotificationTemplatesTab showToast={showToast} />}
       {activeTab === 'broadcasts' && <BroadcastsTab showToast={showToast} />}
       {activeTab === 'country_teams' && <CountryTeamsTab showToast={showToast} />}
+      {activeTab === 'branding' && <BrandingTab showToast={showToast} />}
 
       {/* Toast */}
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
@@ -1738,6 +1742,179 @@ function LoadingState() {
       <div className="text-center">
         <Loader2 className="w-8 h-8 text-[#5DB347] animate-spin mx-auto mb-3" />
         <p className="text-sm text-gray-500">Loading...</p>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════
+//  TAB 7: BRANDING
+// ═══════════════════════════════════════════════════════
+
+function BrandingTab({ showToast }: { showToast: (msg: string, type?: 'success' | 'error') => void }) {
+  const supabase = createClient();
+  const [logoUrl, setLogoUrl] = useState('');
+  const [previewUrl, setPreviewUrl] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const { data } = await supabase
+          .from('site_config')
+          .select('*')
+          .eq('key', 'site_logo_url')
+          .single();
+        if (data) {
+          setLogoUrl(data.value || '');
+          setPreviewUrl(data.value || '');
+        }
+      } catch {
+        // config row may not exist yet
+      }
+      setLoading(false);
+    }
+    load();
+  }, [supabase]);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setSelectedFile(file);
+    const reader = new FileReader();
+    reader.onload = () => setPreviewUrl(reader.result as string);
+    reader.readAsDataURL(file);
+  };
+
+  const handleUrlChange = (url: string) => {
+    setLogoUrl(url);
+    setPreviewUrl(url);
+    setSelectedFile(null);
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      let finalUrl = logoUrl;
+
+      // If a file was selected, upload it to Supabase storage
+      if (selectedFile) {
+        const ext = selectedFile.name.split('.').pop();
+        const filePath = `branding/logo-${Date.now()}.${ext}`;
+        const { error: uploadError } = await supabase.storage
+          .from('public-assets')
+          .upload(filePath, selectedFile, { upsert: true });
+
+        if (uploadError) {
+          // Fall back to just saving the data URL or existing URL
+          console.warn('Upload failed, saving URL directly:', uploadError.message);
+        } else {
+          const { data: urlData } = supabase.storage.from('public-assets').getPublicUrl(filePath);
+          finalUrl = urlData.publicUrl;
+        }
+      }
+
+      // Upsert into site_config
+      const { error } = await supabase
+        .from('site_config')
+        .upsert(
+          {
+            category: 'branding',
+            key: 'site_logo_url',
+            value: finalUrl,
+            value_type: 'string',
+            label: 'Site Logo URL',
+            description: 'URL for the site logo displayed across the platform',
+          },
+          { onConflict: 'key' }
+        );
+
+      if (error) throw error;
+      setLogoUrl(finalUrl);
+      setPreviewUrl(finalUrl);
+      setSelectedFile(null);
+      showToast('Logo updated successfully');
+    } catch {
+      showToast('Failed to save logo', 'error');
+    }
+    setSaving(false);
+  };
+
+  if (loading) return (
+    <div className="flex items-center justify-center py-20">
+      <div className="text-center">
+        <Loader2 className="w-8 h-8 text-[#5DB347] animate-spin mx-auto mb-3" />
+        <p className="text-sm text-gray-500">Loading...</p>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+        <h3 className="text-lg font-semibold text-[#1B2A4A] mb-1">Site Logo</h3>
+        <p className="text-sm text-gray-500 mb-6">Upload or provide a URL for the site logo used across the platform.</p>
+
+        {/* Current Logo Preview */}
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-2">Current Logo</label>
+          <div className="w-full max-w-xs h-32 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200 flex items-center justify-center overflow-hidden">
+            {previewUrl ? (
+              <img
+                src={previewUrl}
+                alt="Site logo preview"
+                className="max-h-full max-w-full object-contain p-3"
+              />
+            ) : (
+              <div className="text-center text-gray-400">
+                <ImageIcon className="w-8 h-8 mx-auto mb-1" />
+                <p className="text-xs">No logo set</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Upload File */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-2">Upload New Logo</label>
+          <label className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer transition-colors">
+            <Upload className="w-4 h-4 text-gray-500" />
+            Choose File
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="hidden"
+            />
+          </label>
+          {selectedFile && (
+            <span className="ml-3 text-sm text-gray-500">{selectedFile.name}</span>
+          )}
+        </div>
+
+        {/* Or URL */}
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-2">Or enter logo URL</label>
+          <input
+            type="url"
+            value={logoUrl}
+            onChange={(e) => handleUrlChange(e.target.value)}
+            placeholder="https://example.com/logo.png"
+            className="w-full max-w-lg px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347]"
+          />
+        </div>
+
+        {/* Save */}
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#5DB347] text-white text-sm font-medium hover:bg-[#4ea03c] transition-colors disabled:opacity-50"
+        >
+          {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+          Save Logo
+        </button>
       </div>
     </div>
   );

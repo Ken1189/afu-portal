@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, useInView } from 'framer-motion';
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import {
   Banknote,
   Cog,
@@ -36,6 +36,7 @@ import {
 } from 'lucide-react';
 import { useCountUp } from '@/hooks/useCountUp';
 import VideoCard from '@/components/VideoCard';
+import { createClient } from '@/lib/supabase/client';
 
 /* ─── Animation helpers ─── */
 function FadeInWhenVisible({
@@ -186,8 +187,8 @@ const flywheelSteps = [
   { step: 7, label: 'Cash Recycle', icon: TrendingUp, bg: 'linear-gradient(135deg, #5DB347, #8CB89C)' },
 ];
 
-/* ─── Testimonials ─── */
-const testimonials = [
+/* ─── Testimonials (fallback) ─── */
+const fallbackTestimonials = [
   {
     name: 'Tendai Moyo',
     role: 'Blueberry Farmer, Zimbabwe',
@@ -237,6 +238,36 @@ const howItWorks = [
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 export default function Home() {
+  const [testimonials, setTestimonials] = useState(fallbackTestimonials);
+
+  useEffect(() => {
+    async function fetchTestimonials() {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from('testimonials')
+          .select('*')
+          .eq('is_featured', true)
+          .order('display_order', { ascending: true })
+          .limit(6);
+        if (data && data.length > 0) {
+          setTestimonials(
+            data.map((t: Record<string, unknown>) => ({
+              name: (t.name as string) || (t.author_name as string) || '',
+              role: (t.role as string) || (t.author_role as string) || '',
+              quote: (t.quote as string) || (t.content as string) || '',
+              img: (t.img as string) || (t.avatar_url as string) || (t.photo_url as string) || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face',
+              rating: (t.rating as number) || 5,
+            }))
+          );
+        }
+      } catch {
+        // keep fallback
+      }
+    }
+    fetchTestimonials();
+  }, []);
+
   return (
     <>
       {/* ─── HERO ─── */}

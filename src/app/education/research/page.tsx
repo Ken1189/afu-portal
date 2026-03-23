@@ -1,129 +1,159 @@
-import Link from "next/link";
+'use client';
 
-export const metadata = {
-  title: "Research Centres - AFU Education",
-  description:
-    "Explore AFU's network of agricultural research centres across Africa, advancing crop science, soil health, livestock genetics, and climate adaptation.",
-};
+import Link from 'next/link';
+import { useState, useEffect } from 'react';
+import { createClient } from '@/lib/supabase/client';
 
-const centres = [
+interface ResearchCentre {
+  id: string;
+  name: string;
+  description: string;
+  focus_areas: string[];
+  country: string;
+  region: string | null;
+  photo_url: string | null;
+  website: string | null;
+  established_year: number | null;
+  team_size: number | null;
+  key_projects: string[];
+  partner_institutions: string[];
+}
+
+// Hardcoded fallback data
+const fallbackCentres: ResearchCentre[] = [
   {
-    name: "Harare Crop Science Lab",
-    country: "Zimbabwe",
-    city: "Harare",
-    focus: "Crop Genetics & Breeding",
-    established: 2019,
-    description:
-      "Specialising in the development of drought-resistant and high-yield crop varieties suited to southern African growing conditions. The lab operates advanced greenhouses and open-field trial plots across 15 hectares.",
-    achievements: [
-      "Developed 3 drought-resistant maize varieties now in commercial use",
-      "Published 12 peer-reviewed papers on crop genetics in tropical climates",
-      "Trained 200+ agricultural extension workers in seed selection techniques",
+    id: '1',
+    name: 'Harare Crop Science Lab',
+    description: 'Specialising in the development of drought-resistant and high-yield crop varieties suited to southern African growing conditions. The lab operates advanced greenhouses and open-field trial plots across 15 hectares.',
+    focus_areas: ['Crop Genetics & Breeding'],
+    country: 'Zimbabwe',
+    region: 'Harare',
+    photo_url: null,
+    website: null,
+    established_year: 2019,
+    team_size: null,
+    key_projects: [
+      'Developed 3 drought-resistant maize varieties now in commercial use',
+      'Published 12 peer-reviewed papers on crop genetics in tropical climates',
+      'Trained 200+ agricultural extension workers in seed selection techniques',
     ],
-    partners: [
-      "University of Zimbabwe",
-      "CIMMYT",
-      "Zimbabwe Agricultural Research Council",
-    ],
+    partner_institutions: ['University of Zimbabwe', 'CIMMYT', 'Zimbabwe Agricultural Research Council'],
   },
   {
-    name: "Gaborone Soil Research Institute",
-    country: "Botswana",
-    city: "Gaborone",
-    focus: "Soil Science & Fertility",
-    established: 2020,
-    description:
-      "Dedicated to understanding and improving soil health across semi-arid regions of southern Africa. The institute conducts large-scale soil mapping and develops sustainable fertilization strategies for degraded farmland.",
-    achievements: [
-      "Completed soil health mapping for 50,000 hectares across Botswana",
-      "Created an organic fertiliser blend that increased yields by 25% in trials",
-      "Established a soil testing service used by 800+ farmers annually",
+    id: '2',
+    name: 'Gaborone Soil Research Institute',
+    description: 'Dedicated to understanding and improving soil health across semi-arid regions of southern Africa. The institute conducts large-scale soil mapping and develops sustainable fertilization strategies for degraded farmland.',
+    focus_areas: ['Soil Science & Fertility'],
+    country: 'Botswana',
+    region: 'Gaborone',
+    photo_url: null,
+    website: null,
+    established_year: 2020,
+    team_size: null,
+    key_projects: [
+      'Completed soil health mapping for 50,000 hectares across Botswana',
+      'Created an organic fertiliser blend that increased yields by 25% in trials',
+      'Established a soil testing service used by 800+ farmers annually',
     ],
-    partners: [
-      "University of Botswana",
-      "ICRISAT",
-      "Botswana Ministry of Agriculture",
-    ],
+    partner_institutions: ['University of Botswana', 'ICRISAT', 'Botswana Ministry of Agriculture'],
   },
   {
-    name: "Dodoma Agricultural Innovation Centre",
-    country: "Tanzania",
-    city: "Dodoma",
-    focus: "Agricultural Technology",
-    established: 2021,
-    description:
-      "A hub for agricultural technology development and adaptation, focusing on precision farming tools, mobile-based extension services, and data-driven farm management solutions for East African smallholders.",
-    achievements: [
-      "Launched a mobile crop advisory platform reaching 15,000 farmers",
-      "Piloted drone-based crop monitoring across 5 districts in central Tanzania",
-      "Developed an SMS-based pest early warning system with 90% accuracy",
+    id: '3',
+    name: 'Dodoma Agricultural Innovation Centre',
+    description: 'A hub for agricultural technology development and adaptation, focusing on precision farming tools, mobile-based extension services, and data-driven farm management solutions for East African smallholders.',
+    focus_areas: ['Agricultural Technology'],
+    country: 'Tanzania',
+    region: 'Dodoma',
+    photo_url: null,
+    website: null,
+    established_year: 2021,
+    team_size: null,
+    key_projects: [
+      'Launched a mobile crop advisory platform reaching 15,000 farmers',
+      'Piloted drone-based crop monitoring across 5 districts in central Tanzania',
+      'Developed an SMS-based pest early warning system with 90% accuracy',
     ],
-    partners: [
-      "University of Dar es Salaam",
-      "Tanzania Agricultural Research Institute",
-      "Google.org",
-    ],
+    partner_institutions: ['University of Dar es Salaam', 'Tanzania Agricultural Research Institute', 'Google.org'],
   },
   {
-    name: "Masvingo Livestock Research Station",
-    country: "Zimbabwe",
-    city: "Masvingo",
-    focus: "Livestock Genetics & Health",
-    established: 2020,
-    description:
-      "Focused on improving livestock productivity through genetic research, disease prevention, and sustainable grazing management. The station maintains a herd of 500+ cattle for breeding trials and veterinary research.",
-    achievements: [
-      "Identified genetic markers for heat tolerance in indigenous cattle breeds",
-      "Reduced tick-borne disease incidence by 40% through integrated management protocols",
-      "Established a livestock semen bank serving 300+ commercial and smallholder farms",
+    id: '4',
+    name: 'Masvingo Livestock Research Station',
+    description: 'Focused on improving livestock productivity through genetic research, disease prevention, and sustainable grazing management. The station maintains a herd of 500+ cattle for breeding trials and veterinary research.',
+    focus_areas: ['Livestock Genetics & Health'],
+    country: 'Zimbabwe',
+    region: 'Masvingo',
+    photo_url: null,
+    website: null,
+    established_year: 2020,
+    team_size: null,
+    key_projects: [
+      'Identified genetic markers for heat tolerance in indigenous cattle breeds',
+      'Reduced tick-borne disease incidence by 40% through integrated management protocols',
+      'Established a livestock semen bank serving 300+ commercial and smallholder farms',
     ],
-    partners: [
-      "Midlands State University",
-      "ILRI",
-      "Zimbabwe Herd Book Authority",
-    ],
+    partner_institutions: ['Midlands State University', 'ILRI', 'Zimbabwe Herd Book Authority'],
   },
   {
-    name: "Francistown Water Management Centre",
-    country: "Botswana",
-    city: "Francistown",
-    focus: "Water Conservation & Irrigation",
-    established: 2022,
-    description:
-      "Researching and deploying water-efficient farming techniques for arid and semi-arid zones. The centre develops drip irrigation systems, rainwater harvesting infrastructure, and groundwater management protocols.",
-    achievements: [
-      "Designed a low-cost drip irrigation kit reducing water use by 60%",
-      "Installed rainwater harvesting systems on 120 farms across northern Botswana",
-      "Published comprehensive groundwater mapping for the Tuli Block farming region",
+    id: '5',
+    name: 'Francistown Water Management Centre',
+    description: 'Researching and deploying water-efficient farming techniques for arid and semi-arid zones. The centre develops drip irrigation systems, rainwater harvesting infrastructure, and groundwater management protocols.',
+    focus_areas: ['Water Conservation & Irrigation'],
+    country: 'Botswana',
+    region: 'Francistown',
+    photo_url: null,
+    website: null,
+    established_year: 2022,
+    team_size: null,
+    key_projects: [
+      'Designed a low-cost drip irrigation kit reducing water use by 60%',
+      'Installed rainwater harvesting systems on 120 farms across northern Botswana',
+      'Published comprehensive groundwater mapping for the Tuli Block farming region',
     ],
-    partners: [
-      "Botswana University of Agriculture",
-      "IWMI",
-      "WaterAid Southern Africa",
-    ],
+    partner_institutions: ['Botswana University of Agriculture', 'IWMI', 'WaterAid Southern Africa'],
   },
   {
-    name: "Arusha Climate Adaptation Lab",
-    country: "Tanzania",
-    city: "Arusha",
-    focus: "Climate-Smart Agriculture",
-    established: 2023,
-    description:
-      "Addressing the impact of climate change on East African agriculture through adaptive crop systems, carbon sequestration research, and climate risk modelling for farming communities in the Great Rift Valley corridor.",
-    achievements: [
-      "Developed a climate risk assessment tool used by 2,000+ farming households",
-      "Established 8 climate-smart demonstration farms across northern Tanzania",
-      "Initiated a carbon credit verification programme for agroforestry systems",
+    id: '6',
+    name: 'Arusha Climate Adaptation Lab',
+    description: 'Addressing the impact of climate change on East African agriculture through adaptive crop systems, carbon sequestration research, and climate risk modelling for farming communities in the Great Rift Valley corridor.',
+    focus_areas: ['Climate-Smart Agriculture'],
+    country: 'Tanzania',
+    region: 'Arusha',
+    photo_url: null,
+    website: null,
+    established_year: 2023,
+    team_size: null,
+    key_projects: [
+      'Developed a climate risk assessment tool used by 2,000+ farming households',
+      'Established 8 climate-smart demonstration farms across northern Tanzania',
+      'Initiated a carbon credit verification programme for agroforestry systems',
     ],
-    partners: [
-      "Nelson Mandela African Institution of Science and Technology",
-      "CCAFS",
-      "Tanzania Meteorological Authority",
-    ],
+    partner_institutions: ['Nelson Mandela African Institution of Science and Technology', 'CCAFS', 'Tanzania Meteorological Authority'],
   },
 ];
 
 export default function ResearchCentresPage() {
+  const [centres, setCentres] = useState<ResearchCentre[]>(fallbackCentres);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from('research_centres')
+          .select('*')
+          .order('established_year', { ascending: true });
+        if (data && data.length > 0) {
+          setCentres(data);
+        }
+      } catch {
+        // keep fallback
+      }
+      setLoading(false);
+    }
+    load();
+  }, []);
+
   return (
     <>
       {/* Hero */}
@@ -146,81 +176,100 @@ export default function ResearchCentresPage() {
       {/* Research Centres Grid */}
       <section className="py-16 bg-[#EBF7E5]/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {centres.map((centre, i) => (
-              <div
-                key={i}
-                className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 border-l-4 border-[#5DB347] shadow-lg shadow-[#5DB347]/5 hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div>
-                    <h3 className="text-xl font-bold text-[#1B2A4A]">
-                      {centre.name}
-                    </h3>
-                    <p className="text-gray-500 text-sm">
-                      {centre.city}, {centre.country}
-                    </p>
-                  </div>
-                  <span className="text-xs font-semibold px-3 py-1 rounded-full bg-[#EBF7E5] text-[#5DB347]">
-                    Est. {centre.established}
-                  </span>
-                </div>
-
-                <div className="inline-block bg-[#5DB347]/10 text-[#5DB347] px-3 py-1 rounded-full text-xs font-medium mb-4">
-                  {centre.focus}
-                </div>
-
-                <p className="text-gray-600 text-sm mb-5 leading-relaxed">
-                  {centre.description}
-                </p>
-
-                <div className="mb-5">
-                  <h4 className="text-sm font-semibold text-[#1B2A4A] mb-3">
-                    Key Achievements
-                  </h4>
-                  <ul className="space-y-2">
-                    {centre.achievements.map((a, j) => (
-                      <li
-                        key={j}
-                        className="flex items-start gap-2 text-gray-600 text-sm"
-                      >
-                        <svg
-                          className="w-4 h-4 text-[#5DB347] mt-0.5 shrink-0"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                        {a}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div>
-                  <h4 className="text-sm font-semibold text-[#1B2A4A] mb-2">
-                    Partner Institutions
-                  </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {centre.partners.map((p, j) => (
-                      <span
-                        key={j}
-                        className="bg-[#EBF7E5] text-[#1B2A4A] text-xs font-medium px-3 py-1 rounded-full border border-[#5DB347]/20"
-                      >
-                        {p}
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin h-8 w-8 border-4 border-[#5DB347] border-t-transparent rounded-full mx-auto mb-3" />
+              <p className="text-gray-500 text-sm">Loading research centres...</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {centres.map((centre) => (
+                <div
+                  key={centre.id}
+                  className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 border-l-4 border-[#5DB347] shadow-lg shadow-[#5DB347]/5 hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <h3 className="text-xl font-bold text-[#1B2A4A]">
+                        {centre.name}
+                      </h3>
+                      <p className="text-gray-500 text-sm">
+                        {centre.region ? `${centre.region}, ` : ''}{centre.country}
+                      </p>
+                    </div>
+                    {centre.established_year && (
+                      <span className="text-xs font-semibold px-3 py-1 rounded-full bg-[#EBF7E5] text-[#5DB347]">
+                        Est. {centre.established_year}
                       </span>
-                    ))}
+                    )}
                   </div>
+
+                  {centre.focus_areas && centre.focus_areas.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {centre.focus_areas.map((fa, j) => (
+                        <span key={j} className="inline-block bg-[#5DB347]/10 text-[#5DB347] px-3 py-1 rounded-full text-xs font-medium">
+                          {fa}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  <p className="text-gray-600 text-sm mb-5 leading-relaxed">
+                    {centre.description}
+                  </p>
+
+                  {centre.key_projects && centre.key_projects.length > 0 && (
+                    <div className="mb-5">
+                      <h4 className="text-sm font-semibold text-[#1B2A4A] mb-3">
+                        Key Achievements
+                      </h4>
+                      <ul className="space-y-2">
+                        {centre.key_projects.map((a, j) => (
+                          <li
+                            key={j}
+                            className="flex items-start gap-2 text-gray-600 text-sm"
+                          >
+                            <svg
+                              className="w-4 h-4 text-[#5DB347] mt-0.5 shrink-0"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M5 13l4 4L19 7"
+                              />
+                            </svg>
+                            {a}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {centre.partner_institutions && centre.partner_institutions.length > 0 && (
+                    <div>
+                      <h4 className="text-sm font-semibold text-[#1B2A4A] mb-2">
+                        Partner Institutions
+                      </h4>
+                      <div className="flex flex-wrap gap-2">
+                        {centre.partner_institutions.map((p, j) => (
+                          <span
+                            key={j}
+                            className="bg-[#EBF7E5] text-[#1B2A4A] text-xs font-medium px-3 py-1 rounded-full border border-[#5DB347]/20"
+                          >
+                            {p}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
