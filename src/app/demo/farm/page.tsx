@@ -33,7 +33,7 @@ export const metadata = {
 
 export default function FarmerDemoPage() {
   return (
-    <div className="pb-20">
+    <div className="pb-20 scroll-smooth">
       {/* ─── DEMO BANNER ─── */}
       <div className="bg-gradient-to-r from-[#5DB347] to-[#449933] text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-3">
@@ -57,7 +57,7 @@ export default function FarmerDemoPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {/* ─── 1. DASHBOARD OVERVIEW ─── */}
-        <section className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+        <section id="dashboard" className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
           <div className="bg-gradient-to-r from-[#1B2A4A] to-[#2D4A7A] px-6 py-6 sm:px-8">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
@@ -114,7 +114,7 @@ export default function FarmerDemoPage() {
         </section>
 
         {/* ─── 2. ACTIVE APPLICATIONS ─── */}
-        <section className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 sm:p-8">
+        <section id="applications" className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 sm:p-8">
           <h2 className="text-lg font-bold text-[#1B2A4A] mb-5 flex items-center gap-2">
             <Clock className="w-5 h-5 text-[#5DB347]" />
             Active Applications
@@ -168,7 +168,7 @@ export default function FarmerDemoPage() {
         </section>
 
         {/* ─── 3. FARM OVERVIEW ─── */}
-        <section className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 sm:p-8">
+        <section id="farm" className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 sm:p-8">
           <h2 className="text-lg font-bold text-[#1B2A4A] mb-5 flex items-center gap-2">
             <Leaf className="w-5 h-5 text-[#5DB347]" />
             Farm Overview
@@ -233,7 +233,7 @@ export default function FarmerDemoPage() {
         </section>
 
         {/* ─── 4. AI CROP DOCTOR ─── */}
-        <section className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 sm:p-8">
+        <section id="ai-doctor" className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 sm:p-8">
           <h2 className="text-lg font-bold text-[#1B2A4A] mb-5 flex items-center gap-2">
             <Microscope className="w-5 h-5 text-[#5DB347]" />
             AI Crop Doctor
@@ -287,7 +287,7 @@ export default function FarmerDemoPage() {
         </section>
 
         {/* ─── 5. TRAINING PROGRESS ─── */}
-        <section className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 sm:p-8">
+        <section id="training" className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 sm:p-8">
           <h2 className="text-lg font-bold text-[#1B2A4A] mb-5 flex items-center gap-2">
             <BookOpen className="w-5 h-5 text-[#5DB347]" />
             Training Progress
@@ -365,7 +365,7 @@ export default function FarmerDemoPage() {
         </section>
 
         {/* ─── 6. MARKET PRICES ─── */}
-        <section className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 sm:p-8">
+        <section id="market-prices" className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 sm:p-8">
           <h2 className="text-lg font-bold text-[#1B2A4A] mb-5 flex items-center gap-2">
             <TrendingUp className="w-5 h-5 text-[#5DB347]" />
             Market Prices
@@ -415,7 +415,7 @@ export default function FarmerDemoPage() {
         </section>
 
         {/* ─── 7. FINANCING ─── */}
-        <section className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 sm:p-8">
+        <section id="financing" className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 sm:p-8">
           <h2 className="text-lg font-bold text-[#1B2A4A] mb-5 flex items-center gap-2">
             <Banknote className="w-5 h-5 text-[#5DB347]" />
             Financing
@@ -477,7 +477,7 @@ export default function FarmerDemoPage() {
         </section>
 
         {/* ─── 8. NOTIFICATIONS ─── */}
-        <section className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 sm:p-8">
+        <section id="notifications" className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 sm:p-8">
           <h2 className="text-lg font-bold text-[#1B2A4A] mb-5 flex items-center gap-2">
             <Bell className="w-5 h-5 text-[#5DB347]" />
             Notifications

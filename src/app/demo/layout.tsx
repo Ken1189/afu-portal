@@ -21,10 +21,10 @@ const TIER_CONFIG = [
     color: '#8CB89C',
     description: 'Getting started',
     items: [
-      { label: 'My Farm', icon: Home, href: '#dashboard' },
-      { label: 'Weather', icon: CloudSun, href: '#weather' },
-      { label: 'Market Prices', icon: BarChart3, href: '#market-prices' },
-      { label: 'Training Hub', icon: GraduationCap, href: '#training' },
+      { label: 'My Farm', icon: Home, id: 'dashboard' },
+      { label: 'Weather', icon: CloudSun, id: 'dashboard' },
+      { label: 'Market Prices', icon: BarChart3, id: 'market-prices' },
+      { label: 'Training Hub', icon: GraduationCap, id: 'training' },
     ],
   },
   {
@@ -33,9 +33,9 @@ const TIER_CONFIG = [
     color: '#5DB347',
     description: 'Farm records',
     items: [
-      { label: 'Farm Journal', icon: BookOpen, href: '#farm' },
-      { label: 'My Crops', icon: Sprout, href: '#crops' },
-      { label: 'Cooperatives', icon: UsersRound, href: '#cooperative' },
+      { label: 'Farm Journal', icon: BookOpen, id: 'farm' },
+      { label: 'My Crops', icon: Sprout, id: 'farm' },
+      { label: 'Cooperatives', icon: UsersRound, id: 'cooperative' },
     ],
   },
   {
@@ -44,9 +44,9 @@ const TIER_CONFIG = [
     color: '#449933',
     description: 'Financial tools',
     items: [
-      { label: 'Financing', icon: Wallet, href: '#financing' },
-      { label: 'Insurance', icon: Shield, href: '#insurance' },
-      { label: 'Payments', icon: CreditCard, href: '#payments' },
+      { label: 'Financing', icon: Wallet, id: 'financing' },
+      { label: 'Insurance', icon: Shield, id: 'financing' },
+      { label: 'Payments', icon: CreditCard, id: 'financing' },
     ],
   },
   {
@@ -55,10 +55,10 @@ const TIER_CONFIG = [
     color: '#2D7A1E',
     description: 'Digital agriculture',
     items: [
-      { label: 'AI Crop Doctor', icon: Camera, href: '#ai-doctor' },
-      { label: 'AI Tools', icon: Brain, href: '#ai-tools' },
-      { label: 'Sustainability', icon: Leaf, href: '#sustainability' },
-      { label: 'Exports', icon: Ship, href: '#exports' },
+      { label: 'AI Crop Doctor', icon: Camera, id: 'ai-doctor' },
+      { label: 'AI Tools', icon: Brain, id: 'ai-doctor' },
+      { label: 'Sustainability', icon: Leaf, id: 'exports' },
+      { label: 'Exports', icon: Ship, id: 'exports' },
     ],
   },
   {
@@ -67,9 +67,9 @@ const TIER_CONFIG = [
     color: '#1B5E14',
     description: 'Full access',
     items: [
-      { label: 'Marketplace', icon: ShoppingBag, href: '#marketplace' },
-      { label: 'Logistics', icon: Truck, href: '#logistics' },
-      { label: 'Tokenize', icon: Coins, href: '#tokenize' },
+      { label: 'Marketplace', icon: ShoppingBag, id: 'marketplace' },
+      { label: 'Logistics', icon: Truck, id: 'marketplace' },
+      { label: 'Tokenize', icon: Coins, id: 'marketplace' },
     ],
   },
 ];
@@ -177,10 +177,16 @@ export default function DemoLayout({ children }: { children: React.ReactNode }) 
                   {tierGroup.items.map((item) => {
                     const Icon = item.icon;
                     return (
-                      <a
+                      <button
                         key={item.label}
-                        href={item.href}
-                        className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs transition-colors ${
+                        onClick={() => {
+                          const el = document.getElementById(item.id);
+                          if (el) {
+                            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            setMobileOpen(false);
+                          }
+                        }}
+                        className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs transition-colors text-left ${
                           unlocked
                             ? 'text-gray-700 hover:bg-[#EBF7E5] hover:text-[#5DB347]'
                             : 'text-gray-400 cursor-default'
@@ -196,7 +202,7 @@ export default function DemoLayout({ children }: { children: React.ReactNode }) 
                             NEW
                           </span>
                         )}
-                      </a>
+                      </button>
                     );
                   })}
                 </div>

@@ -58,7 +58,7 @@ export default function CommercialDemoPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {/* ─── 1. DASHBOARD OVERVIEW ─── */}
-        <section className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+        <section id="dashboard" className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
           <div className="bg-gradient-to-r from-[#1B2A4A] to-[#0F1A30] px-6 py-6 sm:px-8">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
@@ -111,7 +111,7 @@ export default function CommercialDemoPage() {
         </section>
 
         {/* ─── 2. MULTI-PLOT MANAGEMENT ─── */}
-        <section className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 sm:p-8">
+        <section id="farm" className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 sm:p-8">
           <h2 className="text-lg font-bold text-[#1B2A4A] mb-5 flex items-center gap-2">
             <BarChart3 className="w-5 h-5 text-[#5DB347]" />
             Multi-Plot Management
@@ -200,7 +200,7 @@ export default function CommercialDemoPage() {
         </section>
 
         {/* ─── 3. FINANCIAL OVERVIEW ─── */}
-        <section className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 sm:p-8">
+        <section id="financing" className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 sm:p-8">
           <h2 className="text-lg font-bold text-[#1B2A4A] mb-5 flex items-center gap-2">
             <Banknote className="w-5 h-5 text-[#5DB347]" />
             Financial Overview
@@ -315,7 +315,7 @@ export default function CommercialDemoPage() {
         </section>
 
         {/* ─── 4. OFFTAKE CONTRACTS ─── */}
-        <section className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 sm:p-8">
+        <section id="marketplace" className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 sm:p-8">
           <h2 className="text-lg font-bold text-[#1B2A4A] mb-5 flex items-center gap-2">
             <Handshake className="w-5 h-5 text-[#5DB347]" />
             Offtake Contracts
@@ -369,7 +369,7 @@ export default function CommercialDemoPage() {
         </section>
 
         {/* ─── 5. EQUIPMENT ─── */}
-        <section className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 sm:p-8">
+        <section id="equipment" className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 sm:p-8">
           <h2 className="text-lg font-bold text-[#1B2A4A] mb-5 flex items-center gap-2">
             <Tractor className="w-5 h-5 text-[#5DB347]" />
             Equipment Booked
@@ -415,7 +415,7 @@ export default function CommercialDemoPage() {
         </section>
 
         {/* ─── 6. COOPERATIVE MEMBERSHIP ─── */}
-        <section className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 sm:p-8">
+        <section id="cooperative" className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 sm:p-8">
           <h2 className="text-lg font-bold text-[#1B2A4A] mb-5 flex items-center gap-2">
             <Users className="w-5 h-5 text-[#5DB347]" />
             Cooperative Membership
@@ -438,7 +438,7 @@ export default function CommercialDemoPage() {
         </section>
 
         {/* ─── 7. EXPORT READINESS ─── */}
-        <section className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 sm:p-8">
+        <section id="exports" className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 sm:p-8">
           <h2 className="text-lg font-bold text-[#1B2A4A] mb-5 flex items-center gap-2">
             <Globe2 className="w-5 h-5 text-[#5DB347]" />
             Export Readiness
