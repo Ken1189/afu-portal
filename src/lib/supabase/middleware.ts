@@ -62,8 +62,12 @@ export async function updateSession(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // ── Protected route patterns ────────────────────────────────────────
+  // Public paths that start with protected prefixes (must be checked first)
+  const publicExceptions = ['/farmers', '/farms'];
+  const isPublicException = publicExceptions.some((p) => pathname.startsWith(p));
+
   const protectedPaths = ['/dashboard', '/farm', '/supplier', '/admin'];
-  const isProtected = protectedPaths.some((p) => pathname.startsWith(p));
+  const isProtected = !isPublicException && protectedPaths.some((p) => pathname.startsWith(p));
 
   // If accessing a protected route without a session → redirect to login
   if (isProtected && !user) {
