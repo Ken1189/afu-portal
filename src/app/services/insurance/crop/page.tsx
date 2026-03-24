@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Sun, Waves, Bug, Microscope, CloudHail, Snowflake, type LucideIcon } from "lucide-react";
 
 export const metadata = {
   title: "Crop Insurance - AFU",
@@ -7,12 +8,12 @@ export const metadata = {
 };
 
 const perils = [
-  { name: "Drought", description: "Coverage triggered when rainfall falls below the threshold for your crop and region during critical growth stages.", icon: "☀️" },
-  { name: "Flood", description: "Protection against crop loss from excessive rainfall, waterlogging, and river flooding of planted fields.", icon: "🌊" },
-  { name: "Pest Infestation", description: "Coverage for significant crop damage caused by armyworm, bollworm, aphids, and other verified pest outbreaks.", icon: "🐛" },
-  { name: "Crop Disease", description: "Protection against losses from fungal, bacterial, and viral diseases including blight, rust, and wilt.", icon: "🦠" },
-  { name: "Hail Damage", description: "Full coverage for hail damage to standing crops, including partial damage assessments.", icon: "🧊" },
-  { name: "Frost", description: "Protection for frost-sensitive crops during unseasonable cold snaps and late-season frost events.", icon: "❄️" },
+  { name: "Drought", description: "Coverage triggered when rainfall falls below the threshold for your crop and region during critical growth stages.", icon: Sun },
+  { name: "Flood", description: "Protection against crop loss from excessive rainfall, waterlogging, and river flooding of planted fields.", icon: Waves },
+  { name: "Pest Infestation", description: "Coverage for significant crop damage caused by armyworm, bollworm, aphids, and other verified pest outbreaks.", icon: Bug },
+  { name: "Crop Disease", description: "Protection against losses from fungal, bacterial, and viral diseases including blight, rust, and wilt.", icon: Microscope },
+  { name: "Hail Damage", description: "Full coverage for hail damage to standing crops, including partial damage assessments.", icon: CloudHail },
+  { name: "Frost", description: "Protection for frost-sensitive crops during unseasonable cold snaps and late-season frost events.", icon: Snowflake },
 ];
 
 const insuranceTypes = [
@@ -99,7 +100,9 @@ export default function CropInsurancePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {perils.map((peril, i) => (
               <div key={i} className="bg-cream rounded-2xl p-6">
-                <div className="text-3xl mb-3">{peril.icon}</div>
+                <div className="w-12 h-12 rounded-xl bg-[#5DB347]/10 flex items-center justify-center mb-3">
+                  <peril.icon className="w-6 h-6 text-[#5DB347]" />
+                </div>
                 <h3 className="font-bold text-navy mb-2">{peril.name}</h3>
                 <p className="text-gray-500 text-sm leading-relaxed">
                   {peril.description}

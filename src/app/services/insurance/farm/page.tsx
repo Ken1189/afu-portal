@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Building2, Lock, Droplets, Package, Scale, CloudLightning, type LucideIcon } from "lucide-react";
 
 export const metadata = {
   title: "Farm Insurance - Comprehensive Protection - AFU",
@@ -10,32 +11,32 @@ const coverageAreas = [
   {
     title: "Farm Buildings",
     description: "Barns, sheds, pack houses, drying floors, silos, and worker accommodation protected against fire, storm, flood, and structural failure.",
-    icon: "🏗️",
+    icon: Building2,
   },
   {
     title: "Fencing & Boundaries",
     description: "Perimeter fencing, game fencing, electric fencing, and boundary walls covered against storm damage, vehicle impact, and vandalism.",
-    icon: "🔒",
+    icon: Lock,
   },
   {
     title: "Irrigation Infrastructure",
     description: "Centre pivots, drip lines, pump stations, dams, and boreholes insured against mechanical failure, lightning, and flood damage.",
-    icon: "💧",
+    icon: Droplets,
   },
   {
     title: "Stored Produce",
     description: "Harvested crops in storage, seeds, feed, and processed goods protected against fire, water damage, theft, and contamination.",
-    icon: "📦",
+    icon: Package,
   },
   {
     title: "Farm Liability",
     description: "Third-party bodily injury and property damage on your farm. Covers visitor accidents, worker injuries, and product liability.",
-    icon: "⚖️",
+    icon: Scale,
   },
   {
     title: "Natural Disaster",
     description: "Comprehensive coverage for earthquake, severe storm, flooding, wildfire, and other natural catastrophes affecting farm property.",
-    icon: "🌪️",
+    icon: CloudLightning,
   },
 ];
 
@@ -144,7 +145,7 @@ export default function FarmInsurancePage() {
                 key={i}
                 className="bg-cream rounded-2xl p-6 hover:shadow-md transition-all border border-transparent hover:border-gold/20"
               >
-                <div className="text-3xl mb-3">{area.icon}</div>
+                <div className="w-12 h-12 rounded-xl bg-[#5DB347]/10 flex items-center justify-center mb-3"><area.icon className="w-6 h-6 text-[#5DB347]" /></div>
                 <h3 className="font-bold text-navy mb-2">{area.title}</h3>
                 <p className="text-gray-500 text-sm leading-relaxed">
                   {area.description}

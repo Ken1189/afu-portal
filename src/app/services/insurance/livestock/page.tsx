@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Beef, Rabbit, Egg, type LucideIcon } from "lucide-react";
 
 export const metadata = {
   title: "Livestock Insurance - AFU",
@@ -12,28 +13,28 @@ const animalTypes = [
     description: "Dairy and beef cattle including breeding stock, calves, and oxen. Individual or herd-level coverage available.",
     valuationRange: "$300 - $3,000/head",
     premiumRange: "From $5/head/month",
-    icon: "🐄",
+    icon: Beef,
   },
   {
     type: "Goats",
     description: "Meat and dairy goats including breeding stock and kids. Both indigenous and improved breeds covered.",
     valuationRange: "$50 - $500/head",
     premiumRange: "From $1.50/head/month",
-    icon: "🐐",
+    icon: Beef,
   },
   {
     type: "Sheep",
     description: "Wool and meat sheep including breeding ewes, rams, and lambs. Covers both commercial and stud animals.",
     valuationRange: "$80 - $600/head",
     premiumRange: "From $2/head/month",
-    icon: "🐑",
+    icon: Rabbit,
   },
   {
     type: "Poultry",
     description: "Broilers, layers, and breeding stock. Flock-level coverage with per-bird valuation for commercial operations.",
     valuationRange: "$3 - $25/bird",
     premiumRange: "From $0.15/bird/month",
-    icon: "🐔",
+    icon: Egg,
   },
 ];
 
@@ -155,7 +156,7 @@ export default function LivestockInsurancePage() {
                 key={i}
                 className="bg-cream rounded-2xl p-6 hover:shadow-md transition-all border border-transparent hover:border-gold/20"
               >
-                <div className="text-4xl mb-3">{animal.icon}</div>
+                <div className="w-12 h-12 rounded-xl bg-[#5DB347]/10 flex items-center justify-center mb-3"><animal.icon className="w-6 h-6 text-[#5DB347]" /></div>
                 <h3 className="font-bold text-navy mb-2">{animal.type}</h3>
                 <p className="text-gray-500 text-sm mb-4 leading-relaxed">
                   {animal.description}

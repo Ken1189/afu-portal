@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Rocket, Sprout, School, Trophy, Handshake, type LucideIcon } from "lucide-react";
 
 export const metadata = {
   title: "Young Farmers — The Next Generation - AFU",
@@ -6,37 +7,37 @@ export const metadata = {
     "Inspiring the future of African agriculture. Youth incubators, training programs, school partnerships, entrepreneurship awards, and mentorship for young farmers.",
 };
 
-const programs = [
+const programs: { icon: LucideIcon; title: string; description: string; highlight: string }[] = [
   {
-    icon: "🦈",
+    icon: Rocket,
     title: "Young Farmer Incubator",
     description:
       "Our Shark Tank-style pitch program where young entrepreneurs present their agricultural business ideas to a panel of AFU mentors and investors. The best ideas receive seed funding, operational support, and access to AFU's full network to turn their vision into reality.",
     highlight: "Seed funding for winning ideas",
   },
   {
-    icon: "🌱",
+    icon: Sprout,
     title: "Junior Training Program",
     description:
       "Age-appropriate farming education modules covering soil science, crop management, livestock care, basic business skills, and sustainable practices. Designed for ages 10 to 18 with hands-on learning experiences.",
     highlight: "Ages 10-18",
   },
   {
-    icon: "🏫",
+    icon: School,
     title: "School Farm Partnerships",
     description:
       "AFU partners with schools across our member countries to create learning gardens and mini-farms on school grounds. Students learn agriculture from planting to harvest while contributing fresh produce to their school communities.",
     highlight: "Active in 9 countries",
   },
   {
-    icon: "🏆",
+    icon: Trophy,
     title: "Youth Entrepreneurship Awards",
     description:
       "Annual awards recognizing outstanding young agricultural innovators across Africa. Categories include Best Young Farmer, Most Innovative Agritech Idea, Community Impact, and Sustainability Champion.",
     highlight: "Annual awards ceremony",
   },
   {
-    icon: "🤝",
+    icon: Handshake,
     title: "Mentorship Program",
     description:
       "Connecting young farmers with experienced AFU ambassadors and commercial farmers. One-on-one mentorship covering everything from crop planning to business management, with regular farm visits and quarterly reviews.",
@@ -99,7 +100,9 @@ export default function YoungFarmersPage() {
                 className="bg-cream rounded-2xl p-8 md:p-10 border border-gray-100 hover:border-[#5DB347]/20 hover:shadow-lg transition-all duration-300"
               >
                 <div className="flex flex-col md:flex-row gap-6">
-                  <div className="text-5xl shrink-0">{program.icon}</div>
+                  <div className="w-14 h-14 rounded-xl bg-[#5DB347]/10 flex items-center justify-center shrink-0">
+                    <program.icon className="w-7 h-7 text-[#5DB347]" />
+                  </div>
                   <div className="flex-1">
                     <div className="flex flex-wrap items-center gap-3 mb-3">
                       <h3 className="text-xl font-bold text-navy">

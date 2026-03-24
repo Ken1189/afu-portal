@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { Search, CreditCard, Sprout, Building2 } from 'lucide-react';
 
 /* ─── Types ─── */
 
@@ -624,19 +625,19 @@ export default function SponsorPage() {
             {[
               {
                 step: '01',
-                emoji: '🔍',
+                Icon: Search,
                 title: 'Choose a Farmer',
                 desc: 'Browse real farmer profiles — read their story, see their farm, and learn what they need to succeed this season.',
               },
               {
                 step: '02',
-                emoji: '💳',
+                Icon: CreditCard,
                 title: 'Pick Your Tier',
                 desc: 'From $5/month membership coverage to $500/month full program funding. Every contribution makes a measurable difference.',
               },
               {
                 step: '03',
-                emoji: '🌱',
+                Icon: Sprout,
                 title: 'Watch Them Grow',
                 desc: 'Receive monthly updates, harvest photos, and impact reports directly from your farmer. See your money at work.',
               },
@@ -648,7 +649,7 @@ export default function SponsorPage() {
                 >
                   {item.step}
                 </div>
-                <div className="text-5xl mb-4">{item.emoji}</div>
+                <div className="w-12 h-12 rounded-xl bg-[#5DB347]/10 flex items-center justify-center mb-4 mx-auto"><item.Icon className="w-6 h-6 text-[#5DB347]" /></div>
                 <h3 className="text-xl font-bold text-navy mb-3">{item.title}</h3>
                 <p className="text-gray-500 leading-relaxed">{item.desc}</p>
               </div>
@@ -820,7 +821,7 @@ export default function SponsorPage() {
           {/* No results for filter */}
           {!loading && farmers.length > 0 && filteredFarmers.length === 0 && (
             <div className="text-center py-12">
-              <div className="text-4xl mb-3">🔍</div>
+              <div className="w-12 h-12 rounded-xl bg-[#5DB347]/10 flex items-center justify-center mb-3 mx-auto"><Search className="w-6 h-6 text-[#5DB347]" /></div>
               <p className="text-gray-500">
                 No farmers found in {selectedCountry} yet.{' '}
                 <button
@@ -870,7 +871,7 @@ export default function SponsorPage() {
       {/* ── Corporate CTA ── */}
       <section className="bg-white py-16">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="text-4xl mb-4">🏢</div>
+          <div className="w-12 h-12 rounded-xl bg-[#5DB347]/10 flex items-center justify-center mb-4 mx-auto"><Building2 className="w-6 h-6 text-[#5DB347]" /></div>
           <h2 className="text-3xl md:text-4xl font-bold text-navy mb-4">
             Watson &amp; Fine and others are already making an impact
           </h2>

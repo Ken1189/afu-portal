@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Tractor, Droplets, Sun, Factory, Snowflake, Truck, type LucideIcon } from "lucide-react";
 
 export const metadata = {
   title: "Asset Finance - AFU",
@@ -34,12 +35,12 @@ const steps = [
 ];
 
 const assets = [
-  { name: "Tractors & Implements", desc: "New and pre-owned tractors, ploughs, planters, harvesters, and attachments from approved dealers.", icon: "🚜" },
-  { name: "Irrigation Systems", desc: "Centre pivots, drip irrigation, sprinkler systems, and borehole drilling equipment.", icon: "💧" },
-  { name: "Solar Panels & Energy", desc: "Off-grid solar installations, battery storage, and solar-powered pumping systems.", icon: "☀️" },
-  { name: "Processing Equipment", desc: "Milling machines, drying systems, packaging lines, and food processing machinery.", icon: "🏭" },
-  { name: "Cold Storage", desc: "Walk-in coolers, refrigerated containers, and cold chain transport units.", icon: "❄️" },
-  { name: "Farm Vehicles", desc: "Pickup trucks, delivery vehicles, and specialized agricultural transport.", icon: "🚛" },
+  { name: "Tractors & Implements", desc: "New and pre-owned tractors, ploughs, planters, harvesters, and attachments from approved dealers.", icon: Tractor },
+  { name: "Irrigation Systems", desc: "Centre pivots, drip irrigation, sprinkler systems, and borehole drilling equipment.", icon: Droplets },
+  { name: "Solar Panels & Energy", desc: "Off-grid solar installations, battery storage, and solar-powered pumping systems.", icon: Sun },
+  { name: "Processing Equipment", desc: "Milling machines, drying systems, packaging lines, and food processing machinery.", icon: Factory },
+  { name: "Cold Storage", desc: "Walk-in coolers, refrigerated containers, and cold chain transport units.", icon: Snowflake },
+  { name: "Farm Vehicles", desc: "Pickup trucks, delivery vehicles, and specialized agricultural transport.", icon: Truck },
 ];
 
 const terms = [
@@ -134,7 +135,7 @@ export default function AssetFinancePage() {
                 key={i}
                 className="bg-white rounded-2xl p-6 border border-gray-100 hover:border-teal/20 hover:shadow-md transition-all"
               >
-                <div className="text-3xl mb-3">{asset.icon}</div>
+                <div className="w-12 h-12 rounded-xl bg-[#5DB347]/10 flex items-center justify-center mb-3"><asset.icon className="w-6 h-6 text-[#5DB347]" /></div>
                 <h3 className="font-bold text-navy mb-2">{asset.name}</h3>
                 <p className="text-gray-500 text-sm leading-relaxed">
                   {asset.desc}

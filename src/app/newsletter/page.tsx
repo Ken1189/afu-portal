@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { TrendingUp, Sprout, Megaphone, Trophy, DollarSign, Microscope, Newspaper, type LucideIcon } from "lucide-react";
 
 const interests = [
   { id: "market_prices", label: "Market Prices" },
@@ -25,13 +26,13 @@ const countries = [
   "Other",
 ];
 
-const benefits = [
-  { icon: "📈", title: "Market Price Alerts", desc: "Weekly commodity prices across 9 African markets — know when to sell." },
-  { icon: "🌱", title: "Seasonal Farming Tips", desc: "Expert advice on planting calendars, soil management, and pest control." },
-  { icon: "📢", title: "New Program Announcements", desc: "Be the first to know about new financing programs, training, and partnerships." },
-  { icon: "🏆", title: "Success Stories", desc: "Real stories from AFU farmers who are growing their businesses." },
-  { icon: "💰", title: "Investment Opportunities", desc: "Updates on investment rounds, revenue participation notes, and DeFi developments." },
-  { icon: "🔬", title: "Innovation & Technology", desc: "AI tools, satellite monitoring, blockchain updates, and platform features." },
+const benefits: { icon: LucideIcon; title: string; desc: string }[] = [
+  { icon: TrendingUp, title: "Market Price Alerts", desc: "Weekly commodity prices across 9 African markets — know when to sell." },
+  { icon: Sprout, title: "Seasonal Farming Tips", desc: "Expert advice on planting calendars, soil management, and pest control." },
+  { icon: Megaphone, title: "New Program Announcements", desc: "Be the first to know about new financing programs, training, and partnerships." },
+  { icon: Trophy, title: "Success Stories", desc: "Real stories from AFU farmers who are growing their businesses." },
+  { icon: DollarSign, title: "Investment Opportunities", desc: "Updates on investment rounds, revenue participation notes, and DeFi developments." },
+  { icon: Microscope, title: "Innovation & Technology", desc: "AI tools, satellite monitoring, blockchain updates, and platform features." },
 ];
 
 export default function NewsletterPage() {
@@ -146,7 +147,9 @@ export default function NewsletterPage() {
                 key={item.title}
                 className="bg-white rounded-2xl p-6 shadow-lg shadow-[#5DB347]/5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100"
               >
-                <div className="text-3xl mb-3">{item.icon}</div>
+                <div className="w-12 h-12 rounded-xl bg-[#5DB347]/10 flex items-center justify-center mb-3">
+                  <item.icon className="w-6 h-6 text-[#5DB347]" />
+                </div>
                 <h3 className="font-bold text-[#1B2A4A] mb-2">{item.title}</h3>
                 <p className="text-gray-500 text-sm leading-relaxed">{item.desc}</p>
               </div>
@@ -258,7 +261,9 @@ export default function NewsletterPage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-2xl font-bold text-[#1B2A4A] mb-4">Past Editions</h2>
           <div className="bg-[#EDF4EF] rounded-2xl p-8 border border-[#5DB347]/10">
-            <div className="text-4xl mb-4">📰</div>
+            <div className="w-12 h-12 rounded-xl bg-[#5DB347]/10 flex items-center justify-center mb-4 mx-auto">
+              <Newspaper className="w-6 h-6 text-[#5DB347]" />
+            </div>
             <p className="text-gray-600 font-medium mb-2">First edition coming Q2 2026</p>
             <p className="text-gray-400 text-sm">
               Subscribe now to be among the first to receive the AFU Digest when it launches.

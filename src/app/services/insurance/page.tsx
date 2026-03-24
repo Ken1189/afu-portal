@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Tractor, Wheat, Hospital, Home, Ship, Beef, ShieldCheck, Cog, Landmark, Truck, type LucideIcon } from "lucide-react";
 
 export const metadata = {
   title: "Farm Insurance - AFU",
@@ -6,9 +7,9 @@ export const metadata = {
     "Protect your farm, crops, livestock, and family with AFU Insurance. Comprehensive agricultural insurance products with fast claims and affordable premiums.",
 };
 
-const products = [
+const products: { icon: LucideIcon; name: string; description: string; premium: string; link: string }[] = [
   {
-    icon: "🚜",
+    icon: Tractor,
     name: "Asset Insurance",
     description:
       "Protect your farming equipment, machinery, vehicles, and buildings against breakdown, theft, fire, and natural disasters.",
@@ -16,7 +17,7 @@ const products = [
     link: "/services/insurance/asset",
   },
   {
-    icon: "🌾",
+    icon: Wheat,
     name: "Crop Insurance",
     description:
       "Guard against crop loss from drought, flood, pests, disease, and hail with weather-index and traditional indemnity coverage.",
@@ -24,7 +25,7 @@ const products = [
     link: "/services/insurance/crop",
   },
   {
-    icon: "🏥",
+    icon: Hospital,
     name: "Medical Insurance",
     description:
       "Health coverage for farming families including outpatient care, hospitalization, dental, and optical across our clinic network.",
@@ -32,7 +33,7 @@ const products = [
     link: "/services/insurance/medical",
   },
   {
-    icon: "🏡",
+    icon: Home,
     name: "Farm Insurance",
     description:
       "Comprehensive all-in-one protection for your entire farm: buildings, fencing, irrigation, stored produce, and liability coverage.",
@@ -40,7 +41,7 @@ const products = [
     link: "/services/insurance/farm",
   },
   {
-    icon: "🚢",
+    icon: Ship,
     name: "Trade Insurance",
     description:
       "Coverage for export shipments including marine transit, buyer default, letters of credit, and political risk for cross-border trade.",
@@ -48,7 +49,7 @@ const products = [
     link: "/services/insurance/trade",
   },
   {
-    icon: "🐄",
+    icon: Beef,
     name: "Livestock Insurance",
     description:
       "Protect your cattle, goats, sheep, and poultry against disease, theft, predators, and natural disasters.",
@@ -56,7 +57,7 @@ const products = [
     link: "/services/insurance/livestock",
   },
   {
-    icon: "🛡️",
+    icon: ShieldCheck,
     name: "Life & Personal Insurance",
     description:
       "Life cover, funeral plans, and personal accident insurance to protect farming families and their futures.",
@@ -64,7 +65,7 @@ const products = [
     link: "/services/insurance/life",
   },
   {
-    icon: "⚙️",
+    icon: Cog,
     name: "Equipment Insurance",
     description:
       "Cover tractors, irrigation systems, and implements against theft, damage, and mechanical breakdown.",
@@ -72,7 +73,7 @@ const products = [
     link: "/services/insurance/equipment",
   },
   {
-    icon: "🏦",
+    icon: Landmark,
     name: "Pension & Retirement",
     description:
       "Farmer retirement savings plans with leveraged growth through AFU's capital program. Start from $10/month.",
@@ -80,7 +81,7 @@ const products = [
     link: "/services/insurance/pension",
   },
   {
-    icon: "🚛",
+    icon: Truck,
     name: "Vehicle & Transport Insurance",
     description:
       "Third party, fire and theft, or comprehensive cover for farm bakkies, trucks, and fleet vehicles.",
@@ -172,7 +173,9 @@ export default function InsuranceHubPage() {
                 href={product.link}
                 className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-lg shadow-[#5DB347]/5 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 group"
               >
-                <div className="text-4xl mb-4">{product.icon}</div>
+                <div className="w-12 h-12 rounded-xl bg-[#5DB347]/10 flex items-center justify-center mb-4">
+                  <product.icon className="w-6 h-6 text-[#5DB347]" />
+                </div>
                 <h3 className="text-xl font-bold text-navy mb-3 group-hover:text-[#5DB347] transition-colors">
                   {product.name}
                 </h3>

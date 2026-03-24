@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Ship, CreditCard, FileText, Landmark, type LucideIcon } from "lucide-react";
 
 export const metadata = {
   title: "Trade Insurance - AFU",
@@ -12,28 +13,28 @@ const coverageTypes = [
     description:
       "Coverage for agricultural cargo during ocean, road, rail, and air transit from farm gate to final destination. Protects against damage, loss, contamination, and delay.",
     covers: ["Physical damage in transit", "Cargo theft", "Container contamination", "Temperature excursion", "Natural perils (storm, sinking)"],
-    icon: "🚢",
+    icon: Ship,
   },
   {
     title: "Buyer Default Insurance",
     description:
       "Protection when an international buyer fails to pay for delivered goods. Covers insolvency, protracted default, and disputed invoices on confirmed contracts.",
     covers: ["Buyer insolvency", "Payment default (90+ days)", "Contract repudiation", "Disputed quality claims", "Currency inconvertibility"],
-    icon: "💳",
+    icon: CreditCard,
   },
   {
     title: "Letters of Credit Insurance",
     description:
       "Coverage for non-payment under confirmed letters of credit. Protects against issuing bank failure, documentary discrepancies, and political interference.",
     covers: ["Issuing bank default", "Documentary rejection", "LC amendment disputes", "Force majeure events", "Sanctions-related non-payment"],
-    icon: "📄",
+    icon: FileText,
   },
   {
     title: "Political Risk Insurance",
     description:
       "Protection against government actions that prevent contract fulfillment or payment transfer. Essential for trading into higher-risk markets.",
     covers: ["Import/export bans", "Currency controls", "License cancellation", "War and civil unrest", "Government expropriation"],
-    icon: "🏛️",
+    icon: Landmark,
   },
 ];
 
@@ -113,7 +114,7 @@ export default function TradeInsurancePage() {
                 key={i}
                 className="bg-cream rounded-2xl p-8 hover:shadow-md transition-all"
               >
-                <div className="text-3xl mb-3">{type.icon}</div>
+                <div className="w-12 h-12 rounded-xl bg-[#5DB347]/10 flex items-center justify-center mb-3"><type.icon className="w-6 h-6 text-[#5DB347]" /></div>
                 <h3 className="text-xl font-bold text-navy mb-3">
                   {type.title}
                 </h3>

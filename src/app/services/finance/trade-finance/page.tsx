@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { ShieldCheck, ScrollText, DollarSign, Lock, Factory, Globe, type LucideIcon } from "lucide-react";
 
 const products = [
   {
-    icon: "🛡️",
+    icon: ShieldCheck,
     title: "Standby Letters of Credit (SBLCs)",
     description:
       "We back your export deals with bankable guarantees. AFU-issued SBLCs give international buyers confidence and unlock larger trade volumes for African exporters.",
@@ -17,7 +18,7 @@ const products = [
     ],
   },
   {
-    icon: "📜",
+    icon: ScrollText,
     title: "Documentary Credits",
     description:
       "Secure international trade payments through irrevocable letters of credit. Protects both buyer and seller with bank-guaranteed settlement upon document presentation.",
@@ -30,7 +31,7 @@ const products = [
     ],
   },
   {
-    icon: "💰",
+    icon: DollarSign,
     title: "Export Pre-Financing",
     description:
       "Access capital before shipment to fund production, packaging, and logistics. Repayment is tied to confirmed export receipts through AFU escrow accounts.",
@@ -43,7 +44,7 @@ const products = [
     ],
   },
   {
-    icon: "🔒",
+    icon: Lock,
     title: "Trade Insurance",
     description:
       "Protect against buyer default, political risk, and payment delays. Comprehensive coverage ensures your cross-border trade is protected from end to end.",
@@ -56,7 +57,7 @@ const products = [
     ],
   },
   {
-    icon: "🏭",
+    icon: Factory,
     title: "Warehouse Receipt Finance",
     description:
       "Store your grain or commodity in a certified warehouse, receive a receipt, and borrow up to 70% of its value. Sell when prices peak instead of at harvest when prices are lowest — unlocking significantly higher income for staple crop farmers.",
@@ -70,7 +71,7 @@ const products = [
     ],
   },
   {
-    icon: "🌍",
+    icon: Globe,
     title: "Foreign Exchange",
     description:
       "Competitive rates across African currencies. Lock in exchange rates on export proceeds and protect margins against volatility in frontier markets.",
@@ -184,7 +185,7 @@ export default function TradeFinancePage() {
               >
                 <div className="flex flex-col md:flex-row gap-8">
                   <div className="md:w-1/2">
-                    <div className="text-4xl mb-4">{product.icon}</div>
+                    <div className="w-12 h-12 rounded-xl bg-[#5DB347]/10 flex items-center justify-center mb-4"><product.icon className="w-6 h-6 text-[#5DB347]" /></div>
                     <h3 className="text-xl font-bold text-navy mb-3">
                       {product.title}
                     </h3>

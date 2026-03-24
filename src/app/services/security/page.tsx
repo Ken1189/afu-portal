@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { Radio, ShieldAlert, Wifi, MapPin, Lock, Phone } from "lucide-react";
+import { type LucideIcon } from "lucide-react";
 
 export const metadata = {
   title: "Agri-Alert — Farm Security & Protection - AFU",
@@ -6,39 +8,39 @@ export const metadata = {
     "Protecting your farm, your livestock, and your livelihood. Drone surveillance, rapid response teams, smart fencing, livestock tracking, and 24/7 emergency response.",
 };
 
-const services = [
+const services: { icon: LucideIcon; title: string; description: string }[] = [
   {
-    icon: "🛸",
+    icon: Radio,
     title: "Drone Surveillance",
     description:
       "Aerial monitoring of farm perimeters and livestock using state-of-the-art drone technology. Automated patrol routes with real-time video feeds and AI-powered anomaly detection.",
   },
   {
-    icon: "🚨",
+    icon: ShieldAlert,
     title: "Rapid Response Teams",
     description:
       "On-the-ground security personnel trained in agricultural environments. Strategically positioned across regions for fastest possible response times when alerts are triggered.",
   },
   {
-    icon: "📡",
+    icon: Wifi,
     title: "Smart Fencing & Sensors",
     description:
       "IoT-enabled perimeter detection systems that monitor fence integrity, detect breaches, and alert your security dashboard instantly. Solar-powered for off-grid farms.",
   },
   {
-    icon: "📍",
+    icon: MapPin,
     title: "Livestock Tracking",
     description:
       "GPS tags for cattle and high-value animals with real-time location monitoring. Geofencing alerts notify you immediately if animals move outside designated areas.",
   },
   {
-    icon: "🔒",
+    icon: Lock,
     title: "Theft & Poaching Prevention",
     description:
       "Intelligence-led deterrence combining community reporting networks, pattern analysis, and coordinated response with local authorities to prevent stock theft and crop poaching.",
   },
   {
-    icon: "🆘",
+    icon: Phone,
     title: "Emergency Response",
     description:
       "24/7 alert system with dedicated emergency channels. One-touch panic activation from your phone connects you to the nearest response unit and local law enforcement.",
@@ -122,7 +124,9 @@ export default function SecurityPage() {
                 key={i}
                 className="bg-white rounded-2xl p-8 border border-gray-100 hover:border-[#5DB347]/20 hover:shadow-lg transition-all duration-300"
               >
-                <div className="text-4xl mb-4">{service.icon}</div>
+                <div className="w-12 h-12 rounded-xl bg-[#5DB347]/10 flex items-center justify-center mb-4">
+                  <service.icon className="w-6 h-6 text-[#5DB347]" />
+                </div>
                 <h3 className="text-xl font-bold text-navy mb-3">
                   {service.title}
                 </h3>

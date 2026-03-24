@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Globe, Building2, RefreshCw, type LucideIcon } from "lucide-react";
 
 export const metadata = {
   title: "Farm Mortgages - AFU",
@@ -12,21 +13,21 @@ const mortgageTypes = [
     description:
       "Acquire new farmland to expand your operation. We finance productive agricultural land across Botswana, Zimbabwe, and Tanzania.",
     features: ["Up to 70% LTV", "15-year terms available", "Title transfer support"],
-    icon: "🌍",
+    icon: Globe,
   },
   {
     title: "Farm Development",
     description:
       "Build or improve farm infrastructure including barns, processing sheds, worker housing, and irrigation installations.",
     features: ["Progress-based disbursement", "12-year terms", "Construction oversight included"],
-    icon: "🏗️",
+    icon: Building2,
   },
   {
     title: "Refinancing",
     description:
       "Consolidate existing farm debts into a single, lower-rate AFU mortgage. Free up cash flow and simplify repayments.",
     features: ["Lower rates", "Debt consolidation", "Extended terms available"],
-    icon: "🔄",
+    icon: RefreshCw,
   },
 ];
 
@@ -117,7 +118,7 @@ export default function MortgagesPage() {
                 key={i}
                 className="bg-cream rounded-2xl p-8 hover:shadow-md transition-all"
               >
-                <div className="text-4xl mb-4">{type.icon}</div>
+                <div className="w-12 h-12 rounded-xl bg-[#5DB347]/10 flex items-center justify-center mb-4"><type.icon className="w-6 h-6 text-[#5DB347]" /></div>
                 <h3 className="text-xl font-bold text-navy mb-3">
                   {type.title}
                 </h3>

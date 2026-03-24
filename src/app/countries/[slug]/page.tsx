@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { BarChart3, Wheat, Users, Sprout } from "lucide-react";
+import { type LucideIcon } from "lucide-react";
 
 /* ─── Country Data ─── */
 
@@ -475,33 +477,35 @@ export default function CountryPage({ params }: { params: { slug: string } }) {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {[
+            {([
               {
                 label: "GDP from Agriculture",
                 value: country.stats.gdpAgriculture,
-                icon: "\u{1F4CA}",
+                Icon: BarChart3,
               },
               {
                 label: "Arable Land",
                 value: country.stats.arableLand,
-                icon: "\u{1F33E}",
+                Icon: Wheat,
               },
               {
                 label: "Population",
                 value: country.stats.population,
-                icon: "\u{1F465}",
+                Icon: Users,
               },
               {
                 label: "Key Crops",
                 value: `${country.stats.keyCropsCount} Major`,
-                icon: "\u{1F331}",
+                Icon: Sprout,
               },
-            ].map((stat) => (
+            ] as { label: string; value: string; Icon: LucideIcon }[]).map((stat) => (
               <div
                 key={stat.label}
                 className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-lg shadow-[#5DB347]/5 border border-[#EBF7E5] hover:-translate-y-1 hover:shadow-xl transition-all duration-300 text-center"
               >
-                <span className="text-3xl mb-3 block">{stat.icon}</span>
+                <div className="w-12 h-12 rounded-xl bg-[#5DB347]/10 flex items-center justify-center mb-3 mx-auto">
+                  <stat.Icon className="w-6 h-6 text-[#5DB347]" />
+                </div>
                 <div
                   className="text-2xl md:text-3xl font-bold mb-1"
                   style={{ color: "#1B2A4A" }}

@@ -1,41 +1,42 @@
 'use client';
 
 import Link from "next/link";
+import { Tractor, Droplets, Wrench, Zap, Lock, CircleAlert, Cog, Flame, Truck, ShieldAlert, type LucideIcon } from "lucide-react";
 
 const coverTypes = [
   {
     name: "Tractors & Heavy Machinery",
     description:
       "Comprehensive cover for tractors, harvesters, and heavy farming equipment against breakdown, theft, fire, and accidental damage.",
-    icon: "🚜",
+    icon: Tractor,
   },
   {
     name: "Irrigation Systems",
     description:
       "Protect centre pivots, drip systems, pumps, and boreholes against mechanical failure, storm damage, and electrical surges.",
-    icon: "💧",
+    icon: Droplets,
   },
   {
     name: "Implements & Attachments",
     description:
       "Cover for ploughs, planters, sprayers, trailers, and all farming implements whether in use, in transit, or in storage.",
-    icon: "🔧",
+    icon: Wrench,
   },
   {
     name: "Solar & Power Equipment",
     description:
       "Protection for solar panels, generators, batteries, and electrical infrastructure essential to your farm operations.",
-    icon: "⚡",
+    icon: Zap,
   },
 ];
 
 const perils = [
-  { name: "Theft", icon: "🔒", desc: "Full replacement value if equipment is stolen, including from fields and storage." },
-  { name: "Accidental Damage", icon: "💥", desc: "Covers operator error, collisions, and unintentional damage during normal use." },
-  { name: "Mechanical Breakdown", icon: "⚙️", desc: "Major mechanical and electrical failures beyond normal wear and tear." },
-  { name: "Fire & Storm", icon: "🔥", desc: "Protection against fire, lightning strikes, hail damage, and severe weather events." },
-  { name: "Transit Damage", icon: "🚛", desc: "Cover while equipment is being transported between farms or to repair facilities." },
-  { name: "Vandalism", icon: "🚨", desc: "Protection against malicious damage and sabotage of farming equipment." },
+  { name: "Theft", icon: Lock, desc: "Full replacement value if equipment is stolen, including from fields and storage." },
+  { name: "Accidental Damage", icon: CircleAlert, desc: "Covers operator error, collisions, and unintentional damage during normal use." },
+  { name: "Mechanical Breakdown", icon: Cog, desc: "Major mechanical and electrical failures beyond normal wear and tear." },
+  { name: "Fire & Storm", icon: Flame, desc: "Protection against fire, lightning strikes, hail damage, and severe weather events." },
+  { name: "Transit Damage", icon: Truck, desc: "Cover while equipment is being transported between farms or to repair facilities." },
+  { name: "Vandalism", icon: ShieldAlert, desc: "Protection against malicious damage and sabotage of farming equipment." },
 ];
 
 const steps = [
@@ -94,7 +95,7 @@ export default function EquipmentInsurancePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {coverTypes.map((item, i) => (
               <div key={i} className="bg-cream rounded-2xl p-6">
-                <div className="text-3xl mb-3">{item.icon}</div>
+                <div className="w-12 h-12 rounded-xl bg-[#5DB347]/10 flex items-center justify-center mb-3"><item.icon className="w-6 h-6 text-[#5DB347]" /></div>
                 <h3 className="font-bold text-navy mb-2">{item.name}</h3>
                 <p className="text-gray-500 text-sm leading-relaxed">
                   {item.description}
@@ -120,7 +121,7 @@ export default function EquipmentInsurancePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {perils.map((peril, i) => (
               <div key={i} className="bg-white rounded-2xl p-6">
-                <div className="text-3xl mb-3">{peril.icon}</div>
+                <div className="w-12 h-12 rounded-xl bg-[#5DB347]/10 flex items-center justify-center mb-3"><peril.icon className="w-6 h-6 text-[#5DB347]" /></div>
                 <h3 className="font-bold text-navy mb-2">{peril.name}</h3>
                 <p className="text-gray-500 text-sm leading-relaxed">
                   {peril.desc}

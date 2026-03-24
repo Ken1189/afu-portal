@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Search, Zap, ShieldCheck, Banknote, BarChart3, Leaf, type LucideIcon } from "lucide-react";
 
 export const metadata = {
   title: "Blockchain for Agriculture — EDMA | AFU",
@@ -6,19 +7,19 @@ export const metadata = {
     "AFU's blockchain strategy powered by EDMA — transparent, verifiable, trustworthy agricultural finance on Ethereum Layer-2.",
 };
 
-const whyCards = [
+const whyCards: { icon: LucideIcon; title: string; desc: string }[] = [
   {
-    icon: "🔍",
+    icon: Search,
     title: "Transparency",
     desc: "Every loan, disbursement, and repayment recorded on-chain. Immutable audit trail for investors, regulators, and farmers.",
   },
   {
-    icon: "⚡",
+    icon: Zap,
     title: "Efficiency",
     desc: "Cross-border payments in seconds, not days. Stablecoin settlement eliminates FX friction across 9 African countries.",
   },
   {
-    icon: "🛡️",
+    icon: ShieldCheck,
     title: "Trust",
     desc: "Verified real-world assets via Proof-of-Verification protocol. Farm assets, warehouse receipts, and carbon credits — all verifiable on-chain.",
   },
@@ -133,7 +134,9 @@ export default function BlockchainPage() {
                 key={card.title}
                 className="bg-white rounded-3xl p-8 shadow-lg shadow-[#5DB347]/5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100 text-center"
               >
-                <div className="text-5xl mb-4">{card.icon}</div>
+                <div className="w-12 h-12 rounded-xl bg-[#5DB347]/10 flex items-center justify-center mb-4 mx-auto">
+                  <card.icon className="w-6 h-6 text-[#5DB347]" />
+                </div>
                 <h3 className="text-xl font-bold text-[#1B2A4A] mb-3">{card.title}</h3>
                 <p className="text-gray-500 text-sm leading-relaxed">{card.desc}</p>
               </div>
@@ -274,12 +277,14 @@ export default function BlockchainPage() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {[
-              { icon: "💸", title: "Faster Payments", desc: "Cross-border settlement in seconds" },
-              { icon: "📊", title: "Transparent Lending", desc: "Every loan tracked and verifiable" },
-              { icon: "🌿", title: "Carbon Income", desc: "Earn from sustainable farming practices" },
+              { Icon: Banknote, title: "Faster Payments", desc: "Cross-border settlement in seconds" },
+              { Icon: BarChart3, title: "Transparent Lending", desc: "Every loan tracked and verifiable" },
+              { Icon: Leaf, title: "Carbon Income", desc: "Earn from sustainable farming practices" },
             ].map((item) => (
               <div key={item.title} className="bg-white/5 border border-white/10 rounded-2xl p-6">
-                <div className="text-3xl mb-3">{item.icon}</div>
+                <div className="w-12 h-12 rounded-xl bg-[#5DB347]/10 flex items-center justify-center mb-3">
+                  <item.Icon className="w-6 h-6 text-[#5DB347]" />
+                </div>
                 <h4 className="font-bold text-white text-sm mb-1">{item.title}</h4>
                 <p className="text-gray-400 text-xs">{item.desc}</p>
               </div>

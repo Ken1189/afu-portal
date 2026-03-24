@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Landmark, Globe, FlaskConical, Tractor, Sprout, Package, Home, type LucideIcon } from "lucide-react";
 
 export const metadata = {
   title: "Financial Services - AFU",
@@ -6,9 +7,9 @@ export const metadata = {
     "Comprehensive agricultural financing from AFU. Access loans, banking, asset finance, mortgages, and more tailored for African farmers.",
 };
 
-const products = [
+const products: { icon: LucideIcon; title: string; description: string; stat: string; link: string }[] = [
   {
-    icon: "🏦",
+    icon: Landmark,
     title: "AFU Bank",
     description:
       "Our own agricultural banking arm with savings, deposits, and mobile-first accounts designed for farming communities.",
@@ -16,7 +17,7 @@ const products = [
     link: "/services/finance/afu-bank",
   },
   {
-    icon: "🌍",
+    icon: Globe,
     title: "Trade Finance",
     description:
       "SBLCs, Letters of Credit, export pre-financing, warehouse receipt finance, and FX services via Hamilton Reserve Bank. Our highest-margin product powering cross-border agricultural trade across Africa.",
@@ -24,7 +25,7 @@ const products = [
     link: "/services/finance/trade-finance",
   },
   {
-    icon: "🧪",
+    icon: FlaskConical,
     title: "Input Finance",
     description:
       "Get seeds, fertilizers, and chemicals without cash upfront. We pay approved suppliers directly and deduct at harvest.",
@@ -32,7 +33,7 @@ const products = [
     link: "/services/finance/input-finance",
   },
   {
-    icon: "🚜",
+    icon: Tractor,
     title: "Asset Finance",
     description:
       "Finance tractors, irrigation systems, solar panels, cold storage, and other critical farming equipment over flexible terms.",
@@ -40,7 +41,7 @@ const products = [
     link: "/services/finance/asset-finance",
   },
   {
-    icon: "🌱",
+    icon: Sprout,
     title: "Crop Development Loans",
     description:
       "Season-linked lending from pre-plant through harvest. Repayment tied to your crop cycle and offtake revenue.",
@@ -48,7 +49,7 @@ const products = [
     link: "/services/finance/crop-dev-loan",
   },
   {
-    icon: "📦",
+    icon: Package,
     title: "Harvest Finance",
     description:
       "Bridge the gap between crop delivery and buyer payment. Receive up to 80% advance on verified offtake contracts.",
@@ -56,7 +57,7 @@ const products = [
     link: "/services/finance/harvest-finance",
   },
   {
-    icon: "🏠",
+    icon: Home,
     title: "Farm Mortgages",
     description:
       "Long-term financing for farmland purchase, farm buildings, processing facilities, and storage infrastructure.",
@@ -129,7 +130,9 @@ export default function FinanceHubPage() {
                 href={product.link}
                 className="card-polished bg-cream rounded-2xl p-8 hover:shadow-lg transition-all group border border-transparent hover:border-[#5DB347]/20"
               >
-                <div className="text-4xl mb-4">{product.icon}</div>
+                <div className="w-12 h-12 rounded-xl bg-[#5DB347]/10 flex items-center justify-center mb-4">
+                  <product.icon className="w-6 h-6 text-[#5DB347]" />
+                </div>
                 <h3 className="text-xl font-bold text-navy mb-3 group-hover:text-[#5DB347] transition-colors">
                   {product.title}
                 </h3>

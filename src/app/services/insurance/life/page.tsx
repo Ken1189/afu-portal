@@ -1,34 +1,35 @@
 'use client';
 
 import Link from "next/link";
+import { ShieldCheck, Heart, Bandage, Users, type LucideIcon } from "lucide-react";
 
 const products = [
   {
     name: "Life Cover",
     description:
       "Financial protection for your family if anything happens to you. Lump-sum payout to cover debts, school fees, and farm continuity.",
-    icon: "🛡️",
+    icon: ShieldCheck,
     coverage: "Up to $50,000",
   },
   {
     name: "Funeral Cover",
     description:
       "Immediate payout within 48 hours to cover funeral costs and support your family during a difficult time. No medical required.",
-    icon: "🕊️",
+    icon: Heart,
     coverage: "Up to $5,000",
   },
   {
     name: "Personal Accident",
     description:
       "Coverage for accidental injury or disability that prevents you from farming. Covers medical costs and income replacement.",
-    icon: "🩹",
+    icon: Bandage,
     coverage: "Up to $20,000",
   },
   {
     name: "Family Protection Plan",
     description:
       "Bundled life, funeral, and accident cover for you and your immediate family at a discounted group rate.",
-    icon: "👨‍👩‍👧‍👦",
+    icon: Users,
     coverage: "Custom",
   },
 ];
@@ -98,7 +99,7 @@ export default function LifeInsurancePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {products.map((product, i) => (
               <div key={i} className="bg-cream rounded-2xl p-6">
-                <div className="text-3xl mb-3">{product.icon}</div>
+                <div className="w-12 h-12 rounded-xl bg-[#5DB347]/10 flex items-center justify-center mb-3"><product.icon className="w-6 h-6 text-[#5DB347]" /></div>
                 <h3 className="font-bold text-navy mb-2">{product.name}</h3>
                 <p className="text-gray-500 text-sm leading-relaxed mb-4">
                   {product.description}

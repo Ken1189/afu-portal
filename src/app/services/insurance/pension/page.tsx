@@ -1,34 +1,35 @@
 'use client';
 
 import Link from "next/link";
+import { Landmark, RefreshCw, TrendingUp, Users, type LucideIcon } from "lucide-react";
 
 const plans = [
   {
     name: "Farmer Retirement Savings",
     description:
       "A dedicated retirement fund for farmers. Contribute monthly and build a nest egg that grows with AFU's capital program returns.",
-    icon: "🏦",
+    icon: Landmark,
     minContribution: "From $10/month",
   },
   {
     name: "Membership-Linked Pension",
     description:
       "A portion of your AFU membership fee is automatically directed into a pension pot, giving you retirement savings from day one.",
-    icon: "🔄",
+    icon: RefreshCw,
     minContribution: "Included in membership",
   },
   {
     name: "Leveraged Growth Fund",
     description:
       "Your pension contributions are invested through AFU's capital program, accessing returns from agricultural trade finance and land development.",
-    icon: "📈",
+    icon: TrendingUp,
     minContribution: "From $25/month",
   },
   {
     name: "Family Legacy Plan",
     description:
       "A long-term savings plan that combines retirement income with a lump-sum inheritance benefit for your children and dependents.",
-    icon: "👨‍👩‍👧‍👦",
+    icon: Users,
     minContribution: "From $50/month",
   },
 ];
@@ -100,7 +101,7 @@ export default function PensionPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {plans.map((plan, i) => (
               <div key={i} className="bg-cream rounded-2xl p-6">
-                <div className="text-3xl mb-3">{plan.icon}</div>
+                <div className="w-12 h-12 rounded-xl bg-[#5DB347]/10 flex items-center justify-center mb-3"><plan.icon className="w-6 h-6 text-[#5DB347]" /></div>
                 <h3 className="font-bold text-navy mb-2">{plan.name}</h3>
                 <p className="text-gray-500 text-sm leading-relaxed mb-4">
                   {plan.description}

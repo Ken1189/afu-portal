@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Sprout, FlaskConical, ShieldCheck, Globe, type LucideIcon } from "lucide-react";
 
 export const metadata = {
   title: "Input Finance - AFU",
@@ -43,22 +44,22 @@ const coverage = [
   {
     category: "Seeds",
     items: ["Certified hybrid maize seed", "Soya bean inoculated seed", "Groundnut seed", "Vegetable seedlings", "Tobacco seedlings"],
-    icon: "🌱",
+    icon: Sprout,
   },
   {
     category: "Fertilizers",
     items: ["Compound D (basal)", "Ammonium Nitrate (top dress)", "NPK blends", "Lime and gypsum", "Organic fertilizers"],
-    icon: "🧪",
+    icon: FlaskConical,
   },
   {
     category: "Crop Protection",
     items: ["Herbicides (pre & post-emergent)", "Insecticides", "Fungicides", "Biological controls", "Adjuvants and surfactants"],
-    icon: "🛡️",
+    icon: ShieldCheck,
   },
   {
     category: "Soil Amendments",
     items: ["Agricultural lime", "Dolomitic lime", "Compost and mulch", "Soil conditioners", "Micronutrient blends"],
-    icon: "🌍",
+    icon: Globe,
   },
 ];
 
@@ -157,7 +158,7 @@ export default function InputFinancePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {coverage.map((cat, i) => (
               <div key={i} className="bg-white rounded-2xl p-6 border border-gray-100">
-                <div className="text-3xl mb-3">{cat.icon}</div>
+                <div className="w-12 h-12 rounded-xl bg-[#5DB347]/10 flex items-center justify-center mb-3"><cat.icon className="w-6 h-6 text-[#5DB347]" /></div>
                 <h3 className="font-bold text-navy mb-3">{cat.category}</h3>
                 <ul className="space-y-1.5">
                   {cat.items.map((item, j) => (

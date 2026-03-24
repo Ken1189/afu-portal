@@ -1,52 +1,54 @@
 import Link from "next/link";
+import { DollarSign, Sprout, Factory, Handshake, Globe, GraduationCap } from "lucide-react";
+import { type LucideIcon } from "lucide-react";
 
 export const metadata = {
   title: "Services - AFU",
   description: "Explore AFU's integrated services: Financing, Inputs, Processing, Offtake, Trade Finance, and Training.",
 };
 
-const services = [
+const services: { title: string; desc: string; features: string[]; link: string; icon: LucideIcon }[] = [
   {
     title: "Financing",
     desc: "Pre-export working capital (90-180 days, 12-18% APR) and export invoice finance (30-60 days, 8-10% APR). Repayment controlled through offtake + escrow.",
     features: ["Seasonal working capital", "Invoice finance", "Equipment finance", "Escrow-controlled repayment"],
     link: "/services/financing",
-    icon: "💰",
+    icon: DollarSign,
   },
   {
     title: "Inputs & Equipment",
     desc: "Bulk-procured input bundles including seeds, fertilizers, pesticides, plus equipment financing for tractors, drones, irrigation systems, and farm software.",
     features: ["Seed & fertilizer bundles", "Tractor leasing", "Drone services", "Irrigation systems"],
     link: "/services/inputs",
-    icon: "🌱",
+    icon: Sprout,
   },
   {
     title: "Processing Hubs",
     desc: "Anchor processing facilities providing milling, canning, drying, packaging, and cold chain capabilities to add value at source.",
     features: ["Milling & canning", "Drying & packaging", "Cold chain storage", "Quality control"],
     link: "/services/processing",
-    icon: "🏭",
+    icon: Factory,
   },
   {
     title: "Guaranteed Offtake",
     desc: "Aggregation and partner distribution networks ensuring farmers have guaranteed buyers before they plant.",
     features: ["Pre-arranged buyers", "Aggregation centers", "Export packaging", "Market linkage"],
     link: "/services/offtake",
-    icon: "🤝",
+    icon: Handshake,
   },
   {
     title: "Trade Finance",
     desc: "Letters of credit, invoice finance, and commodities partner distribution to bridge the shipment-to-payment gap.",
     features: ["Letters of credit", "Receivables finance", "Commodity trading", "FX management"],
     link: "/services/trade-finance",
-    icon: "🌍",
+    icon: Globe,
   },
   {
     title: "Training & Certification",
     desc: "Online programs and vocational college partnerships to raise yields, build compliance, and develop export readiness.",
     features: ["Online courses", "Vocational partnerships", "Certification programs", "Compliance training"],
     link: "/services/training",
-    icon: "🎓",
+    icon: GraduationCap,
   },
 ];
 
@@ -76,8 +78,8 @@ export default function ServicesPage() {
                 className="relative bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-lg shadow-[#5DB347]/5 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 group overflow-hidden"
               >
                 {/* Floating icon */}
-                <div className="absolute top-6 right-6 w-14 h-14 bg-gradient-to-br from-[#5DB347] to-[#449933] rounded-2xl flex items-center justify-center text-2xl shadow-md shadow-[#5DB347]/20 group-hover:scale-110 transition-transform duration-300">
-                  {svc.icon}
+                <div className="absolute top-6 right-6 w-14 h-14 bg-gradient-to-br from-[#5DB347] to-[#449933] rounded-2xl flex items-center justify-center shadow-md shadow-[#5DB347]/20 group-hover:scale-110 transition-transform duration-300">
+                  <svc.icon className="w-6 h-6 text-white" />
                 </div>
 
                 <div className="flex items-center gap-3 mb-4 pr-16">

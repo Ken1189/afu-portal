@@ -1,6 +1,7 @@
 'use client';
 
 import Link from "next/link";
+import { Truck, TruckIcon, Tractor, Bike, Car, Bus, type LucideIcon } from "lucide-react";
 
 const coverOptions = [
   {
@@ -27,12 +28,12 @@ const coverOptions = [
 ];
 
 const vehicles = [
-  { name: "Farm Bakkies & Pickups", icon: "🛻", desc: "Light commercial vehicles used for daily farm operations and transport." },
-  { name: "Trucks & Lorries", icon: "🚛", desc: "Heavy vehicles for produce transport, livestock hauling, and input delivery." },
-  { name: "Tractors (Road Use)", icon: "🚜", desc: "Cover for tractors when driven on public roads between farms and facilities." },
-  { name: "Motorbikes & ATVs", icon: "🏍️", desc: "Two-wheelers and all-terrain vehicles used for farm patrols and errands." },
-  { name: "Trailers", icon: "🚗", desc: "Agricultural trailers, flatbeds, and tanker trailers used with farm vehicles." },
-  { name: "Fleet Vehicles", icon: "🚐", desc: "Multi-vehicle policies for commercial farms with 3 or more vehicles at discounted rates." },
+  { name: "Farm Bakkies & Pickups", icon: Truck, desc: "Light commercial vehicles used for daily farm operations and transport." },
+  { name: "Trucks & Lorries", icon: TruckIcon, desc: "Heavy vehicles for produce transport, livestock hauling, and input delivery." },
+  { name: "Tractors (Road Use)", icon: Tractor, desc: "Cover for tractors when driven on public roads between farms and facilities." },
+  { name: "Motorbikes & ATVs", icon: Bike, desc: "Two-wheelers and all-terrain vehicles used for farm patrols and errands." },
+  { name: "Trailers", icon: Car, desc: "Agricultural trailers, flatbeds, and tanker trailers used with farm vehicles." },
+  { name: "Fleet Vehicles", icon: Bus, desc: "Multi-vehicle policies for commercial farms with 3 or more vehicles at discounted rates." },
 ];
 
 const steps = [
@@ -147,7 +148,7 @@ export default function VehicleInsurancePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {vehicles.map((v, i) => (
               <div key={i} className="bg-white rounded-2xl p-6">
-                <div className="text-3xl mb-3">{v.icon}</div>
+                <div className="w-12 h-12 rounded-xl bg-[#5DB347]/10 flex items-center justify-center mb-3"><v.icon className="w-6 h-6 text-[#5DB347]" /></div>
                 <h3 className="font-bold text-navy mb-2">{v.name}</h3>
                 <p className="text-gray-500 text-sm leading-relaxed">
                   {v.desc}

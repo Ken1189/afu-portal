@@ -25,6 +25,8 @@ import {
   Calendar,
   Sprout,
   Monitor,
+  HeartHandshake,
+  UtensilsCrossed,
 } from "lucide-react";
 import VideoCard from "@/components/VideoCard";
 
@@ -584,12 +586,14 @@ export default function InvestorsPage() {
                   <p className="text-[#5DB347] text-xs font-semibold mb-3">10% of all profits — permanently committed</p>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                     {[
-                      { name: "Women in Agriculture", icon: "👩‍🌾" },
-                      { name: "Feed a Child", icon: "🍎" },
-                      { name: "Young Farmers", icon: "🌱" },
+                      { name: "Women in Agriculture", Icon: HeartHandshake },
+                      { name: "Feed a Child", Icon: UtensilsCrossed },
+                      { name: "Young Farmers", Icon: Sprout },
                     ].map((prog) => (
                       <div key={prog.name} className="bg-white rounded-lg px-3 py-2.5 text-center border border-[#5DB347]/10">
-                        <span className="text-lg">{prog.icon}</span>
+                        <div className="w-8 h-8 rounded-lg bg-[#5DB347]/10 flex items-center justify-center mx-auto">
+                          <prog.Icon className="w-4 h-4 text-[#5DB347]" />
+                        </div>
                         <p className="text-xs font-semibold text-[#1B2A4A] mt-1">{prog.name}</p>
                       </div>
                     ))}

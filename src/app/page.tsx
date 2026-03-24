@@ -33,6 +33,7 @@ import {
   LineChart,
   Landmark,
   BadgeDollarSign,
+  Medal,
 } from 'lucide-react';
 import { useCountUp } from '@/hooks/useCountUp';
 import VideoCard from '@/components/VideoCard';
@@ -1374,15 +1375,17 @@ export default function Home() {
           {/* 3 tier preview cards */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
             {[
-              { emoji: '🥉', tier: 'Bronze', price: '$5/mo', desc: 'Cover a farmer\'s AFU membership and give them platform access', color: 'border-amber-600' },
-              { emoji: '🥈', tier: 'Silver', price: '$100/mo', desc: 'Fund a full season of crop inputs — seeds, fertiliser, pest control', color: 'border-gray-400', featured: true },
-              { emoji: '🥇', tier: 'Gold', price: '$500/mo', desc: 'Full program sponsorship — inputs, insurance, and working capital', color: 'border-yellow-500' },
+              { tierColor: 'text-amber-600', tier: 'Bronze', price: '$5/mo', desc: 'Cover a farmer\'s AFU membership and give them platform access', color: 'border-amber-600' },
+              { tierColor: 'text-gray-400', tier: 'Silver', price: '$100/mo', desc: 'Fund a full season of crop inputs — seeds, fertiliser, pest control', color: 'border-gray-400', featured: true },
+              { tierColor: 'text-yellow-500', tier: 'Gold', price: '$500/mo', desc: 'Full program sponsorship — inputs, insurance, and working capital', color: 'border-yellow-500' },
             ].map((item) => (
               <div key={item.tier} className={`bg-white rounded-2xl p-6 border-t-4 ${item.color} relative shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300`}>
                 {item.featured && (
                   <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-white text-xs font-bold px-3 py-1 rounded-full" style={{ background: '#5DB347' }}>Most Popular</span>
                 )}
-                <div className="text-3xl mb-3">{item.emoji}</div>
+                <div className="w-12 h-12 rounded-xl bg-[#5DB347]/10 flex items-center justify-center mb-3">
+                  <Medal className={`w-6 h-6 ${item.tierColor}`} />
+                </div>
                 <div className="font-bold text-navy text-lg">{item.tier}</div>
                 <div className="text-2xl font-bold my-1" style={{ color: '#5DB347' }}>{item.price}</div>
                 <p className="text-gray-600 text-sm">{item.desc}</p>

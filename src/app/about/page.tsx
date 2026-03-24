@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Sprout, Tractor, Building2, ShieldCheck, Settings, Globe, BarChart3, Lock } from "lucide-react";
+import { Sprout, Tractor, Building2, ShieldCheck, Settings, Globe, BarChart3, Lock, HeartHandshake, UtensilsCrossed, type LucideIcon } from "lucide-react";
 import LeadershipSection from "@/components/LeadershipSection";
 // CountryTeams removed — will be added when real team members are confirmed
 import VideoCard from "@/components/VideoCard";
@@ -279,28 +279,30 @@ export default function AboutPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
+            {([
               {
-                emoji: '👩‍🌾',
+                Icon: HeartHandshake,
                 title: 'Women in Agriculture',
                 desc: 'Supporting women farmers with training, financing, and mentorship. Across Africa, women produce most of the food but receive a fraction of the support. We\'re changing that — one farmer, one loan, one season at a time.',
               },
               {
-                emoji: '🍲',
+                Icon: UtensilsCrossed,
                 title: 'Feed a Child',
                 desc: 'Ensuring food reaches those who need it most. When our farmers harvest, a portion goes directly to feeding programs in local communities. No child should go hungry in a continent that can feed the world.',
               },
               {
-                emoji: '🌱',
+                Icon: Sprout,
                 title: 'Young Farmers',
                 desc: 'Incubators, education, and entrepreneurship for the next generation. Africa\'s future belongs to its young people — we\'re giving them the tools, the training, and the capital to build farming businesses of their own.',
               },
-            ].map((item) => (
+            ] as { Icon: LucideIcon; title: string; desc: string }[]).map((item) => (
               <div
                 key={item.title}
                 className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl p-8 hover:-translate-y-1 hover:bg-white/10 transition-all duration-300"
               >
-                <div className="text-4xl mb-4">{item.emoji}</div>
+                <div className="w-12 h-12 rounded-xl bg-[#5DB347]/10 flex items-center justify-center mb-4">
+                  <item.Icon className="w-6 h-6 text-[#5DB347]" />
+                </div>
                 <h3 className="text-xl font-bold text-white mb-3">{item.title}</h3>
                 <p className="text-white/60 text-sm leading-relaxed">{item.desc}</p>
               </div>

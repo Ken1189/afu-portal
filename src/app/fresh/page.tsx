@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Wheat, ShoppingCart, Truck, type LucideIcon } from "lucide-react";
 
 export const metadata = {
   title: "AFU Fresh — Farm to Fork | African Farming Union",
@@ -6,22 +7,22 @@ export const metadata = {
     "Fresh produce from African farmers, delivered to your door. Consumer grocery, B2B trade, and premium export — the Amazon of Food for Africa.",
 };
 
-const howItWorks = [
+const howItWorks: { step: string; icon: LucideIcon; title: string; desc: string }[] = [
   {
     step: "01",
-    icon: "🌾",
+    icon: Wheat,
     title: "Browse Local Farms",
     desc: "Discover fresh produce from verified AFU farmers near you. Filter by crop, farm, and delivery date.",
   },
   {
     step: "02",
-    icon: "🛒",
+    icon: ShoppingCart,
     title: "Order Fresh Produce",
     desc: "Add to your box, choose a subscription plan, or place a one-time order. Pay securely via mobile money or card.",
   },
   {
     step: "03",
-    icon: "🚚",
+    icon: Truck,
     title: "Delivered Within 24 Hours",
     desc: "Cold-chain logistics from farm to your door. Track your order in real-time from harvest to delivery.",
   },
@@ -135,7 +136,9 @@ export default function FreshPage() {
                 key={item.step}
                 className="text-center bg-white rounded-3xl p-8 shadow-lg shadow-[#5DB347]/5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100"
               >
-                <div className="text-5xl mb-4">{item.icon}</div>
+                <div className="w-12 h-12 rounded-xl bg-[#5DB347]/10 flex items-center justify-center mb-4 mx-auto">
+                  <item.icon className="w-6 h-6 text-[#5DB347]" />
+                </div>
                 <div className="w-10 h-10 bg-[#5DB347] rounded-full flex items-center justify-center text-white font-bold text-sm mx-auto mb-4">
                   {item.step}
                 </div>
