@@ -66,21 +66,24 @@ const educationLinks = [
 ];
 
 const communityLinks = [
-  { label: "Exchange", href: "/exchange", desc: "Trade with fellow farmers" },
   { label: "Jobs Board", href: "/jobs", desc: "Agricultural positions" },
   { label: "Ambassadors", href: "/ambassadors", desc: "Meet our farmers" },
   { label: "Partner Farms", href: "/farms", desc: "Showcase farms" },
   { label: "Partners", href: "/partners", desc: "Our network" },
   { label: "Programs", href: "/programs", desc: "Active farming programs" },
-  { label: "Projects", href: "/projects", desc: "Development projects" },
-  { label: "Podcasts", href: "/podcasts", desc: "Listen & learn" },
-  { label: "Young Farmers", href: "/young-farmers", desc: "Next generation program" },
-  { label: "Blockchain", href: "/blockchain", desc: "Our technology roadmap" },
-  { label: "AFU Fresh", href: "/fresh", desc: "Farm to fork marketplace" },
-  { label: "Newsletter", href: "/newsletter", desc: "Weekly agricultural intelligence" },
+  { label: "Young Farmers", href: "/young-farmers", desc: "Next generation" },
 ];
 
-type OpenDropdown = null | "services" | "education" | "community";
+const exploreLinks = [
+  { label: "Projects", href: "/projects", desc: "Investment opportunities" },
+  { label: "AFU Fresh", href: "/fresh", desc: "Farm to fork marketplace" },
+  { label: "Exchange", href: "/exchange", desc: "Trade with fellow farmers" },
+  { label: "Blockchain", href: "/blockchain", desc: "EDMA technology roadmap" },
+  { label: "Podcasts", href: "/podcasts", desc: "Listen & learn" },
+  { label: "Newsletter", href: "/newsletter", desc: "Weekly intelligence" },
+];
+
+type OpenDropdown = null | "services" | "education" | "community" | "explore";
 
 /* ─── Dropdown animation variants ─── */
 
@@ -420,6 +423,45 @@ export default function Navbar() {
                     className="absolute top-full left-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50"
                   >
                     {communityLinks.map((link) => (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        onClick={() => setOpenDropdown(null)}
+                        className="flex flex-col px-4 py-2.5 hover:bg-[#EBF7E5]/50 transition-colors"
+                      >
+                        <span className="text-sm font-medium text-navy">{link.label}</span>
+                        <span className="text-[10px] text-gray-400">{link.desc}</span>
+                      </Link>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Explore dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setOpenDropdown(openDropdown === "explore" ? null : "explore")}
+                className={`flex items-center gap-1 text-sm font-medium px-3 py-2 rounded-lg transition-colors ${
+                  openDropdown === "explore"
+                    ? "text-[#5DB347] bg-[#EBF7E5]/50"
+                    : "text-navy hover:text-[#5DB347] hover:bg-[#EBF7E5]/50"
+                }`}
+              >
+                Explore
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${openDropdown === "explore" ? "rotate-180" : ""}`} />
+              </button>
+              <AnimatePresence>
+                {openDropdown === "explore" && (
+                  <motion.div
+                    variants={dropdownVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    transition={{ duration: 0.15 }}
+                    className="absolute top-full right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50"
+                  >
+                    {exploreLinks.map((link) => (
                       <Link
                         key={link.href}
                         href={link.href}
@@ -798,6 +840,21 @@ export default function Navbar() {
                 <div className="pt-2 mt-2 border-t border-gray-100">
                   <p className="text-xs font-bold text-gray-400 uppercase tracking-wider px-3 mb-2">Community</p>
                   {communityLinks.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className="text-navy/80 hover:text-[#5DB347] text-sm font-medium py-2.5 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors block"
+                      onClick={closeMobile}
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
+                </div>
+
+                {/* Explore section */}
+                <div className="pt-2 mt-2 border-t border-gray-100">
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider px-3 mb-2">Explore</p>
+                  {exploreLinks.map((link) => (
                     <Link
                       key={link.href}
                       href={link.href}
