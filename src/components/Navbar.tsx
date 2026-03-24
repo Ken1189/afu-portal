@@ -21,6 +21,7 @@ import {
   LayoutDashboard,
   User,
   Settings,
+  Shield,
 } from "lucide-react";
 import { useAuth } from "@/lib/supabase/auth-context";
 
@@ -55,6 +56,7 @@ const moreServicesLinks = [
   { label: "Technology", href: "/services/technology", icon: Cpu },
   { label: "Energy", href: "/services/energy", icon: Zap },
   { label: "Machinery", href: "/services/machinery", icon: Wrench },
+  { label: "Farm Security", href: "/services/security", icon: Shield },
 ];
 
 const educationLinks = [
@@ -71,6 +73,7 @@ const communityLinks = [
   { label: "Programs", href: "/programs", desc: "Active farming programs" },
   { label: "Projects", href: "/projects", desc: "Development projects" },
   { label: "Podcasts", href: "/podcasts", desc: "Listen & learn" },
+  { label: "Young Farmers", href: "/young-farmers", desc: "Next generation program" },
 ];
 
 type OpenDropdown = null | "services" | "education" | "community";

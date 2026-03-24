@@ -78,6 +78,15 @@ const boardOfDirectors: BoardMember[] = [
     linkedin: '#',
   },
   {
+    name: 'Duncan Kennaird',
+    title: 'Co-Founder & Head of Commercial Agriculture',
+    org: 'African Farming Union',
+    bio: 'Commercial farming expert with deep operational experience across Southern African agriculture. Specializes in livestock management, crop production systems, and building scalable farm operations from the ground up.',
+    country: 'Zimbabwe',
+    flag: '\u{1F1FF}\u{1F1FC}',
+    linkedin: '#',
+  },
+  {
     name: 'Nkechi Okonkwo',
     title: 'Director, Banking & Financial Services',
     org: 'Former MD, Stanbic IBTC Agriculture',

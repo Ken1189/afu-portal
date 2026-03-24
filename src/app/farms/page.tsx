@@ -31,6 +31,30 @@ interface FarmProfile {
 
 const DUMMY_FARMERS: FarmProfile[] = [
   {
+    id: 'showcase-1',
+    slug: 'watson-and-fine',
+    display_name: 'Watson & Fine Group',
+    story: 'Watson & Fine is a diversified commercial farming operation and the founding farm behind AFU. Led by Peter Watson, the group spans 120 hectares across Mashonaland with operations in high-value horticulture, tree crops, and livestock. As AFU\u2019s flagship partner farm, Watson & Fine serves as the model for what integrated, technology-enabled commercial agriculture looks like in Zimbabwe.',
+    hero_photo_url: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=900&h=400&fit=crop',
+    country: 'Zimbabwe',
+    region: 'Mashonaland',
+    crops: ['Blueberries', 'Macadamia', 'Citrus', 'Cattle'],
+    farm_size_ha: 120,
+    is_showcase: true,
+  },
+  {
+    id: 'showcase-2',
+    slug: 'watson-cassava',
+    display_name: 'Watson Cassava Starch',
+    story: 'A dedicated cassava production and starch extraction operation supplying industrial starch to regional manufacturers. The farm demonstrates AFU\u2019s processing hub model \u2014 growing the raw material and adding value before it leaves the farm gate.',
+    hero_photo_url: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=900&h=400&fit=crop',
+    country: 'Zimbabwe',
+    region: 'Mashonaland East',
+    crops: ['Cassava', 'Starch Processing'],
+    farm_size_ha: 45,
+    is_showcase: true,
+  },
+  {
     id: 'dummy-1',
     slug: 'grace-moyo',
     display_name: 'Grace Moyo',
@@ -100,6 +124,12 @@ const CROP_COLORS: Record<string, string> = {
   Tomatoes: 'bg-red-100 text-red-700',
   Peppers: 'bg-rose-100 text-rose-700',
   Lettuce: 'bg-emerald-100 text-emerald-700',
+  Blueberries: 'bg-indigo-100 text-indigo-700',
+  Macadamia: 'bg-amber-100 text-amber-700',
+  Citrus: 'bg-orange-100 text-orange-700',
+  Cattle: 'bg-orange-100 text-orange-700',
+  Cassava: 'bg-yellow-100 text-yellow-700',
+  'Starch Processing': 'bg-violet-100 text-violet-700',
 };
 
 /* ─── Component ─── */

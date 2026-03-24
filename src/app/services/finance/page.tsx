@@ -150,6 +150,69 @@ export default function FinanceHubPage() {
         </div>
       </section>
 
+      {/* Community-Backed Lending */}
+      <section className="py-20 bg-[#F8FBF6]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-4xl mx-auto">
+            <div className="bg-white rounded-2xl border border-[#5DB347]/20 shadow-lg overflow-hidden">
+              <div className="p-8 md:p-12">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-12 h-12 bg-[#5DB347]/10 rounded-xl flex items-center justify-center text-2xl">
+                    🤝
+                  </div>
+                  <div>
+                    <h2 className="text-2xl md:text-3xl font-bold text-navy">
+                      Community-Backed Lending
+                    </h2>
+                    <span className="text-[#5DB347] text-sm font-semibold">
+                      What Makes AFU Different
+                    </span>
+                  </div>
+                </div>
+                <p className="text-gray-600 text-lg leading-relaxed mb-6">
+                  At AFU, lending decisions aren&apos;t made by distant committees.
+                  Your peers &mdash; fellow farmers who understand your land, your
+                  crops, and your potential &mdash; participate in the review
+                  process. When your community believes in you, so do we.
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="bg-cream rounded-xl p-5">
+                    <div className="text-2xl mb-2">👥</div>
+                    <h4 className="font-bold text-navy text-sm mb-1">Peer Review</h4>
+                    <p className="text-gray-500 text-xs leading-relaxed">
+                      Community members who know your farming operation vouch for
+                      your capability and character.
+                    </p>
+                  </div>
+                  <div className="bg-cream rounded-xl p-5">
+                    <div className="text-2xl mb-2">✅</div>
+                    <h4 className="font-bold text-navy text-sm mb-1">Community Vote</h4>
+                    <p className="text-gray-500 text-xs leading-relaxed">
+                      Peers participate in the lending review, adding a trust layer
+                      that traditional banks cannot replicate.
+                    </p>
+                  </div>
+                  <div className="bg-cream rounded-xl p-5">
+                    <div className="text-2xl mb-2">🌍</div>
+                    <h4 className="font-bold text-navy text-sm mb-1">Shared Success</h4>
+                    <p className="text-gray-500 text-xs leading-relaxed">
+                      When one farmer succeeds, the entire community benefits &mdash;
+                      creating aligned incentives and stronger repayment rates.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-navy px-8 md:px-12 py-5">
+                <p className="text-white/80 text-sm text-center">
+                  Our peer-reviewed lending model achieves a <span className="text-[#5DB347] font-bold">98.2% repayment rate</span> &mdash;
+                  higher than any traditional agricultural lender in our markets.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* How It Works */}
       <section className="py-20 bg-cream">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
