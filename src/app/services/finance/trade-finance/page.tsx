@@ -56,6 +56,20 @@ const products = [
     ],
   },
   {
+    icon: "🏭",
+    title: "Warehouse Receipt Finance",
+    description:
+      "Store your grain or commodity in a certified warehouse, receive a receipt, and borrow up to 70% of its value. Sell when prices peak instead of at harvest when prices are lowest — unlocking significantly higher income for staple crop farmers.",
+    stat: "Up to 70% LTV",
+    highlights: [
+      "Store maize, sorghum, wheat, or other staples in certified warehouses",
+      "Receive a warehouse receipt as proof of stored commodity",
+      "Borrow up to 70% of the commodity's current market value",
+      "Sell when prices are favorable — repay the loan from proceeds",
+      "Avoid forced harvest-time sales at the lowest seasonal prices",
+    ],
+  },
+  {
     icon: "🌍",
     title: "Foreign Exchange",
     description:
@@ -156,7 +170,7 @@ export default function TradeFinancePage() {
               Trade Finance Products
             </h2>
             <p className="text-gray-500 max-w-2xl mx-auto">
-              Five specialized instruments designed for African agricultural
+              Six specialized instruments designed for African agricultural
               exporters. Each product is structured to reduce risk and accelerate
               trade settlement.
             </p>

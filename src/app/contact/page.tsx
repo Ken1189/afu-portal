@@ -234,6 +234,7 @@ export default function ContactPage() {
                           <option value="sponsorship">Sponsor a Farmer</option>
                           <option value="training">Training</option>
                           <option value="media">Media / Press</option>
+                          <option value="afu_fresh">AFU Fresh — Farm to Fork Marketplace</option>
                           <option value="general">General Inquiry</option>
                         </select>
                       </div>

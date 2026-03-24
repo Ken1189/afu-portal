@@ -485,6 +485,123 @@ export default function InvestorsPage() {
         </div>
       </section>
 
+      {/* ─── CORPORATE STRUCTURE ─── */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: "#5DB347" }}>
+              Foundation Model
+            </span>
+            <h2 className="text-3xl md:text-4xl font-bold mt-2 mb-4">
+              <span className="bg-gradient-to-r from-[#1B2A4A] to-[#5DB347] bg-clip-text text-transparent">
+                Corporate Structure
+              </span>
+            </h2>
+            <p className="text-gray-500 max-w-3xl mx-auto">
+              AFU is structured as a Netherlands foundation — the most secure, private, and
+              tax-efficient structure for a pan-African agricultural platform. Farmers receive
+              profit-sharing, investors receive revenue participation notes, and 10% of profits
+              are permanently committed to community programs.
+            </p>
+          </div>
+
+          {/* Org Chart */}
+          <div className="max-w-4xl mx-auto">
+            {/* Foundation Root */}
+            <div className="bg-gradient-to-r from-[#0F1A30] to-[#1B2A4A] rounded-2xl p-6 text-white shadow-xl mb-0">
+              <div className="flex items-center gap-3">
+                <Building2 className="w-7 h-7 text-gold" />
+                <div>
+                  <h3 className="text-lg font-bold">AFU Foundation (Netherlands)</h3>
+                  <p className="text-gray-400 text-xs">Stichting — Ring-fenced, tax-efficient, DFI-ready</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Connector line */}
+            <div className="ml-10 border-l-2 border-[#1B2A4A]/30">
+
+              {/* AFU Operations BV */}
+              <div className="pl-8 py-4">
+                <div className="bg-gradient-to-r from-[#1B2A4A] to-[#2D4A7A] rounded-xl p-5 text-white shadow-lg">
+                  <h4 className="font-bold text-sm mb-3 flex items-center gap-2">
+                    <Cog className="w-4 h-4 text-gold" />
+                    AFU Operations BV
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                    {[
+                      { name: "AFU Tech", desc: "Platform, AI, Data" },
+                      { name: "AFU Finance", desc: "Hamilton Reserve White-Label" },
+                      { name: "AFU Insurance", desc: "Lloyd's Coverholder" },
+                      { name: "AFU Agri", desc: "Watson & Fine, Projects" },
+                      { name: "AFU Chain", desc: "EDMA Blockchain Layer" },
+                    ].map((sub) => (
+                      <div key={sub.name} className="bg-[#5DB347]/20 border border-[#5DB347]/30 rounded-lg px-3 py-2.5">
+                        <p className="font-semibold text-sm text-white">{sub.name}</p>
+                        <p className="text-[11px] text-gray-300">{sub.desc}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Country Operations */}
+              <div className="pl-8 py-4">
+                <div className="bg-[#5DB347] rounded-xl p-5 text-white shadow-lg">
+                  <h4 className="font-bold text-sm mb-2 flex items-center gap-2">
+                    <Globe2 className="w-4 h-4" />
+                    Country Operations
+                  </h4>
+                  <p className="text-white/80 text-xs mb-3">51% profit-sharing to farmers</p>
+                  <div className="flex flex-wrap gap-2">
+                    {["Zimbabwe", "Uganda", "Ghana", "Kenya", "Tanzania", "Zambia", "Malawi", "Mozambique", "DRC"].map((c) => (
+                      <span key={c} className="bg-white/20 border border-white/30 rounded-full px-3 py-1 text-xs font-medium">
+                        {c}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Revenue Participation Notes */}
+              <div className="pl-8 py-4">
+                <div className="bg-gradient-to-r from-[#D4A843] to-[#E8C547] rounded-xl p-5 text-[#1B2A4A] shadow-lg">
+                  <h4 className="font-bold text-sm flex items-center gap-2">
+                    <BadgeDollarSign className="w-4 h-4" />
+                    Revenue Participation Notes
+                  </h4>
+                  <p className="text-[#1B2A4A]/70 text-xs mt-1">Structured returns for investors — aligned with platform revenue</p>
+                </div>
+              </div>
+
+              {/* Charitable Trust */}
+              <div className="pl-8 py-4">
+                <div className="bg-gradient-to-br from-[#EBF7E5] to-[#d4edcc] rounded-xl p-5 border border-[#5DB347]/20 shadow-lg">
+                  <h4 className="font-bold text-sm text-[#1B2A4A] mb-3 flex items-center gap-2">
+                    <Sprout className="w-4 h-4 text-[#5DB347]" />
+                    AFU Charitable Trust
+                  </h4>
+                  <p className="text-[#5DB347] text-xs font-semibold mb-3">10% of all profits — permanently committed</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                    {[
+                      { name: "Women in Agriculture", icon: "👩‍🌾" },
+                      { name: "Feed a Child", icon: "🍎" },
+                      { name: "Young Farmers", icon: "🌱" },
+                    ].map((prog) => (
+                      <div key={prog.name} className="bg-white rounded-lg px-3 py-2.5 text-center border border-[#5DB347]/10">
+                        <span className="text-lg">{prog.icon}</span>
+                        <p className="text-xs font-semibold text-[#1B2A4A] mt-1">{prog.name}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ─── INVESTMENT TIERS ─── */}
       <section
         className="py-20 text-white relative overflow-hidden"

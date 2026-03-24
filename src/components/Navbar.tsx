@@ -75,6 +75,9 @@ const communityLinks = [
   { label: "Projects", href: "/projects", desc: "Development projects" },
   { label: "Podcasts", href: "/podcasts", desc: "Listen & learn" },
   { label: "Young Farmers", href: "/young-farmers", desc: "Next generation program" },
+  { label: "Blockchain", href: "/blockchain", desc: "Our technology roadmap" },
+  { label: "AFU Fresh", href: "/fresh", desc: "Farm to fork marketplace" },
+  { label: "Newsletter", href: "/newsletter", desc: "Weekly agricultural intelligence" },
 ];
 
 type OpenDropdown = null | "services" | "education" | "community";
