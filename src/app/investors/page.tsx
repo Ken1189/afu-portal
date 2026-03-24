@@ -485,8 +485,8 @@ export default function InvestorsPage() {
         </div>
       </section>
 
-      {/* ─── CORPORATE STRUCTURE ─── */}
-      <section className="py-20 bg-white">
+      {/* ─── CORPORATE STRUCTURE (hidden — not ready for public) ─── */}
+      {false && <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: "#5DB347" }}>
@@ -600,7 +600,7 @@ export default function InvestorsPage() {
             </div>
           </div>
         </div>
-      </section>
+      </section>}
 
       {/* ─── INVESTMENT TIERS ─── */}
       <section
