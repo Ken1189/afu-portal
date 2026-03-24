@@ -15,7 +15,7 @@ import {
   Landmark,
   // Banknote,
   // ArrowDownToLine,
-  // Ship,
+  Ship,
   Store,
   UserCheck,
   // Award,
@@ -94,6 +94,7 @@ const navGroups: NavGroup[] = [
       { href: '/admin/payments', label: 'Payments', icon: <CreditCard className="w-4 h-4" /> },
       { href: '/admin/financial', label: 'Financial Overview', icon: <Landmark className="w-4 h-4" /> },
       { href: '/admin/credit-scores', label: 'Credit Scoring', icon: <Gauge className="w-4 h-4" /> },
+      { href: '/admin/trade-finance', label: 'Trade Finance', icon: <Ship className="w-4 h-4" /> },
     ],
   },
   {
