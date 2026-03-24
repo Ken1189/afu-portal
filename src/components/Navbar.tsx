@@ -146,10 +146,16 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
-  /* Close mobile menu on route change */
+  /* Close mobile menu on route change — MUST clear body overflow */
   useEffect(() => {
     setMobileOpen(false);
     setOpenDropdown(null);
+    // Force clear overflow on every route change (fixes Android stuck scroll)
+    document.body.style.overflow = "";
+    document.body.style.position = "";
+    document.body.style.top = "";
+    document.body.style.width = "";
+    document.documentElement.style.overflow = "";
   }, [pathname]);
 
   /* Close dropdowns on Escape */
@@ -158,17 +164,26 @@ export default function Navbar() {
       if (e.key === "Escape") {
         setOpenDropdown(null);
         setMobileOpen(false);
+        document.body.style.overflow = "";
+        document.documentElement.style.overflow = "";
       }
     }
     document.addEventListener("keydown", handleKey);
     return () => document.removeEventListener("keydown", handleKey);
   }, []);
 
-  /* Lock body scroll when mobile menu open */
+  /* Lock/unlock body scroll when mobile menu opens/closes */
   useEffect(() => {
-    document.body.style.overflow = mobileOpen ? "hidden" : "";
+    if (mobileOpen) {
+      document.body.style.overflow = "hidden";
+      document.documentElement.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
+    }
     return () => {
       document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
     };
   }, [mobileOpen]);
 
@@ -177,6 +192,9 @@ export default function Navbar() {
     setMobileServicesOpen(false);
     setMobileEducationOpen(false);
     setMobileFinanceOpen(false);
+    // Force clear on Android
+    document.body.style.overflow = "";
+    document.documentElement.style.overflow = "";
     setMobileInsuranceOpen(false);
     setMobileMoreOpen(false);
   }, []);
@@ -629,16 +647,12 @@ export default function Navbar() {
       </div>
 
       {/* ── Mobile Menu ── */}
-      <AnimatePresence>
-        {mobileOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
-            className="fixed inset-x-0 top-[64px] bottom-0 bg-white z-50 lg:hidden overflow-y-auto shadow-2xl"
-          >
-            <div className="px-4 py-6 pb-24">
+      {mobileOpen && (
+        <div
+          className="fixed inset-x-0 top-[64px] bottom-0 bg-white z-50 lg:hidden shadow-2xl"
+          style={{ overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}
+        >
+          <div className="px-4 py-6 pb-32">
               <div className="flex flex-col gap-1">
                 {/* About */}
                 <Link
@@ -978,9 +992,8 @@ export default function Navbar() {
                 )}
               </div>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          </div>
+      )}
     </nav>
   );
 }
