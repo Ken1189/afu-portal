@@ -506,49 +506,54 @@ export default function InvestorsPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
               {
-                tier: "Seed Investor",
-                min: "$250,000",
-                returns: "18-24% target",
+                tier: "Tier 1 — Seed Investor",
+                min: "$1M",
+                returns: "10% target annual return",
                 features: [
                   "Quarterly distributions",
-                  "Annual impact report",
                   "Investor portal access",
-                  "ESG reporting dashboard",
+                  "Quarterly reporting",
                 ],
                 borderColor: "border-[#5DB347]/40",
                 bgColor: "bg-[#5DB347]/5",
                 badge: "bg-[#5DB347]/20 text-[#5DB347]",
+                accentColor: "#5DB347",
               },
               {
-                tier: "Growth Partner",
-                min: "$1,000,000",
-                returns: "24-32% target",
+                tier: "Tier 2 — Growth Partner",
+                min: "$10M",
+                returns: "15% target annual return",
                 features: [
-                  "Monthly distributions",
-                  "Advisory board seat",
-                  "Direct deal co-investment",
-                  "Priority pipeline access",
-                  "Quarterly strategy calls",
+                  "Quarterly distributions",
+                  "Investor portal access",
+                  "Board observer rights",
+                  "Dedicated relationship manager",
+                  "Off-take participation options",
                 ],
                 borderColor: "border-gold/40 ring-2 ring-gold/20",
                 bgColor: "bg-gold/5",
                 badge: "bg-gold/20 text-gold",
                 featured: true,
+                accentColor: "#D4A843",
               },
               {
-                tier: "Strategic Partner",
-                min: "$5,000,000+",
-                returns: "Custom structure",
+                tier: "Tier 3 — Strategic Partner",
+                min: "$100M",
+                returns: "20% target annual return",
                 features: [
-                  "Board observer rights",
-                  "Country exclusivity options",
-                  "Joint venture structures",
+                  "Quarterly distributions",
+                  "Investor portal access",
+                  "Board seat",
                   "Equity participation option",
                   "Dedicated relationship manager",
+                  "Off-take participation options",
+                  "Marketing rights across AFU member network",
+                  "Co-investment rights on projects",
                 ],
-                borderColor: "border-purple-400/40",
-                bgColor: "bg-purple-500/5",
-                badge: "bg-purple-500/20 text-purple-300",
+                borderColor: "border-[#1B2A4A]/60 ring-2 ring-[#1B2A4A]/30",
+                bgColor: "bg-[#1B2A4A]/10",
+                badge: "bg-[#1B2A4A]/30 text-gray-200",
+                accentColor: "#1B2A4A",
               },
             ].map((item) => (
               <div
@@ -567,9 +572,10 @@ export default function InvestorsPage() {
                   {item.tier}
                 </span>
                 <div className="text-3xl md:text-4xl font-extrabold text-white mb-2">{item.min}</div>
-                <p className="text-gray-300 text-sm mb-6">
-                  Target returns: <span className="text-white font-semibold">{item.returns}</span>
-                </p>
+                <div className="text-lg font-semibold mb-1" style={{ color: item.accentColor }}>
+                  {item.returns}
+                </div>
+                <p className="text-gray-400 text-sm mb-6">Minimum investment</p>
                 <ul className="space-y-3 mb-8">
                   {item.features.map((f, j) => (
                     <li key={j} className="flex items-start gap-2 text-sm text-gray-300">

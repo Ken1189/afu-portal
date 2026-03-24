@@ -33,6 +33,7 @@ const financeLinks = [
   { label: "Mortgages", href: "/services/finance/mortgages" },
   { label: "Input Finance", href: "/services/finance/input-finance" },
   { label: "Harvest Finance", href: "/services/finance/harvest-finance" },
+  { label: "Trade Finance", href: "/services/finance/trade-finance" },
 ];
 
 const insuranceLinks = [
