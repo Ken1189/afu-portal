@@ -68,6 +68,7 @@ export default function Footer() {
               <div>
                 <span className="text-white font-bold text-xl tracking-tight">AFU</span>
                 <span className="block text-xs text-gray-400 -mt-0.5">African Farming Union</span>
+                <span className="block text-xs font-medium mt-1" style={{ color: '#5DB347' }}>Let&apos;s Grow Together</span>
               </div>
             </div>
             <p className="text-gray-400 text-sm leading-relaxed mb-6 max-w-sm">

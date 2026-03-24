@@ -261,6 +261,60 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* ─── OUR PROMISE TO AFRICA ─── */}
+      <section className="py-16" style={{ background: 'linear-gradient(135deg, #0F1A30 0%, #1B2A4A 60%, #1e3a3a 100%)' }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#6ABF4B' }}>
+              Giving Back
+            </span>
+            <h2 className="text-3xl md:text-4xl font-bold mt-2 mb-4 text-white">
+              Our Promise to <span className="bg-gradient-to-r from-[#5DB347] to-[#6ABF4B] bg-clip-text text-transparent">Africa</span>
+            </h2>
+            <p className="text-white/70 max-w-2xl mx-auto text-lg">
+              This isn&apos;t corporate CSR. This is personal. Ten percent of everything AFU earns goes straight back
+              into the communities that grow the food. Because farming built us, and we owe it everything.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                emoji: '👩‍🌾',
+                title: 'Women in Agriculture',
+                desc: 'Supporting women farmers with training, financing, and mentorship. Across Africa, women produce most of the food but receive a fraction of the support. We\'re changing that — one farmer, one loan, one season at a time.',
+              },
+              {
+                emoji: '🍲',
+                title: 'Feed a Child',
+                desc: 'Ensuring food reaches those who need it most. When our farmers harvest, a portion goes directly to feeding programs in local communities. No child should go hungry in a continent that can feed the world.',
+              },
+              {
+                emoji: '🌱',
+                title: 'Young Farmers',
+                desc: 'Incubators, education, and entrepreneurship for the next generation. Africa\'s future belongs to its young people — we\'re giving them the tools, the training, and the capital to build farming businesses of their own.',
+              },
+            ].map((item) => (
+              <div
+                key={item.title}
+                className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl p-8 hover:-translate-y-1 hover:bg-white/10 transition-all duration-300"
+              >
+                <div className="text-4xl mb-4">{item.emoji}</div>
+                <h3 className="text-xl font-bold text-white mb-3">{item.title}</h3>
+                <p className="text-white/60 text-sm leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-12 text-center">
+            <div className="inline-flex items-center gap-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl px-8 py-4">
+              <span className="text-3xl font-bold text-white">10%</span>
+              <span className="text-white/70 text-sm text-left">of AFU&apos;s profits go directly<br />into community programs</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ─── LEADERSHIP ─── */}
       <LeadershipSection />
 
@@ -279,17 +333,17 @@ export default function AboutPage() {
             Join the Movement
           </span>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6">
-            Join the <span className="bg-gradient-to-r from-[#5DB347] to-[#6ABF4B] bg-clip-text text-transparent">AFU Ecosystem</span>
+            Let&apos;s <span className="bg-gradient-to-r from-[#5DB347] to-[#6ABF4B] bg-clip-text text-transparent">Grow Together</span>
           </h2>
           <p className="text-lg text-white/70 mb-10 max-w-xl mx-auto">
-            Whether you&apos;re a farmer, investor, partner, or sponsor — there&apos;s a place for you in the AFU platform.
+            Whether you&apos;re a farmer, investor, partner, or sponsor — there&apos;s a place for you in the AFU family. Tell us your story.
           </p>
           <Link
             href="/apply"
             className="inline-block font-semibold text-lg px-10 py-4 rounded-2xl transition-all duration-300 text-white shadow-xl shadow-[#5DB347]/30 hover:-translate-y-1 hover:shadow-2xl hover:shadow-[#5DB347]/40"
             style={{ background: 'linear-gradient(135deg, #5DB347, #449933)' }}
           >
-            Apply for Membership →
+            Join Our Farming Family →
           </Link>
         </div>
       </section>

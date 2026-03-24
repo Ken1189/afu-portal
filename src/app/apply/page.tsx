@@ -62,7 +62,7 @@ export default function ApplyPage() {
       <>
         <section className="bg-navy text-white py-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-white via-[#5DB347] to-[#6ABF4B] bg-clip-text text-transparent">Application Submitted</h1>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-white via-[#5DB347] to-[#6ABF4B] bg-clip-text text-transparent">You&apos;re In!</h1>
           </div>
         </section>
         <section className="py-16 bg-[#EBF7E5]/30">
@@ -71,12 +71,12 @@ export default function ApplyPage() {
               <svg className="w-20 h-20 text-[#5DB347] mx-auto mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <h2 className="text-3xl font-bold text-[#1B2A4A] mb-4">Thank You!</h2>
+              <h2 className="text-3xl font-bold text-[#1B2A4A] mb-4">Welcome to the Family!</h2>
               <p className="text-gray-600 mb-2">
-                Your membership application for <strong>{selectedTier && tiers[selectedTier].name}</strong> has been received.
+                Your <strong>{selectedTier && tiers[selectedTier].name}</strong> application has been received — we&apos;re excited to learn more about you and your farm.
               </p>
               <p className="text-gray-500 mb-8">
-                Our team will review your application and get back to you within 3-5 business days.
+                A real person from our team will be in touch within 3-5 business days. We can&apos;t wait to start this journey with you.
               </p>
               <Link href="/" className="inline-block bg-gradient-to-r from-[#5DB347] to-[#449933] hover:scale-105 text-white px-8 py-3 rounded-xl font-semibold transition-all duration-300 shadow-lg shadow-[#5DB347]/20">
                 Back to Home
@@ -92,9 +92,9 @@ export default function ApplyPage() {
     <>
       <section className="bg-navy text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-[#5DB347] to-[#6ABF4B] bg-clip-text text-transparent">Become a Member</h1>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-[#5DB347] to-[#6ABF4B] bg-clip-text text-transparent">Join Our Farming Family</h1>
           <p className="text-xl text-gray-300 max-w-3xl">
-            Join the AFU ecosystem. Select your membership tier and complete your application.
+            We&apos;re farmers too. We understand the challenges, the risks, the rewards. Tell us about you and your vision — we&apos;re here to help you grow.
           </p>
         </div>
       </section>
@@ -109,7 +109,7 @@ export default function ApplyPage() {
                   {s}
                 </div>
                 <span className={`text-sm font-medium ${step >= s ? "text-[#1B2A4A]" : "text-gray-400"}`}>
-                  {s === 1 ? "Select Tier" : "Your Details"}
+                  {s === 1 ? "Select Tier" : "Tell Us Your Story"}
                 </span>
                 {s < 2 && <div className={`w-16 h-0.5 transition-colors ${step > 1 ? "bg-[#5DB347]" : "bg-gray-200"}`} />}
               </div>
@@ -168,7 +168,7 @@ export default function ApplyPage() {
           {step === 2 && (
             <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 md:p-10 shadow-lg shadow-[#5DB347]/5 border border-white/60">
               <div className="flex items-center justify-between mb-8">
-                <h2 className="text-2xl font-bold text-[#1B2A4A]">Your Details</h2>
+                <h2 className="text-2xl font-bold text-[#1B2A4A]">Tell Us About You</h2>
                 <button onClick={() => setStep(1)} className="text-[#5DB347] hover:text-[#449933] text-sm font-medium transition-colors">
                   ← Change Tier
                 </button>
@@ -187,11 +187,11 @@ export default function ApplyPage() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-[#1B2A4A] mb-2">First Name *</label>
+                    <label className="block text-sm font-medium text-[#1B2A4A] mb-2">Your First Name *</label>
                     <input type="text" required className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5DB347]/50 focus:border-[#5DB347] transition-shadow" value={formData.firstName} onChange={(e) => setFormData({ ...formData, firstName: e.target.value })} />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-[#1B2A4A] mb-2">Last Name *</label>
+                    <label className="block text-sm font-medium text-[#1B2A4A] mb-2">Your Last Name *</label>
                     <input type="text" required className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5DB347]/50 focus:border-[#5DB347] transition-shadow" value={formData.lastName} onChange={(e) => setFormData({ ...formData, lastName: e.target.value })} />
                   </div>
                 </div>
@@ -224,7 +224,7 @@ export default function ApplyPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-[#1B2A4A] mb-2">Organization / Farm Name</label>
+                    <label className="block text-sm font-medium text-[#1B2A4A] mb-2">Your Farm or Organization Name</label>
                     <input type="text" className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5DB347]/50 focus:border-[#5DB347] transition-shadow" value={formData.organization} onChange={(e) => setFormData({ ...formData, organization: e.target.value })} />
                   </div>
                 </div>
@@ -236,23 +236,23 @@ export default function ApplyPage() {
                       <input type="text" className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5DB347]/50 focus:border-[#5DB347] transition-shadow" placeholder="e.g., 5, 50, 500" value={formData.farmSize} onChange={(e) => setFormData({ ...formData, farmSize: e.target.value })} />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-[#1B2A4A] mb-2">Main Crops</label>
+                      <label className="block text-sm font-medium text-[#1B2A4A] mb-2">What Do You Grow?</label>
                       <input type="text" className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5DB347]/50 focus:border-[#5DB347] transition-shadow" placeholder="e.g., Blueberries, Cassava, Sesame" value={formData.crops} onChange={(e) => setFormData({ ...formData, crops: e.target.value })} />
                     </div>
                   </div>
                 )}
 
                 <div>
-                  <label className="block text-sm font-medium text-[#1B2A4A] mb-2">Tell us about your operation *</label>
-                  <textarea required rows={4} className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5DB347]/50 focus:border-[#5DB347] resize-none transition-shadow" placeholder={selectedTier === "partner" ? "Describe your organization and how you'd like to partner with AFU..." : "Describe your farming operation, current challenges, and what you're looking for from AFU..."} value={formData.about} onChange={(e) => setFormData({ ...formData, about: e.target.value })} />
+                  <label className="block text-sm font-medium text-[#1B2A4A] mb-2">What&apos;s your vision? Tell us about your farm and your dreams. *</label>
+                  <textarea required rows={4} className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5DB347]/50 focus:border-[#5DB347] resize-none transition-shadow" placeholder={selectedTier === "partner" ? "Tell us about your organization and how we can work together..." : "Share your farming story — what you grow, the challenges you face, and where you want to take your farm..."} value={formData.about} onChange={(e) => setFormData({ ...formData, about: e.target.value })} />
                 </div>
 
                 <div className="flex gap-4">
                   <button type="button" onClick={() => setStep(1)} className="px-8 py-3 border border-gray-200 rounded-xl font-semibold text-[#1B2A4A] hover:bg-gray-50 transition-all duration-300">
                     Back
                   </button>
-                  <button type="submit" className="bg-gradient-to-r from-[#5DB347] to-[#449933] hover:scale-105 text-white px-10 py-3 rounded-xl font-semibold transition-all duration-300 shadow-lg shadow-[#5DB347]/20">
-                    Submit Application
+                  <button type="submit" disabled={submitting} className="bg-gradient-to-r from-[#5DB347] to-[#449933] hover:scale-105 text-white px-10 py-3 rounded-xl font-semibold transition-all duration-300 shadow-lg shadow-[#5DB347]/20 disabled:opacity-50">
+                    {submitting ? 'Sending...' : "Let\u2019s Grow Together"}
                   </button>
                 </div>
               </form>

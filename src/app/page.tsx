@@ -230,7 +230,7 @@ const partners = [
 
 /* ─── How it works ─── */
 const howItWorks = [
-  { step: '01', title: 'Apply & Join', desc: 'Complete your membership application. Upload farm details and documents.', icon: Users },
+  { step: '01', title: 'Tell Us Your Story', desc: 'Tell us about you and your vision. Share your farming story, your land, your dreams. We want to understand what makes your farm unique.', icon: Users },
   { step: '02', title: 'Get Financed', desc: 'Access working capital, input finance, and equipment leasing tailored to your crop cycle.', icon: Banknote },
   { step: '03', title: 'Grow & Process', desc: 'Use premium inputs, expert training, and processing hubs to maximize yields and value.', icon: Leaf },
   { step: '04', title: 'Sell & Scale', desc: 'Guaranteed offtake contracts and trade finance turn your harvest into predictable cash flows.', icon: TrendingUp },
@@ -303,11 +303,10 @@ export default function Home() {
               transition={{ duration: 0.6, delay: 0.15 }}
               className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] text-white mb-6"
             >
-              Africa&apos;s Agriculture{' '}
+              Let&apos;s{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#6ABF4B] to-[#90D87A]">
-                Development Bank
-              </span>{' '}
-              + Operating Platform
+                Grow Together
+              </span>
             </motion.h1>
 
             <motion.p
@@ -316,8 +315,9 @@ export default function Home() {
               transition={{ duration: 0.6, delay: 0.3 }}
               className="text-lg md:text-xl text-gray-300 mb-10 leading-relaxed max-w-2xl"
             >
-              Financing, Inputs, Processing, Offtake, Trade Finance &amp; Training.
-              One integrated loop that turns crops into controlled cashflows.
+              By farmers, for farmers. Run by Africans, for Africans. We bring the financing, inputs,
+              processing, and guaranteed buyers — you bring the land and the passion. Together, we turn your
+              harvest into real, sustainable income.
             </motion.p>
 
             <motion.div
@@ -333,7 +333,7 @@ export default function Home() {
                 onMouseEnter={(e) => (e.currentTarget.style.background = '#449933')}
                 onMouseLeave={(e) => (e.currentTarget.style.background = '#5DB347')}
               >
-                Become a Member
+                Join Our Farming Family
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
@@ -550,7 +550,7 @@ export default function Home() {
                 Four Steps to Growth
               </h2>
               <p className="text-gray-500 max-w-2xl mx-auto">
-                From application to export income — AFU makes the journey clear and supported.
+                From your first conversation to export income — we walk the journey with you, every step of the way.
               </p>
             </div>
           </FadeInWhenVisible>
@@ -800,12 +800,12 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeInWhenVisible>
             <div className="text-center mb-16">
-              <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#5DB347' }}>Membership</span>
+              <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#5DB347' }}>Join the Family</span>
               <h2 className="text-3xl md:text-4xl font-bold text-navy mt-2 mb-4 text-gradient-green">
-                Choose Your Tier
+                Find Your Fit
               </h2>
               <p className="text-gray-500 max-w-2xl mx-auto">
-                Every tier gets access to the full AFU ecosystem. Pick the level that matches your operation.
+                Every member gets access to the full AFU ecosystem — financing, inputs, markets, and expert support. Pick the level that matches your farm.
               </p>
             </div>
           </FadeInWhenVisible>
@@ -1262,6 +1262,104 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ─── OUR PROMISE ─── */}
+      <section className="py-16 bg-white relative">
+        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#5DB347]/20 to-transparent" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <FadeInWhenVisible>
+            <div className="text-center mb-14">
+              <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#5DB347' }}>What Makes Us Different</span>
+              <h2 className="text-3xl md:text-4xl font-bold text-navy mt-2 mb-4 text-gradient-green">
+                Our Promise
+              </h2>
+              <p className="text-gray-500 max-w-2xl mx-auto">
+                We&apos;re not a bank in a boardroom. We&apos;re farmers who built a platform to solve the problems we lived through ourselves.
+              </p>
+            </div>
+          </FadeInWhenVisible>
+
+          <StaggerChildren className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {[
+              {
+                icon: Sprout,
+                title: 'By Farmers, For Farmers',
+                desc: 'Our founding team has decades of commercial farming experience across Africa. We\'ve walked the fields, faced the droughts, and negotiated the markets. This platform was built from that experience.',
+              },
+              {
+                icon: ShieldCheck,
+                title: 'We Supply the Finance AND the Offtake',
+                desc: 'Capital in, guaranteed revenue out. We don\'t just lend you money and walk away — we arrange the buyers before you even plant. That\'s how we de-risk your season.',
+              },
+              {
+                icon: Users,
+                title: '10% of Profits to Community',
+                desc: 'Women in agriculture, feed a child, young farmers programs. Ten percent of everything AFU earns goes straight back into the communities that grow the food.',
+              },
+              {
+                icon: Tractor,
+                title: 'Farm Managers on the Ground',
+                desc: 'We don\'t just lend — we send experts to help you succeed. Real agronomists, real farm managers, real people standing beside you in the field.',
+              },
+            ].map((item, i) => {
+              const Icon = item.icon;
+              return (
+                <motion.div key={item.title} variants={fadeUpChild}>
+                  <div className="bg-cream rounded-3xl p-8 border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 h-full">
+                    <div className="w-14 h-14 rounded-full flex items-center justify-center mb-5 shadow-lg" style={{ background: 'linear-gradient(135deg, #5DB347, #449933)' }}>
+                      <Icon className="w-7 h-7 text-white" />
+                    </div>
+                    <h3 className="text-lg font-bold text-navy mb-2">{item.title}</h3>
+                    <p className="text-gray-500 text-sm leading-relaxed">{item.desc}</p>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </StaggerChildren>
+        </div>
+      </section>
+
+      {/* ─── WE DON'T JUST FINANCE — WE SHOW UP ─── */}
+      <section className="py-16 bg-gradient-to-b from-[#f8fdf6] to-white relative overflow-hidden">
+        <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, #5DB347 1px, transparent 0)', backgroundSize: '40px 40px' }} />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          <FadeInWhenVisible>
+            <div className="text-center mb-14">
+              <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#5DB347' }}>Our People On Your Farm</span>
+              <h2 className="text-3xl md:text-4xl font-bold text-navy mt-2 mb-4 text-gradient-green">
+                We Don&apos;t Just Finance — We Show Up
+              </h2>
+              <p className="text-gray-500 max-w-2xl mx-auto">
+                Our network of commercial farmers, agronomists, and specialists come to your farm to help you succeed.
+                These are real people with real experience — not just software.
+              </p>
+            </div>
+          </FadeInWhenVisible>
+
+          <StaggerChildren className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+            {[
+              { icon: Tractor, title: 'Commercial Farm Managers', desc: 'Experienced operators who\'ve run large-scale farms across Southern and East Africa.' },
+              { icon: Sprout, title: 'Agronomists', desc: 'Crop scientists who help you choose the right varieties, soil treatments, and planting schedules.' },
+              { icon: Droplets, title: 'Irrigation Specialists', desc: 'Water management experts who design and install systems that save every drop.' },
+              { icon: BarChart3, title: 'Livestock Experts', desc: 'Veterinary and livestock management professionals for mixed farming operations.' },
+              { icon: Globe2, title: 'Export Advisors', desc: 'Trade compliance and market access specialists who get your crops into international markets.' },
+            ].map((item) => {
+              const Icon = item.icon;
+              return (
+                <motion.div key={item.title} variants={fadeUpChild}>
+                  <div className="bg-white rounded-3xl p-6 h-full border border-gray-100 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 text-center">
+                    <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg" style={{ background: 'linear-gradient(135deg, #5DB347, #449933)' }}>
+                      <Icon className="w-7 h-7 text-white" />
+                    </div>
+                    <h3 className="text-sm font-bold text-navy mb-2">{item.title}</h3>
+                    <p className="text-gray-500 text-xs leading-relaxed">{item.desc}</p>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </StaggerChildren>
+        </div>
+      </section>
+
       {/* ─── FINAL CTA ─── */}
       <section className="relative py-32 overflow-hidden">
         <div className="absolute inset-0">
@@ -1279,11 +1377,11 @@ export default function Home() {
           <FadeInWhenVisible>
             <Droplets className="w-14 h-14 text-[#5DB347]/40 mx-auto mb-6" />
             <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 leading-tight text-glow">
-              Ready to Join the Future of African Agriculture?
+              Ready to Grow With Us?
             </h2>
             <p className="text-white/80 text-xl mb-12 max-w-2xl mx-auto leading-relaxed">
-              AFU is building the agriculture development bank Africa has been missing.
-              Not just capital — a full execution loop from seed to sale.
+              Whether you farm two hectares or two thousand, we&apos;re here to help.
+              Tell us your story, share your vision, and let&apos;s build something extraordinary together.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
@@ -1293,14 +1391,14 @@ export default function Home() {
                 onMouseEnter={(e) => (e.currentTarget.style.background = 'linear-gradient(135deg, #6ABF4B, #5DB347)')}
                 onMouseLeave={(e) => (e.currentTarget.style.background = 'linear-gradient(135deg, #5DB347, #449933)')}
               >
-                Apply for Membership
+                Join Our Farming Family
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
                 href="/contact"
                 className="border-2 border-white/50 hover:border-white hover:bg-white/10 text-white px-10 py-5 rounded-2xl font-bold text-lg transition-all duration-300 flex items-center justify-center"
               >
-                Get in Touch
+                We&apos;re Here to Help
               </Link>
             </div>
           </FadeInWhenVisible>
