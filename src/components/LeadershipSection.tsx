@@ -51,15 +51,6 @@ interface BoardMember {
 
 const boardOfDirectors: BoardMember[] = [
   {
-    name: 'Thabo Mokoena',
-    title: 'Chairman of the Board',
-    org: 'Former CEO, AgriSA Holdings',
-    bio: 'Three-decade veteran of African agriculture leadership. Oversaw the commercialization of smallholder networks across Southern Africa and advised three heads of state on food security.',
-    country: 'South Africa',
-    flag: '\u{1F1FF}\u{1F1E6}',
-    linkedin: '#',
-  },
-  {
     name: 'Peter Watson',
     title: 'CEO & Founder',
     org: 'African Farming Union',
@@ -70,9 +61,9 @@ const boardOfDirectors: BoardMember[] = [
   },
   {
     name: 'Devon Kennaird',
-    title: 'Co-Founder & CTO',
+    title: 'Co-Founder',
     org: 'African Farming Union',
-    bio: 'Technology leader and platform architect driving AFU\u2019s digital infrastructure. Built the full-stack agriculture operating system from the ground up \u2014 170+ pages, AI integration, 5 payment gateways, and real-time farm intelligence.',
+    bio: 'Technology leader and platform architect driving AFU\u2019s digital infrastructure. Built the full-stack agriculture operating system from the ground up \u2014 AI integration, 5 payment gateways, and real-time farm intelligence across 10 countries.',
     country: 'Canada',
     flag: '\u{1F1E8}\u{1F1E6}',
     linkedin: '#',
@@ -86,126 +77,10 @@ const boardOfDirectors: BoardMember[] = [
     flag: '\u{1F1FF}\u{1F1FC}',
     linkedin: '#',
   },
-  {
-    name: 'Nkechi Okonkwo',
-    title: 'Director, Banking & Financial Services',
-    org: 'Former MD, Stanbic IBTC Agriculture',
-    bio: 'Led the agriculture lending division at Stanbic IBTC for twelve years, originating over $2B in agri-finance deals across West and East Africa.',
-    country: 'Nigeria',
-    flag: '\u{1F1F3}\u{1F1EC}',
-    linkedin: '#',
-  },
-  {
-    name: 'Jean-Pierre Habimana',
-    title: 'Director, Agricultural Economics',
-    org: 'Former Senior Advisor, African Development Bank',
-    bio: 'Shaped continental agriculture policy at the AfDB for over a decade. Specialist in value chain financing models and food systems transformation across sub-Saharan Africa.',
-    country: 'Rwanda',
-    flag: '\u{1F1F7}\u{1F1FC}',
-    linkedin: '#',
-  },
-  {
-    name: 'Fatima El-Mahdi',
-    title: 'Director, Legal & Compliance',
-    org: 'Partner, Bowmans Africa',
-    bio: 'Pan-African regulatory expert specializing in POPIA, KYC/AML frameworks, and cross-border agribusiness compliance. Advised on landmark fintech licensing across six African jurisdictions.',
-    country: 'Morocco',
-    flag: '\u{1F1F2}\u{1F1E6}',
-    linkedin: '#',
-  },
-  {
-    name: 'Daniel Mensah',
-    title: 'Director, Investment & Private Equity',
-    org: 'Managing Partner, Sahel Capital Agrifund',
-    bio: 'Manages a $350M Africa-focused agri-PE fund. Led investments in processing, cold chain, and export infrastructure across Ghana, Nigeria, and Kenya.',
-    country: 'Ghana',
-    flag: '\u{1F1EC}\u{1F1ED}',
-    linkedin: '#',
-  },
-  {
-    name: 'Lindiwe Dlamini',
-    title: 'Director, Insurance & Risk Management',
-    org: 'Former Head of Agri Insurance, Sanlam',
-    bio: 'Pioneered index-based crop insurance products for smallholder farmers in Southern Africa. Designed parametric weather risk solutions deployed across five AFU countries.',
-    country: 'Eswatini',
-    flag: '\u{1F1F8}\u{1F1FF}',
-    linkedin: '#',
-  },
 ];
 
 const advisoryCouncil: BoardMember[] = [
-  {
-    name: 'Kofi Asante',
-    title: 'Agritech & Precision Agriculture Advisor',
-    org: 'Founder, CropTech Africa',
-    bio: 'Built one of Africa\'s leading precision agriculture platforms using satellite imagery and IoT. Former Google engineer who returned to the continent to transform farming with technology.',
-    country: 'Ghana',
-    flag: '\u{1F1EC}\u{1F1ED}',
-    linkedin: '#',
-  },
-  {
-    name: 'Aisha Mohammed',
-    title: 'Blockchain & Digital Assets Advisor',
-    org: 'Co-Founder, ChainAgri Protocol',
-    bio: 'Web3 pioneer building decentralized commodity trading infrastructure. Previously led DeFi strategy at a top-tier African crypto exchange with focus on real-world asset tokenization.',
-    country: 'Kenya',
-    flag: '\u{1F1F0}\u{1F1EA}',
-    linkedin: '#',
-  },
-  {
-    name: 'Emmanuel Okoro',
-    title: 'Supply Chain & Logistics Advisor',
-    org: 'Former VP, Bolloré Logistics Africa',
-    bio: 'Managed pan-African trade corridors and last-mile agricultural logistics for fifteen years. Expert in cold chain infrastructure and cross-border commodity movement.',
-    country: 'Nigeria',
-    flag: '\u{1F1F3}\u{1F1EC}',
-    linkedin: '#',
-  },
-  {
-    name: 'Dr. Wanjiku Kamau',
-    title: 'Climate & Sustainability Advisor',
-    org: 'Director, Africa Carbon Markets Initiative',
-    bio: 'Leading voice in African carbon credit markets and regenerative agriculture. Holds a PhD in Climate Science from Oxford and advises the AU on climate-smart agriculture policy.',
-    country: 'Kenya',
-    flag: '\u{1F1F0}\u{1F1EA}',
-    linkedin: '#',
-  },
-  {
-    name: 'Sipho Ndlovu',
-    title: 'Telecommunications & Mobile Money Advisor',
-    org: 'Former CTO, MTN Mobile Financial Services',
-    bio: 'Architected mobile money platforms reaching 40M+ users. Specialist in digital payments infrastructure, USSD-based financial services, and rural connectivity solutions.',
-    country: 'South Africa',
-    flag: '\u{1F1FF}\u{1F1E6}',
-    linkedin: '#',
-  },
-  {
-    name: 'Prof. Adebayo Oluwaseun',
-    title: 'Academic & Research Advisor',
-    org: 'Dean, Faculty of Agriculture, University of Ibadan',
-    bio: 'Leading agricultural researcher with over 120 published papers on tropical crop systems. Bridges the gap between academic research and practical farming outcomes across West Africa.',
-    country: 'Nigeria',
-    flag: '\u{1F1F3}\u{1F1EC}',
-    linkedin: '#',
-  },
-  {
-    name: 'Hon. Grace Mwangi',
-    title: 'Government Relations Advisor',
-    org: 'Former Deputy Minister of Agriculture, Kenya',
-    bio: 'Shaped Kenya\'s agricultural transformation strategy and the national food security policy. Maintains deep relationships with policymakers across East and Southern Africa.',
-    country: 'Kenya',
-    flag: '\u{1F1F0}\u{1F1EA}',
-    linkedin: '#',
-  },
-  {
-    name: 'Moussa Traoré',
-    title: 'Agricultural Policy Advisor',
-    org: 'Former Country Director, FAO West Africa',
-    bio: 'Fifteen years directing FAO programs across the Sahel region. Deep expertise in food systems resilience, agricultural trade policy, and farmer cooperative development.',
-    country: 'Mali',
-    flag: '\u{1F1F2}\u{1F1F1}',
-    linkedin: '#',
-  },
+  // Advisory positions to be filled — managed from admin CMS
 ];
 
 function avatarUrl(name: string) {
@@ -279,12 +154,12 @@ export default function LeadershipSection() {
                   backgroundClip: 'text',
                 }}
               >
-                Board of Directors & Advisory Council
+                Founding Team
               </span>
             </h2>
             <p className="text-gray-500 max-w-2xl mx-auto">
-              Our leadership team brings decades of experience across African agriculture, finance,
-              technology, and policy — ensuring AFU delivers on its mission to transform farming across the continent.
+              Built by farmers, for farmers. Our founding team brings hands-on commercial farming experience
+              and deep technical expertise to transform African agriculture.
             </p>
           </div>
         </FadeInWhenVisible>
@@ -308,24 +183,27 @@ export default function LeadershipSection() {
           ))}
         </div>
 
-        {/* ── Advisory Council ── */}
-        <FadeInWhenVisible>
-          <div className="mb-6">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-1 h-6 rounded-full" style={{ background: '#8CB89C' }} />
-              <h3 className="text-xl font-bold text-[#1B2A4A]">Advisory Council</h3>
+        {/* Advisory Council — hidden until real advisors are confirmed */}
+        {advisoryCouncil.length > 0 && (
+          <>
+            <FadeInWhenVisible>
+              <div className="mb-6">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-1 h-6 rounded-full" style={{ background: '#8CB89C' }} />
+                  <h3 className="text-xl font-bold text-[#1B2A4A]">Advisory Council</h3>
+                </div>
+                <p className="text-sm text-gray-500 ml-[19px]">
+                  Domain experts guiding AFU&apos;s technology, policy, and market strategy
+                </p>
+              </div>
+            </FadeInWhenVisible>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {advisoryCouncil.map((member, i) => (
+                <MemberCard key={member.name} member={member} delay={i * 0.08} />
+              ))}
             </div>
-            <p className="text-sm text-gray-500 ml-[19px]">
-              Domain experts guiding AFU&apos;s technology, policy, and market strategy
-            </p>
-          </div>
-        </FadeInWhenVisible>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {advisoryCouncil.map((member, i) => (
-            <MemberCard key={member.name} member={member} delay={i * 0.08} />
-          ))}
-        </div>
+          </>
+        )}
       </div>
     </section>
   );

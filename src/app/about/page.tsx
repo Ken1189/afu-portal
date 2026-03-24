@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Sprout, Tractor, Building2, ShieldCheck, Settings, Globe, BarChart3, Lock } from "lucide-react";
 import LeadershipSection from "@/components/LeadershipSection";
-import CountryTeams from "@/components/CountryTeams";
+// CountryTeams removed — will be added when real team members are confirmed
 import VideoCard from "@/components/VideoCard";
 
 export const metadata = {
@@ -319,7 +319,7 @@ export default function AboutPage() {
       <LeadershipSection />
 
       {/* ─── COUNTRY TEAMS ─── */}
-      <CountryTeams />
+      {/* CountryTeams will be added when real team members are confirmed */}
 
       {/* ─── FINAL CTA ─── */}
       <section
