@@ -68,6 +68,7 @@ const communityLinks = [
   { label: "Ambassadors", href: "/ambassadors", desc: "Meet our farmers" },
   { label: "Partner Farms", href: "/farms", desc: "Showcase farms" },
   { label: "Partners", href: "/partners", desc: "Our network" },
+  { label: "Programs", href: "/programs", desc: "Active farming programs" },
   { label: "Projects", href: "/projects", desc: "Development projects" },
   { label: "Podcasts", href: "/podcasts", desc: "Listen & learn" },
 ];

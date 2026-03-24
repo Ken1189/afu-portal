@@ -480,6 +480,94 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ─── OUR PROGRAMS ─── */}
+      <section className="py-16 bg-white relative overflow-hidden">
+        <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, #5DB347 1px, transparent 0)', backgroundSize: '40px 40px' }} />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          <FadeInWhenVisible>
+            <div className="text-center mb-14">
+              <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#5DB347' }}>Active Programs</span>
+              <h2 className="text-3xl md:text-4xl font-bold text-navy mt-2 mb-4 text-gradient-green">
+                Our Programs
+              </h2>
+              <p className="text-gray-500 max-w-2xl mx-auto">
+                Real farming programs generating real revenue. From blueberries bound for Europe to castor oil feeding global biofuel demand.
+              </p>
+            </div>
+          </FadeInWhenVisible>
+
+          <StaggerChildren className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              {
+                name: 'Blueberry Export Program',
+                countries: 'Zimbabwe',
+                crop: 'Blueberries',
+                desc: '25ha commercial blueberry operation targeting EU markets. Counter-seasonal advantage delivers premium pricing when Northern Hemisphere supply is low.',
+                icon: Sprout,
+              },
+              {
+                name: 'Maize & Soya Staples Program',
+                countries: 'Multi-country',
+                crop: 'Maize & Soya',
+                desc: 'Food security crops cultivated across all 10 AFU countries. Building reliable staple supply chains from smallholder to market.',
+                icon: Leaf,
+              },
+              {
+                name: 'Sesame Export Program',
+                countries: 'Zimbabwe, Tanzania',
+                crop: 'Sesame',
+                desc: 'High-demand oilseed for export markets. Contract farming model connecting smallholders to international commodity buyers.',
+                icon: TrendingUp,
+              },
+              {
+                name: 'Castor Oil Program',
+                countries: 'Multi-country',
+                crop: 'Castor',
+                desc: 'ENI-approved off-take agreement for biofuel feedstock. Industrial-grade castor oil production with guaranteed buyer.',
+                icon: Factory,
+              },
+              {
+                name: 'Macadamia Development',
+                countries: 'Zimbabwe, Mozambique',
+                crop: 'Macadamia',
+                desc: 'Premium nut export program. Long-term orchard development delivering high-margin returns in global snack and confectionery markets.',
+                icon: Target,
+              },
+            ].map((program) => {
+              const Icon = program.icon;
+              return (
+                <motion.div key={program.name} variants={fadeUpChild}>
+                  <Link
+                    href="/projects"
+                    className="group block bg-white rounded-3xl p-6 shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 border border-gray-100 h-full"
+                  >
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-md" style={{ background: 'linear-gradient(135deg, #5DB347, #449933)' }}>
+                        <Icon className="w-6 h-6 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-bold text-navy group-hover:text-[#5DB347] transition-colors leading-tight">
+                          {program.name}
+                        </h3>
+                        <span className="text-xs text-gray-400 font-medium">{program.countries}</span>
+                      </div>
+                    </div>
+                    <span className="inline-block bg-[#EBF7E5] text-[#449933] text-xs font-semibold px-3 py-1 rounded-full mb-3">
+                      {program.crop}
+                    </span>
+                    <p className="text-gray-500 text-sm leading-relaxed mb-4">{program.desc}</p>
+                    <span className="inline-flex items-center gap-1.5 text-sm font-semibold group-hover:gap-2.5 transition-all" style={{ color: '#5DB347' }}>
+                      Learn More
+                      <ArrowRight className="w-4 h-4" />
+                    </span>
+                  </Link>
+                </motion.div>
+              );
+            })}
+          </StaggerChildren>
+        </div>
+      </section>
+
       {/* ─── THE AFU FLYWHEEL ─── */}
       <section className="py-16 bg-navy text-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

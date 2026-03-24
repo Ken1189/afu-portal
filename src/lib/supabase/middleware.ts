@@ -63,7 +63,7 @@ export async function updateSession(request: NextRequest) {
 
   // ── Protected route patterns ────────────────────────────────────────
   // Public paths that start with protected prefixes (must be checked first)
-  const publicExceptions = ['/farmers', '/farms'];
+  const publicExceptions = ['/farmers', '/farms', '/investors'];
   const isPublicException = publicExceptions.some((p) => pathname.startsWith(p));
 
   const protectedPaths = ['/dashboard', '/farm', '/supplier', '/admin', '/investor'];

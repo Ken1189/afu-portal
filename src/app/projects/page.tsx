@@ -1,115 +1,119 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "Our Projects - AFU",
+  title: "Projects & Investment Opportunities - AFU",
   description:
-    "Explore AFU's active projects across Africa, from smart irrigation and value chain development to youth farming accelerators and carbon credit certification.",
+    "Explore AFU's current farming projects and investment opportunities across Africa. From blueberry exports to solar irrigation — real deal flow for serious investors.",
 };
 
-const projects = [
+const currentProjects = [
   {
-    name: "Smart Irrigation Pilot",
-    country: "Botswana",
-    category: "Water & Infrastructure",
-    timeline: "2024-2026",
-    budget: "$510,000",
-    progress: 65,
-    description:
-      "Deploying low-cost, solar-powered drip irrigation systems across 200 smallholder farms in northern Botswana. The project combines IoT soil moisture sensors with mobile-based scheduling to reduce water consumption by 60% while increasing crop yields. Each installation includes farmer training, maintenance support, and integration with AFU's crop tracking platform.",
-    impact: [
-      { value: "200", label: "Farms Equipped" },
-      { value: "60%", label: "Water Savings" },
-      { value: "35%", label: "Yield Increase" },
-    ],
-    partners: ["IWMI", "WaterAid", "Botswana Ministry of Agriculture"],
-  },
-  {
-    name: "Maize Value Chain Development",
+    name: "Zimbabwe Blueberry Commercial Operation",
     country: "Zimbabwe",
-    category: "Value Chain",
-    timeline: "2023-2026",
-    budget: "$420,000",
-    progress: 78,
+    status: "Active",
     description:
-      "An end-to-end programme connecting smallholder maize farmers with processing hubs and guaranteed offtakers. The project provides certified seed, seasonal financing, extension support, and post-harvest handling training. Harvested maize is aggregated, quality-tested, and processed at AFU-partnered milling facilities before distribution to domestic and regional markets.",
-    impact: [
-      { value: "800+", label: "Farmers Enrolled" },
-      { value: "12,000t", label: "Annual Target" },
-      { value: "$1.8M", label: "Farmer Revenue" },
+      "25-hectare commercial blueberry farm targeting EU export markets. Leveraging Zimbabwe's counter-seasonal advantage to deliver premium fresh blueberries when Northern Hemisphere supply drops. Full cold chain from farm gate to Rotterdam.",
+    highlights: [
+      { value: "25ha", label: "Under Cultivation" },
+      { value: "$5-8M", label: "Revenue Target (Year 3)" },
+      { value: "200+", label: "Jobs Created" },
     ],
-    partners: ["Seed Co International", "National Foods", "CIMMYT"],
+    partners: ["EU Fresh Produce Importers", "Zimtrade", "Cold Chain Africa"],
   },
   {
-    name: "Youth Farming Accelerator",
-    country: "Tanzania",
-    category: "Capacity Building",
-    timeline: "2024-2027",
-    budget: "$280,000",
-    progress: 40,
+    name: "Zimbabwe Maize Program",
+    country: "Zimbabwe",
+    status: "Active",
     description:
-      "A 12-month accelerator programme for young entrepreneurs aged 18-35 who want to build farming businesses. Participants receive hands-on training at demonstration farms, mentorship from experienced commercial farmers, micro-financing of up to $2,000, and guaranteed market access through AFU's offtake network for their first two seasons.",
-    impact: [
-      { value: "150", label: "Youth Enrolled" },
-      { value: "85%", label: "Completion Rate" },
-      { value: "120", label: "Businesses Launched" },
+      "Staple crop program focused on food security and domestic supply. Partnering with smallholder farmers to build a reliable maize value chain — from certified seed distribution through aggregation to milling and market delivery.",
+    highlights: [
+      { value: "5,000", label: "Smallholder Target" },
+      { value: "Staple", label: "Crop Category" },
+      { value: "Food Security", label: "Mission Focus" },
     ],
-    partners: ["AGRA", "Sokoine University", "Tanzania Youth Agency"],
+    partners: ["Seed Co International", "National Foods", "Zimbabwe GMB"],
   },
   {
-    name: "Mobile Extension Network",
-    country: "Zimbabwe, Botswana, Tanzania",
-    category: "Technology",
-    timeline: "2022-2025",
-    budget: "$180,000",
-    progress: 92,
+    name: "Castor Oil Initiative",
+    country: "Multi-country",
+    status: "Active",
     description:
-      "A multi-channel digital extension platform delivering crop advisories, pest alerts, weather forecasts, and market prices via SMS, USSD, and a mobile app. The platform reaches farmers without smartphones through simple text messages in local languages, while app users access rich media content including video tutorials, interactive guides, and AI-powered crop diagnostics.",
-    impact: [
-      { value: "15,000+", label: "Farmers Reached" },
-      { value: "3", label: "Countries Active" },
-      { value: "90%", label: "Satisfaction Rate" },
+      "Industrial castor oil production with an ENI-approved off-take agreement for biofuel feedstock. Multi-country cultivation model across East and Southern Africa with guaranteed buyer and fixed pricing.",
+    highlights: [
+      { value: "ENI", label: "Off-take Partner" },
+      { value: "Biofuel", label: "End Market" },
+      { value: "Multi-country", label: "Scale" },
     ],
-    partners: ["Econet Wireless", "Vodacom", "University of Dar es Salaam"],
-  },
-  {
-    name: "Carbon Credit Certification",
-    country: "Zimbabwe & Botswana",
-    category: "Climate & Sustainability",
-    timeline: "2025-2028",
-    budget: "$650,000",
-    progress: 15,
-    description:
-      "Developing a standardised methodology for agricultural carbon credits in sub-Saharan Africa. The project builds a digital MRV (Monitoring, Reporting, Verification) platform to measure carbon sequestration from agroforestry, conservation agriculture, and improved grazing management. Verified credits will be sold on voluntary carbon markets, creating a new revenue stream for participating farmers.",
-    impact: [
-      { value: "50,000", label: "Hectares Targeted" },
-      { value: "25,000t", label: "CO2e Offset Goal" },
-      { value: "$500K+", label: "Projected Revenue" },
-    ],
-    partners: ["Verra", "Climate Focus", "AfDB"],
-  },
-  {
-    name: "Livestock Disease Surveillance",
-    country: "Tanzania",
-    category: "Animal Health",
-    timeline: "2024-2026",
-    budget: "$320,000",
-    progress: 55,
-    description:
-      "Establishing a real-time livestock disease surveillance network across northern Tanzania. Community-based animal health workers are equipped with mobile reporting tools to detect and report disease outbreaks within 24 hours. The system integrates with veterinary services for rapid response and includes a vaccination tracking module that ensures herd health compliance across participating farms.",
-    impact: [
-      { value: "2,000+", label: "Herds Monitored" },
-      { value: "40%", label: "Faster Detection" },
-      { value: "12", label: "Districts Covered" },
-    ],
-    partners: ["ILRI", "Tanzania Veterinary Laboratory Agency", "FAO"],
+    partners: ["ENI", "Castor Oil Processors Association"],
   },
 ];
 
-const impactStats = [
-  { value: "2,500+", label: "Farmers Reached" },
-  { value: "$1.2M", label: "Deployed" },
-  { value: "3", label: "Countries" },
-  { value: "15", label: "Partners" },
+const investmentOpportunities = [
+  {
+    name: "Macadamia Orchard Development",
+    country: "Zimbabwe, Mozambique",
+    investment: "$2M",
+    description:
+      "50-hectare macadamia orchard development across two countries. Macadamia is the highest-value tree nut globally with structural undersupply. 7-year maturity to full production with escalating returns from Year 4.",
+    returnTimeline: "7-year maturity, returns from Year 4",
+    highlights: [
+      { value: "50ha", label: "Orchard Size" },
+      { value: "$2M", label: "Capital Required" },
+      { value: "7 yrs", label: "To Full Production" },
+    ],
+  },
+  {
+    name: "Sesame Export Expansion",
+    country: "Tanzania",
+    investment: "$500K",
+    description:
+      "Contract farming model connecting 2,000 Tanzanian smallholders to international sesame commodity buyers. High-demand oilseed with established export routes to India, Japan, and the EU.",
+    returnTimeline: "Revenue from Season 1, breakeven by Season 2",
+    highlights: [
+      { value: "2,000", label: "Farmers" },
+      { value: "$500K", label: "Capital Required" },
+      { value: "Season 2", label: "Breakeven" },
+    ],
+  },
+  {
+    name: "Solar Irrigation Network",
+    country: "Zimbabwe",
+    investment: "$1.5M",
+    description:
+      "Deploying 100 solar-powered irrigation pumps across smallholder farming regions in Zimbabwe. Converting rain-dependent farms to year-round production with clean energy — doubling crop cycles and eliminating fuel costs.",
+    returnTimeline: "3-year payback, recurring revenue via water-as-a-service",
+    highlights: [
+      { value: "100", label: "Solar Pumps" },
+      { value: "$1.5M", label: "Capital Required" },
+      { value: "3 yrs", label: "Payback Period" },
+    ],
+  },
+  {
+    name: "Poultry Scale-Up",
+    country: "Zimbabwe",
+    investment: "$800K",
+    description:
+      "50,000-bird broiler operation serving the Harare market. Integrated feed mill, broiler houses, and distribution targeting the fast-growing urban protein demand. Off-take agreements with major supermarket chains already in place.",
+    returnTimeline: "18-month payback, 30%+ operating margin",
+    highlights: [
+      { value: "50,000", label: "Bird Capacity" },
+      { value: "$800K", label: "Capital Required" },
+      { value: "18 mo", label: "Payback Period" },
+    ],
+  },
+  {
+    name: "Cassava Processing Hub",
+    country: "Uganda",
+    investment: "$3M",
+    description:
+      "Industrial starch extraction facility processing raw cassava into high-grade starch for food, textile, and pharmaceutical industries. Aggregation network of 5,000+ smallholder suppliers feeds continuous processing capacity.",
+    returnTimeline: "4-year payback, scalable to regional hub",
+    highlights: [
+      { value: "5,000+", label: "Suppliers" },
+      { value: "$3M", label: "Capital Required" },
+      { value: "4 yrs", label: "Payback Period" },
+    ],
+  },
 ];
 
 export default function ProjectsPage() {
@@ -119,72 +123,59 @@ export default function ProjectsPage() {
       <section className="bg-navy text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-[#6ABF4B] via-[#5DB347] to-[#8CB89C] bg-clip-text text-transparent">
-            Our Projects
+            Projects &amp; Deal Flow
           </h1>
           <p className="text-xl text-gray-300 max-w-3xl leading-relaxed">
-            AFU deploys capital and expertise through targeted projects that
-            address critical gaps in African agriculture. Each project is
-            designed to be self-sustaining, measurable, and scalable &mdash;
-            creating lasting impact from the farm gate to the market.
+            Active farming operations generating revenue today, and investment-ready
+            opportunities seeking capital. Real projects, real returns, real impact
+            across Africa.
           </p>
         </div>
       </section>
 
-      {/* Project Showcase */}
+      {/* ─── Current Projects ─── */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-12">
+            <span className="text-sm font-semibold uppercase tracking-wider text-[#5DB347]">
+              Actively Deployed
+            </span>
+            <h2 className="text-3xl font-bold text-[#1B2A4A] mt-2 mb-3">
+              Current Projects
+            </h2>
+            <p className="text-gray-500 max-w-2xl">
+              These programs are live, generating revenue, and creating jobs
+              across our operating countries.
+            </p>
+          </div>
+
           <div className="space-y-8">
-            {projects.map((project, i) => (
+            {currentProjects.map((project, i) => (
               <div
                 key={i}
-                className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-lg shadow-[#5DB347]/5 border-l-4 border-[#5DB347] hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
+                className="bg-white rounded-3xl p-8 shadow-lg shadow-[#5DB347]/5 border-l-4 border-[#5DB347] hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
               >
                 <div className="flex flex-col lg:flex-row gap-8">
-                  {/* Content */}
                   <div className="flex-1">
                     <div className="flex flex-wrap items-center gap-3 mb-4">
                       <h3 className="text-xl font-bold text-[#1B2A4A]">
                         {project.name}
                       </h3>
                       <span className="bg-gradient-to-r from-[#5DB347] to-[#449933] text-white text-xs font-semibold px-4 py-1.5 rounded-full">
-                        {project.category}
+                        {project.status}
                       </span>
                     </div>
 
-                    {/* Budget/Timeline Info Cards */}
                     <div className="flex flex-wrap gap-3 mb-4">
                       <span className="bg-[#EBF7E5] text-[#449933] text-sm font-medium px-3 py-1 rounded-full">
                         {project.country}
                       </span>
-                      <span className="bg-[#EBF7E5] text-[#449933] text-sm font-medium px-3 py-1 rounded-full">
-                        {project.timeline}
-                      </span>
-                      <span className="bg-[#1B2A4A] text-white text-sm font-bold px-3 py-1 rounded-full">
-                        {project.budget}
-                      </span>
-                    </div>
-
-                    {/* Progress Bar */}
-                    <div className="mb-5">
-                      <div className="flex justify-between items-center mb-1.5">
-                        <span className="text-xs font-medium text-gray-500">Progress</span>
-                        <span className="text-xs font-bold text-[#5DB347]">{project.progress}%</span>
-                      </div>
-                      <div className="w-full h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                        <div
-                          className="h-full rounded-full bg-gradient-to-r from-[#5DB347] to-[#6ABF4B] relative"
-                          style={{ width: `${project.progress}%` }}
-                        >
-                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-[shimmer_2s_infinite] bg-[length:200%_100%]" />
-                        </div>
-                      </div>
                     </div>
 
                     <p className="text-gray-600 text-sm leading-relaxed mb-5">
                       {project.description}
                     </p>
 
-                    {/* Partners */}
                     <div>
                       <h4 className="text-xs font-semibold text-[#1B2A4A] uppercase tracking-wider mb-2">
                         Partners
@@ -202,13 +193,12 @@ export default function ProjectsPage() {
                     </div>
                   </div>
 
-                  {/* Impact Stats */}
                   <div className="lg:w-64 shrink-0">
                     <h4 className="text-xs font-semibold text-[#1B2A4A] uppercase tracking-wider mb-4">
-                      Impact
+                      Key Metrics
                     </h4>
                     <div className="grid grid-cols-3 lg:grid-cols-1 gap-4">
-                      {project.impact.map((stat, j) => (
+                      {project.highlights.map((stat, j) => (
                         <div
                           key={j}
                           className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 text-center lg:text-left shadow-md shadow-[#5DB347]/5"
@@ -230,14 +220,90 @@ export default function ProjectsPage() {
         </div>
       </section>
 
-      {/* Impact Numbers */}
+      {/* ─── Investment Opportunities ─── */}
+      <section className="py-20 bg-[#f8fdf6]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-12">
+            <span className="text-sm font-semibold uppercase tracking-wider text-[#5DB347]">
+              Seeking Capital
+            </span>
+            <h2 className="text-3xl font-bold text-[#1B2A4A] mt-2 mb-3">
+              Investment Opportunities
+            </h2>
+            <p className="text-gray-500 max-w-2xl">
+              Vetted, structured investment opportunities in African agriculture.
+              Each project has defined capital requirements, clear return timelines,
+              and identified off-take or market routes.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {investmentOpportunities.map((opp, i) => (
+              <div
+                key={i}
+                className="bg-white rounded-3xl p-8 shadow-lg hover:-translate-y-1 hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col"
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <h3 className="text-xl font-bold text-[#1B2A4A] mb-1">
+                      {opp.name}
+                    </h3>
+                    <span className="text-sm text-gray-400">{opp.country}</span>
+                  </div>
+                  <span className="bg-[#1B2A4A] text-white text-sm font-bold px-4 py-1.5 rounded-full whitespace-nowrap">
+                    {opp.investment}
+                  </span>
+                </div>
+
+                <p className="text-gray-600 text-sm leading-relaxed mb-4 flex-1">
+                  {opp.description}
+                </p>
+
+                <div className="bg-[#EBF7E5] rounded-xl p-3 mb-5">
+                  <span className="text-xs font-semibold text-[#449933]">
+                    Return Timeline:
+                  </span>{" "}
+                  <span className="text-xs text-[#1B2A4A]">
+                    {opp.returnTimeline}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-3 gap-3 mb-6">
+                  {opp.highlights.map((stat, j) => (
+                    <div key={j} className="text-center">
+                      <div className="text-lg font-bold bg-gradient-to-r from-[#5DB347] to-[#449933] bg-clip-text text-transparent">
+                        {stat.value}
+                      </div>
+                      <div className="text-xs text-gray-500">{stat.label}</div>
+                    </div>
+                  ))}
+                </div>
+
+                <Link
+                  href={`/contact?subject=investor&project=${encodeURIComponent(opp.name)}`}
+                  className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#5DB347] to-[#449933] text-white px-6 py-3 rounded-full font-semibold text-sm hover:shadow-lg hover:shadow-[#5DB347]/25 hover:-translate-y-0.5 transition-all duration-300"
+                >
+                  Express Interest
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Impact Numbers ─── */}
       <section className="py-16 bg-navy">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl font-bold text-center mb-10 bg-gradient-to-r from-[#6ABF4B] via-[#5DB347] to-[#8CB89C] bg-clip-text text-transparent">
-            Collective Impact
+            Portfolio Overview
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {impactStats.map((stat, i) => (
+            {[
+              { value: "$7.8M+", label: "Capital Deployed" },
+              { value: "3", label: "Active Projects" },
+              { value: "5", label: "Open Opportunities" },
+              { value: "6", label: "Countries" },
+            ].map((stat, i) => (
               <div key={i} className="text-center">
                 <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#5DB347] to-[#6ABF4B] bg-clip-text text-transparent mb-2">
                   {stat.value}
@@ -249,32 +315,33 @@ export default function ProjectsPage() {
         </div>
       </section>
 
-      {/* Get Involved CTA */}
-      <section className="py-16" style={{ background: '#1B2A4A' }}>
+      {/* ─── CTA ─── */}
+      <section className="py-16" style={{ background: "#1B2A4A" }}>
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">Get Involved</h2>
+          <h2 className="text-3xl font-bold text-white mb-4">
+            Ready to Invest in African Agriculture?
+          </h2>
           <p className="text-white/80 mb-8 max-w-2xl mx-auto">
-            Whether you are a development agency, investor, technology partner,
-            or farmer interested in participating, there are many ways to engage
-            with our projects. Let&apos;s build sustainable agriculture together.
+            Whether you are a development finance institution, impact fund,
+            family office, or individual investor — we have structured
+            opportunities across risk profiles and return timelines.
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
             <Link
-              href="/apply"
+              href="/contact?subject=investor"
               className="inline-block bg-gradient-to-r from-[#5DB347] to-[#449933] text-white hover:shadow-lg hover:shadow-[#5DB347]/25 hover:-translate-y-1 px-8 py-3.5 rounded-full font-semibold text-lg transition-all duration-300"
             >
-              Apply to Participate
+              Talk to Our Investment Team
             </Link>
             <Link
-              href="/contact"
+              href="/apply"
               className="inline-block border-2 border-white text-white hover:bg-white/10 hover:-translate-y-1 px-8 py-3.5 rounded-full font-semibold text-lg transition-all duration-300"
             >
-              Partner With Us
+              Apply as a Farmer
             </Link>
           </div>
         </div>
       </section>
-
     </>
   );
 }
