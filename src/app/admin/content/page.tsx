@@ -112,7 +112,7 @@ interface CountryTeamData {
   members: CountryTeamMember[];
 }
 
-type TabId = 'content' | 'flags' | 'config' | 'templates' | 'broadcasts' | 'country_teams' | 'branding';
+type TabId = 'content' | 'flags' | 'config' | 'templates' | 'broadcasts' | 'country_teams' | 'branding' | 'hero';
 
 // ═══════════════════════════════════════════════════════
 //  CONSTANTS
@@ -126,6 +126,7 @@ const TABS: { id: TabId; label: string; icon: React.ReactNode }[] = [
   { id: 'broadcasts', label: 'Broadcasts', icon: <Megaphone className="w-4 h-4" /> },
   { id: 'country_teams', label: 'Country Teams', icon: <Users className="w-4 h-4" /> },
   { id: 'branding', label: 'Branding', icon: <ImageIcon className="w-4 h-4" /> },
+  { id: 'hero', label: 'Hero Banner', icon: <Globe className="w-4 h-4" /> },
 ];
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -274,6 +275,7 @@ export default function AdminContentPage() {
       {activeTab === 'broadcasts' && <BroadcastsTab showToast={showToast} />}
       {activeTab === 'country_teams' && <CountryTeamsTab showToast={showToast} />}
       {activeTab === 'branding' && <BrandingTab showToast={showToast} />}
+      {activeTab === 'hero' && <HeroBannerTab showToast={showToast} />}
 
       {/* Toast */}
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
@@ -1914,6 +1916,140 @@ function BrandingTab({ showToast }: { showToast: (msg: string, type?: 'success' 
         >
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
           Save Logo
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════
+//  TAB 8: HERO BANNER
+// ═══════════════════════════════════════════════════════
+
+const HERO_FIELDS = [
+  { key: 'hero_headline', label: 'Hero Headline', type: 'text', placeholder: "Let's Grow Together" },
+  { key: 'hero_subtitle', label: 'Hero Subtitle', type: 'textarea', placeholder: 'By farmers, for farmers...' },
+  { key: 'hero_cta_text', label: 'Hero CTA Text', type: 'text', placeholder: 'Join Our Farming Family' },
+  { key: 'hero_cta_link', label: 'Hero CTA Link', type: 'text', placeholder: '/apply' },
+  { key: 'hero_bg_image', label: 'Hero Background Image URL', type: 'text', placeholder: 'https://images.unsplash.com/...' },
+] as const;
+
+function HeroBannerTab({ showToast }: { showToast: (msg: string, type?: 'success' | 'error') => void }) {
+  const supabase = createClient();
+  const [values, setValues] = useState<Record<string, string>>({});
+  const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const { data } = await supabase
+          .from('site_config')
+          .select('*')
+          .in('key', HERO_FIELDS.map((f) => f.key));
+        if (data) {
+          const map: Record<string, string> = {};
+          data.forEach((row: SiteConfig) => {
+            map[row.key] = row.value || '';
+          });
+          setValues(map);
+        }
+      } catch {
+        // config rows may not exist yet
+      }
+      setLoading(false);
+    }
+    load();
+  }, [supabase]);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const rows = HERO_FIELDS.map((f) => ({
+        category: 'hero',
+        key: f.key,
+        value: values[f.key] || '',
+        value_type: 'string',
+        label: f.label,
+        description: `Hero banner: ${f.label}`,
+      }));
+
+      const { error } = await supabase
+        .from('site_config')
+        .upsert(rows, { onConflict: 'key' });
+
+      if (error) throw error;
+      showToast('Hero banner updated successfully');
+    } catch {
+      showToast('Failed to save hero banner', 'error');
+    }
+    setSaving(false);
+  };
+
+  if (loading) return (
+    <div className="flex items-center justify-center py-20">
+      <div className="text-center">
+        <Loader2 className="w-8 h-8 text-[#5DB347] animate-spin mx-auto mb-3" />
+        <p className="text-sm text-gray-500">Loading...</p>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+        <h3 className="text-lg font-semibold text-[#1B2A4A] mb-1">Hero Banner</h3>
+        <p className="text-sm text-gray-500 mb-6">Edit the homepage hero section headline, subtitle, call-to-action, and background image.</p>
+
+        <div className="space-y-5 max-w-xl">
+          {HERO_FIELDS.map((field) => (
+            <div key={field.key}>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">{field.label}</label>
+              {field.type === 'textarea' ? (
+                <textarea
+                  value={values[field.key] || ''}
+                  onChange={(e) => setValues((prev) => ({ ...prev, [field.key]: e.target.value }))}
+                  placeholder={field.placeholder}
+                  rows={3}
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347] resize-y"
+                />
+              ) : (
+                <input
+                  type="text"
+                  value={values[field.key] || ''}
+                  onChange={(e) => setValues((prev) => ({ ...prev, [field.key]: e.target.value }))}
+                  placeholder={field.placeholder}
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347]"
+                />
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Preview */}
+        {values.hero_bg_image && (
+          <div className="mt-6">
+            <label className="block text-sm font-medium text-gray-700 mb-2">Background Preview</label>
+            <div className="relative w-full max-w-xl h-40 rounded-xl overflow-hidden border border-gray-200">
+              <img src={values.hero_bg_image} alt="Hero background preview" className="w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-r from-[#1B2A4A]/80 to-transparent flex items-center px-6">
+                <div>
+                  <p className="text-white font-bold text-lg">{values.hero_headline || 'Headline'}</p>
+                  <p className="text-gray-300 text-sm mt-1 line-clamp-2">{values.hero_subtitle || 'Subtitle'}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Save */}
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          className="mt-6 flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#5DB347] text-white text-sm font-medium hover:bg-[#4ea03c] transition-colors disabled:opacity-50"
+        >
+          {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+          Save Hero Banner
         </button>
       </div>
     </div>

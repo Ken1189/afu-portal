@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import {
   CloudSun,
@@ -9,6 +9,8 @@ import {
   CloudRain,
   CloudLightning,
   CloudDrizzle,
+  CloudSnow,
+  CloudFog,
   Thermometer,
   Wind,
   Droplets,
@@ -32,7 +34,9 @@ import {
   TrendingDown,
   Clock,
   ChevronRight,
+  Loader2,
 } from 'lucide-react';
+import { useAuth } from '@/lib/supabase/auth-context';
 
 // ---------------------------------------------------------------------------
 // Animation Variants
@@ -63,189 +67,132 @@ const cardVariants = {
 };
 
 // ---------------------------------------------------------------------------
+// Country Coordinates
+// ---------------------------------------------------------------------------
+
+const COUNTRY_COORDS: Record<string, { lat: number; lng: number; city: string }> = {
+  Zimbabwe: { lat: -17.83, lng: 31.05, city: 'Harare' },
+  ZW: { lat: -17.83, lng: 31.05, city: 'Harare' },
+  Uganda: { lat: 0.35, lng: 32.58, city: 'Kampala' },
+  UG: { lat: 0.35, lng: 32.58, city: 'Kampala' },
+  Kenya: { lat: -1.29, lng: 36.82, city: 'Nairobi' },
+  KE: { lat: -1.29, lng: 36.82, city: 'Nairobi' },
+  Tanzania: { lat: -6.79, lng: 39.28, city: 'Dar es Salaam' },
+  TZ: { lat: -6.79, lng: 39.28, city: 'Dar es Salaam' },
+  Nigeria: { lat: 9.06, lng: 7.49, city: 'Abuja' },
+  NG: { lat: 9.06, lng: 7.49, city: 'Abuja' },
+  'South Africa': { lat: -33.93, lng: 18.42, city: 'Cape Town' },
+  ZA: { lat: -33.93, lng: 18.42, city: 'Cape Town' },
+  Ghana: { lat: 5.56, lng: -0.19, city: 'Accra' },
+  GH: { lat: 5.56, lng: -0.19, city: 'Accra' },
+  Zambia: { lat: -15.39, lng: 28.32, city: 'Lusaka' },
+  ZM: { lat: -15.39, lng: 28.32, city: 'Lusaka' },
+  Mozambique: { lat: -25.97, lng: 32.57, city: 'Maputo' },
+  MZ: { lat: -25.97, lng: 32.57, city: 'Maputo' },
+  Botswana: { lat: -24.65, lng: 25.91, city: 'Gaborone' },
+  BW: { lat: -24.65, lng: 25.91, city: 'Gaborone' },
+};
+
+const DEFAULT_COORDS = { lat: -24.65, lng: 25.91, city: 'Gaborone' };
+
+// ---------------------------------------------------------------------------
+// WMO Weather Code Mapping
+// ---------------------------------------------------------------------------
+
+type IconType = 'sun' | 'cloud' | 'cloud-sun' | 'rain' | 'storm' | 'drizzle' | 'snow' | 'fog';
+
+function wmoToIcon(code: number): IconType {
+  if (code === 0) return 'sun';
+  if (code === 1 || code === 2) return 'cloud-sun';
+  if (code === 3) return 'cloud';
+  if (code >= 45 && code <= 48) return 'fog';
+  if (code >= 51 && code <= 57) return 'drizzle';
+  if (code >= 61 && code <= 67) return 'rain';
+  if (code >= 71 && code <= 77) return 'snow';
+  if (code >= 80 && code <= 82) return 'rain';
+  if (code >= 85 && code <= 86) return 'snow';
+  if (code >= 95 && code <= 99) return 'storm';
+  return 'cloud';
+}
+
+function wmoToCondition(code: number): string {
+  if (code === 0) return 'Clear Sky';
+  if (code === 1) return 'Mainly Clear';
+  if (code === 2) return 'Partly Cloudy';
+  if (code === 3) return 'Overcast';
+  if (code >= 45 && code <= 48) return 'Foggy';
+  if (code >= 51 && code <= 55) return 'Drizzle';
+  if (code === 56 || code === 57) return 'Freezing Drizzle';
+  if (code >= 61 && code <= 65) return 'Rain';
+  if (code === 66 || code === 67) return 'Freezing Rain';
+  if (code >= 71 && code <= 77) return 'Snow';
+  if (code >= 80 && code <= 82) return 'Rain Showers';
+  if (code >= 85 && code <= 86) return 'Snow Showers';
+  if (code === 95) return 'Thunderstorm';
+  if (code >= 96 && code <= 99) return 'Thunderstorm with Hail';
+  return 'Unknown';
+}
+
+function getFarmAdvice(code: number, precipitation: number): string {
+  if (code >= 95) return 'Stay indoors, secure equipment';
+  if (precipitation > 50) return 'Delay planting';
+  if (precipitation > 20) return 'Light field work only';
+  if (code >= 61 && code <= 67) return 'Good for transplanting';
+  if (code >= 51 && code <= 57) return 'Good for transplanting';
+  if (code === 0) return 'Ideal for harvesting';
+  if (code <= 2) return 'Good for spraying';
+  return 'Optimal planting window';
+}
+
+// ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
+
+interface CurrentWeather {
+  temperature: number;
+  humidity: number;
+  windSpeed: number;
+  condition: string;
+  weatherCode: number;
+}
 
 interface DayForecast {
   day: string;
   date: string;
-  icon: 'sun' | 'cloud' | 'cloud-sun' | 'rain' | 'storm' | 'drizzle';
+  icon: IconType;
   high: number;
   low: number;
   rainfall: number;
-  wind: number;
   advice: string;
 }
 
-interface WeatherAlert {
-  id: string;
-  severity: 'red' | 'amber' | 'green';
-  title: string;
-  description: string;
-  time: string;
-  icon: React.ElementType;
-}
-
-interface AgriculturalIndex {
-  name: string;
-  value: number;
-  max: number;
-  unit: string;
-  status: 'low' | 'moderate' | 'high' | 'optimal';
-  icon: React.ElementType;
-}
-
-interface MonthComparison {
-  metric: string;
-  thisYear: string;
-  lastYear: string;
-  change: 'up' | 'down' | 'same';
-  changeValue: string;
-}
-
 // ---------------------------------------------------------------------------
-// Mock Data
+// Weather Icon Component
 // ---------------------------------------------------------------------------
 
-const currentConditions = {
-  temperature: 28,
-  feelsLike: 31,
-  condition: 'Partly Cloudy',
-  humidity: 62,
-  windSpeed: 14,
-  windDirection: 'NE',
-  pressure: 1013,
-  uvIndex: 7,
-  sunrise: '05:42',
-  sunset: '18:28',
-  location: 'Gaborone, Botswana',
-  visibility: 12,
-  dewPoint: 20,
-};
-
-const sevenDayForecast: DayForecast[] = [
-  { day: 'Today', date: 'Mar 16', icon: 'cloud-sun', high: 28, low: 18, rainfall: 10, wind: 14, advice: 'Good for spraying' },
-  { day: 'Tuesday', date: 'Mar 17', icon: 'sun', high: 31, low: 19, rainfall: 0, wind: 8, advice: 'Ideal for harvesting' },
-  { day: 'Wednesday', date: 'Mar 18', icon: 'sun', high: 33, low: 21, rainfall: 0, wind: 10, advice: 'Irrigate early morning' },
-  { day: 'Thursday', date: 'Mar 19', icon: 'rain', high: 24, low: 17, rainfall: 65, wind: 22, advice: 'Delay planting' },
-  { day: 'Friday', date: 'Mar 20', icon: 'drizzle', high: 22, low: 16, rainfall: 40, wind: 18, advice: 'Light field work only' },
-  { day: 'Saturday', date: 'Mar 21', icon: 'cloud', high: 25, low: 17, rainfall: 15, wind: 12, advice: 'Good for transplanting' },
-  { day: 'Sunday', date: 'Mar 22', icon: 'cloud-sun', high: 27, low: 18, rainfall: 5, wind: 10, advice: 'Optimal planting window' },
-];
-
-const weatherAlerts: WeatherAlert[] = [
-  {
-    id: 'alert-1',
-    severity: 'red',
-    title: 'Heat Wave Warning',
-    description: 'Temperatures expected to exceed 35\u00B0C on Tuesday and Wednesday. Ensure adequate irrigation for all crops and provide shade for livestock. Avoid field work between 11:00-15:00.',
-    time: '2 hours ago',
-    icon: Flame,
-  },
-  {
-    id: 'alert-2',
-    severity: 'amber',
-    title: 'Rainfall Expected Thursday',
-    description: 'Heavy rainfall of 40-65mm expected Thursday through Friday. Secure loose equipment, check drainage channels, and postpone any spraying activities until Saturday.',
-    time: '5 hours ago',
-    icon: CloudRain,
-  },
-  {
-    id: 'alert-3',
-    severity: 'green',
-    title: 'Optimal Planting Window Next Week',
-    description: 'Soil moisture and temperature conditions will be ideal for planting maize and sorghum from Sunday onwards. Prepare seedbeds and ensure seed stock is ready.',
-    time: '1 day ago',
-    icon: Sprout,
-  },
-];
-
-const agriculturalIndices: AgriculturalIndex[] = [
-  { name: 'Soil Moisture Index', value: 68, max: 100, unit: '%', status: 'optimal', icon: Droplets },
-  { name: 'Evapotranspiration Rate', value: 5.2, max: 10, unit: 'mm/day', status: 'moderate', icon: Waves },
-  { name: 'Growing Degree Days', value: 1240, max: 2000, unit: 'GDD', status: 'high', icon: Thermometer },
-  { name: 'Frost Risk', value: 5, max: 100, unit: '%', status: 'low', icon: Snowflake },
-  { name: 'Crop Stress Index', value: 32, max: 100, unit: '%', status: 'moderate', icon: Leaf },
-];
-
-const historicalComparison: MonthComparison[] = [
-  { metric: 'Average Temperature', thisYear: '27.3\u00B0C', lastYear: '25.8\u00B0C', change: 'up', changeValue: '+1.5\u00B0C' },
-  { metric: 'Total Rainfall', thisYear: '78mm', lastYear: '112mm', change: 'down', changeValue: '-34mm' },
-  { metric: 'Sunny Days', thisYear: '18', lastYear: '14', change: 'up', changeValue: '+4 days' },
-  { metric: 'Avg Humidity', thisYear: '58%', lastYear: '65%', change: 'down', changeValue: '-7%' },
-  { metric: 'Wind Speed (avg)', thisYear: '12 km/h', lastYear: '10 km/h', change: 'up', changeValue: '+2 km/h' },
-];
-
-// ---------------------------------------------------------------------------
-// Helper Components
-// ---------------------------------------------------------------------------
-
-function WeatherIcon({ type, className = 'w-6 h-6' }: { type: DayForecast['icon']; className?: string }) {
-  const icons: Record<DayForecast['icon'], React.ElementType> = {
+function WeatherIcon({ type, className = 'w-6 h-6' }: { type: IconType; className?: string }) {
+  const icons: Record<IconType, React.ElementType> = {
     sun: Sun,
     cloud: Cloud,
     'cloud-sun': CloudSun,
     rain: CloudRain,
     storm: CloudLightning,
     drizzle: CloudDrizzle,
+    snow: CloudSnow,
+    fog: CloudFog,
   };
-  const Icon = icons[type];
-  const colors: Record<DayForecast['icon'], string> = {
+  const Icon = icons[type] || Cloud;
+  const colors: Record<IconType, string> = {
     sun: 'text-amber-500',
     cloud: 'text-gray-400',
     'cloud-sun': 'text-amber-400',
     rain: 'text-blue-500',
     storm: 'text-purple-500',
     drizzle: 'text-blue-400',
+    snow: 'text-cyan-400',
+    fog: 'text-gray-300',
   };
-  return <Icon className={`${className} ${colors[type]}`} />;
-}
-
-function SeverityBadge({ severity }: { severity: WeatherAlert['severity'] }) {
-  const config = {
-    red: { label: 'Critical', bg: 'bg-red-100 text-red-700 border-red-200' },
-    amber: { label: 'Warning', bg: 'bg-amber-100 text-amber-700 border-amber-200' },
-    green: { label: 'Advisory', bg: 'bg-green-100 text-green-700 border-green-200' },
-  };
-  const c = config[severity];
-  return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${c.bg}`}>
-      {c.label}
-    </span>
-  );
-}
-
-function StatusIndicator({ status }: { status: AgriculturalIndex['status'] }) {
-  const config = {
-    low: { label: 'Low', color: 'text-blue-600 bg-blue-50' },
-    moderate: { label: 'Moderate', color: 'text-amber-600 bg-amber-50' },
-    high: { label: 'High', color: 'text-red-600 bg-red-50' },
-    optimal: { label: 'Optimal', color: 'text-green-600 bg-green-50' },
-  };
-  const c = config[status];
-  return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${c.color}`}>
-      {c.label}
-    </span>
-  );
-}
-
-function ProgressBar({ value, max, status }: { value: number; max: number; status: AgriculturalIndex['status'] }) {
-  const pct = Math.min((value / max) * 100, 100);
-  const barColors = {
-    low: 'bg-blue-500',
-    moderate: 'bg-amber-500',
-    high: 'bg-red-500',
-    optimal: 'bg-green-500',
-  };
-  return (
-    <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-      <div
-        className={`h-full rounded-full transition-all duration-700 ${barColors[status]}`}
-        style={{ width: `${pct}%` }}
-      />
-    </div>
-  );
+  return <Icon className={`${className} ${colors[type] || 'text-gray-400'}`} />;
 }
 
 // ---------------------------------------------------------------------------
@@ -253,8 +200,107 @@ function ProgressBar({ value, max, status }: { value: number; max: number; statu
 // ---------------------------------------------------------------------------
 
 export default function WeatherPage() {
+  const { profile } = useAuth();
   const [selectedDay, setSelectedDay] = useState<number>(0);
-  const [expandedAlert, setExpandedAlert] = useState<string | null>(null);
+  const [current, setCurrent] = useState<CurrentWeather | null>(null);
+  const [forecast, setForecast] = useState<DayForecast[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [location, setLocation] = useState('');
+
+  const fetchWeather = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
+    // Determine coordinates from farmer profile
+    const country = profile?.country || '';
+    const coords = COUNTRY_COORDS[country] || DEFAULT_COORDS;
+    const city = coords.city;
+    const countryName = country || 'Botswana';
+    setLocation(`${city}, ${countryName}`);
+
+    try {
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${coords.lat}&longitude=${coords.lng}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,weather_code&timezone=auto&forecast_days=7`;
+
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('Weather API failed');
+      const data = await res.json();
+
+      // Parse current conditions
+      const currentData = data.current;
+      setCurrent({
+        temperature: Math.round(currentData.temperature_2m),
+        humidity: Math.round(currentData.relative_humidity_2m),
+        windSpeed: Math.round(currentData.wind_speed_10m),
+        weatherCode: currentData.weather_code,
+        condition: wmoToCondition(currentData.weather_code),
+      });
+
+      // Parse 7-day forecast
+      const daily = data.daily;
+      const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+      const forecastDays: DayForecast[] = daily.time.map((dateStr: string, i: number) => {
+        const d = new Date(dateStr + 'T12:00:00');
+        const code = daily.weather_code[i] as number;
+        const precip = (daily.precipitation_sum[i] as number) || 0;
+        return {
+          day: i === 0 ? 'Today' : days[d.getDay()],
+          date: `${months[d.getMonth()]} ${d.getDate()}`,
+          icon: wmoToIcon(code),
+          high: Math.round(daily.temperature_2m_max[i] as number),
+          low: Math.round(daily.temperature_2m_min[i] as number),
+          rainfall: Math.round(precip),
+          advice: getFarmAdvice(code, precip),
+        };
+      });
+
+      setForecast(forecastDays);
+    } catch {
+      setError('Unable to fetch weather data. Please try again later.');
+    }
+    setLoading(false);
+  }, [profile?.country]);
+
+  useEffect(() => {
+    fetchWeather();
+  }, [fetchWeather]);
+
+  const today = new Date();
+  const dateStr = today.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 text-sky-500 animate-spin mx-auto mb-3" />
+          <p className="text-sm text-gray-500">Loading weather data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !current) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center max-w-sm">
+          <AlertTriangle className="w-10 h-10 text-amber-500 mx-auto mb-3" />
+          <p className="text-sm text-gray-600 mb-4">{error || 'Unable to load weather'}</p>
+          <button
+            onClick={fetchWeather}
+            className="px-4 py-2 bg-sky-500 text-white rounded-lg text-sm font-medium hover:bg-sky-600 transition-colors"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -280,10 +326,10 @@ export default function WeatherPage() {
           </div>
           <div className="flex items-center gap-2 text-sky-200 text-sm mt-4">
             <MapPin className="w-4 h-4" />
-            <span>{currentConditions.location}</span>
+            <span>{location}</span>
             <span className="mx-2">|</span>
             <Calendar className="w-4 h-4" />
-            <span>March 16, 2026</span>
+            <span>{dateStr}</span>
           </div>
         </div>
       </motion.div>
@@ -302,17 +348,14 @@ export default function WeatherPage() {
               {/* Temperature Display */}
               <div className="flex items-center gap-4 lg:col-span-1">
                 <div className="relative">
-                  <CloudSun className="w-20 h-20 text-amber-400" />
+                  <WeatherIcon type={wmoToIcon(current.weatherCode)} className="w-20 h-20" />
                 </div>
                 <div>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-5xl lg:text-6xl font-bold text-[#1B2A4A]">{currentConditions.temperature}</span>
+                    <span className="text-5xl lg:text-6xl font-bold text-[#1B2A4A]">{current.temperature}</span>
                     <span className="text-2xl text-gray-400">&deg;C</span>
                   </div>
-                  <p className="text-gray-500 text-sm mt-1">
-                    Feels like <span className="font-semibold text-[#1B2A4A]">{currentConditions.feelsLike}&deg;C</span>
-                  </p>
-                  <p className="text-[#8CB89C] font-medium text-sm">{currentConditions.condition}</p>
+                  <p className="text-[#8CB89C] font-medium text-sm">{current.condition}</p>
                 </div>
               </div>
 
@@ -323,44 +366,21 @@ export default function WeatherPage() {
                     <Droplets className="w-3.5 h-3.5" />
                     Humidity
                   </div>
-                  <p className="text-lg font-bold text-[#1B2A4A]">{currentConditions.humidity}%</p>
+                  <p className="text-lg font-bold text-[#1B2A4A]">{current.humidity}%</p>
                 </div>
                 <div className="bg-gray-50 rounded-xl p-3">
                   <div className="flex items-center gap-2 text-gray-400 text-xs mb-1">
                     <Wind className="w-3.5 h-3.5" />
                     Wind
                   </div>
-                  <p className="text-lg font-bold text-[#1B2A4A]">{currentConditions.windSpeed} km/h</p>
-                  <p className="text-xs text-gray-400">{currentConditions.windDirection}</p>
+                  <p className="text-lg font-bold text-[#1B2A4A]">{current.windSpeed} km/h</p>
                 </div>
                 <div className="bg-gray-50 rounded-xl p-3">
                   <div className="flex items-center gap-2 text-gray-400 text-xs mb-1">
-                    <Gauge className="w-3.5 h-3.5" />
-                    Pressure
+                    <Thermometer className="w-3.5 h-3.5" />
+                    Condition
                   </div>
-                  <p className="text-lg font-bold text-[#1B2A4A]">{currentConditions.pressure} hPa</p>
-                </div>
-                <div className="bg-gray-50 rounded-xl p-3">
-                  <div className="flex items-center gap-2 text-gray-400 text-xs mb-1">
-                    <Sun className="w-3.5 h-3.5" />
-                    UV Index
-                  </div>
-                  <p className="text-lg font-bold text-amber-600">{currentConditions.uvIndex}</p>
-                  <p className="text-xs text-amber-500">High</p>
-                </div>
-                <div className="bg-gray-50 rounded-xl p-3">
-                  <div className="flex items-center gap-2 text-gray-400 text-xs mb-1">
-                    <Sunrise className="w-3.5 h-3.5" />
-                    Sunrise
-                  </div>
-                  <p className="text-lg font-bold text-[#1B2A4A]">{currentConditions.sunrise}</p>
-                </div>
-                <div className="bg-gray-50 rounded-xl p-3">
-                  <div className="flex items-center gap-2 text-gray-400 text-xs mb-1">
-                    <Sunset className="w-3.5 h-3.5" />
-                    Sunset
-                  </div>
-                  <p className="text-lg font-bold text-[#1B2A4A]">{currentConditions.sunset}</p>
+                  <p className="text-sm font-bold text-[#1B2A4A]">{current.condition}</p>
                 </div>
               </div>
             </div>
@@ -368,228 +388,86 @@ export default function WeatherPage() {
         </motion.div>
 
         {/* ─── 7-Day Forecast ─── */}
-        <motion.div variants={cardVariants} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="p-6 lg:p-8">
-            <h2 className="text-lg font-bold text-[#1B2A4A] mb-4">7-Day Forecast</h2>
-            <div className="flex gap-3 overflow-x-auto pb-2 -mx-2 px-2 scrollbar-thin">
-              {sevenDayForecast.map((day, idx) => (
-                <button
-                  key={day.day}
-                  onClick={() => setSelectedDay(idx)}
-                  className={`flex-shrink-0 w-[140px] rounded-2xl p-4 transition-all border-2 ${
-                    selectedDay === idx
-                      ? 'border-[#8CB89C] bg-[#8CB89C]/5 shadow-sm'
-                      : 'border-transparent bg-gray-50 hover:bg-gray-100'
-                  }`}
-                >
-                  <p className={`text-sm font-semibold mb-1 ${selectedDay === idx ? 'text-[#8CB89C]' : 'text-[#1B2A4A]'}`}>
-                    {day.day}
-                  </p>
-                  <p className="text-xs text-gray-400 mb-3">{day.date}</p>
-                  <WeatherIcon type={day.icon} className="w-10 h-10 mx-auto mb-3" />
-                  <div className="flex items-center justify-center gap-2 mb-2">
-                    <span className="text-lg font-bold text-[#1B2A4A]">{day.high}&deg;</span>
-                    <span className="text-sm text-gray-400">{day.low}&deg;</span>
-                  </div>
-                  <div className="flex items-center justify-center gap-1 text-xs text-blue-500 mb-2">
-                    <Droplets className="w-3 h-3" />
-                    <span>{day.rainfall}%</span>
-                  </div>
-                  <div className="flex items-center justify-center gap-1 text-xs text-gray-400 mb-3">
-                    <Wind className="w-3 h-3" />
-                    <span>{day.wind} km/h</span>
-                  </div>
-                  <div className={`text-[10px] font-medium rounded-lg px-2 py-1 text-center ${
-                    selectedDay === idx ? 'bg-[#8CB89C]/10 text-[#8CB89C]' : 'bg-gray-100 text-gray-500'
-                  }`}>
-                    {day.advice}
-                  </div>
-                </button>
-              ))}
-            </div>
-
-            {/* Selected Day Detail */}
-            <motion.div
-              key={selectedDay}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-              className="mt-6 bg-gradient-to-r from-[#8CB89C]/5 to-sky-50 rounded-2xl p-5 border border-[#8CB89C]/10"
-            >
-              <div className="flex items-center justify-between flex-wrap gap-3">
-                <div className="flex items-center gap-3">
-                  <WeatherIcon type={sevenDayForecast[selectedDay].icon} className="w-12 h-12" />
-                  <div>
-                    <p className="font-bold text-[#1B2A4A] text-lg">{sevenDayForecast[selectedDay].day}</p>
-                    <p className="text-sm text-gray-500">{sevenDayForecast[selectedDay].date}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-6">
-                  <div className="text-center">
-                    <p className="text-xs text-gray-400">High</p>
-                    <p className="text-xl font-bold text-red-500">{sevenDayForecast[selectedDay].high}&deg;C</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-xs text-gray-400">Low</p>
-                    <p className="text-xl font-bold text-blue-500">{sevenDayForecast[selectedDay].low}&deg;C</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-xs text-gray-400">Rain</p>
-                    <p className="text-xl font-bold text-sky-500">{sevenDayForecast[selectedDay].rainfall}%</p>
-                  </div>
-                </div>
-              </div>
-              <div className="mt-4 flex items-center gap-2 bg-white/70 rounded-xl px-4 py-3">
-                <Sprout className="w-5 h-5 text-[#8CB89C]" />
-                <p className="text-sm font-medium text-[#1B2A4A]">
-                  Farm Advice: <span className="text-[#8CB89C]">{sevenDayForecast[selectedDay].advice}</span>
-                </p>
-              </div>
-            </motion.div>
-          </div>
-        </motion.div>
-
-        {/* ─── Farm Weather Alerts ─── */}
-        <motion.div variants={cardVariants} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="p-6 lg:p-8">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <ShieldAlert className="w-5 h-5 text-[#D4A843]" />
-                <h2 className="text-lg font-bold text-[#1B2A4A]">Farm Weather Alerts</h2>
-              </div>
-              <span className="text-xs font-semibold text-white bg-red-500 px-2.5 py-1 rounded-full">
-                {weatherAlerts.length} Active
-              </span>
-            </div>
-            <div className="space-y-3">
-              {weatherAlerts.map((alert) => {
-                const AlertIcon = alert.icon;
-                const borderColors = {
-                  red: 'border-l-red-500 bg-red-50/50',
-                  amber: 'border-l-amber-500 bg-amber-50/50',
-                  green: 'border-l-green-500 bg-green-50/50',
-                };
-                const iconBg = {
-                  red: 'bg-red-100 text-red-600',
-                  amber: 'bg-amber-100 text-amber-600',
-                  green: 'bg-green-100 text-green-600',
-                };
-                const isExpanded = expandedAlert === alert.id;
-                return (
-                  <motion.button
-                    key={alert.id}
-                    onClick={() => setExpandedAlert(isExpanded ? null : alert.id)}
-                    className={`w-full text-left rounded-xl border-l-4 p-4 transition-all ${borderColors[alert.severity]}`}
-                    whileHover={{ scale: 1.005 }}
+        {forecast.length > 0 && (
+          <motion.div variants={cardVariants} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="p-6 lg:p-8">
+              <h2 className="text-lg font-bold text-[#1B2A4A] mb-4">7-Day Forecast</h2>
+              <div className="flex gap-3 overflow-x-auto pb-2 -mx-2 px-2 scrollbar-thin">
+                {forecast.map((day, idx) => (
+                  <button
+                    key={day.date}
+                    onClick={() => setSelectedDay(idx)}
+                    className={`flex-shrink-0 w-[140px] rounded-2xl p-4 transition-all border-2 ${
+                      selectedDay === idx
+                        ? 'border-[#8CB89C] bg-[#8CB89C]/5 shadow-sm'
+                        : 'border-transparent bg-gray-50 hover:bg-gray-100'
+                    }`}
                   >
-                    <div className="flex items-start gap-3">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${iconBg[alert.severity]}`}>
-                        <AlertIcon className="w-5 h-5" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap mb-1">
-                          <h3 className="font-semibold text-[#1B2A4A] text-sm">{alert.title}</h3>
-                          <SeverityBadge severity={alert.severity} />
-                        </div>
-                        <p className={`text-sm text-gray-600 ${isExpanded ? '' : 'line-clamp-2'}`}>
-                          {alert.description}
-                        </p>
-                        <div className="flex items-center gap-1 mt-2 text-xs text-gray-400">
-                          <Clock className="w-3 h-3" />
-                          {alert.time}
-                        </div>
-                      </div>
-                      <ChevronRight className={`w-5 h-5 text-gray-300 flex-shrink-0 transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
+                    <p className={`text-sm font-semibold mb-1 ${selectedDay === idx ? 'text-[#8CB89C]' : 'text-[#1B2A4A]'}`}>
+                      {day.day}
+                    </p>
+                    <p className="text-xs text-gray-400 mb-3">{day.date}</p>
+                    <WeatherIcon type={day.icon} className="w-10 h-10 mx-auto mb-3" />
+                    <div className="flex items-center justify-center gap-2 mb-2">
+                      <span className="text-lg font-bold text-[#1B2A4A]">{day.high}&deg;</span>
+                      <span className="text-sm text-gray-400">{day.low}&deg;</span>
                     </div>
-                  </motion.button>
-                );
-              })}
-            </div>
-          </div>
-        </motion.div>
+                    <div className="flex items-center justify-center gap-1 text-xs text-blue-500 mb-2">
+                      <Droplets className="w-3 h-3" />
+                      <span>{day.rainfall}mm</span>
+                    </div>
+                    <div className={`text-[10px] font-medium rounded-lg px-2 py-1 text-center ${
+                      selectedDay === idx ? 'bg-[#8CB89C]/10 text-[#8CB89C]' : 'bg-gray-100 text-gray-500'
+                    }`}>
+                      {day.advice}
+                    </div>
+                  </button>
+                ))}
+              </div>
 
-        {/* ─── Agricultural Indices ─── */}
-        <motion.div variants={cardVariants} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="p-6 lg:p-8">
-            <div className="flex items-center gap-2 mb-6">
-              <BarChart3 className="w-5 h-5 text-[#8CB89C]" />
-              <h2 className="text-lg font-bold text-[#1B2A4A]">Agricultural Indices</h2>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {agriculturalIndices.map((index) => {
-                const Icon = index.icon;
-                return (
-                  <div key={index.name} className="bg-gray-50 rounded-xl p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center">
-                          <Icon className="w-4 h-4 text-[#8CB89C]" />
-                        </div>
-                        <p className="text-sm font-medium text-[#1B2A4A]">{index.name}</p>
+              {/* Selected Day Detail */}
+              {forecast[selectedDay] && (
+                <motion.div
+                  key={selectedDay}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="mt-6 bg-gradient-to-r from-[#8CB89C]/5 to-sky-50 rounded-2xl p-5 border border-[#8CB89C]/10"
+                >
+                  <div className="flex items-center justify-between flex-wrap gap-3">
+                    <div className="flex items-center gap-3">
+                      <WeatherIcon type={forecast[selectedDay].icon} className="w-12 h-12" />
+                      <div>
+                        <p className="font-bold text-[#1B2A4A] text-lg">{forecast[selectedDay].day}</p>
+                        <p className="text-sm text-gray-500">{forecast[selectedDay].date}</p>
                       </div>
                     </div>
-                    <div className="flex items-end justify-between mb-2">
-                      <div className="flex items-baseline gap-1">
-                        <span className="text-2xl font-bold text-[#1B2A4A]">{index.value}</span>
-                        <span className="text-xs text-gray-400">{index.unit}</span>
+                    <div className="flex items-center gap-6">
+                      <div className="text-center">
+                        <p className="text-xs text-gray-400">High</p>
+                        <p className="text-xl font-bold text-red-500">{forecast[selectedDay].high}&deg;C</p>
                       </div>
-                      <StatusIndicator status={index.status} />
+                      <div className="text-center">
+                        <p className="text-xs text-gray-400">Low</p>
+                        <p className="text-xl font-bold text-blue-500">{forecast[selectedDay].low}&deg;C</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-xs text-gray-400">Rain</p>
+                        <p className="text-xl font-bold text-sky-500">{forecast[selectedDay].rainfall}mm</p>
+                      </div>
                     </div>
-                    <ProgressBar value={index.value} max={index.max} status={index.status} />
                   </div>
-                );
-              })}
+                  <div className="mt-4 flex items-center gap-2 bg-white/70 rounded-xl px-4 py-3">
+                    <Sprout className="w-5 h-5 text-[#8CB89C]" />
+                    <p className="text-sm font-medium text-[#1B2A4A]">
+                      Farm Advice: <span className="text-[#8CB89C]">{forecast[selectedDay].advice}</span>
+                    </p>
+                  </div>
+                </motion.div>
+              )}
             </div>
-          </div>
-        </motion.div>
-
-        {/* ─── Historical Comparison ─── */}
-        <motion.div variants={cardVariants} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="p-6 lg:p-8">
-            <div className="flex items-center gap-2 mb-6">
-              <Calendar className="w-5 h-5 text-[#D4A843]" />
-              <h2 className="text-lg font-bold text-[#1B2A4A]">Historical Comparison</h2>
-              <span className="text-xs text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full">March 2026 vs March 2025</span>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-gray-100">
-                    <th className="text-left py-3 px-4 text-gray-400 font-medium text-xs uppercase tracking-wider">Metric</th>
-                    <th className="text-center py-3 px-4 text-gray-400 font-medium text-xs uppercase tracking-wider">This Year</th>
-                    <th className="text-center py-3 px-4 text-gray-400 font-medium text-xs uppercase tracking-wider">Last Year</th>
-                    <th className="text-center py-3 px-4 text-gray-400 font-medium text-xs uppercase tracking-wider">Change</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {historicalComparison.map((row) => (
-                    <tr key={row.metric} className="border-b border-gray-50 last:border-0">
-                      <td className="py-3 px-4 font-medium text-[#1B2A4A]">{row.metric}</td>
-                      <td className="py-3 px-4 text-center font-semibold text-[#1B2A4A]">{row.thisYear}</td>
-                      <td className="py-3 px-4 text-center text-gray-500">{row.lastYear}</td>
-                      <td className="py-3 px-4">
-                        <div className="flex items-center justify-center gap-1">
-                          {row.change === 'up' ? (
-                            <ArrowUp className="w-4 h-4 text-red-500" />
-                          ) : row.change === 'down' ? (
-                            <ArrowDown className="w-4 h-4 text-blue-500" />
-                          ) : (
-                            <span className="w-4 h-4 text-gray-400">=</span>
-                          )}
-                          <span className={`font-semibold text-sm ${
-                            row.change === 'up' ? 'text-red-500' : row.change === 'down' ? 'text-blue-500' : 'text-gray-400'
-                          }`}>
-                            {row.changeValue}
-                          </span>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </motion.div>
+          </motion.div>
+        )}
 
         {/* Bottom spacer for mobile nav */}
         <div className="h-4" />

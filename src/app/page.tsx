@@ -237,8 +237,40 @@ const howItWorks = [
 ];
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* ─── Hero defaults ─── */
+const HERO_DEFAULTS = {
+  hero_headline: "Let's Grow Together",
+  hero_subtitle: 'By farmers, for farmers. Run by Africans, for Africans. We bring the financing, inputs, processing, and guaranteed buyers — you bring the land and the passion. Together, we turn your harvest into real, sustainable income.',
+  hero_cta_text: 'Join Our Farming Family',
+  hero_cta_link: '/apply',
+  hero_bg_image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1920&h=1080&fit=crop',
+};
+
 export default function Home() {
   const [testimonials, setTestimonials] = useState(fallbackTestimonials);
+  const [hero, setHero] = useState(HERO_DEFAULTS);
+
+  useEffect(() => {
+    async function fetchHero() {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from('site_config')
+          .select('key, value')
+          .in('key', Object.keys(HERO_DEFAULTS));
+        if (data && data.length > 0) {
+          const updates: Record<string, string> = {};
+          data.forEach((row: { key: string; value: string }) => {
+            if (row.value) updates[row.key] = row.value;
+          });
+          setHero((prev) => ({ ...prev, ...updates }));
+        }
+      } catch {
+        // keep defaults
+      }
+    }
+    fetchHero();
+  }, []);
 
   useEffect(() => {
     async function fetchTestimonials() {
@@ -275,7 +307,7 @@ export default function Home() {
         {/* Background image */}
         <div className="absolute inset-0">
           <Image
-            src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1920&h=1080&fit=crop"
+            src={hero.hero_bg_image}
             alt="African farmland at sunrise"
             fill
             className="object-cover"
@@ -303,10 +335,16 @@ export default function Home() {
               transition={{ duration: 0.6, delay: 0.15 }}
               className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] text-white mb-6"
             >
-              Let&apos;s{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#6ABF4B] to-[#90D87A]">
-                Grow Together
-              </span>
+              {hero.hero_headline.includes('Grow Together') ? (
+                <>
+                  Let&apos;s{' '}
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#6ABF4B] to-[#90D87A]">
+                    Grow Together
+                  </span>
+                </>
+              ) : (
+                hero.hero_headline
+              )}
             </motion.h1>
 
             <motion.p
@@ -315,9 +353,7 @@ export default function Home() {
               transition={{ duration: 0.6, delay: 0.3 }}
               className="text-lg md:text-xl text-gray-300 mb-10 leading-relaxed max-w-2xl"
             >
-              By farmers, for farmers. Run by Africans, for Africans. We bring the financing, inputs,
-              processing, and guaranteed buyers — you bring the land and the passion. Together, we turn your
-              harvest into real, sustainable income.
+              {hero.hero_subtitle}
             </motion.p>
 
             <motion.div
@@ -327,13 +363,13 @@ export default function Home() {
               className="flex flex-col sm:flex-row gap-4"
             >
               <Link
-                href="/apply"
+                href={hero.hero_cta_link}
                 className="group text-white px-8 py-4 rounded-xl font-semibold text-lg transition-smooth flex items-center justify-center gap-2 shadow-lg"
                 style={{ background: '#5DB347' }}
                 onMouseEnter={(e) => (e.currentTarget.style.background = '#449933')}
                 onMouseLeave={(e) => (e.currentTarget.style.background = '#5DB347')}
               >
-                Join Our Farming Family
+                {hero.hero_cta_text}
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
