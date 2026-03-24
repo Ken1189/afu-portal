@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ChevronDown,
@@ -22,7 +22,19 @@ import {
   User,
   Settings,
   Shield,
+  Briefcase,
+  Award,
+  Sprout,
+  Handshake,
+  Target,
+  GraduationCap,
+  ShoppingBag,
+  ArrowLeftRight,
+  Blocks,
+  Headphones,
+  Mail,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { useAuth } from "@/lib/supabase/auth-context";
 
 /* ─── Data ─── */
@@ -65,22 +77,22 @@ const educationLinks = [
   { label: "Knowledgebase", href: "/education/knowledgebase", icon: BookOpen },
 ];
 
-const communityLinks = [
-  { label: "Jobs Board", href: "/jobs", desc: "Agricultural positions" },
-  { label: "Ambassadors", href: "/ambassadors", desc: "Meet our farmers" },
-  { label: "Partner Farms", href: "/farms", desc: "Showcase farms" },
-  { label: "Partners", href: "/partners", desc: "Our network" },
-  { label: "Programs", href: "/programs", desc: "Active farming programs" },
-  { label: "Young Farmers", href: "/young-farmers", desc: "Next generation" },
+const communityLinks: { label: string; href: string; desc: string; icon: LucideIcon }[] = [
+  { label: "Jobs Board", href: "/jobs", desc: "Agricultural positions", icon: Briefcase },
+  { label: "Ambassadors", href: "/ambassadors", desc: "Meet our farmers", icon: Award },
+  { label: "Partner Farms", href: "/farms", desc: "Showcase farms", icon: Sprout },
+  { label: "Partners", href: "/partners", desc: "Our network", icon: Handshake },
+  { label: "Programs", href: "/programs", desc: "Active farming programs", icon: Target },
+  { label: "Young Farmers", href: "/young-farmers", desc: "Next generation", icon: GraduationCap },
 ];
 
-const exploreLinks = [
-  { label: "Projects", href: "/projects", desc: "Investment opportunities" },
-  { label: "AFU Fresh", href: "/fresh", desc: "Farm to fork marketplace" },
-  { label: "Exchange", href: "/exchange", desc: "Trade with fellow farmers" },
-  { label: "Blockchain", href: "/blockchain", desc: "EDMA technology roadmap" },
-  { label: "Podcasts", href: "/podcasts", desc: "Listen & learn" },
-  { label: "Newsletter", href: "/newsletter", desc: "Weekly intelligence" },
+const exploreLinks: { label: string; href: string; desc: string; icon: LucideIcon }[] = [
+  { label: "Projects", href: "/projects", desc: "Investment opportunities", icon: FolderKanban },
+  { label: "AFU Fresh", href: "/fresh", desc: "Farm to fork marketplace", icon: ShoppingBag },
+  { label: "Exchange", href: "/exchange", desc: "Trade with fellow farmers", icon: ArrowLeftRight },
+  { label: "Blockchain", href: "/blockchain", desc: "EDMA technology roadmap", icon: Blocks },
+  { label: "Podcasts", href: "/podcasts", desc: "Listen & learn", icon: Headphones },
+  { label: "Newsletter", href: "/newsletter", desc: "Weekly intelligence", icon: Mail },
 ];
 
 type OpenDropdown = null | "services" | "education" | "community" | "explore";
@@ -94,9 +106,9 @@ const dropdownVariants = {
 };
 
 const mobileMenuVariants = {
-  hidden: { opacity: 0, x: "100%" as string },
-  visible: { opacity: 1, x: "0%" },
-  exit: { opacity: 0, x: "100%" as string },
+  hidden: { opacity: 0, y: -10 },
+  visible: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -10 },
 };
 
 /* ─── Component ─── */
@@ -104,6 +116,7 @@ const mobileMenuVariants = {
 export default function Navbar() {
   const { user, profile, isAdmin, signOut, isLoading: authLoading } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<OpenDropdown>(null);
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
@@ -132,6 +145,12 @@ export default function Navbar() {
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
+
+  /* Close mobile menu on route change */
+  useEffect(() => {
+    setMobileOpen(false);
+    setOpenDropdown(null);
+  }, [pathname]);
 
   /* Close dropdowns on Escape */
   useEffect(() => {
@@ -317,7 +336,7 @@ export default function Navbar() {
                               <Link
                                 key={link.href}
                                 href={link.href}
-                                className="block px-3 py-2 text-sm text-navy hover:bg-[#EBF7E5] hover:text-[#5DB347] rounded-lg transition-colors"
+                                className="block px-3 py-2 text-sm text-navy hover:bg-[#EBF7E5] hover:text-[#5DB347] rounded-lg transition-all hover:translate-x-0.5 border-l-2 border-transparent hover:border-[#5DB347]"
                                 onClick={() => setOpenDropdown(null)}
                               >
                                 {link.label}
@@ -339,7 +358,7 @@ export default function Navbar() {
                               <Link
                                 key={link.href}
                                 href={link.href}
-                                className="block px-3 py-2 text-sm text-navy hover:bg-[#EBF7E5] hover:text-[#5DB347] rounded-lg transition-colors"
+                                className="block px-3 py-2 text-sm text-navy hover:bg-[#EBF7E5] hover:text-[#5DB347] rounded-lg transition-all hover:translate-x-0.5 border-l-2 border-transparent hover:border-[#5DB347]"
                                 onClick={() => setOpenDropdown(null)}
                               >
                                 {link.label}
@@ -362,7 +381,7 @@ export default function Navbar() {
                                 <Link
                                   key={link.href}
                                   href={link.href}
-                                  className="flex items-center gap-3 px-3 py-2 text-sm text-navy hover:bg-[#EBF7E5] hover:text-[#5DB347] rounded-lg transition-colors"
+                                  className="flex items-center gap-3 px-3 py-2 text-sm text-navy hover:bg-[#EBF7E5] hover:text-[#5DB347] rounded-lg transition-all hover:translate-x-0.5 border-l-2 border-transparent hover:border-[#5DB347]"
                                   onClick={() => setOpenDropdown(null)}
                                 >
                                   <Icon className="w-4 h-4 text-gray-400" />
@@ -420,19 +439,26 @@ export default function Navbar() {
                     animate="visible"
                     exit="exit"
                     transition={{ duration: 0.15 }}
-                    className="absolute top-full left-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50"
+                    className="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50"
                   >
-                    {communityLinks.map((link) => (
-                      <Link
-                        key={link.href}
-                        href={link.href}
-                        onClick={() => setOpenDropdown(null)}
-                        className="flex flex-col px-4 py-2.5 hover:bg-[#EBF7E5]/50 transition-colors"
-                      >
-                        <span className="text-sm font-medium text-navy">{link.label}</span>
-                        <span className="text-[10px] text-gray-400">{link.desc}</span>
-                      </Link>
-                    ))}
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-4 pt-1 pb-2">Community</p>
+                    {communityLinks.map((link) => {
+                      const Icon = link.icon;
+                      return (
+                        <Link
+                          key={link.href}
+                          href={link.href}
+                          onClick={() => setOpenDropdown(null)}
+                          className="flex items-center gap-3 px-4 py-2.5 hover:bg-[#EBF7E5] hover:translate-x-0.5 transition-all border-l-2 border-transparent hover:border-[#5DB347]"
+                        >
+                          <Icon className="w-4 h-4 text-[#8CB89C] shrink-0" />
+                          <div>
+                            <span className="text-sm font-medium text-navy block">{link.label}</span>
+                            <span className="text-[10px] text-gray-400 block">{link.desc}</span>
+                          </div>
+                        </Link>
+                      );
+                    })}
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -459,31 +485,38 @@ export default function Navbar() {
                     animate="visible"
                     exit="exit"
                     transition={{ duration: 0.15 }}
-                    className="absolute top-full right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50"
+                    className="absolute top-full right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50"
                   >
-                    {exploreLinks.map((link) => (
-                      <Link
-                        key={link.href}
-                        href={link.href}
-                        onClick={() => setOpenDropdown(null)}
-                        className="flex flex-col px-4 py-2.5 hover:bg-[#EBF7E5]/50 transition-colors"
-                      >
-                        <span className="text-sm font-medium text-navy">{link.label}</span>
-                        <span className="text-[10px] text-gray-400">{link.desc}</span>
-                      </Link>
-                    ))}
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-4 pt-1 pb-2">Explore</p>
+                    {exploreLinks.map((link) => {
+                      const Icon = link.icon;
+                      return (
+                        <Link
+                          key={link.href}
+                          href={link.href}
+                          onClick={() => setOpenDropdown(null)}
+                          className="flex items-center gap-3 px-4 py-2.5 hover:bg-[#EBF7E5] hover:translate-x-0.5 transition-all border-l-2 border-transparent hover:border-[#5DB347]"
+                        >
+                          <Icon className="w-4 h-4 text-[#8CB89C] shrink-0" />
+                          <div>
+                            <span className="text-sm font-medium text-navy block">{link.label}</span>
+                            <span className="text-[10px] text-gray-400 block">{link.desc}</span>
+                          </div>
+                        </Link>
+                      );
+                    })}
                   </motion.div>
                 )}
               </AnimatePresence>
             </div>
             <Link
               href="/sponsor"
-              className="text-white font-semibold text-xs px-3 py-1.5 rounded-md transition-colors flex items-center gap-1 whitespace-nowrap"
+              className="text-white font-semibold text-xs px-4 py-2 rounded-lg transition-colors flex items-center gap-1.5 whitespace-nowrap"
               style={{ background: '#5DB347' }}
               onMouseEnter={(e) => (e.currentTarget.style.background = '#449933')}
               onMouseLeave={(e) => (e.currentTarget.style.background = '#5DB347')}
             >
-              <span className="text-sm">❤️</span>
+              <span className="text-sm">&#10084;&#65039;</span>
               Sponsor
             </Link>
           </div>
@@ -599,12 +632,11 @@ export default function Navbar() {
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
-            variants={mobileMenuVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            transition={{ duration: 0.25, ease: "easeInOut" }}
-            className="fixed inset-0 top-16 bg-white z-40 lg:hidden overflow-y-auto"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="fixed inset-x-0 top-[64px] bottom-0 bg-white z-50 lg:hidden overflow-y-auto shadow-2xl"
           >
             <div className="px-4 py-6 pb-24">
               <div className="flex flex-col gap-1">
@@ -839,31 +871,39 @@ export default function Navbar() {
                 {/* Community section */}
                 <div className="pt-2 mt-2 border-t border-gray-100">
                   <p className="text-xs font-bold text-gray-400 uppercase tracking-wider px-3 mb-2">Community</p>
-                  {communityLinks.map((link) => (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      className="text-navy/80 hover:text-[#5DB347] text-sm font-medium py-2.5 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors block"
-                      onClick={closeMobile}
-                    >
-                      {link.label}
-                    </Link>
-                  ))}
+                  {communityLinks.map((link) => {
+                    const Icon = link.icon;
+                    return (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        className="flex items-center gap-3 text-navy/80 hover:text-[#5DB347] text-sm font-medium py-2.5 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors"
+                        onClick={closeMobile}
+                      >
+                        <Icon className="w-4 h-4 text-[#8CB89C]" />
+                        {link.label}
+                      </Link>
+                    );
+                  })}
                 </div>
 
                 {/* Explore section */}
                 <div className="pt-2 mt-2 border-t border-gray-100">
                   <p className="text-xs font-bold text-gray-400 uppercase tracking-wider px-3 mb-2">Explore</p>
-                  {exploreLinks.map((link) => (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      className="text-navy/80 hover:text-[#5DB347] text-sm font-medium py-2.5 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors block"
-                      onClick={closeMobile}
-                    >
-                      {link.label}
-                    </Link>
-                  ))}
+                  {exploreLinks.map((link) => {
+                    const Icon = link.icon;
+                    return (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        className="flex items-center gap-3 text-navy/80 hover:text-[#5DB347] text-sm font-medium py-2.5 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors"
+                        onClick={closeMobile}
+                      >
+                        <Icon className="w-4 h-4 text-[#8CB89C]" />
+                        {link.label}
+                      </Link>
+                    );
+                  })}
                 </div>
 
                 <Link
@@ -872,7 +912,7 @@ export default function Navbar() {
                   style={{ background: '#5DB347' }}
                   onClick={closeMobile}
                 >
-                  <span>❤️</span>
+                  <span>&#10084;&#65039;</span>
                   Sponsor a Farmer
                 </Link>
 
