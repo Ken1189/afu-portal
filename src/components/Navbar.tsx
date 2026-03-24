@@ -212,6 +212,7 @@ export default function Navbar() {
   };
 
   return (
+    <>
     <nav
       ref={navRef}
       className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100 shadow-sm"
@@ -646,13 +647,23 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* ── Mobile Menu ── */}
-      {mobileOpen && (
-        <div
-          className="fixed inset-x-0 top-[64px] bottom-0 bg-white z-50 lg:hidden shadow-2xl"
-          style={{ overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}
-        >
-          <div className="px-4 py-6 pb-32">
+    </nav>
+    {/* ── Mobile Menu — OUTSIDE nav to fix Android fixed-inside-sticky bug ── */}
+    {mobileOpen && (
+      <div
+        className="lg:hidden bg-white border-t border-gray-100"
+        style={{
+          position: 'fixed',
+          left: 0,
+          right: 0,
+          top: '64px',
+          bottom: 0,
+          zIndex: 9999,
+          overflowY: 'auto',
+          WebkitOverflowScrolling: 'touch',
+        }}
+      >
+        <div className="px-4 py-6 pb-32">
               <div className="flex flex-col gap-1">
                 {/* About */}
                 <Link
@@ -994,6 +1005,6 @@ export default function Navbar() {
             </div>
           </div>
       )}
-    </nav>
+    </>
   );
 }
