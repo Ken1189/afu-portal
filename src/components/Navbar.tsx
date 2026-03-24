@@ -66,6 +66,7 @@ const educationLinks = [
 ];
 
 const communityLinks = [
+  { label: "Exchange", href: "/exchange", desc: "Trade with fellow farmers" },
   { label: "Jobs Board", href: "/jobs", desc: "Agricultural positions" },
   { label: "Ambassadors", href: "/ambassadors", desc: "Meet our farmers" },
   { label: "Partner Farms", href: "/farms", desc: "Showcase farms" },

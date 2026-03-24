@@ -24,6 +24,7 @@ import {
   Globe2,
   Tractor,
   Wheat,
+  Scale,
 } from "lucide-react";
 
 export const metadata = {
@@ -311,6 +312,84 @@ export default function CommercialDemoPage() {
                 </div>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* ─── 3b. TRADE FINANCE INSTRUMENTS ─── */}
+        <section id="trade-finance" className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 sm:p-8">
+          <h2 className="text-lg font-bold text-[#1B2A4A] mb-5 flex items-center gap-2">
+            <Scale className="w-5 h-5 text-[#5DB347]" />
+            Active Trade Finance
+          </h2>
+          <div className="space-y-4">
+            {[
+              {
+                type: "SBLC",
+                name: "Standby Letter of Credit",
+                buyer: "Cotton Company of Zimbabwe",
+                amount: "$45,000",
+                expiry: "September 2026",
+                bank: "Hamilton Reserve Bank",
+                status: "Active",
+                statusColor: "text-emerald-600 bg-emerald-50",
+              },
+              {
+                type: "LC",
+                name: "Documentary Letter of Credit",
+                buyer: "EuroCotton Trading, Netherlands",
+                amount: "$28,000",
+                expiry: "July 2026",
+                bank: "Hamilton Reserve Bank",
+                status: "Active",
+                statusColor: "text-emerald-600 bg-emerald-50",
+              },
+              {
+                type: "Pre-Finance",
+                name: "Export Pre-Financing",
+                buyer: "Local Oil Processor",
+                amount: "$15,000",
+                expiry: "August 2026",
+                bank: "Hamilton Reserve Bank",
+                status: "Disbursed",
+                statusColor: "text-blue-600 bg-blue-50",
+              },
+            ].map((instrument) => (
+              <div
+                key={instrument.name + instrument.buyer}
+                className="flex flex-col sm:flex-row sm:items-center justify-between p-5 rounded-xl border border-gray-100 hover:border-[#5DB347]/30 transition-colors gap-4"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-[#5DB347]/10 flex items-center justify-center shrink-0">
+                    <Scale className="w-6 h-6 text-[#5DB347]" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-[#5DB347] bg-[#EBF7E5] px-2 py-0.5 rounded-full">
+                        {instrument.type}
+                      </span>
+                    </div>
+                    <p className="text-sm font-bold text-[#1B2A4A] mt-0.5">{instrument.name}</p>
+                    <p className="text-xs text-gray-500">{instrument.buyer}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4 sm:gap-6">
+                  <div className="text-right">
+                    <p className="text-sm font-bold text-[#1B2A4A]">{instrument.amount}</p>
+                    <p className="text-xs text-gray-500">Expires: {instrument.expiry}</p>
+                  </div>
+                  <span className={`text-xs font-semibold px-3 py-1 rounded-full ${instrument.statusColor}`}>
+                    {instrument.status}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-4 p-4 rounded-xl bg-[#EBF7E5]/50 border border-[#5DB347]/20">
+            <p className="text-xs text-gray-600">
+              <span className="font-bold text-[#1B2A4A]">Banking Partner:</span> Hamilton Reserve Bank &middot;
+              All trade finance instruments are structured and issued through our banking partnership, enabling
+              cross-border agricultural trade across 15+ currencies.
+            </p>
           </div>
         </section>
 

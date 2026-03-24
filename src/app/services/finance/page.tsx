@@ -16,6 +16,22 @@ const products = [
     link: "/services/finance/afu-bank",
   },
   {
+    icon: "🌍",
+    title: "Trade Finance",
+    description:
+      "SBLCs, Letters of Credit, export pre-financing, warehouse receipt finance, and FX services via Hamilton Reserve Bank. Our highest-margin product powering cross-border agricultural trade across Africa.",
+    stat: "15+ currencies",
+    link: "/services/finance/trade-finance",
+  },
+  {
+    icon: "🧪",
+    title: "Input Finance",
+    description:
+      "Get seeds, fertilizers, and chemicals without cash upfront. We pay approved suppliers directly and deduct at harvest.",
+    stat: "Zero upfront cost",
+    link: "/services/finance/input-finance",
+  },
+  {
     icon: "🚜",
     title: "Asset Finance",
     description:
@@ -32,22 +48,6 @@ const products = [
     link: "/services/finance/crop-dev-loan",
   },
   {
-    icon: "🏠",
-    title: "Farm Mortgages",
-    description:
-      "Long-term financing for farmland purchase, farm buildings, processing facilities, and storage infrastructure.",
-    stat: "Up to 15 years",
-    link: "/services/finance/mortgages",
-  },
-  {
-    icon: "🧪",
-    title: "Input Finance",
-    description:
-      "Get seeds, fertilizers, and chemicals without cash upfront. We pay approved suppliers directly and deduct at harvest.",
-    stat: "Zero upfront cost",
-    link: "/services/finance/input-finance",
-  },
-  {
     icon: "📦",
     title: "Harvest Finance",
     description:
@@ -56,12 +56,12 @@ const products = [
     link: "/services/finance/harvest-finance",
   },
   {
-    icon: "🌍",
-    title: "Trade Finance",
+    icon: "🏠",
+    title: "Farm Mortgages",
     description:
-      "SBLCs, documentary credits, export pre-financing, and FX services to power cross-border agricultural trade across Africa.",
-    stat: "15+ currencies",
-    link: "/services/finance/trade-finance",
+      "Long-term financing for farmland purchase, farm buildings, processing facilities, and storage infrastructure.",
+    stat: "Up to 15 years",
+    link: "/services/finance/mortgages",
   },
 ];
 

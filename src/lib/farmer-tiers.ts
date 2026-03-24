@@ -41,7 +41,7 @@ export const FARMER_TIERS = {
     emoji: '\u{1F3C6}',
     color: '#1B5E14',
     description: 'Full platform access',
-    features: ['marketplace', 'offtake', 'logistics', 'tokenize', 'staking'],
+    features: ['marketplace', 'exchange', 'offtake', 'logistics', 'tokenize', 'staking'],
     requiredCourse: 'advanced-trading',
   },
 } as const;
@@ -76,6 +76,7 @@ export const FARM_SIDEBAR_ITEMS = [
 
   // Pioneer tier
   { href: '/farm/marketplace', label: 'Marketplace', icon: 'ShoppingBag', tier: 'pioneer' as FarmerTier },
+  { href: '/farm/exchange', label: 'Exchange', icon: 'Coins', tier: 'pioneer' as FarmerTier },
   { href: '/farm/logistics', label: 'Logistics', icon: 'Truck', tier: 'pioneer' as FarmerTier },
   { href: '/farm/tokenize', label: 'Tokenize', icon: 'Coins', tier: 'pioneer' as FarmerTier },
 ];

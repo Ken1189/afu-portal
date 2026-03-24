@@ -23,6 +23,13 @@ import {
   BarChart3,
   Award,
   Wheat,
+  Coins,
+  ArrowUpRight,
+  ArrowDownLeft,
+  ShoppingBag,
+  Wrench,
+  Globe2,
+  FileText,
 } from "lucide-react";
 
 export const metadata = {
@@ -476,6 +483,79 @@ export default function FarmerDemoPage() {
           </div>
         </section>
 
+        {/* ─── 7b. TRADE FINANCE APPLICATION ─── */}
+        <section id="trade-finance" className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 sm:p-8">
+          <h2 className="text-lg font-bold text-[#1B2A4A] mb-5 flex items-center gap-2">
+            <Globe2 className="w-5 h-5 text-[#5DB347]" />
+            Trade Finance
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Active trade finance application */}
+            <div className="p-5 rounded-xl border-2 border-[#5DB347]/20 bg-[#EBF7E5]/30">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                    Export Pre-Financing
+                  </p>
+                  <p className="text-lg font-bold text-[#1B2A4A] mt-1">Blueberry Export &mdash; EU</p>
+                </div>
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-amber-600 bg-amber-50">
+                  <Loader2 className="w-3.5 h-3.5" />
+                  Under Review
+                </div>
+              </div>
+              <div className="space-y-3 text-sm">
+                <div className="flex justify-between py-2 border-b border-gray-50">
+                  <span className="text-gray-500">Instrument</span>
+                  <span className="font-semibold text-[#1B2A4A]">Standby Letter of Credit (SBLC)</span>
+                </div>
+                <div className="flex justify-between py-2 border-b border-gray-50">
+                  <span className="text-gray-500">Amount</span>
+                  <span className="font-semibold text-[#1B2A4A]">$12,000</span>
+                </div>
+                <div className="flex justify-between py-2 border-b border-gray-50">
+                  <span className="text-gray-500">Buyer</span>
+                  <span className="font-semibold text-[#1B2A4A]">FreshBerry GmbH, Germany</span>
+                </div>
+                <div className="flex justify-between py-2">
+                  <span className="text-gray-500">Bank Partner</span>
+                  <span className="font-semibold text-[#5DB347]">Hamilton Reserve Bank</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Trade finance info */}
+            <div className="p-5 rounded-xl border border-gray-100">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">
+                How Trade Finance Works
+              </p>
+              <div className="space-y-3">
+                <div className="flex items-start gap-3 p-3 rounded-xl bg-[#EBF7E5]/50 border border-[#5DB347]/10">
+                  <div className="w-7 h-7 bg-[#5DB347] text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">1</div>
+                  <div>
+                    <p className="text-sm font-semibold text-[#1B2A4A]">Secure an Export Buyer</p>
+                    <p className="text-xs text-gray-500">AFU connects you to verified international buyers</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-3 rounded-xl bg-[#EBF7E5]/50 border border-[#5DB347]/10">
+                  <div className="w-7 h-7 bg-[#5DB347] text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">2</div>
+                  <div>
+                    <p className="text-sm font-semibold text-[#1B2A4A]">SBLC or Letter of Credit Issued</p>
+                    <p className="text-xs text-gray-500">Hamilton Reserve Bank issues the instrument</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-3 rounded-xl bg-[#EBF7E5]/50 border border-[#5DB347]/10">
+                  <div className="w-7 h-7 bg-[#5DB347] text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">3</div>
+                  <div>
+                    <p className="text-sm font-semibold text-[#1B2A4A]">Get Pre-Financed</p>
+                    <p className="text-xs text-gray-500">Receive up to 80% advance against your export contract</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* ─── 8. NOTIFICATIONS ─── */}
         <section id="notifications" className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 sm:p-8">
           <h2 className="text-lg font-bold text-[#1B2A4A] mb-5 flex items-center gap-2">
@@ -521,6 +601,111 @@ export default function FarmerDemoPage() {
                 </div>
               );
             })}
+          </div>
+        </section>
+
+        {/* ─── 9. AFU EXCHANGE ─── */}
+        <section id="exchange" className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="bg-gradient-to-br from-[#1B2A4A] to-[#2D4A7A] px-6 py-5 sm:px-8">
+            <h2 className="text-lg font-bold text-white flex items-center gap-2">
+              <Coins className="w-5 h-5 text-amber-400" />
+              AFU Exchange
+            </h2>
+            <p className="text-white/60 text-sm mt-1">
+              Trade goods, services &amp; equipment with fellow farmers using AFU Credits
+            </p>
+          </div>
+
+          {/* Credit Wallet */}
+          <div className="px-6 py-5 sm:px-8 border-b border-gray-100">
+            <div className="flex flex-col sm:flex-row gap-6">
+              <div className="flex-1">
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">
+                  Credit Balance
+                </p>
+                <div className="flex items-center gap-2 mb-2">
+                  <Coins className="w-6 h-6 text-amber-500" />
+                  <span className="text-3xl font-bold text-[#1B2A4A]">2,450</span>
+                  <span className="text-sm text-gray-400 mt-1">credits</span>
+                </div>
+                <div className="flex gap-4 text-sm">
+                  <div>
+                    <p className="text-gray-400 text-xs">Earned</p>
+                    <p className="font-semibold text-emerald-600">+4,200</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-400 text-xs">Spent</p>
+                    <p className="font-semibold text-red-500">-1,750</p>
+                  </div>
+                </div>
+              </div>
+              <div className="flex-1 space-y-2">
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                  Recent Activity
+                </p>
+                {[
+                  { type: "earned" as const, desc: "Sold: Surplus Maize", amount: 1500 },
+                  { type: "spent" as const, desc: "Bought: Irrigation Pump", amount: 200 },
+                  { type: "earned" as const, desc: "Tractor hire payment", amount: 500 },
+                ].map((tx) => (
+                  <div key={tx.desc} className="flex items-center gap-2 text-sm">
+                    <div
+                      className={`w-5 h-5 rounded-full flex items-center justify-center ${
+                        tx.type === "earned" ? "bg-emerald-50" : "bg-red-50"
+                      }`}
+                    >
+                      {tx.type === "earned" ? (
+                        <ArrowDownLeft className="w-3 h-3 text-emerald-600" />
+                      ) : (
+                        <ArrowUpRight className="w-3 h-3 text-red-500" />
+                      )}
+                    </div>
+                    <span className="flex-1 text-xs text-gray-600 truncate">{tx.desc}</span>
+                    <span
+                      className={`text-xs font-bold ${
+                        tx.type === "earned" ? "text-emerald-600" : "text-red-500"
+                      }`}
+                    >
+                      {tx.type === "earned" ? "+" : "-"}
+                      {tx.amount}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Sample Listing */}
+          <div className="px-6 py-5 sm:px-8">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+              Active Listing
+            </p>
+            <div className="flex items-center gap-4 p-4 rounded-xl border border-gray-100 hover:border-[#5DB347]/30 transition-colors">
+              <div className="w-14 h-14 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
+                <Wrench className="w-7 h-7 text-blue-400" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-sm text-[#1B2A4A]">
+                  John Deere Tractor &mdash; Available for Hire
+                </p>
+                <div className="flex items-center gap-2 mt-1 text-xs text-gray-500">
+                  <span className="bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full font-medium">
+                    Equipment
+                  </span>
+                  <span>42 views</span>
+                  <span>&bull;</span>
+                  <MapPin className="w-3 h-3" />
+                  <span>Mashonaland East, Zimbabwe</span>
+                </div>
+              </div>
+              <div className="text-right shrink-0">
+                <div className="flex items-center gap-1">
+                  <Coins className="w-4 h-4 text-amber-500" />
+                  <span className="text-lg font-bold text-[#1B2A4A]">500</span>
+                </div>
+                <p className="text-[10px] text-gray-400">credits/day</p>
+              </div>
+            </div>
           </div>
         </section>
 

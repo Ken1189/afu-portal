@@ -60,6 +60,7 @@ export default function AboutPage() {
             <p className="text-xl text-white/80 leading-relaxed mb-10">
               The African Farming Union is a vertically integrated agriculture development platform —
               functioning as a specialized agri dev bank and full-stack execution engine for African farmers.
+              We finance the trade with SBLCs, Letters of Credit, and export pre-financing that unlock international markets.
             </p>
             {/* 3 stat pills — glassmorphism */}
             <div className="flex flex-wrap gap-4">
@@ -135,7 +136,7 @@ export default function AboutPage() {
           <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 mt-8 shadow-lg shadow-[#5DB347]/5 border-l-4 border-[#5DB347]">
             <p className="text-[#1B2A4A] text-center font-medium">
               Africa&apos;s agriculture doesn&apos;t fail at farming &mdash; it fails at{' '}
-              <strong style={{ color: '#5DB347' }}>finance + offtake + processing</strong>.
+              <strong style={{ color: '#5DB347' }}>finance + trade finance + offtake + processing</strong>.
             </p>
           </div>
         </div>
@@ -174,7 +175,7 @@ export default function AboutPage() {
                 items: [
                   "Equipment finance, irrigation, high-value crop financing",
                   "Structured contracts + processing access",
-                  "Market linkage + export packaging",
+                  "Trade finance (SBLCs, LCs) + export packaging",
                 ],
               },
               {

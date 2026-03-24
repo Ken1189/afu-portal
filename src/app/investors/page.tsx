@@ -270,6 +270,10 @@ export default function InvestorsPage() {
                     desc: "AI credit scoring, satellite crop monitoring, blockchain traceability, and a full digital platform create defensible advantages over traditional lenders.",
                   },
                   {
+                    title: "Trade Finance Revenue Engine",
+                    desc: "SBLCs, Letters of Credit, export pre-financing, and FX services via Hamilton Reserve Bank generate high-margin fee income ($8M Year 3, $80M Year 5) while unlocking cross-border trade. Our highest-margin product line.",
+                  },
+                  {
                     title: "De-Risked Capital Deployment",
                     desc: "Input-in-kind financing, offtake contracts, and tranche releases mean capital is always tied to productive use. Escrow-controlled repayment eliminates leakage.",
                   },
@@ -374,7 +378,7 @@ export default function InvestorsPage() {
               {
                 icon: CircleDollarSign,
                 title: "Trade Finance",
-                desc: "Letters of credit, invoice finance, and commodities distribution for international trade.",
+                desc: "SBLCs, Letters of Credit, export pre-financing, and FX via Hamilton Reserve Bank. Our highest-margin product — projected $8M Year 3, $80M Year 5.",
                 color: "from-[#6ABF4B] to-[#5DB347]",
               },
               {
@@ -449,7 +453,7 @@ export default function InvestorsPage() {
               {
                 value: "Full",
                 label: "Platform Built",
-                desc: "Farmer portal, supplier marketplace, admin dashboard, AI tools, insurance, crop scanner, weather, and training modules",
+                desc: "Farmer portal, trade finance page, supplier marketplace, admin dashboard, AI tools, insurance, crop scanner, weather, and training modules",
                 icon: Building2,
               },
               {
@@ -792,8 +796,8 @@ export default function InvestorsPage() {
             ?
           </h2>
           <p className="text-lg text-white/70 mb-12 max-w-2xl mx-auto">
-            Request our investor pack for the full financial model, country deployment plans, risk framework,
-            and team profiles. Or schedule a call to discuss the opportunity directly.
+            Request our investor pack for the full financial model, trade finance revenue projections, country deployment plans,
+            risk framework, and team profiles. Or schedule a call to discuss the opportunity directly.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">

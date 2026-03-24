@@ -163,7 +163,7 @@ const services = [
   {
     icon: CircleDollarSign,
     title: 'Trade Finance',
-    desc: 'Letters of credit, invoice finance, and commodities partner distribution.',
+    desc: 'SBLCs, Letters of Credit, export pre-financing, and FX services via Hamilton Reserve Bank.',
     link: '/services/trade-finance',
     img: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800&q=80',
   },
@@ -1059,7 +1059,7 @@ export default function Home() {
               </h2>
               <p className="text-gray-300 max-w-3xl mx-auto text-lg">
                 AFU is raising a $500M seed round to build Africa&apos;s first vertically integrated agriculture
-                development bank and operating platform. A $1 trillion market by 2030 — and we&apos;re the execution layer.
+                development bank and operating platform. Trade finance, input lending, and offtake — a $1 trillion market by 2030.
               </p>
             </div>
           </FadeInWhenVisible>
@@ -1103,8 +1103,8 @@ export default function Home() {
                       desc: 'AFU controls the full value chain — financing, inputs, processing, and offtake — creating compounding returns at every stage.',
                     },
                     {
-                      title: 'Capital-Efficient Flywheel',
-                      desc: 'Cash recycles through the loop: farmer repayments fund new disbursements. Each rotation costs less and yields more.',
+                      title: 'Trade Finance Revenue Engine',
+                      desc: 'SBLCs, Letters of Credit, and export pre-financing via Hamilton Reserve Bank generate high-margin fee income while unlocking cross-border trade for farmers.',
                     },
                     {
                       title: 'Massive Addressable Market',
@@ -1387,6 +1387,11 @@ export default function Home() {
                 icon: Tractor,
                 title: 'Farm Managers on the Ground',
                 desc: 'We don\'t just lend — we send experts to help you succeed. Real agronomists, real farm managers, real people standing beside you in the field.',
+              },
+              {
+                icon: Scale,
+                title: 'We Finance the Trade',
+                desc: 'SBLCs and Letters of Credit that unlock export markets. Through our partnership with Hamilton Reserve Bank, we provide the trade finance instruments that turn harvests into international revenue.',
               },
             ].map((item, i) => {
               const Icon = item.icon;

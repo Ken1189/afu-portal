@@ -123,6 +123,7 @@ const navGroups: NavGroup[] = [
     label: 'Marketplace & Partners',
     defaultOpen: false,
     links: [
+      { href: '/admin/exchange', label: 'Exchange', icon: <HandCoins className="w-4 h-4" /> },
       { href: '/admin/suppliers', label: 'Suppliers', icon: <Store className="w-4 h-4" /> },
       { href: '/admin/partnerships', label: 'Partners', icon: <Handshake className="w-4 h-4" /> },
       { href: '/admin/testimonials', label: 'Testimonials', icon: <MessageSquare className="w-4 h-4" /> },
