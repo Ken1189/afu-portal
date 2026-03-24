@@ -55,6 +55,38 @@ const products = [
     premium: "From $10/month",
     link: "/services/insurance/livestock",
   },
+  {
+    icon: "🛡️",
+    name: "Life & Personal Insurance",
+    description:
+      "Life cover, funeral plans, and personal accident insurance to protect farming families and their futures.",
+    premium: "From $3/month",
+    link: "/services/insurance/life",
+  },
+  {
+    icon: "⚙️",
+    name: "Equipment Insurance",
+    description:
+      "Cover tractors, irrigation systems, and implements against theft, damage, and mechanical breakdown.",
+    premium: "From $15/month",
+    link: "/services/insurance/equipment",
+  },
+  {
+    icon: "🏦",
+    name: "Pension & Retirement",
+    description:
+      "Farmer retirement savings plans with leveraged growth through AFU's capital program. Start from $10/month.",
+    premium: "From $10/month",
+    link: "/services/insurance/pension",
+  },
+  {
+    icon: "🚛",
+    name: "Vehicle & Transport Insurance",
+    description:
+      "Third party, fire and theft, or comprehensive cover for farm bakkies, trucks, and fleet vehicles.",
+    premium: "From $8/month",
+    link: "/services/insurance/vehicle",
+  },
 ];
 
 const stats = [
@@ -129,7 +161,7 @@ export default function InsuranceHubPage() {
               Our Insurance Products
             </h2>
             <p className="text-gray-500 max-w-2xl mx-auto">
-              Six specialized insurance products covering every aspect of your
+              Ten specialized insurance products covering every aspect of your
               farming operation, from equipment to exports.
             </p>
           </div>

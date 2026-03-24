@@ -43,6 +43,10 @@ const insuranceLinks = [
   { label: "Farm Insurance", href: "/services/insurance/farm" },
   { label: "Trade Insurance", href: "/services/insurance/trade" },
   { label: "Livestock Insurance", href: "/services/insurance/livestock" },
+  { label: "Life & Personal Insurance", href: "/services/insurance/life" },
+  { label: "Equipment Insurance", href: "/services/insurance/equipment" },
+  { label: "Pension & Retirement", href: "/services/insurance/pension" },
+  { label: "Vehicle Insurance", href: "/services/insurance/vehicle" },
 ];
 
 const moreServicesLinks = [
