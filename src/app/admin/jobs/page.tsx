@@ -45,6 +45,18 @@ interface JobListing {
 /* ─── Constants ─── */
 
 const SECTORS = [
+  'Executive',
+  'Technology',
+  'Operations',
+  'Commercial',
+  'Finance',
+  'Regional',
+  'Country',
+  'Agronomy',
+  'Insurance',
+  'Legal',
+  'Community',
+  'Marketing',
   'Livestock',
   'Horticulture',
   'Poultry',
