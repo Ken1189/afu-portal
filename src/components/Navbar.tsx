@@ -84,6 +84,7 @@ const communityLinks: { label: string; href: string; desc: string; icon: LucideI
   { label: "Partners", href: "/partners", desc: "Our network", icon: Handshake },
   { label: "Programs", href: "/programs", desc: "Active farming programs", icon: Target },
   { label: "Young Farmers", href: "/young-farmers", desc: "Next generation", icon: GraduationCap },
+  { label: "Sponsor a Farmer", href: "/sponsor", desc: "Change a life today", icon: Handshake },
 ];
 
 const exploreLinks: { label: string; href: string; desc: string; icon: LucideIcon }[] = [
