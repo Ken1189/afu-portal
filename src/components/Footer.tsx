@@ -112,6 +112,7 @@ export default function Footer() {
               <Link href="/services/training" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">Training</Link>
               <Link href="/services/legal-assistance" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">Legal Assistance</Link>
               <Link href="/services/veterinary" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">Veterinary Services</Link>
+              <Link href="/services/advertising" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">Advertise with Us</Link>
             </div>
           </div>
 

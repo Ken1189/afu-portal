@@ -35,6 +35,7 @@ import {
   Mail,
   Scale,
   Stethoscope,
+  Megaphone,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useAuth } from "@/lib/supabase/auth-context";
@@ -73,6 +74,7 @@ const moreServicesLinks = [
   { label: "Farm Security", href: "/services/security", icon: Shield },
   { label: "Legal Assistance", href: "/services/legal-assistance", icon: Scale },
   { label: "Veterinary", href: "/services/veterinary", icon: Stethoscope },
+  { label: "Advertise with Us", href: "/services/advertising", icon: Megaphone },
 ];
 
 const educationLinks = [
