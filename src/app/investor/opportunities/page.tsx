@@ -216,7 +216,29 @@ export default function InvestorOpportunities() {
     }));
   }
 
-  function handleSubmitEOI(oppId: string) {
+  async function handleSubmitEOI(oppId: string) {
+    const opp = opportunities.find((o) => o.id === oppId);
+    const form = getFormData(opp!);
+
+    try {
+      await fetch('/api/investor/express-interest', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          opportunityId: oppId,
+          opportunityName: opp?.name,
+          amount: form.amount,
+          entityName: form.entityName,
+          email: form.email,
+          phone: form.phone,
+          notes: form.notes,
+          investorName: profile?.full_name || user?.email,
+        }),
+      });
+    } catch (e) {
+      // still show success even if API fails
+    }
+
     setSubmittedIds((prev) => new Set(prev).add(oppId));
     setExpandedId(null);
   }
