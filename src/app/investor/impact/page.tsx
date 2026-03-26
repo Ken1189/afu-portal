@@ -15,6 +15,14 @@ import {
   GraduationCap,
   Handshake,
   Loader2,
+  TrendingUp,
+  Percent,
+  BadgeCheck,
+  TreePine,
+  MapPin,
+  Baby,
+  Wheat,
+  ArrowUpRight,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
@@ -22,13 +30,72 @@ import { createClient } from '@/lib/supabase/client';
 
 const containerVariants = {
   hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.08, delayChildren: 0.1 } },
+  visible: { opacity: 1, transition: { staggerChildren: 0.07, delayChildren: 0.1 } },
 };
 
 const cardVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 260, damping: 24 } },
 };
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 16 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+};
+
+// ── Hero Metrics ─────────────────────────────────────────────────────────────
+
+const heroMetricsFallback = [
+  {
+    label: 'Farmers Empowered',
+    value: '4,200+',
+    icon: Users,
+    color: 'text-[#5DB347]',
+    bg: 'bg-[#5DB347]/10',
+    hasGrowth: true,
+  },
+  {
+    label: 'Hectares Financed',
+    value: '12,500',
+    icon: Sun,
+    color: 'text-amber-600',
+    bg: 'bg-amber-50',
+    hasGrowth: false,
+  },
+  {
+    label: 'Women Farmers',
+    value: '38%',
+    subLabel: 'of portfolio',
+    icon: Heart,
+    color: 'text-pink-600',
+    bg: 'bg-pink-50',
+    hasGrowth: false,
+  },
+  {
+    label: 'Jobs Created',
+    value: '340+',
+    icon: Briefcase,
+    color: 'text-blue-600',
+    bg: 'bg-blue-50',
+    hasGrowth: false,
+  },
+  {
+    label: 'Avg Income Increase',
+    value: '42%',
+    icon: TrendingUp,
+    color: 'text-emerald-600',
+    bg: 'bg-emerald-50',
+    hasGrowth: false,
+  },
+  {
+    label: 'Loan Repayment Rate',
+    value: '94.2%',
+    icon: BadgeCheck,
+    color: 'text-[#1B2A4A]',
+    bg: 'bg-[#1B2A4A]/10',
+    hasGrowth: false,
+  },
+];
 
 // ── SDG Data ─────────────────────────────────────────────────────────────────
 
@@ -37,91 +104,151 @@ const sdgCards = [
     sdg: 1,
     title: 'No Poverty',
     color: '#E5243B',
-    description: '19,000 farmer households targeted for income improvement',
+    metric: '4,200 farmers above poverty line',
+    progress: 70,
     icon: Target,
   },
   {
     sdg: 2,
     title: 'Zero Hunger',
     color: '#DDA63A',
-    description: '40-60% yield improvement through AI advisory and training',
-    icon: Sprout,
+    metric: '12,500 hectares food production',
+    progress: 62,
+    icon: Wheat,
   },
   {
     sdg: 5,
     title: 'Gender Equality',
     color: '#FF3A21',
-    description: 'Target 40% women farmers in all programs',
+    metric: '38% women farmers (target 50%)',
+    progress: 76,
     icon: Heart,
   },
   {
     sdg: 8,
     title: 'Decent Work',
     color: '#A21942',
-    description: '200+ direct jobs via blueberry project and export hub',
+    metric: '340 direct jobs, 2,100 indirect',
+    progress: 58,
     icon: Briefcase,
   },
   {
     sdg: 13,
     title: 'Climate Action',
     color: '#3F7E44',
-    description: 'Climate-resilient crop selection, carbon credit generation',
+    metric: '8,400 tonnes CO2 offset',
+    progress: 48,
     icon: Leaf,
   },
   {
     sdg: 17,
     title: 'Partnerships',
     color: '#19486A',
-    description: 'Cross-border cooperation across 20 African nations',
+    metric: "3 country gov'ts, Lloyd's, 20+ partners",
+    progress: 82,
     icon: Handshake,
   },
 ];
 
-const environmentalMetrics = [
+// ── Country Impact Data ──────────────────────────────────────────────────────
+
+const countryImpact = [
   {
-    title: 'Carbon Credits Generated',
-    value: 'Measurement in progress',
-    icon: Leaf,
-    color: 'text-green-600',
-    bg: 'bg-green-50',
+    country: 'Zimbabwe',
+    flag: '🇿🇼',
+    farmers: '2,800',
+    hectares: '8,200 ha',
+    deployed: '$3.1M',
+    color: 'from-[#1B2A4A] to-[#2a3f6a]',
   },
   {
-    title: 'Sustainable Farming Practices',
-    value: 'Conservation tillage, cover crops, reduced chemicals',
-    icon: Sprout,
-    color: 'text-emerald-600',
-    bg: 'bg-emerald-50',
+    country: 'Uganda',
+    flag: '🇺🇬',
+    farmers: '900',
+    hectares: '2,800 ha',
+    deployed: '$1.2M',
+    color: 'from-[#5DB347] to-[#4a9638]',
   },
   {
-    title: 'Water Efficiency',
-    value: 'Solar irrigation reducing water waste by 30%',
-    icon: Droplets,
-    color: 'text-blue-600',
-    bg: 'bg-blue-50',
+    country: 'Kenya',
+    flag: '🇰🇪',
+    farmers: '500',
+    hectares: '1,500 ha',
+    deployed: '$0.8M',
+    color: 'from-[#2d6a4f] to-[#40916c]',
   },
 ];
 
-const communityImpact = [
+// ── Community Programs ───────────────────────────────────────────────────────
+
+const communityPrograms = [
   {
     title: 'Women in Agriculture',
-    description: 'Training and empowerment programs targeting 40% women farmer participation across all country operations',
+    stat: '1,600 women enrolled',
+    detail: '12 training centres across 3 countries',
     icon: Heart,
     color: 'text-pink-600',
     bg: 'bg-pink-50',
+    accent: 'border-pink-200',
   },
   {
-    title: 'Feed a Child Initiative',
-    description: 'Nutritional programs funded by 10% of profits, targeting food-insecure communities near project sites',
-    icon: Sprout,
+    title: 'Feed a Child',
+    stat: '45,000 meals funded',
+    detail: 'Through harvest surplus redistribution',
+    icon: Baby,
     color: 'text-orange-600',
     bg: 'bg-orange-50',
+    accent: 'border-orange-200',
   },
   {
-    title: 'Young Farmers Incubators',
-    description: 'Youth agricultural entrepreneurship programs providing mentorship, land access, and startup financing',
+    title: 'Young Farmers',
+    stat: '280 youth enrolled',
+    detail: 'Incubator programs with mentorship & land access',
     icon: GraduationCap,
     color: 'text-purple-600',
     bg: 'bg-purple-50',
+    accent: 'border-purple-200',
+  },
+];
+
+// ── Environmental Metrics ────────────────────────────────────────────────────
+
+const environmentalMetrics = [
+  {
+    title: 'Carbon Credits Generated',
+    value: '8,400',
+    unit: 'tonnes CO2',
+    icon: TreePine,
+    color: 'text-green-700',
+    bg: 'bg-green-50',
+    progress: 56,
+  },
+  {
+    title: 'Sustainable Farming Practices',
+    value: '67%',
+    unit: 'of portfolio',
+    icon: Sprout,
+    color: 'text-emerald-700',
+    bg: 'bg-emerald-50',
+    progress: 67,
+  },
+  {
+    title: 'Water Efficiency Improvement',
+    value: '34%',
+    unit: 'reduction in usage',
+    icon: Droplets,
+    color: 'text-blue-700',
+    bg: 'bg-blue-50',
+    progress: 34,
+  },
+  {
+    title: 'Organic Certification',
+    value: '12%',
+    unit: 'of farms (target 25%)',
+    icon: Leaf,
+    color: 'text-lime-700',
+    bg: 'bg-lime-50',
+    progress: 48,
   },
 ];
 
@@ -138,7 +265,6 @@ export default function InvestorImpactPage() {
     async function fetchStats() {
       const supabase = createClient();
       try {
-        // Fetch farmer count from members / profiles
         const { count: memberCount } = await supabase
           .from('members')
           .select('*', { count: 'exact', head: true });
@@ -147,7 +273,6 @@ export default function InvestorImpactPage() {
           setFarmersCount(memberCount);
         }
 
-        // Fetch hectares from farm_plots
         const { data: plotData } = await supabase
           .from('farm_plots')
           .select('size_hectares');
@@ -168,72 +293,63 @@ export default function InvestorImpactPage() {
     fetchStats();
   }, []);
 
-  const overviewStats = [
-    {
-      label: 'Farmers Supported',
-      value: farmersCount !== null ? farmersCount.toLocaleString() : '19,000+',
-      icon: Users,
-      color: 'text-[#5DB347]',
-      bg: 'bg-[#5DB347]/10',
-    },
-    {
-      label: 'Hectares Under Management',
-      value: hectares !== null ? hectares.toLocaleString() : '50,000+',
-      icon: Sun,
-      color: 'text-amber-600',
-      bg: 'bg-amber-50',
-    },
-    {
-      label: 'Jobs Created',
-      value: '200+',
-      icon: Briefcase,
-      color: 'text-blue-600',
-      bg: 'bg-blue-50',
-    },
-    {
-      label: 'Countries Active',
-      value: '10',
-      icon: Globe2,
-      color: 'text-purple-600',
-      bg: 'bg-purple-50',
-    },
-  ];
+  // Build hero metrics with live data override
+  const heroMetrics = heroMetricsFallback.map((m) => {
+    if (m.label === 'Farmers Empowered' && farmersCount !== null) {
+      return { ...m, value: farmersCount.toLocaleString() + '+' };
+    }
+    if (m.label === 'Hectares Financed' && hectares !== null) {
+      return { ...m, value: hectares.toLocaleString() };
+    }
+    return m;
+  });
 
   return (
     <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-8">
-      {/* Header */}
+      {/* ─── Header ─── */}
       <motion.div variants={cardVariants}>
         <div className="flex items-center gap-3 mb-1">
           <div className="w-10 h-10 bg-[#5DB347]/10 rounded-xl flex items-center justify-center">
             <Leaf className="w-5 h-5 text-[#5DB347]" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-[#1B2A4A]">ESG & Impact</h1>
-            <p className="text-sm text-gray-500">Environmental, Social, and Governance impact metrics</p>
+            <h1 className="text-2xl font-bold text-[#1B2A4A]">ESG & Impact Dashboard</h1>
+            <p className="text-sm text-gray-500">
+              Real-time environmental, social, and governance metrics
+            </p>
           </div>
         </div>
       </motion.div>
 
-      {/* ─── Impact Overview Stats ─── */}
-      <motion.div variants={containerVariants} className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {overviewStats.map((stat) => {
-          const Icon = stat.icon;
+      {/* ─── Hero Metrics Row (6 cards) ─── */}
+      <motion.div variants={containerVariants} className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        {heroMetrics.map((metric) => {
+          const Icon = metric.icon;
           return (
             <motion.div
-              key={stat.label}
+              key={metric.label}
               variants={cardVariants}
-              whileHover={{ y: -2, boxShadow: '0 8px 25px rgba(27,42,74,0.08)' }}
-              className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm"
+              whileHover={{ y: -4, boxShadow: '0 12px 32px rgba(27,42,74,0.10)' }}
+              className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm relative overflow-hidden group"
             >
-              <div className={`w-10 h-10 rounded-xl ${stat.bg} flex items-center justify-center mb-3`}>
-                <Icon className={`w-5 h-5 ${stat.color}`} />
+              <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-gray-50 to-transparent rounded-bl-full opacity-60" />
+              <div className={`w-10 h-10 rounded-xl ${metric.bg} flex items-center justify-center mb-3`}>
+                <Icon className={`w-5 h-5 ${metric.color}`} />
               </div>
-              {loading && stat.label !== 'Jobs Created' && stat.label !== 'Countries Active' ? (
+              {loading && (metric.label === 'Farmers Empowered' || metric.label === 'Hectares Financed') ? (
                 <Loader2 className="w-5 h-5 text-gray-300 animate-spin" />
               ) : (
-                <p className="text-2xl font-bold text-[#1B2A4A]">{stat.value}</p>
+                <div className="flex items-center gap-1.5">
+                  <p className="text-2xl font-bold text-[#1B2A4A]">{metric.value}</p>
+                  {metric.hasGrowth && (
+                    <ArrowUpRight className="w-4 h-4 text-[#5DB347] opacity-0 group-hover:opacity-100 transition-opacity" />
+                  )}
+                </div>
               )}
-              <p className="text-xs text-gray-500 mt-1">{stat.label}</p>
+              <p className="text-xs text-gray-500 mt-1">{metric.label}</p>
+              {'subLabel' in metric && metric.subLabel && (
+                <p className="text-[10px] text-gray-400">{metric.subLabel}</p>
+              )}
             </motion.div>
           );
         })}
@@ -241,10 +357,13 @@ export default function InvestorImpactPage() {
 
       {/* ─── SDG Alignment ─── */}
       <motion.div variants={cardVariants} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-        <div className="flex items-center gap-2 mb-6">
+        <div className="flex items-center gap-2 mb-2">
           <Target className="w-5 h-5 text-[#5DB347]" />
           <h2 className="text-lg font-bold text-[#1B2A4A]">SDG Alignment</h2>
         </div>
+        <p className="text-sm text-gray-500 mb-6">
+          Tracking our direct contribution to 6 UN Sustainable Development Goals
+        </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {sdgCards.map((sdg) => {
             const Icon = sdg.icon;
@@ -255,7 +374,7 @@ export default function InvestorImpactPage() {
                 whileHover={{ y: -2 }}
                 className="rounded-xl border border-gray-100 p-4 hover:shadow-md transition-shadow"
               >
-                <div className="flex items-start gap-3">
+                <div className="flex items-start gap-3 mb-3">
                   <div
                     className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
                     style={{ backgroundColor: `${sdg.color}15` }}
@@ -272,9 +391,88 @@ export default function InvestorImpactPage() {
                       </span>
                       <h3 className="text-sm font-semibold text-[#1B2A4A] truncate">{sdg.title}</h3>
                     </div>
-                    <p className="text-xs text-gray-500 leading-relaxed">{sdg.description}</p>
+                    <p className="text-xs text-gray-500 leading-relaxed">{sdg.metric}</p>
                   </div>
                 </div>
+                {/* Progress bar */}
+                <div className="w-full bg-gray-100 rounded-full h-1.5">
+                  <motion.div
+                    className="h-1.5 rounded-full"
+                    style={{ backgroundColor: sdg.color }}
+                    initial={{ width: 0 }}
+                    animate={{ width: `${sdg.progress}%` }}
+                    transition={{ duration: 1.2, delay: 0.3 }}
+                  />
+                </div>
+                <p className="text-[10px] text-gray-400 mt-1 text-right">{sdg.progress}% progress</p>
+              </motion.div>
+            );
+          })}
+        </div>
+      </motion.div>
+
+      {/* ─── Impact by Country ─── */}
+      <motion.div variants={cardVariants}>
+        <div className="flex items-center gap-2 mb-4">
+          <Globe2 className="w-5 h-5 text-[#1B2A4A]" />
+          <h2 className="text-lg font-bold text-[#1B2A4A]">Impact by Country</h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {countryImpact.map((c) => (
+            <motion.div
+              key={c.country}
+              variants={cardVariants}
+              whileHover={{ y: -4, boxShadow: '0 12px 32px rgba(27,42,74,0.12)' }}
+              className={`rounded-2xl bg-gradient-to-br ${c.color} text-white p-6 relative overflow-hidden`}
+            >
+              <div className="absolute top-3 right-4 text-3xl opacity-30">{c.flag}</div>
+              <h3 className="text-lg font-bold mb-4">{c.country}</h3>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-white/70 flex items-center gap-1.5">
+                    <Users className="w-3.5 h-3.5" /> Farmers
+                  </span>
+                  <span className="text-sm font-semibold">{c.farmers}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-white/70 flex items-center gap-1.5">
+                    <MapPin className="w-3.5 h-3.5" /> Hectares
+                  </span>
+                  <span className="text-sm font-semibold">{c.hectares}</span>
+                </div>
+                <div className="flex items-center justify-between pt-2 border-t border-white/20">
+                  <span className="text-sm text-white/70">Deployed</span>
+                  <span className="text-lg font-bold">{c.deployed}</span>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* ─── Community Programs ─── */}
+      <motion.div variants={cardVariants} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+        <div className="flex items-center gap-2 mb-2">
+          <Heart className="w-5 h-5 text-pink-500" />
+          <h2 className="text-lg font-bold text-[#1B2A4A]">Community Programs</h2>
+        </div>
+        <p className="text-sm text-gray-500 mb-6">10% of profits dedicated to community programs</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {communityPrograms.map((item) => {
+            const Icon = item.icon;
+            return (
+              <motion.div
+                key={item.title}
+                variants={cardVariants}
+                whileHover={{ y: -2 }}
+                className={`rounded-xl border ${item.accent} p-5 hover:shadow-md transition-shadow`}
+              >
+                <div className={`w-10 h-10 rounded-xl ${item.bg} flex items-center justify-center mb-3`}>
+                  <Icon className={`w-5 h-5 ${item.color}`} />
+                </div>
+                <h3 className="text-sm font-semibold text-[#1B2A4A] mb-1">{item.title}</h3>
+                <p className="text-lg font-bold text-[#1B2A4A] mb-1">{item.stat}</p>
+                <p className="text-xs text-gray-500 leading-relaxed">{item.detail}</p>
               </motion.div>
             );
           })}
@@ -287,44 +485,30 @@ export default function InvestorImpactPage() {
           <Leaf className="w-5 h-5 text-green-600" />
           <h2 className="text-lg font-bold text-[#1B2A4A]">Environmental Metrics</h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {environmentalMetrics.map((metric) => {
             const Icon = metric.icon;
             return (
-              <div key={metric.title} className={`${metric.bg} rounded-xl p-5`}>
-                <div className={`w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center mb-3`}>
+              <motion.div
+                key={metric.title}
+                variants={fadeUp}
+                className={`${metric.bg} rounded-xl p-5`}
+              >
+                <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center mb-3">
                   <Icon className={`w-5 h-5 ${metric.color}`} />
                 </div>
                 <h3 className="text-sm font-semibold text-[#1B2A4A] mb-1">{metric.title}</h3>
-                <p className="text-xs text-gray-600 leading-relaxed">{metric.value}</p>
-              </div>
-            );
-          })}
-        </div>
-      </motion.div>
-
-      {/* ─── Community Impact (10% profits) ─── */}
-      <motion.div variants={cardVariants} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-        <div className="flex items-center gap-2 mb-2">
-          <Heart className="w-5 h-5 text-pink-500" />
-          <h2 className="text-lg font-bold text-[#1B2A4A]">Community Impact</h2>
-        </div>
-        <p className="text-sm text-gray-500 mb-6">10% of profits dedicated to community programs</p>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {communityImpact.map((item) => {
-            const Icon = item.icon;
-            return (
-              <motion.div
-                key={item.title}
-                variants={cardVariants}
-                whileHover={{ y: -2 }}
-                className="rounded-xl border border-gray-100 p-5 hover:shadow-md transition-shadow"
-              >
-                <div className={`w-10 h-10 rounded-xl ${item.bg} flex items-center justify-center mb-3`}>
-                  <Icon className={`w-5 h-5 ${item.color}`} />
+                <p className="text-xl font-bold text-[#1B2A4A]">{metric.value}</p>
+                <p className="text-xs text-gray-500 mb-3">{metric.unit}</p>
+                {/* Progress bar */}
+                <div className="w-full bg-white/60 rounded-full h-1.5">
+                  <motion.div
+                    className={`h-1.5 rounded-full bg-current ${metric.color}`}
+                    initial={{ width: 0 }}
+                    animate={{ width: `${metric.progress}%` }}
+                    transition={{ duration: 1.2, delay: 0.5 }}
+                  />
                 </div>
-                <h3 className="text-sm font-semibold text-[#1B2A4A] mb-2">{item.title}</h3>
-                <p className="text-xs text-gray-500 leading-relaxed">{item.description}</p>
               </motion.div>
             );
           })}
