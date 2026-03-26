@@ -31,6 +31,8 @@ import {
   GraduationCap,
   Coins,
   HelpCircle,
+  Scale,
+  Stethoscope,
 } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
@@ -76,6 +78,8 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   GraduationCap,
   Coins,
   Lock,
+  Scale,
+  Stethoscope,
 };
 
 // Bottom nav keys — always show core items regardless of tier

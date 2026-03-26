@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { DollarSign, Sprout, Factory, Handshake, Globe, GraduationCap } from "lucide-react";
+import { DollarSign, Sprout, Factory, Handshake, Globe, GraduationCap, Scale, Stethoscope } from "lucide-react";
 import { type LucideIcon } from "lucide-react";
 
 export const metadata = {
   title: "Services - AFU",
-  description: "Explore AFU's integrated services: Financing, Inputs, Processing, Offtake, Trade Finance, and Training.",
+  description: "Explore AFU's integrated services: Financing, Inputs, Processing, Offtake, Trade Finance, Training, Legal Assistance, and Veterinary Services.",
 };
 
 const services: { title: string; desc: string; features: string[]; link: string; icon: LucideIcon }[] = [
@@ -50,6 +50,20 @@ const services: { title: string; desc: string; features: string[]; link: string;
     link: "/services/training",
     icon: GraduationCap,
   },
+  {
+    title: "Legal Assistance",
+    desc: "Professional legal support covering land rights, contract review, dispute resolution, regulatory compliance, and cooperative governance across 20 African countries.",
+    features: ["Land rights & tenure", "Contract review", "Dispute resolution", "Regulatory compliance"],
+    link: "/services/legal-assistance",
+    icon: Scale,
+  },
+  {
+    title: "Veterinary Services",
+    desc: "On-farm veterinary care, vaccination programs, breeding support, nutrition advisory, and 24/7 emergency hotline through our network of 200+ qualified vets.",
+    features: ["On-farm vet visits", "Vaccination programs", "Breeding & genetics", "24/7 emergency line"],
+    link: "/services/veterinary",
+    icon: Stethoscope,
+  },
 ];
 
 export default function ServicesPage() {
@@ -63,7 +77,7 @@ export default function ServicesPage() {
             </span>
           </h1>
           <p className="text-xl text-gray-300 max-w-3xl">
-            Six integrated pillars that form the AFU flywheel. Each one strengthens the others.
+            Eight integrated pillars that form the AFU flywheel. Each one strengthens the others.
           </p>
         </div>
       </section>

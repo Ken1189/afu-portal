@@ -33,6 +33,8 @@ import {
   Blocks,
   Headphones,
   Mail,
+  Scale,
+  Stethoscope,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useAuth } from "@/lib/supabase/auth-context";
@@ -69,6 +71,8 @@ const moreServicesLinks = [
   { label: "Energy", href: "/services/energy", icon: Zap },
   { label: "Machinery", href: "/services/machinery", icon: Wrench },
   { label: "Farm Security", href: "/services/security", icon: Shield },
+  { label: "Legal Assistance", href: "/services/legal-assistance", icon: Scale },
+  { label: "Veterinary", href: "/services/veterinary", icon: Stethoscope },
 ];
 
 const educationLinks = [

@@ -55,6 +55,8 @@ import {
   Rocket,
   Tractor,
   BarChart3,
+  Scale as ScaleIcon,
+  Stethoscope,
 } from 'lucide-react';
 
 // ── Navigation structure with collapsible groups ──
@@ -122,6 +124,8 @@ const navGroups: NavGroup[] = [
       { href: '/admin/insurance', label: 'Insurance', icon: <Shield className="w-4 h-4" /> },
       { href: '/admin/crops', label: 'Crops', icon: <Sprout className="w-4 h-4" /> },
       { href: '/admin/livestock', label: 'Livestock', icon: <Beef className="w-4 h-4" /> },
+      { href: '/admin/legal-services', label: 'Legal Services', icon: <ScaleIcon className="w-4 h-4" /> },
+      { href: '/admin/veterinary', label: 'Veterinary', icon: <Stethoscope className="w-4 h-4" /> },
     ],
   },
   {

@@ -110,6 +110,8 @@ export default function Footer() {
               <Link href="/services/offtake" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">Guaranteed Offtake</Link>
               <Link href="/services/trade-finance" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">Trade Finance</Link>
               <Link href="/services/training" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">Training</Link>
+              <Link href="/services/legal-assistance" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">Legal Assistance</Link>
+              <Link href="/services/veterinary" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">Veterinary Services</Link>
             </div>
           </div>
 

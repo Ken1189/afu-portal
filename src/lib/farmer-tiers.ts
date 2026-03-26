@@ -68,6 +68,8 @@ export const FARM_SIDEBAR_ITEMS = [
   { href: '/farm/insurance', label: 'Insurance', icon: 'Shield', tier: 'growth' as FarmerTier },
   { href: '/farm/payments', label: 'Payments', icon: 'CreditCard', tier: 'growth' as FarmerTier },
   { href: '/farm/trade-finance', label: 'Trade Finance', icon: 'Ship', tier: 'growth' as FarmerTier },
+  { href: '/farm/legal', label: 'Legal Help', icon: 'Scale', tier: 'growth' as FarmerTier },
+  { href: '/farm/vet', label: 'Vet Services', icon: 'Stethoscope', tier: 'growth' as FarmerTier },
 
   // Harvest tier
   { href: '/farm/ai-tools', label: 'AI Tools', icon: 'Brain', tier: 'harvest' as FarmerTier },
