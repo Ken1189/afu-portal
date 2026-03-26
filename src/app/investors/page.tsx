@@ -33,7 +33,7 @@ import VideoCard from "@/components/VideoCard";
 export const metadata = {
   title: "Invest in AFU - $500M Seed Round | African Farming Union",
   description:
-    "Join AFU's $500M seed round to build Africa's first vertically integrated agriculture development bank. $1T market opportunity. De-risked, technology-enabled model across 10 countries.",
+    "Join AFU's $500M seed round to build Africa's first vertically integrated agriculture development bank. $1T market opportunity. De-risked, technology-enabled model across 20 countries.",
   openGraph: {
     title: "Invest in AFU - $500M Seed Round",
     description:
@@ -264,7 +264,7 @@ export default function InvestorsPage() {
                     desc: "AFU controls the full value chain — financing, inputs, processing, and offtake — creating compounding returns at every stage. No one else does this.",
                   },
                   {
-                    title: "10 Countries, One Platform",
+                    title: "20 Countries, One Platform",
                     desc: "Multi-country diversification de-risks exposure to any single market. Same playbook, different geographies, shared infrastructure.",
                   },
                   {

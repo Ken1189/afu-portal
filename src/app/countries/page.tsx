@@ -3,18 +3,18 @@ import Link from "next/link";
 export const metadata = {
   title: "Our Countries - AFU",
   description:
-    "AFU operates across 10 African countries: Botswana, Ghana, Kenya, Mozambique, Nigeria, South Africa, Tanzania, Uganda, Zambia, and Zimbabwe.",
+    "AFU operates across 20 African countries including Botswana, Ghana, Kenya, Mozambique, Nigeria, South Africa, Tanzania, Uganda, Zambia, Zimbabwe, Sierra Leone, Egypt, Ethiopia, Malawi, Namibia, Guinea, Guinea-Bissau, Liberia, Mali, and Ivory Coast.",
   openGraph: {
     title: "Our Countries - AFU",
     description:
-      "Ten strategic markets across Africa, each serving a distinct purpose in the AFU agricultural development platform.",
+      "Twenty strategic markets across Africa, each serving a distinct purpose in the AFU agricultural development platform.",
     url: "https://afu-portal.vercel.app/countries",
     images: [
       {
         url: "https://afu-portal.vercel.app/og-image.png",
         width: 1200,
         height: 630,
-        alt: "AFU Countries - 10 African Nations",
+        alt: "AFU Countries - 20 African Nations",
       },
     ],
   },
@@ -22,7 +22,7 @@ export const metadata = {
     card: "summary_large_image",
     title: "Our Countries - AFU",
     description:
-      "Ten strategic markets across Africa, each serving a distinct purpose in the AFU agricultural development platform.",
+      "Twenty strategic markets across Africa, each serving a distinct purpose in the AFU agricultural development platform.",
   },
 };
 
@@ -47,8 +47,8 @@ const countries = [
     flag: "🇲🇿",
     country: "Mozambique",
     role: "Southern Corridor",
-    desc: "Strategic port access for Southern African trade. Cashew, maize, and cassava production with export potential.",
-    highlights: ["Port of Maputo access", "Cashew nut exports", "Cross-border grain trade", "SADC corridor"],
+    desc: "Strategic port access for Southern African trade. Cashew, sesame, maize, cassava, and fruit production with export potential.",
+    highlights: ["Port of Maputo access", "Cashew nut & sesame exports", "Tropical fruit production", "Cross-border grain trade", "SADC corridor"],
     stat: "Port Access",
   },
   {
@@ -78,17 +78,17 @@ const countries = [
   {
     flag: "🇹🇿",
     country: "Tanzania",
-    role: "Scale Lane (Cassava + Sesame)",
-    desc: "Cassava for food security + processing potential. Sesame as an export commodity with fast turnover.",
-    highlights: ["Cassava processing", "Sesame exports", "Food security impact", "Fast capital turnover"],
+    role: "Scale Lane (Cassava, Sesame, Cashews & Coffee)",
+    desc: "Cassava for food security + processing potential. Sesame and cashews as export commodities. Growing coffee and avocado sectors with fast turnover.",
+    highlights: ["Cassava processing", "Sesame & cashew exports", "Coffee & avocado production", "Food security impact", "Fast capital turnover"],
     stat: "Scale",
   },
   {
     flag: "🇺🇬",
     country: "Uganda",
     role: "East African Breadbasket",
-    desc: "Major coffee exporter and food producer. Strong mobile money ecosystem with MTN and Airtel driving financial inclusion.",
-    highlights: ["Coffee & tea exports", "MTN Mobile Money", "Maize & banana production", "EAC trade hub"],
+    desc: "Major coffee and cashew exporter and food producer. Strong mobile money ecosystem with MTN and Airtel driving financial inclusion.",
+    highlights: ["Coffee, tea & cashew exports", "MTN Mobile Money", "Maize & banana production", "EAC trade hub"],
     stat: "Coffee #1",
   },
   {
@@ -107,6 +107,88 @@ const countries = [
     highlights: ["Blueberry export focus", "Structured buyer demand", "Escrow-based repayment", "Invoice finance ready"],
     stat: "Export",
   },
+  // ── East & Southern Africa Expansion (Planned) ──
+  {
+    flag: "🇸🇱",
+    country: "Sierra Leone",
+    role: "West African Agriculture Revival",
+    desc: "Emerging agricultural market with strong potential in rice, cocoa, and palm oil production. AFU is building partnerships to support farmer cooperatives.",
+    highlights: ["Rice & cocoa production", "Palm oil potential", "Cooperative development", "Post-conflict agricultural revival"],
+    stat: "Planned",
+  },
+  {
+    flag: "🇪🇬",
+    country: "Egypt",
+    role: "North African Agri Powerhouse",
+    desc: "Africa's largest agricultural economy with advanced irrigation infrastructure along the Nile. Strategic gateway to Middle Eastern and European export markets.",
+    highlights: ["Nile basin irrigation", "Citrus & cotton exports", "Gateway to MENA markets", "Advanced agri-infrastructure"],
+    stat: "Planned",
+  },
+  {
+    flag: "🇪🇹",
+    country: "Ethiopia",
+    role: "Coffee Origin & Highland Agriculture",
+    desc: "Birthplace of coffee and Africa's second most populous nation. Massive smallholder farming base with growing commercial agriculture sector.",
+    highlights: ["World's #5 coffee producer", "100M+ population market", "Highland grain production", "Flower export industry"],
+    stat: "Planned",
+  },
+  {
+    flag: "🇲🇼",
+    country: "Malawi",
+    role: "Warm Heart of Africa",
+    desc: "Tobacco diversification opportunity and growing tea, sugar, and legume sectors. Strong NGO ecosystem supporting smallholder development.",
+    highlights: ["Tobacco diversification", "Tea & sugar production", "Legume exports", "Smallholder focus"],
+    stat: "Planned",
+  },
+  {
+    flag: "🇳🇦",
+    country: "Namibia",
+    role: "Southern African Livestock & Horticulture",
+    desc: "Premium beef exports and emerging horticulture sector. Stable economy with strong governance and trade links to South Africa and the EU.",
+    highlights: ["Premium beef exports to EU", "Emerging grape & date farming", "SACU trade access", "Stable governance"],
+    stat: "Planned",
+  },
+  // ── West Africa Expansion (Planned) ──
+  {
+    flag: "🇬🇳",
+    country: "Republic of Guinea",
+    role: "West African Mining-to-Agriculture Transition",
+    desc: "Rich agricultural potential in rice, cassava, and tropical fruits. AFU aims to support the diversification away from mining dependency.",
+    highlights: ["Rice & cassava farming", "Tropical fruit potential", "Agricultural diversification", "ECOWAS trade access"],
+    stat: "Planned",
+  },
+  {
+    flag: "🇬🇼",
+    country: "Guinea-Bissau",
+    role: "Cashew Capital of West Africa",
+    desc: "World's fifth-largest cashew producer with agriculture as the backbone of the economy. Significant potential for value-added processing.",
+    highlights: ["Top 5 global cashew producer", "Cashew processing potential", "Rice production", "ECOWAS integration"],
+    stat: "Planned",
+  },
+  {
+    flag: "🇱🇷",
+    country: "Liberia",
+    role: "West African Rubber & Palm Oil Hub",
+    desc: "Major rubber and palm oil producer rebuilding its agricultural sector. Significant rainforest-based agriculture and cocoa potential.",
+    highlights: ["Rubber & palm oil exports", "Cocoa development", "Agricultural rebuilding", "Rainforest-based farming"],
+    stat: "Planned",
+  },
+  {
+    flag: "🇲🇱",
+    country: "Mali",
+    role: "Sahel Cotton & Grain Belt",
+    desc: "One of Africa's largest cotton producers and a major rice-growing nation along the Niger River. Key market for Sahel food security.",
+    highlights: ["Top African cotton producer", "Niger River rice farming", "Mango & shea exports", "Sahel food security"],
+    stat: "Planned",
+  },
+  {
+    flag: "🇨🇮",
+    country: "Ivory Coast",
+    role: "Global Cocoa & Cashew Leader",
+    desc: "World's largest cocoa producer and a leading cashew exporter. West Africa's economic powerhouse with the strongest agricultural GDP in the region.",
+    highlights: ["World's #1 cocoa producer", "Top 3 global cashew exporter", "Rubber & palm oil", "Strongest West African economy"],
+    stat: "Planned",
+  },
 ];
 
 export default function CountriesPage() {
@@ -124,7 +206,7 @@ export default function CountriesPage() {
             Our <span className="bg-gradient-to-r from-[#5DB347] to-[#6ABF4B] bg-clip-text text-transparent">Countries</span>
           </h1>
           <p className="text-xl text-gray-300 max-w-3xl">
-            Ten strategic markets across Africa, each serving a distinct purpose in the AFU flywheel.
+            Twenty strategic markets across Africa, each serving a distinct purpose in the AFU flywheel.
           </p>
           <div className="flex flex-wrap gap-3 mt-8">
             {countries.map((c) => (
@@ -197,7 +279,7 @@ export default function CountriesPage() {
               <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">
                 Join the Pan-African <span className="bg-gradient-to-r from-[#5DB347] to-[#6ABF4B] bg-clip-text text-transparent">Agricultural Revolution</span>
               </h3>
-              <p className="text-white/70 mb-8 max-w-lg mx-auto">10 countries. One integrated platform. Apply for membership or become a supplier today.</p>
+              <p className="text-white/70 mb-8 max-w-lg mx-auto">20 countries. One integrated platform. Apply for membership or become a supplier today.</p>
               <div className="flex flex-wrap gap-4 justify-center">
                 <Link
                   href="/apply"

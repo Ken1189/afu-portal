@@ -1,7 +1,7 @@
 /**
  * Payment Router
  * Smart routing of payments by country and payment method.
- * Maps each of the 10 AFU countries to their available payment providers.
+ * Maps each of the 20 AFU countries to their available payment providers.
  */
 
 import {
@@ -44,6 +44,17 @@ const COUNTRY_PROVIDERS: Record<string, CountryPaymentConfig> = {
   MZ: { mobileMoney: ['mpesa'], bankTransfer: true, card: true },
   SL: { mobileMoney: ['orange-money'], bankTransfer: true, card: true },
   UG: { mobileMoney: ['mtn-momo', 'airtel-money'], bankTransfer: true, card: true },
+  // Expansion countries (planned)
+  GH: { mobileMoney: ['mtn-momo'], bankTransfer: true, card: true },
+  EG: { mobileMoney: [], bankTransfer: true, card: true },
+  ET: { mobileMoney: [], bankTransfer: true, card: true },
+  MW: { mobileMoney: ['airtel-money'], bankTransfer: true, card: true },
+  NA: { mobileMoney: [], bankTransfer: true, card: true },
+  GN: { mobileMoney: ['orange-money', 'mtn-momo'], bankTransfer: true, card: true },
+  GW: { mobileMoney: ['orange-money'], bankTransfer: true, card: true },
+  LR: { mobileMoney: ['orange-money', 'mtn-momo'], bankTransfer: true, card: true },
+  ML: { mobileMoney: ['orange-money'], bankTransfer: true, card: true },
+  CI: { mobileMoney: ['orange-money', 'mtn-momo'], bankTransfer: true, card: true },
 };
 
 /**

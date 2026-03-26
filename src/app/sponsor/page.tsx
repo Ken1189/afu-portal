@@ -881,7 +881,7 @@ export default function SponsorPage() {
             that your company is transforming African agriculture at scale.
           </p>
           <p className="text-gray-500 mb-8">
-            Recognised across 10 countries. Reported quarterly. Fully transparent.
+            Recognised across 20 countries. Reported quarterly. Fully transparent.
           </p>
           <a
             href="mailto:partners@afu.org"

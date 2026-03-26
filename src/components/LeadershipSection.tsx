@@ -63,7 +63,7 @@ const boardOfDirectors: BoardMember[] = [
     name: 'Devon Kennaird',
     title: 'Co-Founder',
     org: 'African Farming Union',
-    bio: 'Technology leader and platform architect driving AFU\u2019s digital infrastructure. Built the full-stack agriculture operating system from the ground up \u2014 AI integration, 5 payment gateways, and real-time farm intelligence across 10 countries.',
+    bio: 'Technology leader and platform architect driving AFU\u2019s digital infrastructure. Built the full-stack agriculture operating system from the ground up \u2014 AI integration, 5 payment gateways, and real-time farm intelligence across 20 countries.',
     country: 'Canada',
     flag: '\u{1F1E8}\u{1F1E6}',
     linkedin: '#',

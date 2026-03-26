@@ -70,7 +70,7 @@ export async function getChatResponse(
   // --- How AFU works ---
   if (/how.*work|what.*do|what.*afu|about.*afu|tell.*more/.test(lowerMessage)) {
     return {
-      text: "AFU is a vertically integrated agriculture development platform. We connect farmers to everything they need:\n\n\u2022 **Financing** \u2014 Working capital, input finance, trade finance (SBLCs via our banking partners)\n\u2022 **Inputs** \u2014 Seeds, fertilizer, equipment at bulk pricing\n\u2022 **Insurance** \u2014 Crop, livestock, equipment (underwritten by Lloyd's of London)\n\u2022 **Off-take** \u2014 Guaranteed buyers for your harvest\n\u2022 **Training** \u2014 AI-powered advisory and progressive certification\n\u2022 **Trade Finance** \u2014 SBLCs and Letters of Credit for export\n\nWe operate across 10 African countries. Visit /services to learn more.",
+      text: "AFU is a vertically integrated agriculture development platform. We connect farmers to everything they need:\n\n\u2022 **Financing** \u2014 Working capital, input finance, trade finance (SBLCs via our banking partners)\n\u2022 **Inputs** \u2014 Seeds, fertilizer, equipment at bulk pricing\n\u2022 **Insurance** \u2014 Crop, livestock, equipment (underwritten by Lloyd's of London)\n\u2022 **Off-take** \u2014 Guaranteed buyers for your harvest\n\u2022 **Training** \u2014 AI-powered advisory and progressive certification\n\u2022 **Trade Finance** \u2014 SBLCs and Letters of Credit for export\n\nWe operate across 20 African countries. Visit /services to learn more.",
       suggestions: ['Membership options', 'Our services', 'Which countries?', 'Apply now'],
     };
   }
@@ -116,9 +116,9 @@ export async function getChatResponse(
   }
 
   // --- Countries ---
-  if (/countr|where|africa|zimbabwe|uganda|kenya|nigeria|ghana|tanzania|zambia|mozambique|botswana|south\s*africa/.test(lowerMessage)) {
+  if (/countr|where|africa|zimbabwe|uganda|kenya|nigeria|ghana|tanzania|zambia|mozambique|botswana|south\s*africa|sierra\s*leone|egypt|ethiopia|malawi|namibia|guinea|liberia|mali|ivory\s*coast|c[oô]te/.test(lowerMessage)) {
     return {
-      text: "AFU operates across 10 African countries:\n\nZimbabwe (pilot), Uganda, Ghana, Kenya, Tanzania, Nigeria, Zambia, Mozambique, South Africa, and Botswana.\n\nEach country has a dedicated team, local partnerships, and country-specific programs. Zimbabwe is our flagship market with the blueberry export project and Watson & Fine showcase farm.\n\nVisit /countries to explore each market.",
+      text: "AFU operates across 20 African countries:\n\n**Live:** Botswana, Zimbabwe, Tanzania, Kenya, South Africa\n**Pilot:** Nigeria, Zambia, Mozambique, Uganda\n**Planned:** Sierra Leone, Egypt, Ethiopia, Malawi, Namibia, Ghana, Republic of Guinea, Guinea-Bissau, Liberia, Mali, Ivory Coast\n\nEach country has a dedicated team, local partnerships, and country-specific programs. Zimbabwe is our flagship market with the blueberry export project and Watson & Fine showcase farm.\n\nVisit /countries to explore each market.",
       suggestions: ['Zimbabwe', 'Uganda', 'All countries', 'Our programs'],
     };
   }
@@ -157,7 +157,7 @@ export async function getChatResponse(
 
   // --- Default ---
   return {
-    text: "I can help you learn about AFU. Here are some topics:\n\n\u2022 How AFU works\n\u2022 Membership tiers and pricing\n\u2022 Investment opportunities ($500M seed round)\n\u2022 Insurance products (Lloyd's of London)\n\u2022 Trade finance (SBLCs, Letters of Credit)\n\u2022 Our 10 African countries\n\u2022 Sponsoring a farmer\n\u2022 Jobs marketplace\n\nWhat would you like to know?",
+    text: "I can help you learn about AFU. Here are some topics:\n\n\u2022 How AFU works\n\u2022 Membership tiers and pricing\n\u2022 Investment opportunities ($500M seed round)\n\u2022 Insurance products (Lloyd's of London)\n\u2022 Trade finance (SBLCs, Letters of Credit)\n\u2022 Our 20 African countries\n\u2022 Sponsoring a farmer\n\u2022 Jobs marketplace\n\nWhat would you like to know?",
     suggestions: ['How does AFU work?', 'Membership options', 'Investment opportunity', 'Insurance', 'Trade finance', 'Contact us'],
   };
 }

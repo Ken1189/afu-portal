@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------------
 // AFU Portal — Internationalization (i18n)
-// 14 Languages across 10 African countries
+// 14+ Languages across 20 African countries
 // ---------------------------------------------------------------------------
 
 export type Locale = 'en' | 'sn' | 'nd' | 'sw' | 'tn' | 'pt' | 'ha' | 'yo' | 'zu' | 'af' | 'bem' | 'kri' | 'lg';

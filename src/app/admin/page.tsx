@@ -828,7 +828,7 @@ export default function AdminDashboard() {
 
           {/* Country total summary */}
           <div className="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between">
-            <span className="text-xs text-gray-400">Total across 10 countries</span>
+            <span className="text-xs text-gray-400">Total across 20 countries</span>
             <span className="text-sm font-bold text-navy">{totalMemberCount} members</span>
           </div>
         </motion.div>

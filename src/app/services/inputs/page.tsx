@@ -86,7 +86,7 @@ const features = [
 
 const stats = [
   { value: "40%", label: "Average Cost Savings", sub: "vs. retail prices" },
-  { value: "10,000+", label: "Farmers Served", sub: "across 10 countries" },
+  { value: "10,000+", label: "Farmers Served", sub: "across 20 countries" },
   { value: "500+", label: "Supplier Partners", sub: "vetted & certified" },
   { value: "$25M+", label: "Inputs Distributed", sub: "in cumulative value" },
 ];

@@ -27,7 +27,7 @@ const programs: { icon: LucideIcon; title: string; description: string; highligh
     title: "School Farm Partnerships",
     description:
       "AFU partners with schools across our member countries to create learning gardens and mini-farms on school grounds. Students learn agriculture from planting to harvest while contributing fresh produce to their school communities.",
-    highlight: "Active in 9 countries",
+    highlight: "Active in 20 countries",
   },
   {
     icon: Trophy,

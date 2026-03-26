@@ -80,7 +80,7 @@ const features = [
     icon: MapPin,
     title: "Extension Officer Network",
     description:
-      "200+ field-based extension officers across 10 countries deliver in-person training, monitor farmer progress, and provide on-farm advisory services in local languages.",
+      "200+ field-based extension officers across 20 countries deliver in-person training, monitor farmer progress, and provide on-farm advisory services in local languages.",
   },
 ];
 

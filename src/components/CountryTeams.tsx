@@ -53,7 +53,7 @@ interface CountryTeam {
   members: TeamMember[];
 }
 
-/* ─── Data: 10 countries, 3-4 members each ─── */
+/* ─── Data: 20 countries, 3-4 members each ─── */
 
 const COUNTRY_TEAMS: CountryTeam[] = [
   {

@@ -21,8 +21,8 @@ const fallbackPrograms = [
     crop: 'Maize & Soya',
     status: 'Active',
     description:
-      'Food security crops cultivated across all 10 AFU operating countries. Building reliable staple supply chains connecting smallholder farmers to domestic and regional markets through aggregation, quality assurance, and guaranteed off-take.',
-    highlights: ['10 countries', 'Food security focus', '5,000+ smallholder target', 'Domestic & regional markets'],
+      'Food security crops cultivated across all 20 AFU operating countries. Building reliable staple supply chains connecting smallholder farmers to domestic and regional markets through aggregation, quality assurance, and guaranteed off-take.',
+    highlights: ['20 countries', 'Food security focus', '5,000+ smallholder target', 'Domestic & regional markets'],
   },
   {
     name: 'Sesame Export Program',

@@ -72,7 +72,7 @@ const sdgCards = [
     sdg: 17,
     title: 'Partnerships',
     color: '#19486A',
-    description: 'Cross-border cooperation across 10 African nations',
+    description: 'Cross-border cooperation across 20 African nations',
     icon: Handshake,
   },
 ];

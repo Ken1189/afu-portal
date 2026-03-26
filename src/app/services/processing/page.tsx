@@ -86,7 +86,7 @@ const features = [
 ];
 
 const stats = [
-  { value: "12", label: "Processing Hubs", sub: "planned across 10 countries" },
+  { value: "12", label: "Processing Hubs", sub: "planned across 20 countries" },
   { value: "3x", label: "Value Multiplication", sub: "raw to processed" },
   { value: "60%", label: "Waste Reduction", sub: "in post-harvest losses" },
   { value: "5,000+", label: "Tonnes Processed", sub: "annual capacity per hub" },

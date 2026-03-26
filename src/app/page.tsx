@@ -451,7 +451,7 @@ export default function Home() {
             </FadeInWhenVisible>
             <FadeInWhenVisible delay={0.3}>
               <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border-l-4 border-[#5DB347] shadow-lg shadow-[#5DB347]/5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                <CountStat target={247} suffix="+" label="active AFU members across 10 countries" />
+                <CountStat target={247} suffix="+" label="active AFU members across 20 countries" />
               </div>
             </FadeInWhenVisible>
           </div>
@@ -546,7 +546,7 @@ export default function Home() {
                 name: 'Maize & Soya Staples Program',
                 countries: 'Multi-country',
                 crop: 'Maize & Soya',
-                desc: 'Food security crops cultivated across all 10 AFU countries. Building reliable staple supply chains from smallholder to market.',
+                desc: 'Food security crops cultivated across all 20 AFU countries. Building reliable staple supply chains from smallholder to market.',
                 icon: Leaf,
               },
               {

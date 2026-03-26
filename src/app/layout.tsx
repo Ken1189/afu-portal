@@ -15,14 +15,14 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "African Farming Union (AFU) - Africa's Agriculture Development Platform",
   description:
-    "Pan-African agriculture development bank and operating platform. Financing, insurance, training, and market access for farmers across 10 countries.",
+    "Pan-African agriculture development bank and operating platform. Financing, insurance, training, and market access for farmers across 20 countries.",
   keywords: ["agriculture", "Africa", "farming", "financing", "trade finance", "agri-bank", "insurance", "training", "market access"],
   manifest: "/manifest.json",
   themeColor: "#5DB347",
   openGraph: {
     title: "African Farming Union (AFU) - Africa's Agriculture Development Platform",
     description:
-      "Pan-African agriculture development bank and operating platform. Financing, insurance, training, and market access for farmers across 10 countries.",
+      "Pan-African agriculture development bank and operating platform. Financing, insurance, training, and market access for farmers across 20 countries.",
     url: "https://afu-portal.vercel.app",
     siteName: "African Farming Union",
     images: [
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "African Farming Union (AFU) - Africa's Agriculture Development Platform",
     description:
-      "Pan-African agriculture development bank and operating platform. Financing, insurance, training, and market access for farmers across 10 countries.",
+      "Pan-African agriculture development bank and operating platform. Financing, insurance, training, and market access for farmers across 20 countries.",
     images: ["https://afu-portal.vercel.app/og-image.png"],
   },
   appleWebApp: {

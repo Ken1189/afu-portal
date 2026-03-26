@@ -91,6 +91,11 @@ const countries: Country[] = [
     status: 'pilot', members: 745, activeLoans: 63, revenueThisMonth: 11200,
   },
   {
+    iso: 'GH', name: 'Ghana', flag: '🇬🇭', currency: 'GHS',
+    paymentProviders: ['MTN MoMo', 'Vodafone Cash'], languages: ['English', 'Twi', 'Ga'],
+    status: 'pilot', members: 700, activeLoans: 58, revenueThisMonth: 12400,
+  },
+  {
     iso: 'SL', name: 'Sierra Leone', flag: '🇸🇱', currency: 'SLE',
     paymentProviders: ['Orange Money'], languages: ['Krio', 'English'],
     status: 'planned', members: 210, activeLoans: 0, revenueThisMonth: 0,
@@ -99,6 +104,53 @@ const countries: Country[] = [
     iso: 'UG', name: 'Uganda', flag: '🇺🇬', currency: 'UGX',
     paymentProviders: ['MTN Mobile Money', 'Airtel Money'], languages: ['English', 'Luganda', 'Swahili'],
     status: 'pilot', members: 620, activeLoans: 45, revenueThisMonth: 9800,
+  },
+  // ── East & Southern Africa Expansion ──
+  {
+    iso: 'EG', name: 'Egypt', flag: '🇪🇬', currency: 'EGP',
+    paymentProviders: ['Bank Transfer', 'Fawry'], languages: ['Arabic', 'English'],
+    status: 'planned', members: 0, activeLoans: 0, revenueThisMonth: 0,
+  },
+  {
+    iso: 'ET', name: 'Ethiopia', flag: '🇪🇹', currency: 'ETB',
+    paymentProviders: ['Telebirr', 'Bank Transfer'], languages: ['Amharic', 'English'],
+    status: 'planned', members: 0, activeLoans: 0, revenueThisMonth: 0,
+  },
+  {
+    iso: 'MW', name: 'Malawi', flag: '🇲🇼', currency: 'MWK',
+    paymentProviders: ['Airtel Money', 'TNM Mpamba'], languages: ['Chichewa', 'English'],
+    status: 'planned', members: 0, activeLoans: 0, revenueThisMonth: 0,
+  },
+  {
+    iso: 'NA', name: 'Namibia', flag: '🇳🇦', currency: 'NAD',
+    paymentProviders: ['Bank Transfer', 'MTC MoMo'], languages: ['English', 'Afrikaans', 'Oshiwambo'],
+    status: 'planned', members: 0, activeLoans: 0, revenueThisMonth: 0,
+  },
+  // ── West Africa Expansion ──
+  {
+    iso: 'GN', name: 'Republic of Guinea', flag: '🇬🇳', currency: 'GNF',
+    paymentProviders: ['Orange Money', 'MTN MoMo'], languages: ['French', 'Fula', 'Mandinka'],
+    status: 'planned', members: 0, activeLoans: 0, revenueThisMonth: 0,
+  },
+  {
+    iso: 'GW', name: 'Guinea-Bissau', flag: '🇬🇼', currency: 'XOF',
+    paymentProviders: ['Orange Money'], languages: ['Portuguese', 'Kriol'],
+    status: 'planned', members: 0, activeLoans: 0, revenueThisMonth: 0,
+  },
+  {
+    iso: 'LR', name: 'Liberia', flag: '🇱🇷', currency: 'LRD',
+    paymentProviders: ['Orange Money', 'MTN MoMo'], languages: ['English'],
+    status: 'planned', members: 0, activeLoans: 0, revenueThisMonth: 0,
+  },
+  {
+    iso: 'ML', name: 'Mali', flag: '🇲🇱', currency: 'XOF',
+    paymentProviders: ['Orange Money', 'Moov Money'], languages: ['French', 'Bambara'],
+    status: 'planned', members: 0, activeLoans: 0, revenueThisMonth: 0,
+  },
+  {
+    iso: 'CI', name: 'Ivory Coast', flag: '🇨🇮', currency: 'XOF',
+    paymentProviders: ['Orange Money', 'MTN MoMo', 'Moov Money'], languages: ['French'],
+    status: 'planned', members: 0, activeLoans: 0, revenueThisMonth: 0,
   },
 ];
 
@@ -137,7 +189,7 @@ export default function CountriesPage() {
   const pilotCount = countries.filter((c) => c.status === 'pilot').length;
 
   const summaryCards = [
-    { label: 'Total Countries', value: '9', icon: Globe2, accent: 'text-[#8CB89C]' },
+    { label: 'Total Countries', value: String(countries.length), icon: Globe2, accent: 'text-[#8CB89C]' },
     { label: 'Total Members', value: totalMembers.toLocaleString(), icon: Users, accent: 'text-[#D4A843]' },
     { label: 'Monthly Revenue', value: formatCurrency(totalRevenue), icon: TrendingUp, accent: 'text-emerald-400' },
     { label: 'Live / Pilot', value: `${liveCount} / ${pilotCount}`, icon: Radio, accent: 'text-[#8CB89C]' },

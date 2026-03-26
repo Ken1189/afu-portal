@@ -105,7 +105,7 @@ const countries: CountryData[] = [
       gdpAgriculture: "26.7%",
       arableLand: "15.2M ha",
       population: "65.5M",
-      keyCropsCount: 5,
+      keyCropsCount: 7,
     },
     operations: {
       services: ["Input Finance", "Processing", "Training", "Crop Insurance"],
@@ -115,13 +115,16 @@ const countries: CountryData[] = [
     crops: [
       { name: "Cassava", icon: "\u{1F360}" },
       { name: "Sesame", icon: "\u{1F33E}" },
+      { name: "Cashews", icon: "\u{1F95C}" },
+      { name: "Coffee", icon: "\u2615" },
+      { name: "Avocados", icon: "\u{1F951}" },
       { name: "Maize", icon: "\u{1F33D}" },
       { name: "Rice", icon: "\u{1F35A}" },
-      { name: "Cashews", icon: "\u{1F95C}" },
     ],
     highlights: [
       "Cassava processing for starch & flour",
-      "Sesame exports to Asia & Middle East",
+      "Sesame & cashew exports to Asia & Middle East",
+      "Growing coffee & avocado sectors",
       "Mobile money penetration above 60%",
       "EAC trade corridor access",
     ],
@@ -238,7 +241,7 @@ const countries: CountryData[] = [
       gdpAgriculture: "27.3%",
       arableLand: "5.6M ha",
       population: "33.9M",
-      keyCropsCount: 4,
+      keyCropsCount: 6,
     },
     operations: {
       services: ["Trade Finance", "Input Supply", "Processing", "Insurance"],
@@ -247,6 +250,8 @@ const countries: CountryData[] = [
     },
     crops: [
       { name: "Cashews", icon: "\u{1F95C}" },
+      { name: "Sesame", icon: "\u{1F33E}" },
+      { name: "Fruit", icon: "\u{1F34A}" },
       { name: "Maize", icon: "\u{1F33D}" },
       { name: "Cassava", icon: "\u{1F360}" },
       { name: "Coconut", icon: "\u{1F965}" },
@@ -254,6 +259,7 @@ const countries: CountryData[] = [
     highlights: [
       "Port of Maputo — key SADC trade gateway",
       "World-class cashew nut production & export",
+      "Sesame & tropical fruit expansion",
       "Cross-border grain trade infrastructure",
       "SADC corridor connecting landlocked nations",
     ],
@@ -337,7 +343,7 @@ const countries: CountryData[] = [
       gdpAgriculture: "24.1%",
       arableLand: "7.2M ha",
       population: "48.6M",
-      keyCropsCount: 5,
+      keyCropsCount: 6,
     },
     operations: {
       services: ["Coffee Finance", "Input Supply", "Training", "Crop Insurance"],
@@ -346,6 +352,7 @@ const countries: CountryData[] = [
     },
     crops: [
       { name: "Coffee", icon: "\u2615" },
+      { name: "Cashews", icon: "\u{1F95C}" },
       { name: "Tea", icon: "\u{1F375}" },
       { name: "Maize", icon: "\u{1F33D}" },
       { name: "Bananas", icon: "\u{1F34C}" },
@@ -353,14 +360,340 @@ const countries: CountryData[] = [
     ],
     highlights: [
       "Africa's top coffee exporter by volume",
+      "Growing cashew nut production & export",
       "MTN & Airtel mobile money for financial inclusion",
       "Maize & banana production feeding the EAC",
       "Strategic EAC trade hub positioning",
     ],
   },
+  // ── East & Southern Africa Expansion (Planned) ──
+  {
+    name: "Sierra Leone",
+    slug: "sierra-leone",
+    flag: "\u{1F1F8}\u{1F1F1}",
+    role: "West African Agriculture Revival",
+    heroImage: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1600&q=80",
+    description:
+      "Sierra Leone is an emerging agricultural market with strong potential in rice, cocoa, and palm oil production. AFU is building partnerships to support farmer cooperatives and drive post-conflict agricultural revival across the country.",
+    stats: {
+      gdpAgriculture: "60.7%",
+      arableLand: "5.4M ha",
+      population: "8.6M",
+      keyCropsCount: 4,
+    },
+    operations: {
+      services: ["Input Supply", "Training", "Cooperative Development"],
+      members: "Coming Soon",
+      paymentMethods: ["Orange Money", "Bank Transfer"],
+    },
+    crops: [
+      { name: "Rice", icon: "\u{1F35A}" },
+      { name: "Cocoa", icon: "\u{1F36B}" },
+      { name: "Palm Oil", icon: "\u{1F334}" },
+      { name: "Cassava", icon: "\u{1F360}" },
+    ],
+    highlights: [
+      "Rice self-sufficiency drive",
+      "Cocoa & palm oil export potential",
+      "Post-conflict agricultural rebuilding",
+      "Strong cooperative tradition",
+    ],
+  },
+  {
+    name: "Egypt",
+    slug: "egypt",
+    flag: "\u{1F1EA}\u{1F1EC}",
+    role: "North African Agri Powerhouse",
+    heroImage: "https://images.unsplash.com/photo-1539768942893-daf53e736b68?w=1600&q=80",
+    description:
+      "Egypt is Africa's largest agricultural economy with advanced irrigation infrastructure along the Nile. A strategic gateway to Middle Eastern and European export markets, Egypt offers established agri-finance systems and a large domestic market.",
+    stats: {
+      gdpAgriculture: "11.3%",
+      arableLand: "3.7M ha",
+      population: "109M",
+      keyCropsCount: 5,
+    },
+    operations: {
+      services: ["Trade Finance", "Input Supply", "Processing"],
+      members: "Coming Soon",
+      paymentMethods: ["Bank Transfer", "Fawry", "Card"],
+    },
+    crops: [
+      { name: "Cotton", icon: "\u{2601}\u{FE0F}" },
+      { name: "Citrus", icon: "\u{1F34A}" },
+      { name: "Rice", icon: "\u{1F35A}" },
+      { name: "Wheat", icon: "\u{1F33E}" },
+      { name: "Sugarcane", icon: "\u{1F33F}" },
+    ],
+    highlights: [
+      "Nile basin irrigation infrastructure",
+      "Citrus & cotton export powerhouse",
+      "Gateway to MENA & EU markets",
+      "Africa's largest agricultural GDP",
+    ],
+  },
+  {
+    name: "Ethiopia",
+    slug: "ethiopia",
+    flag: "\u{1F1EA}\u{1F1F9}",
+    role: "Coffee Origin & Highland Agriculture",
+    heroImage: "https://images.unsplash.com/photo-1523805009345-7448845a9e53?w=1600&q=80",
+    description:
+      "Ethiopia is the birthplace of coffee and Africa's second most populous nation. With a massive smallholder farming base and growing commercial agriculture sector, Ethiopia offers enormous scale potential for AFU's integrated platform.",
+    stats: {
+      gdpAgriculture: "36.3%",
+      arableLand: "15.1M ha",
+      population: "126M",
+      keyCropsCount: 5,
+    },
+    operations: {
+      services: ["Coffee Finance", "Input Supply", "Training"],
+      members: "Coming Soon",
+      paymentMethods: ["Telebirr", "Bank Transfer"],
+    },
+    crops: [
+      { name: "Coffee", icon: "\u2615" },
+      { name: "Teff", icon: "\u{1F33E}" },
+      { name: "Flowers", icon: "\u{1F33A}" },
+      { name: "Sesame", icon: "\u{1F33E}" },
+      { name: "Pulses", icon: "\u{1FAD8}" },
+    ],
+    highlights: [
+      "World's #5 coffee producer & origin of Arabica",
+      "126M population — massive domestic market",
+      "Highland grain & pulse production",
+      "Fast-growing flower export industry",
+    ],
+  },
+  {
+    name: "Malawi",
+    slug: "malawi",
+    flag: "\u{1F1F2}\u{1F1FC}",
+    role: "Warm Heart of Africa",
+    heroImage: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1600&q=80",
+    description:
+      "Malawi presents a tobacco diversification opportunity alongside growing tea, sugar, and legume sectors. A strong NGO ecosystem supporting smallholder development makes it ideal for AFU's cooperative-led model.",
+    stats: {
+      gdpAgriculture: "22.4%",
+      arableLand: "3.8M ha",
+      population: "20.4M",
+      keyCropsCount: 5,
+    },
+    operations: {
+      services: ["Input Supply", "Training", "Crop Insurance"],
+      members: "Coming Soon",
+      paymentMethods: ["Airtel Money", "TNM Mpamba", "Bank Transfer"],
+    },
+    crops: [
+      { name: "Tobacco", icon: "\u{1F33F}" },
+      { name: "Tea", icon: "\u{1F375}" },
+      { name: "Sugar", icon: "\u{1F33F}" },
+      { name: "Maize", icon: "\u{1F33D}" },
+      { name: "Legumes", icon: "\u{1FAD8}" },
+    ],
+    highlights: [
+      "Tobacco diversification into higher-value crops",
+      "Tea & sugar export sectors",
+      "Strong smallholder NGO ecosystem",
+      "Legume production for regional food security",
+    ],
+  },
+  {
+    name: "Namibia",
+    slug: "namibia",
+    flag: "\u{1F1F3}\u{1F1E6}",
+    role: "Southern African Livestock & Horticulture",
+    heroImage: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1600&q=80",
+    description:
+      "Namibia offers premium beef exports and an emerging horticulture sector. A stable economy with strong governance and trade links to South Africa and the EU makes it a reliable market for AFU's expansion.",
+    stats: {
+      gdpAgriculture: "6.2%",
+      arableLand: "0.8M ha",
+      population: "2.6M",
+      keyCropsCount: 4,
+    },
+    operations: {
+      services: ["Livestock Finance", "Trade Finance", "Insurance"],
+      members: "Coming Soon",
+      paymentMethods: ["Bank Transfer", "MTC MoMo", "Card"],
+    },
+    crops: [
+      { name: "Beef Cattle", icon: "\u{1F404}" },
+      { name: "Grapes", icon: "\u{1F347}" },
+      { name: "Dates", icon: "\u{1F334}" },
+      { name: "Maize", icon: "\u{1F33D}" },
+    ],
+    highlights: [
+      "Premium beef exports to EU markets",
+      "Emerging grape & date farming",
+      "SACU trade access & stable governance",
+      "Strong livestock sector infrastructure",
+    ],
+  },
+  // ── West Africa Expansion (Planned) ──
+  {
+    name: "Republic of Guinea",
+    slug: "republic-of-guinea",
+    flag: "\u{1F1EC}\u{1F1F3}",
+    role: "West African Mining-to-Agriculture Transition",
+    heroImage: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1600&q=80",
+    description:
+      "Guinea has rich agricultural potential in rice, cassava, and tropical fruits. AFU aims to support the country's diversification away from mining dependency through farmer cooperatives and input finance.",
+    stats: {
+      gdpAgriculture: "26.7%",
+      arableLand: "6.2M ha",
+      population: "14.2M",
+      keyCropsCount: 4,
+    },
+    operations: {
+      services: ["Input Supply", "Training", "Cooperative Development"],
+      members: "Coming Soon",
+      paymentMethods: ["Orange Money", "MTN MoMo", "Bank Transfer"],
+    },
+    crops: [
+      { name: "Rice", icon: "\u{1F35A}" },
+      { name: "Cassava", icon: "\u{1F360}" },
+      { name: "Tropical Fruit", icon: "\u{1F34A}" },
+      { name: "Palm Oil", icon: "\u{1F334}" },
+    ],
+    highlights: [
+      "Rice & cassava farming at scale",
+      "Tropical fruit export potential",
+      "Agricultural diversification from mining",
+      "ECOWAS trade corridor access",
+    ],
+  },
+  {
+    name: "Guinea-Bissau",
+    slug: "guinea-bissau",
+    flag: "\u{1F1EC}\u{1F1FC}",
+    role: "Cashew Capital of West Africa",
+    heroImage: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1600&q=80",
+    description:
+      "Guinea-Bissau is the world's fifth-largest cashew producer, with agriculture as the backbone of the economy. AFU sees significant potential for value-added cashew processing and rice production.",
+    stats: {
+      gdpAgriculture: "50.2%",
+      arableLand: "0.9M ha",
+      population: "2.1M",
+      keyCropsCount: 3,
+    },
+    operations: {
+      services: ["Cashew Finance", "Processing", "Training"],
+      members: "Coming Soon",
+      paymentMethods: ["Orange Money", "Bank Transfer"],
+    },
+    crops: [
+      { name: "Cashews", icon: "\u{1F95C}" },
+      { name: "Rice", icon: "\u{1F35A}" },
+      { name: "Palm Oil", icon: "\u{1F334}" },
+    ],
+    highlights: [
+      "Top 5 global cashew producer",
+      "Cashew processing value-addition potential",
+      "Rice self-sufficiency programmes",
+      "ECOWAS & Lusophone trade links",
+    ],
+  },
+  {
+    name: "Liberia",
+    slug: "liberia",
+    flag: "\u{1F1F1}\u{1F1F7}",
+    role: "West African Rubber & Palm Oil Hub",
+    heroImage: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1600&q=80",
+    description:
+      "Liberia is a major rubber and palm oil producer rebuilding its agricultural sector. With significant rainforest-based agriculture and cocoa potential, Liberia offers long-term development opportunities.",
+    stats: {
+      gdpAgriculture: "34.1%",
+      arableLand: "2.6M ha",
+      population: "5.4M",
+      keyCropsCount: 4,
+    },
+    operations: {
+      services: ["Input Supply", "Training", "Cooperative Development"],
+      members: "Coming Soon",
+      paymentMethods: ["Orange Money", "MTN MoMo", "Bank Transfer"],
+    },
+    crops: [
+      { name: "Rubber", icon: "\u{1F333}" },
+      { name: "Palm Oil", icon: "\u{1F334}" },
+      { name: "Cocoa", icon: "\u{1F36B}" },
+      { name: "Rice", icon: "\u{1F35A}" },
+    ],
+    highlights: [
+      "Rubber & palm oil export industries",
+      "Cocoa sector development",
+      "Post-conflict agricultural rebuilding",
+      "Rainforest-based sustainable farming",
+    ],
+  },
+  {
+    name: "Mali",
+    slug: "mali",
+    flag: "\u{1F1F2}\u{1F1F1}",
+    role: "Sahel Cotton & Grain Belt",
+    heroImage: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1600&q=80",
+    description:
+      "Mali is one of Africa's largest cotton producers and a major rice-growing nation along the Niger River. As a key market for Sahel food security, Mali represents a strategic entry point for AFU's West African expansion.",
+    stats: {
+      gdpAgriculture: "36.8%",
+      arableLand: "7.0M ha",
+      population: "22.6M",
+      keyCropsCount: 4,
+    },
+    operations: {
+      services: ["Cotton Finance", "Input Supply", "Training"],
+      members: "Coming Soon",
+      paymentMethods: ["Orange Money", "Moov Money", "Bank Transfer"],
+    },
+    crops: [
+      { name: "Cotton", icon: "\u{2601}\u{FE0F}" },
+      { name: "Rice", icon: "\u{1F35A}" },
+      { name: "Mango", icon: "\u{1F96D}" },
+      { name: "Shea", icon: "\u{1F333}" },
+    ],
+    highlights: [
+      "Top African cotton producer",
+      "Niger River irrigated rice farming",
+      "Mango & shea nut export potential",
+      "Sahel food security anchor market",
+    ],
+  },
+  {
+    name: "Ivory Coast",
+    slug: "ivory-coast",
+    flag: "\u{1F1E8}\u{1F1EE}",
+    role: "Global Cocoa & Cashew Leader",
+    heroImage: "https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=1600&q=80",
+    description:
+      "Ivory Coast (Cote d'Ivoire) is the world's largest cocoa producer and a leading cashew exporter. As West Africa's economic powerhouse with the strongest agricultural GDP in the region, it anchors AFU's West African strategy.",
+    stats: {
+      gdpAgriculture: "21.2%",
+      arableLand: "6.9M ha",
+      population: "28.9M",
+      keyCropsCount: 5,
+    },
+    operations: {
+      services: ["Cocoa Finance", "Cashew Processing", "Trade Finance", "Training"],
+      members: "Coming Soon",
+      paymentMethods: ["Orange Money", "MTN MoMo", "Moov Money", "Bank Transfer"],
+    },
+    crops: [
+      { name: "Cocoa", icon: "\u{1F36B}" },
+      { name: "Cashews", icon: "\u{1F95C}" },
+      { name: "Rubber", icon: "\u{1F333}" },
+      { name: "Palm Oil", icon: "\u{1F334}" },
+      { name: "Coffee", icon: "\u2615" },
+    ],
+    highlights: [
+      "World's #1 cocoa producer — 40%+ of global supply",
+      "Top 3 global cashew exporter",
+      "Rubber & palm oil diversification",
+      "Strongest economy in Francophone West Africa",
+    ],
+  },
 ];
 
-/* ─── Static params for all 10 slugs ─── */
+/* ─── Static params for all country slugs ─── */
 
 export function generateStaticParams() {
   return countries.map((c) => ({ slug: c.slug }));

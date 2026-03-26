@@ -1,7 +1,7 @@
 /**
  * Payment Gateway Infrastructure for AFU Portal
  * Abstract interfaces and types for multi-country payment processing
- * Serving 10 African countries: BW, ZW, TZ, KE, ZA, NG, ZM, MZ, SL, UG
+ * Serving 20 African countries: BW, ZW, TZ, KE, ZA, NG, ZM, MZ, SL, UG, GH, EG, ET, MW, NA, GN, GW, LR, ML, CI
  */
 
 export type PaymentProvider =
