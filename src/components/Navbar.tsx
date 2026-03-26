@@ -543,6 +543,12 @@ export default function Navbar() {
               <span className="text-sm">&#10084;&#65039;</span>
               Sponsor
             </Link>
+            <Link
+              href="/donate"
+              className="text-white font-semibold text-xs px-4 py-2 rounded-lg transition-colors flex items-center gap-1.5 whitespace-nowrap border border-white/20 hover:bg-white/10"
+            >
+              Donate
+            </Link>
           </div>
 
           {/* ── Desktop CTA ── */}
