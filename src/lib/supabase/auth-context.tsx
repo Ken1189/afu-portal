@@ -24,6 +24,7 @@ interface AuthContextType {
   profile: Profile | null;
   isLoading: boolean;
   isAdmin: boolean;
+  isSuperAdmin: boolean;
   isSupplier: boolean;
   isMember: boolean;
   signUp: (email: string, password: string, fullName: string) => Promise<{ error: Error | null }>;
@@ -135,6 +136,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // ── Role helpers ──────────────────────────────────────────────────────
 
+  const isSuperAdmin = profile?.role === 'super_admin';
   const isAdmin = profile?.role === 'admin' || profile?.role === 'super_admin';
   const isSupplier = profile?.role === 'supplier' || isAdmin;
   const isMember = profile?.role === 'member' || isAdmin;
@@ -147,6 +149,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         profile,
         isLoading,
         isAdmin,
+        isSuperAdmin,
         isSupplier,
         isMember,
         signUp,

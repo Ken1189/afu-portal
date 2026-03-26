@@ -51,6 +51,10 @@ import {
   Briefcase,
   Megaphone,
   FlaskConical,
+  ExternalLink,
+  Rocket,
+  Tractor,
+  BarChart3,
 } from 'lucide-react';
 
 // ── Navigation structure with collapsible groups ──
@@ -65,6 +69,7 @@ interface NavGroup {
   label: string;
   links: NavLink[];
   defaultOpen?: boolean;
+  superAdminOnly?: boolean;
 }
 
 const navGroups: NavGroup[] = [
@@ -93,9 +98,18 @@ const navGroups: NavGroup[] = [
       { href: '/admin/loans', label: 'Loan Management', icon: <HandCoins className="w-4 h-4" /> },
       { href: '/admin/payments', label: 'Payments', icon: <CreditCard className="w-4 h-4" /> },
       { href: '/admin/financial', label: 'Financial Overview', icon: <Landmark className="w-4 h-4" /> },
-      { href: '/admin/investor-relations', label: 'Investor Relations', icon: <Landmark className="w-4 h-4" /> },
       { href: '/admin/credit-scores', label: 'Credit Scoring', icon: <Gauge className="w-4 h-4" /> },
       { href: '/admin/trade-finance', label: 'Trade Finance', icon: <Ship className="w-4 h-4" /> },
+    ],
+  },
+  {
+    label: 'Investor Management',
+    defaultOpen: true,
+    superAdminOnly: true,
+    links: [
+      { href: '/admin/investor-relations', label: 'Investor Pipeline', icon: <Landmark className="w-4 h-4" /> },
+      { href: '/admin/investors', label: 'All Investors', icon: <Users className="w-4 h-4" /> },
+      { href: '/admin/investments', label: 'Total Investments', icon: <BarChart3 className="w-4 h-4" /> },
     ],
   },
   {
@@ -153,6 +167,18 @@ const navGroups: NavGroup[] = [
       { href: '/admin/notifications', label: 'Notifications', icon: <Bell className="w-4 h-4" /> },
       { href: '/admin/settings', label: 'Settings', icon: <Settings className="w-4 h-4" /> },
       { href: '/admin/run-migration', label: 'Run Migrations', icon: <Database className="w-4 h-4" /> },
+    ],
+  },
+  {
+    label: 'Switch Portal',
+    defaultOpen: false,
+    superAdminOnly: true,
+    links: [
+      { href: '/investor', label: 'Investor Portal', icon: <BarChart3 className="w-4 h-4" /> },
+      { href: '/investor/opportunities', label: 'Investment Opps', icon: <Rocket className="w-4 h-4" /> },
+      { href: '/farm', label: 'Farmer Portal', icon: <Tractor className="w-4 h-4" /> },
+      { href: '/dashboard', label: 'Member Dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
+      { href: '/', label: 'Public Website', icon: <ExternalLink className="w-4 h-4" /> },
     ],
   },
 ];
@@ -231,12 +257,16 @@ function SidebarContent({
   collapsedGroups,
   toggleGroup,
   onLinkClick,
+  isSuperAdmin = false,
 }: {
   pathname: string;
   collapsedGroups: Record<string, boolean>;
   toggleGroup: (label: string) => void;
   onLinkClick?: () => void;
+  isSuperAdmin?: boolean;
 }) {
+  const visibleGroups = navGroups.filter((g) => !g.superAdminOnly || isSuperAdmin);
+
   return (
     <>
       <div className="p-5 border-b border-white/10">
@@ -246,7 +276,7 @@ function SidebarContent({
       </div>
 
       <nav className="flex-1 px-3 py-3 space-y-1 overflow-y-auto scrollbar-hide">
-        {navGroups.map((group) => (
+        {visibleGroups.map((group) => (
           <NavSection
             key={group.label}
             group={group}
@@ -278,7 +308,7 @@ function SidebarContent({
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, profile, signOut, isLoading: authLoading, isAdmin } = useAuth();
+  const { user, profile, signOut, isLoading: authLoading, isAdmin, isSuperAdmin } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [roleChecked, setRoleChecked] = useState(false);
   const [authorized, setAuthorized] = useState(false);
@@ -352,6 +382,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           pathname={pathname}
           collapsedGroups={collapsedGroups}
           toggleGroup={toggleGroup}
+          isSuperAdmin={isSuperAdmin}
         />
       </aside>
 
@@ -378,6 +409,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 collapsedGroups={collapsedGroups}
                 toggleGroup={toggleGroup}
                 onLinkClick={() => setMobileOpen(false)}
+                isSuperAdmin={isSuperAdmin}
               />
             </motion.aside>
           </>
@@ -408,7 +440,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <div className="hidden sm:block">
                 <p className="text-sm font-medium text-navy leading-tight">{displayName}</p>
                 <p className="text-[10px] text-gray-400 leading-tight">
-                  {isAdmin ? 'Super Admin' : 'Admin'}
+                  {isSuperAdmin ? 'Super Admin' : 'Admin'}
                 </p>
               </div>
               <button
