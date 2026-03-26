@@ -2,8 +2,9 @@
 
 import Link from 'next/link';
 import { useEffect } from 'react';
+import { RefreshCw, Home } from 'lucide-react';
 
-export default function GlobalError({
+export default function Error({
   error,
   reset,
 }: {
@@ -15,34 +16,37 @@ export default function GlobalError({
   }, [error]);
 
   return (
-    <div className="min-h-screen bg-cream flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-to-b from-[#1B2A4A] to-[#0f1a30] flex items-center justify-center px-4">
       <div className="text-center max-w-md">
-        <div className="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-          <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
-          </svg>
+        <div className="w-16 h-16 bg-red-500/15 rounded-2xl flex items-center justify-center mx-auto mb-6">
+          <span className="text-3xl">⚠️</span>
         </div>
-        <h1 className="text-2xl font-bold text-navy mb-2">Something went wrong</h1>
-        <p className="text-gray-500 mb-6">
-          An unexpected error occurred. Our team has been notified.
+        <h1 className="text-2xl md:text-3xl font-bold text-white mb-3">Something Went Wrong</h1>
+        <p className="text-white/50 mb-8">
+          An unexpected error occurred. Our team has been notified and is working on a fix.
         </p>
         <div className="flex items-center justify-center gap-3">
           <button
             onClick={reset}
-            className="px-6 py-2.5 bg-[#5DB347] text-white rounded-xl font-medium hover:bg-[#449933] transition-colors"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-[#5DB347] text-white rounded-full font-semibold hover:bg-[#449933] transition-all hover:-translate-y-0.5 shadow-lg shadow-[#5DB347]/25"
           >
+            <RefreshCw className="w-4 h-4" />
             Try Again
           </button>
           <Link
             href="/"
-            className="px-6 py-2.5 border border-gray-200 text-gray-600 rounded-xl font-medium hover:bg-gray-50 transition-colors"
+            className="inline-flex items-center gap-2 px-6 py-3 border border-white/20 text-white rounded-full font-medium hover:bg-white/10 transition-all"
           >
+            <Home className="w-4 h-4" />
             Go Home
           </Link>
         </div>
         {error.digest && (
-          <p className="mt-6 text-xs text-gray-400">Error ID: {error.digest}</p>
+          <p className="mt-8 text-xs text-white/20">Error ID: {error.digest}</p>
         )}
+        <p className="mt-6 text-white/15 text-xs">
+          African Farming Union &middot; africanfarmingunion.org
+        </p>
       </div>
     </div>
   );

@@ -15,19 +15,19 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "African Farming Union (AFU) - Africa's Agriculture Development Platform",
   description:
-    "Pan-African agriculture development bank and operating platform. Financing, insurance, training, and market access for farmers across 20 countries.",
+    "By Farmers, For Farmers. Financing, insurance, legal assistance, veterinary services, training, and market access for farmers across 20 African countries.",
   keywords: ["agriculture", "Africa", "farming", "financing", "trade finance", "agri-bank", "insurance", "training", "market access"],
   manifest: "/manifest.json",
   themeColor: "#5DB347",
   openGraph: {
     title: "African Farming Union (AFU) - Africa's Agriculture Development Platform",
     description:
-      "Pan-African agriculture development bank and operating platform. Financing, insurance, training, and market access for farmers across 20 countries.",
-    url: "https://afu-portal.vercel.app",
+      "By Farmers, For Farmers. Financing, insurance, legal assistance, veterinary services, training, and market access for farmers across 20 African countries.",
+    url: "https://africanfarmingunion.org",
     siteName: "African Farming Union",
     images: [
       {
-        url: "https://afu-portal.vercel.app/og-image.png",
+        url: "https://africanfarmingunion.org/og-image.png",
         width: 1200,
         height: 630,
         alt: "African Farming Union - Pan-African Agriculture Development Platform",
@@ -40,8 +40,8 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "African Farming Union (AFU) - Africa's Agriculture Development Platform",
     description:
-      "Pan-African agriculture development bank and operating platform. Financing, insurance, training, and market access for farmers across 20 countries.",
-    images: ["https://afu-portal.vercel.app/og-image.png"],
+      "By Farmers, For Farmers. Financing, insurance, legal assistance, veterinary services, training, and market access for farmers across 20 African countries.",
+    images: ["https://africanfarmingunion.org/og-image.png"],
   },
   appleWebApp: {
     capable: true,

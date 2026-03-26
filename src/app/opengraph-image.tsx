@@ -156,7 +156,7 @@ export default async function Image() {
                 letterSpacing: '1px',
               }}
             >
-              10 Countries &nbsp;•&nbsp; $500M Seed Round
+              20 Countries &nbsp;•&nbsp; 1M+ Farmers &nbsp;•&nbsp; By Farmers, For Farmers
             </span>
           </div>
 
@@ -168,7 +168,7 @@ export default async function Image() {
               letterSpacing: '1px',
             }}
           >
-            afu.africa
+            africanfarmingunion.org
           </span>
         </div>
       </div>
