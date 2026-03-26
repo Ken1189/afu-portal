@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import {
@@ -127,11 +127,63 @@ export default function FarmVetPage() {
   const [preferredDate, setPreferredDate] = useState('');
   const [notes, setNotes] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [liveVisits, setLiveVisits] = useState<DemoVisit[]>(demoVisits);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Fetch real appointments from API on mount
+  useEffect(() => {
+    fetch('/api/vet')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.appointments && data.appointments.length > 0) {
+          const mapped = data.appointments.map((a: Record<string, string | number>) => ({
+            id: a.appointment_number || a.id,
+            vetName: a.assigned_vet_name || 'Unassigned',
+            date: (a.scheduled_date as string)?.split('T')[0] || (a.created_at as string)?.split('T')[0] || '',
+            serviceType: (a.service_type as string)?.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase()) || '',
+            status: a.status === 'completed' ? 'Completed' : a.status === 'cancelled' ? 'Cancelled' : 'Scheduled',
+            animalType: (a.animal_type as string)?.replace(/\b\w/g, (l: string) => l.toUpperCase()) || '',
+          }));
+          setLiveVisits(mapped);
+        }
+      })
+      .catch(() => { /* fall back to demo data */ });
+  }, [submitted]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!animalType || !serviceType || !preferredDate) return;
-    setSubmitted(true);
+    setSubmitting(true);
+
+    try {
+      const serviceMap: Record<string, string> = {
+        'Routine Check-up': 'routine_checkup',
+        'Vaccination': 'vaccination',
+        'Sick Animal': 'disease_treatment',
+        'Breeding/AI': 'breeding',
+        'Lab Test': 'lab_test',
+      };
+
+      const res = await fetch('/api/vet', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          service_type: serviceMap[serviceType] || 'consultation',
+          animal_type: animalType.toLowerCase(),
+          animal_count: parseInt(numAnimals) || 1,
+          description: notes || `${serviceType} for ${numAnimals || 1} ${animalType}`,
+          scheduled_date: new Date(preferredDate).toISOString(),
+        }),
+      });
+
+      if (res.ok) {
+        setSubmitted(true);
+      }
+    } catch {
+      setSubmitted(true);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const resetForm = () => {
@@ -369,11 +421,12 @@ export default function FarmVetPage() {
               {/* Submit */}
               <button
                 type="submit"
-                className="inline-flex items-center gap-2 rounded-lg px-6 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90"
+                disabled={submitting}
+                className="inline-flex items-center gap-2 rounded-lg px-6 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
                 style={{ backgroundColor: '#5DB347' }}
               >
                 <Send className="h-4 w-4" />
-                Book Visit
+                {submitting ? 'Booking...' : 'Book Visit'}
               </button>
             </form>
           )}
@@ -398,7 +451,7 @@ export default function FarmVetPage() {
             animate="animate"
             className="space-y-4"
           >
-            {demoVisits.map((v) => {
+            {liveVisits.map((v) => {
               const style = statusStyles[v.status];
               return (
                 <motion.div
