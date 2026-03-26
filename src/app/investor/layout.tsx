@@ -15,11 +15,13 @@ import {
   Menu,
   X,
   TrendingUp,
+  Rocket,
 } from 'lucide-react';
 import { useAuth } from '@/lib/supabase/auth-context';
 
 const navLinks = [
   { href: '/investor', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/investor/opportunities', label: 'Invest Now', icon: Rocket },
   { href: '/investor/portfolio', label: 'Portfolio', icon: Briefcase },
   { href: '/investor/documents', label: 'Documents', icon: FileText },
   { href: '/investor/updates', label: 'Updates', icon: Bell },
