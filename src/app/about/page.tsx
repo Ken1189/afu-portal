@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Sprout, Tractor, Building2, ShieldCheck, Settings, Globe, BarChart3, Lock, HeartHandshake, UtensilsCrossed, type LucideIcon } from "lucide-react";
+import { Sprout, Tractor, Building2, ShieldCheck, Settings, Globe, BarChart3, Lock, HeartHandshake, UtensilsCrossed, Heart, type LucideIcon } from "lucide-react";
 import LeadershipSection from "@/components/LeadershipSection";
 // CountryTeams removed — will be added when real team members are confirmed
 import VideoCard from "@/components/VideoCard";
@@ -57,9 +57,13 @@ export default function AboutPage() {
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
               About <span className="bg-gradient-to-r from-[#5DB347] to-[#6ABF4B] bg-clip-text text-transparent">AFU</span>
             </h1>
+            <p className="text-2xl font-semibold italic text-[#6ABF4B] mb-4">
+              By Farmers, For Farmers
+            </p>
             <p className="text-xl text-white/80 leading-relaxed mb-10">
               The African Farming Union is a vertically integrated agriculture development platform —
-              functioning as a specialized agri dev bank and full-stack execution engine for African farmers.
+              <strong className="text-white"> By Farmers, For Farmers</strong> — functioning as a specialized agri dev bank
+              and full-stack execution engine for African farmers.
               We finance the trade with SBLCs, Letters of Credit, and export pre-financing that unlock international markets.
             </p>
             {/* 3 stat pills — glassmorphism */}
@@ -283,28 +287,38 @@ export default function AboutPage() {
               {
                 Icon: HeartHandshake,
                 title: 'Women in Agriculture',
+                slug: 'women-in-agriculture',
                 desc: 'Supporting women farmers with training, financing, and mentorship. Across Africa, women produce most of the food but receive a fraction of the support. We\'re changing that — one farmer, one loan, one season at a time.',
               },
               {
                 Icon: UtensilsCrossed,
                 title: 'Feed a Child',
+                slug: 'feed-a-child',
                 desc: 'Ensuring food reaches those who need it most. When our farmers harvest, a portion goes directly to feeding programs in local communities. No child should go hungry in a continent that can feed the world.',
               },
               {
                 Icon: Sprout,
                 title: 'Young Farmers',
+                slug: 'young-farmers',
                 desc: 'Incubators, education, and entrepreneurship for the next generation. Africa\'s future belongs to its young people — we\'re giving them the tools, the training, and the capital to build farming businesses of their own.',
               },
-            ] as { Icon: LucideIcon; title: string; desc: string }[]).map((item) => (
+            ] as { Icon: LucideIcon; title: string; slug: string; desc: string }[]).map((item) => (
               <div
                 key={item.title}
-                className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl p-8 hover:-translate-y-1 hover:bg-white/10 transition-all duration-300"
+                className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl p-8 hover:-translate-y-1 hover:bg-white/10 transition-all duration-300 flex flex-col"
               >
                 <div className="w-12 h-12 rounded-xl bg-[#5DB347]/10 flex items-center justify-center mb-4">
                   <item.Icon className="w-6 h-6 text-[#5DB347]" />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-3">{item.title}</h3>
-                <p className="text-white/60 text-sm leading-relaxed">{item.desc}</p>
+                <p className="text-white/60 text-sm leading-relaxed mb-6 flex-1">{item.desc}</p>
+                <Link
+                  href={`/donate?program=${item.slug}`}
+                  className="inline-flex items-center justify-center gap-2 bg-[#5DB347] hover:bg-[#449933] text-white text-sm font-semibold px-6 py-3 rounded-full transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[#5DB347]/25"
+                >
+                  <Heart className="w-4 h-4" />
+                  Donate to This Program
+                </Link>
               </div>
             ))}
           </div>

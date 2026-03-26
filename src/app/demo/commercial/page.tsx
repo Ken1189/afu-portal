@@ -329,7 +329,7 @@ export default function CommercialDemoPage() {
                 buyer: "Cotton Company of Zimbabwe",
                 amount: "$45,000",
                 expiry: "September 2026",
-                bank: "Hamilton Reserve Bank",
+                bank: "AFU Banking Partner",
                 status: "Active",
                 statusColor: "text-emerald-600 bg-emerald-50",
               },
@@ -339,7 +339,7 @@ export default function CommercialDemoPage() {
                 buyer: "EuroCotton Trading, Netherlands",
                 amount: "$28,000",
                 expiry: "July 2026",
-                bank: "Hamilton Reserve Bank",
+                bank: "AFU Banking Partner",
                 status: "Active",
                 statusColor: "text-emerald-600 bg-emerald-50",
               },
@@ -349,7 +349,7 @@ export default function CommercialDemoPage() {
                 buyer: "Local Oil Processor",
                 amount: "$15,000",
                 expiry: "August 2026",
-                bank: "Hamilton Reserve Bank",
+                bank: "AFU Banking Partner",
                 status: "Disbursed",
                 statusColor: "text-blue-600 bg-blue-50",
               },
@@ -386,7 +386,7 @@ export default function CommercialDemoPage() {
           </div>
           <div className="mt-4 p-4 rounded-xl bg-[#EBF7E5]/50 border border-[#5DB347]/20">
             <p className="text-xs text-gray-600">
-              <span className="font-bold text-[#1B2A4A]">Banking Partner:</span> Hamilton Reserve Bank &middot;
+              <span className="font-bold text-[#1B2A4A]">Banking Partner:</span> AFU Banking Partner &middot;
               All trade finance instruments are structured and issued through our banking partnership, enabling
               cross-border agricultural trade across 15+ currencies.
             </p>

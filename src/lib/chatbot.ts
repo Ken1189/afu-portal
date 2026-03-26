@@ -70,7 +70,7 @@ export async function getChatResponse(
   // --- How AFU works ---
   if (/how.*work|what.*do|what.*afu|about.*afu|tell.*more/.test(lowerMessage)) {
     return {
-      text: "AFU is a vertically integrated agriculture development platform. We connect farmers to everything they need:\n\n\u2022 **Financing** \u2014 Working capital, input finance, trade finance (SBLCs via Hamilton Reserve)\n\u2022 **Inputs** \u2014 Seeds, fertilizer, equipment at bulk pricing\n\u2022 **Insurance** \u2014 Crop, livestock, equipment (underwritten by Lloyd's of London)\n\u2022 **Off-take** \u2014 Guaranteed buyers for your harvest\n\u2022 **Training** \u2014 AI-powered advisory and progressive certification\n\u2022 **Trade Finance** \u2014 SBLCs and Letters of Credit for export\n\nWe operate across 10 African countries. Visit /services to learn more.",
+      text: "AFU is a vertically integrated agriculture development platform. We connect farmers to everything they need:\n\n\u2022 **Financing** \u2014 Working capital, input finance, trade finance (SBLCs via our banking partners)\n\u2022 **Inputs** \u2014 Seeds, fertilizer, equipment at bulk pricing\n\u2022 **Insurance** \u2014 Crop, livestock, equipment (underwritten by Lloyd's of London)\n\u2022 **Off-take** \u2014 Guaranteed buyers for your harvest\n\u2022 **Training** \u2014 AI-powered advisory and progressive certification\n\u2022 **Trade Finance** \u2014 SBLCs and Letters of Credit for export\n\nWe operate across 10 African countries. Visit /services to learn more.",
       suggestions: ['Membership options', 'Our services', 'Which countries?', 'Apply now'],
     };
   }
@@ -110,7 +110,7 @@ export async function getChatResponse(
   // --- Trade Finance ---
   if (/trade\s*finance|sblc|letter\s*of\s*credit|export|import|warehouse\s*receipt/.test(lowerMessage)) {
     return {
-      text: "AFU provides trade finance via Hamilton Reserve Bank:\n\n\u2022 **Standby Letters of Credit (SBLCs)** \u2014 Guarantee your export deals\n\u2022 **Documentary Credits** \u2014 Secure international trade payments\n\u2022 **Export Pre-Financing** \u2014 Capital before shipment\n\u2022 **Warehouse Receipt Finance** \u2014 Borrow against stored commodity\n\u2022 **Foreign Exchange** \u2014 Competitive rates across African currencies\n\nVisit /services/finance/trade-finance for details.",
+      text: "AFU provides trade finance via our banking partners:\n\n\u2022 **Standby Letters of Credit (SBLCs)** \u2014 Guarantee your export deals\n\u2022 **Documentary Credits** \u2014 Secure international trade payments\n\u2022 **Export Pre-Financing** \u2014 Capital before shipment\n\u2022 **Warehouse Receipt Finance** \u2014 Borrow against stored commodity\n\u2022 **Foreign Exchange** \u2014 Competitive rates across African currencies\n\nVisit /services/finance/trade-finance for details.",
       suggestions: ['Trade finance page', 'Apply now', 'Contact us'],
     };
   }

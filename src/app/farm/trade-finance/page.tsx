@@ -46,7 +46,7 @@ const mockInstruments: TradeInstrument[] = [
     currency: 'USD',
     status: 'Active',
     detail: 'Expires Dec 2026',
-    bank: 'Hamilton Reserve Bank',
+    bank: 'AFU Banking Partner',
   },
   {
     id: 'TF-002',
@@ -407,7 +407,7 @@ export default function TradeFinancePage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[
             { step: 1, icon: FileText, title: 'Apply through AFU', desc: 'Submit your trade finance application with buyer details and shipment information.' },
-            { step: 2, icon: Landmark, title: 'Hamilton Reserve issues the instrument', desc: 'Our banking partner issues the SBLC, LC, or pre-finance arrangement.' },
+            { step: 2, icon: Landmark, title: 'Our banking partner issues the instrument', desc: 'Our banking partner issues the SBLC, LC, or pre-finance arrangement.' },
             { step: 3, icon: Package, title: 'Ship your goods with confidence', desc: 'Export your products knowing payment is secured by the instrument.' },
             { step: 4, icon: DollarSign, title: 'Buyer pays on delivery, you get paid', desc: 'Funds are released upon confirmed delivery, and you receive your payment.' },
           ].map((item) => {

@@ -164,7 +164,7 @@ const services = [
   {
     icon: CircleDollarSign,
     title: 'Trade Finance',
-    desc: 'SBLCs, Letters of Credit, export pre-financing, and FX services via Hamilton Reserve Bank.',
+    desc: 'SBLCs, Letters of Credit, export pre-financing, and FX services via our banking partners.',
     link: '/services/trade-finance',
     img: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800&q=80',
   },
@@ -1156,7 +1156,7 @@ export default function Home() {
                     },
                     {
                       title: 'Trade Finance Revenue Engine',
-                      desc: 'SBLCs, Letters of Credit, and export pre-financing via Hamilton Reserve Bank generate high-margin fee income while unlocking cross-border trade for farmers.',
+                      desc: 'SBLCs, Letters of Credit, and export pre-financing via our banking partners generate high-margin fee income while unlocking cross-border trade for farmers.',
                     },
                     {
                       title: 'Massive Addressable Market',
@@ -1445,7 +1445,7 @@ export default function Home() {
               {
                 icon: Scale,
                 title: 'We Finance the Trade',
-                desc: 'SBLCs and Letters of Credit that unlock export markets. Through our partnership with Hamilton Reserve Bank, we provide the trade finance instruments that turn harvests into international revenue.',
+                desc: 'SBLCs and Letters of Credit that unlock export markets. We provide the trade finance instruments that turn harvests into international revenue.',
               },
             ].map((item, i) => {
               const Icon = item.icon;

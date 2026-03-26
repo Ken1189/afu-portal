@@ -519,7 +519,7 @@ export default function FarmerDemoPage() {
                 </div>
                 <div className="flex justify-between py-2">
                   <span className="text-gray-500">Bank Partner</span>
-                  <span className="font-semibold text-[#5DB347]">Hamilton Reserve Bank</span>
+                  <span className="font-semibold text-[#5DB347]">AFU Banking Partner</span>
                 </div>
               </div>
             </div>
@@ -541,7 +541,7 @@ export default function FarmerDemoPage() {
                   <div className="w-7 h-7 bg-[#5DB347] text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">2</div>
                   <div>
                     <p className="text-sm font-semibold text-[#1B2A4A]">SBLC or Letter of Credit Issued</p>
-                    <p className="text-xs text-gray-500">Hamilton Reserve Bank issues the instrument</p>
+                    <p className="text-xs text-gray-500">Our banking partner issues the instrument</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3 p-3 rounded-xl bg-[#EBF7E5]/50 border border-[#5DB347]/10">

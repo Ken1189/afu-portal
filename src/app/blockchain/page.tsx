@@ -33,7 +33,7 @@ const roadmap = [
     title: "Platform Live — Traditional Finance Rails",
     items: [
       "Full digital platform operational across 9 countries",
-      "Traditional banking infrastructure via Hamilton Reserve",
+      "Traditional banking infrastructure via our banking partners",
       "Escrow-controlled loan disbursement and repayment",
       "Foundation laid for blockchain integration",
     ],

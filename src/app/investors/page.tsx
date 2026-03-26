@@ -273,7 +273,7 @@ export default function InvestorsPage() {
                   },
                   {
                     title: "Trade Finance Revenue Engine",
-                    desc: "SBLCs, Letters of Credit, export pre-financing, and FX services via Hamilton Reserve Bank generate high-margin fee income ($8M Year 3, $80M Year 5) while unlocking cross-border trade. Our highest-margin product line.",
+                    desc: "SBLCs, Letters of Credit, export pre-financing, and FX services via our banking partners generate high-margin fee income ($8M Year 3, $80M Year 5) while unlocking cross-border trade. Our highest-margin product line.",
                   },
                   {
                     title: "De-Risked Capital Deployment",
@@ -380,7 +380,7 @@ export default function InvestorsPage() {
               {
                 icon: CircleDollarSign,
                 title: "Trade Finance",
-                desc: "SBLCs, Letters of Credit, export pre-financing, and FX via Hamilton Reserve Bank. Our highest-margin product — projected $8M Year 3, $80M Year 5.",
+                desc: "SBLCs, Letters of Credit, export pre-financing, and FX via our banking partners. Our highest-margin product — projected $8M Year 3, $80M Year 5.",
                 color: "from-[#6ABF4B] to-[#5DB347]",
               },
               {
@@ -533,7 +533,7 @@ export default function InvestorsPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
                     {[
                       { name: "AFU Tech", desc: "Platform, AI, Data" },
-                      { name: "AFU Finance", desc: "Hamilton Reserve White-Label" },
+                      { name: "AFU Finance", desc: "White-Label Banking" },
                       { name: "AFU Insurance", desc: "Lloyd's Coverholder" },
                       { name: "AFU Agri", desc: "Watson & Fine, Projects" },
                       { name: "AFU Chain", desc: "EDMA Blockchain Layer" },

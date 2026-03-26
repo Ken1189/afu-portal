@@ -166,9 +166,11 @@ export default function ResearchCentresPage() {
             Research Centres
           </h1>
           <p className="text-xl text-gray-300 max-w-3xl leading-relaxed">
-            A network of specialised agricultural research centres across Africa,
-            driving innovation from the lab to the field. Each centre partners
-            with leading universities and international research organisations.
+            AFU is building its own network of specialised agricultural research and training
+            facilities across Africa, while also pursuing strategic partnerships with leading
+            universities and international research organisations. Our centres will drive
+            innovation from the lab to the field — combining AFU-led research with collaborative
+            programmes across the continent.
           </p>
         </div>
       </section>
@@ -252,7 +254,7 @@ export default function ResearchCentresPage() {
                   {centre.partner_institutions && centre.partner_institutions.length > 0 && (
                     <div>
                       <h4 className="text-sm font-semibold text-[#1B2A4A] mb-2">
-                        Partner Institutions
+                        Partnership Targets
                       </h4>
                       <div className="flex flex-wrap gap-2">
                         {centre.partner_institutions.map((p, j) => (

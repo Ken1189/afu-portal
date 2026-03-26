@@ -7,8 +7,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 const tiers = [
   {
     name: 'Smallholder',
-    priceMonthly: '$5',
-    priceAnnual: '$50',
+    priceMonthly: '$4.99',
+    priceAnnual: '$49',
     priceNote: 'per month',
     audience: 'Farms under 10 hectares',
     accent: 'border-[#5DB347] bg-[#EBF7E5]',
@@ -34,8 +34,8 @@ const tiers = [
   },
   {
     name: 'Commercial Bronze',
-    priceMonthly: '$42',
-    priceAnnual: '$500',
+    priceMonthly: '$49',
+    priceAnnual: '$490',
     priceNote: 'per year',
     audience: 'Growing commercial farms',
     accent: 'border-amber-600 bg-amber-50',
@@ -61,8 +61,8 @@ const tiers = [
   },
   {
     name: 'Commercial Gold',
-    priceMonthly: '$420',
-    priceAnnual: '$5,000',
+    priceMonthly: '$499',
+    priceAnnual: '$4,990',
     priceNote: 'per year',
     audience: 'Established commercial operations',
     accent: 'border-yellow-500 bg-yellow-50',
@@ -88,8 +88,8 @@ const tiers = [
   },
   {
     name: 'Commercial Platinum',
-    priceMonthly: '$835',
-    priceAnnual: '$10,000+',
+    priceMonthly: '$999',
+    priceAnnual: '$9,990',
     priceNote: 'per year',
     audience: 'Large-scale & estate operations',
     accent: 'border-slate-400 bg-slate-50',
@@ -115,9 +115,10 @@ const tiers = [
   },
   {
     name: 'Partner / Vendor',
-    priceMonthly: '$210',
-    priceAnnual: '$2,500+',
-    priceNote: 'per year',
+    priceMonthly: 'By Application',
+    priceAnnual: 'By Application',
+    priceNote: '',
+    byApplication: true,
     audience: 'Suppliers, offtakers, service providers',
     accent: 'border-purple-400 bg-purple-50',
     accentBadge: 'bg-purple-100 text-purple-700',
@@ -167,7 +168,7 @@ const faqs = [
   },
   {
     q: 'Is there a discount for annual billing?',
-    a: 'Yes, annual billing provides a 20% discount on all paid tiers. When you select annual billing during sign-up, you will see the discounted rate applied automatically. Annual plans are billed once per year.',
+    a: 'Yes, annual billing provides approximately 18% savings on all paid tiers. When you select annual billing during sign-up, you will see the discounted rate applied automatically. Annual plans are billed once per year.',
   },
   {
     q: 'How does the financing access limit work?',
@@ -175,7 +176,7 @@ const faqs = [
   },
   {
     q: 'Can I try before committing to a paid plan?',
-    a: 'Yes. When you apply for any membership, our team reviews your application and you can discuss the best tier for your needs. The Smallholder plan at $5 per month ($50 per year) is an affordable entry point, and you can upgrade to a Commercial tier as your operation grows.',
+    a: 'Yes. When you apply for any membership, our team reviews your application and you can discuss the best tier for your needs. The Smallholder plan at $4.99 per month ($49 per year) is an affordable entry point, and you can upgrade to a Commercial tier as your operation grows.',
   },
 ];
 
@@ -238,7 +239,7 @@ export default function MembershipsPage() {
             <span className={`text-sm font-medium ${isAnnual ? 'text-navy' : 'text-gray-400'}`}>
               Annual
               <span className="ml-1.5 text-xs font-bold text-[#5DB347] bg-[#5DB347]/10 px-2 py-0.5 rounded-full">
-                Save 20%
+                Save ~18%
               </span>
             </span>
           </div>
@@ -268,12 +269,14 @@ export default function MembershipsPage() {
                 </div>
 
                 <div className="mb-2">
-                  <span className="text-4xl font-bold text-navy">
+                  <span className={`font-bold text-navy ${('byApplication' in tier && tier.byApplication) ? 'text-2xl' : 'text-4xl'}`}>
                     {isAnnual ? tier.priceAnnual : tier.priceMonthly}
                   </span>
-                  <span className="text-sm text-gray-500 ml-1">
-                    /{isAnnual ? 'year' : 'month'}
-                  </span>
+                  {!('byApplication' in tier && tier.byApplication) && (
+                    <span className="text-sm text-gray-500 ml-1">
+                      /{isAnnual ? 'year' : 'month'}
+                    </span>
+                  )}
                 </div>
                 <p className="text-xs text-gray-500 mb-5">{tier.audience}</p>
 
@@ -312,15 +315,17 @@ export default function MembershipsPage() {
                 </ul>
 
                 <Link
-                  href="/apply"
+                  href={'byApplication' in tier && tier.byApplication ? '/contact' : '/apply'}
                   className={`block text-center px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 hover:scale-105 ${
                     tier.popular
                       ? 'text-white shadow-md shadow-[#5DB347]/20'
-                      : 'bg-navy/10 hover:bg-navy/20 text-navy'
+                      : 'byApplication' in tier && tier.byApplication
+                        ? 'bg-purple-600 hover:bg-purple-700 text-white'
+                        : 'bg-navy/10 hover:bg-navy/20 text-navy'
                   }`}
                   style={tier.popular ? { background: 'linear-gradient(135deg, #5DB347, #449933)' } : undefined}
                 >
-                  Get Started
+                  {'byApplication' in tier && tier.byApplication ? 'Contact Us' : 'Get Started'}
                 </Link>
               </div>
             ))}

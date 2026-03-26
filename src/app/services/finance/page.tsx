@@ -20,7 +20,7 @@ const products: { icon: LucideIcon; title: string; description: string; stat: st
     icon: Globe,
     title: "Trade Finance",
     description:
-      "SBLCs, Letters of Credit, export pre-financing, warehouse receipt finance, and FX services via Hamilton Reserve Bank. Our highest-margin product powering cross-border agricultural trade across Africa.",
+      "SBLCs, Letters of Credit, export pre-financing, warehouse receipt finance, and FX services via our banking partners. Our highest-margin product powering cross-border agricultural trade across Africa.",
     stat: "15+ currencies",
     link: "/services/finance/trade-finance",
   },

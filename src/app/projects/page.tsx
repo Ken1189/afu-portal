@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AlertTriangle } from "lucide-react";
 
 export const metadata = {
   title: "Projects & Investment Opportunities - AFU",
@@ -133,6 +134,18 @@ export default function ProjectsPage() {
         </div>
       </section>
 
+      {/* ─── Disclaimer Banner ─── */}
+      <section className="bg-amber-50 border-b border-amber-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5 shrink-0" />
+            <p className="text-sm text-amber-800 leading-relaxed">
+              <strong>Please note:</strong> Projects shown are in various stages of development. Partnership discussions are ongoing — references to organisations represent planned collaborations and do not imply confirmed agreements unless explicitly stated.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* ─── Current Projects ─── */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -178,7 +191,7 @@ export default function ProjectsPage() {
 
                     <div>
                       <h4 className="text-xs font-semibold text-[#1B2A4A] uppercase tracking-wider mb-2">
-                        Partners
+                        Planned Partners
                       </h4>
                       <div className="flex flex-wrap gap-2">
                         {project.partners.map((p, j) => (
@@ -186,7 +199,7 @@ export default function ProjectsPage() {
                             key={j}
                             className="bg-white text-[#1B2A4A] text-xs font-medium px-3 py-1.5 rounded-full shadow-sm border border-gray-100"
                           >
-                            {p}
+                            {p} <span className="text-amber-600 font-normal">(In Discussion)</span>
                           </span>
                         ))}
                       </div>
