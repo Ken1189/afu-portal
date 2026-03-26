@@ -47,7 +47,7 @@ export default function InvestorLayout({ children }: { children: React.ReactNode
   useEffect(() => {
     if (authLoading) return;
     if (!user) {
-      router.replace('/login?redirect=/investor');
+      router.replace('/investor-login');
       return;
     }
     fetch('/api/auth/me')
