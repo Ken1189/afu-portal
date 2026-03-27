@@ -264,12 +264,19 @@ export default function InvestorLayout({ children }: { children: React.ReactNode
             >
               <Menu className="w-5 h-5 text-[#1B2A4A]" />
             </button>
+            <Link href="/" className="p-2 rounded-lg hover:bg-gray-100 transition-colors" title="Back to AFU Home">
+              <Home className="w-5 h-5 text-[#1B2A4A]" />
+            </Link>
             <div>
               <h2 className="text-lg font-semibold text-[#1B2A4A]">Investor Portal</h2>
               <p className="text-xs text-gray-400">AFU Capital</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
+            <Link href="/admin" className="hidden sm:flex items-center gap-1.5 text-xs text-gray-500 hover:text-[#1B2A4A] transition-colors px-3 py-1.5 rounded-lg hover:bg-gray-100">
+              <ExternalLink className="w-3.5 h-3.5" />
+              Admin
+            </Link>
             <div className="w-8 h-8 bg-[#5DB347] rounded-full flex items-center justify-center">
               <span className="text-white text-xs font-bold">{initials}</span>
             </div>

@@ -1,0 +1,43 @@
+# African Farming Union - africanfarmingunion.org
+User-agent: *
+Allow: /
+
+# Block portal/admin areas from indexing
+Disallow: /admin
+Disallow: /admin/*
+Disallow: /farm
+Disallow: /farm/*
+Disallow: /investor
+Disallow: /investor/*
+Disallow: /supplier
+Disallow: /supplier/*
+Disallow: /dashboard
+Disallow: /dashboard/*
+Disallow: /api
+Disallow: /api/*
+Disallow: /investor-login
+Disallow: /onboarding
+Disallow: /demo
+Disallow: /demo/*
+
+# Allow public pages
+Allow: /about
+Allow: /services
+Allow: /services/*
+Allow: /education
+Allow: /education/*
+Allow: /countries
+Allow: /countries/*
+Allow: /jobs
+Allow: /jobs/*
+Allow: /programs
+Allow: /ambassadors
+Allow: /farms
+Allow: /partners
+Allow: /projects
+Allow: /memberships
+Allow: /donate
+Allow: /contact
+Allow: /legal/*
+
+Sitemap: https://africanfarmingunion.org/sitemap.xml

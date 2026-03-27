@@ -66,7 +66,7 @@ export default function CookieConsent() {
                   keep the site running; optional cookies help us understand
                   usage.{' '}
                   <Link
-                    href="/legal/cookies"
+                    href="/legal/privacy"
                     className="text-teal underline underline-offset-2 hover:text-teal-dark transition-colors"
                   >
                     Learn more
