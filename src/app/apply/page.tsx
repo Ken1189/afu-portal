@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useApplications } from "@/lib/supabase/use-applications";
 
 type Tier = "smallholder" | "commercial" | "enterprise" | "partner";
@@ -14,9 +15,12 @@ const tiers = {
 };
 
 export default function ApplyPage() {
+  const searchParams = useSearchParams();
+  const refCode = searchParams.get("ref");
   const [step, setStep] = useState(1);
   const [selectedTier, setSelectedTier] = useState<Tier | null>(null);
   const [submitted, setSubmitted] = useState(false);
+  const [referredBy, setReferredBy] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -32,6 +36,18 @@ export default function ApplyPage() {
 
   const { submitApplication } = useApplications();
   const [submitting, setSubmitting] = useState(false);
+
+  // Capture referral code from URL
+  useEffect(() => {
+    if (refCode) {
+      setReferredBy(refCode);
+      // Store in sessionStorage so it persists through the form
+      sessionStorage.setItem("afu_referral_code", refCode);
+    } else {
+      const stored = sessionStorage.getItem("afu_referral_code");
+      if (stored) setReferredBy(stored);
+    }
+  }, [refCode]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,6 +69,19 @@ export default function ApplyPage() {
 
     setSubmitting(false);
     if (!error) {
+      // Register referral if there's a referral code
+      const storedRef = referredBy || sessionStorage.getItem("afu_referral_code");
+      if (storedRef) {
+        fetch("/api/ambassadors", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "register-referral",
+            referral_code: storedRef,
+          }),
+        }).catch(() => {}); // Fire and forget
+        sessionStorage.removeItem("afu_referral_code");
+      }
       setSubmitted(true);
     }
   };
@@ -90,6 +119,11 @@ export default function ApplyPage() {
 
   return (
     <>
+      {referredBy && (
+        <div className="bg-[#5DB347] text-white text-center py-2.5 text-sm">
+          🎉 You were referred by a member! You&apos;ll both earn rewards when you join.
+        </div>
+      )}
       <section className="bg-navy text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-[#5DB347] to-[#6ABF4B] bg-clip-text text-transparent">Join Our Farming Family</h1>

@@ -1056,6 +1056,129 @@ export default function DashboardPage() {
           })}
         </div>
       </motion.div>
+
+      {/* ── Referral Programme ── */}
+      <ReferralCard />
     </div>
+  );
+}
+
+// ── Referral Card Component ──
+function ReferralCard() {
+  const [referralData, setReferralData] = useState<{
+    referral_code: string;
+    total_referrals: number;
+    total_earnings: number;
+    pending_earnings: number;
+    is_ambassador: boolean;
+    ambassador_tier: string | null;
+    share_url: string;
+  } | null>(null);
+  const [copied, setCopied] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/ambassadors?action=referral-code')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.referral_code) setReferralData(data);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  const copyCode = () => {
+    if (!referralData) return;
+    navigator.clipboard.writeText(referralData.share_url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  if (loading) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.3, duration: 0.4, ease: 'easeOut' as const }}
+      className="rounded-2xl border border-[#5DB347]/20 bg-gradient-to-r from-[#EBF7E5] to-white p-6"
+    >
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-8 h-8 rounded-lg bg-[#5DB347] flex items-center justify-center">
+              <Award className="w-4 h-4 text-white" />
+            </div>
+            <h3 className="text-base font-semibold text-[#1B2A4A]">
+              Refer &amp; Earn
+              {referralData?.is_ambassador && (
+                <span className="ml-2 text-xs px-2 py-0.5 bg-[#5DB347] text-white rounded-full">
+                  {referralData.ambassador_tier ? referralData.ambassador_tier.charAt(0).toUpperCase() + referralData.ambassador_tier.slice(1) : 'Ambassador'}
+                </span>
+              )}
+            </h3>
+          </div>
+          <p className="text-sm text-gray-500 max-w-md">
+            Share your referral link and earn <span className="font-semibold text-[#5DB347]">10% commission</span> on every membership fee your referrals pay. The more you refer, the more you earn.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3 flex-shrink-0">
+          {referralData && (
+            <>
+              <div className="text-center px-4">
+                <div className="text-xl font-bold text-[#1B2A4A]">{referralData.total_referrals}</div>
+                <div className="text-[10px] text-gray-400 uppercase tracking-wider">Referrals</div>
+              </div>
+              <div className="text-center px-4 border-l border-gray-200">
+                <div className="text-xl font-bold text-[#5DB347]">${referralData.total_earnings.toFixed(2)}</div>
+                <div className="text-[10px] text-gray-400 uppercase tracking-wider">Earned</div>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
+      {referralData && (
+        <div className="mt-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+          <div className="flex-1 flex items-center gap-2 bg-white rounded-xl border px-4 py-2.5">
+            <span className="text-xs text-gray-400">Your link:</span>
+            <span className="text-sm font-mono font-medium text-[#1B2A4A] truncate flex-1">
+              {referralData.share_url}
+            </span>
+          </div>
+          <button
+            onClick={copyCode}
+            className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+              copied
+                ? 'bg-[#5DB347] text-white'
+                : 'bg-[#1B2A4A] text-white hover:bg-[#243556]'
+            }`}
+          >
+            {copied ? '✓ Copied!' : 'Copy Link'}
+          </button>
+          <button
+            onClick={() => {
+              if (navigator.share) {
+                navigator.share({
+                  title: 'Join African Farming Union',
+                  text: 'Join AFU and access financing, insurance, training, and market access for your farm.',
+                  url: referralData.share_url,
+                });
+              }
+            }}
+            className="px-5 py-2.5 rounded-xl text-sm font-semibold border border-[#5DB347] text-[#5DB347] hover:bg-[#5DB347] hover:text-white transition-all sm:block hidden"
+          >
+            Share
+          </button>
+        </div>
+      )}
+
+      {referralData?.pending_earnings !== undefined && referralData.pending_earnings > 0 && (
+        <div className="mt-3 text-xs text-gray-500">
+          💰 You have <span className="font-semibold text-[#5DB347]">${referralData.pending_earnings.toFixed(2)}</span> in pending earnings
+        </div>
+      )}
+    </motion.div>
   );
 }
