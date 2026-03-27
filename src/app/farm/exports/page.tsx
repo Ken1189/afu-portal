@@ -644,7 +644,7 @@ export default function ExportHubPage() {
   const [historySearch, setHistorySearch] = useState('');
   const [liveShipments, setLiveShipments] = useState<ExportShipment[]>(exportShipments);
   const [liveDocs, setLiveDocs] = useState<ExportDocument[]>(exportDocuments);
-  const [dataLoading, setDataLoading] = useState(true);
+  const [_dataLoading, setDataLoading] = useState(true);
 
   useEffect(() => {
     const supabase = createClient();

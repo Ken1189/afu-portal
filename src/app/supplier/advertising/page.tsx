@@ -246,7 +246,7 @@ function CustomTooltip({
 export default function AdvertisingDashboard() {
   const { user } = useAuth();
   const [ads, setAds] = useState<Advertisement[]>(supplierAds);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
 
   // ── Fetch advertisements from Supabase ──────────────────────────────────
   useEffect(() => {
@@ -289,7 +289,7 @@ export default function AdvertisingDashboard() {
             setAds(mapped);
           }
         }
-      } catch (err) {
+      } catch (_err) {
         // Keep fallback demo data
       } finally {
         setLoading(false);

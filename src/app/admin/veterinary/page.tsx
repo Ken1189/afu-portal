@@ -223,7 +223,7 @@ export default function VeterinaryPage() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [vetAppointments, setVetAppointments] = useState<VetAppointment[]>(fallback_vetAppointments);
   const [statCounts, setStatCounts] = useState(fallback_statCounts);
-  const [isLoading, setIsLoading] = useState(true);
+  const [_isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const supabase = createClient();

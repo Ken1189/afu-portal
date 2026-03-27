@@ -140,7 +140,7 @@ export default function CreditScoresPage() {
   const [sortDir, setSortDir]     = useState<SortDir>('desc');
   const [members, setMembers]     = useState<Member[]>(fallback_members);
   const [recentOverrides, setRecentOverrides] = useState(fallback_recentOverrides);
-  const [isLoading, setIsLoading] = useState(true);
+  const [_isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const supabase = createClient();

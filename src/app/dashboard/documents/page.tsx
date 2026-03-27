@@ -86,7 +86,7 @@ export default function DocumentsPage() {
   const [showUpload, setShowUpload] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [documents, setDocuments] = useState<Document[]>(defaultDocuments);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
 
   // Fetch documents from Supabase
   useEffect(() => {

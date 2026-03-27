@@ -260,7 +260,7 @@ export default function InvestorImpactPage() {
   const [farmersCount, setFarmersCount] = useState<number | null>(null);
   const [hectares, setHectares] = useState<number | null>(null);
   const [countriesCount, setCountriesCount] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchStats() {

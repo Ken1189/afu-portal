@@ -81,7 +81,7 @@ export default function AdminAdvertisingPage() {
   const [expanded, setExpanded] = useState<string | null>(null);
   const [kpis, setKpis] = useState(fallback_kpis);
   const [ads, setAds] = useState(fallback_ads);
-  const [isLoading, setIsLoading] = useState(true);
+  const [_isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const supabase = createClient();

@@ -582,7 +582,7 @@ export default function AdminCompliancePage() {
   const [complianceIssues, setComplianceIssues] = useState<ComplianceIssue[]>(fallback_complianceIssues);
   const [certifications, setCertifications] = useState<Certification[]>(fallback_certifications);
   const [auditRecords, setAuditRecords] = useState<AuditRecord[]>(fallback_auditRecords);
-  const [isLoading, setIsLoading] = useState(true);
+  const [_isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const supabase = createClient();
@@ -666,7 +666,7 @@ export default function AdminCompliancePage() {
   // ── Filtered member compliance ────────────────────────────────────────
 
   const filteredMembers = useMemo(() => {
-    let results = memberCompliance.filter((m) => {
+    const results = memberCompliance.filter((m) => {
       if (countryFilter !== 'all' && m.country !== countryFilter) return false;
       if (statusFilter !== 'all' && m.status !== statusFilter) return false;
       if (scoreFilter === 'high' && m.complianceScore < 90) return false;

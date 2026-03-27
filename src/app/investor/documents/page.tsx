@@ -185,7 +185,7 @@ export default function DocumentsPage() {
   const [search, setSearch] = useState('');
   const [sortField, setSortField] = useState<SortField>('date');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
   const [showSortMenu, setShowSortMenu] = useState(false);
   const supabase = createClient();
 

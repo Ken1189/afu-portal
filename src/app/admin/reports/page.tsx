@@ -122,7 +122,7 @@ export default function AdminReportsPage() {
   const [quickReports] = useState(fallback_quickReports);
   const [savedReports] = useState(fallback_savedReports);
   const [scheduledState, setScheduledState] = useState(fallback_scheduledReports);
-  const [isLoading, setIsLoading] = useState(true);
+  const [_isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const supabase = createClient();

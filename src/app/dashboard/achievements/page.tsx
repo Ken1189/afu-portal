@@ -244,7 +244,7 @@ export default function AchievementsPage() {
   const [filter, setFilter] = useState<FilterTab>('all');
   const [categoryFilter, setCategoryFilter] = useState<BadgeCategory | 'all'>('all');
   const [earnedBadges, setEarnedBadges] = useState<EarnedBadge[]>(defaultEarnedBadges);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
 
   // Fetch earned badges from Supabase
   useEffect(() => {

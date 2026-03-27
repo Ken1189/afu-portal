@@ -288,7 +288,7 @@ export default function CommissionTracking() {
   const [selectedPeriod, setSelectedPeriod] = useState<Period>('all-time');
   const [showPayoutModal, setShowPayoutModal] = useState(false);
   const [liveCommissions, setLiveCommissions] = useState<Commission[]>(supplierCommissions);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
 
   // ── Fetch commissions from Supabase ─────────────────────────────────────
   useEffect(() => {
@@ -327,7 +327,7 @@ export default function CommissionTracking() {
             setLiveCommissions(mapped);
           }
         }
-      } catch (err) {
+      } catch (_err) {
         // Keep fallback demo data
       } finally {
         setLoading(false);

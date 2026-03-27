@@ -727,7 +727,7 @@ export default function LogisticsPage() {
   const [activeTab, setActiveTab] = useState<TabId>('bookings');
   const [statusFilter, setStatusFilter] = useState<BookingStatus | 'all'>('all');
   const [liveBookings, setLiveBookings] = useState<TransportBooking[]>(transportBookings);
-  const [dataLoading, setDataLoading] = useState(true);
+  const [_dataLoading, setDataLoading] = useState(true);
 
   useEffect(() => {
     const supabase = createClient();

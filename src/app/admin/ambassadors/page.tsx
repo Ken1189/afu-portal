@@ -222,7 +222,7 @@ function TagInput({
 
 export default function AdminAmbassadorsPage() {
   const [ambassadors, setAmbassadors] = useState<Ambassador[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);

@@ -228,7 +228,7 @@ export default function AdminProgramDetailPage() {
       }
       const data = await res.json();
       setProgram(data.program);
-    } catch (err) {
+    } catch (_err) {
       setError(err instanceof Error ? err.message : 'Failed to load program');
     } finally {
       setProgramLoading(false);
@@ -245,7 +245,7 @@ export default function AdminProgramDetailPage() {
       if (!res.ok) throw new Error('Failed to fetch enrollments');
       const data = await res.json();
       setEnrollments(data.enrollments ?? []);
-    } catch (err) {
+    } catch (_err) {
       console.error('Failed to fetch enrollments:', err);
     } finally {
       setEnrollmentsLoading(false);

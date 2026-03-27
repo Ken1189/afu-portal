@@ -158,7 +158,7 @@ const categoryOptions = [
 export default function SupplierProfilePage() {
   const { user } = useAuth();
   const [supplierId, setSupplierId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
 
   // -- Company details form state
   const [companyName, setCompanyName] = useState(currentSupplier.companyName);
@@ -219,7 +219,7 @@ export default function SupplierProfilePage() {
             setCertifications(supplier.certifications);
           }
         }
-      } catch (err) {
+      } catch (_err) {
         // Keep fallback
       } finally {
         setLoading(false);
@@ -245,7 +245,7 @@ export default function SupplierProfilePage() {
             description,
           })
           .eq('id', supplierId);
-      } catch (err) {
+      } catch (_err) {
         // Silent fallback
       }
     }
@@ -267,7 +267,7 @@ export default function SupplierProfilePage() {
             certifications,
           })
           .eq('id', supplierId);
-      } catch (err) {
+      } catch (_err) {
         // Silent fallback
       }
     }

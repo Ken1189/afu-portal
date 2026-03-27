@@ -174,7 +174,7 @@ export default function CountriesPage() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<CountryStatus | 'all'>('all');
   const [countries, setCountries] = useState<Country[]>(fallback_countries);
-  const [isLoading, setIsLoading] = useState(true);
+  const [_isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const supabase = createClient();

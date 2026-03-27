@@ -319,7 +319,7 @@ export default function CartPage() {
             }
           }
         }
-      } catch (err) {
+      } catch (_err) {
         console.error('Order creation error:', err);
       }
     }

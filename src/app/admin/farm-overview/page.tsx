@@ -115,7 +115,7 @@ export default function FarmOverviewPage() {
   const [livestock, setLivestock] = useState<LivestockSummary[]>(fallback_livestock);
   const [countryProduction, setCountryProduction] = useState<CountryProduction[]>(fallback_countryProduction);
   const [summary, setSummary] = useState(FALLBACK_SUMMARY);
-  const [isLoading, setIsLoading] = useState(true);
+  const [_isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const supabase = createClient();

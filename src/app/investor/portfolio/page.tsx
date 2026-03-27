@@ -96,7 +96,7 @@ const item = {
 export default function PortfolioPage() {
   const { user } = useAuth();
   const [investments, setInvestments] = useState<Investment[]>(demoInvestments);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
   const supabase = createClient();
 
   useEffect(() => {

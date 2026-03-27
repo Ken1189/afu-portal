@@ -281,7 +281,7 @@ export default function SupplierDetailPage() {
   const params = useParams();
   const id = params.id as string;
   const [supplier, setSupplier] = useState<SupplierRow | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabKey>('overview');
 
   // Fetch supplier from Supabase

@@ -1075,7 +1075,7 @@ function ReferralCard() {
     share_url: string;
   } | null>(null);
   const [copied, setCopied] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch('/api/ambassadors?action=referral-code')

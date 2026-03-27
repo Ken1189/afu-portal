@@ -617,7 +617,7 @@ function BookingContent() {
   const equipmentId = searchParams.get('id');
 
   const [liveEquipment, setLiveEquipment] = useState<FallbackEquipment[]>(FALLBACK_EQUIPMENT);
-  const [dataLoading, setDataLoading] = useState(true);
+  const [_dataLoading, setDataLoading] = useState(true);
 
   useEffect(() => {
     const supabase = createClient();

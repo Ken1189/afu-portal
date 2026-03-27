@@ -282,7 +282,7 @@ export default function SupplierAnalyticsPage() {
   const [dateRange, setDateRange] = useState<DateRange>('All Time');
   const [chartView, setChartView] = useState<ChartView>('Revenue');
   const [dateDropdownOpen, setDateDropdownOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
   const [liveRevenueTrend, setLiveRevenueTrend] = useState(revenueTrendData);
   const [liveTopProducts, setLiveTopProducts] = useState(topProductsData);
 
@@ -340,7 +340,7 @@ export default function SupplierAnalyticsPage() {
             if (topProds.length > 0) setLiveTopProducts(topProds);
           }
         }
-      } catch (err) {
+      } catch (_err) {
         // Keep fallback demo data
       } finally {
         setLoading(false);

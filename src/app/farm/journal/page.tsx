@@ -810,7 +810,7 @@ export default function FarmJournalPage() {
   const { t } = useLanguage();
   const { user } = useAuth();
   const [entries, setEntries] = useState<JournalEntry[]>(initialEntries);
-  const [dataLoading, setDataLoading] = useState(true);
+  const [_dataLoading, setDataLoading] = useState(true);
 
   useEffect(() => {
     const supabase = createClient();

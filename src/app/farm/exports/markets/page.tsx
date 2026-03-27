@@ -618,7 +618,7 @@ export default function ExportMarketsPage() {
   const { user } = useAuth();
   const [showIntelligence, setShowIntelligence] = useState(true);
   const [livePriceTrends, setLivePriceTrends] = useState<PriceTrend[]>(PRICE_TRENDS);
-  const [dataLoading, setDataLoading] = useState(true);
+  const [_dataLoading, setDataLoading] = useState(true);
 
   useEffect(() => {
     const supabase = createClient();

@@ -224,7 +224,7 @@ export default function CreateCampaign() {
           .eq('email', user?.email ?? '')
           .single();
         if (supplier) setSupplierId(supplier.id);
-      } catch (err) {
+      } catch (_err) {
         // Fallback: no supplier id
       }
     }
@@ -246,7 +246,7 @@ export default function CreateCampaign() {
           end_date: formData.endDate,
           target_countries: formData.countries,
         });
-      } catch (err) {
+      } catch (_err) {
         // Silent fallback — still show success UI
       }
     }

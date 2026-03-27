@@ -225,7 +225,7 @@ export default function AdminNewProgramPage() {
       }
 
       router.push('/admin/programs');
-    } catch (err) {
+    } catch (_err) {
       alert(err instanceof Error ? err.message : 'Failed to save program');
     } finally {
       setSaving(false);

@@ -135,7 +135,7 @@ export default function MemberDiscounts() {
   const { user } = useAuth();
   const [liveProducts, setLiveProducts] = useState<SupplierProduct[]>(myProducts);
   const [liveSupplier, setLiveSupplier] = useState(currentSupplier);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
 
   // ── Fetch products & supplier from Supabase ─────────────────────────────
   useEffect(() => {
@@ -186,7 +186,7 @@ export default function MemberDiscounts() {
             setLiveProducts(mapped);
           }
         }
-      } catch (err) {
+      } catch (_err) {
         // Keep fallback
       } finally {
         setLoading(false);

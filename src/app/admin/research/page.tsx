@@ -51,7 +51,7 @@ const emptyForm: FormData = {
 export default function AdminResearchPage() {
   const supabase = createClient();
   const [centres, setCentres] = useState<ResearchCentre[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);

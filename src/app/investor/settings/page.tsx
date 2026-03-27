@@ -125,7 +125,7 @@ function ChannelToggle({
 
 export default function InvestorSettingsPage() {
   const { user, profile, isLoading: authLoading } = useAuth();
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
 
   // Editable fields
   const [entityName, setEntityName] = useState('Watson Capital Partners');

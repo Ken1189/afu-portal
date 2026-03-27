@@ -96,7 +96,7 @@ function Toast({ message, type, onClose }: { message: string; type: 'success' | 
 
 export default function PartnershipsAdmin() {
   const [partners, setPartners] = useState<ManagedPartner[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);

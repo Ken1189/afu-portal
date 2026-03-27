@@ -148,7 +148,7 @@ export default function SupplierMarketplacePage() {
   const [selectedTier, setSelectedTier] = useState<MemberTier>('Smallholder');
   const tiers: MemberTier[] = ['Smallholder', 'Commercial', 'Enterprise'];
   const [liveProducts, setLiveProducts] = useState<SupplierProduct[]>(myProducts);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
 
   // ── Fetch products from Supabase ────────────────────────────────────────
   useEffect(() => {
@@ -191,7 +191,7 @@ export default function SupplierMarketplacePage() {
             setLiveProducts(mapped);
           }
         }
-      } catch (err) {
+      } catch (_err) {
         // Keep fallback demo data
       } finally {
         setLoading(false);

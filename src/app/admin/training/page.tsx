@@ -149,7 +149,7 @@ export default function AdminTrainingPage() {
   const [programs, setPrograms] = useState<Program[]>(fallback_programs);
   const [enrollments, setEnrollments] = useState<Enrollment[]>(fallback_enrollments);
   const [certificates, setCertificates] = useState<Certificate[]>(fallback_certificates);
-  const [isLoading, setIsLoading] = useState(true);
+  const [_isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const supabase = createClient();

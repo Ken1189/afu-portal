@@ -246,7 +246,7 @@ export default function SupplierReviewsPage() {
   const [responseText, setResponseText] = useState('');
   const [filterStars, setFilterStars] = useState<number | null>(null);
   const [showAllReviews, setShowAllReviews] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
   const [totalReviews, setTotalReviews] = useState(312);
   const [averageRating, setAverageRating] = useState(4.8);
 
@@ -289,7 +289,7 @@ export default function SupplierReviewsPage() {
             setReviews(mapped);
           }
         }
-      } catch (err) {
+      } catch (_err) {
         // Keep fallback demo data — table may not exist yet
       } finally {
         setLoading(false);

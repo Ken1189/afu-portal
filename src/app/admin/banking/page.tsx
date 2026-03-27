@@ -110,7 +110,7 @@ export default function AdminBankingPage() {
   const [systemAccounts, setSystemAccounts] = useState(fallback_systemAccounts);
   const [flags, setFlags] = useState(fallback_flags);
   const [reconRuns, setReconRuns] = useState(fallback_reconRuns);
-  const [isLoading, setIsLoading] = useState(true);
+  const [_isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const supabase = createClient();

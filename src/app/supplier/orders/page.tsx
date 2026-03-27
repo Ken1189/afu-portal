@@ -433,7 +433,7 @@ export default function SupplierOrdersPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [orders, setOrders] = useState<SupplierOrder[]>(supplierOrders);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
 
   // ── Fetch orders from Supabase ──────────────────────────────────────────
   useEffect(() => {
@@ -474,7 +474,7 @@ export default function SupplierOrdersPage() {
             setOrders(mapped);
           }
         }
-      } catch (err) {
+      } catch (_err) {
         // Keep fallback demo data
       } finally {
         setLoading(false);

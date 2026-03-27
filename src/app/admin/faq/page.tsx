@@ -73,7 +73,7 @@ function Toast({ message, type, onClose }: { message: string; type: 'success' | 
 
 export default function FaqAdmin() {
   const [items, setItems] = useState<FaqItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);

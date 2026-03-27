@@ -894,7 +894,7 @@ export default function AIToolsPage() {
   const { user } = useAuth();
   const [expandedTool, setExpandedTool] = useState<string | null>(null);
   const [liveDiagnosis, setLiveDiagnosis] = useState<DiagnosisResult>(mockDiagnosis);
-  const [dataLoading, setDataLoading] = useState(true);
+  const [_dataLoading, setDataLoading] = useState(true);
 
   useEffect(() => {
     // Attempt to fetch any AI diagnosis results from Supabase or an AI endpoint

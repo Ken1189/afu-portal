@@ -247,7 +247,7 @@ export default function ClaimsPage() {
   const ti = t.insurance;
 
   const [insuranceClaims, setInsuranceClaims] = useState<InsuranceClaim[]>(mockInsuranceClaims);
-  const [dataLoading, setDataLoading] = useState(true);
+  const [_dataLoading, setDataLoading] = useState(true);
 
   useEffect(() => {
     const supabase = createClient();

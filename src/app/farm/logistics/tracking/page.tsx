@@ -897,7 +897,7 @@ export default function TrackingPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showDelivered, setShowDelivered] = useState(false);
   const [liveBookings, setLiveBookings] = useState<TransportBooking[]>(transportBookings);
-  const [dataLoading, setDataLoading] = useState(true);
+  const [_dataLoading, setDataLoading] = useState(true);
 
   useEffect(() => {
     const supabase = createClient();

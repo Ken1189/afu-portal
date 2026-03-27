@@ -93,7 +93,7 @@ export default function EquipmentRegistryPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [equipment, setEquipment] = useState<EquipmentRecord[]>(fallback_equipment);
-  const [isLoading, setIsLoading] = useState(true);
+  const [_isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const supabase = createClient();

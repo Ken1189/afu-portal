@@ -98,7 +98,7 @@ export default function CropManagementPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [stageFilter, setStageFilter] = useState<StageFilter>('all');
   const [cropRecords, setCropRecords] = useState<CropRecord[]>(fallback_cropRecords);
-  const [isLoading, setIsLoading] = useState(true);
+  const [_isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const supabase = createClient();

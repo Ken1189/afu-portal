@@ -231,7 +231,7 @@ export default function SupplierOrderDetailPage() {
   const { user } = useAuth();
   const orderId = params.id as string;
   const [dbOrder, setDbOrder] = useState<SupplierOrder | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
 
   // ── Fetch single order from Supabase ─────────────────────────────────────
   useEffect(() => {
@@ -264,7 +264,7 @@ export default function SupplierOrderDetailPage() {
           };
           setDbOrder(mapped);
         }
-      } catch (err) {
+      } catch (_err) {
         // Fall back to static data
       } finally {
         setLoading(false);

@@ -110,7 +110,7 @@ function StarRating({ value, onChange, readonly = false }: { value: number; onCh
 
 export default function TestimonialsAdmin() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);

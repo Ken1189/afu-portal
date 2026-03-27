@@ -165,7 +165,7 @@ export default function ProfilePage() {
   // Extra data from members + kyc tables
   const [member, setMember] = useState<MemberRecord | null>(null);
   const [kycStatus, setKycStatus] = useState<string>('not_started');
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
 
   // ── Fetch member record + KYC ──
   const fetchExtras = useCallback(async () => {

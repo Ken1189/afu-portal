@@ -111,7 +111,7 @@ type PayoutMethod = 'Bank Transfer' | 'Mobile Money';
 
 export default function SupplierSettingsPage() {
   const { user } = useAuth();
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
 
   // -- Notification preferences
   const [notifNewOrders, setNotifNewOrders] = useState(true);
@@ -159,7 +159,7 @@ export default function SupplierSettingsPage() {
           if (meta.payoutThreshold) setPayoutThreshold(meta.payoutThreshold);
           if (meta.twoFactorEnabled !== undefined) setTwoFactorEnabled(meta.twoFactorEnabled);
         }
-      } catch (err) {
+      } catch (_err) {
         // Keep fallback defaults
       } finally {
         setLoading(false);
