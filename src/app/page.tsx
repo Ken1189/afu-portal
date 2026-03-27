@@ -215,18 +215,18 @@ const fallbackTestimonials = [
 
 /* ─── Partner logos (styled brand-color cards) ─── */
 const partners = [
-  { name: 'World Bank', initials: 'WB', color: '#009FDA' },
-  { name: 'AfDB', initials: 'AfDB', color: '#00A651' },
-  { name: 'FAO', initials: 'FAO', color: '#004B87' },
-  { name: 'AGRA', initials: 'AG', color: '#6DB33F' },
-  { name: 'Stanbic', initials: 'SB', color: '#003DA5' },
-  { name: 'FNB', initials: 'FNB', color: '#009681' },
-  { name: 'Safaricom', initials: 'SC', color: '#66BE29' },
-  { name: 'MTN', initials: 'MTN', color: '#FFCC00' },
-  { name: 'Corteva', initials: 'CV', color: '#00843D' },
-  { name: 'Syngenta', initials: 'SY', color: '#007934' },
-  { name: 'John Deere', initials: 'JD', color: '#367C2B' },
-  { name: 'Bayer', initials: 'BY', color: '#10384F' },
+  { name: 'Stripe', initials: 'ST', color: '#635BFF' },
+  { name: 'Supabase', initials: 'SB', color: '#3ECF8E' },
+  { name: 'Vercel', initials: 'VL', color: '#000000' },
+  { name: 'Google AI', initials: 'AI', color: '#4285F4' },
+  { name: 'M-Pesa', initials: 'MP', color: '#4CAF50' },
+  { name: 'EcoCash', initials: 'EC', color: '#0072BC' },
+  { name: 'MTN MoMo', initials: 'MTN', color: '#FFCC00' },
+  { name: 'Resend', initials: 'RS', color: '#000000' },
+  { name: 'Lloyd\'s', initials: 'LL', color: '#003DA5' },
+  { name: 'Airtel Money', initials: 'AM', color: '#ED1C24' },
+  { name: 'Orange Money', initials: 'OM', color: '#FF6600' },
+  { name: 'TypeScript', initials: 'TS', color: '#3178C6' },
 ];
 
 /* ─── How it works ─── */
@@ -892,7 +892,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeInWhenVisible>
             <p className="text-center text-sm font-semibold text-gray-400 uppercase tracking-wider mb-10">
-              Trusted by Leading Organizations
+              Powered By
             </p>
           </FadeInWhenVisible>
           <div className="overflow-hidden relative">
@@ -940,8 +940,8 @@ export default function Home() {
               {
                 tier: 'Smallholder',
                 name: 'Smallholder',
-                price: '$50',
-                period: '/year',
+                price: '$4.99',
+                period: '/month',
                 features: [
                   'Platform access & AI chatbot',
                   'Training & certification',
@@ -955,8 +955,8 @@ export default function Home() {
               {
                 tier: 'Bronze',
                 name: 'Commercial Bronze',
-                price: '$500',
-                period: '/year',
+                price: '$49',
+                period: '/month',
                 features: [
                   'Everything in Smallholder',
                   'Discounted inputs',
@@ -970,8 +970,8 @@ export default function Home() {
               {
                 tier: 'Gold',
                 name: 'Commercial Gold',
-                price: '$5,000',
-                period: '/year',
+                price: '$499',
+                period: '/month',
                 features: [
                   'Everything in Bronze',
                   'Equipment leasing priority',
@@ -985,8 +985,8 @@ export default function Home() {
               {
                 tier: 'Platinum',
                 name: 'Commercial Platinum',
-                price: '$10,000+',
-                period: '/year',
+                price: '$999',
+                period: '/month',
                 features: [
                   'Everything in Gold',
                   'Legal support',
@@ -1000,8 +1000,8 @@ export default function Home() {
               {
                 tier: 'Partner',
                 name: 'Partner / Vendor',
-                price: '$2,500+',
-                period: '/year',
+                price: 'Apply',
+                period: '',
                 features: [
                   'Directory listing',
                   'Co-branded programs',
@@ -1009,7 +1009,7 @@ export default function Home() {
                   'Deal flow access',
                   'Dedicated advisor',
                 ],
-                cta: 'Become a Partner',
+                cta: 'Contact Us',
                 highlight: false,
               },
             ].map((item) => (
