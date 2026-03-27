@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createClient } from '@/lib/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Stethoscope,
@@ -45,7 +46,7 @@ interface VetAppointment {
 
 // -- Demo Data ----------------------------------------------------------------
 
-const vetAppointments: VetAppointment[] = [
+const fallback_vetAppointments: VetAppointment[] = [
   {
     id: 'VET-001',
     farmerName: 'Kwame Asante',
@@ -188,7 +189,7 @@ const serviceTypeIcons: Record<ServiceType, React.ReactNode> = {
   'Lab Test': <FlaskConical className="w-3.5 h-3.5" />,
 };
 
-const statCounts = {
+const fallback_statCounts = {
   total: 156,
   upcoming: 23,
   completed: 121,
@@ -220,6 +221,46 @@ export default function VeterinaryPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<AppointmentStatus | 'All'>('All');
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [vetAppointments, setVetAppointments] = useState<VetAppointment[]>(fallback_vetAppointments);
+  const [statCounts, setStatCounts] = useState(fallback_statCounts);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const supabase = createClient();
+    async function fetchData() {
+      try {
+        const { data, error } = await supabase
+          .from('vet_appointments')
+          .select('*')
+          .order('date_scheduled', { ascending: false });
+        if (!error && data && data.length > 0) {
+          const mapped = data.map((row: Record<string, unknown>) => ({
+            id: (row.id as string) || '',
+            farmerName: (row.farmer_name as string) || 'Unknown',
+            farmLocation: (row.farm_location as string) || (row.country as string) || '',
+            animalType: ((row.animal_type as string) || 'Cattle') as AnimalType,
+            animalCount: (row.animal_count as number) || 0,
+            serviceType: ((row.service_type as string) || 'Routine Check') as ServiceType,
+            description: (row.description as string) || '',
+            status: ((row.status as string) || 'Scheduled') as AppointmentStatus,
+            assignedVet: (row.assigned_vet as string) || 'Unassigned',
+            dateScheduled: ((row.date_scheduled as string) || '')?.split('T')[0] || '',
+            priority: ((row.priority as string) || 'Normal') as AppointmentPriority,
+            notes: (row.notes as string) || '',
+          }));
+          setVetAppointments(mapped);
+          setStatCounts({
+            total: mapped.length,
+            upcoming: mapped.filter(a => a.status === 'Scheduled').length,
+            completed: mapped.filter(a => a.status === 'Completed').length,
+            emergencyActive: mapped.filter(a => a.status === 'Emergency').length,
+          });
+        }
+      } catch { /* fallback */ }
+      setIsLoading(false);
+    }
+    fetchData();
+  }, []);
 
   const statusFilters: (AppointmentStatus | 'All')[] = [
     'All',

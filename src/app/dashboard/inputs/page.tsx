@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import {
@@ -22,7 +22,10 @@ import {
   PackageSearch,
   Leaf,
   FileText,
+  Loader2,
 } from 'lucide-react';
+import { useAuth } from '@/lib/supabase/auth-context';
+import { createClient } from '@/lib/supabase/client';
 /* ------------------------------------------------------------------ */
 /*  Product type & data (inlined from @/lib/data/products)              */
 /* ------------------------------------------------------------------ */
@@ -41,7 +44,7 @@ interface Product {
   rating: number;
 }
 
-const products: Product[] = [
+const defaultProducts: Product[] = [
   { id: 'PRD-001', name: 'Premium Blueberry Seedlings (Duke)', category: 'Seeds & Seedlings', description: 'High-yield Duke variety blueberry seedlings, adapted for sub-Saharan climate. 12-month tissue culture plants.', price: 3.50, unit: 'per plant', image: 'https://images.unsplash.com/photo-1498579809087-ef1e558fd1da?w=400&h=300&fit=crop', availability: 'in-stock', recommendedCrops: ['Blueberries'], supplier: 'AgriPlant Zimbabwe', rating: 4.8 },
   { id: 'PRD-002', name: 'Blueberry Starter Bundle', category: 'Seeds & Seedlings', description: 'Complete starter kit: 500 seedlings, mycorrhizal inoculant, pH test kit, and planting guide.', price: 2200, unit: 'per bundle', image: 'https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=400&h=300&fit=crop', availability: 'in-stock', recommendedCrops: ['Blueberries'], supplier: 'AgriPlant Zimbabwe', rating: 4.9 },
   { id: 'PRD-003', name: 'Cassava Stem Cuttings (TMS 30572)', category: 'Seeds & Seedlings', description: 'Disease-resistant cassava variety with high starch content. Suitable for both food and industrial processing.', price: 0.15, unit: 'per cutting', image: 'https://images.unsplash.com/photo-1590682680695-43b964a3ae17?w=400&h=300&fit=crop', availability: 'in-stock', recommendedCrops: ['Cassava'], supplier: 'Tanzania Seed Agency', rating: 4.5 },
@@ -221,9 +224,9 @@ function ctaLabel(avail: Availability) {
   }
 }
 
-function countByCategory(cat: Category | 'all'): number {
-  if (cat === 'all') return products.length;
-  return products.filter((p) => p.category === cat).length;
+function countByCategory(cat: Category | 'all', productList: Product[]): number {
+  if (cat === 'all') return productList.length;
+  return productList.filter((p) => p.category === cat).length;
 }
 
 /* ------------------------------------------------------------------ */
@@ -261,6 +264,9 @@ function StarRating({ rating }: { rating: number }) {
 /* ------------------------------------------------------------------ */
 
 export default function InputsMarketplacePage() {
+  const { user } = useAuth();
+  const supabase = createClient();
+
   /* -- State -- */
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<Category | 'all'>('all');
@@ -269,6 +275,48 @@ export default function InputsMarketplacePage() {
   const [cartOpen, setCartOpen] = useState(false);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
+  const [products, setProducts] = useState<Product[]>(defaultProducts);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch products from Supabase
+  useEffect(() => {
+    let cancelled = false;
+    async function fetchProducts() {
+      setLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('products')
+          .select('*')
+          .eq('is_active', true)
+          .order('created_at', { ascending: false });
+
+        if (!cancelled && data && data.length > 0) {
+          const mapped: Product[] = data.map((p: Record<string, unknown>) => ({
+            id: (p.id as string) || '',
+            name: (p.name as string) || 'Unnamed Product',
+            category: ((p.category as string) || 'Equipment') as Product['category'],
+            description: (p.description as string) || '',
+            price: (p.price as number) || 0,
+            unit: (p.unit as string) || 'per unit',
+            image: (p.image_url as string) || (p.image as string) || 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop',
+            availability: ((p.availability as string) || 'in-stock') as Product['availability'],
+            recommendedCrops: Array.isArray(p.recommended_crops) ? p.recommended_crops as string[] : [],
+            supplier: (p.supplier as string) || (p.supplier_name as string) || 'AFU Marketplace',
+            rating: (p.rating as number) || 4.0,
+          }));
+          setProducts(mapped);
+        }
+        // If no data returned, keep the default products as fallback
+      } catch {
+        // Supabase fetch failed — keep default products as fallback
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    fetchProducts();
+    return () => { cancelled = true; };
+  }, [supabase]);
 
   /* -- Cart helpers -- */
   const cartCount = useMemo(() => cart.reduce((sum, i) => sum + i.quantity, 0), [cart]);
@@ -309,7 +357,7 @@ export default function InputsMarketplacePage() {
 
   /* -- Filtered & sorted products -- */
   const filteredProducts = useMemo(() => {
-    let result = [...products];
+    let result: Product[] = [...products];
 
     // Search
     if (searchQuery.trim()) {
@@ -356,6 +404,14 @@ export default function InputsMarketplacePage() {
   /* ---------------------------------------------------------------- */
   /*  Render                                                          */
   /* ---------------------------------------------------------------- */
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="w-8 h-8 text-teal animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="relative min-h-screen">
@@ -444,7 +500,7 @@ export default function InputsMarketplacePage() {
         {categoryMeta.map((cat) => {
           const Icon = cat.icon;
           const isActive = selectedCategory === cat.value;
-          const count = countByCategory(cat.value);
+          const count = countByCategory(cat.value, products);
           return (
             <button
               key={cat.value}

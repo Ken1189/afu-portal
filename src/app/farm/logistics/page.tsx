@@ -1,7 +1,9 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '@/lib/supabase/auth-context';
+import { createClient } from '@/lib/supabase/client';
 import {
   Truck,
   Plus,
@@ -721,24 +723,63 @@ function CarriersTab() {
 type TabId = 'bookings' | 'book' | 'carriers';
 
 export default function LogisticsPage() {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<TabId>('bookings');
   const [statusFilter, setStatusFilter] = useState<BookingStatus | 'all'>('all');
+  const [liveBookings, setLiveBookings] = useState<TransportBooking[]>(transportBookings);
+  const [dataLoading, setDataLoading] = useState(true);
+
+  useEffect(() => {
+    const supabase = createClient();
+    const load = async () => {
+      try {
+        let query = supabase.from('shipments').select('*').order('created_at', { ascending: false });
+        if (user) query = query.eq('member_id', user.id);
+        const { data } = await query;
+        if (data && data.length > 0) {
+          setLiveBookings(data.map((s: any) => ({
+            id: s.id,
+            farmerId: s.member_id || '',
+            farmerName: '',
+            type: 'dry-bulk' as TransportType,
+            carrierId: '',
+            carrierName: s.carrier || '',
+            origin: s.origin || '',
+            destination: s.destination || '',
+            cargo: s.cargo_type || '',
+            weight: s.weight_kg || 0,
+            status: (s.status || 'requested').replace('_', '-') as BookingStatus,
+            requestDate: s.created_at?.split('T')[0] || '',
+            pickupDate: s.pickup_date || '',
+            deliveryDate: s.delivery_date || null,
+            estimatedCost: s.cost || 0,
+            actualCost: s.status === 'delivered' ? s.cost : null,
+            currency: s.currency || 'USD',
+            notes: s.notes || '',
+            timeline: [],
+          })));
+        }
+      } catch { /* keep fallback */ }
+      setDataLoading(false);
+    };
+    load();
+  }, [user]);
 
   // ---------- Computed stats ----------
   const stats = useMemo(() => {
-    const active = transportBookings.filter(
+    const active = liveBookings.filter(
       (b) => b.status === 'confirmed' || b.status === 'in-transit' || b.status === 'requested'
     );
-    const deliveredThisMonth = transportBookings.filter((b) => {
+    const deliveredThisMonth = liveBookings.filter((b) => {
       if (b.status !== 'delivered' || !b.deliveryDate) return false;
       const d = new Date(b.deliveryDate);
       const now = new Date();
       return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
     });
-    const totalSpent = transportBookings
+    const totalSpent = liveBookings
       .filter((b) => b.actualCost !== null)
       .reduce((sum, b) => sum + (b.actualCost ?? 0), 0);
-    const totalDeliveredWeight = transportBookings
+    const totalDeliveredWeight = liveBookings
       .filter((b) => b.status === 'delivered')
       .reduce((sum, b) => sum + b.weight, 0);
     const avgCostPerTonne =
@@ -752,13 +793,13 @@ export default function LogisticsPage() {
       totalSpent,
       avgCostPerTonne,
     };
-  }, []);
+  }, [liveBookings]);
 
   // ---------- Filtered bookings ----------
   const filteredBookings = useMemo(() => {
-    if (statusFilter === 'all') return transportBookings;
-    return transportBookings.filter((b) => b.status === statusFilter);
-  }, [statusFilter]);
+    if (statusFilter === 'all') return liveBookings;
+    return liveBookings.filter((b) => b.status === statusFilter);
+  }, [statusFilter, liveBookings]);
 
   // ---------- Tab definitions ----------
   const tabs: { id: TabId; label: string }[] = [
@@ -918,10 +959,10 @@ export default function LogisticsPage() {
                       : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'
                   }`}
                 >
-                  All ({transportBookings.length})
+                  All ({liveBookings.length})
                 </button>
                 {ALL_STATUSES.map((status) => {
-                  const count = transportBookings.filter((b) => b.status === status).length;
+                  const count = liveBookings.filter((b) => b.status === status).length;
                   return (
                     <button
                       key={status}

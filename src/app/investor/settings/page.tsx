@@ -147,17 +147,34 @@ export default function InvestorSettingsPage() {
       const supabase = createClient();
       try {
         if (user) {
-          const { data } = await supabase
+          // Try profiles table first for core user data
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .single();
+
+          if (profileData) {
+            if (profileData.company_name || profileData.entity_name || profileData.organization) {
+              setEntityName(String(profileData.company_name || profileData.entity_name || profileData.organization));
+            }
+            if (profileData.phone || profileData.phone_number) {
+              setPhoneNumber(String(profileData.phone || profileData.phone_number));
+            }
+          }
+
+          // Also try investor_settings for comm preferences
+          const { data: settingsData } = await supabase
             .from('investor_settings')
             .select('*')
             .eq('user_id', user.id)
             .single();
 
-          if (data) {
-            if (data.entity_name) setEntityName(data.entity_name);
-            if (data.phone) setPhoneNumber(data.phone);
-            if (data.comm_preferences) {
-              setCommPrefs(data.comm_preferences as CommPreferences);
+          if (settingsData) {
+            if (settingsData.entity_name && !profileData?.company_name) setEntityName(settingsData.entity_name);
+            if (settingsData.phone && !profileData?.phone) setPhoneNumber(settingsData.phone);
+            if (settingsData.comm_preferences) {
+              setCommPrefs(settingsData.comm_preferences as CommPreferences);
             }
           }
         }
@@ -170,12 +187,38 @@ export default function InvestorSettingsPage() {
   }, [user]);
 
   const handleSave = async () => {
+    if (!user) return;
     setSaving(true);
-    // Simulate save
-    await new Promise((r) => setTimeout(r, 800));
+    try {
+      const supabase = createClient();
+
+      // Save to profiles table
+      await supabase
+        .from('profiles')
+        .update({
+          company_name: entityName,
+          phone: phoneNumber,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', user.id);
+
+      // Save comm preferences to investor_settings (upsert)
+      await supabase
+        .from('investor_settings')
+        .upsert({
+          user_id: user.id,
+          entity_name: entityName,
+          phone: phoneNumber,
+          comm_preferences: commPrefs,
+          updated_at: new Date().toISOString(),
+        }, { onConflict: 'user_id' });
+
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } catch {
+      // Silently fail -- the UI still shows the local state
+    }
     setSaving(false);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
   };
 
   const updateCommPref = (key: keyof CommPreferences, value: CommChannel) => {

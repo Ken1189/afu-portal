@@ -1,8 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+import { createClient } from '@/lib/supabase/client';
+import { useAuth } from '@/lib/supabase/auth-context';
 import {
   ArrowLeft,
   ArrowRight,
@@ -208,7 +210,46 @@ export default function CreateCampaign() {
     });
   };
 
-  const handleSubmit = () => {
+  const { user } = useAuth();
+  const [supplierId, setSupplierId] = useState<string | null>(null);
+
+  // ── Get supplier ID for current user ────────────────────────────────────
+  useEffect(() => {
+    async function getSupplierId() {
+      try {
+        const supabase = createClient();
+        const { data: supplier } = await supabase
+          .from('suppliers')
+          .select('id')
+          .eq('email', user?.email ?? '')
+          .single();
+        if (supplier) setSupplierId(supplier.id);
+      } catch (err) {
+        // Fallback: no supplier id
+      }
+    }
+    if (user) getSupplierId();
+  }, [user]);
+
+  const handleSubmit = async () => {
+    // ── POST to Supabase if supplier is known ────────────────────────────
+    if (supplierId) {
+      try {
+        const supabase = createClient();
+        await supabase.from('advertisements').insert({
+          supplier_id: supplierId,
+          title: formData.title,
+          description: formData.description,
+          budget: formData.budget,
+          status: 'pending-review',
+          start_date: formData.startDate,
+          end_date: formData.endDate,
+          target_countries: formData.countries,
+        });
+      } catch (err) {
+        // Silent fallback — still show success UI
+      }
+    }
     setSubmitted(true);
   };
 

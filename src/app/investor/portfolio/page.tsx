@@ -103,14 +103,35 @@ export default function PortfolioPage() {
     async function load() {
       if (!user) { setLoading(false); return; }
       try {
+        // Try investments table first
         const { data } = await supabase
           .from('investments')
           .select('*')
           .eq('investor_user_id', user.id)
           .order('invested_at', { ascending: false });
         if (data && data.length > 0) {
-          // Map DB rows to local shape if available; fall back to demo
           setInvestments(data as unknown as Investment[]);
+        } else {
+          // Fall back to investor_interests table
+          const { data: interests } = await supabase
+            .from('investor_interests')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false });
+          if (interests && interests.length > 0) {
+            const mapped: Investment[] = interests.map((row: Record<string, unknown>, idx: number) => ({
+              id: String(row.id || idx),
+              name: String(row.opportunity_name || row.name || `Investment ${idx + 1}`),
+              type: (String(row.investment_type || row.type || 'Debt')) as Investment['type'],
+              committed: Number(row.amount || row.committed || 0),
+              deployed: Number(row.deployed_amount || row.deployed || row.amount || 0),
+              returns: Number(row.returns || row.irr || 0),
+              irr: Number(row.irr || row.returns || 0),
+              status: (String(row.status || 'Active') === 'active' ? 'Active' : String(row.status || 'Active')) as Investment['status'],
+              vintage: new Date(String(row.created_at || new Date())).getFullYear(),
+            }));
+            setInvestments(mapped);
+          }
         }
       } catch {
         // use demo data on error

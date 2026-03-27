@@ -193,11 +193,56 @@ export default function DocumentsPage() {
     async function load() {
       if (!user) { setLoading(false); return; }
       try {
+        // Try investor_documents table first
         const { data } = await supabase
           .from('investor_documents')
           .select('*')
           .order('uploaded_at', { ascending: false });
-        if (data && data.length > 0) setDocuments(data);
+        if (data && data.length > 0) {
+          setDocuments(data);
+        } else {
+          // Fall back to documents table
+          const { data: docs } = await supabase
+            .from('documents')
+            .select('*')
+            .order('created_at', { ascending: false });
+          if (docs && docs.length > 0) {
+            const mapped: InvestorDocument[] = docs.map((row: Record<string, unknown>) => ({
+              id: String(row.id),
+              name: String(row.name || row.title || 'Untitled'),
+              category: String(row.category || row.document_type || 'fund_docs'),
+              file_url: row.file_url ? String(row.file_url) : row.storage_path ? String(row.storage_path) : null,
+              file_size: row.file_size ? String(row.file_size) : null,
+              uploaded_at: String(row.uploaded_at || row.created_at || new Date().toISOString()),
+              description: row.description ? String(row.description) : null,
+            }));
+            setDocuments(mapped);
+          } else {
+            // Try Supabase storage bucket listing as last resort
+            const { data: storageFiles } = await supabase.storage
+              .from('investor-documents')
+              .list('', { limit: 50, sortBy: { column: 'created_at', order: 'desc' } });
+            if (storageFiles && storageFiles.length > 0) {
+              const mapped: InvestorDocument[] = storageFiles
+                .filter((f) => f.name && !f.name.startsWith('.'))
+                .map((f) => {
+                  const { data: urlData } = supabase.storage
+                    .from('investor-documents')
+                    .getPublicUrl(f.name);
+                  return {
+                    id: f.id || f.name,
+                    name: f.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' '),
+                    category: 'fund_docs',
+                    file_url: urlData?.publicUrl || null,
+                    file_size: f.metadata?.size ? `${(Number(f.metadata.size) / (1024 * 1024)).toFixed(1)} MB` : null,
+                    uploaded_at: f.created_at || new Date().toISOString(),
+                    description: null,
+                  };
+                });
+              if (mapped.length > 0) setDocuments(mapped);
+            }
+          }
+        }
       } catch {
         // use demo
       }

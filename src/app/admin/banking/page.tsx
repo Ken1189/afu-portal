@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createClient } from '@/lib/supabase/client';
 import {
   Landmark,
   Wallet,
@@ -28,14 +29,14 @@ type Tab = 'overview' | 'wallets' | 'ledger' | 'monitoring' | 'reconciliation';
 
 // ─── Demo Data ───
 
-const kpis = [
+const fallback_kpis = [
   { label: 'Total AUM', value: '$4.75M', change: '+12.3%', icon: DollarSign, color: 'text-green-600 bg-green-50' },
   { label: 'Active Wallets', value: '2,847', change: '+189 this month', icon: Wallet, color: 'text-blue-600 bg-blue-50' },
   { label: 'Transactions Today', value: '342', change: '$127K volume', icon: ArrowUpDown, color: 'text-purple-600 bg-purple-50' },
   { label: 'Pending Flags', value: '7', change: '2 high severity', icon: AlertTriangle, color: 'text-amber-600 bg-amber-50' },
 ];
 
-const recentTransactions = [
+const fallback_recentTransactions = [
   { id: 'TXN-001', type: 'Deposit', user: 'Grace Mutua', amount: '+$2,500.00', currency: 'USD', time: '2 min ago', status: 'completed' },
   { id: 'TXN-002', type: 'Transfer', user: 'John Kamau', amount: '-KES 45,000', currency: 'KES', time: '8 min ago', status: 'completed' },
   { id: 'TXN-003', type: 'Loan Disbursement', user: 'Faith Ochieng', amount: '+$5,000.00', currency: 'USD', time: '15 min ago', status: 'completed' },
@@ -44,7 +45,7 @@ const recentTransactions = [
   { id: 'TXN-006', type: 'Insurance Premium', user: 'Peter Banda', amount: '-$120.00', currency: 'USD', time: '45 min ago', status: 'completed' },
 ];
 
-const systemAccounts = [
+const fallback_systemAccounts = [
   { name: 'Revenue - USD', type: 'revenue', currency: 'USD', balance: 245_830.50 },
   { name: 'Escrow - USD', type: 'escrow', currency: 'USD', balance: 1_250_000.00 },
   { name: 'Loan Book - USD', type: 'loan_book', currency: 'USD', balance: 2_150_000.00 },
@@ -57,7 +58,7 @@ const systemAccounts = [
   { name: 'Escrow - BWP', type: 'escrow', currency: 'BWP', balance: 1_540_000 },
 ];
 
-const flags = [
+const fallback_flags = [
   { id: 'FLG-001', user: 'Unknown User #4521', type: 'velocity', severity: 'high', detail: '12 transactions in 10 minutes', time: '1 hour ago', status: 'pending' },
   { id: 'FLG-002', user: 'James Otieno', type: 'amount_threshold', severity: 'high', detail: 'KES 2.5M in 24 hours (threshold: 1M)', time: '3 hours ago', status: 'pending' },
   { id: 'FLG-003', user: 'Sarah Mensah', type: 'cross_border', severity: 'medium', detail: 'Transfer to non-AFU country', time: '5 hours ago', status: 'investigating' },
@@ -65,7 +66,7 @@ const flags = [
   { id: 'FLG-005', user: 'Grace Mutua', type: 'velocity', severity: 'low', detail: '8 transactions in 1 hour', time: '1 day ago', status: 'cleared' },
 ];
 
-const reconRuns = [
+const fallback_reconRuns = [
   { date: '2026-03-25', provider: 'Stripe', currency: 'USD', our: 127_450.00, theirs: 127_450.00, disc: 0, matched: 45, unmatched: 0, status: 'matched' },
   { date: '2026-03-25', provider: 'M-Pesa', currency: 'KES', our: 3_450_000, theirs: 3_448_500, disc: 1500, matched: 128, unmatched: 2, status: 'discrepancy' },
   { date: '2026-03-25', provider: 'EcoCash', currency: 'ZWL', our: 12_500_000, theirs: 12_500_000, disc: 0, matched: 34, unmatched: 0, status: 'matched' },
@@ -104,6 +105,101 @@ function severityBadge(severity: string) {
 export default function AdminBankingPage() {
   const [activeTab, setActiveTab] = useState<Tab>('overview');
   const [expandedFlag, setExpandedFlag] = useState<string | null>(null);
+  const [kpis, setKpis] = useState(fallback_kpis);
+  const [recentTransactions, setRecentTransactions] = useState(fallback_recentTransactions);
+  const [systemAccounts, setSystemAccounts] = useState(fallback_systemAccounts);
+  const [flags, setFlags] = useState(fallback_flags);
+  const [reconRuns, setReconRuns] = useState(fallback_reconRuns);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const supabase = createClient();
+    async function fetchData() {
+      try {
+        // Fetch wallet transactions as recent transactions
+        const { data: txData } = await supabase
+          .from('wallet_transactions')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(10);
+        if (txData && txData.length > 0) {
+          setRecentTransactions(
+            txData.map((t: Record<string, unknown>) => ({
+              id: (t.id as string)?.slice(0, 8) || 'TXN',
+              type: (t.transaction_type as string) || 'Transaction',
+              user: (t.description as string) || 'Unknown',
+              amount: `${(t.amount as number) >= 0 ? '+' : ''}$${Math.abs((t.amount as number) || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
+              currency: (t.currency as string) || 'USD',
+              time: (t.created_at as string) || '',
+              status: (t.status as string) || 'completed',
+            }))
+          );
+        }
+
+        // Fetch ledger accounts as system accounts
+        const { data: ledgerData } = await supabase
+          .from('ledger_accounts')
+          .select('*')
+          .order('name');
+        if (ledgerData && ledgerData.length > 0) {
+          setSystemAccounts(
+            ledgerData.map((a: Record<string, unknown>) => ({
+              name: (a.name as string) || 'Account',
+              type: (a.account_type as string) || 'general',
+              currency: (a.currency as string) || 'USD',
+              balance: (a.balance as number) || 0,
+            }))
+          );
+        }
+
+        // Fetch transaction flags
+        const { data: flagData } = await supabase
+          .from('transaction_flags')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(10);
+        if (flagData && flagData.length > 0) {
+          setFlags(
+            flagData.map((f: Record<string, unknown>) => ({
+              id: (f.id as string)?.slice(0, 8) || 'FLG',
+              user: (f.user_name as string) || 'Unknown User',
+              type: (f.flag_type as string) || 'unknown',
+              severity: (f.severity as string) || 'medium',
+              detail: (f.detail as string) || '',
+              time: (f.created_at as string) || '',
+              status: (f.status as string) || 'pending',
+            }))
+          );
+        }
+
+        // Fetch reconciliation runs
+        const { data: reconData } = await supabase
+          .from('reconciliation_runs')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(10);
+        if (reconData && reconData.length > 0) {
+          setReconRuns(
+            reconData.map((r: Record<string, unknown>) => ({
+              date: ((r.run_date as string) || (r.created_at as string))?.split('T')[0] || '',
+              provider: (r.provider as string) || 'Unknown',
+              currency: (r.currency as string) || 'USD',
+              our: (r.our_balance as number) || 0,
+              theirs: (r.provider_balance as number) || 0,
+              disc: (r.discrepancy as number) || 0,
+              matched: (r.matched_count as number) || 0,
+              unmatched: (r.unmatched_count as number) || 0,
+              status: (r.status as string) || 'matched',
+            }))
+          );
+        }
+      } catch {
+        // fallback data already set
+      }
+      setIsLoading(false);
+    }
+    fetchData();
+  }, []);
 
   const tabs: { key: Tab; label: string; icon: typeof Landmark }[] = [
     { key: 'overview', label: 'Overview', icon: BarChart3 },

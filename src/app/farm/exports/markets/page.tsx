@@ -1,8 +1,10 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '@/lib/supabase/auth-context';
+import { createClient } from '@/lib/supabase/client';
 import {
   Globe,
   ArrowLeft,
@@ -613,7 +615,49 @@ function RegionSection({
 // ---------------------------------------------------------------------------
 
 export default function ExportMarketsPage() {
+  const { user } = useAuth();
   const [showIntelligence, setShowIntelligence] = useState(true);
+  const [livePriceTrends, setLivePriceTrends] = useState<PriceTrend[]>(PRICE_TRENDS);
+  const [dataLoading, setDataLoading] = useState(true);
+
+  useEffect(() => {
+    const supabase = createClient();
+    const load = async () => {
+      try {
+        const { data } = await supabase
+          .from('market_prices')
+          .select('*')
+          .order('date', { ascending: false })
+          .limit(100);
+        if (data && data.length > 0) {
+          // Group by commodity and build trends
+          const byCommodity: Record<string, any[]> = {};
+          data.forEach((row: any) => {
+            if (!byCommodity[row.commodity]) byCommodity[row.commodity] = [];
+            byCommodity[row.commodity].push(row);
+          });
+          const trends: PriceTrend[] = Object.entries(byCommodity).slice(0, 6).map(([commodity, rows]) => {
+            const sorted = rows.sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime());
+            const currentPrice = sorted[sorted.length - 1]?.price || 0;
+            const previousPrice = sorted.length > 1 ? sorted[sorted.length - 2]?.price || currentPrice : currentPrice;
+            const change = previousPrice > 0 ? ((currentPrice - previousPrice) / previousPrice) * 100 : 0;
+            const bars = sorted.slice(-12).map((r: any) => r.price);
+            return {
+              commodity,
+              currentPrice,
+              previousPrice,
+              unit: `${sorted[0]?.currency || '$'}/${sorted[0]?.unit || 'tonne'}`,
+              change: Math.round(change * 10) / 10,
+              bars: bars.length > 0 ? bars : [50],
+            };
+          });
+          if (trends.length > 0) setLivePriceTrends(trends);
+        }
+      } catch { /* keep fallback */ }
+      setDataLoading(false);
+    };
+    load();
+  }, [user]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -712,7 +756,7 @@ export default function ExportMarketsPage() {
                     animate="visible"
                     className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
                   >
-                    {PRICE_TRENDS.map((trend) => (
+                    {livePriceTrends.map((trend) => (
                       <PriceTrendCard
                         key={trend.commodity}
                         trend={trend}

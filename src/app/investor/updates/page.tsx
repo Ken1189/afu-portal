@@ -145,12 +145,33 @@ export default function UpdatesPage() {
     async function load() {
       if (!user) { setLoading(false); return; }
       try {
+        // Try investor_updates table first
         const { data } = await supabase
           .from('investor_updates')
           .select('*')
           .eq('status', 'published')
           .order('published_at', { ascending: false });
-        if (data && data.length > 0) setUpdates(data);
+        if (data && data.length > 0) {
+          setUpdates(data);
+        } else {
+          // Fall back to notifications table
+          const { data: notifs } = await supabase
+            .from('notifications')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(20);
+          if (notifs && notifs.length > 0) {
+            const mapped: InvestorUpdate[] = notifs.map((row: Record<string, unknown>) => ({
+              id: String(row.id),
+              title: String(row.title || row.subject || 'Update'),
+              body: String(row.body || row.message || row.content || ''),
+              update_type: String(row.update_type || row.type || row.category || 'fund_update'),
+              published_at: String(row.published_at || row.created_at || new Date().toISOString()),
+              metrics_snapshot: (row.metrics_snapshot as Record<string, string | number>) || null,
+            }));
+            setUpdates(mapped);
+          }
+        }
       } catch {
         // use demo
       }

@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createClient } from '@/lib/supabase/client';
 import {
   Megaphone,
   DollarSign,
@@ -22,7 +23,7 @@ import {
 
 // ─── Demo Data ───
 
-const kpis = [
+const fallback_kpis = [
   { label: 'Total Ad Revenue', value: '$24,750', change: '+$4,200 this month', icon: DollarSign, color: 'text-green-600 bg-green-50' },
   { label: 'Active Campaigns', value: '18', change: '12 suppliers', icon: Megaphone, color: 'text-blue-600 bg-blue-50' },
   { label: 'Pending Approval', value: '5', change: 'Needs review', icon: Clock, color: 'text-amber-600 bg-amber-50' },
@@ -38,7 +39,7 @@ const revenueByMonth = [
   { month: 'Mar', amount: 5850 },
 ];
 
-const ads = [
+const fallback_ads = [
   { id: 'AD-001', title: 'Premium Maize Seeds — PlantRight Africa', supplier: 'PlantRight Seeds', type: 'banner', status: 'active', countries: ['KE', 'TZ', 'UG'], impressions: 12450, clicks: 398, ctr: 3.2, budget: 500, spent: 342, package: 'Growth' },
   { id: 'AD-002', title: 'Tractor Hire — AgriMech East Africa', supplier: 'AgriMech EA', type: 'featured-product', status: 'active', countries: ['KE', 'UG'], impressions: 8920, clicks: 245, ctr: 2.7, budget: 300, spent: 210, package: 'Starter' },
   { id: 'AD-003', title: 'Crop Insurance — SafeHarvest', supplier: 'SafeHarvest Insurance', type: 'sidebar', status: 'active', countries: ['ZA', 'BW', 'ZW'], impressions: 15200, clicks: 612, ctr: 4.0, budget: 1500, spent: 980, package: 'Premium' },
@@ -78,6 +79,41 @@ export default function AdminAdvertisingPage() {
   const [filter, setFilter] = useState<'all' | AdStatus>('all');
   const [search, setSearch] = useState('');
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [kpis, setKpis] = useState(fallback_kpis);
+  const [ads, setAds] = useState(fallback_ads);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const supabase = createClient();
+    async function fetchData() {
+      try {
+        const { data, error } = await supabase
+          .from('advertisements')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (!error && data && data.length > 0) {
+          setAds(
+            data.map((row: Record<string, unknown>) => ({
+              id: (row.id as string) || '',
+              title: (row.title as string) || 'Untitled',
+              supplier: (row.supplier_name as string) || (row.supplier as string) || 'Unknown',
+              type: (row.ad_type as string) || 'banner',
+              status: (row.status as string) || 'pending',
+              countries: Array.isArray(row.countries) ? (row.countries as string[]) : [],
+              impressions: (row.impressions as number) || 0,
+              clicks: (row.clicks as number) || 0,
+              ctr: (row.ctr as number) || 0,
+              budget: (row.budget as number) || 0,
+              spent: (row.spent as number) || 0,
+              package: (row.package_name as string) || (row.ad_package as string) || 'Starter',
+            }))
+          );
+        }
+      } catch { /* fallback */ }
+      setIsLoading(false);
+    }
+    fetchData();
+  }, []);
 
   const filteredAds = ads.filter((ad) => {
     if (filter !== 'all' && ad.status !== filter) return false;

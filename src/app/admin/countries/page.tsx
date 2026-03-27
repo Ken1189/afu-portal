@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { createClient } from '@/lib/supabase/client';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import {
@@ -49,7 +50,7 @@ interface Country {
 
 // ── Mock Data ───────────────────────────────────────────────────────────────
 
-const countries: Country[] = [
+const fallback_countries: Country[] = [
   {
     iso: 'BW', name: 'Botswana', flag: '🇧🇼', currency: 'BWP',
     paymentProviders: ['Orange Money'], languages: ['Setswana', 'English'],
@@ -172,6 +173,36 @@ function formatCurrency(amount: number): string {
 export default function CountriesPage() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<CountryStatus | 'all'>('all');
+  const [countries, setCountries] = useState<Country[]>(fallback_countries);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const supabase = createClient();
+    async function fetchData() {
+      try {
+        // Try to fetch country data from profiles grouped by country
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('country')
+          .not('country', 'is', null);
+        if (!error && data && data.length > 0) {
+          // Count members per country and update fallback data
+          const countryMemberCounts: Record<string, number> = {};
+          data.forEach((row: Record<string, unknown>) => {
+            const c = (row.country as string) || '';
+            if (c) countryMemberCounts[c] = (countryMemberCounts[c] || 0) + 1;
+          });
+          // Update the fallback countries with real member counts
+          setCountries(prev => prev.map(c => {
+            const realCount = countryMemberCounts[c.name] || countryMemberCounts[c.iso];
+            return realCount !== undefined ? { ...c, members: realCount } : c;
+          }));
+        }
+      } catch { /* fallback */ }
+      setIsLoading(false);
+    }
+    fetchData();
+  }, []);
 
   const filtered = useMemo(() => {
     return countries.filter((c) => {

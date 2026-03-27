@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createClient } from '@/lib/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Scale,
@@ -41,7 +42,7 @@ interface LegalCase {
 
 // -- Demo Data ----------------------------------------------------------------
 
-const legalCases: LegalCase[] = [
+const fallback_legalCases: LegalCase[] = [
   {
     id: 'LGL-001',
     farmerName: 'Amina Diallo',
@@ -168,7 +169,7 @@ const caseTypeIcons: Record<CaseType, React.ReactNode> = {
   IP: <Briefcase className="w-3.5 h-3.5" />,
 };
 
-const statCounts = {
+const fallback_statCounts = {
   total: 47,
   pending: 8,
   inProgress: 15,
@@ -200,6 +201,44 @@ export default function LegalServicesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<CaseStatus | 'All'>('All');
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [legalCases, setLegalCases] = useState<LegalCase[]>(fallback_legalCases);
+  const [statCounts, setStatCounts] = useState(fallback_statCounts);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const supabase = createClient();
+    async function fetchData() {
+      try {
+        const { data, error } = await supabase
+          .from('legal_cases')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (!error && data && data.length > 0) {
+          const mapped = data.map((row: Record<string, unknown>) => ({
+            id: (row.id as string) || '',
+            farmerName: (row.farmer_name as string) || 'Unknown',
+            farmLocation: (row.farm_location as string) || (row.country as string) || '',
+            caseType: ((row.case_type as string) || 'Compliance') as CaseType,
+            description: (row.description as string) || '',
+            status: ((row.status as string) || 'Pending') as CaseStatus,
+            assignedFirm: (row.assigned_firm as string) || 'Unassigned',
+            dateSubmitted: ((row.date_submitted as string) || (row.created_at as string) || '')?.split('T')[0] || '',
+            priority: ((row.priority as string) || 'Medium') as CasePriority,
+            notes: (row.notes as string) || '',
+          }));
+          setLegalCases(mapped);
+          setStatCounts({
+            total: mapped.length,
+            pending: mapped.filter(c => c.status === 'Pending').length,
+            inProgress: mapped.filter(c => c.status === 'In Progress').length,
+            resolved: mapped.filter(c => c.status === 'Resolved').length,
+          });
+        }
+      } catch { /* fallback */ }
+      setIsLoading(false);
+    }
+    fetchData();
+  }, []);
 
   const statusFilters: (CaseStatus | 'All')[] = ['All', 'Pending', 'In Progress', 'Resolved', 'Closed'];
 

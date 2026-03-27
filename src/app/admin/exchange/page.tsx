@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createClient } from '@/lib/supabase/client';
 import {
   Coins,
   ShoppingBag,
@@ -120,6 +121,39 @@ const STATUS_COLORS: Record<string, string> = {
 // ── Page ──
 export default function AdminExchangePage() {
   const [tab, setTab] = useState<'listings' | 'transactions'>('listings');
+  const [listings, setListings] = useState<ExchangeListing[]>(DEMO_LISTINGS);
+  const [transactions, setTransactions] = useState<ExchangeTransaction[]>(DEMO_TRANSACTIONS);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const supabase = createClient();
+    async function fetchData() {
+      try {
+        const { data, error } = await supabase
+          .from('exchange_listings')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (!error && data && data.length > 0) {
+          setListings(
+            data.map((row: Record<string, unknown>) => ({
+              id: (row.id as string) || '',
+              title: (row.title as string) || 'Untitled',
+              seller: (row.seller_name as string) || (row.seller as string) || 'Unknown',
+              category: (row.category as string) || 'Other',
+              price: (row.price as number) || 0,
+              priceType: (row.price_type as string) || '',
+              status: ((row.status as string) || 'active') as ExchangeListing['status'],
+              views: (row.views as number) || 0,
+              country: (row.country as string) || '',
+              created_at: ((row.created_at as string) || '')?.split('T')[0] || '',
+            }))
+          );
+        }
+      } catch { /* fallback */ }
+      setIsLoading(false);
+    }
+    fetchData();
+  }, []);
 
   const [listingFilters, setListingFilters] = useState<FilterValues>({
     search: '',
@@ -138,7 +172,7 @@ export default function AdminExchangePage() {
 
   // Apply filters — cast to satisfy Record<string, unknown> constraint
   const filteredListings = (applyFilters(
-    DEMO_LISTINGS as unknown as Record<string, unknown>[],
+    listings as unknown as Record<string, unknown>[],
     listingFilters,
     ['title', 'seller', 'category'],
   ) as unknown as ExchangeListing[]).filter((l) => {
@@ -147,13 +181,13 @@ export default function AdminExchangePage() {
   });
 
   const filteredTransactions = applyFilters(
-    DEMO_TRANSACTIONS as unknown as Record<string, unknown>[],
+    transactions as unknown as Record<string, unknown>[],
     txFilters,
     ['buyer', 'seller', 'listing'],
   ) as unknown as ExchangeTransaction[];
 
   // Compute stats
-  const totalCommission = DEMO_TRANSACTIONS
+  const totalCommission = transactions
     .filter((t) => t.status === 'completed')
     .reduce((sum, t) => sum + Math.round(t.amount * 0.05), 0);
 
@@ -169,8 +203,8 @@ export default function AdminExchangePage() {
       {/* ── Stats ── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'Total Listings', value: DEMO_LISTINGS.length.toString(), icon: ShoppingBag, color: 'bg-blue-50 text-blue-600' },
-          { label: 'Active Trades', value: DEMO_TRANSACTIONS.filter((t) => t.status === 'pending').length.toString(), icon: TrendingUp, color: 'bg-green-50 text-green-600' },
+          { label: 'Total Listings', value: listings.length.toString(), icon: ShoppingBag, color: 'bg-blue-50 text-blue-600' },
+          { label: 'Active Trades', value: transactions.filter((t) => t.status === 'pending').length.toString(), icon: TrendingUp, color: 'bg-green-50 text-green-600' },
           { label: 'Credits Circulating', value: creditsCirculating.toLocaleString(), icon: Coins, color: 'bg-amber-50 text-amber-600' },
           { label: 'Commission Earned', value: `${totalCommission.toLocaleString()} cr`, icon: DollarSign, color: 'bg-purple-50 text-purple-600' },
         ].map((stat) => {
@@ -199,7 +233,7 @@ export default function AdminExchangePage() {
             tab === 'listings' ? 'bg-white text-[#1B2A4A] shadow-sm' : 'text-gray-500 hover:text-gray-700'
           }`}
         >
-          Listings ({DEMO_LISTINGS.length})
+          Listings ({listings.length})
         </button>
         <button
           onClick={() => setTab('transactions')}
@@ -207,7 +241,7 @@ export default function AdminExchangePage() {
             tab === 'transactions' ? 'bg-white text-[#1B2A4A] shadow-sm' : 'text-gray-500 hover:text-gray-700'
           }`}
         >
-          Transactions ({DEMO_TRANSACTIONS.length})
+          Transactions ({transactions.length})
         </button>
       </div>
 

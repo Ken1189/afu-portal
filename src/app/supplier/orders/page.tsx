@@ -1,8 +1,10 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+import { createClient } from '@/lib/supabase/client';
+import { useAuth } from '@/lib/supabase/auth-context';
 import {
   ShoppingCart,
   Download,
@@ -426,10 +428,61 @@ function formatCurrency(value: number): string {
 // ═══════════════════════════════════════════════════════════════════════════
 
 export default function SupplierOrdersPage() {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<'all' | OrderStatus>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [orders, setOrders] = useState<SupplierOrder[]>(supplierOrders);
+  const [loading, setLoading] = useState(true);
+
+  // ── Fetch orders from Supabase ──────────────────────────────────────────
+  useEffect(() => {
+    async function fetchOrders() {
+      try {
+        const supabase = createClient();
+        // Get supplier record for current user
+        const { data: supplier } = await supabase
+          .from('suppliers')
+          .select('id')
+          .eq('email', user?.email ?? '')
+          .single();
+
+        if (supplier) {
+          const { data: orderItems } = await supabase
+            .from('order_items')
+            .select('*, order:orders(*), product:products(name)')
+            .eq('supplier_id', supplier.id)
+            .order('created_at', { ascending: false });
+
+          if (orderItems && orderItems.length > 0) {
+            const mapped: SupplierOrder[] = orderItems.map((item: any) => ({
+              id: item.order?.order_number || item.order_id,
+              productName: item.product?.name || 'Product',
+              productId: item.product_id,
+              buyerName: item.order?.shipping_address?.name || 'Customer',
+              buyerType: 'commercial' as const,
+              quantity: item.quantity,
+              amount: item.total_price,
+              status: (item.order?.status === 'pending' ? 'new' : item.order?.status) || 'new',
+              orderDate: item.order?.created_at?.split('T')[0] || '',
+              deliveryDate: item.order?.updated_at?.split('T')[0] || null,
+              shippingAddress: item.order?.shipping_address
+                ? Object.values(item.order.shipping_address).join(', ')
+                : '',
+              paymentMethod: 'Bank Transfer',
+            }));
+            setOrders(mapped);
+          }
+        }
+      } catch (err) {
+        // Keep fallback demo data
+      } finally {
+        setLoading(false);
+      }
+    }
+    if (user) fetchOrders();
+    else setLoading(false);
+  }, [user]);
 
   // ── Count by status ─────────────────────────────────────────────────────
 

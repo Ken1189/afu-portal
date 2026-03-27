@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createClient } from '@/lib/supabase/client';
 import { motion } from 'framer-motion';
 import {
   GraduationCap,
@@ -77,7 +78,7 @@ interface Certificate {
 }
 
 // ── Mock Data ──
-const programs: Program[] = [
+const fallback_programs: Program[] = [
   { id: 1, title: 'GlobalGAP Certification', category: 'Certification', categoryColor: 'bg-green-100 text-green-700', duration: '12 weeks', enrolled: 45, capacity: 50, completionRate: 78, instructor: 'Dr. Sarah Moyo', nextSession: 'Mar 20, 2026', status: 'active', icon: <CheckCircle2 className="w-5 h-5" /> },
   { id: 2, title: 'Organic Farming', category: 'Agriculture', categoryColor: 'bg-emerald-100 text-emerald-700', duration: '8 weeks', enrolled: 38, capacity: 40, completionRate: 85, instructor: 'Prof. James Banda', nextSession: 'Mar 25, 2026', status: 'active', icon: <Leaf className="w-5 h-5" /> },
   { id: 3, title: 'Financial Literacy', category: 'Business', categoryColor: 'bg-blue-100 text-blue-700', duration: '6 weeks', enrolled: 62, capacity: 80, completionRate: 72, instructor: 'Grace Nyathi, CPA', nextSession: 'Apr 1, 2026', status: 'active', icon: <DollarSign className="w-5 h-5" /> },
@@ -88,7 +89,7 @@ const programs: Program[] = [
   { id: 8, title: 'Livestock Management', category: 'Agriculture', categoryColor: 'bg-emerald-100 text-emerald-700', duration: '10 weeks', enrolled: 18, capacity: 25, completionRate: 45, instructor: 'Dr. John Moyo', nextSession: 'Apr 20, 2026', status: 'active', icon: <Heart className="w-5 h-5" /> },
 ];
 
-const enrollments: Enrollment[] = [
+const fallback_enrollments: Enrollment[] = [
   { id: 1, farmerName: 'John Moyo', program: 'GlobalGAP Certification', startDate: 'Jan 15, 2026', progress: 85, status: 'active', hasCertificate: false },
   { id: 2, farmerName: 'Grace Nyathi', program: 'Organic Farming', startDate: 'Feb 1, 2026', progress: 100, status: 'completed', hasCertificate: true },
   { id: 3, farmerName: 'Baraka Mwanga', program: 'Financial Literacy', startDate: 'Jan 20, 2026', progress: 65, status: 'active', hasCertificate: false },
@@ -111,7 +112,7 @@ const enrollments: Enrollment[] = [
   { id: 20, farmerName: 'Martha Nzimande', program: 'Post-Harvest Handling', startDate: 'Jan 8, 2026', progress: 67, status: 'active', hasCertificate: false },
 ];
 
-const certificates: Certificate[] = [
+const fallback_certificates: Certificate[] = [
   { id: 'CERT-2026-001', farmerName: 'Grace Nyathi', program: 'Organic Farming', issueDate: 'Mar 10, 2026' },
   { id: 'CERT-2026-002', farmerName: 'Sarah Dube', program: 'Irrigation Management', issueDate: 'Mar 8, 2026' },
   { id: 'CERT-2026-003', farmerName: 'Amina Osei', program: 'Digital Agriculture', issueDate: 'Mar 5, 2026' },
@@ -145,6 +146,62 @@ export default function AdminTrainingPage() {
   const [enrollmentFilter, setEnrollmentFilter] = useState<'all' | EnrollmentStatus>('all');
   const [programFilter, setProgramFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [programs, setPrograms] = useState<Program[]>(fallback_programs);
+  const [enrollments, setEnrollments] = useState<Enrollment[]>(fallback_enrollments);
+  const [certificates, setCertificates] = useState<Certificate[]>(fallback_certificates);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const supabase = createClient();
+    async function fetchData() {
+      try {
+        // Fetch courses
+        const { data: courseData } = await supabase
+          .from('courses')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (courseData && courseData.length > 0) {
+          setPrograms(
+            courseData.map((row: Record<string, unknown>, idx: number) => ({
+              id: idx + 1,
+              title: (row.title as string) || 'Untitled',
+              category: (row.category as string) || 'General',
+              categoryColor: 'bg-green-100 text-green-700',
+              duration: (row.duration as string) || '4 weeks',
+              enrolled: (row.enrolled_count as number) || 0,
+              capacity: (row.capacity as number) || 50,
+              completionRate: (row.completion_rate as number) || 0,
+              instructor: (row.instructor as string) || 'TBA',
+              nextSession: (row.next_session as string) || '',
+              status: ((row.status as string) || 'active') as ProgramStatus,
+              icon: <BookOpen className="w-5 h-5" />,
+            }))
+          );
+        }
+
+        // Fetch enrollments
+        const { data: enrollData } = await supabase
+          .from('course_enrollments')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (enrollData && enrollData.length > 0) {
+          setEnrollments(
+            enrollData.map((row: Record<string, unknown>, idx: number) => ({
+              id: idx + 1,
+              farmerName: (row.farmer_name as string) || 'Unknown',
+              program: (row.course_name as string) || (row.program as string) || 'Unknown',
+              startDate: ((row.start_date as string) || (row.created_at as string) || '')?.split('T')[0] || '',
+              progress: (row.progress as number) || 0,
+              status: ((row.status as string) || 'active') as EnrollmentStatus,
+              hasCertificate: (row.has_certificate as boolean) || false,
+            }))
+          );
+        }
+      } catch { /* fallback */ }
+      setIsLoading(false);
+    }
+    fetchData();
+  }, []);
 
   const tabs: { key: TabKey; label: string }[] = [
     { key: 'programs', label: 'Programs' },

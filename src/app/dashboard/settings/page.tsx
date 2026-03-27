@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import type { Variants } from 'framer-motion';
 import { useAuth } from '@/lib/supabase/auth-context';
 import { createClient } from '@/lib/supabase/client';
+import { Loader2 } from 'lucide-react';
 import {
   Bell,
   MessageSquare,
@@ -294,7 +295,8 @@ const tierData = [
 // PAGE COMPONENT
 // ===========================================================================
 export default function SettingsPage() {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
+  const supabase = createClient();
 
   // ---- Tab state ----------------------------------------------------------
   const [activeTab, setActiveTab] = useState<TabId>('notifications');
@@ -334,30 +336,101 @@ export default function SettingsPage() {
   // ---- Save state ---------------------------------------------------------
   const [saveToast, setSaveToast] = useState(false);
   const [settingsLoaded, setSettingsLoaded] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  // ---- Load settings from localStorage on mount ---------------------------
+  // ---- Member record for tier info ----------------------------------------
+  const [memberData, setMemberData] = useState<Member | null>(null);
+
+  // ---- Load settings from Supabase (with localStorage fallback) on mount --
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem('afu_user_settings');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed.emailNotifs) setEmailNotifs(parsed.emailNotifs);
-        if (parsed.smsNotifs) setSmsNotifs(parsed.smsNotifs);
-        if (parsed.pushNotifs) setPushNotifs(parsed.pushNotifs);
-        if (parsed.language) setLanguage(parsed.language);
-        if (parsed.currency) setCurrency(parsed.currency);
-        if (parsed.timezone) setTimezone(parsed.timezone);
-        if (parsed.dateFormat) setDateFormat(parsed.dateFormat);
-        if (parsed.theme) setTheme(parsed.theme);
-        if (parsed.defaultView) setDefaultView(parsed.defaultView);
-        if (typeof parsed.cookiePrefs === 'boolean') setCookiePrefs(parsed.cookiePrefs);
-        if (typeof parsed.marketingConsent === 'boolean') setMarketingConsent(parsed.marketingConsent);
+    let cancelled = false;
+    async function loadSettings() {
+      setLoading(true);
+
+      // Try loading from Supabase first
+      if (user) {
+        try {
+          const [profileRes, memberRes] = await Promise.all([
+            supabase.from('profiles').select('preferences, language, timezone').eq('id', user.id).single(),
+            supabase.from('members').select('*').eq('profile_id', user.id).maybeSingle(),
+          ]);
+
+          if (!cancelled && profileRes.data) {
+            const prefs = profileRes.data.preferences as Record<string, unknown> | null;
+            if (prefs) {
+              if (prefs.email_notifications) setEmailNotifs(prefs.email_notifications as typeof emailNotifs);
+              if (prefs.sms_notifications) setSmsNotifs(prefs.sms_notifications as typeof smsNotifs);
+              if (prefs.push_notifications) setPushNotifs(prefs.push_notifications as typeof pushNotifs);
+              if (prefs.currency) setCurrency(prefs.currency as string);
+              if (prefs.dateFormat) setDateFormat(prefs.dateFormat as string);
+              if (prefs.theme) setTheme(prefs.theme as string);
+              if (prefs.defaultView) setDefaultView(prefs.defaultView as string);
+              if (typeof prefs.cookiePrefs === 'boolean') setCookiePrefs(prefs.cookiePrefs);
+              if (typeof prefs.marketingConsent === 'boolean') setMarketingConsent(prefs.marketingConsent);
+            }
+            if (profileRes.data.language) setLanguage(profileRes.data.language);
+            if (profileRes.data.timezone) setTimezone(profileRes.data.timezone);
+          }
+
+          if (!cancelled && memberRes.data) {
+            setMemberData({
+              id: memberRes.data.member_id || memberRes.data.id,
+              firstName: profile?.full_name?.split(' ')[0] || currentUser.firstName,
+              lastName: profile?.full_name?.split(' ').slice(1).join(' ') || currentUser.lastName,
+              email: profile?.email || currentUser.email,
+              phone: profile?.phone || currentUser.phone,
+              tier: memberRes.data.tier || currentUser.tier,
+              country: profile?.country || currentUser.country,
+              region: profile?.region || currentUser.region,
+              status: memberRes.data.status || currentUser.status,
+              kycStatus: currentUser.kycStatus,
+              profileCompleteness: currentUser.profileCompleteness,
+              farmName: memberRes.data.farm_name || currentUser.farmName,
+              farmSize: memberRes.data.farm_size_ha || currentUser.farmSize,
+              primaryCrops: memberRes.data.primary_crops || currentUser.primaryCrops,
+              joinDate: memberRes.data.join_date || currentUser.joinDate,
+              lastActive: currentUser.lastActive,
+              avatar: null,
+              creditScore: memberRes.data.credit_score ?? currentUser.creditScore,
+            });
+          }
+        } catch {
+          // Supabase fetch failed — fall back to localStorage
+        }
       }
-    } catch {
-      // Ignore parse errors
+
+      // Fallback: load from localStorage
+      if (!cancelled) {
+        try {
+          const saved = localStorage.getItem('afu_user_settings');
+          if (saved) {
+            const parsed = JSON.parse(saved);
+            // Only apply localStorage values if Supabase didn't provide them
+            if (!user) {
+              if (parsed.emailNotifs) setEmailNotifs(parsed.emailNotifs);
+              if (parsed.smsNotifs) setSmsNotifs(parsed.smsNotifs);
+              if (parsed.pushNotifs) setPushNotifs(parsed.pushNotifs);
+              if (parsed.language) setLanguage(parsed.language);
+              if (parsed.currency) setCurrency(parsed.currency);
+              if (parsed.timezone) setTimezone(parsed.timezone);
+              if (parsed.dateFormat) setDateFormat(parsed.dateFormat);
+              if (parsed.theme) setTheme(parsed.theme);
+              if (parsed.defaultView) setDefaultView(parsed.defaultView);
+              if (typeof parsed.cookiePrefs === 'boolean') setCookiePrefs(parsed.cookiePrefs);
+              if (typeof parsed.marketingConsent === 'boolean') setMarketingConsent(parsed.marketingConsent);
+            }
+          }
+        } catch {
+          // Ignore parse errors
+        }
+        setSettingsLoaded(true);
+        setLoading(false);
+      }
     }
-    setSettingsLoaded(true);
-  }, []);
+
+    loadSettings();
+    return () => { cancelled = true; };
+  }, [user, profile, supabase]);
 
   // ---- Save state for button -----------------------------------------------
   const [saving, setSaving] = useState(false);
@@ -429,11 +502,21 @@ export default function SettingsPage() {
   const togglePush = (key: keyof typeof pushNotifs) =>
     setPushNotifs((prev) => ({ ...prev, [key]: !prev[key] }));
 
-  const currentTier = currentUser.tier;
+  const activeUser = memberData || currentUser;
+  const currentTier = activeUser.tier;
 
   // =========================================================================
   // RENDER
   // =========================================================================
+
+  if (loading && !settingsLoaded) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="w-8 h-8 text-[#5DB347] animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <div>
       {/* Header */}
@@ -442,7 +525,7 @@ export default function SettingsPage() {
         <p className="text-gray-500 text-sm mt-1">
           Manage your account preferences and privacy &mdash;{' '}
           <span className="text-navy font-medium">
-            {currentUser.firstName} {currentUser.lastName}
+            {profile?.full_name || `${activeUser.firstName} ${activeUser.lastName}`}
           </span>
         </p>
       </div>
@@ -797,7 +880,7 @@ export default function SettingsPage() {
                   </h2>
                   <p className="text-white/80 text-sm">
                     {tierData.find((t) => t.id === currentTier)?.price} &middot;
-                    Member since {currentUser.joinDate}
+                    Member since {activeUser.joinDate}
                   </p>
                   <div className="mt-4 flex flex-wrap gap-2">
                     {Object.values(

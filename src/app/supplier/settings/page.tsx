@@ -1,7 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { createClient } from '@/lib/supabase/client';
+import { useAuth } from '@/lib/supabase/auth-context';
 import {
   Settings,
   Bell,
@@ -108,6 +110,9 @@ type PayoutMethod = 'Bank Transfer' | 'Mobile Money';
 // =============================================================================
 
 export default function SupplierSettingsPage() {
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(true);
+
   // -- Notification preferences
   const [notifNewOrders, setNotifNewOrders] = useState(true);
   const [notifPaymentReceived, setNotifPaymentReceived] = useState(true);
@@ -128,6 +133,41 @@ export default function SupplierSettingsPage() {
   // -- Save states
   const [notifSaved, setNotifSaved] = useState(false);
   const [payoutSaved, setPayoutSaved] = useState(false);
+
+  // ── Fetch settings from Supabase ────────────────────────────────────────
+  useEffect(() => {
+    async function fetchSettings() {
+      try {
+        const supabase = createClient();
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user?.id ?? '')
+          .single();
+
+        if (profile) {
+          // Load notification preferences from profile metadata if available
+          const meta = (profile as any).metadata || {};
+          if (meta.notifNewOrders !== undefined) setNotifNewOrders(meta.notifNewOrders);
+          if (meta.notifPaymentReceived !== undefined) setNotifPaymentReceived(meta.notifPaymentReceived);
+          if (meta.notifReviews !== undefined) setNotifReviews(meta.notifReviews);
+          if (meta.notifCommissions !== undefined) setNotifCommissions(meta.notifCommissions);
+          if (meta.notifAdvertising !== undefined) setNotifAdvertising(meta.notifAdvertising);
+          if (meta.notifSystem !== undefined) setNotifSystem(meta.notifSystem);
+          if (meta.payoutMethod) setPayoutMethod(meta.payoutMethod);
+          if (meta.payoutFrequency) setPayoutFrequency(meta.payoutFrequency);
+          if (meta.payoutThreshold) setPayoutThreshold(meta.payoutThreshold);
+          if (meta.twoFactorEnabled !== undefined) setTwoFactorEnabled(meta.twoFactorEnabled);
+        }
+      } catch (err) {
+        // Keep fallback defaults
+      } finally {
+        setLoading(false);
+      }
+    }
+    if (user) fetchSettings();
+    else setLoading(false);
+  }, [user]);
 
   // -- Deactivation
   const [showDeactivateConfirm, setShowDeactivateConfirm] = useState(false);

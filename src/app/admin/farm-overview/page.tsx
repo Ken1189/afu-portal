@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createClient } from '@/lib/supabase/client';
 import { motion } from 'framer-motion';
 import {
   MapPin,
@@ -43,7 +44,7 @@ const FALLBACK_SUMMARY = {
   totalLivestock: 42_380,
 };
 
-const FALLBACK_CROPS: CropBreakdown[] = [
+const fallback_crops: CropBreakdown[] = [
   { name: 'Maize', totalHectares: 4200, farmerCount: 186, avgYield: 5.2, yieldUnit: 't/ha' },
   { name: 'Cassava', totalHectares: 3100, farmerCount: 142, avgYield: 12.8, yieldUnit: 't/ha' },
   { name: 'Blueberries', totalHectares: 980, farmerCount: 48, avgYield: 6.4, yieldUnit: 't/ha' },
@@ -55,7 +56,7 @@ const FALLBACK_CROPS: CropBreakdown[] = [
   { name: 'Tobacco', totalHectares: 1200, farmerCount: 41, avgYield: 2.4, yieldUnit: 't/ha' },
 ];
 
-const FALLBACK_LIVESTOCK: LivestockSummary[] = [
+const fallback_livestock: LivestockSummary[] = [
   { type: 'Cattle', totalCount: 18_400, avgHealthScore: 87 },
   { type: 'Poultry', totalCount: 12_600, avgHealthScore: 91 },
   { type: 'Goats', totalCount: 6_200, avgHealthScore: 84 },
@@ -63,7 +64,7 @@ const FALLBACK_LIVESTOCK: LivestockSummary[] = [
   { type: 'Pigs', totalCount: 2_080, avgHealthScore: 89 },
 ];
 
-const FALLBACK_COUNTRY_PRODUCTION: CountryProduction[] = [
+const fallback_countryProduction: CountryProduction[] = [
   { country: 'Zimbabwe', flag: '\uD83C\uDDFF\uD83C\uDDFC', tonnes: 48_200 },
   { country: 'Tanzania', flag: '\uD83C\uDDF9\uD83C\uDDFF', tonnes: 36_800 },
   { country: 'Botswana', flag: '\uD83C\uDDE7\uD83C\uDDFC', tonnes: 22_400 },
@@ -110,18 +111,82 @@ function healthColor(score: number): string {
 export default function FarmOverviewPage() {
   const { locale: _locale } = useLanguage();
   const [cropSearch, setCropSearch] = useState('');
+  const [crops, setCrops] = useState<CropBreakdown[]>(fallback_crops);
+  const [livestock, setLivestock] = useState<LivestockSummary[]>(fallback_livestock);
+  const [countryProduction, setCountryProduction] = useState<CountryProduction[]>(fallback_countryProduction);
+  const [summary, setSummary] = useState(FALLBACK_SUMMARY);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const maxTonnes = Math.max(...FALLBACK_COUNTRY_PRODUCTION.map((c) => c.tonnes), 1);
+  useEffect(() => {
+    const supabase = createClient();
+    async function fetchData() {
+      try {
+        // Fetch farm plots for crop data
+        const { data: plotData } = await supabase
+          .from('farm_plots')
+          .select('*');
+        if (plotData && plotData.length > 0) {
+          setSummary(prev => ({ ...prev, totalPlots: plotData.length, totalHectares: plotData.reduce((s: number, p: Record<string, unknown>) => s + ((p.size_hectares as number) || 0), 0) }));
+          // Group by crop
+          const cropMap: Record<string, { hectares: number; farmers: Set<string>; yields: number[] }> = {};
+          plotData.forEach((p: Record<string, unknown>) => {
+            const crop = (p.crop_type as string) || 'Unknown';
+            if (!cropMap[crop]) cropMap[crop] = { hectares: 0, farmers: new Set(), yields: [] };
+            cropMap[crop].hectares += (p.size_hectares as number) || 0;
+            cropMap[crop].farmers.add((p.farmer_id as string) || '');
+            if (p.avg_yield) cropMap[crop].yields.push(p.avg_yield as number);
+          });
+          const cropArr = Object.entries(cropMap).map(([name, d]) => ({
+            name,
+            totalHectares: Math.round(d.hectares),
+            farmerCount: d.farmers.size,
+            avgYield: d.yields.length > 0 ? Math.round((d.yields.reduce((a, b) => a + b, 0) / d.yields.length) * 10) / 10 : 0,
+            yieldUnit: 't/ha',
+          }));
+          if (cropArr.length > 0) setCrops(cropArr);
+        }
 
-  const filteredCrops = FALLBACK_CROPS.filter((c) =>
+        // Fetch livestock
+        const { data: lsData } = await supabase
+          .from('livestock')
+          .select('*');
+        if (lsData && lsData.length > 0) {
+          const lsMap: Record<string, { count: number; healthScores: number[] }> = {};
+          lsData.forEach((l: Record<string, unknown>) => {
+            const type = (l.animal_type as string) || 'Other';
+            if (!lsMap[type]) lsMap[type] = { count: 0, healthScores: [] };
+            lsMap[type].count += (l.count as number) || 1;
+            if (l.health_score) lsMap[type].healthScores.push(l.health_score as number);
+          });
+          const lsArr = Object.entries(lsMap).map(([type, d]) => ({
+            type,
+            totalCount: d.count,
+            avgHealthScore: d.healthScores.length > 0 ? Math.round(d.healthScores.reduce((a, b) => a + b, 0) / d.healthScores.length) : 85,
+          }));
+          if (lsArr.length > 0) {
+            setLivestock(lsArr);
+            setSummary(prev => ({ ...prev, totalLivestock: lsArr.reduce((s, l) => s + l.totalCount, 0) }));
+          }
+        }
+      } catch {
+        // fallback data already set
+      }
+      setIsLoading(false);
+    }
+    fetchData();
+  }, []);
+
+  const maxTonnes = Math.max(...countryProduction.map((c) => c.tonnes), 1);
+
+  const filteredCrops = crops.filter((c) =>
     c.name.toLowerCase().includes(cropSearch.toLowerCase())
   );
 
   const summaryCards = [
-    { label: 'Total Farm Plots', value: formatNumber(FALLBACK_SUMMARY.totalPlots), icon: <MapPin className="w-5 h-5" />, color: 'text-teal', bg: 'bg-teal/10' },
-    { label: 'Hectares Under Mgmt', value: formatNumber(FALLBACK_SUMMARY.totalHectares), icon: <Tractor className="w-5 h-5" />, color: 'text-navy', bg: 'bg-blue-50' },
-    { label: 'Active Crops', value: FALLBACK_SUMMARY.activeCrops.toString(), icon: <Sprout className="w-5 h-5" />, color: 'text-green-600', bg: 'bg-green-50' },
-    { label: 'Total Livestock', value: formatNumber(FALLBACK_SUMMARY.totalLivestock), icon: <HeartPulse className="w-5 h-5" />, color: 'text-amber-600', bg: 'bg-amber-50' },
+    { label: 'Total Farm Plots', value: formatNumber(summary.totalPlots), icon: <MapPin className="w-5 h-5" />, color: 'text-teal', bg: 'bg-teal/10' },
+    { label: 'Hectares Under Mgmt', value: formatNumber(summary.totalHectares), icon: <Tractor className="w-5 h-5" />, color: 'text-navy', bg: 'bg-blue-50' },
+    { label: 'Active Crops', value: summary.activeCrops.toString(), icon: <Sprout className="w-5 h-5" />, color: 'text-green-600', bg: 'bg-green-50' },
+    { label: 'Total Livestock', value: formatNumber(summary.totalLivestock), icon: <HeartPulse className="w-5 h-5" />, color: 'text-amber-600', bg: 'bg-amber-50' },
   ];
 
   return (
@@ -213,7 +278,7 @@ export default function FarmOverviewPage() {
             </h3>
           </div>
           <div className="divide-y divide-gray-50">
-            {FALLBACK_LIVESTOCK.map((ls) => (
+            {livestock.map((ls) => (
               <div key={ls.type} className="px-5 py-3 flex items-center justify-between hover:bg-cream/50 transition-colors">
                 <div>
                   <p className="font-medium text-navy text-sm">{ls.type}</p>
@@ -235,7 +300,7 @@ export default function FarmOverviewPage() {
           Top Producing Countries (tonnes)
         </h3>
         <div className="space-y-3">
-          {FALLBACK_COUNTRY_PRODUCTION.map((c, i) => (
+          {countryProduction.map((c, i) => (
             <motion.div
               key={c.country}
               initial={{ opacity: 0, x: -10 }}

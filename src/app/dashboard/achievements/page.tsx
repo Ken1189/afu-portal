@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -13,7 +13,10 @@ import {
   Award,
   Target,
   Clock,
+  Loader2,
 } from 'lucide-react';
+import { useAuth } from '@/lib/supabase/auth-context';
+import { createClient } from '@/lib/supabase/client';
 /* ------------------------------------------------------------------ */
 /*  Badge types & data (inlined from @/lib/data/badges)                 */
 /* ------------------------------------------------------------------ */
@@ -61,7 +64,7 @@ const badges: Badge[] = [
   { id: 'market-maven', name: 'Market Maven', description: 'Complete 10 or more marketplace transactions like a pro.', icon: '💎', category: 'marketplace', rarity: 'epic', requirement: '10+ marketplace transactions', points: 75 },
 ];
 
-const earnedBadges: EarnedBadge[] = [
+const defaultEarnedBadges: EarnedBadge[] = [
   { badgeId: 'first-steps', earnedAt: '2025-09-15T10:30:00Z' },
   { badgeId: 'profile-perfect', earnedAt: '2025-09-18T14:22:00Z' },
   { badgeId: 'verified-farmer', earnedAt: '2025-10-02T09:15:00Z' },
@@ -235,17 +238,99 @@ function BadgeCard({ badge, earned, earnedAt }: { badge: Badge; earned: boolean;
 /* ------------------------------------------------------------------ */
 
 export default function AchievementsPage() {
+  const { user } = useAuth();
+  const supabase = createClient();
+
   const [filter, setFilter] = useState<FilterTab>('all');
   const [categoryFilter, setCategoryFilter] = useState<BadgeCategory | 'all'>('all');
+  const [earnedBadges, setEarnedBadges] = useState<EarnedBadge[]>(defaultEarnedBadges);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch earned badges from Supabase
+  useEffect(() => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    async function fetchAchievements() {
+      setLoading(true);
+      try {
+        // Try fetching from farmer_badges or achievements table
+        const { data: badgeData } = await supabase
+          .from('farmer_badges')
+          .select('badge_id, earned_at')
+          .eq('profile_id', user!.id);
+
+        if (!cancelled && badgeData && badgeData.length > 0) {
+          const mapped: EarnedBadge[] = badgeData.map((b: Record<string, unknown>) => ({
+            badgeId: b.badge_id as string,
+            earnedAt: b.earned_at as string,
+          }));
+          setEarnedBadges(mapped);
+        }
+        // If no data, keep default earned badges as fallback
+
+        // Also try to derive achievements from course_enrollments and farmer_tiers
+        const [enrollRes, tierRes] = await Promise.all([
+          supabase.from('course_enrollments').select('id, status, enrolled_at').eq('profile_id', user!.id),
+          supabase.from('farmer_tiers').select('tier, points').eq('profile_id', user!.id).maybeSingle(),
+        ]);
+
+        if (!cancelled) {
+          const derivedBadges: EarnedBadge[] = [];
+          // Derive education badges from course enrollments
+          if (enrollRes.data && enrollRes.data.length > 0) {
+            const completedCourses = enrollRes.data.filter((e: Record<string, unknown>) => e.status === 'completed');
+            if (enrollRes.data.length > 0) {
+              derivedBadges.push({
+                badgeId: 'knowledge-seeker',
+                earnedAt: (enrollRes.data[0] as Record<string, unknown>).enrolled_at as string || new Date().toISOString(),
+              });
+            }
+            if (completedCourses.length >= 3) {
+              derivedBadges.push({
+                badgeId: 'scholar',
+                earnedAt: (completedCourses[2] as Record<string, unknown>).enrolled_at as string || new Date().toISOString(),
+              });
+            }
+            if (completedCourses.length >= 10) {
+              derivedBadges.push({
+                badgeId: 'expert-farmer',
+                earnedAt: (completedCourses[9] as Record<string, unknown>).enrolled_at as string || new Date().toISOString(),
+              });
+            }
+          }
+
+          // Merge derived badges with existing (avoid duplicates)
+          if (derivedBadges.length > 0) {
+            setEarnedBadges((prev) => {
+              const existingIds = new Set(prev.map((b) => b.badgeId));
+              const newBadges = derivedBadges.filter((b) => !existingIds.has(b.badgeId));
+              return newBadges.length > 0 ? [...prev, ...newBadges] : prev;
+            });
+          }
+        }
+      } catch {
+        // Supabase fetch failed — keep default earned badges as fallback
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    fetchAchievements();
+    return () => { cancelled = true; };
+  }, [user, supabase]);
 
   /* Computed values */
-  const earnedSet = useMemo(() => new Set(earnedBadges.map((e) => e.badgeId)), []);
+  const earnedSet = useMemo(() => new Set(earnedBadges.map((e) => e.badgeId)), [earnedBadges]);
 
   const earnedMap = useMemo(() => {
     const m = new Map<string, string>();
     earnedBadges.forEach((e) => m.set(e.badgeId, e.earnedAt));
     return m;
-  }, []);
+  }, [earnedBadges]);
 
   const totalPoints = useMemo(
     () => badges.filter((b) => earnedSet.has(b.id)).reduce((sum, b) => sum + b.points, 0),
@@ -293,7 +378,7 @@ export default function AchievementsPage() {
         ...eb,
         badge: badges.find((b) => b.id === eb.badgeId)!,
       }));
-  }, []);
+  }, [earnedBadges]);
 
   /* Categories for filter */
   const categories: (BadgeCategory | 'all')[] = [
@@ -305,6 +390,14 @@ export default function AchievementsPage() {
     'community',
     'marketplace',
   ];
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="w-8 h-8 text-[#8CB89C] animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">

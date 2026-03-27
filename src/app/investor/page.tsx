@@ -286,12 +286,57 @@ export default function InvestorDashboard() {
         return;
       }
       try {
+        // Try investor_profiles first, then fall back to ledger/wallet accounts
         const { data: ip } = await supabase
           .from('investor_profiles')
           .select('*')
           .eq('user_id', user.id)
           .single();
-        if (ip) setInvestorProfile(ip);
+        if (ip) {
+          setInvestorProfile(ip);
+        } else {
+          // Attempt to build profile from ledger_accounts and wallet_accounts
+          let totalCommitted = 0;
+          let totalDeployed = 0;
+          let returnsToDate = 0;
+
+          const { data: ledgerData } = await supabase
+            .from('ledger_accounts')
+            .select('balance, account_type')
+            .eq('user_id', user.id);
+          if (ledgerData && ledgerData.length > 0) {
+            totalCommitted = ledgerData.reduce((sum: number, r: Record<string, unknown>) => sum + (Number(r.balance) || 0), 0);
+          }
+
+          const { data: walletData } = await supabase
+            .from('wallet_accounts')
+            .select('balance, currency')
+            .eq('user_id', user.id);
+          if (walletData && walletData.length > 0) {
+            totalDeployed = walletData.reduce((sum: number, r: Record<string, unknown>) => sum + (Number(r.balance) || 0), 0);
+          }
+
+          const { data: interestsData } = await supabase
+            .from('investor_interests')
+            .select('amount, status')
+            .eq('user_id', user.id);
+          if (interestsData && interestsData.length > 0) {
+            returnsToDate = interestsData
+              .filter((r: Record<string, unknown>) => r.status === 'confirmed' || r.status === 'active')
+              .reduce((sum: number, r: Record<string, unknown>) => sum + (Number(r.amount) || 0), 0);
+          }
+
+          if (totalCommitted > 0 || totalDeployed > 0) {
+            setInvestorProfile({
+              id: user.id,
+              user_id: user.id,
+              company_name: null,
+              total_committed: totalCommitted,
+              total_deployed: totalDeployed,
+              returns_to_date: returnsToDate,
+            });
+          }
+        }
 
         const { data: upd } = await supabase
           .from('investor_updates')

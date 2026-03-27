@@ -1,7 +1,9 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '@/lib/supabase/auth-context';
+import { createClient } from '@/lib/supabase/client';
 import {
   MapPin,
   Search,
@@ -891,12 +893,51 @@ function DeliveredCard({ booking }: { booking: TransportBooking }) {
 // ---------------------------------------------------------------------------
 
 export default function TrackingPage() {
+  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [showDelivered, setShowDelivered] = useState(false);
+  const [liveBookings, setLiveBookings] = useState<TransportBooking[]>(transportBookings);
+  const [dataLoading, setDataLoading] = useState(true);
+
+  useEffect(() => {
+    const supabase = createClient();
+    const load = async () => {
+      try {
+        let query = supabase.from('shipments').select('*').order('created_at', { ascending: false });
+        if (user) query = query.eq('member_id', user.id);
+        const { data } = await query;
+        if (data && data.length > 0) {
+          setLiveBookings(data.map((s: any) => ({
+            id: s.id,
+            farmerId: s.member_id || '',
+            farmerName: '',
+            type: 'dry-bulk' as TransportType,
+            carrierId: '',
+            carrierName: s.carrier || '',
+            origin: s.origin || '',
+            destination: s.destination || '',
+            cargo: s.cargo_type || '',
+            weight: s.weight_kg || 0,
+            status: (s.status || 'requested').replace('_', '-') as BookingStatus,
+            requestDate: s.created_at?.split('T')[0] || '',
+            pickupDate: s.pickup_date || '',
+            deliveryDate: s.delivery_date || null,
+            estimatedCost: s.cost || 0,
+            actualCost: s.status === 'delivered' ? s.cost : null,
+            currency: s.currency || 'USD',
+            notes: s.notes || '',
+            timeline: [],
+          })));
+        }
+      } catch { /* keep fallback */ }
+      setDataLoading(false);
+    };
+    load();
+  }, [user]);
 
   // Active shipments: confirmed or in-transit
   const activeShipments = useMemo(() => {
-    const active = transportBookings.filter(
+    const active = liveBookings.filter(
       (b) => b.status === 'confirmed' || b.status === 'in-transit'
     );
     if (!searchQuery.trim()) return active;
@@ -915,17 +956,17 @@ export default function TrackingPage() {
   const recentlyDelivered = useMemo(() => {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    return transportBookings.filter((b) => {
+    return liveBookings.filter((b) => {
       if (b.status !== 'delivered' || !b.deliveryDate) return false;
       return new Date(b.deliveryDate) >= thirtyDaysAgo;
     });
-  }, []);
+  }, [liveBookings]);
 
   // Search across all bookings if searching
   const searchResults = useMemo(() => {
     if (!searchQuery.trim()) return null;
     const q = searchQuery.toLowerCase();
-    return transportBookings.filter(
+    return liveBookings.filter(
       (b) =>
         b.id.toLowerCase().includes(q) ||
         b.origin.toLowerCase().includes(q) ||

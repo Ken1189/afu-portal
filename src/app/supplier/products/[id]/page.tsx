@@ -1,9 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { createClient } from '@/lib/supabase/client';
+import { useAuth } from '@/lib/supabase/auth-context';
 import {
   LineChart,
   Line,
@@ -292,8 +294,55 @@ function CustomTooltip({
 
 export default function SupplierProductDetailPage() {
   const params = useParams();
+  const { user } = useAuth();
   const productId = params.id as string;
-  const product = supplierProducts.find((p) => p.id === productId);
+  const [dbProduct, setDbProduct] = useState<SupplierProduct | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  // ── Fetch single product from Supabase ──────────────────────────────────
+  useEffect(() => {
+    async function fetchProduct() {
+      try {
+        const supabase = createClient();
+        const { data: p } = await supabase
+          .from('products')
+          .select('*, supplier:suppliers(company_name, verified)')
+          .eq('id', productId)
+          .single();
+
+        if (p) {
+          const mapped: SupplierProduct = {
+            id: p.id,
+            supplierId: p.supplier_id,
+            supplierName: (p.supplier as any)?.company_name || '',
+            name: p.name,
+            description: p.description || '',
+            category: p.category || 'seeds',
+            price: p.price,
+            memberPrice: p.member_price || p.price,
+            currency: p.currency || 'USD',
+            unit: p.unit || 'unit',
+            image: p.image_url || 'https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=400&h=300&fit=crop',
+            availability: p.in_stock ? 'in-stock' : 'out-of-stock',
+            rating: p.rating || 0,
+            reviewCount: p.review_count || 0,
+            soldCount: p.sold_count || 0,
+            tags: p.tags || [],
+            featured: p.featured || false,
+            minOrder: 1,
+          };
+          setDbProduct(mapped);
+        }
+      } catch (err) {
+        // Fall back to static data
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchProduct();
+  }, [productId]);
+
+  const product = dbProduct || supplierProducts.find((p) => p.id === productId);
 
   const [selectedImage, setSelectedImage] = useState(0);
 

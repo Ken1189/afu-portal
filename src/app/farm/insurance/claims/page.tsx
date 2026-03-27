@@ -1,8 +1,10 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '@/lib/supabase/auth-context';
+import { createClient } from '@/lib/supabase/client';
 import {
   FileText,
   Camera,
@@ -241,9 +243,41 @@ type FilterKey = 'all' | ClaimStatus;
 /* ------------------------------------------------------------------ */
 export default function ClaimsPage() {
   const { t } = useLanguage();
+  const { user } = useAuth();
   const ti = t.insurance;
 
-  const insuranceClaims = mockInsuranceClaims;
+  const [insuranceClaims, setInsuranceClaims] = useState<InsuranceClaim[]>(mockInsuranceClaims);
+  const [dataLoading, setDataLoading] = useState(true);
+
+  useEffect(() => {
+    const supabase = createClient();
+    const load = async () => {
+      try {
+        let query = supabase.from('insurance_claims').select('*').order('submitted_at', { ascending: false });
+        if (user) query = query.eq('member_id', user.id);
+        const { data } = await query;
+        if (data && data.length > 0) {
+          setInsuranceClaims(data.map((c: any) => ({
+            id: c.id,
+            policyId: c.policy_id || '',
+            policyName: c.description?.split(' ')[0] || 'Policy',
+            type: 'crop' as InsuranceType,
+            status: (c.status || 'submitted').replace('_', '-') as ClaimStatus,
+            submittedDate: c.submitted_at?.split('T')[0] || '',
+            incidentDate: c.submitted_at?.split('T')[0] || '',
+            description: c.description || '',
+            estimatedLoss: c.claim_amount || 0,
+            approvedAmount: c.approved_amount,
+            paidDate: c.reviewed_at?.split('T')[0] || null,
+            photos: (c.evidence_urls || []).length,
+            timeline: [{ date: c.submitted_at?.split('T')[0] || '', status: 'Submitted', note: 'Claim submitted' }],
+          })));
+        }
+      } catch { /* keep fallback */ }
+      setDataLoading(false);
+    };
+    load();
+  }, [user]);
 
   const [activeFilter, setActiveFilter] = useState<FilterKey>('all');
   const [expandedClaim, setExpandedClaim] = useState<string | null>(null);

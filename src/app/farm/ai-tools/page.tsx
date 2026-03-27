@@ -1,7 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '@/lib/supabase/auth-context';
+import { createClient } from '@/lib/supabase/client';
 import {
   Brain,
   Camera,
@@ -889,7 +891,34 @@ function ToolContent({ toolId }: { toolId: string }) {
 // ---------------------------------------------------------------------------
 
 export default function AIToolsPage() {
+  const { user } = useAuth();
   const [expandedTool, setExpandedTool] = useState<string | null>(null);
+  const [liveDiagnosis, setLiveDiagnosis] = useState<DiagnosisResult>(mockDiagnosis);
+  const [dataLoading, setDataLoading] = useState(true);
+
+  useEffect(() => {
+    // Attempt to fetch any AI diagnosis results from Supabase or an AI endpoint
+    const load = async () => {
+      try {
+        const supabase = createClient();
+        // Try fetching latest farm activity as context for AI tools
+        if (user) {
+          const { data } = await supabase
+            .from('farm_activities')
+            .select('*')
+            .eq('member_id', user.id)
+            .order('date', { ascending: false })
+            .limit(1);
+          // Data available but diagnosis stays as demo until real AI endpoint exists
+          if (data && data.length > 0) {
+            // Context loaded — keep demo diagnosis as fallback
+          }
+        }
+      } catch { /* keep fallback */ }
+      setDataLoading(false);
+    };
+    load();
+  }, [user]);
 
   const toggleTool = (toolId: string) => {
     setExpandedTool(expandedTool === toolId ? null : toolId);

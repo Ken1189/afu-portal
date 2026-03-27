@@ -1,8 +1,10 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { createClient } from '@/lib/supabase/client';
+import { useAuth } from '@/lib/supabase/auth-context';
 import {
   AreaChart,
   Area,
@@ -282,13 +284,63 @@ function CustomTooltip({
 // ═══════════════════════════════════════════════════════════════════════════
 
 export default function CommissionTracking() {
+  const { user } = useAuth();
   const [selectedPeriod, setSelectedPeriod] = useState<Period>('all-time');
   const [showPayoutModal, setShowPayoutModal] = useState(false);
+  const [liveCommissions, setLiveCommissions] = useState<Commission[]>(supplierCommissions);
+  const [loading, setLoading] = useState(true);
+
+  // ── Fetch commissions from Supabase ─────────────────────────────────────
+  useEffect(() => {
+    async function fetchCommissions() {
+      try {
+        const supabase = createClient();
+        const { data: supplier } = await supabase
+          .from('suppliers')
+          .select('id, company_name')
+          .eq('email', user?.email ?? '')
+          .single();
+
+        if (supplier) {
+          const { data: dbCommissions } = await supabase
+            .from('commissions')
+            .select('*, order:orders(order_number, created_at)')
+            .eq('supplier_id', supplier.id)
+            .order('created_at', { ascending: false });
+
+          if (dbCommissions && dbCommissions.length > 0) {
+            const mapped: Commission[] = dbCommissions.map((c: any) => ({
+              id: c.id,
+              supplierId: c.supplier_id,
+              supplierName: supplier.company_name,
+              orderId: c.order?.order_number || c.order_id,
+              productName: 'Order Item',
+              buyerName: 'Customer',
+              buyerType: 'commercial' as const,
+              orderAmount: c.sale_amount || 0,
+              commissionRate: c.commission_rate || 0,
+              commissionAmount: c.commission_amount || 0,
+              status: c.status || 'pending',
+              orderDate: (c.order?.created_at || c.created_at)?.split('T')[0] || '',
+              paymentDate: c.paid_at?.split('T')[0] || null,
+            }));
+            setLiveCommissions(mapped);
+          }
+        }
+      } catch (err) {
+        // Keep fallback demo data
+      } finally {
+        setLoading(false);
+      }
+    }
+    if (user) fetchCommissions();
+    else setLoading(false);
+  }, [user]);
 
   // ── Filter commissions by period ──────────────────────────────────────
   const filteredCommissions = useMemo(() => {
     const now = new Date();
-    return supplierCommissions.filter((c) => {
+    return liveCommissions.filter((c) => {
       const date = new Date(c.orderDate);
       switch (selectedPeriod) {
         case 'this-month':
@@ -306,7 +358,7 @@ export default function CommissionTracking() {
           return true;
       }
     });
-  }, [selectedPeriod]);
+  }, [selectedPeriod, liveCommissions]);
 
   // ── Period totals ─────────────────────────────────────────────────────
   const periodTotal = filteredCommissions.reduce((sum, c) => sum + c.commissionAmount, 0);
@@ -325,7 +377,7 @@ export default function CommissionTracking() {
     {
       label: 'Pending Balance',
       value: formatCurrency(pendingBalance + approvedBalance),
-      sublabel: `${supplierCommissions.filter((c) => c.status === 'pending' || c.status === 'approved').length} transactions`,
+      sublabel: `${liveCommissions.filter((c) => c.status === 'pending' || c.status === 'approved').length} transactions`,
       icon: <Clock className="w-5 h-5" />,
       color: 'text-[#D4A843]',
       bgColor: 'bg-amber-50',
@@ -334,7 +386,7 @@ export default function CommissionTracking() {
     {
       label: 'Paid Out',
       value: formatCurrency(paidOut),
-      sublabel: `${supplierCommissions.filter((c) => c.status === 'paid').length} payouts completed`,
+      sublabel: `${liveCommissions.filter((c) => c.status === 'paid').length} payouts completed`,
       icon: <Wallet className="w-5 h-5" />,
       color: 'text-[#8CB89C]',
       bgColor: 'bg-[#8CB89C]/10',

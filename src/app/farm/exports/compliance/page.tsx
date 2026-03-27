@@ -1,8 +1,10 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '@/lib/supabase/auth-context';
+import { createClient } from '@/lib/supabase/client';
 import {
   ShieldCheck,
   ArrowLeft,
@@ -812,7 +814,27 @@ function AuditCard({ audit }: { audit: AuditRecord }) {
 // ---------------------------------------------------------------------------
 
 export default function ExportCompliancePage() {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<TabType>('requirements');
+  const [kycDocs, setKycDocs] = useState<any[]>([]);
+  const [dataLoading, setDataLoading] = useState(true);
+
+  useEffect(() => {
+    const supabase = createClient();
+    const load = async () => {
+      try {
+        const { data } = await supabase
+          .from('kyc_documents')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (data && data.length > 0) {
+          setKycDocs(data);
+        }
+      } catch { /* keep fallback */ }
+      setDataLoading(false);
+    };
+    load();
+  }, [user]);
 
   // Overall compliance score
   const overallScore = useMemo(() => {

@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { createClient } from '@/lib/supabase/client';
 import { motion } from 'framer-motion';
 import {
   ArrowLeft,
@@ -76,7 +77,7 @@ interface Member {
   lastUpdated: string;
 }
 
-const members: Member[] = [
+const fallback_members: Member[] = [
   { rank: 1,  name: 'Amara Diallo',      country: 'Kenya',      score: 948, tier: 'Excellent', trend: 'up',   paymentHistory: 98, farmProductivity: 91, lastUpdated: '2026-03-18' },
   { rank: 2,  name: 'Chidi Okonkwo',     country: 'Nigeria',    score: 921, tier: 'Excellent', trend: 'up',   paymentHistory: 96, farmProductivity: 88, lastUpdated: '2026-03-18' },
   { rank: 3,  name: 'Fatima Nkosi',      country: 'Zimbabwe',   score: 887, tier: 'Excellent', trend: 'flat', paymentHistory: 94, farmProductivity: 82, lastUpdated: '2026-03-18' },
@@ -89,7 +90,7 @@ const members: Member[] = [
   { rank: 10, name: 'Babajide Adeyemi',  country: 'Nigeria',    score: 352, tier: 'Poor',      trend: 'down', paymentHistory: 42, farmProductivity: 38, lastUpdated: '2026-03-15' },
 ];
 
-const recentOverrides = [
+const fallback_recentOverrides = [
   {
     id: 1,
     member: 'Tendai Moyo',
@@ -137,6 +138,42 @@ export default function CreditScoresPage() {
   const [search, setSearch]       = useState('');
   const [sortKey, setSortKey]     = useState<SortKey>('score');
   const [sortDir, setSortDir]     = useState<SortDir>('desc');
+  const [members, setMembers]     = useState<Member[]>(fallback_members);
+  const [recentOverrides, setRecentOverrides] = useState(fallback_recentOverrides);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const supabase = createClient();
+    async function fetchData() {
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('id, full_name, country, credit_score, credit_trend, payment_history_pct, farm_productivity_pct, credit_score_updated_at')
+          .not('credit_score', 'is', null)
+          .order('credit_score', { ascending: false });
+
+        if (!error && data && data.length > 0) {
+          setMembers(
+            data.map((row: Record<string, unknown>, idx: number) => ({
+              rank: idx + 1,
+              name: (row.full_name as string) || 'Unknown',
+              country: (row.country as string) || 'Unknown',
+              score: (row.credit_score as number) || 0,
+              tier: getTier((row.credit_score as number) || 0),
+              trend: ((row.credit_trend as string) || 'flat') as 'up' | 'down' | 'flat',
+              paymentHistory: (row.payment_history_pct as number) || 0,
+              farmProductivity: (row.farm_productivity_pct as number) || 0,
+              lastUpdated: (row.credit_score_updated_at as string)?.split('T')[0] || '',
+            }))
+          );
+        }
+      } catch {
+        // fallback already set
+      }
+      setIsLoading(false);
+    }
+    fetchData();
+  }, []);
 
   // ── Filtering & Sorting ──
   const filtered = members

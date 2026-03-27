@@ -1,9 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { createClient } from '@/lib/supabase/client';
+import { useAuth } from '@/lib/supabase/auth-context';
 import {
   ArrowLeft,
   ChevronRight,
@@ -226,10 +228,59 @@ function generatePaymentRef(orderId: string): string {
 
 export default function SupplierOrderDetailPage() {
   const params = useParams();
+  const { user } = useAuth();
   const orderId = params.id as string;
-  const order = supplierOrders.find((o) => o.id === orderId);
+  const [dbOrder, setDbOrder] = useState<SupplierOrder | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  // ── Fetch single order from Supabase ─────────────────────────────────────
+  useEffect(() => {
+    async function fetchOrder() {
+      try {
+        const supabase = createClient();
+        const { data: orderData } = await supabase
+          .from('orders')
+          .select('*, order_items(*, product:products(name))')
+          .eq('order_number', orderId)
+          .single();
+
+        if (orderData) {
+          const item = orderData.order_items?.[0];
+          const mapped: SupplierOrder = {
+            id: orderData.order_number,
+            productName: item?.product?.name || 'Product',
+            productId: item?.product_id || '',
+            buyerName: orderData.shipping_address?.name || 'Customer',
+            buyerType: 'commercial',
+            quantity: item?.quantity || 1,
+            amount: orderData.total,
+            status: (orderData.status === 'pending' ? 'new' : orderData.status) || 'new',
+            orderDate: orderData.created_at?.split('T')[0] || '',
+            deliveryDate: orderData.updated_at?.split('T')[0] || null,
+            shippingAddress: orderData.shipping_address
+              ? Object.values(orderData.shipping_address).join(', ')
+              : '',
+            paymentMethod: 'Bank Transfer',
+          };
+          setDbOrder(mapped);
+        }
+      } catch (err) {
+        // Fall back to static data
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchOrder();
+  }, [orderId]);
+
+  const order = dbOrder || supplierOrders.find((o) => o.id === orderId);
 
   const [currentStatus, setCurrentStatus] = useState<OrderStatus>(order?.status || 'new');
+
+  // Update currentStatus when dbOrder loads
+  useEffect(() => {
+    if (dbOrder) setCurrentStatus(dbOrder.status);
+  }, [dbOrder]);
 
   if (!order) {
     return (

@@ -1,8 +1,10 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '@/lib/supabase/auth-context';
+import { createClient } from '@/lib/supabase/client';
 import {
   Ship,
   FileText,
@@ -634,16 +636,48 @@ function HistoryCard({ shipment }: { shipment: ExportShipment }) {
 // ---------------------------------------------------------------------------
 
 export default function ExportHubPage() {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<TabType>('active');
   const [historyFilter, setHistoryFilter] = useState<ShipmentStatus | 'all'>(
     'all'
   );
   const [historySearch, setHistorySearch] = useState('');
+  const [liveShipments, setLiveShipments] = useState<ExportShipment[]>(exportShipments);
+  const [liveDocs, setLiveDocs] = useState<ExportDocument[]>(exportDocuments);
+  const [dataLoading, setDataLoading] = useState(true);
+
+  useEffect(() => {
+    const supabase = createClient();
+    const load = async () => {
+      try {
+        const { data: shipData } = await supabase
+          .from('export_documents')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (shipData && shipData.length > 0) {
+          setLiveDocs(shipData.map((d: any) => ({
+            id: d.id,
+            shipmentId: d.member_id || '',
+            type: d.document_type as DocumentType,
+            title: d.document_type?.replace(/-/g, ' ') || '',
+            status: (d.status || 'not-started') as DocumentStatus,
+            issuedBy: d.country_of_origin || '',
+            issuedDate: d.created_at?.split('T')[0] || null,
+            expiryDate: null,
+            reference: d.id,
+            notes: d.notes || '',
+          })));
+        }
+      } catch { /* keep fallback */ }
+      setDataLoading(false);
+    };
+    load();
+  }, [user]);
 
   // Computed data
   const activeShipments = useMemo(
     () =>
-      exportShipments.filter(
+      liveShipments.filter(
         (s) =>
           s.status === 'in-transit' ||
           s.status === 'at-port' ||
@@ -654,36 +688,36 @@ export default function ExportHubPage() {
   );
 
   const totalExportValue = useMemo(
-    () => exportShipments.reduce((sum, s) => sum + s.value, 0),
-    []
+    () => liveShipments.reduce((sum, s) => sum + s.value, 0),
+    [liveShipments]
   );
 
   const pendingDocs = useMemo(
     () =>
-      exportDocuments.filter(
+      liveDocs.filter(
         (d) =>
           d.status === 'in-progress' ||
           d.status === 'submitted' ||
           d.status === 'not-started'
       ).length,
-    []
+    [liveDocs]
   );
 
   const uniqueCountries = useMemo(
-    () => new Set(exportShipments.map((s) => s.destination)).size,
-    []
+    () => new Set(liveShipments.map((s) => s.destination)).size,
+    [liveShipments]
   );
 
   const complianceScore = useMemo(() => {
-    const total = exportDocuments.length;
-    const approved = exportDocuments.filter(
+    const total = liveDocs.length;
+    const approved = liveDocs.filter(
       (d) => d.status === 'approved'
     ).length;
     return total > 0 ? Math.round((approved / total) * 100) : 0;
-  }, []);
+  }, [liveDocs]);
 
   const filteredHistory = useMemo(() => {
-    let list = exportShipments;
+    let list = liveShipments;
     if (historyFilter !== 'all') {
       list = list.filter((s) => s.status === historyFilter);
     }

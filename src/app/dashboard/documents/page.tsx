@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Upload,
@@ -18,8 +18,11 @@ import {
   Image as ImageIcon,
   File,
   Shield,
+  Loader2,
 } from 'lucide-react';
 import { FileUpload } from '@/components/ui/FileUpload';
+import { useAuth } from '@/lib/supabase/auth-context';
+import { createClient } from '@/lib/supabase/client';
 
 type DocStatus = 'verified' | 'pending' | 'rejected' | 'expired';
 
@@ -34,7 +37,7 @@ interface Document {
   statusNote?: string;
 }
 
-const documents: Document[] = [
+const defaultDocuments: Document[] = [
   { id: 'DOC-001', name: 'Membership Agreement', type: 'PDF', size: '245 KB', date: 'Jan 15, 2026', category: 'Contracts', status: 'verified' },
   { id: 'DOC-002', name: 'Working Capital Loan Agreement - FIN-2026-012', type: 'PDF', size: '380 KB', date: 'Feb 1, 2026', category: 'Financing', status: 'verified' },
   { id: 'DOC-003', name: 'Invoice Finance Agreement - FIN-2026-018', type: 'PDF', size: '320 KB', date: 'Feb 20, 2026', category: 'Financing', status: 'verified' },
@@ -46,6 +49,17 @@ const documents: Document[] = [
   { id: 'DOC-009', name: 'Bank Statement (Dec-Feb)', type: 'PDF', size: '890 KB', date: 'Mar 9, 2026', category: 'Financing', status: 'rejected', statusNote: 'Document older than 3 months. Please upload a recent one.' },
   { id: 'DOC-010', name: 'Farm Photos - Season 2', type: 'ZIP', size: '15.4 MB', date: 'Mar 11, 2026', category: 'Compliance', status: 'pending' },
 ];
+
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function getFileType(name: string): string {
+  const ext = name.split('.').pop()?.toUpperCase() || 'FILE';
+  return ext;
+}
 
 const categories = ['All', 'Contracts', 'Financing', 'Offtake', 'Compliance', 'Certifications', 'KYC'];
 
@@ -64,10 +78,67 @@ const typeIcon: Record<string, React.ElementType> = {
 };
 
 export default function DocumentsPage() {
+  const { user } = useAuth();
+  const supabase = createClient();
+
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [showUpload, setShowUpload] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [documents, setDocuments] = useState<Document[]>(defaultDocuments);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch documents from Supabase
+  useEffect(() => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    async function fetchDocuments() {
+      setLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('documents')
+          .select('*')
+          .eq('profile_id', user!.id)
+          .order('created_at', { ascending: false });
+
+        if (!cancelled && data && data.length > 0) {
+          const mapped: Document[] = data.map((doc: Record<string, unknown>) => ({
+            id: (doc.id as string) || '',
+            name: (doc.name as string) || (doc.file_name as string) || 'Untitled',
+            type: getFileType((doc.name as string) || (doc.file_name as string) || ''),
+            size: doc.file_size ? formatFileSize(doc.file_size as number) : 'N/A',
+            date: doc.created_at
+              ? new Date(doc.created_at as string).toLocaleDateString('en-GB', { month: 'short', day: 'numeric', year: 'numeric' })
+              : 'N/A',
+            category: (doc.category as string) || 'Compliance',
+            status: ((doc.status as string) || 'pending') as DocStatus,
+            statusNote: (doc.status_note as string) || undefined,
+          }));
+          setDocuments(mapped);
+        }
+        // If no data returned, keep the default demo documents as fallback
+      } catch {
+        // Supabase fetch failed — keep default documents as fallback
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    fetchDocuments();
+    return () => { cancelled = true; };
+  }, [user, supabase]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="w-8 h-8 text-teal animate-spin" />
+      </div>
+    );
+  }
 
   const filtered = documents.filter((doc) => {
     const matchCat = activeCategory === 'All' || doc.category === activeCategory;

@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { createClient } from '@/lib/supabase/client';
 import { motion } from 'framer-motion';
 import {
   Search,
@@ -30,7 +31,7 @@ type StatusFilter = 'all' | 'available' | 'in-use' | 'maintenance';
 
 // ── Placeholder Data ─────────────────────────────────────────────────────────
 
-const FALLBACK_EQUIPMENT: EquipmentRecord[] = [
+const fallback_equipment: EquipmentRecord[] = [
   { id: 'EQ-001', name: 'John Deere 5055E', type: 'Tractor', ownerName: 'Grace Moyo', farmName: 'Moyo Farm', status: 'available', dailyRate: 120, location: 'Zimbabwe' },
   { id: 'EQ-002', name: 'Kubota L3901', type: 'Tractor', ownerName: 'Baraka Mushi', farmName: 'Mushi Agri', status: 'in-use', dailyRate: 95, location: 'Tanzania' },
   { id: 'EQ-003', name: 'Netafim Drip System', type: 'Irrigation', ownerName: 'Tendai Chirwa', farmName: 'Chirwa Orchards', status: 'available', dailyRate: 45, location: 'Zimbabwe' },
@@ -91,9 +92,39 @@ export default function EquipmentRegistryPage() {
   const { locale: _locale } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const [equipment, setEquipment] = useState<EquipmentRecord[]>(fallback_equipment);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const supabase = createClient();
+    async function fetchData() {
+      try {
+        const { data, error } = await supabase
+          .from('equipment')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (!error && data && data.length > 0) {
+          setEquipment(
+            data.map((row: Record<string, unknown>) => ({
+              id: (row.id as string) || '',
+              name: (row.name as string) || 'Unknown',
+              type: (row.equipment_type as string) || (row.type as string) || 'Other',
+              ownerName: (row.owner_name as string) || 'Unknown',
+              farmName: (row.farm_name as string) || '',
+              status: ((row.status as string) || 'available') as EquipmentRecord['status'],
+              dailyRate: (row.daily_rate as number) || 0,
+              location: (row.location as string) || (row.country as string) || '',
+            }))
+          );
+        }
+      } catch { /* fallback */ }
+      setIsLoading(false);
+    }
+    fetchData();
+  }, []);
 
   const filtered = useMemo(() => {
-    let result = [...FALLBACK_EQUIPMENT];
+    let result = [...equipment];
     if (statusFilter !== 'all') result = result.filter((e) => e.status === statusFilter);
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
@@ -107,10 +138,10 @@ export default function EquipmentRegistryPage() {
     return result;
   }, [searchQuery, statusFilter]);
 
-  const totalEquipment = FALLBACK_EQUIPMENT.length;
-  const availableNow = FALLBACK_EQUIPMENT.filter((e) => e.status === 'available').length;
-  const activeBookings = FALLBACK_EQUIPMENT.filter((e) => e.status === 'in-use').length;
-  const rentalRevenue = FALLBACK_EQUIPMENT.filter((e) => e.status === 'in-use').reduce((s, e) => s + e.dailyRate * 30, 0);
+  const totalEquipment = equipment.length;
+  const availableNow = equipment.filter((e) => e.status === 'available').length;
+  const activeBookings = equipment.filter((e) => e.status === 'in-use').length;
+  const rentalRevenue = equipment.filter((e) => e.status === 'in-use').reduce((s, e) => s + e.dailyRate * 30, 0);
 
   const summaryCards = [
     { label: 'Total Equipment', value: totalEquipment.toString(), icon: <Wrench className="w-5 h-5" />, color: 'text-teal', bg: 'bg-teal/10' },

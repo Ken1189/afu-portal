@@ -1,7 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { createClient } from '@/lib/supabase/client';
+import { useAuth } from '@/lib/supabase/auth-context';
 import {
   AreaChart,
   Area,
@@ -276,9 +278,77 @@ function CountryTooltip({
 // =============================================================================
 
 export default function SupplierAnalyticsPage() {
+  const { user } = useAuth();
   const [dateRange, setDateRange] = useState<DateRange>('All Time');
   const [chartView, setChartView] = useState<ChartView>('Revenue');
   const [dateDropdownOpen, setDateDropdownOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [liveRevenueTrend, setLiveRevenueTrend] = useState(revenueTrendData);
+  const [liveTopProducts, setLiveTopProducts] = useState(topProductsData);
+
+  // ── Fetch analytics data from Supabase ──────────────────────────────────
+  useEffect(() => {
+    async function fetchAnalytics() {
+      try {
+        const supabase = createClient();
+        const { data: supplier } = await supabase
+          .from('suppliers')
+          .select('id')
+          .eq('email', user?.email ?? '')
+          .single();
+
+        if (supplier) {
+          // Fetch order items for revenue data
+          const { data: orderItems } = await supabase
+            .from('order_items')
+            .select('total_price, created_at, product:products(name)')
+            .eq('supplier_id', supplier.id)
+            .order('created_at', { ascending: true });
+
+          if (orderItems && orderItems.length > 0) {
+            // Group by month for revenue trend
+            const monthMap = new Map<string, { revenue: number; orders: number }>();
+            orderItems.forEach((item: any) => {
+              const d = new Date(item.created_at);
+              const key = `${d.toLocaleString('en', { month: 'short' })} ${String(d.getFullYear()).slice(2)}`;
+              const existing = monthMap.get(key) || { revenue: 0, orders: 0 };
+              monthMap.set(key, {
+                revenue: existing.revenue + (item.total_price || 0),
+                orders: existing.orders + 1,
+              });
+            });
+            if (monthMap.size > 0) {
+              setLiveRevenueTrend(
+                Array.from(monthMap.entries()).map(([month, data]) => ({
+                  month,
+                  revenue: data.revenue,
+                  orders: data.orders,
+                }))
+              );
+            }
+
+            // Top products by revenue
+            const productMap = new Map<string, number>();
+            orderItems.forEach((item: any) => {
+              const name = (item.product as any)?.name || 'Unknown';
+              productMap.set(name, (productMap.get(name) || 0) + (item.total_price || 0));
+            });
+            const topProds = Array.from(productMap.entries())
+              .sort((a, b) => b[1] - a[1])
+              .slice(0, 5)
+              .map(([name, revenue]) => ({ name, revenue }));
+            if (topProds.length > 0) setLiveTopProducts(topProds);
+          }
+        }
+      } catch (err) {
+        // Keep fallback demo data
+      } finally {
+        setLoading(false);
+      }
+    }
+    if (user) fetchAnalytics();
+    else setLoading(false);
+  }, [user]);
 
   return (
     <motion.div

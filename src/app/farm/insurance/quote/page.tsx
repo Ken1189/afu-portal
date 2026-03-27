@@ -1,8 +1,10 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '@/lib/supabase/auth-context';
+import { createClient } from '@/lib/supabase/client';
 import {
   Shield,
   CheckCircle2,
@@ -251,9 +253,43 @@ const typeRates: Record<InsuranceType, number> = {
 /* ------------------------------------------------------------------ */
 export default function QuotePage() {
   const { t } = useLanguage();
+  const { user } = useAuth();
   const ti = t.insurance;
 
-  const insuranceProducts: InsuranceProduct[] = mockInsuranceProducts;
+  const [insuranceProducts, setInsuranceProducts] = useState<InsuranceProduct[]>(mockInsuranceProducts);
+  const [dataLoading, setDataLoading] = useState(true);
+
+  useEffect(() => {
+    const supabase = createClient();
+    const load = async () => {
+      try {
+        const { data } = await supabase
+          .from('insurance_products')
+          .select('*')
+          .eq('active', true)
+          .order('name');
+        if (data && data.length > 0) {
+          setInsuranceProducts(data.map((p: any) => ({
+            id: p.id,
+            name: p.name,
+            type: (p.type || 'crop') as InsuranceType,
+            description: p.description || '',
+            coverageDetails: p.coverage_details?.details || [],
+            premiumRange: p.premium_range || { min: 10, max: 100 },
+            coverageRange: { min: 500, max: 50000 },
+            deductible: p.deductible_percent || 10,
+            waitingPeriod: `${p.waiting_period_days || 14} days after enrollment`,
+            claimProcess: 'Submit photos + verification within 14 days',
+            eligibility: p.eligibility || ['AFU member in good standing'],
+            popular: false,
+            icon: p.type === 'livestock' ? '\u{1F404}' : p.type === 'equipment' ? '\u{1F69C}' : p.type === 'weather-index' ? '\u{1F326}\uFE0F' : '\u{1F33E}',
+          })));
+        }
+      } catch { /* keep fallback */ }
+      setDataLoading(false);
+    };
+    load();
+  }, [user]);
 
   /* ── Form state ── */
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);

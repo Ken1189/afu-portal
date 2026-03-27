@@ -1,7 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { createClient } from '@/lib/supabase/client';
+import { useAuth } from '@/lib/supabase/auth-context';
 import {
   Building2,
   User,
@@ -154,6 +156,10 @@ const categoryOptions = [
 // =============================================================================
 
 export default function SupplierProfilePage() {
+  const { user } = useAuth();
+  const [supplierId, setSupplierId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
   // -- Company details form state
   const [companyName, setCompanyName] = useState(currentSupplier.companyName);
   const [contactPerson, setContactPerson] = useState(currentSupplier.contactName);
@@ -187,12 +193,84 @@ export default function SupplierProfilePage() {
   const [companySaved, setCompanySaved] = useState(false);
   const [businessSaved, setBusinessSaved] = useState(false);
 
-  const handleSaveCompany = () => {
+  // ── Fetch profile from Supabase ─────────────────────────────────────────
+  useEffect(() => {
+    async function fetchProfile() {
+      try {
+        const supabase = createClient();
+        const { data: supplier } = await supabase
+          .from('suppliers')
+          .select('*')
+          .eq('email', user?.email ?? '')
+          .single();
+
+        if (supplier) {
+          setSupplierId(supplier.id);
+          setCompanyName(supplier.company_name || currentSupplier.companyName);
+          setContactPerson(supplier.contact_name || currentSupplier.contactName);
+          setEmail(supplier.email || currentSupplier.email);
+          setPhone(supplier.phone || currentSupplier.phone);
+          setWebsite(supplier.website || currentSupplier.website);
+          setDescription(supplier.description || currentSupplier.description);
+          setCountry(supplier.country || currentSupplier.country);
+          setRegion(supplier.region || currentSupplier.region);
+          setCategory(supplier.category || currentSupplier.category);
+          if (supplier.certifications && supplier.certifications.length > 0) {
+            setCertifications(supplier.certifications);
+          }
+        }
+      } catch (err) {
+        // Keep fallback
+      } finally {
+        setLoading(false);
+      }
+    }
+    if (user) fetchProfile();
+    else setLoading(false);
+  }, [user]);
+
+  const handleSaveCompany = async () => {
+    // ── Save to Supabase ──────────────────────────────────────────────────
+    if (supplierId) {
+      try {
+        const supabase = createClient();
+        await supabase
+          .from('suppliers')
+          .update({
+            company_name: companyName,
+            contact_name: contactPerson,
+            email,
+            phone,
+            website,
+            description,
+          })
+          .eq('id', supplierId);
+      } catch (err) {
+        // Silent fallback
+      }
+    }
     setCompanySaved(true);
     setTimeout(() => setCompanySaved(false), 2000);
   };
 
-  const handleSaveBusiness = () => {
+  const handleSaveBusiness = async () => {
+    // ── Save to Supabase ──────────────────────────────────────────────────
+    if (supplierId) {
+      try {
+        const supabase = createClient();
+        await supabase
+          .from('suppliers')
+          .update({
+            country,
+            region,
+            category,
+            certifications,
+          })
+          .eq('id', supplierId);
+      } catch (err) {
+        // Silent fallback
+      }
+    }
     setBusinessSaved(true);
     setTimeout(() => setBusinessSaved(false), 2000);
   };

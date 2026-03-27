@@ -1,8 +1,10 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '@/lib/supabase/auth-context';
+import { createClient } from '@/lib/supabase/client';
 import {
   FileText,
   ArrowLeft,
@@ -521,28 +523,59 @@ function TemplateCard({ template }: { template: TemplateItem }) {
 // ---------------------------------------------------------------------------
 
 export default function ExportDocumentsPage() {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<TabType>('all');
   const [typeFilter, setTypeFilter] = useState<DocumentType | 'all'>('all');
   const [statusFilter, setStatusFilter] = useState<DocumentStatus | 'all'>(
     'all'
   );
   const [searchQuery, setSearchQuery] = useState('');
+  const [liveDocs, setLiveDocs] = useState<ExportDocument[]>(exportDocuments);
+  const [dataLoading, setDataLoading] = useState(true);
+
+  useEffect(() => {
+    const supabase = createClient();
+    const load = async () => {
+      try {
+        const { data } = await supabase
+          .from('export_documents')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (data && data.length > 0) {
+          setLiveDocs(data.map((d: any) => ({
+            id: d.id,
+            shipmentId: d.member_id || '',
+            type: (d.document_type || 'commercial-invoice') as DocumentType,
+            title: d.document_type?.replace(/-/g, ' ') || d.id,
+            status: (d.status || 'not-started') as DocumentStatus,
+            issuedBy: d.country_of_origin || '',
+            issuedDate: d.created_at?.split('T')[0] || null,
+            expiryDate: null,
+            reference: d.id,
+            notes: d.notes || '',
+          })));
+        }
+      } catch { /* keep fallback */ }
+      setDataLoading(false);
+    };
+    load();
+  }, [user]);
 
   // Stats
-  const totalDocs = exportDocuments.length;
-  const approvedDocs = exportDocuments.filter(
+  const totalDocs = liveDocs.length;
+  const approvedDocs = liveDocs.filter(
     (d) => d.status === 'approved'
   ).length;
-  const pendingDocs = exportDocuments.filter(
+  const pendingDocs = liveDocs.filter(
     (d) => d.status === 'in-progress' || d.status === 'submitted'
   ).length;
-  const expiringSoon = exportDocuments.filter((d) =>
+  const expiringSoon = liveDocs.filter((d) =>
     isExpiringSoon(d.expiryDate)
   ).length;
 
   // Filtered documents
   const filteredDocs = useMemo(() => {
-    let list = exportDocuments;
+    let list = liveDocs;
     if (typeFilter !== 'all') {
       list = list.filter((d) => d.type === typeFilter);
     }

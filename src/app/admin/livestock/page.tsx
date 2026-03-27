@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { createClient } from '@/lib/supabase/client';
 import { motion } from 'framer-motion';
 import {
   Search,
@@ -30,7 +31,7 @@ type TypeFilter = 'all' | 'cattle' | 'poultry' | 'goats' | 'sheep' | 'pigs';
 
 // ── Placeholder Data ─────────────────────────────────────────────────────────
 
-const FALLBACK_LIVESTOCK: LivestockRecord[] = [
+const fallback_livestockRecords: LivestockRecord[] = [
   { id: 'LS-001', animalType: 'Cattle', breed: 'Brahman', memberName: 'Grace Moyo', farmName: 'Moyo Farm', count: 120, healthStatus: 'healthy', location: 'Zimbabwe', valueEstimate: 180000 },
   { id: 'LS-002', animalType: 'Poultry', breed: 'Rhode Island Red', memberName: 'Tendai Chirwa', farmName: 'Chirwa Orchards', count: 2500, healthStatus: 'healthy', location: 'Zimbabwe', valueEstimate: 25000 },
   { id: 'LS-003', animalType: 'Goats', breed: 'Boer', memberName: 'Amina Salim', farmName: 'Salim Holdings', count: 85, healthStatus: 'fair', location: 'Tanzania', valueEstimate: 12750 },
@@ -87,9 +88,40 @@ export default function LivestockManagementPage() {
   const { locale: _locale } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all');
+  const [livestockRecords, setLivestockRecords] = useState<LivestockRecord[]>(fallback_livestockRecords);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const supabase = createClient();
+    async function fetchData() {
+      try {
+        const { data, error } = await supabase
+          .from('livestock')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (!error && data && data.length > 0) {
+          setLivestockRecords(
+            data.map((row: Record<string, unknown>) => ({
+              id: (row.id as string) || '',
+              animalType: (row.animal_type as string) || 'Other',
+              breed: (row.breed as string) || '',
+              memberName: (row.member_name as string) || (row.farmer_name as string) || 'Unknown',
+              farmName: (row.farm_name as string) || '',
+              count: (row.count as number) || (row.head_count as number) || 1,
+              healthStatus: ((row.health_status as string) || 'healthy') as LivestockRecord['healthStatus'],
+              location: (row.location as string) || (row.country as string) || '',
+              valueEstimate: (row.value_estimate as number) || 0,
+            }))
+          );
+        }
+      } catch { /* fallback */ }
+      setIsLoading(false);
+    }
+    fetchData();
+  }, []);
 
   const filtered = useMemo(() => {
-    let result = [...FALLBACK_LIVESTOCK];
+    let result = [...livestockRecords];
     if (typeFilter !== 'all') result = result.filter((l) => l.animalType.toLowerCase() === typeFilter);
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
@@ -103,11 +135,11 @@ export default function LivestockManagementPage() {
     return result;
   }, [searchQuery, typeFilter]);
 
-  const totalAnimals = FALLBACK_LIVESTOCK.reduce((s, l) => s + l.count, 0);
-  const healthyCount = FALLBACK_LIVESTOCK.filter((l) => l.healthStatus === 'healthy').reduce((s, l) => s + l.count, 0);
+  const totalAnimals = livestockRecords.reduce((s, l) => s + l.count, 0);
+  const healthyCount = livestockRecords.filter((l) => l.healthStatus === 'healthy').reduce((s, l) => s + l.count, 0);
   const healthyPct = Math.round((healthyCount / totalAnimals) * 100);
-  const totalValue = FALLBACK_LIVESTOCK.reduce((s, l) => s + l.valueEstimate, 0);
-  const farmsWithLivestock = new Set(FALLBACK_LIVESTOCK.map((l) => l.farmName)).size;
+  const totalValue = livestockRecords.reduce((s, l) => s + l.valueEstimate, 0);
+  const farmsWithLivestock = new Set(livestockRecords.map((l) => l.farmName)).size;
 
   const summaryCards = [
     { label: 'Total Animals', value: totalAnimals.toLocaleString(), icon: <Beef className="w-5 h-5" />, color: 'text-teal', bg: 'bg-teal/10' },
@@ -184,7 +216,7 @@ export default function LivestockManagementPage() {
             ))}
           </div>
         </div>
-        <p className="text-xs text-gray-400 mt-3">Showing {filtered.length} of {FALLBACK_LIVESTOCK.length} records</p>
+        <p className="text-xs text-gray-400 mt-3">Showing {filtered.length} of {livestockRecords.length} records</p>
       </motion.div>
 
       {/* Table */}

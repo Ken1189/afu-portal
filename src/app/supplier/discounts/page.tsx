@@ -1,8 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { createClient } from '@/lib/supabase/client';
+import { useAuth } from '@/lib/supabase/auth-context';
 import {
   Percent,
   ArrowLeft,
@@ -130,14 +132,84 @@ interface VolumeRange {
 // ═══════════════════════════════════════════════════════════════════════════
 
 export default function MemberDiscounts() {
+  const { user } = useAuth();
+  const [liveProducts, setLiveProducts] = useState<SupplierProduct[]>(myProducts);
+  const [liveSupplier, setLiveSupplier] = useState(currentSupplier);
+  const [loading, setLoading] = useState(true);
+
+  // ── Fetch products & supplier from Supabase ─────────────────────────────
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const supabase = createClient();
+        const { data: supplier } = await supabase
+          .from('suppliers')
+          .select('*')
+          .eq('email', user?.email ?? '')
+          .single();
+
+        if (supplier) {
+          setLiveSupplier({
+            ...currentSupplier,
+            id: supplier.id,
+            companyName: supplier.company_name,
+            memberDiscountPercent: supplier.member_discount_percent ?? currentSupplier.memberDiscountPercent,
+            commissionRate: supplier.commission_rate ?? currentSupplier.commissionRate,
+          });
+
+          const { data: products } = await supabase
+            .from('products')
+            .select('*')
+            .eq('supplier_id', supplier.id);
+
+          if (products && products.length > 0) {
+            const mapped: SupplierProduct[] = products.map((p: any) => ({
+              id: p.id,
+              supplierId: p.supplier_id,
+              supplierName: supplier.company_name,
+              name: p.name,
+              description: p.description || '',
+              category: p.category || 'seeds',
+              price: p.price,
+              memberPrice: p.member_price || p.price,
+              currency: p.currency || 'USD',
+              unit: p.unit || 'unit',
+              image: p.image_url || 'https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=400&h=300&fit=crop',
+              availability: p.in_stock ? 'in-stock' : 'out-of-stock',
+              rating: p.rating || 0,
+              reviewCount: p.review_count || 0,
+              soldCount: p.sold_count || 0,
+              tags: p.tags || [],
+              featured: p.featured || false,
+              minOrder: 1,
+            }));
+            setLiveProducts(mapped);
+          }
+        }
+      } catch (err) {
+        // Keep fallback
+      } finally {
+        setLoading(false);
+      }
+    }
+    if (user) fetchData();
+    else setLoading(false);
+  }, [user]);
+
   // ── Global discount state ─────────────────────────────────────────────
   const [globalDiscount, setGlobalDiscount] = useState(currentSupplier.memberDiscountPercent);
   const [savedGlobalDiscount, setSavedGlobalDiscount] = useState(currentSupplier.memberDiscountPercent);
   const [globalSaved, setGlobalSaved] = useState(false);
 
+  // Sync global discount when supplier loads from DB
+  useEffect(() => {
+    setGlobalDiscount(liveSupplier.memberDiscountPercent);
+    setSavedGlobalDiscount(liveSupplier.memberDiscountPercent);
+  }, [liveSupplier]);
+
   // ── Per-product discount state ────────────────────────────────────────
   const [productDiscounts, setProductDiscounts] = useState<ProductDiscount[]>(
-    myProducts.map((p) => ({
+    liveProducts.map((p) => ({
       productId: p.id,
       discount: Math.round(((p.price - p.memberPrice) / p.price) * 100),
     }))

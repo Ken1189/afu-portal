@@ -1,7 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { createClient } from '@/lib/supabase/client';
+import { useAuth } from '@/lib/supabase/auth-context';
 import {
   Star,
   MessageSquare,
@@ -238,14 +240,64 @@ const sentimentData = [
 // =============================================================================
 
 export default function SupplierReviewsPage() {
+  const { user } = useAuth();
   const [reviews, setReviews] = useState<Review[]>(mockReviews);
   const [respondingTo, setRespondingTo] = useState<string | null>(null);
   const [responseText, setResponseText] = useState('');
   const [filterStars, setFilterStars] = useState<number | null>(null);
   const [showAllReviews, setShowAllReviews] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [totalReviews, setTotalReviews] = useState(312);
+  const [averageRating, setAverageRating] = useState(4.8);
 
-  const totalReviews = 312;
-  const averageRating = 4.8;
+  // ── Fetch reviews from Supabase ─────────────────────────────────────────
+  useEffect(() => {
+    async function fetchReviews() {
+      try {
+        const supabase = createClient();
+        const { data: supplier } = await supabase
+          .from('suppliers')
+          .select('id, rating, review_count')
+          .eq('email', user?.email ?? '')
+          .single();
+
+        if (supplier) {
+          if (supplier.review_count) setTotalReviews(supplier.review_count);
+          if (supplier.rating) setAverageRating(supplier.rating);
+
+          // Try to fetch reviews if the table exists
+          const { data: dbReviews } = await supabase
+            .from('reviews')
+            .select('*, product:products(name)')
+            .eq('supplier_id', supplier.id)
+            .order('created_at', { ascending: false });
+
+          if (dbReviews && dbReviews.length > 0) {
+            const colors = ['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-amber-500', 'bg-red-500', 'bg-cyan-500'];
+            const mapped: Review[] = dbReviews.map((r: any, i: number) => ({
+              id: r.id,
+              buyerName: r.reviewer_name || 'Anonymous',
+              buyerInitials: (r.reviewer_name || 'AN').split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2),
+              buyerColor: colors[i % colors.length],
+              rating: r.rating || 5,
+              text: r.comment || r.text || '',
+              date: r.created_at?.split('T')[0] || '',
+              productName: (r.product as any)?.name || 'Product',
+              productId: r.product_id || '',
+              response: r.response || null,
+            }));
+            setReviews(mapped);
+          }
+        }
+      } catch (err) {
+        // Keep fallback demo data — table may not exist yet
+      } finally {
+        setLoading(false);
+      }
+    }
+    if (user) fetchReviews();
+    else setLoading(false);
+  }, [user]);
 
   const filteredReviews = filterStars
     ? reviews.filter((r) => r.rating === filterStars)

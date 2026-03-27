@@ -259,20 +259,40 @@ const environmentalMetrics = [
 export default function InvestorImpactPage() {
   const [farmersCount, setFarmersCount] = useState<number | null>(null);
   const [hectares, setHectares] = useState<number | null>(null);
+  const [countriesCount, setCountriesCount] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchStats() {
       const supabase = createClient();
       try {
+        // Try members table first, then profiles table for farmer count
         const { count: memberCount } = await supabase
           .from('members')
           .select('*', { count: 'exact', head: true });
 
         if (memberCount !== null && memberCount > 0) {
           setFarmersCount(memberCount);
+        } else {
+          // Fall back to profiles table filtering for farmer role
+          const { count: profileCount } = await supabase
+            .from('profiles')
+            .select('*', { count: 'exact', head: true })
+            .eq('role', 'farmer');
+          if (profileCount !== null && profileCount > 0) {
+            setFarmersCount(profileCount);
+          } else {
+            // Try all profiles as a general count
+            const { count: allProfiles } = await supabase
+              .from('profiles')
+              .select('*', { count: 'exact', head: true });
+            if (allProfiles !== null && allProfiles > 0) {
+              setFarmersCount(allProfiles);
+            }
+          }
         }
 
+        // Fetch hectares from farm_plots
         const { data: plotData } = await supabase
           .from('farm_plots')
           .select('size_hectares');
@@ -284,6 +304,18 @@ export default function InvestorImpactPage() {
             0
           );
           if (total > 0) setHectares(Math.round(total));
+        }
+
+        // Fetch distinct countries from profiles or members
+        const { data: countryData } = await supabase
+          .from('profiles')
+          .select('country')
+          .not('country', 'is', null);
+        if (countryData && countryData.length > 0) {
+          const uniqueCountries = new Set(
+            countryData.map((r: Record<string, unknown>) => String(r.country)).filter(Boolean)
+          );
+          if (uniqueCountries.size > 0) setCountriesCount(uniqueCountries.size);
         }
       } catch {
         // keep fallbacks

@@ -1,8 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { createClient } from '@/lib/supabase/client';
+import { useAuth } from '@/lib/supabase/auth-context';
 import {
   BarChart,
   Bar,
@@ -395,13 +397,53 @@ function CustomTooltip({
 // ═══════════════════════════════════════════════════════════════════════════
 
 export default function SponsorshipProgram() {
+  const { user } = useAuth();
+  const [liveSupplier, setLiveSupplier] = useState(currentSupplier);
+  const [loading, setLoading] = useState(true);
+
+  // ── Fetch supplier data from Supabase ───────────────────────────────────
+  useEffect(() => {
+    async function fetchSupplier() {
+      try {
+        const supabase = createClient();
+        const { data: supplier } = await supabase
+          .from('suppliers')
+          .select('*')
+          .eq('email', user?.email ?? '')
+          .single();
+
+        if (supplier) {
+          setLiveSupplier({
+            ...currentSupplier,
+            id: supplier.id,
+            companyName: supplier.company_name,
+            sponsorshipTier: supplier.sponsorship_tier || currentSupplier.sponsorshipTier,
+            totalSales: supplier.total_sales ?? currentSupplier.totalSales,
+            totalOrders: supplier.total_orders ?? currentSupplier.totalOrders,
+            productsCount: supplier.products_count ?? currentSupplier.productsCount,
+            rating: supplier.rating ?? currentSupplier.rating,
+            reviewCount: supplier.review_count ?? currentSupplier.reviewCount,
+            isFounding: supplier.is_founding ?? currentSupplier.isFounding,
+            joinDate: supplier.join_date || currentSupplier.joinDate,
+          });
+        }
+      } catch (err) {
+        // Keep fallback
+      } finally {
+        setLoading(false);
+      }
+    }
+    if (user) fetchSupplier();
+    else setLoading(false);
+  }, [user]);
+
   const [showUpgradeInfo, setShowUpgradeInfo] = useState(false);
-  const currentTierIndex = tiers.findIndex((t) => t.id === currentSupplier.sponsorshipTier);
+  const currentTierIndex = tiers.findIndex((t) => t.id === liveSupplier.sponsorshipTier);
   const currentTier = tiers[currentTierIndex];
 
   // Current benefits for this tier
   const currentBenefits = benefits.filter((b) =>
-    b.tiers.includes(currentSupplier.sponsorshipTier || '')
+    b.tiers.includes(liveSupplier.sponsorshipTier || '')
   );
 
   return (
@@ -459,8 +501,8 @@ export default function SponsorshipProgram() {
                 {currentTier?.label || 'Platinum'} Sponsor
               </h2>
               <p className="text-white/70 text-sm mt-0.5">
-                {currentSupplier.companyName} &bull; Founding Member since{' '}
-                {new Date(currentSupplier.joinDate).getFullYear()}
+                {liveSupplier.companyName} &bull; Founding Member since{' '}
+                {new Date(liveSupplier.joinDate).getFullYear()}
               </p>
             </div>
           </div>
@@ -527,7 +569,7 @@ export default function SponsorshipProgram() {
                   <th
                     key={tier.id}
                     className={`text-center py-3 px-3 text-xs font-medium uppercase tracking-wider min-w-[100px] ${
-                      tier.id === currentSupplier.sponsorshipTier
+                      tier.id === liveSupplier.sponsorshipTier
                         ? 'bg-[#8CB89C]/5'
                         : ''
                     }`}
@@ -535,7 +577,7 @@ export default function SponsorshipProgram() {
                     <div className="flex flex-col items-center gap-1">
                       <span
                         className={`font-semibold ${
-                          tier.id === currentSupplier.sponsorshipTier
+                          tier.id === liveSupplier.sponsorshipTier
                             ? 'text-[#8CB89C]'
                             : 'text-gray-500'
                         }`}
@@ -545,7 +587,7 @@ export default function SponsorshipProgram() {
                       <span className="text-[10px] text-gray-400 font-normal normal-case">
                         {tier.price}
                       </span>
-                      {tier.id === currentSupplier.sponsorshipTier && (
+                      {tier.id === liveSupplier.sponsorshipTier && (
                         <span className="text-[9px] px-2 py-0.5 rounded-full bg-[#8CB89C] text-white font-semibold">
                           Current
                         </span>
@@ -569,7 +611,7 @@ export default function SponsorshipProgram() {
                   </td>
                   {(['bronze', 'silver', 'gold', 'platinum'] as const).map((tierId) => {
                     const val = row[tierId];
-                    const isCurrentTier = tierId === currentSupplier.sponsorshipTier;
+                    const isCurrentTier = tierId === liveSupplier.sponsorshipTier;
                     return (
                       <td
                         key={tierId}
@@ -727,13 +769,13 @@ export default function SponsorshipProgram() {
                     <div
                       key={tier.id}
                       className={`px-3 py-2 rounded-lg text-xs font-medium ${
-                        tier.id === currentSupplier.sponsorshipTier
+                        tier.id === liveSupplier.sponsorshipTier
                           ? 'bg-[#8CB89C] text-white'
                           : 'bg-white border border-gray-200 text-gray-600'
                       }`}
                     >
                       {tier.label} - {tier.price}
-                      {tier.id === currentSupplier.sponsorshipTier && ' (Current)'}
+                      {tier.id === liveSupplier.sponsorshipTier && ' (Current)'}
                     </div>
                   ))}
                 </div>
@@ -783,7 +825,7 @@ export default function SponsorshipProgram() {
           <Star className="w-5 h-5 text-[#D4A843] fill-[#D4A843]" />
         </div>
         <p className="text-xs text-gray-500 max-w-lg mx-auto">
-          As one of the original founding sponsors, {currentSupplier.companyName} has been instrumental in
+          As one of the original founding sponsors, {liveSupplier.companyName} has been instrumental in
           building the AFU marketplace. Your commitment to empowering African farmers through quality
           agricultural supplies and competitive pricing makes a real difference in the lives of over
           1,200 farming families across Botswana, Zimbabwe, and Tanzania.
@@ -795,11 +837,11 @@ export default function SponsorshipProgram() {
           </div>
           <div className="flex items-center gap-1">
             <Star className="w-3.5 h-3.5 text-[#D4A843]" />
-            <span className="text-xs font-medium text-[#D4A843]">{currentSupplier.rating} Rating</span>
+            <span className="text-xs font-medium text-[#D4A843]">{liveSupplier.rating} Rating</span>
           </div>
           <div className="flex items-center gap-1">
             <Package className="w-3.5 h-3.5 text-[#1B2A4A]" />
-            <span className="text-xs font-medium text-[#1B2A4A]">{currentSupplier.productsCount} Products</span>
+            <span className="text-xs font-medium text-[#1B2A4A]">{liveSupplier.productsCount} Products</span>
           </div>
         </div>
       </motion.div>

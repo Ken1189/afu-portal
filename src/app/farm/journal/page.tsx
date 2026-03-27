@@ -1,8 +1,10 @@
 'use client';
 
-import { useState, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
+import { useAuth } from '@/lib/supabase/auth-context';
+import { createClient } from '@/lib/supabase/client';
 import {
   Sprout,
   Droplets,
@@ -806,7 +808,40 @@ function PhotoViewer({ url, onClose }: { url: string; onClose: () => void }) {
 
 export default function FarmJournalPage() {
   const { t } = useLanguage();
+  const { user } = useAuth();
   const [entries, setEntries] = useState<JournalEntry[]>(initialEntries);
+  const [dataLoading, setDataLoading] = useState(true);
+
+  useEffect(() => {
+    const supabase = createClient();
+    const load = async () => {
+      try {
+        let query = supabase.from('farm_activities').select('*').order('date', { ascending: false });
+        if (user) query = query.eq('member_id', user.id);
+        const { data } = await query;
+        if (data && data.length > 0) {
+          const mapped: JournalEntry[] = data.map((a: any) => ({
+            id: a.id,
+            date: a.date || a.created_at?.split('T')[0] || '',
+            time: a.created_at?.split('T')[1]?.substring(0, 5) || '08:00',
+            type: (a.type || 'other') as ActivityType,
+            plotId: a.plot_id || undefined,
+            plotName: undefined,
+            title: a.description?.substring(0, 50) || a.type || 'Activity',
+            description: a.description || '',
+            photo: a.photo_url || undefined,
+            mood: undefined,
+            weather: undefined,
+            cost: a.cost || undefined,
+            currency: a.currency || 'USD',
+          }));
+          setEntries(mapped.length > 0 ? mapped : initialEntries);
+        }
+      } catch { /* keep fallback */ }
+      setDataLoading(false);
+    };
+    load();
+  }, [user]);
   const [showNewEntry, setShowNewEntry] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [plotFilter, setPlotFilter] = useState('all');

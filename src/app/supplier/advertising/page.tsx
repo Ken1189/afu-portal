@@ -1,8 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { createClient } from '@/lib/supabase/client';
+import { useAuth } from '@/lib/supabase/auth-context';
 import {
   BarChart,
   Bar,
@@ -242,9 +244,79 @@ function CustomTooltip({
 // ═══════════════════════════════════════════════════════════════════════════
 
 export default function AdvertisingDashboard() {
+  const { user } = useAuth();
+  const [ads, setAds] = useState<Advertisement[]>(supplierAds);
+  const [loading, setLoading] = useState(true);
+
+  // ── Fetch advertisements from Supabase ──────────────────────────────────
+  useEffect(() => {
+    async function fetchAds() {
+      try {
+        const supabase = createClient();
+        const { data: supplier } = await supabase
+          .from('suppliers')
+          .select('id, company_name')
+          .eq('email', user?.email ?? '')
+          .single();
+
+        if (supplier) {
+          const { data: dbAds } = await supabase
+            .from('advertisements')
+            .select('*')
+            .eq('supplier_id', supplier.id)
+            .order('created_at', { ascending: false });
+
+          if (dbAds && dbAds.length > 0) {
+            const mapped: Advertisement[] = dbAds.map((a: any) => ({
+              id: a.id,
+              supplierId: a.supplier_id,
+              supplierName: supplier.company_name,
+              type: 'banner',
+              placement: 'dashboard',
+              title: a.title,
+              description: a.description || '',
+              image: a.image_url || 'https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=400&h=300&fit=crop',
+              targetUrl: '',
+              startDate: a.start_date || '',
+              endDate: a.end_date || '',
+              impressions: a.impressions || 0,
+              clicks: a.clicks || 0,
+              ctr: a.impressions > 0 ? Number(((a.clicks / a.impressions) * 100).toFixed(1)) : 0,
+              budget: a.budget || 0,
+              spent: a.spent || 0,
+              status: a.status || 'active',
+            }));
+            setAds(mapped);
+          }
+        }
+      } catch (err) {
+        // Keep fallback demo data
+      } finally {
+        setLoading(false);
+      }
+    }
+    if (user) fetchAds();
+    else setLoading(false);
+  }, [user]);
+
+  // Recalculate derived data from potentially live ads
+  const liveSupplierAds = ads;
+  const liveActiveCampaigns = liveSupplierAds.filter((a) => a.status === 'active').length;
+  const liveTotalImpressions = liveSupplierAds.reduce((sum, a) => sum + a.impressions, 0);
+  const liveTotalClicks = liveSupplierAds.reduce((sum, a) => sum + a.clicks, 0);
+  const liveAvgCTR =
+    liveSupplierAds.length > 0
+      ? (liveSupplierAds.reduce((sum, a) => sum + a.ctr, 0) / liveSupplierAds.length).toFixed(1)
+      : '0.0';
+
   const [campaignStatuses, setCampaignStatuses] = useState<Record<string, string>>(
-    Object.fromEntries(supplierAds.map((a) => [a.id, a.status]))
+    Object.fromEntries(ads.map((a) => [a.id, a.status]))
   );
+
+  // Sync campaign statuses when ads update
+  useEffect(() => {
+    setCampaignStatuses(Object.fromEntries(ads.map((a) => [a.id, a.status])));
+  }, [ads]);
 
   const handleTogglePause = (adId: string) => {
     setCampaignStatuses((prev) => ({

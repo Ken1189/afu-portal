@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { createClient } from '@/lib/supabase/client';
 import { motion } from 'framer-motion';
 import {
   Sprout,
@@ -32,7 +33,7 @@ type StageFilter = 'all' | 'seedling' | 'growing' | 'harvest-ready' | 'harvested
 
 // ── Placeholder Data ─────────────────────────────────────────────────────────
 
-const FALLBACK_CROPS: CropRecord[] = [
+const fallback_cropRecords: CropRecord[] = [
   { id: 'CR-001', cropName: 'Maize', variety: 'SC 513', memberName: 'Grace Moyo', farmName: 'Moyo Farm', hectares: 45, stage: 'growing', healthScore: 88, plantingDate: '2025-11-15', expectedHarvest: '2026-04-20', estimatedRevenue: 28500 },
   { id: 'CR-002', cropName: 'Blueberries', variety: 'Duke', memberName: 'Tendai Chirwa', farmName: 'Chirwa Orchards', hectares: 12, stage: 'harvest-ready', healthScore: 94, plantingDate: '2025-08-01', expectedHarvest: '2026-03-25', estimatedRevenue: 96000 },
   { id: 'CR-003', cropName: 'Cassava', variety: 'TMS 30572', memberName: 'Amina Salim', farmName: 'Salim Holdings', hectares: 80, stage: 'growing', healthScore: 82, plantingDate: '2025-10-05', expectedHarvest: '2026-07-10', estimatedRevenue: 44000 },
@@ -96,9 +97,42 @@ export default function CropManagementPage() {
   const { locale: _locale } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [stageFilter, setStageFilter] = useState<StageFilter>('all');
+  const [cropRecords, setCropRecords] = useState<CropRecord[]>(fallback_cropRecords);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const supabase = createClient();
+    async function fetchData() {
+      try {
+        const { data, error } = await supabase
+          .from('farm_plots')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (!error && data && data.length > 0) {
+          setCropRecords(
+            data.map((row: Record<string, unknown>) => ({
+              id: (row.id as string) || '',
+              cropName: (row.crop_type as string) || (row.crop_name as string) || 'Unknown',
+              variety: (row.variety as string) || '',
+              memberName: (row.member_name as string) || (row.farmer_name as string) || 'Unknown',
+              farmName: (row.farm_name as string) || '',
+              hectares: (row.size_hectares as number) || 0,
+              stage: ((row.stage as string) || 'growing') as CropRecord['stage'],
+              healthScore: (row.health_score as number) || 0,
+              plantingDate: ((row.planting_date as string) || '')?.split('T')[0] || '',
+              expectedHarvest: ((row.expected_harvest as string) || '')?.split('T')[0] || '',
+              estimatedRevenue: (row.estimated_revenue as number) || 0,
+            }))
+          );
+        }
+      } catch { /* fallback */ }
+      setIsLoading(false);
+    }
+    fetchData();
+  }, []);
 
   const filtered = useMemo(() => {
-    let result = [...FALLBACK_CROPS];
+    let result = [...cropRecords];
     if (stageFilter !== 'all') result = result.filter((c) => c.stage === stageFilter);
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
@@ -112,10 +146,10 @@ export default function CropManagementPage() {
     return result;
   }, [searchQuery, stageFilter]);
 
-  const totalCrops = FALLBACK_CROPS.length;
-  const avgHealth = Math.round(FALLBACK_CROPS.reduce((s, c) => s + c.healthScore, 0) / totalCrops);
-  const harvestReady = FALLBACK_CROPS.filter((c) => c.stage === 'harvest-ready').length;
-  const totalRevenue = FALLBACK_CROPS.reduce((s, c) => s + c.estimatedRevenue, 0);
+  const totalCrops = cropRecords.length;
+  const avgHealth = Math.round(cropRecords.reduce((s, c) => s + c.healthScore, 0) / totalCrops);
+  const harvestReady = cropRecords.filter((c) => c.stage === 'harvest-ready').length;
+  const totalRevenue = cropRecords.reduce((s, c) => s + c.estimatedRevenue, 0);
 
   const summaryCards = [
     { label: 'Total Crops', value: totalCrops.toString(), icon: <Sprout className="w-5 h-5" />, color: 'text-green-600', bg: 'bg-green-50' },
