@@ -104,11 +104,38 @@ export default function DonatePage() {
 
   const donationAmount = selectedAmount || (customAmount ? parseFloat(customAmount) : 0);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [processing, setProcessing] = useState(false);
+  const [payError, setPayError] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!donationAmount || donationAmount <= 0) return;
-    setSubmitted(true);
-    // In production, this would integrate with Stripe Checkout
+    setProcessing(true);
+    setPayError('');
+
+    try {
+      const res = await fetch('/api/payments/donate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: Math.round(donationAmount * 100),
+          program: selectedProgram.slug,
+          isMonthly,
+          donorName,
+          donorEmail: donorEmail || undefined,
+        }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        setPayError(data.error || 'Payment system unavailable. Please try again later.');
+        setProcessing(false);
+      }
+    } catch {
+      setPayError('Unable to connect to payment system. Please try again.');
+      setProcessing(false);
+    }
   };
 
   if (submitted) {
@@ -303,15 +330,27 @@ export default function DonatePage() {
                   </div>
                 </div>
 
+                {payError && (
+                  <p className="text-sm text-red-500 text-center mb-3">{payError}</p>
+                )}
                 <button
                   type="submit"
-                  disabled={!donationAmount || donationAmount <= 0}
+                  disabled={!donationAmount || donationAmount <= 0 || processing}
                   className="w-full py-4 bg-[#5DB347] text-white rounded-xl font-semibold text-base hover:bg-[#449933] transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-[#5DB347]/25 hover:shadow-xl hover:-translate-y-0.5"
                 >
-                  <Heart className="w-5 h-5 inline mr-2" />
-                  {donationAmount > 0
-                    ? `Donate $${donationAmount.toFixed(2)}${isMonthly ? '/month' : ''}`
-                    : 'Select an amount'}
+                  {processing ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+                      Connecting to Stripe...
+                    </span>
+                  ) : (
+                    <>
+                      <Heart className="w-5 h-5 inline mr-2" />
+                      {donationAmount > 0
+                        ? `Donate $${donationAmount.toFixed(2)}${isMonthly ? '/month' : ''}`
+                        : 'Select an amount'}
+                    </>
+                  )}
                 </button>
               </form>
 

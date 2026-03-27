@@ -22,16 +22,19 @@ export function getStripe(): Stripe {
 }
 
 // Membership tier pricing (amounts in cents)
-export const MEMBERSHIP_PRICES = {
-  smallholder: { amount: 500, currency: 'usd', name: 'Smallholder Membership', interval: 'month' as const },
-  commercial: { amount: 2500, currency: 'usd', name: 'Commercial Membership', interval: 'month' as const },
-  enterprise: { amount: 9900, currency: 'usd', name: 'Enterprise Membership', interval: 'month' as const },
-  partner: { amount: 25000, currency: 'usd', name: 'Partner Membership', interval: 'month' as const },
+export const MEMBERSHIP_PRICES: Record<string, { amount: number; currency: string; name: string; interval: 'month' }> = {
+  smallholder: { amount: 499, currency: 'usd', name: 'Smallholder Membership', interval: 'month' },
+  bronze: { amount: 4900, currency: 'usd', name: 'Commercial Bronze Membership', interval: 'month' },
+  gold: { amount: 49900, currency: 'usd', name: 'Commercial Gold Membership', interval: 'month' },
+  platinum: { amount: 99900, currency: 'usd', name: 'Commercial Platinum Membership', interval: 'month' },
 };
 
 // Sponsor tier pricing (amounts in cents)
-export const SPONSOR_PRICES = {
-  bronze: { amount: 500, currency: 'usd', name: 'Bronze Sponsorship', interval: 'month' as const },
-  silver: { amount: 10000, currency: 'usd', name: 'Silver Sponsorship', interval: 'month' as const },
-  gold: { amount: 50000, currency: 'usd', name: 'Gold Sponsorship', interval: 'month' as const },
+export const SPONSOR_PRICES: Record<string, { amount: number; currency: string; name: string; interval: 'month' }> = {
+  bronze: { amount: 500, currency: 'usd', name: 'Bronze Sponsorship', interval: 'month' },
+  silver: { amount: 10000, currency: 'usd', name: 'Silver Sponsorship', interval: 'month' },
+  gold: { amount: 50000, currency: 'usd', name: 'Gold Sponsorship', interval: 'month' },
 };
+
+// Donation amounts (one-time, amounts in cents)
+export const DONATION_AMOUNTS = [1000, 2500, 5000, 10000, 25000, 50000];

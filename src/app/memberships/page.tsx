@@ -2,11 +2,14 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Loader2 } from 'lucide-react';
 
 const tiers = [
   {
     name: 'Smallholder',
+    slug: 'smallholder',
     priceMonthly: '$4.99',
     priceAnnual: '$49',
     priceNote: 'per month',
@@ -34,6 +37,7 @@ const tiers = [
   },
   {
     name: 'Commercial Bronze',
+    slug: 'bronze',
     priceMonthly: '$49',
     priceAnnual: '$490',
     priceNote: 'per year',
@@ -61,6 +65,7 @@ const tiers = [
   },
   {
     name: 'Commercial Gold',
+    slug: 'gold',
     priceMonthly: '$499',
     priceAnnual: '$4,990',
     priceNote: 'per year',
@@ -88,6 +93,7 @@ const tiers = [
   },
   {
     name: 'Commercial Platinum',
+    slug: 'platinum',
     priceMonthly: '$999',
     priceAnnual: '$9,990',
     priceNote: 'per year',
@@ -115,6 +121,7 @@ const tiers = [
   },
   {
     name: 'Partner / Vendor',
+    slug: 'partner',
     priceMonthly: 'By Application',
     priceAnnual: 'By Application',
     priceNote: '',
@@ -197,9 +204,38 @@ function FeatureCell({ value }: { value: boolean | string }) {
 }
 
 export default function MembershipsPage() {
+  const router = useRouter();
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [showComparison, setShowComparison] = useState(false);
   const [isAnnual, setIsAnnual] = useState(false);
+  const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
+  const [checkoutError, setCheckoutError] = useState('');
+
+  const handleCheckout = async (tierSlug: string) => {
+    if (tierSlug === 'partner') {
+      router.push('/contact');
+      return;
+    }
+    setCheckoutLoading(tierSlug);
+    setCheckoutError('');
+    try {
+      const res = await fetch('/api/payments/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'membership', tier: tierSlug }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        setCheckoutError(data.error || 'Payment system unavailable. Please try again.');
+        setCheckoutLoading(null);
+      }
+    } catch {
+      setCheckoutError('Unable to connect to payment system. Please try again.');
+      setCheckoutLoading(null);
+    }
+  };
 
   return (
     <>
@@ -314,9 +350,10 @@ export default function MembershipsPage() {
                   })}
                 </ul>
 
-                <Link
-                  href={'byApplication' in tier && tier.byApplication ? '/contact' : '/apply'}
-                  className={`block text-center px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 hover:scale-105 ${
+                <button
+                  onClick={() => handleCheckout(tier.slug)}
+                  disabled={checkoutLoading === tier.slug}
+                  className={`w-full block text-center px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 hover:scale-105 disabled:opacity-60 disabled:cursor-wait ${
                     tier.popular
                       ? 'text-white shadow-md shadow-[#5DB347]/20'
                       : 'byApplication' in tier && tier.byApplication
@@ -325,8 +362,13 @@ export default function MembershipsPage() {
                   }`}
                   style={tier.popular ? { background: 'linear-gradient(135deg, #5DB347, #449933)' } : undefined}
                 >
-                  {'byApplication' in tier && tier.byApplication ? 'Contact Us' : 'Get Started'}
-                </Link>
+                  {checkoutLoading === tier.slug ? (
+                    <span className="flex items-center justify-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /> Processing...</span>
+                  ) : 'byApplication' in tier && tier.byApplication ? 'Contact Us' : 'Get Started'}
+                </button>
+                {checkoutError && checkoutLoading === null && (
+                  <p className="text-xs text-red-500 mt-2 text-center">{checkoutError}</p>
+                )}
               </div>
             ))}
           </div>
