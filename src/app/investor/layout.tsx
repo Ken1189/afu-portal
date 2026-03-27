@@ -16,6 +16,9 @@ import {
   X,
   TrendingUp,
   Rocket,
+  Home,
+  ExternalLink,
+  LogOut,
 } from 'lucide-react';
 import { useAuth } from '@/lib/supabase/auth-context';
 
@@ -150,14 +153,36 @@ export default function InvestorLayout({ children }: { children: React.ReactNode
           {renderNavLinks()}
         </nav>
 
-        <div className="p-3 border-t border-white/10">
+        <div className="p-3 border-t border-white/10 space-y-1">
           <Link
-            href="/dashboard"
+            href="/"
             className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-colors"
           >
-            <ChevronLeft className="w-4 h-4" />
-            Back to Dashboard
+            <Home className="w-4 h-4" />
+            AFU Home
           </Link>
+          <Link
+            href="/admin"
+            className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-colors"
+          >
+            <ExternalLink className="w-4 h-4" />
+            Admin Portal
+          </Link>
+          <button
+            onClick={async () => {
+              const { createBrowserClient } = await import('@supabase/ssr');
+              const supabase = createBrowserClient(
+                process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+              );
+              await supabase.auth.signOut();
+              router.push('/investor-login');
+            }}
+            className="w-full flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-medium text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors"
+          >
+            <LogOut className="w-4 h-4" />
+            Sign Out
+          </button>
         </div>
       </aside>
 
@@ -191,15 +216,38 @@ export default function InvestorLayout({ children }: { children: React.ReactNode
               <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
                 {renderNavLinks(() => setMobileOpen(false))}
               </nav>
-              <div className="p-3 border-t border-white/10">
+              <div className="p-3 border-t border-white/10 space-y-1">
                 <Link
-                  href="/dashboard"
+                  href="/"
                   onClick={() => setMobileOpen(false)}
                   className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-colors"
                 >
-                  <ChevronLeft className="w-4 h-4" />
-                  Back to Dashboard
+                  <Home className="w-4 h-4" />
+                  AFU Home
                 </Link>
+                <Link
+                  href="/admin"
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-colors"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  Admin Portal
+                </Link>
+                <button
+                  onClick={async () => {
+                    const { createBrowserClient } = await import('@supabase/ssr');
+                    const supabase = createBrowserClient(
+                      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+                    );
+                    await supabase.auth.signOut();
+                    router.push('/investor-login');
+                  }}
+                  className="w-full flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-medium text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Sign Out
+                </button>
               </div>
             </motion.aside>
           </>
