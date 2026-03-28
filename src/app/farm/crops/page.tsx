@@ -30,8 +30,9 @@ import {
   Check,
   Loader2,
 } from 'lucide-react';
-import { useFarmPlots, type FarmPlotRow } from '@/lib/supabase/use-farm-plots';
+import { useFarmPlots, useCreateFarmPlot, useCreateFarmActivity, type FarmPlotRow } from '@/lib/supabase/use-farm-plots';
 import { useFarmActivities } from '@/lib/supabase/use-farm-activities';
+import { useAuth } from '@/lib/supabase/auth-context';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 // ---------------------------------------------------------------------------
@@ -517,22 +518,48 @@ function LogActivityModal({
   open,
   onClose,
   plotName,
+  plotId,
 }: {
   open: boolean;
   onClose: () => void;
   plotName: string;
+  plotId: string;
 }) {
   const { t } = useLanguage();
+  const { user } = useAuth();
+  const { createActivity } = useCreateFarmActivity();
   const [selectedType, setSelectedType] = useState<ActivityType | null>(null);
   const [notes, setNotes] = useState('');
   const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    if (!selectedType || !user) return;
+    setSaving(true);
+    setSaveError(null);
+    const { error } = await createActivity({
+      plot_id: plotId,
+      member_id: user.id,
+      type: selectedType,
+      date: new Date().toISOString().split('T')[0],
+      description: notes || `${selectedType} activity`,
+      notes: notes || null,
+      photo_url: null,
+      cost: 0,
+      currency: 'USD',
+    });
+    setSaving(false);
+    if (error) {
+      setSaveError(error);
+      return;
+    }
     setSaved(true);
     setTimeout(() => {
       setSaved(false);
       setSelectedType(null);
       setNotes('');
+      setSaveError(null);
       onClose();
     }, 1200);
   };
@@ -628,19 +655,27 @@ function LogActivityModal({
                 />
               </div>
 
+              {/* Error message */}
+              {saveError && (
+                <div className="px-3 py-2 rounded-xl bg-red-50 border border-red-200 text-xs text-red-600">
+                  {saveError}
+                </div>
+              )}
+
               {/* Save */}
               <button
                 onClick={handleSave}
-                disabled={!selectedType || saved}
-                className={`w-full py-3.5 rounded-xl font-semibold text-sm transition-all ${
+                disabled={!selectedType || saved || saving}
+                className={`w-full py-3.5 rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2 ${
                   saved
                     ? 'bg-green-500 text-white'
-                    : selectedType
+                    : selectedType && !saving
                       ? 'bg-[#5DB347] text-white active:bg-[#449933]'
                       : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                 }`}
               >
-                {saved ? 'Saved!' : t.common.save}
+                {saving && <Loader2 className="w-4 h-4 animate-spin" />}
+                {saved ? 'Saved!' : saving ? 'Saving...' : t.common.save}
               </button>
             </div>
           </motion.div>
@@ -654,14 +689,39 @@ function LogActivityModal({
 
 function AddPlotModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { t } = useLanguage();
+  const { user } = useAuth();
+  const { createPlot } = useCreateFarmPlot();
   const [plotName, setPlotName] = useState('');
   const [crop, setCrop] = useState('');
   const [variety, setVariety] = useState('');
   const [size, setSize] = useState('');
   const [plantingDate, setPlantingDate] = useState('');
   const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    if (!plotName.trim() || !crop.trim() || !user) return;
+    setSaving(true);
+    setSaveError(null);
+    const { error } = await createPlot({
+      member_id: user.id,
+      name: plotName.trim(),
+      crop: crop.trim(),
+      variety: variety.trim() || null,
+      size_ha: size ? parseFloat(size) : null,
+      planting_date: plantingDate || null,
+      expected_harvest: null,
+      stage: 'planning',
+      soil_ph: null,
+      location: null,
+      notes: null,
+    });
+    setSaving(false);
+    if (error) {
+      setSaveError(error);
+      return;
+    }
     setSaved(true);
     setTimeout(() => {
       setSaved(false);
@@ -670,6 +730,7 @@ function AddPlotModal({ open, onClose }: { open: boolean; onClose: () => void })
       setVariety('');
       setSize('');
       setPlantingDate('');
+      setSaveError(null);
       onClose();
     }, 1200);
   };
@@ -784,19 +845,27 @@ function AddPlotModal({ open, onClose }: { open: boolean; onClose: () => void })
                 </div>
               </div>
 
+              {/* Error message */}
+              {saveError && (
+                <div className="px-3 py-2 rounded-xl bg-red-50 border border-red-200 text-xs text-red-600">
+                  {saveError}
+                </div>
+              )}
+
               {/* Save */}
               <button
                 onClick={handleSave}
-                disabled={!isValid || saved}
-                className={`w-full py-3.5 rounded-xl font-semibold text-sm transition-all mt-2 ${
+                disabled={!isValid || saved || saving}
+                className={`w-full py-3.5 rounded-xl font-semibold text-sm transition-all mt-2 flex items-center justify-center gap-2 ${
                   saved
                     ? 'bg-green-500 text-white'
-                    : isValid
+                    : isValid && !saving
                       ? 'bg-[#5DB347] text-white active:bg-[#449933]'
                       : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                 }`}
               >
-                {saved ? 'Plot Added!' : t.cropTracker.addPlot}
+                {saving && <Loader2 className="w-4 h-4 animate-spin" />}
+                {saved ? 'Plot Added!' : saving ? 'Saving...' : t.cropTracker.addPlot}
               </button>
             </div>
           </motion.div>
@@ -990,6 +1059,7 @@ function PlotCard({ plot }: { plot: FarmPlot }) {
         open={logModalOpen}
         onClose={() => setLogModalOpen(false)}
         plotName={plot.name}
+        plotId={plot.id}
       />
     </>
   );

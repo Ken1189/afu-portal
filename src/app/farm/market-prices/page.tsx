@@ -26,8 +26,11 @@ import {
   Star,
   Trash2,
   ArrowUpDown,
+  Loader2,
 } from 'lucide-react';
 import { useMarketPrices, type MarketPriceRow } from '@/lib/supabase/use-market-prices';
+import { useAuth } from '@/lib/supabase/auth-context';
+import { createClient } from '@/lib/supabase/client';
 
 // ---------------------------------------------------------------------------
 // Animation Variants
@@ -206,6 +209,18 @@ function MiniSparkline({ data, positive }: { data: number[]; positive: boolean }
 
 export default function MarketPricesPage() {
   const { prices, loading, error } = useMarketPrices();
+  const { user } = useAuth();
+  const supabase = createClient();
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
+  const [alertSaving, setAlertSaving] = useState(false);
+
+  // Auto-dismiss toast
+  useEffect(() => {
+    if (toastMsg) {
+      const t = setTimeout(() => setToastMsg(null), 3000);
+      return () => clearTimeout(t);
+    }
+  }, [toastMsg]);
 
   const allCommodities: Commodity[] = useMemo(
     () => prices.map(mapPriceRow),
@@ -292,11 +307,15 @@ export default function MarketPricesPage() {
     );
   }
 
-  const toggleWatchlist = (commodity: Commodity) => {
+  const toggleWatchlist = async (commodity: Commodity) => {
     const newIds = new Set(watchlistIds);
     if (newIds.has(commodity.id)) {
       newIds.delete(commodity.id);
       setWatchlist(prev => prev.filter(w => w.id !== commodity.id));
+      if (user) {
+        await supabase.from('market_watchlist').delete().eq('user_id', user.id).eq('commodity_id', commodity.id);
+      }
+      setToastMsg('Removed from watchlist');
     } else {
       newIds.add(commodity.id);
       setWatchlist(prev => [...prev, {
@@ -308,18 +327,30 @@ export default function MarketPricesPage() {
         dailyChange: commodity.dailyChange,
         alertThreshold: null,
       }]);
+      if (user) {
+        await supabase.from('market_watchlist').insert({
+          user_id: user.id,
+          commodity_id: commodity.id,
+          commodity_name: commodity.name,
+        });
+      }
+      setToastMsg('Added to watchlist');
     }
     setWatchlistIds(newIds);
   };
 
-  const removeFromWatchlist = (id: string) => {
+  const removeFromWatchlist = async (id: string) => {
     setWatchlist(prev => prev.filter(w => w.id !== id));
     const newIds = new Set(watchlistIds);
     newIds.delete(id);
     setWatchlistIds(newIds);
+    if (user) {
+      await supabase.from('market_watchlist').delete().eq('user_id', user.id).eq('commodity_id', id);
+    }
+    setToastMsg('Removed from watchlist');
   };
 
-  const addAlert = () => {
+  const addAlert = async () => {
     const newAlert: PriceAlert = {
       id: `a${Date.now()}`,
       commodity: alertCommodity,
@@ -327,11 +358,31 @@ export default function MarketPricesPage() {
       threshold: parseFloat(alertThreshold),
       active: true,
     };
+    setAlertSaving(true);
     setAlerts(prev => [...prev, newAlert]);
+    if (user) {
+      const { error: saveErr } = await supabase.from('price_alerts').insert({
+        user_id: user.id,
+        commodity: alertCommodity,
+        condition: alertCondition,
+        threshold: parseFloat(alertThreshold),
+        active: true,
+      });
+      if (saveErr) {
+        setToastMsg('Failed to save alert');
+      } else {
+        setToastMsg('Price alert created');
+      }
+    }
+    setAlertSaving(false);
   };
 
-  const removeAlert = (id: string) => {
+  const removeAlert = async (id: string) => {
     setAlerts(prev => prev.filter(a => a.id !== id));
+    if (user) {
+      await supabase.from('price_alerts').delete().eq('id', id);
+    }
+    setToastMsg('Alert removed');
   };
 
   const tabs = [
@@ -656,10 +707,11 @@ export default function MarketPricesPage() {
                   <div className="flex items-end">
                     <button
                       onClick={addAlert}
-                      className="w-full py-2 bg-[#D4A843] text-white rounded-xl text-sm font-medium hover:bg-[#c49a3a] transition-colors flex items-center justify-center gap-2"
+                      disabled={alertSaving}
+                      className="w-full py-2 bg-[#D4A843] text-white rounded-xl text-sm font-medium hover:bg-[#c49a3a] transition-colors flex items-center justify-center gap-2 disabled:opacity-60"
                     >
-                      <Plus className="w-4 h-4" />
-                      Add Alert
+                      {alertSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+                      {alertSaving ? 'Saving...' : 'Add Alert'}
                     </button>
                   </div>
                 </div>
@@ -756,6 +808,20 @@ export default function MarketPricesPage() {
         {/* Bottom spacer for mobile nav */}
         <div className="h-4" />
       </div>
+
+      {/* Toast notification */}
+      <AnimatePresence>
+        {toastMsg && (
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 40 }}
+            className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 bg-[#1B2A4A] text-white text-sm px-5 py-2.5 rounded-xl shadow-lg"
+          >
+            {toastMsg}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

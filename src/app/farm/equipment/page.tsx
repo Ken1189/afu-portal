@@ -1,9 +1,11 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEquipment, useEquipmentBookings, EquipmentRow } from '@/lib/supabase/use-equipment';
+import { useAuth } from '@/lib/supabase/auth-context';
+import { createClient } from '@/lib/supabase/client';
 import {
   Wrench,
   Search,
@@ -1190,6 +1192,27 @@ export default function EquipmentHirePage() {
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [bookingFilter, setBookingFilter] = useState<BookingFilter>('all');
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
+  const { user } = useAuth();
+  const supabase = createClient();
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
+
+  // Load saved favorites from Supabase on mount
+  useEffect(() => {
+    if (!user) return;
+    supabase.from('equipment_favorites').select('equipment_id').eq('user_id', user.id).then(({ data }) => {
+      if (data && data.length > 0) {
+        setSavedIds(new Set(data.map((r: { equipment_id: string }) => r.equipment_id)));
+      }
+    });
+  }, [user, supabase]);
+
+  // Auto-dismiss toast
+  useEffect(() => {
+    if (toastMsg) {
+      const t = setTimeout(() => setToastMsg(null), 3000);
+      return () => clearTimeout(t);
+    }
+  }, [toastMsg]);
 
   // --- Supabase bookings ---
   const { bookings: dbBookings, loading: bookingsLoading, cancelBooking } = useEquipmentBookings();
@@ -1277,7 +1300,7 @@ export default function EquipmentHirePage() {
   }, [equipment, bookings]);
 
   // --- Handlers ---
-  const handleToggleSaved = (id: string) => {
+  const handleToggleSaved = async (id: string) => {
     setSavedIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) {
@@ -1287,6 +1310,15 @@ export default function EquipmentHirePage() {
       }
       return next;
     });
+    if (user) {
+      if (savedIds.has(id)) {
+        await supabase.from('equipment_favorites').delete().eq('user_id', user.id).eq('equipment_id', id);
+        setToastMsg('Removed from favorites');
+      } else {
+        await supabase.from('equipment_favorites').insert({ user_id: user.id, equipment_id: id });
+        setToastMsg('Added to favorites');
+      }
+    }
   };
 
   const handleCancelBooking = async (id: string) => {
@@ -1805,6 +1837,20 @@ export default function EquipmentHirePage() {
           )}
         </AnimatePresence>
       </div>
+
+      {/* Toast notification */}
+      <AnimatePresence>
+        {toastMsg && (
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 40 }}
+            className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 bg-[#1B2A4A] text-white text-sm px-5 py-2.5 rounded-xl shadow-lg"
+          >
+            {toastMsg}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

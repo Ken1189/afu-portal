@@ -319,8 +319,8 @@ export default function CartPage() {
             }
           }
         }
-      } catch (err) {
-        console.error('Order creation error:', err);
+      } catch {
+        // Order creation failed — silent fallback
       }
     }
 

@@ -132,14 +132,23 @@ export default function TrainingPage() {
         setCourses(FALLBACK_COURSES);
       } else {
         // Map DB courses to our Course shape, fallback where needed
-        const mapped: Course[] = data.map((c: any) => ({
+        interface CourseDbRow {
+          id: string;
+          title: string;
+          description: string | null;
+          duration_minutes: number | null;
+          difficulty: string | null;
+          modules_count: number | null;
+          category: string | null;
+        }
+        const mapped: Course[] = (data as CourseDbRow[]).map((c) => ({
           id: c.id,
           title: c.title,
           description: c.description || '',
           duration_hours: Math.round((c.duration_minutes || 120) / 60),
           difficulty: c.difficulty || 'Beginner',
           lesson_count: c.modules_count || 5,
-          tier_unlock: TIER_COURSE_MAP[c.category?.toLowerCase().replace(/\s+/g, '-')] || 'sprout',
+          tier_unlock: TIER_COURSE_MAP[c.category?.toLowerCase().replace(/\s+/g, '-') ?? ''] || 'sprout',
           slug: c.category?.toLowerCase().replace(/\s+/g, '-') || c.id,
           category: c.category || 'General',
         }));

@@ -31,7 +31,7 @@ import {
   BarChart3,
   Globe,
 } from 'lucide-react';
-import { useCooperatives } from '@/lib/supabase/use-cooperatives';
+import { useCooperatives, type CooperativeRow } from '@/lib/supabase/use-cooperatives';
 
 // ---------------------------------------------------------------------------
 // Types (inlined from @/lib/data/cooperatives)
@@ -73,14 +73,13 @@ interface CooperativeActivity {
 // Inline adaptCooperative (from @/lib/data/adapters)
 // ---------------------------------------------------------------------------
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function adaptCooperative(row: Record<string, any>): Cooperative {
+function adaptCooperative(row: CooperativeRow): Cooperative {
   return {
     id: row.id,
     name: row.name || '',
     type: 'mixed' as const,
     region: row.region || '',
-    country: row.country || 'Botswana',
+    country: (row.country || 'Botswana') as Cooperative['country'],
     description: row.description || '',
     established: row.created_at ? new Date(row.created_at).getFullYear() : 2024,
     memberCount: row.member_count || 0,
@@ -388,7 +387,7 @@ const filterTabs = ['All', 'Crop', 'Livestock', 'Mixed', 'Processing', 'Marketin
 
 export default function CooperativesPage() {
   const { cooperatives: liveCoops, loading: coopsLoading } = useCooperatives();
-  const cooperatives: Cooperative[] = liveCoops.length > 0 ? liveCoops.map(adaptCooperative) as Cooperative[] : mockCooperatives;
+  const cooperatives: Cooperative[] = liveCoops.length > 0 ? liveCoops.map(adaptCooperative) : mockCooperatives;
 
   // The user's cooperative is the first one
   const myCooperative = cooperatives[0];
