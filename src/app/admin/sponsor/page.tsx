@@ -17,12 +17,8 @@ import {
   ChevronDown,
   TrendingUp,
 } from 'lucide-react';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { createClient } from '@/lib/supabase/client';
+import { Loader2, AlertCircle, X, CheckCircle2, XCircle } from 'lucide-react';
 
 // ── Animation variants ──
 const containerVariants = {
@@ -102,8 +98,32 @@ export default function AdminSponsorPage() {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
-  // ── Stats derived from mock data ──
+  const supabase = createClient();
+
+  // ── Fetch sponsorships from Supabase ──
+  useEffect(() => {
+    async function fetchSponsorships() {
+      setLoading(true);
+      const { data, error } = await supabase.from('sponsorships').select('*').order('created_at', { ascending: false });
+      if (!error && data && data.length > 0) {
+        setSponsorships(data.map((row: Record<string, unknown>) => ({
+          id: (row.id as string) || '', sponsor_name: (row.sponsor_name as string) || 'Unknown',
+          sponsor_email: (row.sponsor_email as string) || '', tier: ((row.tier as string) || 'bronze') as SponsorshipTier,
+          farmer_name: (row.farmer_name as string) || '', amount: (row.amount as number) || 0,
+          billing_cycle: ((row.billing_cycle as string) || 'monthly') as 'monthly' | 'annual',
+          status: ((row.status as string) || 'active') as SponsorshipStatus,
+          started_at: (row.started_at as string) || (row.created_at as string) || '',
+        })));
+      }
+      setLoading(false);
+    }
+    fetchSponsorships();
+  }, [supabase]);
+
+  // ── Stats derived from data ──
   const totalActive = sponsorships.filter((s) => s.status === 'active').length;
   const mrr = sponsorships.filter((s) => s.status === 'active').reduce((sum, s) => sum + (s.billing_cycle === 'annual' ? s.amount / 12 : s.amount), 0);
   const farmerProfilesLive = farmers.filter((f) => f.active_sponsors >= 0).length;
@@ -122,14 +142,31 @@ export default function AdminSponsorPage() {
 
   // ── Toggle featured ──
   const toggleFeatured = useCallback(async (farmerId: string, currentValue: boolean) => {
-    setFarmers((prev) =>
-      prev.map((f) => (f.id === farmerId ? { ...f, is_featured: !currentValue } : f))
-    );
-    // In production: update Supabase farmer_public_profiles
-  }, []);
+    setFarmers((prev) => prev.map((f) => (f.id === farmerId ? { ...f, is_featured: !currentValue } : f)));
+    const { error } = await supabase.from('farmer_public_profiles').update({ is_featured: !currentValue }).eq('id', farmerId);
+    if (!error) { setToast({ message: !currentValue ? 'Farmer featured' : 'Farmer unfeatured', type: 'success' }); }
+  }, [supabase]);
+
+  // ── Approve/Reject sponsorship ──
+  const handleSponsorshipAction = async (id: string, newStatus: SponsorshipStatus) => {
+    setActionLoading(id);
+    const { error } = await supabase.from('sponsorships').update({ status: newStatus }).eq('id', id);
+    if (error) { setSponsorships(prev => prev.map(s => s.id === id ? { ...s, status: newStatus } : s)); }
+    else { setSponsorships(prev => prev.map(s => s.id === id ? { ...s, status: newStatus } : s)); }
+    setToast({ message: `Sponsorship ${newStatus}`, type: 'success' });
+    setActionLoading(null);
+  };
 
   return (
     <div className="space-y-6">
+      {/* Toast */}
+      {toast && (
+        <div className={`fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-xl shadow-lg text-white text-sm font-medium ${toast.type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}>
+          {toast.type === 'success' ? <CheckCircle2 className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
+          {toast.message}
+          <button onClick={() => setToast(null)} className="ml-2"><X className="w-3 h-3" /></button>
+        </div>
+      )}
       {/* ── Page Header ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -242,12 +279,13 @@ export default function AdminSponsorPage() {
                       <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Billing</th>
                       <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
                       <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Started</th>
+                      <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-50">
                     {filteredSponsorships.length === 0 ? (
                       <tr>
-                        <td colSpan={7} className="text-center py-12 text-gray-400 text-sm">
+                        <td colSpan={8} className="text-center py-12 text-gray-400 text-sm">
                           No sponsorships found matching your filters.
                         </td>
                       </tr>
@@ -275,6 +313,17 @@ export default function AdminSponsorPage() {
                               </span>
                             </td>
                             <td className="px-4 py-3 text-gray-500">{new Date(s.started_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
+                            <td className="px-4 py-3">
+                              <div className="flex items-center justify-end gap-1">
+                                {actionLoading === s.id ? <Loader2 className="w-4 h-4 animate-spin text-gray-400" /> : (
+                                  <>
+                                    {s.status === 'paused' && <button onClick={() => handleSponsorshipAction(s.id, 'active')} className="px-2 py-1 text-xs font-medium bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors">Activate</button>}
+                                    {s.status === 'active' && <button onClick={() => handleSponsorshipAction(s.id, 'paused')} className="px-2 py-1 text-xs font-medium bg-amber-50 text-amber-700 rounded-lg hover:bg-amber-100 transition-colors">Pause</button>}
+                                    {s.status !== 'cancelled' && <button onClick={() => handleSponsorshipAction(s.id, 'cancelled')} className="px-2 py-1 text-xs font-medium bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors">Cancel</button>}
+                                  </>
+                                )}
+                              </div>
+                            </td>
                           </tr>
                         );
                       })

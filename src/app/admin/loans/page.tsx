@@ -410,8 +410,36 @@ export default function LoansPage() {
     return true;
   });
 
-  const handleDisburse = (loanId: string) => {
-    setDisbursedIds((prev) => new Set([...prev, loanId]));
+  const handleDisburse = async (loanId: string) => {
+    if (!window.confirm('Are you sure you want to disburse this loan?')) return;
+    setActionLoading(loanId);
+    try {
+      const res = await fetch('/api/admin/loans/approve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ loanId, action: 'disburse' }),
+      });
+      if (res.ok) {
+        setDisbursedIds((prev) => new Set([...prev, loanId]));
+        await fetchLoans();
+      } else {
+        // Fallback: update directly via Supabase
+        const supabase = createClient();
+        const { error } = await supabase.from('loans').update({
+          status: 'disbursed',
+          disbursed_at: new Date().toISOString(),
+        }).eq('id', loanId);
+        if (!error) {
+          setDisbursedIds((prev) => new Set([...prev, loanId]));
+          await fetchLoans();
+        } else {
+          alert(`Disburse failed: ${error.message}`);
+        }
+      }
+    } catch {
+      alert('Network error during disbursement.');
+    }
+    setActionLoading(null);
   };
 
   // Approve or reject a loan via the real API

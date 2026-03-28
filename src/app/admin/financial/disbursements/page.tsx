@@ -286,42 +286,105 @@ export default function DisbursementsPage() {
     }
   };
 
-  const handleApprove = (id: string) => {
+  const [actionLoading, setActionLoading] = useState(false);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const showSuccess = (msg: string) => { setSuccessMsg(msg); setTimeout(() => setSuccessMsg(null), 3000); };
+
+  const disburseToSupabase = async (disbursement: PendingDisbursement) => {
+    const supabase = createClient();
+    // Find matching loan and update to disbursed
+    const { error } = await supabase.from('loans').update({
+      status: 'disbursed',
+      disbursed_at: new Date().toISOString(),
+    }).eq('loan_number', disbursement.appId);
+    return error;
+  };
+
+  const rejectInSupabase = async (disbursement: PendingDisbursement) => {
+    const supabase = createClient();
+    const { error } = await supabase.from('loans').update({
+      status: 'rejected',
+    }).eq('loan_number', disbursement.appId);
+    return error;
+  };
+
+  const handleApprove = async (id: string) => {
+    setActionLoading(true);
+    const disbursement = activePending.find(d => d.id === id);
+    if (disbursement) {
+      const error = await disburseToSupabase(disbursement);
+      if (error) {
+        alert(`Disbursement failed: ${error.message}`);
+      } else {
+        showSuccess(`Disbursement of ${formatCurrency(disbursement.amount)} to ${disbursement.memberName} processed.`);
+      }
+    }
     setApprovedIds((prev) => new Set(prev).add(id));
-    setSelectedRows((prev) => {
-      const next = new Set(prev);
-      next.delete(id);
-      return next;
-    });
+    setSelectedRows((prev) => { const next = new Set(prev); next.delete(id); return next; });
     setShowApproveModal(null);
+    setActionLoading(false);
   };
 
-  const handleReject = (id: string) => {
+  const handleReject = async (id: string) => {
+    setActionLoading(true);
+    const disbursement = activePending.find(d => d.id === id);
+    if (disbursement) {
+      const error = await rejectInSupabase(disbursement);
+      if (error) {
+        alert(`Rejection failed: ${error.message}`);
+      } else {
+        showSuccess(`Disbursement for ${disbursement.memberName} rejected.`);
+      }
+    }
     setRejectedIds((prev) => new Set(prev).add(id));
-    setSelectedRows((prev) => {
-      const next = new Set(prev);
-      next.delete(id);
-      return next;
-    });
+    setSelectedRows((prev) => { const next = new Set(prev); next.delete(id); return next; });
     setShowRejectModal(null);
+    setActionLoading(false);
   };
 
-  const handleBatchApprove = () => {
+  const handleBatchApprove = async () => {
+    setActionLoading(true);
+    for (const id of selectedRows) {
+      const disbursement = activePending.find(d => d.id === id);
+      if (disbursement) await disburseToSupabase(disbursement);
+    }
     setApprovedIds((prev) => {
       const next = new Set(prev);
       selectedRows.forEach((id) => next.add(id));
       return next;
     });
     setSelectedRows(new Set());
+    showSuccess(`${selectedRows.size} disbursement(s) approved.`);
+    setActionLoading(false);
   };
 
-  const handleBatchReject = () => {
+  const handleBatchReject = async () => {
+    setActionLoading(true);
+    for (const id of selectedRows) {
+      const disbursement = activePending.find(d => d.id === id);
+      if (disbursement) await rejectInSupabase(disbursement);
+    }
     setRejectedIds((prev) => {
       const next = new Set(prev);
       selectedRows.forEach((id) => next.add(id));
       return next;
     });
     setSelectedRows(new Set());
+    showSuccess(`${selectedRows.size} disbursement(s) rejected.`);
+    setActionLoading(false);
+  };
+
+  const handleExport = () => {
+    const headers = ['ID', 'App ID', 'Member', 'Amount', 'Type', 'Risk', 'Officer', 'Country', 'Approved Date'];
+    const rows = activePending.map(d => [d.id, d.appId, d.memberName, d.amount, d.loanType, d.riskGrade, d.officer, d.country, d.approvedDate]);
+    const csv = [headers, ...rows].map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `afu-disbursements-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   const isAllSelected = visiblePending.length > 0 && selectedRows.size === visiblePending.length;
@@ -344,7 +407,10 @@ export default function DisbursementsPage() {
             <p className="text-sm text-gray-500 mt-0.5">Pending approval queue and disbursement log</p>
           </div>
           <div className="flex items-center gap-2">
-            <button className="flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold text-navy bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors">
+            <button
+              onClick={handleExport}
+              className="flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold text-navy bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
+            >
               <Download className="w-3.5 h-3.5" />
               Export
             </button>
@@ -698,6 +764,14 @@ export default function DisbursementsPage() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Success Toast */}
+      {successMsg && (
+        <div className="fixed bottom-6 right-6 z-50 bg-green-600 text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-2 text-sm font-medium">
+          <CheckCircle2 className="w-4 h-4" />
+          {successMsg}
+        </div>
+      )}
     </motion.div>
   );
 }

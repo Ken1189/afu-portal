@@ -584,6 +584,27 @@ export default function AdminCompliancePage() {
   const [auditRecords, setAuditRecords] = useState<AuditRecord[]>(fallback_auditRecords);
   const [isLoading, setIsLoading] = useState(true);
 
+  const handleMarkResolved = (issueId: string) => {
+    setComplianceIssues((prev) =>
+      prev.map((i) => (i.id === issueId ? { ...i, status: 'resolved' as IssueStatus } : i))
+    );
+  };
+
+  const handleExportComplianceCSV = () => {
+    const headers = ['ID', 'Member', 'Severity', 'Category', 'Description', 'Status', 'Date Raised', 'Deadline', 'Assigned To'];
+    const rows = complianceIssues.map((i) => [
+      i.id, i.memberName, i.severity, i.category, `"${i.description.replace(/"/g, '""')}"`, i.status, i.dateRaised, i.deadline, i.assignedTo,
+    ]);
+    const csv = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `compliance_issues_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   useEffect(() => {
     const supabase = createClient();
     async function fetchData() {
@@ -1224,6 +1245,13 @@ export default function AdminCompliancePage() {
                   <option value="in-progress">In Progress</option>
                   <option value="resolved">Resolved</option>
                 </select>
+                <button
+                  onClick={handleExportComplianceCSV}
+                  className="ml-auto px-3 py-2 rounded-lg text-xs font-medium bg-navy text-white hover:bg-navy/90 transition-colors flex items-center gap-1.5"
+                >
+                  <FileCheck className="w-3.5 h-3.5" />
+                  Export CSV
+                </button>
               </div>
             </div>
 
@@ -1279,6 +1307,15 @@ export default function AdminCompliancePage() {
                             <User className="w-3 h-3" />
                             Assigned: {issue.assignedTo}
                           </span>
+                          {issue.status !== 'resolved' && (
+                            <button
+                              onClick={() => handleMarkResolved(issue.id)}
+                              className="ml-auto inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium bg-green-50 text-green-700 hover:bg-green-100 transition-colors border border-green-200"
+                            >
+                              <CheckCircle2 className="w-3 h-3" />
+                              Mark Resolved
+                            </button>
+                          )}
                         </div>
                       </div>
                     </div>

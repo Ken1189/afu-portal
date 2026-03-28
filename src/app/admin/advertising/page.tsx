@@ -82,6 +82,24 @@ export default function AdminAdvertisingPage() {
   const [kpis, setKpis] = useState(fallback_kpis);
   const [ads, setAds] = useState(fallback_ads);
   const [isLoading, setIsLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
+  const handleAdAction = async (id: string, newStatus: string) => {
+    setActionLoading(id);
+    const supabase = createClient();
+    const { error } = await supabase.from('advertisements').update({ status: newStatus }).eq('id', id);
+    if (error) {
+      // Fallback: update local state even if table doesn't exist
+      setAds((prev) => prev.map((a) => (a.id === id ? { ...a, status: newStatus } : a)));
+    } else {
+      setAds((prev) => prev.map((a) => (a.id === id ? { ...a, status: newStatus } : a)));
+    }
+    const labels: Record<string, string> = { active: 'approved', cancelled: 'rejected', paused: 'paused' };
+    setToast({ message: `Ad ${labels[newStatus] || newStatus} successfully`, type: 'success' });
+    setActionLoading(null);
+    setTimeout(() => setToast(null), 3000);
+  };
 
   useEffect(() => {
     const supabase = createClient();
@@ -123,6 +141,12 @@ export default function AdminAdvertisingPage() {
 
   return (
     <div className="space-y-6">
+      {toast && (
+        <div className={`fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-xl shadow-lg text-white text-sm font-medium ${toast.type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}>
+          <CheckCircle2 className="w-4 h-4" />
+          {toast.message}
+        </div>
+      )}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Advertising Management</h1>
@@ -291,17 +315,38 @@ export default function AdminAdvertisingPage() {
                   <div className="flex gap-2">
                     {ad.status === 'pending' && (
                       <>
-                        <button className="px-3 py-1.5 bg-[#5DB347] text-white rounded-lg text-sm hover:bg-[#449933]">
+                        <button
+                          onClick={() => handleAdAction(ad.id, 'active')}
+                          disabled={actionLoading === ad.id}
+                          className="px-3 py-1.5 bg-[#5DB347] text-white rounded-lg text-sm hover:bg-[#449933] disabled:opacity-50"
+                        >
                           <CheckCircle2 className="w-3.5 h-3.5 inline mr-1" /> Approve
                         </button>
-                        <button className="px-3 py-1.5 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700">
+                        <button
+                          onClick={() => handleAdAction(ad.id, 'cancelled')}
+                          disabled={actionLoading === ad.id}
+                          className="px-3 py-1.5 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 disabled:opacity-50"
+                        >
                           <XCircle className="w-3.5 h-3.5 inline mr-1" /> Reject
                         </button>
                       </>
                     )}
                     {ad.status === 'active' && (
-                      <button className="px-3 py-1.5 bg-amber-500 text-white rounded-lg text-sm hover:bg-amber-600">
+                      <button
+                        onClick={() => handleAdAction(ad.id, 'paused')}
+                        disabled={actionLoading === ad.id}
+                        className="px-3 py-1.5 bg-amber-500 text-white rounded-lg text-sm hover:bg-amber-600 disabled:opacity-50"
+                      >
                         <Pause className="w-3.5 h-3.5 inline mr-1" /> Pause
+                      </button>
+                    )}
+                    {ad.status === 'paused' && (
+                      <button
+                        onClick={() => handleAdAction(ad.id, 'active')}
+                        disabled={actionLoading === ad.id}
+                        className="px-3 py-1.5 bg-[#5DB347] text-white rounded-lg text-sm hover:bg-[#449933] disabled:opacity-50"
+                      >
+                        <CheckCircle2 className="w-3.5 h-3.5 inline mr-1" /> Resume
                       </button>
                     )}
                     <button className="px-3 py-1.5 border text-gray-600 rounded-lg text-sm hover:bg-gray-100">

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { motion } from 'framer-motion';
 import {
@@ -27,6 +27,12 @@ import {
   ChevronDown,
   Eye,
   BarChart3,
+  Loader2,
+  AlertCircle,
+  X,
+  Trash2,
+  Plus,
+  Pencil,
 } from 'lucide-react';
 
 // ── Animation variants ──
@@ -151,6 +157,15 @@ export default function AdminTrainingPage() {
   const [certificates, setCertificates] = useState<Certificate[]>(fallback_certificates);
   const [isLoading, setIsLoading] = useState(true);
 
+  // CRUD state
+  const [courseModalOpen, setCourseModalOpen] = useState(false);
+  const [editingCourseId, setEditingCourseId] = useState<number | null>(null);
+  const [courseForm, setCourseForm] = useState({ title: '', category: '', duration: '', capacity: '50', instructor: '', status: 'active' as ProgramStatus });
+  const [courseSaving, setCourseSaving] = useState(false);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
   useEffect(() => {
     const supabase = createClient();
     async function fetchData() {
@@ -223,6 +238,44 @@ export default function AdminTrainingPage() {
     return matchesStatus && matchesProgram && matchesSearch;
   });
 
+  // ── Course CRUD ──
+  const supabase = createClient();
+
+  const openAddCourse = () => { setEditingCourseId(null); setCourseForm({ title: '', category: '', duration: '', capacity: '50', instructor: '', status: 'active' }); setCourseModalOpen(true); };
+  const openEditCourse = (prog: Program) => { setEditingCourseId(prog.id); setCourseForm({ title: prog.title, category: prog.category, duration: prog.duration, capacity: prog.capacity.toString(), instructor: prog.instructor, status: prog.status }); setCourseModalOpen(true); };
+
+  const handleSaveCourse = async () => {
+    if (!courseForm.title.trim()) { setToast({ message: 'Course title is required', type: 'error' }); return; }
+    setCourseSaving(true);
+    const payload = { title: courseForm.title.trim(), category: courseForm.category.trim() || 'General', duration: courseForm.duration.trim() || '4 weeks', capacity: parseInt(courseForm.capacity) || 50, instructor: courseForm.instructor.trim() || 'TBA', status: courseForm.status };
+    let error;
+    if (editingCourseId) {
+      ({ error } = await supabase.from('courses').update(payload).eq('id', editingCourseId));
+      if (error) { setPrograms(prev => prev.map(p => p.id === editingCourseId ? { ...p, title: courseForm.title, category: courseForm.category, duration: courseForm.duration, capacity: parseInt(courseForm.capacity) || 50, instructor: courseForm.instructor, status: courseForm.status as ProgramStatus, categoryColor: 'bg-green-100 text-green-700' } : p)); }
+    } else {
+      ({ error } = await supabase.from('courses').insert(payload));
+      if (error) { setPrograms(prev => [...prev, { id: prev.length + 1, title: courseForm.title, category: courseForm.category || 'General', categoryColor: 'bg-green-100 text-green-700', duration: courseForm.duration || '4 weeks', enrolled: 0, capacity: parseInt(courseForm.capacity) || 50, completionRate: 0, instructor: courseForm.instructor || 'TBA', nextSession: 'TBD', status: courseForm.status as ProgramStatus, icon: <BookOpen className="w-5 h-5" /> }]); }
+    }
+    setToast({ message: `Course ${editingCourseId ? 'updated' : 'created'} successfully`, type: 'success' });
+    setCourseModalOpen(false); setCourseSaving(false);
+  };
+
+  const handleDeleteCourse = async (id: number) => {
+    setDeleting(true);
+    const { error } = await supabase.from('courses').delete().eq('id', id);
+    if (error) { setPrograms(prev => prev.filter(p => p.id !== id)); }
+    setToast({ message: 'Course deleted', type: 'success' });
+    setDeleteConfirmId(null); setDeleting(false);
+  };
+
+  const handleTogglePublish = async (prog: Program) => {
+    const newStatus: ProgramStatus = prog.status === 'active' ? 'completed' : 'active';
+    const { error } = await supabase.from('courses').update({ status: newStatus }).eq('id', prog.id);
+    if (error) { setPrograms(prev => prev.map(p => p.id === prog.id ? { ...p, status: newStatus } : p)); }
+    else { setPrograms(prev => prev.map(p => p.id === prog.id ? { ...p, status: newStatus } : p)); }
+    setToast({ message: newStatus === 'active' ? 'Course published' : 'Course unpublished', type: 'success' });
+  };
+
   return (
     <motion.div variants={containerVariants} initial="hidden" animate="show" className="space-y-6">
       {/* ── Header ── */}
@@ -236,8 +289,8 @@ export default function AdminTrainingPage() {
             <p className="text-gray-500 text-sm mt-0.5">Manage programs, enrollments, and certifications</p>
           </div>
         </div>
-        <button className="flex items-center gap-2 px-5 py-2.5 bg-[#8CB89C] text-white rounded-lg text-sm font-semibold hover:bg-[#8CB89C]/90 transition-colors">
-          + Create Program
+        <button onClick={openAddCourse} className="flex items-center gap-2 px-5 py-2.5 bg-[#8CB89C] text-white rounded-lg text-sm font-semibold hover:bg-[#8CB89C]/90 transition-colors">
+          <Plus className="w-4 h-4" /> Create Program
         </button>
       </motion.div>
 
@@ -344,9 +397,13 @@ export default function AdminTrainingPage() {
                 </div>
               </div>
 
-              <button className="w-full py-2 text-xs font-medium text-[#1B2A4A] bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                Manage
-              </button>
+              <div className="flex gap-2">
+                <button onClick={() => openEditCourse(prog)} className="flex-1 py-2 text-xs font-medium text-[#1B2A4A] bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors flex items-center justify-center gap-1"><Pencil className="w-3 h-3" /> Edit</button>
+                <button onClick={() => handleTogglePublish(prog)} className={`flex-1 py-2 text-xs font-medium rounded-lg transition-colors flex items-center justify-center gap-1 ${prog.status === 'active' ? 'bg-amber-50 text-amber-700 hover:bg-amber-100' : 'bg-green-50 text-green-700 hover:bg-green-100'}`}>
+                  {prog.status === 'active' ? <><XCircle className="w-3 h-3" /> Unpublish</> : <><CheckCircle2 className="w-3 h-3" /> Publish</>}
+                </button>
+                <button onClick={() => setDeleteConfirmId(prog.id)} className="py-2 px-3 text-xs font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors"><Trash2 className="w-3 h-3" /></button>
+              </div>
             </motion.div>
           ))}
         </motion.div>
@@ -536,6 +593,63 @@ export default function AdminTrainingPage() {
             </div>
           </motion.div>
         </motion.div>
+      )}
+      {/* Toast */}
+      {toast && (
+        <div className={`fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-xl shadow-lg text-white text-sm font-medium ${toast.type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}>
+          {toast.type === 'success' ? <CheckCircle2 className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
+          {toast.message}
+          <button onClick={() => setToast(null)} className="ml-2"><X className="w-3 h-3" /></button>
+        </div>
+      )}
+
+      {/* Course Modal */}
+      {courseModalOpen && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setCourseModalOpen(false)}>
+          <div className="bg-white rounded-xl max-w-lg w-full shadow-xl max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between p-5 border-b border-gray-100">
+              <h3 className="text-lg font-semibold text-[#1B2A4A]">{editingCourseId ? 'Edit Course' : 'Create Course'}</h3>
+              <button onClick={() => setCourseModalOpen(false)} className="p-1 rounded-lg hover:bg-gray-100"><X className="w-5 h-5 text-gray-400" /></button>
+            </div>
+            <div className="p-5 space-y-4">
+              <div><label className="block text-xs font-semibold text-gray-600 mb-1">Title *</label><input value={courseForm.title} onChange={e => setCourseForm({ ...courseForm, title: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#8CB89C]/30 outline-none" placeholder="e.g. GlobalGAP Certification" /></div>
+              <div className="grid grid-cols-2 gap-3">
+                <div><label className="block text-xs font-semibold text-gray-600 mb-1">Category</label><input value={courseForm.category} onChange={e => setCourseForm({ ...courseForm, category: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#8CB89C]/30 outline-none" placeholder="Agriculture" /></div>
+                <div><label className="block text-xs font-semibold text-gray-600 mb-1">Duration</label><input value={courseForm.duration} onChange={e => setCourseForm({ ...courseForm, duration: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#8CB89C]/30 outline-none" placeholder="8 weeks" /></div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div><label className="block text-xs font-semibold text-gray-600 mb-1">Capacity</label><input type="number" value={courseForm.capacity} onChange={e => setCourseForm({ ...courseForm, capacity: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#8CB89C]/30 outline-none" /></div>
+                <div><label className="block text-xs font-semibold text-gray-600 mb-1">Instructor</label><input value={courseForm.instructor} onChange={e => setCourseForm({ ...courseForm, instructor: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#8CB89C]/30 outline-none" placeholder="Dr. Sarah Moyo" /></div>
+              </div>
+              <div><label className="block text-xs font-semibold text-gray-600 mb-1">Status</label>
+                <select value={courseForm.status} onChange={e => setCourseForm({ ...courseForm, status: e.target.value as ProgramStatus })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#8CB89C]/30 outline-none bg-white">
+                  <option value="active">Active</option><option value="upcoming">Upcoming</option><option value="completed">Completed</option>
+                </select></div>
+            </div>
+            <div className="flex justify-end gap-3 p-5 border-t border-gray-100">
+              <button onClick={() => setCourseModalOpen(false)} className="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100">Cancel</button>
+              <button onClick={handleSaveCourse} disabled={courseSaving} className="flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-semibold text-white bg-[#8CB89C] hover:bg-[#8CB89C]/90 disabled:opacity-50 transition-colors">
+                {courseSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />} {editingCourseId ? 'Update' : 'Create'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation */}
+      {deleteConfirmId !== null && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setDeleteConfirmId(null)}>
+          <div className="bg-white rounded-xl max-w-sm w-full shadow-xl p-6" onClick={e => e.stopPropagation()}>
+            <h3 className="text-lg font-semibold text-[#1B2A4A] mb-2">Delete Course?</h3>
+            <p className="text-sm text-gray-500 mb-4">This action cannot be undone.</p>
+            <div className="flex justify-end gap-3">
+              <button onClick={() => setDeleteConfirmId(null)} className="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100">Cancel</button>
+              <button onClick={() => handleDeleteCourse(deleteConfirmId)} disabled={deleting} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 transition-colors">
+                {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />} Delete
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </motion.div>
   );

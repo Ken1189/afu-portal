@@ -157,6 +157,12 @@ export default function KycManagementPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRecord, setSelectedRecord] = useState<KycRecord | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const showSuccess = (msg: string) => { setSuccessMsg(msg); setTimeout(() => setSuccessMsg(null), 3000); };
+  const showError = (msg: string) => { setErrorMsg(msg); setTimeout(() => setErrorMsg(null), 5000); };
 
   // Fetch real KYC documents from Supabase
   const fetchKycRecords = useCallback(async () => {
@@ -208,25 +214,76 @@ export default function KycManagementPage() {
       if (res.ok) {
         setRecords((prev) => prev.map((r) => (r.id === id ? { ...r, status: 'verified' as KycStatus } : r)));
         if (selectedRecord?.id === id) setSelectedRecord((r) => r ? { ...r, status: 'verified' as KycStatus } : r);
+        showSuccess('Document verified successfully.');
+      } else {
+        // Fallback: update directly via Supabase
+        const supabase = createClient();
+        const { error } = await supabase.from('kyc_documents').update({ status: 'verified' }).eq('id', id);
+        if (!error) {
+          setRecords((prev) => prev.map((r) => (r.id === id ? { ...r, status: 'verified' as KycStatus } : r)));
+          if (selectedRecord?.id === id) setSelectedRecord((r) => r ? { ...r, status: 'verified' as KycStatus } : r);
+          showSuccess('Document verified successfully.');
+        } else {
+          showError(`Failed to verify: ${error.message}`);
+        }
       }
-    } catch { /* Sprint 4: proper error handling */ }
+    } catch {
+      showError('Network error while approving document.');
+    }
     setActionLoading(null);
   }
 
   async function handleReject(id: string) {
+    const reason = window.prompt('Enter rejection reason:');
+    if (reason === null) return; // cancelled
     setActionLoading(id);
     try {
       const res = await fetch('/api/admin/kyc/approve', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ documentId: id, action: 'reject' }),
+        body: JSON.stringify({ documentId: id, action: 'reject', reason }),
       });
       if (res.ok) {
         setRecords((prev) => prev.map((r) => (r.id === id ? { ...r, status: 'rejected' as KycStatus } : r)));
         if (selectedRecord?.id === id) setSelectedRecord((r) => r ? { ...r, status: 'rejected' as KycStatus } : r);
+        showSuccess('Document rejected.');
+      } else {
+        const supabase = createClient();
+        const { error } = await supabase.from('kyc_documents').update({ status: 'rejected', rejection_reason: reason }).eq('id', id);
+        if (!error) {
+          setRecords((prev) => prev.map((r) => (r.id === id ? { ...r, status: 'rejected' as KycStatus } : r)));
+          if (selectedRecord?.id === id) setSelectedRecord((r) => r ? { ...r, status: 'rejected' as KycStatus } : r);
+          showSuccess('Document rejected.');
+        } else {
+          showError(`Failed to reject: ${error.message}`);
+        }
       }
-    } catch { /* Sprint 4: proper error handling */ }
+    } catch {
+      showError('Network error while rejecting document.');
+    }
     setActionLoading(null);
+  }
+
+  async function handleRequestMoreInfo(id: string) {
+    const note = window.prompt('Enter note for additional information request:');
+    if (!note) return;
+    setActionLoading(id);
+    const supabase = createClient();
+    const { error } = await supabase.from('kyc_documents').update({ status: 'pending', admin_notes: note }).eq('id', id);
+    if (!error) {
+      setRecords((prev) => prev.map((r) => (r.id === id ? { ...r, status: 'pending' as KycStatus } : r)));
+      showSuccess('Request for more information sent.');
+    } else {
+      showError(`Failed: ${error.message}`);
+    }
+    setActionLoading(null);
+  }
+
+  async function handleRefresh() {
+    setRefreshing(true);
+    await fetchKycRecords();
+    setRefreshing(false);
+    showSuccess('Data refreshed.');
   }
 
   const stats = {
@@ -262,8 +319,12 @@ export default function KycManagementPage() {
               <h1 className="text-lg font-semibold text-[#1B2A4A]">KYC Management</h1>
             </div>
           </div>
-          <button className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-500 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-            <RefreshCw className="w-4 h-4" />
+          <button
+            onClick={handleRefresh}
+            disabled={refreshing}
+            className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-500 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+          >
+            <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
             Refresh
           </button>
         </div>
@@ -713,6 +774,22 @@ export default function KycManagementPage() {
           </div>
         </motion.div>
       </div>
+
+      {/* Success Toast */}
+      {successMsg && (
+        <div className="fixed bottom-6 right-6 z-50 bg-green-600 text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-2 text-sm font-medium">
+          <CheckCircle2 className="w-4 h-4" />
+          {successMsg}
+        </div>
+      )}
+
+      {/* Error Toast */}
+      {errorMsg && (
+        <div className="fixed bottom-6 right-6 z-50 bg-red-600 text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-2 text-sm font-medium">
+          <AlertCircle className="w-4 h-4" />
+          {errorMsg}
+        </div>
+      )}
     </div>
   );
 }

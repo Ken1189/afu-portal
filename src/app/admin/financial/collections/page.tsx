@@ -38,6 +38,8 @@ import {
   TrendingUp,
   DollarSign,
   Target,
+  CheckCircle2,
+  Loader2,
 } from 'lucide-react';
 
 // ── Animation variants ──────────────────────────────────────────────────────
@@ -174,6 +176,50 @@ export default function CollectionsPage() {
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   const [dbLoans, setDbLoans] = useState<OverdueLoan[]>([]);
   const [dbLoading, setDbLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+  const showSuccess = (msg: string) => { setSuccessMsg(msg); setTimeout(() => setSuccessMsg(null), 3000); };
+
+  const handleCollectionAction = async (loan: OverdueLoan, action: 'reminder' | 'escalate' | 'restructure' | 'collected') => {
+    setActionLoading(loan.id);
+    const supabase = createClient();
+    try {
+      const statusMap = { reminder: 'reminder-sent', escalate: 'escalated', restructure: 'restructured', collected: 'completed' } as const;
+      const newStatus = statusMap[action];
+      // Update the payment/loan in DB if it's a DB record
+      if (loan.loanId) {
+        await supabase.from('loans').update({
+          status: action === 'collected' ? 'completed' : loan.loanId ? 'overdue' : undefined,
+          ...(action === 'collected' ? { amount_repaid: loan.amount } : {}),
+        }).eq('loan_number', loan.loanId);
+      }
+      // Update local state
+      const updateFn = (loans: OverdueLoan[]) =>
+        action === 'collected'
+          ? loans.filter(l => l.id !== loan.id)
+          : loans.map(l => l.id === loan.id ? { ...l, status: newStatus as OverdueLoan['status'] } : l);
+      setDbLoans(updateFn);
+      const actionLabels = { reminder: 'Reminder sent', escalate: 'Loan escalated', restructure: 'Loan restructured', collected: 'Marked as collected' };
+      showSuccess(`${actionLabels[action]} for ${loan.memberName}.`);
+    } catch {
+      alert('Action failed. Please try again.');
+    }
+    setActionLoading(null);
+  };
+
+  const handleExportReport = () => {
+    const headers = ['ID', 'Member', 'Loan ID', 'Outstanding', 'Days Overdue', 'Status', 'Country', 'Last Payment'];
+    const rows = filteredAndSorted.map(l => [l.id, l.memberName, l.loanId, l.outstandingAmount, l.daysOverdue, l.status, l.country, l.lastPaymentDate]);
+    const csv = [headers, ...rows].map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `afu-collections-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   useEffect(() => {
     const supabase = createClient();
@@ -295,7 +341,10 @@ export default function CollectionsPage() {
             <p className="text-sm text-gray-500 mt-0.5">Manage overdue loans and recovery actions</p>
           </div>
           <div className="flex items-center gap-2">
-            <button className="flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold text-navy bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors">
+            <button
+              onClick={handleExportReport}
+              className="flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold text-navy bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
+            >
               <Download className="w-3.5 h-3.5" />
               Export Report
             </button>
@@ -486,16 +535,36 @@ export default function CollectionsPage() {
                     </td>
                     <td className="py-3 px-4 text-right">
                       <div className="flex items-center justify-end gap-1">
-                        <button className="p-1.5 hover:bg-blue-50 rounded-lg transition-colors group" title="Send Reminder">
+                        <button
+                          onClick={() => handleCollectionAction(loan, 'reminder')}
+                          disabled={actionLoading === loan.id}
+                          className="p-1.5 hover:bg-blue-50 rounded-lg transition-colors group disabled:opacity-50"
+                          title="Send Reminder"
+                        >
                           <Send className="w-3.5 h-3.5 text-gray-400 group-hover:text-blue-600" />
                         </button>
-                        <button className="p-1.5 hover:bg-green-50 rounded-lg transition-colors group" title="Call">
+                        <button
+                          onClick={() => handleCollectionAction(loan, 'collected')}
+                          disabled={actionLoading === loan.id}
+                          className="p-1.5 hover:bg-green-50 rounded-lg transition-colors group disabled:opacity-50"
+                          title="Mark as Collected"
+                        >
                           <PhoneCall className="w-3.5 h-3.5 text-gray-400 group-hover:text-green-600" />
                         </button>
-                        <button className="p-1.5 hover:bg-red-50 rounded-lg transition-colors group" title="Escalate">
+                        <button
+                          onClick={() => { if (window.confirm(`Escalate ${loan.memberName}'s loan?`)) handleCollectionAction(loan, 'escalate'); }}
+                          disabled={actionLoading === loan.id}
+                          className="p-1.5 hover:bg-red-50 rounded-lg transition-colors group disabled:opacity-50"
+                          title="Escalate"
+                        >
                           <TriangleAlert className="w-3.5 h-3.5 text-gray-400 group-hover:text-red-600" />
                         </button>
-                        <button className="p-1.5 hover:bg-purple-50 rounded-lg transition-colors group" title="Restructure">
+                        <button
+                          onClick={() => { if (window.confirm(`Restructure ${loan.memberName}'s loan?`)) handleCollectionAction(loan, 'restructure'); }}
+                          disabled={actionLoading === loan.id}
+                          className="p-1.5 hover:bg-purple-50 rounded-lg transition-colors group disabled:opacity-50"
+                          title="Restructure"
+                        >
                           <ArrowRightLeft className="w-3.5 h-3.5 text-gray-400 group-hover:text-purple-600" />
                         </button>
                       </div>
@@ -558,6 +627,14 @@ export default function CollectionsPage() {
           </div>
         </div>
       </motion.div>
+
+      {/* Success Toast */}
+      {successMsg && (
+        <div className="fixed bottom-6 right-6 z-50 bg-green-600 text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-2 text-sm font-medium">
+          <CheckCircle2 className="w-4 h-4" />
+          {successMsg}
+        </div>
+      )}
     </motion.div>
   );
 }

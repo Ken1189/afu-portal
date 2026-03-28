@@ -353,7 +353,21 @@ export default function FinancialManagementPage() {
             <Banknote className="w-3.5 h-3.5" />
             Collection Report
           </Link>
-          <button className="flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold text-navy bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors">
+          <button
+            onClick={() => {
+              const headers = ['Loan ID', 'Member', 'Type', 'Amount', 'Outstanding', 'Interest Rate', 'Status', 'Disbursement Date', 'Maturity Date', 'Country', 'Crop'];
+              const rows = loans.map(l => [l.id, l.memberName, l.type, l.amount, l.outstanding, `${l.interestRate}%`, l.status, l.disbursementDate, l.maturityDate, l.country, l.crop]);
+              const csv = [headers, ...rows].map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
+              const blob = new Blob([csv], { type: 'text/csv' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = `afu-portfolio-${new Date().toISOString().slice(0, 10)}.csv`;
+              a.click();
+              URL.revokeObjectURL(url);
+            }}
+            className="flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold text-navy bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
+          >
             <Download className="w-3.5 h-3.5" />
             Portfolio Export
           </button>

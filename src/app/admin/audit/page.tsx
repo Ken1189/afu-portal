@@ -414,6 +414,22 @@ export default function AuditPage() {
   const visibleEntries = filteredEntries.slice(0, visibleCount);
   const hasMore = visibleCount < filteredEntries.length;
 
+  const handleExportAuditCSV = () => {
+    const headers = ['ID', 'Timestamp', 'Action', 'Severity', 'User', 'Role', 'Entity Type', 'Entity ID', 'Entity Name', 'Description', 'IP Address'];
+    const rows = filteredEntries.map((e) => [
+      e.id, e.timestamp, e.action, e.severity, e.userName, e.userRole, e.entityType, e.entityId, e.entityName,
+      `"${e.description.replace(/"/g, '""')}"`, e.ipAddress,
+    ]);
+    const csv = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `audit_log_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   // ── Stat cards ────────────────────────────────────────────────────────
 
   const statCards = [
@@ -472,8 +488,17 @@ export default function AuditPage() {
             Chronological log of all platform events and actions
           </p>
         </div>
-        <div className="text-xs text-gray-400">
-          {auditEntries.length} total events
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-gray-400">
+            {auditEntries.length} total events
+          </span>
+          <button
+            onClick={handleExportAuditCSV}
+            className="inline-flex items-center gap-1.5 px-3 py-2 bg-navy text-white text-xs font-medium rounded-lg hover:bg-navy/90 transition-colors"
+          >
+            <Activity className="w-3.5 h-3.5" />
+            Export CSV
+          </button>
         </div>
       </motion.div>
 

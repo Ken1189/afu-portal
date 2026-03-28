@@ -403,7 +403,21 @@ export default function PaymentsPage() {
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           className="flex items-center gap-2 px-4 py-2 bg-navy text-white text-sm font-medium rounded-lg hover:bg-navy/90 transition-colors"
-          onClick={() => { const headers = 'ID,Amount,Status,Method,Date\n'; const blob = new Blob([headers], { type: 'text/csv' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `afu-payments-${new Date().toISOString().slice(0,10)}.csv`; a.click(); URL.revokeObjectURL(url); }}
+          onClick={() => {
+            const headers = ['ID', 'Member', 'Type', 'Method', 'Provider', 'Amount', 'Currency', 'Reference', 'Status', 'Date', 'Description'];
+            const rows = filteredPayments.map(p => [
+              p.id, p.memberName, p.type, p.method, p.provider,
+              p.amount.toFixed(2), p.currency, p.reference, p.status, p.date, p.description
+            ]);
+            const csv = [headers, ...rows].map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `afu-payments-${new Date().toISOString().slice(0,10)}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+          }}
         >
           <Download className="w-4 h-4" />
           Export CSV

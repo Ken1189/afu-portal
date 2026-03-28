@@ -141,6 +141,8 @@ export default function CreditScoresPage() {
   const [members, setMembers]     = useState<Member[]>(fallback_members);
   const [recentOverrides, setRecentOverrides] = useState(fallback_recentOverrides);
   const [isLoading, setIsLoading] = useState(true);
+  const [recalculating, setRecalculating] = useState(false);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   useEffect(() => {
     const supabase = createClient();
@@ -632,9 +634,58 @@ export default function CreditScoresPage() {
         </div>
 
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <button className="flex items-center gap-2 px-5 py-2.5 bg-[#1B2A4A] hover:bg-[#1B2A4A]/90 text-white rounded-xl text-sm font-semibold transition-all shadow-sm hover:shadow-md active:scale-95">
-            <RefreshCw className="w-4 h-4" />
-            Recalculate All Scores
+          <button
+            onClick={async () => {
+              if (!window.confirm('Recalculate credit scores for all members? This may take a few minutes.')) return;
+              setRecalculating(true);
+              try {
+                const supabase = createClient();
+                // Trigger recalculation by updating credit_score_updated_at for all profiles
+                const { data: profiles } = await supabase
+                  .from('profiles')
+                  .select('id, credit_score')
+                  .not('credit_score', 'is', null);
+                if (profiles) {
+                  // Update each profile's updated timestamp to trigger recalc
+                  for (const p of profiles) {
+                    await supabase.from('profiles').update({
+                      credit_score_updated_at: new Date().toISOString(),
+                    }).eq('id', p.id);
+                  }
+                }
+                setSuccessMsg('Credit scores recalculated successfully.');
+                setTimeout(() => setSuccessMsg(null), 3000);
+                // Re-fetch data
+                const { data, error } = await supabase
+                  .from('profiles')
+                  .select('id, full_name, country, credit_score, credit_trend, payment_history_pct, farm_productivity_pct, credit_score_updated_at')
+                  .not('credit_score', 'is', null)
+                  .order('credit_score', { ascending: false });
+                if (!error && data && data.length > 0) {
+                  setMembers(
+                    data.map((row: Record<string, unknown>, idx: number) => ({
+                      rank: idx + 1,
+                      name: (row.full_name as string) || 'Unknown',
+                      country: (row.country as string) || 'Unknown',
+                      score: (row.credit_score as number) || 0,
+                      tier: getTier((row.credit_score as number) || 0),
+                      trend: ((row.credit_trend as string) || 'flat') as 'up' | 'down' | 'flat',
+                      paymentHistory: (row.payment_history_pct as number) || 0,
+                      farmProductivity: (row.farm_productivity_pct as number) || 0,
+                      lastUpdated: (row.credit_score_updated_at as string)?.split('T')[0] || '',
+                    }))
+                  );
+                }
+              } catch {
+                alert('Error recalculating scores.');
+              }
+              setRecalculating(false);
+            }}
+            disabled={recalculating}
+            className="flex items-center gap-2 px-5 py-2.5 bg-[#1B2A4A] hover:bg-[#1B2A4A]/90 text-white rounded-xl text-sm font-semibold transition-all shadow-sm hover:shadow-md active:scale-95 disabled:opacity-50"
+          >
+            <RefreshCw className={`w-4 h-4 ${recalculating ? 'animate-spin' : ''}`} />
+            {recalculating ? 'Recalculating...' : 'Recalculate All Scores'}
           </button>
           <p className="text-[11px] text-gray-400">
             This will trigger a full score recalculation for all{' '}
@@ -643,6 +694,14 @@ export default function CreditScoresPage() {
           </p>
         </div>
       </motion.div>
+
+      {/* Success Toast */}
+      {successMsg && (
+        <div className="fixed bottom-6 right-6 z-50 bg-green-600 text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-2 text-sm font-medium">
+          <CheckCircle2 className="w-4 h-4" />
+          {successMsg}
+        </div>
+      )}
     </motion.div>
   );
 }

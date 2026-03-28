@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import {
   Search, Users, CheckCircle2, Clock, Ban, Eye, UserPlus,
-  MapPin, CreditCard, Loader2,
+  MapPin, CreditCard, Loader2, Download,
 } from 'lucide-react';
 import { useMembers } from '@/lib/supabase/use-members';
 
@@ -39,6 +39,8 @@ export default function AdminMembersPage() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [countryFilter, setCountryFilter] = useState('all');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [confirmAction, setConfirmAction] = useState<{ id: string; action: 'suspend' | 'activate' } | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   const filtered = useMemo(() => {
     let result = [...members];
@@ -59,9 +61,38 @@ export default function AdminMembersPage() {
 
   const handleAction = async (id: string, action: 'suspend' | 'activate') => {
     setActionLoading(id);
-    if (action === 'suspend') await suspendMember(id);
-    else await activateMember(id);
+    const result = action === 'suspend' ? await suspendMember(id) : await activateMember(id);
     setActionLoading(null);
+    setConfirmAction(null);
+    if (result.error) {
+      alert(`Error: ${result.error}`);
+    } else {
+      const name = members.find(m => m.id === id)?.profile?.full_name || 'Member';
+      setSuccessMsg(`${name} has been ${action === 'suspend' ? 'suspended' : 'activated'} successfully.`);
+      setTimeout(() => setSuccessMsg(null), 3000);
+    }
+  };
+
+  const handleExportCSV = () => {
+    const headers = ['Member ID', 'Name', 'Email', 'Tier', 'Country', 'Farm', 'Status', 'Join Date'];
+    const rows = filtered.map(m => [
+      m.member_id,
+      m.profile?.full_name || '',
+      m.profile?.email || '',
+      m.tier,
+      m.profile?.country || '',
+      m.farm_name || '',
+      m.status,
+      m.join_date,
+    ]);
+    const csv = [headers, ...rows].map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `afu-members-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   const summaryCards = [
@@ -79,6 +110,13 @@ export default function AdminMembersPage() {
           <h1 className="text-2xl font-bold text-navy">Members</h1>
           <p className="text-sm text-gray-500 mt-0.5">Manage all AFU members</p>
         </div>
+        <button
+          onClick={handleExportCSV}
+          className="flex items-center gap-2 px-4 py-2 bg-navy text-white text-sm font-medium rounded-lg hover:bg-navy/90 transition-colors"
+        >
+          <Download className="w-4 h-4" />
+          Export CSV
+        </button>
       </div>
 
       {/* Summary */}
@@ -206,22 +244,22 @@ export default function AdminMembersPage() {
                         </Link>
                         {m.status === 'active' && (
                           <button
-                            onClick={() => handleAction(m.id, 'suspend')}
+                            onClick={() => setConfirmAction({ id: m.id, action: 'suspend' })}
                             disabled={actionLoading === m.id}
                             className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-600 transition-colors disabled:opacity-50"
                             title="Suspend"
                           >
-                            <Ban className="w-4 h-4" />
+                            {actionLoading === m.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Ban className="w-4 h-4" />}
                           </button>
                         )}
                         {m.status === 'suspended' && (
                           <button
-                            onClick={() => handleAction(m.id, 'activate')}
+                            onClick={() => setConfirmAction({ id: m.id, action: 'activate' })}
                             disabled={actionLoading === m.id}
                             className="p-1.5 rounded-lg hover:bg-green-50 text-gray-400 hover:text-green-600 transition-colors disabled:opacity-50"
                             title="Activate"
                           >
-                            <CheckCircle2 className="w-4 h-4" />
+                            {actionLoading === m.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
                           </button>
                         )}
                       </div>
@@ -239,6 +277,50 @@ export default function AdminMembersPage() {
               </p>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Confirmation Dialog */}
+      {confirmAction && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-xl p-6 max-w-sm w-full mx-4 shadow-2xl">
+            <h3 className="text-lg font-bold text-navy mb-2">
+              {confirmAction.action === 'suspend' ? 'Suspend Member?' : 'Activate Member?'}
+            </h3>
+            <p className="text-sm text-gray-500 mb-4">
+              {confirmAction.action === 'suspend'
+                ? 'This member will be suspended and lose access to the platform. You can reactivate them later.'
+                : 'This member will be reactivated and regain full access to the platform.'}
+            </p>
+            <div className="flex items-center justify-end gap-2">
+              <button
+                onClick={() => setConfirmAction(null)}
+                className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleAction(confirmAction.id, confirmAction.action)}
+                disabled={!!actionLoading}
+                className={`px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2 ${
+                  confirmAction.action === 'suspend'
+                    ? 'bg-red-600 hover:bg-red-700'
+                    : 'bg-green-600 hover:bg-green-700'
+                }`}
+              >
+                {actionLoading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                {confirmAction.action === 'suspend' ? 'Suspend' : 'Activate'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Success Toast */}
+      {successMsg && (
+        <div className="fixed bottom-6 right-6 z-50 bg-green-600 text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-2 text-sm font-medium animate-in slide-in-from-bottom-4">
+          <CheckCircle2 className="w-4 h-4" />
+          {successMsg}
         </div>
       )}
     </div>

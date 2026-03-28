@@ -44,6 +44,8 @@ import {
   Activity,
   ChevronRight,
   CreditCard,
+  Loader2,
+  Save,
 } from 'lucide-react';
 // ── Inline types & fallback data (formerly from @/lib/data/members & @/lib/data/loans) ─
 
@@ -352,6 +354,16 @@ export default function MemberDetailPage() {
   const [dbMember, setDbMember] = useState<Member | null>(null);
   const [dbLoans, setDbLoans] = useState<Loan[]>([]);
   const [dbLoading, setDbLoading] = useState(true);
+  const [editMode, setEditMode] = useState(false);
+  const [editFields, setEditFields] = useState({ firstName: '', lastName: '', email: '', phone: '', farmName: '', farmSize: 0 });
+  const [saving, setSaving] = useState(false);
+  const [statusLoading, setStatusLoading] = useState(false);
+  const [tierModalOpen, setTierModalOpen] = useState(false);
+  const [selectedTier, setSelectedTier] = useState<MemberTier>('smallholder');
+  const [confirmSuspend, setConfirmSuspend] = useState(false);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+  const showSuccess = (msg: string) => { setSuccessMsg(msg); setTimeout(() => setSuccessMsg(null), 3000); };
 
   const memberId = params.id as string;
 
@@ -428,6 +440,65 @@ export default function MemberDetailPage() {
     }
     fetchMemberData();
   }, [memberId]);
+
+  // ── Edit / Status / Tier handlers ─────────────────────────────────────────
+  const handleSaveProfile = async () => {
+    setSaving(true);
+    const supabase = createClient();
+    // Update members table
+    const { error: memberErr } = await supabase
+      .from('members')
+      .update({ farm_name: editFields.farmName, farm_size_ha: editFields.farmSize })
+      .eq('member_id', memberId);
+    // Update profiles table (find via members join)
+    const { data: memberRow } = await supabase.from('members').select('profile_id').eq('member_id', memberId).single();
+    if (memberRow?.profile_id) {
+      await supabase.from('profiles').update({
+        full_name: `${editFields.firstName} ${editFields.lastName}`.trim(),
+        email: editFields.email,
+        phone: editFields.phone,
+      }).eq('id', memberRow.profile_id);
+    }
+    setSaving(false);
+    if (!memberErr) {
+      setEditMode(false);
+      showSuccess('Profile updated successfully.');
+      // Refresh from DB
+      window.location.reload();
+    } else {
+      alert(`Save failed: ${memberErr.message}`);
+    }
+  };
+
+  const handleToggleStatus = async () => {
+    if (!member) return;
+    setStatusLoading(true);
+    const supabase = createClient();
+    const newStatus = member.status === 'active' ? 'suspended' : 'active';
+    const { error } = await supabase.from('members').update({ status: newStatus }).eq('member_id', memberId);
+    setStatusLoading(false);
+    setConfirmSuspend(false);
+    if (!error) {
+      showSuccess(`Member ${newStatus === 'suspended' ? 'suspended' : 'activated'} successfully.`);
+      window.location.reload();
+    } else {
+      alert(`Error: ${error.message}`);
+    }
+  };
+
+  const handleChangeTier = async () => {
+    setSaving(true);
+    const supabase = createClient();
+    const { error } = await supabase.from('members').update({ tier: selectedTier }).eq('member_id', memberId);
+    setSaving(false);
+    setTierModalOpen(false);
+    if (!error) {
+      showSuccess(`Tier changed to ${selectedTier} successfully.`);
+      window.location.reload();
+    } else {
+      alert(`Error: ${error.message}`);
+    }
+  };
 
   // Use DB data if available, otherwise fallback to mock
   const fallbackMember = useMemo(() => members.find((m) => m.id === memberId), [memberId]);
@@ -507,26 +578,46 @@ export default function MemberDetailPage() {
 
           {/* Admin Actions */}
           <div className="flex items-center gap-2 flex-wrap">
-            <button className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-navy bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors">
+            <button
+              onClick={() => {
+                setEditFields({
+                  firstName: member.firstName,
+                  lastName: member.lastName,
+                  email: member.email,
+                  phone: member.phone,
+                  farmName: member.farmName,
+                  farmSize: member.farmSize,
+                });
+                setEditMode(true);
+              }}
+              className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-navy bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
+            >
               <Edit3 className="w-3.5 h-3.5" />
               Edit Profile
             </button>
-            <button className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-teal-dark bg-teal/10 hover:bg-teal/20 rounded-lg transition-colors">
-              <MessageSquare className="w-3.5 h-3.5" />
-              Send Message
-            </button>
-            <button className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-amber-700 bg-amber-50 hover:bg-amber-100 rounded-lg transition-colors">
+            <button
+              onClick={() => { setSelectedTier(member.tier); setTierModalOpen(true); }}
+              className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-amber-700 bg-amber-50 hover:bg-amber-100 rounded-lg transition-colors"
+            >
               <RefreshCw className="w-3.5 h-3.5" />
               Change Tier
             </button>
             {member.status === 'active' ? (
-              <button className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors">
+              <button
+                onClick={() => setConfirmSuspend(true)}
+                disabled={statusLoading}
+                className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors disabled:opacity-50"
+              >
                 <Ban className="w-3.5 h-3.5" />
                 Suspend
               </button>
             ) : (
-              <button className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-green-700 bg-green-50 hover:bg-green-100 rounded-lg transition-colors">
-                <CheckCircle2 className="w-3.5 h-3.5" />
+              <button
+                onClick={handleToggleStatus}
+                disabled={statusLoading}
+                className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-green-700 bg-green-50 hover:bg-green-100 rounded-lg transition-colors disabled:opacity-50"
+              >
+                {statusLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
                 Activate
               </button>
             )}
@@ -1045,6 +1136,103 @@ export default function MemberDetailPage() {
           )}
         </motion.div>
       </AnimatePresence>
+
+      {/* ── Edit Profile Modal ────────────────────────────────────────── */}
+      {editMode && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl">
+            <h3 className="text-lg font-bold text-navy mb-4">Edit Member Profile</h3>
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs text-gray-500">First Name</label>
+                  <input value={editFields.firstName} onChange={(e) => setEditFields(f => ({ ...f, firstName: e.target.value }))} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal/50" />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500">Last Name</label>
+                  <input value={editFields.lastName} onChange={(e) => setEditFields(f => ({ ...f, lastName: e.target.value }))} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal/50" />
+                </div>
+              </div>
+              <div>
+                <label className="text-xs text-gray-500">Email</label>
+                <input value={editFields.email} onChange={(e) => setEditFields(f => ({ ...f, email: e.target.value }))} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal/50" />
+              </div>
+              <div>
+                <label className="text-xs text-gray-500">Phone</label>
+                <input value={editFields.phone} onChange={(e) => setEditFields(f => ({ ...f, phone: e.target.value }))} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal/50" />
+              </div>
+              <div>
+                <label className="text-xs text-gray-500">Farm Name</label>
+                <input value={editFields.farmName} onChange={(e) => setEditFields(f => ({ ...f, farmName: e.target.value }))} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal/50" />
+              </div>
+              <div>
+                <label className="text-xs text-gray-500">Farm Size (hectares)</label>
+                <input type="number" value={editFields.farmSize} onChange={(e) => setEditFields(f => ({ ...f, farmSize: parseFloat(e.target.value) || 0 }))} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal/50" />
+              </div>
+            </div>
+            <div className="flex items-center justify-end gap-2 mt-5">
+              <button onClick={() => setEditMode(false)} className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">Cancel</button>
+              <button onClick={handleSaveProfile} disabled={saving} className="px-4 py-2 text-sm font-medium text-white bg-teal hover:bg-teal/90 rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2">
+                {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Change Tier Modal ─────────────────────────────────────────── */}
+      {tierModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-xl p-6 max-w-sm w-full mx-4 shadow-2xl">
+            <h3 className="text-lg font-bold text-navy mb-4">Change Membership Tier</h3>
+            <select
+              value={selectedTier}
+              onChange={(e) => setSelectedTier(e.target.value as MemberTier)}
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal/50"
+            >
+              <option value="smallholder">Smallholder</option>
+              <option value="commercial">Commercial</option>
+              <option value="enterprise">Enterprise</option>
+              <option value="partner">Partner</option>
+            </select>
+            <div className="flex items-center justify-end gap-2 mt-5">
+              <button onClick={() => setTierModalOpen(false)} className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">Cancel</button>
+              <button onClick={handleChangeTier} disabled={saving} className="px-4 py-2 text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2">
+                {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                Update Tier
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Confirm Suspend Dialog ────────────────────────────────────── */}
+      {confirmSuspend && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-xl p-6 max-w-sm w-full mx-4 shadow-2xl">
+            <h3 className="text-lg font-bold text-navy mb-2">Suspend Member?</h3>
+            <p className="text-sm text-gray-500 mb-4">
+              This member will lose access to the platform. You can reactivate them later.
+            </p>
+            <div className="flex items-center justify-end gap-2">
+              <button onClick={() => setConfirmSuspend(false)} className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">Cancel</button>
+              <button onClick={handleToggleStatus} disabled={statusLoading} className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2">
+                {statusLoading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                Suspend
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Success Toast ────────────────────────────────────────────── */}
+      {successMsg && (
+        <div className="fixed bottom-6 right-6 z-50 bg-green-600 text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-2 text-sm font-medium">
+          <CheckCircle2 className="w-4 h-4" />
+          {successMsg}
+        </div>
+      )}
     </motion.div>
   );
 }

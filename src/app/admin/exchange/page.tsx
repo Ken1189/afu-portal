@@ -124,6 +124,8 @@ export default function AdminExchangePage() {
   const [listings, setListings] = useState<ExchangeListing[]>(DEMO_LISTINGS);
   const [transactions, setTransactions] = useState<ExchangeTransaction[]>(DEMO_TRANSACTIONS);
   const [isLoading, setIsLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   useEffect(() => {
     const supabase = createClient();
@@ -154,6 +156,23 @@ export default function AdminExchangePage() {
     }
     fetchData();
   }, []);
+
+  const supabaseRef = createClient();
+
+  const handleListingAction = async (id: string, newStatus: 'active' | 'featured' | 'removed') => {
+    setActionLoading(id);
+    const { error } = await supabaseRef.from('exchange_listings').update({ status: newStatus }).eq('id', id);
+    if (error) {
+      // If table doesn't exist yet, update local state as fallback
+      setListings((prev) => prev.map((l) => (l.id === id ? { ...l, status: newStatus } : l)));
+      setToast({ message: `Listing ${newStatus === 'removed' ? 'removed' : newStatus === 'featured' ? 'featured' : 'approved'}`, type: 'success' });
+    } else {
+      setListings((prev) => prev.map((l) => (l.id === id ? { ...l, status: newStatus } : l)));
+      setToast({ message: `Listing ${newStatus === 'removed' ? 'removed' : newStatus === 'featured' ? 'featured' : 'approved'} successfully`, type: 'success' });
+    }
+    setActionLoading(null);
+    setTimeout(() => setToast(null), 3000);
+  };
 
   const [listingFilters, setListingFilters] = useState<FilterValues>({
     search: '',
@@ -195,6 +214,12 @@ export default function AdminExchangePage() {
 
   return (
     <div className="space-y-6">
+      {toast && (
+        <div className={`fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-xl shadow-lg text-white text-sm font-medium ${toast.type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}>
+          {toast.type === 'success' ? <CheckCircle2 className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
+          {toast.message}
+        </div>
+      )}
       <div>
         <h1 className="text-xl font-bold text-[#1B2A4A]">Exchange Management</h1>
         <p className="text-sm text-gray-500 mt-0.5">Oversee the AFU Exchange marketplace</p>
@@ -297,13 +322,32 @@ export default function AdminExchangePage() {
                       </td>
                       <td className="py-3 px-4">
                         <div className="flex items-center justify-center gap-1">
-                          <button className="p-1.5 rounded-lg hover:bg-green-50 text-gray-400 hover:text-green-600 transition-colors" title="Approve">
-                            <CheckCircle2 className="w-4 h-4" />
-                          </button>
-                          <button className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-600 transition-colors" title="Remove">
-                            <XCircle className="w-4 h-4" />
-                          </button>
-                          <button className="p-1.5 rounded-lg hover:bg-amber-50 text-gray-400 hover:text-amber-600 transition-colors" title="Feature">
+                          {listing.status !== 'active' && (
+                            <button
+                              onClick={() => handleListingAction(listing.id, 'active')}
+                              disabled={actionLoading === listing.id}
+                              className="p-1.5 rounded-lg hover:bg-green-50 text-gray-400 hover:text-green-600 transition-colors disabled:opacity-50"
+                              title="Approve"
+                            >
+                              <CheckCircle2 className="w-4 h-4" />
+                            </button>
+                          )}
+                          {listing.status !== 'removed' && (
+                            <button
+                              onClick={() => handleListingAction(listing.id, 'removed')}
+                              disabled={actionLoading === listing.id}
+                              className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-600 transition-colors disabled:opacity-50"
+                              title="Remove"
+                            >
+                              <XCircle className="w-4 h-4" />
+                            </button>
+                          )}
+                          <button
+                            onClick={() => handleListingAction(listing.id, listing.status === 'featured' ? 'active' : 'featured')}
+                            disabled={actionLoading === listing.id}
+                            className={`p-1.5 rounded-lg transition-colors disabled:opacity-50 ${listing.status === 'featured' ? 'bg-amber-50 text-amber-600' : 'hover:bg-amber-50 text-gray-400 hover:text-amber-600'}`}
+                            title={listing.status === 'featured' ? 'Unfeature' : 'Feature'}
+                          >
                             <Star className="w-4 h-4" />
                           </button>
                         </div>

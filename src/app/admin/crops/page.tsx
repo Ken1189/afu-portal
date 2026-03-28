@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { motion } from 'framer-motion';
 import {
@@ -10,6 +10,12 @@ import {
   DollarSign,
   CheckCircle2,
   Leaf,
+  Plus,
+  Pencil,
+  Trash2,
+  X,
+  Loader2,
+  AlertCircle,
 } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 
@@ -89,6 +95,46 @@ function formatCurrency(value: number): string {
   return `$${value.toLocaleString()}`;
 }
 
+// ── Toast ────────────────────────────────────────────────────────────────────
+
+function Toast({ message, type, onClose }: { message: string; type: 'success' | 'error'; onClose: () => void }) {
+  useEffect(() => { const t = setTimeout(onClose, 3000); return () => clearTimeout(t); }, [onClose]);
+  return (
+    <div className={`fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-xl shadow-lg text-white text-sm font-medium ${type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}>
+      {type === 'success' ? <CheckCircle2 className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
+      {message}
+    </div>
+  );
+}
+
+// ── Form defaults ────────────────────────────────────────────────────────────
+
+interface CropFormData {
+  cropName: string;
+  variety: string;
+  memberName: string;
+  farmName: string;
+  hectares: string;
+  stage: CropRecord['stage'];
+  healthScore: string;
+  plantingDate: string;
+  expectedHarvest: string;
+  estimatedRevenue: string;
+}
+
+const emptyForm: CropFormData = {
+  cropName: '',
+  variety: '',
+  memberName: '',
+  farmName: '',
+  hectares: '',
+  stage: 'seedling',
+  healthScore: '80',
+  plantingDate: '',
+  expectedHarvest: '',
+  estimatedRevenue: '',
+};
+
 // ═══════════════════════════════════════════════════════════════════════════════
 //  MAIN COMPONENT
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -99,37 +145,46 @@ export default function CropManagementPage() {
   const [stageFilter, setStageFilter] = useState<StageFilter>('all');
   const [cropRecords, setCropRecords] = useState<CropRecord[]>(fallback_cropRecords);
   const [isLoading, setIsLoading] = useState(true);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
-  useEffect(() => {
-    const supabase = createClient();
-    async function fetchData() {
-      try {
-        const { data, error } = await supabase
-          .from('farm_plots')
-          .select('*')
-          .order('created_at', { ascending: false });
-        if (!error && data && data.length > 0) {
-          setCropRecords(
-            data.map((row: Record<string, unknown>) => ({
-              id: (row.id as string) || '',
-              cropName: (row.crop_type as string) || (row.crop_name as string) || 'Unknown',
-              variety: (row.variety as string) || '',
-              memberName: (row.member_name as string) || (row.farmer_name as string) || 'Unknown',
-              farmName: (row.farm_name as string) || '',
-              hectares: (row.size_hectares as number) || 0,
-              stage: ((row.stage as string) || 'growing') as CropRecord['stage'],
-              healthScore: (row.health_score as number) || 0,
-              plantingDate: ((row.planting_date as string) || '')?.split('T')[0] || '',
-              expectedHarvest: ((row.expected_harvest as string) || '')?.split('T')[0] || '',
-              estimatedRevenue: (row.estimated_revenue as number) || 0,
-            }))
-          );
-        }
-      } catch { /* fallback */ }
-      setIsLoading(false);
-    }
-    fetchData();
-  }, []);
+  // Modal state
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [form, setForm] = useState<CropFormData>(emptyForm);
+  const [saving, setSaving] = useState(false);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  const supabase = createClient();
+
+  const fetchData = useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from('farm_plots')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (!error && data && data.length > 0) {
+        setCropRecords(
+          data.map((row: Record<string, unknown>) => ({
+            id: (row.id as string) || '',
+            cropName: (row.crop_type as string) || (row.crop_name as string) || 'Unknown',
+            variety: (row.variety as string) || '',
+            memberName: (row.member_name as string) || (row.farmer_name as string) || 'Unknown',
+            farmName: (row.farm_name as string) || '',
+            hectares: (row.size_hectares as number) || 0,
+            stage: ((row.stage as string) || 'growing') as CropRecord['stage'],
+            healthScore: (row.health_score as number) || 0,
+            plantingDate: ((row.planting_date as string) || '')?.split('T')[0] || '',
+            expectedHarvest: ((row.expected_harvest as string) || '')?.split('T')[0] || '',
+            estimatedRevenue: (row.estimated_revenue as number) || 0,
+          }))
+        );
+      }
+    } catch { /* fallback */ }
+    setIsLoading(false);
+  }, [supabase]);
+
+  useEffect(() => { fetchData(); }, [fetchData]);
 
   const filtered = useMemo(() => {
     let result = [...cropRecords];
@@ -144,10 +199,10 @@ export default function CropManagementPage() {
       );
     }
     return result;
-  }, [searchQuery, stageFilter]);
+  }, [searchQuery, stageFilter, cropRecords]);
 
   const totalCrops = cropRecords.length;
-  const avgHealth = Math.round(cropRecords.reduce((s, c) => s + c.healthScore, 0) / totalCrops);
+  const avgHealth = totalCrops > 0 ? Math.round(cropRecords.reduce((s, c) => s + c.healthScore, 0) / totalCrops) : 0;
   const harvestReady = cropRecords.filter((c) => c.stage === 'harvest-ready').length;
   const totalRevenue = cropRecords.reduce((s, c) => s + c.estimatedRevenue, 0);
 
@@ -166,12 +221,116 @@ export default function CropManagementPage() {
     { key: 'harvested', label: 'Harvested' },
   ];
 
+  // ── CRUD Handlers ──────────────────────────────────────────────────────────
+
+  const openAdd = () => {
+    setEditingId(null);
+    setForm(emptyForm);
+    setModalOpen(true);
+  };
+
+  const openEdit = (crop: CropRecord) => {
+    setEditingId(crop.id);
+    setForm({
+      cropName: crop.cropName,
+      variety: crop.variety,
+      memberName: crop.memberName,
+      farmName: crop.farmName,
+      hectares: crop.hectares.toString(),
+      stage: crop.stage,
+      healthScore: crop.healthScore.toString(),
+      plantingDate: crop.plantingDate,
+      expectedHarvest: crop.expectedHarvest,
+      estimatedRevenue: crop.estimatedRevenue.toString(),
+    });
+    setModalOpen(true);
+  };
+
+  const handleSave = async () => {
+    if (!form.cropName.trim() || !form.memberName.trim()) {
+      setToast({ message: 'Crop name and member name are required', type: 'error' });
+      return;
+    }
+    setSaving(true);
+    const payload = {
+      crop_type: form.cropName.trim(),
+      variety: form.variety.trim() || null,
+      member_name: form.memberName.trim(),
+      farm_name: form.farmName.trim() || null,
+      size_hectares: parseFloat(form.hectares) || 0,
+      stage: form.stage,
+      health_score: parseInt(form.healthScore) || 0,
+      planting_date: form.plantingDate || null,
+      expected_harvest: form.expectedHarvest || null,
+      estimated_revenue: parseFloat(form.estimatedRevenue) || 0,
+    };
+
+    let error;
+    if (editingId) {
+      ({ error } = await supabase.from('farm_plots').update(payload).eq('id', editingId));
+    } else {
+      ({ error } = await supabase.from('farm_plots').insert(payload));
+    }
+
+    if (error) {
+      // Fallback: update local state for demo
+      if (editingId) {
+        setCropRecords(prev => prev.map(c => c.id === editingId ? {
+          ...c, cropName: form.cropName, variety: form.variety, memberName: form.memberName,
+          farmName: form.farmName, hectares: parseFloat(form.hectares) || 0, stage: form.stage,
+          healthScore: parseInt(form.healthScore) || 0, plantingDate: form.plantingDate,
+          expectedHarvest: form.expectedHarvest, estimatedRevenue: parseFloat(form.estimatedRevenue) || 0,
+        } : c));
+      } else {
+        setCropRecords(prev => [{
+          id: `CR-${String(prev.length + 1).padStart(3, '0')}`,
+          cropName: form.cropName, variety: form.variety, memberName: form.memberName,
+          farmName: form.farmName, hectares: parseFloat(form.hectares) || 0, stage: form.stage,
+          healthScore: parseInt(form.healthScore) || 0, plantingDate: form.plantingDate,
+          expectedHarvest: form.expectedHarvest, estimatedRevenue: parseFloat(form.estimatedRevenue) || 0,
+        }, ...prev]);
+      }
+      setToast({ message: `Crop ${editingId ? 'updated' : 'added'} (local)`, type: 'success' });
+    } else {
+      setToast({ message: `Crop ${editingId ? 'updated' : 'added'} successfully`, type: 'success' });
+      await fetchData();
+    }
+    setModalOpen(false);
+    setSaving(false);
+  };
+
+  const handleDelete = async (id: string) => {
+    setDeleting(true);
+    const { error } = await supabase.from('farm_plots').delete().eq('id', id);
+    if (error) {
+      // Fallback: remove locally
+      setCropRecords(prev => prev.filter(c => c.id !== id));
+      setToast({ message: 'Crop removed (local)', type: 'success' });
+    } else {
+      setToast({ message: 'Crop deleted successfully', type: 'success' });
+      await fetchData();
+    }
+    setDeleteConfirmId(null);
+    setDeleting(false);
+  };
+
   return (
     <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-6">
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+
       {/* Header */}
-      <motion.div variants={cardVariants}>
-        <h1 className="text-2xl font-bold text-navy">Crop Management</h1>
-        <p className="text-sm text-gray-500 mt-0.5">All crops across all member farms</p>
+      <motion.div variants={cardVariants} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold text-navy">Crop Management</h1>
+          <p className="text-sm text-gray-500 mt-0.5">All crops across all member farms</p>
+        </div>
+        <button
+          onClick={openAdd}
+          className="inline-flex items-center gap-2 bg-teal text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-teal/90 transition-colors shadow-sm"
+        >
+          <Plus className="w-4 h-4" />
+          Add Crop
+        </button>
       </motion.div>
 
       {/* Summary Cards */}
@@ -242,6 +401,7 @@ export default function CropManagementPage() {
                 <th className="text-right py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Health</th>
                 <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Planted</th>
                 <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Exp. Harvest</th>
+                <th className="text-right py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
@@ -271,6 +431,24 @@ export default function CropManagementPage() {
                   </td>
                   <td className="py-3 px-4 text-xs text-gray-500">{crop.plantingDate}</td>
                   <td className="py-3 px-4 text-xs text-gray-500">{crop.expectedHarvest}</td>
+                  <td className="py-3 px-4">
+                    <div className="flex items-center justify-end gap-1">
+                      <button
+                        onClick={() => openEdit(crop)}
+                        className="p-1.5 rounded-lg text-gray-400 hover:text-navy hover:bg-gray-100 transition-colors"
+                        title="Edit"
+                      >
+                        <Pencil className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => setDeleteConfirmId(crop.id)}
+                        className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                        title="Delete"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -283,6 +461,97 @@ export default function CropManagementPage() {
           </div>
         )}
       </motion.div>
+
+      {/* ── Add/Edit Modal ── */}
+      {modalOpen && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setModalOpen(false)}>
+          <div className="bg-white rounded-xl max-w-lg w-full shadow-xl max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between p-5 border-b border-gray-100">
+              <h3 className="text-lg font-semibold text-navy">{editingId ? 'Edit Crop' : 'Add Crop'}</h3>
+              <button onClick={() => setModalOpen(false)} className="p-1 rounded-lg hover:bg-gray-100"><X className="w-5 h-5 text-gray-400" /></button>
+            </div>
+            <div className="p-5 space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">Crop Name *</label>
+                  <input value={form.cropName} onChange={e => setForm({ ...form, cropName: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-teal/30 focus:border-teal outline-none" placeholder="Maize" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">Variety</label>
+                  <input value={form.variety} onChange={e => setForm({ ...form, variety: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-teal/30 focus:border-teal outline-none" placeholder="SC 513" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">Member Name *</label>
+                  <input value={form.memberName} onChange={e => setForm({ ...form, memberName: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-teal/30 focus:border-teal outline-none" placeholder="Grace Moyo" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">Farm Name</label>
+                  <input value={form.farmName} onChange={e => setForm({ ...form, farmName: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-teal/30 focus:border-teal outline-none" placeholder="Moyo Farm" />
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">Hectares</label>
+                  <input type="number" value={form.hectares} onChange={e => setForm({ ...form, hectares: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-teal/30 focus:border-teal outline-none" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">Stage</label>
+                  <select value={form.stage} onChange={e => setForm({ ...form, stage: e.target.value as CropRecord['stage'] })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-teal/30 focus:border-teal outline-none bg-white">
+                    <option value="seedling">Seedling</option>
+                    <option value="growing">Growing</option>
+                    <option value="harvest-ready">Harvest Ready</option>
+                    <option value="harvested">Harvested</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">Health %</label>
+                  <input type="number" min="0" max="100" value={form.healthScore} onChange={e => setForm({ ...form, healthScore: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-teal/30 focus:border-teal outline-none" />
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">Planting Date</label>
+                  <input type="date" value={form.plantingDate} onChange={e => setForm({ ...form, plantingDate: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-teal/30 focus:border-teal outline-none" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">Exp. Harvest</label>
+                  <input type="date" value={form.expectedHarvest} onChange={e => setForm({ ...form, expectedHarvest: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-teal/30 focus:border-teal outline-none" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">Est. Revenue ($)</label>
+                  <input type="number" value={form.estimatedRevenue} onChange={e => setForm({ ...form, estimatedRevenue: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-teal/30 focus:border-teal outline-none" />
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-end gap-3 p-5 border-t border-gray-100">
+              <button onClick={() => setModalOpen(false)} className="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100">Cancel</button>
+              <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-semibold text-white bg-teal hover:bg-teal/90 disabled:opacity-50 transition-colors">
+                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
+                {editingId ? 'Update' : 'Add'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Delete Confirmation ── */}
+      {deleteConfirmId && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setDeleteConfirmId(null)}>
+          <div className="bg-white rounded-xl max-w-sm w-full shadow-xl p-6" onClick={e => e.stopPropagation()}>
+            <h3 className="text-lg font-semibold text-navy mb-2">Delete Crop Record?</h3>
+            <p className="text-sm text-gray-500 mb-4">This action cannot be undone. The crop record will be permanently removed.</p>
+            <div className="flex justify-end gap-3">
+              <button onClick={() => setDeleteConfirmId(null)} className="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100">Cancel</button>
+              <button onClick={() => handleDelete(deleteConfirmId)} disabled={deleting} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 transition-colors">
+                {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 }

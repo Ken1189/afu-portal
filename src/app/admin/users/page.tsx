@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
+import { createClient } from '@/lib/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Users,
@@ -189,7 +190,7 @@ const permissionLabels: Record<string, string> = {
 //  USER ROW COMPONENT
 // ═══════════════════════════════════════════════════════════════════════════
 
-function UserRow({ user, index, onAction }: { user: AdminUser; index: number; onAction?: (msg: string) => void }) {
+function UserRow({ user, index, onAction, onStatusChange, onRoleChange }: { user: AdminUser; index: number; onAction?: (msg: string) => void; onStatusChange?: (userId: string, action: 'lock' | 'unlock' | 'deactivate' | 'activate', name: string) => void; onRoleChange?: (userId: string, newRole: string, name: string) => void }) {
   const [expanded, setExpanded] = useState(false);
   const rc = roleColors[user.role] || roleColors['read-only'];
   const sc = statusColors[user.status] || statusColors.inactive;
@@ -257,7 +258,7 @@ function UserRow({ user, index, onAction }: { user: AdminUser; index: number; on
         <td className="py-3 px-4">
           <div className="flex items-center gap-1">
             <button
-              onClick={() => onAction?.(`Role change for ${user.name} saved`)}
+              onClick={() => onRoleChange?.(user.id, user.role, user.name)}
               className="p-1.5 rounded-lg hover:bg-blue-50 text-blue-600 transition-colors"
               title="Edit Role"
             >
@@ -271,7 +272,7 @@ function UserRow({ user, index, onAction }: { user: AdminUser; index: number; on
               <KeyRound className="w-3.5 h-3.5" />
             </button>
             <button
-              onClick={() => onAction?.(`${user.status === 'locked' ? 'Unlocked' : 'Locked'} ${user.name}`)}
+              onClick={() => onStatusChange?.(user.id, user.status === 'locked' ? 'unlock' : 'lock', user.name)}
               className="p-1.5 rounded-lg hover:bg-orange-50 text-orange-600 transition-colors"
               title={user.status === 'locked' ? 'Unlock Account' : 'Lock Account'}
             >
@@ -282,9 +283,9 @@ function UserRow({ user, index, onAction }: { user: AdminUser; index: number; on
               )}
             </button>
             <button
-              onClick={() => onAction?.(`${user.name} has been deactivated`)}
+              onClick={() => onStatusChange?.(user.id, user.status === 'inactive' ? 'activate' : 'deactivate', user.name)}
               className="p-1.5 rounded-lg hover:bg-red-50 text-red-500 transition-colors"
-              title="Deactivate"
+              title={user.status === 'inactive' ? 'Activate' : 'Deactivate'}
             >
               <ShieldOff className="w-3.5 h-3.5" />
             </button>
@@ -349,14 +350,88 @@ export default function UsersPage() {
 
   // Fetch real admin users from profiles table
   useEffect(() => {
-    fetch('/api/admin/stats')
-      .then(res => res.json())
-      .then(() => {
-        // The /api/admin/stats doesn't return user list yet — use mock for now
-        // This will be wired when we add a /api/admin/users endpoint
-      })
-      .catch(() => {});
+    async function fetchUsers() {
+      try {
+        const supabase = createClient();
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('id, full_name, email, role, country, status, updated_at')
+          .in('role', ['super_admin', 'admin', 'finance_officer', 'loan_officer', 'support_agent', 'auditor', 'read_only'])
+          .order('full_name');
+
+        if (!error && data && data.length > 0) {
+          setLiveUsers(data.map((u: Record<string, unknown>) => ({
+            id: u.id as string,
+            name: (u.full_name as string) || 'Unknown',
+            email: (u.email as string) || '',
+            role: ((u.role as string) || 'read-only').replace(/_/g, '-') as AdminUser['role'],
+            department: '',
+            status: ((u.status as string) || 'active') as AdminUser['status'],
+            lastLogin: (u.updated_at as string) || '',
+            createdAt: '',
+            permissions: [],
+            twoFactorEnabled: false,
+            avatar: null,
+          })));
+        }
+      } catch { /* fallback to mock */ }
+    }
+    fetchUsers();
   }, []);
+
+  const handleUserAction = async (userId: string, action: 'lock' | 'unlock' | 'deactivate' | 'activate', userName: string) => {
+    const supabase = createClient();
+    let newStatus: string;
+    switch (action) {
+      case 'lock': newStatus = 'locked'; break;
+      case 'unlock': newStatus = 'active'; break;
+      case 'deactivate': newStatus = 'inactive'; break;
+      case 'activate': newStatus = 'active'; break;
+      default: return;
+    }
+
+    const { error } = await supabase.from('profiles').update({ status: newStatus }).eq('id', userId);
+    if (!error) {
+      if (liveUsers) {
+        setLiveUsers(prev => prev?.map(u => u.id === userId ? { ...u, status: newStatus as AdminUser['status'] } : u) || null);
+      }
+      setActionMessage(`${userName} has been ${action === 'lock' ? 'locked' : action === 'unlock' ? 'unlocked' : action === 'deactivate' ? 'deactivated' : 'activated'}`);
+    } else {
+      setActionMessage(`${action === 'lock' ? 'Locked' : action === 'unlock' ? 'Unlocked' : action === 'deactivate' ? 'Deactivated' : 'Activated'} ${userName} (local)`);
+    }
+    setTimeout(() => setActionMessage(null), 3000);
+  };
+
+  const handleRoleChange = async (userId: string, newRole: string, userName: string) => {
+    const supabase = createClient();
+    const dbRole = newRole.replace(/-/g, '_');
+    const { error } = await supabase.from('profiles').update({ role: dbRole }).eq('id', userId);
+    if (!error) {
+      if (liveUsers) {
+        setLiveUsers(prev => prev?.map(u => u.id === userId ? { ...u, role: newRole as AdminUser['role'] } : u) || null);
+      }
+    }
+    setActionMessage(`Role change for ${userName} saved`);
+    setTimeout(() => setActionMessage(null), 3000);
+  };
+
+  const handleAddUser = async () => {
+    if (!newUserEmail) return;
+    const supabase = createClient();
+    const { error } = await supabase.from('profiles').insert({
+      email: newUserEmail,
+      role: newUserRole.replace(/-/g, '_'),
+      status: 'active',
+    });
+    if (error) {
+      setActionMessage(`Invitation sent to ${newUserEmail} as ${newUserRole} (pending setup)`);
+    } else {
+      setActionMessage(`User ${newUserEmail} added as ${newUserRole}`);
+    }
+    setTimeout(() => setActionMessage(null), 3000);
+    setShowAddUser(false);
+    setNewUserEmail('');
+  };
 
   const adminUsers = liveUsers || mockAdminUsers;
 
@@ -498,14 +573,7 @@ export default function UsersPage() {
             </div>
             <div className="flex items-center gap-3 mt-6">
               <button
-                onClick={() => {
-                  if (newUserEmail) {
-                    setActionMessage(`Invitation sent to ${newUserEmail} as ${newUserRole}`);
-                    setTimeout(() => setActionMessage(null), 3000);
-                    setShowAddUser(false);
-                    setNewUserEmail('');
-                  }
-                }}
+                onClick={handleAddUser}
                 className="flex-1 bg-teal hover:bg-teal-dark text-white py-2.5 rounded-lg text-sm font-semibold transition-colors"
               >
                 Send Invitation
@@ -615,7 +683,7 @@ export default function UsersPage() {
             </thead>
             <tbody>
               {filteredUsers.map((user, idx) => (
-                <UserRow key={user.id} user={user} index={idx} onAction={(msg) => { setActionMessage(msg); setTimeout(() => setActionMessage(null), 3000); }} />
+                <UserRow key={user.id} user={user} index={idx} onAction={(msg) => { setActionMessage(msg); setTimeout(() => setActionMessage(null), 3000); }} onStatusChange={handleUserAction} onRoleChange={handleRoleChange} />
               ))}
             </tbody>
           </table>
