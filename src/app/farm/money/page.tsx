@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { useFarmPlots, type FarmPlotRow } from '@/lib/supabase/use-farm-plots';
 import { useFarmTransactions } from '@/lib/supabase/use-farm-transactions';
+import { useAuth } from '@/lib/supabase/auth-context';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 import type { Translations } from '@/lib/i18n/translations';
 
@@ -331,6 +332,8 @@ type FilterTab = 'all' | 'income' | 'expense';
 
 export default function MoneyTrackerPage() {
   const { t } = useLanguage();
+  const { user } = useAuth();
+  const { createTransaction: createDbTransaction } = useFarmTransactions(user?.id);
   const { plots: livePlots } = useFarmPlots();
   const farmPlots = livePlots.length > 0 ? livePlots.map(adaptFarmPlot) : mockFarmPlots;
   const summary = useMemo(() => getMockFarmSummary(), []);
@@ -349,6 +352,8 @@ export default function MoneyTrackerPage() {
   // Local transactions state (allows "adding")
   const farmTransactions = mockFarmTransactions;
   const [transactions, setTransactions] = useState<FarmTransaction[]>(farmTransactions);
+  const [savingTxn, setSavingTxn] = useState(false);
+  const [txnToast, setTxnToast] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   // Animated counters
   const animatedProfit = useAnimatedCounter(summary.profit);
@@ -401,8 +406,11 @@ export default function MoneyTrackerPage() {
     setModalOpen(true);
   }, []);
 
-  const handleSaveTransaction = useCallback(() => {
+  const handleSaveTransaction = useCallback(async () => {
     if (!modalAmount || !modalCategory) return;
+    setSavingTxn(true);
+    setTxnToast(null);
+
     const newTxn: FarmTransaction = {
       id: `TXN-${Date.now()}`,
       type: modalType,
@@ -416,7 +424,35 @@ export default function MoneyTrackerPage() {
     };
     setTransactions((prev) => [newTxn, ...prev]);
     setModalOpen(false);
-  }, [modalAmount, modalCategory, modalType, modalDate, modalDescription, modalPlotId, t]);
+
+    // Persist to Supabase
+    if (user) {
+      try {
+        const { error } = await createDbTransaction({
+          member_id: user.id,
+          type: modalType,
+          category: modalCategory as string,
+          amount: parseFloat(modalAmount),
+          currency: 'USD',
+          date: modalDate,
+          description: newTxn.description,
+          plot_id: modalPlotId || null,
+        });
+        if (error) {
+          setTxnToast({ type: 'error', text: error });
+        } else {
+          setTxnToast({ type: 'success', text: `${modalType === 'income' ? 'Income' : 'Expense'} saved successfully` });
+        }
+      } catch {
+        setTxnToast({ type: 'error', text: 'Could not save to database' });
+      }
+    } else {
+      setTxnToast({ type: 'success', text: 'Transaction recorded locally' });
+    }
+
+    setSavingTxn(false);
+    setTimeout(() => setTxnToast(null), 3000);
+  }, [modalAmount, modalCategory, modalType, modalDate, modalDescription, modalPlotId, t, user, createDbTransaction]);
 
   // Income categories for modal
   const incomeCategories: TransactionCategory[] = ['harvest-sale', 'contract-payment', 'subsidy', 'other'];
@@ -438,6 +474,16 @@ export default function MoneyTrackerPage() {
 
   return (
     <>
+      {/* Toast notification */}
+      {txnToast && (
+        <div className={`fixed top-4 right-4 z-[60] px-4 py-3 rounded-xl shadow-lg text-sm font-medium transition-all ${
+          txnToast.type === 'success'
+            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+            : 'bg-red-50 text-red-700 border border-red-200'
+        }`}>
+          {txnToast.text}
+        </div>
+      )}
       <motion.div
         variants={containerVariants}
         initial="hidden"
@@ -946,16 +992,23 @@ export default function MoneyTrackerPage() {
               {/* Save button */}
               <button
                 onClick={handleSaveTransaction}
-                disabled={!modalAmount || !modalCategory}
-                className={`w-full py-4 rounded-xl text-white font-bold text-base transition-all min-h-[52px] ${
-                  !modalAmount || !modalCategory
+                disabled={!modalAmount || !modalCategory || savingTxn}
+                className={`w-full py-4 rounded-xl text-white font-bold text-base transition-all min-h-[52px] flex items-center justify-center gap-2 ${
+                  !modalAmount || !modalCategory || savingTxn
                     ? 'bg-gray-300 cursor-not-allowed'
                     : modalType === 'income'
                       ? 'bg-green-500 active:bg-green-600 shadow-lg shadow-green-500/25'
                       : 'bg-red-500 active:bg-red-600 shadow-lg shadow-red-500/25'
                 }`}
               >
-                {modalType === 'income' ? `${t.common.save} ${t.moneyTracker.income}` : `${t.common.save} ${t.moneyTracker.expenses}`}
+                {savingTxn ? (
+                  <>
+                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+                    Saving...
+                  </>
+                ) : (
+                  modalType === 'income' ? `${t.common.save} ${t.moneyTracker.income}` : `${t.common.save} ${t.moneyTracker.expenses}`
+                )}
               </button>
             </motion.div>
           </motion.div>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { useAuth } from '@/lib/supabase/auth-context';
 import Link from 'next/link';
 import {
   Coins,
@@ -111,6 +112,7 @@ const STATUS_ICONS: Record<string, React.ComponentType<{ className?: string }>> 
 
 // ── Page ──
 export default function FarmExchangePage() {
+  const { user } = useAuth();
   const [dbTransactions, setDbTransactions] = useState<Transaction[]>([]);
   const [dbListings, setDbListings] = useState<MyListing[]>([]);
   const [dbTrades, setDbTrades] = useState<Trade[]>([]);
@@ -178,6 +180,8 @@ export default function FarmExchangePage() {
   const trades = dbTrades.length > 0 ? dbTrades : DEMO_TRADES;
 
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [formSubmitting, setFormSubmitting] = useState(false);
+  const [formMessage, setFormMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [form, setForm] = useState({
     title: '',
     description: '',
@@ -198,10 +202,7 @@ export default function FarmExchangePage() {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // In production, this would save to Supabase exchange_listings table
-    setShowCreateModal(false);
+  const resetForm = () => {
     setForm({
       title: '',
       description: '',
@@ -217,6 +218,48 @@ export default function FarmExchangePage() {
       region: '',
       delivery: false,
     });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormSubmitting(true);
+    setFormMessage(null);
+
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.from('trade_orders').insert({
+        user_id: user?.id || null,
+        title: form.title,
+        description: form.description,
+        category: form.category,
+        commodity: form.subcategory || form.category,
+        price: parseFloat(form.price) || 0,
+        total_amount: parseFloat(form.price) || 0,
+        order_type: 'sell',
+        status: 'active',
+        condition: form.condition,
+        quantity: parseInt(form.quantity) || 1,
+        unit: form.unit,
+        image_url: form.photoUrl || null,
+        country: form.country,
+        region: form.region || null,
+        delivery_available: form.delivery,
+        price_type: form.priceType,
+      });
+
+      if (error) throw error;
+
+      setFormMessage({ type: 'success', text: 'Listing published successfully!' });
+      resetForm();
+      setTimeout(() => {
+        setShowCreateModal(false);
+        setFormMessage(null);
+      }, 1500);
+    } catch (err: any) {
+      setFormMessage({ type: 'error', text: err?.message || 'Failed to create listing. Please try again.' });
+    } finally {
+      setFormSubmitting(false);
+    }
   };
 
   return (
@@ -610,12 +653,31 @@ export default function FarmExchangePage() {
                 </button>
               </div>
 
+              {/* Status message */}
+              {formMessage && (
+                <div className={`p-3 rounded-lg text-sm font-medium ${
+                  formMessage.type === 'success'
+                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                    : 'bg-red-50 text-red-700 border border-red-200'
+                }`}>
+                  {formMessage.text}
+                </div>
+              )}
+
               {/* Submit */}
               <button
                 type="submit"
-                className="w-full bg-[#5DB347] hover:bg-[#4A9E35] text-white py-3 rounded-xl font-semibold text-sm transition-colors"
+                disabled={formSubmitting}
+                className="w-full bg-[#5DB347] hover:bg-[#4A9E35] text-white py-3 rounded-xl font-semibold text-sm transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                Publish Listing
+                {formSubmitting ? (
+                  <>
+                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+                    Publishing...
+                  </>
+                ) : (
+                  'Publish Listing'
+                )}
               </button>
             </form>
           </div>

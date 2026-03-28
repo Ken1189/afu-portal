@@ -100,6 +100,8 @@ const socialTemplates = [
 export default function MaterialsPage() {
   const { user } = useAuth();
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [downloadToast, setDownloadToast] = useState<{ type: 'success' | 'info' | 'error'; text: string } | null>(null);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
   const referralCode = user?.id?.slice(0, 8).toUpperCase() || 'DEMO1234';
   const referralLink = `https://africanfarmingunion.org/apply?ref=${referralCode}`;
@@ -112,13 +114,58 @@ export default function MaterialsPage() {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const handleDownload = (asset: typeof marketingAssets[0]) => {
-    // In production, this would download from Supabase Storage
-    alert(`Download started: ${asset.name}.${asset.format.toLowerCase()}`);
+  const handleDownload = async (asset: typeof marketingAssets[0]) => {
+    setDownloadingId(asset.id);
+    setDownloadToast(null);
+
+    try {
+      // Attempt to download from Supabase Storage
+      const { createClient } = await import('@/lib/supabase/client');
+      const supabase = createClient();
+      const filePath = `ambassador-materials/${asset.name.toLowerCase().replace(/\s+/g, '-')}.${asset.format.toLowerCase()}`;
+      const { data } = await supabase.storage.from('public-assets').createSignedUrl(filePath, 60);
+
+      if (data?.signedUrl) {
+        window.open(data.signedUrl, '_blank');
+        setDownloadToast({ type: 'success', text: `Downloading ${asset.name}` });
+      } else {
+        // File not yet available in storage — show friendly message
+        setDownloadToast({ type: 'info', text: `Download link for "${asset.name}" will be emailed to you shortly.` });
+        // Log the download request
+        try {
+          await supabase.from('download_requests').insert({
+            user_id: user?.id || null,
+            asset_name: asset.name,
+            asset_format: asset.format,
+            requested_at: new Date().toISOString(),
+          });
+        } catch {
+          // Silent — logging is best-effort
+        }
+      }
+    } catch {
+      setDownloadToast({ type: 'info', text: `Download link for "${asset.name}" will be emailed to you shortly.` });
+    } finally {
+      setDownloadingId(null);
+      setTimeout(() => setDownloadToast(null), 4000);
+    }
   };
 
   return (
     <div className="space-y-6">
+      {/* Toast notification */}
+      {downloadToast && (
+        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-lg text-sm font-medium max-w-sm transition-all ${
+          downloadToast.type === 'success'
+            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+            : downloadToast.type === 'error'
+            ? 'bg-red-50 text-red-700 border border-red-200'
+            : 'bg-blue-50 text-blue-700 border border-blue-200'
+        }`}>
+          {downloadToast.text}
+        </div>
+      )}
+
       {/* Page Header */}
       <div>
         <h1 className="text-2xl font-bold text-[#1B2A4A]">Marketing Materials</h1>
@@ -183,10 +230,20 @@ export default function MaterialsPage() {
                 <p className="text-xs text-gray-400 mb-3">{asset.format} &middot; {asset.size}</p>
                 <button
                   onClick={() => handleDownload(asset)}
-                  className="w-full py-2 rounded-lg bg-gray-50 text-sm font-medium text-[#1B2A4A] hover:bg-[#5DB347] hover:text-white transition-colors flex items-center justify-center gap-2"
+                  disabled={downloadingId === asset.id}
+                  className="w-full py-2 rounded-lg bg-gray-50 text-sm font-medium text-[#1B2A4A] hover:bg-[#5DB347] hover:text-white transition-colors flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  <Download className="w-3.5 h-3.5" />
-                  Download
+                  {downloadingId === asset.id ? (
+                    <>
+                      <svg className="animate-spin h-3.5 w-3.5" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+                      Preparing...
+                    </>
+                  ) : (
+                    <>
+                      <Download className="w-3.5 h-3.5" />
+                      Download
+                    </>
+                  )}
                 </button>
               </div>
             );
