@@ -212,6 +212,8 @@ export default function AdminProgramDetailPage() {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [selectedEnrollments, setSelectedEnrollments] = useState<Set<string>>(new Set());
   const [bulkLoading, setBulkLoading] = useState(false);
+  const [toast, setToast] = useState<{message: string, type: 'success'|'error'}|null>(null);
+  const showToast = (message: string, type: 'success'|'error' = 'success') => { setToast({message, type}); setTimeout(() => setToast(null), 3000); };
 
   // ── Fetch program ─────────────────────────────────────────────────────
   const fetchProgram = useCallback(async () => {
@@ -279,13 +281,13 @@ export default function AdminProgramDetailPage() {
 
       if (!res.ok) {
         const data = await res.json();
-        alert(data.error ?? 'Action failed');
+        showToast(data.error ?? 'Action failed', 'error');
         return;
       }
 
       await fetchEnrollments();
     } catch {
-      alert('Failed to update enrollment');
+      showToast('Failed to update enrollment', 'error');
     } finally {
       setActionLoading(null);
     }
@@ -308,7 +310,7 @@ export default function AdminProgramDetailPage() {
       setSelectedEnrollments(new Set());
       await fetchEnrollments();
     } catch {
-      alert('Bulk approve failed for some enrollments');
+      showToast('Bulk approve failed for some enrollments', 'error');
     } finally {
       setBulkLoading(false);
     }
@@ -837,6 +839,13 @@ export default function AdminProgramDetailPage() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Toast */}
+      {toast && (
+        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-lg text-white text-sm font-medium transition-all ${toast.type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}>
+          {toast.message}
+        </div>
+      )}
     </motion.div>
   );
 }

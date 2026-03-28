@@ -165,6 +165,8 @@ export default function AdminProgramsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [togglingId, setTogglingId] = useState<string | null>(null);
+  const [toast, setToast] = useState<{message: string, type: 'success'|'error'}|null>(null);
+  const showToast = (message: string, type: 'success'|'error' = 'success') => { setToast({message, type}); setTimeout(() => setToast(null), 3000); };
 
   // Filters
   const [searchQuery, setSearchQuery] = useState('');
@@ -210,14 +212,14 @@ export default function AdminProgramsPage() {
       });
       if (!res.ok) {
         const data = await res.json();
-        alert(data.error ?? 'Failed to update status');
+        showToast(data.error ?? 'Failed to update status', 'error');
         return;
       }
       setPrograms(prev =>
         prev.map(p => (p.id === program.id ? { ...p, status: cfg.next! } : p))
       );
     } catch {
-      alert('Failed to update program status');
+      showToast('Failed to update program status', 'error');
     } finally {
       setTogglingId(null);
     }
@@ -541,6 +543,13 @@ export default function AdminProgramsPage() {
           </div>
         )}
       </motion.div>
+
+      {/* Toast */}
+      {toast && (
+        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-lg text-white text-sm font-medium transition-all ${toast.type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}>
+          {toast.message}
+        </div>
+      )}
     </motion.div>
   );
 }

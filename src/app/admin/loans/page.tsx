@@ -346,6 +346,9 @@ export default function LoansPage() {
     dateRange: 'all',
   });
   const [selectedCase, setSelectedCase] = useState<CaseRecord | null>(null);
+  const [toast, setToast] = useState<{message: string, type: 'success'|'error'}|null>(null);
+  const [confirmAction, setConfirmAction] = useState<{message: string, onConfirm: () => void}|null>(null);
+  const showToast = (message: string, type: 'success'|'error' = 'success') => { setToast({message, type}); setTimeout(() => setToast(null), 3000); };
 
   // Fetch real loans from Supabase
   const fetchLoans = useCallback(async () => {
@@ -410,8 +413,7 @@ export default function LoansPage() {
     return true;
   });
 
-  const handleDisburse = async (loanId: string) => {
-    if (!window.confirm('Are you sure you want to disburse this loan?')) return;
+  const doDisburse = async (loanId: string) => {
     setActionLoading(loanId);
     try {
       const res = await fetch('/api/admin/loans/approve', {
@@ -422,6 +424,7 @@ export default function LoansPage() {
       if (res.ok) {
         setDisbursedIds((prev) => new Set([...prev, loanId]));
         await fetchLoans();
+        showToast('Loan disbursed successfully.');
       } else {
         // Fallback: update directly via Supabase
         const supabase = createClient();
@@ -432,14 +435,22 @@ export default function LoansPage() {
         if (!error) {
           setDisbursedIds((prev) => new Set([...prev, loanId]));
           await fetchLoans();
+          showToast('Loan disbursed successfully.');
         } else {
-          alert(`Disburse failed: ${error.message}`);
+          showToast(`Disburse failed: ${error.message}`, 'error');
         }
       }
     } catch {
-      alert('Network error during disbursement.');
+      showToast('Network error during disbursement.', 'error');
     }
     setActionLoading(null);
+  };
+
+  const handleDisburse = (loanId: string) => {
+    setConfirmAction({
+      message: 'Are you sure you want to disburse this loan?',
+      onConfirm: () => doDisburse(loanId),
+    });
   };
 
   // Approve or reject a loan via the real API
@@ -456,7 +467,7 @@ export default function LoansPage() {
         await fetchLoans();
       }
     } catch {
-      // Silently fail — real error handling in Sprint 4
+      showToast(`Failed to ${action} loan. Please try again.`, 'error');
     }
     setActionLoading(null);
   };
@@ -1046,6 +1057,27 @@ export default function LoansPage() {
           setSelectedCase(null);
         }}
       />
+
+      {/* Toast */}
+      {toast && (
+        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-lg text-white text-sm font-medium transition-all ${toast.type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}>
+          {toast.message}
+        </div>
+      )}
+
+      {/* Confirmation Modal */}
+      {confirmAction && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl">
+            <h3 className="text-lg font-bold text-[#1B2A4A] mb-2">Confirm Action</h3>
+            <p className="text-gray-600 mb-6">{confirmAction.message}</p>
+            <div className="flex gap-3 justify-end">
+              <button onClick={() => setConfirmAction(null)} className="px-4 py-2 text-sm font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50">Cancel</button>
+              <button onClick={() => { confirmAction.onConfirm(); setConfirmAction(null); }} className="px-4 py-2 text-sm font-medium text-white bg-[#5DB347] rounded-lg hover:bg-[#4ea03c]">Confirm</button>
+            </div>
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 }

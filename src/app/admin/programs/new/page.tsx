@@ -102,6 +102,8 @@ export default function AdminNewProgramPage() {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [toast, setToast] = useState<{message: string, type: 'success'|'error'}|null>(null);
+  const showToast = (message: string, type: 'success'|'error' = 'success') => { setToast({message, type}); setTimeout(() => setToast(null), 3000); };
 
   // Section 1 — Program Details
   const [title, setTitle] = useState('');
@@ -226,7 +228,7 @@ export default function AdminNewProgramPage() {
 
       router.push('/admin/programs');
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to save program');
+      showToast(err instanceof Error ? err.message : 'Failed to save program', 'error');
     } finally {
       setSaving(false);
     }
@@ -658,6 +660,13 @@ export default function AdminNewProgramPage() {
           </button>
         </div>
       </motion.div>
+
+      {/* Toast */}
+      {toast && (
+        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-lg text-white text-sm font-medium transition-all ${toast.type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}>
+          {toast.message}
+        </div>
+      )}
     </motion.div>
   );
 }

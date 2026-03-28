@@ -288,7 +288,9 @@ export default function DisbursementsPage() {
 
   const [actionLoading, setActionLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const showSuccess = (msg: string) => { setSuccessMsg(msg); setTimeout(() => setSuccessMsg(null), 3000); };
+  const showError = (msg: string) => { setErrorMsg(msg); setTimeout(() => setErrorMsg(null), 3000); };
 
   const disburseToSupabase = async (disbursement: PendingDisbursement) => {
     const supabase = createClient();
@@ -314,7 +316,7 @@ export default function DisbursementsPage() {
     if (disbursement) {
       const error = await disburseToSupabase(disbursement);
       if (error) {
-        alert(`Disbursement failed: ${error.message}`);
+        showError(`Disbursement failed: ${error.message}`);
       } else {
         showSuccess(`Disbursement of ${formatCurrency(disbursement.amount)} to ${disbursement.memberName} processed.`);
       }
@@ -331,7 +333,7 @@ export default function DisbursementsPage() {
     if (disbursement) {
       const error = await rejectInSupabase(disbursement);
       if (error) {
-        alert(`Rejection failed: ${error.message}`);
+        showError(`Rejection failed: ${error.message}`);
       } else {
         showSuccess(`Disbursement for ${disbursement.memberName} rejected.`);
       }
@@ -765,11 +767,15 @@ export default function DisbursementsPage() {
         )}
       </AnimatePresence>
 
-      {/* Success Toast */}
+      {/* Toast */}
       {successMsg && (
-        <div className="fixed bottom-6 right-6 z-50 bg-green-600 text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-2 text-sm font-medium">
-          <CheckCircle2 className="w-4 h-4" />
+        <div className="fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-lg text-white text-sm font-medium bg-green-600">
           {successMsg}
+        </div>
+      )}
+      {errorMsg && (
+        <div className="fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-lg text-white text-sm font-medium bg-red-600">
+          {errorMsg}
         </div>
       )}
     </motion.div>

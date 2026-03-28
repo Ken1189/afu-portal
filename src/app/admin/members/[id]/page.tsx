@@ -362,15 +362,16 @@ export default function MemberDetailPage() {
   const [selectedTier, setSelectedTier] = useState<MemberTier>('smallholder');
   const [confirmSuspend, setConfirmSuspend] = useState(false);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const showSuccess = (msg: string) => { setSuccessMsg(msg); setTimeout(() => setSuccessMsg(null), 3000); };
+  const showError = (msg: string) => { setErrorMsg(msg); setTimeout(() => setErrorMsg(null), 3000); };
 
   const memberId = params.id as string;
 
-  useEffect(() => {
+  const fetchMemberData = async () => {
     const supabase = createClient();
-    async function fetchMemberData() {
-      try {
+    try {
         // Try fetching from members table joined with profiles
         const { data: memberData } = await supabase
           .from('members')
@@ -432,13 +433,16 @@ export default function MemberDetailPage() {
           }));
           setDbLoans(mapped);
         }
-      } catch {
-        // keep fallback
-      } finally {
-        setDbLoading(false);
-      }
+    } catch {
+      // keep fallback
+    } finally {
+      setDbLoading(false);
     }
+  };
+
+  useEffect(() => {
     fetchMemberData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [memberId]);
 
   // ── Edit / Status / Tier handlers ─────────────────────────────────────────
@@ -464,9 +468,9 @@ export default function MemberDetailPage() {
       setEditMode(false);
       showSuccess('Profile updated successfully.');
       // Refresh from DB
-      window.location.reload();
+      fetchMemberData();
     } else {
-      alert(`Save failed: ${memberErr.message}`);
+      showError(`Save failed: ${memberErr.message}`);
     }
   };
 
@@ -480,9 +484,9 @@ export default function MemberDetailPage() {
     setConfirmSuspend(false);
     if (!error) {
       showSuccess(`Member ${newStatus === 'suspended' ? 'suspended' : 'activated'} successfully.`);
-      window.location.reload();
+      fetchMemberData();
     } else {
-      alert(`Error: ${error.message}`);
+      showError(`Error: ${error.message}`);
     }
   };
 
@@ -494,9 +498,9 @@ export default function MemberDetailPage() {
     setTierModalOpen(false);
     if (!error) {
       showSuccess(`Tier changed to ${selectedTier} successfully.`);
-      window.location.reload();
+      fetchMemberData();
     } else {
-      alert(`Error: ${error.message}`);
+      showError(`Error: ${error.message}`);
     }
   };
 
@@ -1228,9 +1232,13 @@ export default function MemberDetailPage() {
 
       {/* ── Success Toast ────────────────────────────────────────────── */}
       {successMsg && (
-        <div className="fixed bottom-6 right-6 z-50 bg-green-600 text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-2 text-sm font-medium">
-          <CheckCircle2 className="w-4 h-4" />
+        <div className="fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-lg text-white text-sm font-medium bg-green-600">
           {successMsg}
+        </div>
+      )}
+      {errorMsg && (
+        <div className="fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-lg text-white text-sm font-medium bg-red-600">
+          {errorMsg}
         </div>
       )}
     </motion.div>

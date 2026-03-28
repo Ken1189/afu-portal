@@ -88,6 +88,8 @@ export default function AdminApplicationsPage() {
   const [activeTab, setActiveTab] = useState<FilterTab>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [toast, setToast] = useState<{message: string, type: 'success'|'error'}|null>(null);
+  const showToast = (message: string, type: 'success'|'error' = 'success') => { setToast({message, type}); setTimeout(() => setToast(null), 3000); };
   const [tempPasswordModal, setTempPasswordModal] = useState<{
     email: string;
     tempPassword: string | null;
@@ -136,10 +138,10 @@ export default function AdminApplicationsPage() {
         // Also update the local state
         await approveApplication(app.id, app.profile_id || '');
       } else {
-        alert('Error approving: ' + (data.error || 'Unknown error'));
+        showToast('Error approving: ' + (data.error || 'Unknown error'), 'error');
       }
     } catch {
-      alert('Failed to approve application. Please try again.');
+      showToast('Failed to approve application. Please try again.', 'error');
     }
     setActionLoading(null);
   };
@@ -355,6 +357,13 @@ export default function AdminApplicationsPage() {
               </p>
             </div>
           )}
+        </div>
+      )}
+
+      {/* ── Toast ── */}
+      {toast && (
+        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-lg text-white text-sm font-medium transition-all ${toast.type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}>
+          {toast.message}
         </div>
       )}
 

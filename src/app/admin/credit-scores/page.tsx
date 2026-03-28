@@ -143,6 +143,8 @@ export default function CreditScoresPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [recalculating, setRecalculating] = useState(false);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [confirmAction, setConfirmAction] = useState<{message: string, onConfirm: () => void}|null>(null);
 
   useEffect(() => {
     const supabase = createClient();
@@ -635,51 +637,56 @@ export default function CreditScoresPage() {
 
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
           <button
-            onClick={async () => {
-              if (!window.confirm('Recalculate credit scores for all members? This may take a few minutes.')) return;
-              setRecalculating(true);
-              try {
-                const supabase = createClient();
-                // Trigger recalculation by updating credit_score_updated_at for all profiles
-                const { data: profiles } = await supabase
-                  .from('profiles')
-                  .select('id, credit_score')
-                  .not('credit_score', 'is', null);
-                if (profiles) {
-                  // Update each profile's updated timestamp to trigger recalc
-                  for (const p of profiles) {
-                    await supabase.from('profiles').update({
-                      credit_score_updated_at: new Date().toISOString(),
-                    }).eq('id', p.id);
+            onClick={() => {
+              setConfirmAction({
+                message: 'Recalculate credit scores for all members? This may take a few minutes.',
+                onConfirm: async () => {
+                  setRecalculating(true);
+                  try {
+                    const supabase = createClient();
+                    // Trigger recalculation by updating credit_score_updated_at for all profiles
+                    const { data: profiles } = await supabase
+                      .from('profiles')
+                      .select('id, credit_score')
+                      .not('credit_score', 'is', null);
+                    if (profiles) {
+                      // Update each profile's updated timestamp to trigger recalc
+                      for (const p of profiles) {
+                        await supabase.from('profiles').update({
+                          credit_score_updated_at: new Date().toISOString(),
+                        }).eq('id', p.id);
+                      }
+                    }
+                    setSuccessMsg('Credit scores recalculated successfully.');
+                    setTimeout(() => setSuccessMsg(null), 3000);
+                    // Re-fetch data
+                    const { data, error } = await supabase
+                      .from('profiles')
+                      .select('id, full_name, country, credit_score, credit_trend, payment_history_pct, farm_productivity_pct, credit_score_updated_at')
+                      .not('credit_score', 'is', null)
+                      .order('credit_score', { ascending: false });
+                    if (!error && data && data.length > 0) {
+                      setMembers(
+                        data.map((row: Record<string, unknown>, idx: number) => ({
+                          rank: idx + 1,
+                          name: (row.full_name as string) || 'Unknown',
+                          country: (row.country as string) || 'Unknown',
+                          score: (row.credit_score as number) || 0,
+                          tier: getTier((row.credit_score as number) || 0),
+                          trend: ((row.credit_trend as string) || 'flat') as 'up' | 'down' | 'flat',
+                          paymentHistory: (row.payment_history_pct as number) || 0,
+                          farmProductivity: (row.farm_productivity_pct as number) || 0,
+                          lastUpdated: (row.credit_score_updated_at as string)?.split('T')[0] || '',
+                        }))
+                      );
+                    }
+                  } catch {
+                    setErrorMsg('Error recalculating scores.');
+                    setTimeout(() => setErrorMsg(null), 3000);
                   }
-                }
-                setSuccessMsg('Credit scores recalculated successfully.');
-                setTimeout(() => setSuccessMsg(null), 3000);
-                // Re-fetch data
-                const { data, error } = await supabase
-                  .from('profiles')
-                  .select('id, full_name, country, credit_score, credit_trend, payment_history_pct, farm_productivity_pct, credit_score_updated_at')
-                  .not('credit_score', 'is', null)
-                  .order('credit_score', { ascending: false });
-                if (!error && data && data.length > 0) {
-                  setMembers(
-                    data.map((row: Record<string, unknown>, idx: number) => ({
-                      rank: idx + 1,
-                      name: (row.full_name as string) || 'Unknown',
-                      country: (row.country as string) || 'Unknown',
-                      score: (row.credit_score as number) || 0,
-                      tier: getTier((row.credit_score as number) || 0),
-                      trend: ((row.credit_trend as string) || 'flat') as 'up' | 'down' | 'flat',
-                      paymentHistory: (row.payment_history_pct as number) || 0,
-                      farmProductivity: (row.farm_productivity_pct as number) || 0,
-                      lastUpdated: (row.credit_score_updated_at as string)?.split('T')[0] || '',
-                    }))
-                  );
-                }
-              } catch {
-                alert('Error recalculating scores.');
-              }
-              setRecalculating(false);
+                  setRecalculating(false);
+                },
+              });
             }}
             disabled={recalculating}
             className="flex items-center gap-2 px-5 py-2.5 bg-[#1B2A4A] hover:bg-[#1B2A4A]/90 text-white rounded-xl text-sm font-semibold transition-all shadow-sm hover:shadow-md active:scale-95 disabled:opacity-50"
@@ -695,11 +702,29 @@ export default function CreditScoresPage() {
         </div>
       </motion.div>
 
-      {/* Success Toast */}
+      {/* Toast */}
       {successMsg && (
-        <div className="fixed bottom-6 right-6 z-50 bg-green-600 text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-2 text-sm font-medium">
-          <CheckCircle2 className="w-4 h-4" />
+        <div className="fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-lg text-white text-sm font-medium bg-green-600">
           {successMsg}
+        </div>
+      )}
+      {errorMsg && (
+        <div className="fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-lg text-white text-sm font-medium bg-red-600">
+          {errorMsg}
+        </div>
+      )}
+
+      {/* Confirmation Modal */}
+      {confirmAction && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl">
+            <h3 className="text-lg font-bold text-[#1B2A4A] mb-2">Confirm Action</h3>
+            <p className="text-gray-600 mb-6">{confirmAction.message}</p>
+            <div className="flex gap-3 justify-end">
+              <button onClick={() => setConfirmAction(null)} className="px-4 py-2 text-sm font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50">Cancel</button>
+              <button onClick={() => { confirmAction.onConfirm(); setConfirmAction(null); }} className="px-4 py-2 text-sm font-medium text-white bg-[#5DB347] rounded-lg hover:bg-[#4ea03c]">Confirm</button>
+            </div>
+          </div>
         </div>
       )}
     </motion.div>

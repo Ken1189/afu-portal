@@ -177,7 +177,9 @@ export default function CollectionsPage() {
   const [dbLoans, setDbLoans] = useState<OverdueLoan[]>([]);
   const [dbLoading, setDbLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [confirmAction, setConfirmAction] = useState<{message: string, onConfirm: () => void}|null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const showSuccess = (msg: string) => { setSuccessMsg(msg); setTimeout(() => setSuccessMsg(null), 3000); };
 
@@ -203,7 +205,9 @@ export default function CollectionsPage() {
       const actionLabels = { reminder: 'Reminder sent', escalate: 'Loan escalated', restructure: 'Loan restructured', collected: 'Marked as collected' };
       showSuccess(`${actionLabels[action]} for ${loan.memberName}.`);
     } catch {
-      alert('Action failed. Please try again.');
+      setSuccessMsg(null);
+      setErrorMsg('Action failed. Please try again.');
+      setTimeout(() => setErrorMsg(null), 3000);
     }
     setActionLoading(null);
   };
@@ -552,7 +556,7 @@ export default function CollectionsPage() {
                           <PhoneCall className="w-3.5 h-3.5 text-gray-400 group-hover:text-green-600" />
                         </button>
                         <button
-                          onClick={() => { if (window.confirm(`Escalate ${loan.memberName}'s loan?`)) handleCollectionAction(loan, 'escalate'); }}
+                          onClick={() => { setConfirmAction({ message: `Escalate ${loan.memberName}'s loan?`, onConfirm: () => handleCollectionAction(loan, 'escalate') }); }}
                           disabled={actionLoading === loan.id}
                           className="p-1.5 hover:bg-red-50 rounded-lg transition-colors group disabled:opacity-50"
                           title="Escalate"
@@ -560,7 +564,7 @@ export default function CollectionsPage() {
                           <TriangleAlert className="w-3.5 h-3.5 text-gray-400 group-hover:text-red-600" />
                         </button>
                         <button
-                          onClick={() => { if (window.confirm(`Restructure ${loan.memberName}'s loan?`)) handleCollectionAction(loan, 'restructure'); }}
+                          onClick={() => { setConfirmAction({ message: `Restructure ${loan.memberName}'s loan?`, onConfirm: () => handleCollectionAction(loan, 'restructure') }); }}
                           disabled={actionLoading === loan.id}
                           className="p-1.5 hover:bg-purple-50 rounded-lg transition-colors group disabled:opacity-50"
                           title="Restructure"
@@ -628,11 +632,29 @@ export default function CollectionsPage() {
         </div>
       </motion.div>
 
-      {/* Success Toast */}
+      {/* Toast */}
       {successMsg && (
-        <div className="fixed bottom-6 right-6 z-50 bg-green-600 text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-2 text-sm font-medium">
-          <CheckCircle2 className="w-4 h-4" />
+        <div className="fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-lg text-white text-sm font-medium bg-green-600">
           {successMsg}
+        </div>
+      )}
+      {errorMsg && (
+        <div className="fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-lg text-white text-sm font-medium bg-red-600">
+          {errorMsg}
+        </div>
+      )}
+
+      {/* Confirmation Modal */}
+      {confirmAction && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl">
+            <h3 className="text-lg font-bold text-[#1B2A4A] mb-2">Confirm Action</h3>
+            <p className="text-gray-600 mb-6">{confirmAction.message}</p>
+            <div className="flex gap-3 justify-end">
+              <button onClick={() => setConfirmAction(null)} className="px-4 py-2 text-sm font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50">Cancel</button>
+              <button onClick={() => { confirmAction.onConfirm(); setConfirmAction(null); }} className="px-4 py-2 text-sm font-medium text-white bg-[#5DB347] rounded-lg hover:bg-[#4ea03c]">Confirm</button>
+            </div>
+          </div>
         </div>
       )}
     </motion.div>

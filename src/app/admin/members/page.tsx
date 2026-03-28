@@ -41,6 +41,7 @@ export default function AdminMembersPage() {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [confirmAction, setConfirmAction] = useState<{ id: string; action: 'suspend' | 'activate' } | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const filtered = useMemo(() => {
     let result = [...members];
@@ -65,7 +66,8 @@ export default function AdminMembersPage() {
     setActionLoading(null);
     setConfirmAction(null);
     if (result.error) {
-      alert(`Error: ${result.error}`);
+      setErrorMsg(`Error: ${result.error}`);
+      setTimeout(() => setErrorMsg(null), 3000);
     } else {
       const name = members.find(m => m.id === id)?.profile?.full_name || 'Member';
       setSuccessMsg(`${name} has been ${action === 'suspend' ? 'suspended' : 'activated'} successfully.`);
@@ -316,11 +318,15 @@ export default function AdminMembersPage() {
         </div>
       )}
 
-      {/* Success Toast */}
+      {/* Toast */}
       {successMsg && (
-        <div className="fixed bottom-6 right-6 z-50 bg-green-600 text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-2 text-sm font-medium animate-in slide-in-from-bottom-4">
-          <CheckCircle2 className="w-4 h-4" />
+        <div className="fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-lg text-white text-sm font-medium bg-green-600">
           {successMsg}
+        </div>
+      )}
+      {errorMsg && (
+        <div className="fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-lg text-white text-sm font-medium bg-red-600">
+          {errorMsg}
         </div>
       )}
     </div>

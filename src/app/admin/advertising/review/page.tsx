@@ -82,6 +82,8 @@ export default function AdminAdReviewPage() {
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [rejectionReasons, setRejectionReasons] = useState<Record<string, string>>({});
   const [showRejectInput, setShowRejectInput] = useState<string | null>(null);
+  const [toast, setToast] = useState<{message: string, type: 'success'|'error'}|null>(null);
+  const showToast = (message: string, type: 'success'|'error' = 'success') => { setToast({message, type}); setTimeout(() => setToast(null), 3000); };
 
   // ── Fetch all ads ───────────────────────────────────────────────────────
   useEffect(() => {
@@ -153,7 +155,7 @@ export default function AdminAdReviewPage() {
         )
       );
     } catch (err: any) {
-      alert('Failed to approve: ' + (err?.message || 'Unknown error'));
+      showToast('Failed to approve: ' + (err?.message || 'Unknown error'), 'error');
     } finally {
       setProcessingId(null);
     }
@@ -163,7 +165,7 @@ export default function AdminAdReviewPage() {
   const handleReject = async (adId: string) => {
     const reason = rejectionReasons[adId]?.trim();
     if (!reason) {
-      alert('Please provide a rejection reason.');
+      showToast('Please provide a rejection reason.', 'error');
       return;
     }
 
@@ -193,7 +195,7 @@ export default function AdminAdReviewPage() {
         return copy;
       });
     } catch (err: any) {
-      alert('Failed to reject: ' + (err?.message || 'Unknown error'));
+      showToast('Failed to reject: ' + (err?.message || 'Unknown error'), 'error');
     } finally {
       setProcessingId(null);
     }
@@ -557,6 +559,13 @@ export default function AdminAdReviewPage() {
           })}
         </div>
       </div>
+
+      {/* Toast */}
+      {toast && (
+        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-lg text-white text-sm font-medium transition-all ${toast.type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}>
+          {toast.message}
+        </div>
+      )}
     </div>
   );
 }
