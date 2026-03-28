@@ -321,7 +321,7 @@ function SidebarContent({
             pathname={pathname}
             collapsed={collapsedGroups[group.label] ?? false}
             onToggle={() => toggleGroup(group.label)}
-            isSuperAdmin={isSuperAdmin}
+            isSuperAdmin={effectiveSuperAdmin}
           />
         ))}
       </nav>
@@ -352,6 +352,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [mobileOpen, setMobileOpen] = useState(false);
   const [roleChecked, setRoleChecked] = useState(false);
   const [authorized, setAuthorized] = useState(false);
+  const [serverRole, setServerRole] = useState<string | null>(null);
 
   const displayName = profile?.full_name || user?.email?.split('@')[0] || 'Admin';
   const initials = displayName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
@@ -376,6 +377,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       .then(({ role }) => {
         if (role === 'admin' || role === 'super_admin') {
           setAuthorized(true);
+          setServerRole(role);
         } else {
           router.replace('/dashboard');
         }
@@ -414,6 +416,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     );
   }
 
+  // Use server role as fallback — profile.role may not be loaded yet
+  const effectiveSuperAdmin = isSuperAdmin || serverRole === 'super_admin';
+
   return (
     <div className="min-h-screen bg-cream flex">
       {/* ── Desktop Sidebar ─────────────────────────────────── */}
@@ -422,7 +427,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           pathname={pathname}
           collapsedGroups={collapsedGroups}
           toggleGroup={toggleGroup}
-          isSuperAdmin={isSuperAdmin}
+          isSuperAdmin={effectiveSuperAdmin}
           hasAnyPermission={hasAnyPermission}
           permissionsLoading={permissionsLoading}
         />
@@ -451,7 +456,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 collapsedGroups={collapsedGroups}
                 toggleGroup={toggleGroup}
                 onLinkClick={() => setMobileOpen(false)}
-                isSuperAdmin={isSuperAdmin}
+                isSuperAdmin={effectiveSuperAdmin}
                 hasAnyPermission={hasAnyPermission}
                 permissionsLoading={permissionsLoading}
               />
@@ -484,7 +489,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <div className="hidden sm:block">
                 <p className="text-sm font-medium text-navy leading-tight">{displayName}</p>
                 <p className="text-[10px] text-gray-400 leading-tight">
-                  {isSuperAdmin ? 'Super Admin' : 'Admin'}
+                  {effectiveSuperAdmin ? 'Super Admin' : 'Admin'}
                 </p>
               </div>
               <button
