@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/lib/supabase/auth-context';
+import { usePermissions, SIDEBAR_PERMISSION_MAP } from '@/lib/permissions';
 import {
   LayoutDashboard,
   Users,
@@ -58,6 +59,7 @@ import {
   Scale as ScaleIcon,
   Stethoscope,
   ArrowLeftRight,
+  ShieldCheck,
 } from 'lucide-react';
 
 // ── Navigation structure with collapsible groups ──
@@ -66,6 +68,7 @@ interface NavLink {
   href: string;
   label: string;
   icon: React.ReactNode;
+  superAdminOnly?: boolean;
 }
 
 interface NavGroup {
@@ -176,6 +179,7 @@ const navGroups: NavGroup[] = [
     defaultOpen: false,
     links: [
       { href: '/admin/users', label: 'Users & Roles', icon: <UserCog className="w-4 h-4" /> },
+      { href: '/admin/users/permissions', label: 'Permissions', icon: <ShieldCheck className="w-4 h-4" />, superAdminOnly: true },
       { href: '/admin/audit', label: 'Audit Trail', icon: <ScrollText className="w-4 h-4" /> },
       { href: '/admin/compliance', label: 'Compliance', icon: <Shield className="w-4 h-4" /> },
       { href: '/admin/notifications', label: 'Notifications', icon: <Bell className="w-4 h-4" /> },
@@ -204,13 +208,17 @@ function NavSection({
   pathname,
   collapsed,
   onToggle,
+  isSuperAdmin = false,
 }: {
   group: NavGroup;
   pathname: string;
   collapsed: boolean;
   onToggle: () => void;
+  isSuperAdmin?: boolean;
 }) {
-  const hasActiveLink = group.links.some(
+  // Filter out superAdminOnly links for non-super admins
+  const filteredLinks = group.links.filter((l) => !l.superAdminOnly || isSuperAdmin);
+  const hasActiveLink = filteredLinks.some(
     (l) => pathname === l.href || pathname.startsWith(l.href + '/')
   );
 
@@ -235,7 +243,7 @@ function NavSection({
             className="overflow-hidden"
           >
             <div className="space-y-0.5 pb-2">
-              {group.links.map((link) => {
+              {filteredLinks.map((link) => {
                 const isActive =
                   link.href === '/admin'
                     ? pathname === '/admin'
@@ -272,14 +280,30 @@ function SidebarContent({
   toggleGroup,
   onLinkClick,
   isSuperAdmin = false,
+  hasAnyPermission,
+  permissionsLoading = false,
 }: {
   pathname: string;
   collapsedGroups: Record<string, boolean>;
   toggleGroup: (label: string) => void;
   onLinkClick?: () => void;
   isSuperAdmin?: boolean;
+  hasAnyPermission?: (perms: string[]) => boolean;
+  permissionsLoading?: boolean;
 }) {
-  const visibleGroups = navGroups.filter((g) => !g.superAdminOnly || isSuperAdmin);
+  // super_admin sees everything; regular admins filtered by permissions
+  const visibleGroups = navGroups.filter((g) => {
+    // super_admin-only groups (Switch Portal)
+    if (g.superAdminOnly && !isSuperAdmin) return false;
+    // super_admin always sees all groups
+    if (isSuperAdmin) return true;
+    // While permissions load, show all non-superAdminOnly groups (brief flash)
+    if (permissionsLoading || !hasAnyPermission) return true;
+    // Check sidebar permission map
+    const requiredPerms = SIDEBAR_PERMISSION_MAP[g.label];
+    if (!requiredPerms || requiredPerms.length === 0) return true; // everyone
+    return hasAnyPermission(requiredPerms);
+  });
 
   return (
     <>
@@ -297,6 +321,7 @@ function SidebarContent({
             pathname={pathname}
             collapsed={collapsedGroups[group.label] ?? false}
             onToggle={() => toggleGroup(group.label)}
+            isSuperAdmin={isSuperAdmin}
           />
         ))}
       </nav>
@@ -323,6 +348,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname();
   const router = useRouter();
   const { user, profile, signOut, isLoading: authLoading, isAdmin, isSuperAdmin } = useAuth();
+  const { hasAnyPermission, loading: permissionsLoading } = usePermissions(user?.id);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [roleChecked, setRoleChecked] = useState(false);
   const [authorized, setAuthorized] = useState(false);
@@ -397,6 +423,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           collapsedGroups={collapsedGroups}
           toggleGroup={toggleGroup}
           isSuperAdmin={isSuperAdmin}
+          hasAnyPermission={hasAnyPermission}
+          permissionsLoading={permissionsLoading}
         />
       </aside>
 
@@ -424,6 +452,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 toggleGroup={toggleGroup}
                 onLinkClick={() => setMobileOpen(false)}
                 isSuperAdmin={isSuperAdmin}
+                hasAnyPermission={hasAnyPermission}
+                permissionsLoading={permissionsLoading}
               />
             </motion.aside>
           </>
