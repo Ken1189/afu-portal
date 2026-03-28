@@ -113,6 +113,7 @@ export default function Footer() {
               <Link href="/services/legal-assistance" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">Legal Assistance</Link>
               <Link href="/services/veterinary" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">Veterinary Services</Link>
               <Link href="/services/advertising" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">Advertise with Us</Link>
+              <Link href="/supplier/apply" className="text-[#5DB347] hover:text-[#449933] text-sm font-medium transition-colors duration-300">Become a Supplier</Link>
             </div>
           </div>
 
@@ -127,6 +128,7 @@ export default function Footer() {
               <Link href="/partners" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">Partners</Link>
               <Link href="/jobs" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">Jobs</Link>
               <Link href="/ambassadors" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">Ambassadors</Link>
+              <Link href="/ambassador/apply" className="text-[#5DB347] hover:text-[#449933] text-sm font-medium transition-colors duration-300">Become an Ambassador</Link>
               <Link href="/farms" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">Farms</Link>
               <Link href="/sponsor" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">Sponsor a Farmer</Link>
               <Link href="/donate" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">Donate</Link>

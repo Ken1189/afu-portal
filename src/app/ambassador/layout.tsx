@@ -36,6 +36,9 @@ export default function AmbassadorLayout({ children }: { children: React.ReactNo
   const [authorized, setAuthorized] = useState(false);
   const [roleChecked, setRoleChecked] = useState(false);
 
+  // Public pages under /ambassador that don't need auth
+  const isPublicPage = pathname === '/ambassador/apply';
+
   const displayName = profile?.full_name || user?.email?.split('@')[0] || 'Ambassador';
   const initials = displayName
     .split(' ')
@@ -44,8 +47,13 @@ export default function AmbassadorLayout({ children }: { children: React.ReactNo
     .toUpperCase()
     .slice(0, 2);
 
-  // Role guard
+  // Role guard — skip for public pages
   useEffect(() => {
+    if (isPublicPage) {
+      setAuthorized(true);
+      setRoleChecked(true);
+      return;
+    }
     if (authLoading) return;
     if (!user) {
       router.replace('/login');
@@ -64,7 +72,7 @@ export default function AmbassadorLayout({ children }: { children: React.ReactNo
       .catch(() => {
         router.replace('/dashboard');
       });
-  }, [user, authLoading, router]);
+  }, [user, authLoading, router, isPublicPage]);
 
   const isActive = (href: string) =>
     href === '/ambassador' ? pathname === '/ambassador' : pathname.startsWith(href);
@@ -81,6 +89,11 @@ export default function AmbassadorLayout({ children }: { children: React.ReactNo
         </div>
       </div>
     );
+  }
+
+  // Public pages render without the ambassador layout chrome
+  if (isPublicPage) {
+    return <>{children}</>;
   }
 
   if (!authorized) {

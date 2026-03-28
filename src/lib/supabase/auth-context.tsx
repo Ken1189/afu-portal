@@ -99,13 +99,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // ── Auth methods ──────────────────────────────────────────────────────
 
   const signUp = async (email: string, password: string, fullName: string) => {
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: { full_name: fullName },
+        data: { full_name: fullName, role: 'member' },
       },
     });
+
+    // If signup succeeded and we have a user, create their profile record
+    if (!error && data?.user) {
+      await supabase.from('profiles').upsert({
+        id: data.user.id,
+        email,
+        full_name: fullName,
+        role: 'member',
+      });
+    }
+
     return { error: error as Error | null };
   };
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import Link from 'next/link';
 import {
   Award,
   MapPin,
@@ -13,6 +14,7 @@ import {
   Egg,
   Beef,
   Quote,
+  ArrowRight,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
@@ -193,9 +195,17 @@ export default function AmbassadorsPage() {
           <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-4 tracking-tight">
             Meet Our Ambassadors
           </h1>
-          <p className="text-lg text-white/70 max-w-2xl mx-auto">
+          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
             The farmers leading Africa&apos;s agricultural transformation
           </p>
+          <Link
+            href="/ambassador/apply"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-white font-semibold text-sm transition-all hover:shadow-lg hover:shadow-[#5DB347]/30 hover:-translate-y-0.5"
+            style={{ background: 'linear-gradient(135deg, #5DB347, #449933)' }}
+          >
+            Become an Ambassador
+            <ArrowRight className="w-4 h-4" />
+          </Link>
         </div>
       </section>
 

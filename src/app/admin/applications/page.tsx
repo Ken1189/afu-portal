@@ -88,6 +88,11 @@ export default function AdminApplicationsPage() {
   const [activeTab, setActiveTab] = useState<FilterTab>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [tempPasswordModal, setTempPasswordModal] = useState<{
+    email: string;
+    tempPassword: string | null;
+    message: string;
+  } | null>(null);
 
   // ── Filtered & searched applications ──
   const filtered = useMemo(() => {
@@ -115,7 +120,27 @@ export default function AdminApplicationsPage() {
   // ── Actions ──
   const handleApprove = async (app: ApplicationRow) => {
     setActionLoading(app.id);
-    await approveApplication(app.id, app.profile_id || '');
+    try {
+      const res = await fetch('/api/admin/applications/approve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ applicationId: app.id }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setTempPasswordModal({
+          email: app.email,
+          tempPassword: data.tempPassword,
+          message: data.message,
+        });
+        // Also update the local state
+        await approveApplication(app.id, app.profile_id || '');
+      } else {
+        alert('Error approving: ' + (data.error || 'Unknown error'));
+      }
+    } catch {
+      alert('Failed to approve application. Please try again.');
+    }
     setActionLoading(null);
   };
 
@@ -330,6 +355,50 @@ export default function AdminApplicationsPage() {
               </p>
             </div>
           )}
+        </div>
+      )}
+
+      {/* ── Temp Password Modal ── */}
+      {tempPasswordModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                <CheckCircle2 className="w-5 h-5 text-green-600" />
+              </div>
+              <h3 className="text-lg font-bold text-navy">Application Approved</h3>
+            </div>
+            <p className="text-sm text-gray-600 mb-4">{tempPasswordModal.message}</p>
+            {tempPasswordModal.tempPassword && (
+              <div className="bg-gray-50 rounded-xl p-4 mb-4">
+                <p className="text-xs text-gray-500 mb-1">Email</p>
+                <p className="text-sm font-medium text-navy mb-3">{tempPasswordModal.email}</p>
+                <p className="text-xs text-gray-500 mb-1">Temporary Password</p>
+                <div className="flex items-center gap-2">
+                  <code className="text-sm font-mono font-bold text-teal bg-teal/10 px-3 py-1.5 rounded-lg">
+                    {tempPasswordModal.tempPassword}
+                  </code>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(tempPasswordModal.tempPassword || '');
+                    }}
+                    className="text-xs text-teal hover:text-teal/80 font-medium"
+                  >
+                    Copy
+                  </button>
+                </div>
+                <p className="text-xs text-amber-600 mt-3">
+                  Share these credentials securely with the applicant. They should change their password on first login.
+                </p>
+              </div>
+            )}
+            <button
+              onClick={() => setTempPasswordModal(null)}
+              className="w-full py-2.5 bg-navy text-white rounded-xl text-sm font-semibold hover:bg-navy/90 transition-colors"
+            >
+              Done
+            </button>
+          </div>
         </div>
       )}
     </div>

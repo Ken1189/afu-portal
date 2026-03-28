@@ -50,8 +50,16 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
   const [authorized, setAuthorized] = useState(false);
   const [denied, setDenied] = useState(false);
 
+  // Public pages under /supplier that don't need auth
+  const isPublicPage = pathname === '/supplier/apply';
+
   // ── Role guard: only supplier, admin, super_admin can access ──
   useEffect(() => {
+    if (isPublicPage) {
+      setAuthorized(true);
+      setRoleChecked(true);
+      return;
+    }
     if (authLoading) return;
 
     if (!user) {
@@ -66,7 +74,12 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
       setDenied(true);
     }
     setRoleChecked(true);
-  }, [user, profile, authLoading, router]);
+  }, [user, profile, authLoading, router, isPublicPage]);
+
+  // Public pages render without the supplier layout chrome
+  if (isPublicPage) {
+    return <>{children}</>;
+  }
 
   // Show access denied state
   if (denied) {

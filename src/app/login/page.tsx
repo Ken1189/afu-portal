@@ -145,12 +145,28 @@ export default function LoginPage() {
   const [fullName, setFullName] = useState('');
   const [activeTestimonial, setActiveTestimonial] = useState(0);
 
-  // Helper: fetch role from server API (bypasses RLS)
+  // Helper: fetch role from server API (bypasses RLS) and redirect by role
   const fetchRoleAndRedirect = useCallback(async () => {
     try {
       const res = await fetch('/api/auth/me');
       const { role } = await res.json();
-      router.push((role === 'admin' || role === 'super_admin') ? '/admin' : '/dashboard');
+      switch (role) {
+        case 'super_admin':
+        case 'admin':
+          router.push('/admin');
+          break;
+        case 'investor':
+          router.push('/investor');
+          break;
+        case 'supplier':
+          router.push('/supplier');
+          break;
+        case 'ambassador':
+          router.push('/ambassador');
+          break;
+        default:
+          router.push('/dashboard');
+      }
     } catch {
       router.push('/dashboard');
     }

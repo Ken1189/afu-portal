@@ -63,7 +63,7 @@ export async function updateSession(request: NextRequest) {
 
   // ── Protected route patterns ────────────────────────────────────────
   // Public paths that start with protected prefixes (must be checked first)
-  const publicExceptions = ['/farmers', '/farms', '/investors', '/investor-login'];
+  const publicExceptions = ['/farmers', '/farms', '/investors', '/investor-login', '/supplier/apply', '/ambassador/apply'];
   const isPublicException = publicExceptions.some((p) => pathname.startsWith(p));
 
   const protectedPaths = ['/dashboard', '/farm', '/supplier', '/admin', '/investor', '/ambassador'];
@@ -81,7 +81,23 @@ export async function updateSession(request: NextRequest) {
   if (pathname === '/login' && user) {
     const role = await getUserRole(user.id);
     const dest = request.nextUrl.clone();
-    dest.pathname = (role === 'admin' || role === 'super_admin') ? '/admin' : '/dashboard';
+    switch (role) {
+      case 'super_admin':
+      case 'admin':
+        dest.pathname = '/admin';
+        break;
+      case 'investor':
+        dest.pathname = '/investor';
+        break;
+      case 'supplier':
+        dest.pathname = '/supplier';
+        break;
+      case 'ambassador':
+        dest.pathname = '/ambassador';
+        break;
+      default:
+        dest.pathname = '/dashboard';
+    }
     return NextResponse.redirect(dest);
   }
 
