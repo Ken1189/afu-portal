@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/supabase/auth-context';
 import Link from 'next/link';
@@ -13,12 +13,26 @@ import {
   Plus,
   Loader2,
   CheckCircle,
-  Clock,
   AlertCircle,
   TrendingUp,
   TrendingDown,
   ChevronRight,
+  Repeat,
+  Zap,
+  Truck,
+  DollarSign,
+  LineChart,
 } from 'lucide-react';
+import {
+  LineChart as RechartsLine,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from 'recharts';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 interface TradeOrder {
@@ -37,6 +51,12 @@ interface TradeOrder {
   status: string;
   created_at: string;
   afu_price: number | null;
+  is_urgent?: boolean;
+  is_recurring?: boolean;
+  recurring_interval?: string;
+  delivery_status?: string;
+  payment_status?: string;
+  counterparty_name?: string;
 }
 
 interface CommodityPrice {
@@ -48,6 +68,7 @@ interface CommodityPrice {
   currency: string;
   unit: string;
   updated_at: string;
+  valid_from?: string;
 }
 
 // ── Status badges ─────────────────────────────────────────────────────────
@@ -89,8 +110,25 @@ const UNITS = ['kg', 'tonnes', 'bags (50kg)', 'bags (90kg)', 'litres', 'heads', 
 const QUALITY_GRADES = ['Grade A (Premium)', 'Grade B (Standard)', 'Grade C (Economy)', 'Organic Certified', 'Fair Trade'];
 const COUNTRIES = ['Kenya', 'Uganda', 'Tanzania', 'Rwanda', 'Ethiopia', 'Nigeria', 'Ghana', 'South Africa', 'Zambia', 'Malawi', 'Mozambique', 'Zimbabwe'];
 
+// ── Demo price history data ───────────────────────────────────────────────
+function generatePriceHistory(commodity: string, days: number) {
+  const data = [];
+  const basePrice = { Maize: 28, Wheat: 35, Coffee: 120, Rice: 42, Beans: 55, Soybeans: 48 }[commodity] || 30;
+  const now = new Date();
+  for (let i = days; i >= 0; i -= 3) {
+    const d = new Date(now.getTime() - i * 86400000);
+    const variation = Math.sin(i / 7) * 5 + (Math.random() - 0.5) * 4;
+    data.push({
+      date: d.toLocaleDateString('en', { month: 'short', day: 'numeric' }),
+      buy: +(basePrice + variation).toFixed(2),
+      sell: +(basePrice + variation + 3 + Math.random() * 2).toFixed(2),
+    });
+  }
+  return data;
+}
+
 // ── Tab names ──────────────────────────────────────────────────────────────
-type Tab = 'buy' | 'sell' | 'orders' | 'prices';
+type Tab = 'buy' | 'sell' | 'orders' | 'prices' | 'history';
 
 export default function FarmTradePage() {
   const supabase = createClient();
@@ -112,7 +150,15 @@ export default function FarmTradePage() {
     target_price: '',
     currency: 'USD',
     notes: '',
+    is_urgent: false,
+    is_recurring: false,
+    recurring_interval: 'monthly',
   });
+
+  // Commodity search
+  const [commoditySearch, setCommoditySearch] = useState('');
+  const [showCommodityDropdown, setShowCommodityDropdown] = useState(false);
+  const filteredCommodities = COMMODITIES.filter(c => c.toLowerCase().includes(commoditySearch.toLowerCase()));
 
   // Orders state
   const [orders, setOrders] = useState<TradeOrder[]>([]);
@@ -122,6 +168,11 @@ export default function FarmTradePage() {
   const [prices, setPrices] = useState<CommodityPrice[]>([]);
   const [pricesLoading, setPricesLoading] = useState(false);
   const [priceCountry, setPriceCountry] = useState(profile?.country || 'Kenya');
+
+  // Price history state
+  const [histCommodity, setHistCommodity] = useState('Maize');
+  const [histDays, setHistDays] = useState(30);
+  const priceHistoryData = useMemo(() => generatePriceHistory(histCommodity, histDays), [histCommodity, histDays]);
 
   // Set country from profile
   useEffect(() => {
@@ -192,6 +243,9 @@ export default function FarmTradePage() {
           target_price: parseFloat(form.target_price),
           currency: form.currency,
           notes: form.notes,
+          is_urgent: form.is_urgent,
+          is_recurring: form.is_recurring,
+          recurring_interval: form.is_recurring ? form.recurring_interval : null,
         }),
       });
 
@@ -202,7 +256,8 @@ export default function FarmTradePage() {
 
       const { order } = await res.json();
       setSuccess(`Order ${order.order_number} created successfully!`);
-      setForm(f => ({ ...f, commodity: '', quantity: '', delivery_location: '', deadline: '', target_price: '', notes: '' }));
+      setForm(f => ({ ...f, commodity: '', quantity: '', delivery_location: '', deadline: '', target_price: '', notes: '', is_urgent: false, is_recurring: false }));
+      setCommoditySearch('');
       setTimeout(() => setSuccess(''), 4000);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Something went wrong');
@@ -210,42 +265,84 @@ export default function FarmTradePage() {
     setLoading(false);
   };
 
+  // ── Delivery/Payment status helpers ────────────────────────────────────
+  const getDeliveryBadge = (status?: string) => {
+    const map: Record<string, string> = {
+      pending: 'bg-gray-100 text-gray-600',
+      in_transit: 'bg-blue-100 text-blue-700',
+      delivered: 'bg-green-100 text-green-700',
+    };
+    return status ? (
+      <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${map[status] || 'bg-gray-100 text-gray-600'}`}>
+        <Truck className="w-3 h-3 inline mr-0.5" />
+        {status.replace('_', ' ')}
+      </span>
+    ) : null;
+  };
+
+  const getPaymentBadge = (status?: string) => {
+    const map: Record<string, string> = {
+      pending: 'bg-yellow-100 text-yellow-700',
+      paid: 'bg-green-100 text-green-700',
+      overdue: 'bg-red-100 text-red-700',
+    };
+    return status ? (
+      <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${map[status] || 'bg-gray-100 text-gray-600'}`}>
+        <DollarSign className="w-3 h-3 inline mr-0.5" />
+        {status}
+      </span>
+    ) : null;
+  };
+
   // ── Shared form ─────────────────────────────────────────────────────────
   const renderOrderForm = (type: 'buy' | 'sell') => (
     <div className="space-y-5">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {/* Commodity */}
-        <div>
+        {/* Commodity with search/autocomplete */}
+        <div className="relative">
           <label className="block text-sm font-medium text-gray-700 mb-1">Commodity *</label>
-          <select
-            value={form.commodity}
-            onChange={e => setForm(f => ({ ...f, commodity: e.target.value }))}
+          <input
+            type="text"
+            value={commoditySearch || form.commodity}
+            onChange={e => {
+              setCommoditySearch(e.target.value);
+              setShowCommodityDropdown(true);
+              if (COMMODITIES.includes(e.target.value)) {
+                setForm(f => ({ ...f, commodity: e.target.value }));
+              }
+            }}
+            onFocus={() => setShowCommodityDropdown(true)}
+            placeholder="Search commodity..."
             className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-[#5DB347] focus:border-transparent"
-          >
-            <option value="">Select commodity...</option>
-            {COMMODITIES.map(c => <option key={c} value={c}>{c}</option>)}
-          </select>
+          />
+          {showCommodityDropdown && commoditySearch && filteredCommodities.length > 0 && (
+            <div className="absolute z-20 w-full bg-white border border-gray-200 rounded-xl mt-1 max-h-48 overflow-y-auto shadow-lg">
+              {filteredCommodities.map(c => (
+                <button
+                  key={c}
+                  onClick={() => {
+                    setForm(f => ({ ...f, commodity: c }));
+                    setCommoditySearch(c);
+                    setShowCommodityDropdown(false);
+                  }}
+                  className="w-full text-left px-3 py-2 text-sm hover:bg-[#EBF7E5] transition-colors"
+                >
+                  {c}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Quantity + Unit */}
         <div className="flex gap-2">
           <div className="flex-1">
             <label className="block text-sm font-medium text-gray-700 mb-1">Quantity *</label>
-            <input
-              type="number"
-              value={form.quantity}
-              onChange={e => setForm(f => ({ ...f, quantity: e.target.value }))}
-              placeholder="e.g. 500"
-              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-[#5DB347] focus:border-transparent"
-            />
+            <input type="number" value={form.quantity} onChange={e => setForm(f => ({ ...f, quantity: e.target.value }))} placeholder="e.g. 500" className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-[#5DB347] focus:border-transparent" />
           </div>
           <div className="w-36">
             <label className="block text-sm font-medium text-gray-700 mb-1">Unit</label>
-            <select
-              value={form.unit}
-              onChange={e => setForm(f => ({ ...f, unit: e.target.value }))}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-[#5DB347] focus:border-transparent"
-            >
+            <select value={form.unit} onChange={e => setForm(f => ({ ...f, unit: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-[#5DB347] focus:border-transparent">
               {UNITS.map(u => <option key={u} value={u}>{u}</option>)}
             </select>
           </div>
@@ -254,11 +351,7 @@ export default function FarmTradePage() {
         {/* Quality Grade */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Quality Grade</label>
-          <select
-            value={form.quality_grade}
-            onChange={e => setForm(f => ({ ...f, quality_grade: e.target.value }))}
-            className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-[#5DB347] focus:border-transparent"
-          >
+          <select value={form.quality_grade} onChange={e => setForm(f => ({ ...f, quality_grade: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-[#5DB347] focus:border-transparent">
             {QUALITY_GRADES.map(g => <option key={g} value={g}>{g}</option>)}
           </select>
         </div>
@@ -266,11 +359,7 @@ export default function FarmTradePage() {
         {/* Country */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Country *</label>
-          <select
-            value={form.country}
-            onChange={e => setForm(f => ({ ...f, country: e.target.value }))}
-            className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-[#5DB347] focus:border-transparent"
-          >
+          <select value={form.country} onChange={e => setForm(f => ({ ...f, country: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-[#5DB347] focus:border-transparent">
             <option value="">Select country...</option>
             {COUNTRIES.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
@@ -279,91 +368,78 @@ export default function FarmTradePage() {
         {/* Delivery Location */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Delivery Location *</label>
-          <input
-            type="text"
-            value={form.delivery_location}
-            onChange={e => setForm(f => ({ ...f, delivery_location: e.target.value }))}
-            placeholder="e.g. Nairobi Warehouse"
-            className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-[#5DB347] focus:border-transparent"
-          />
+          <input type="text" value={form.delivery_location} onChange={e => setForm(f => ({ ...f, delivery_location: e.target.value }))} placeholder="e.g. Nairobi Warehouse" className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-[#5DB347] focus:border-transparent" />
         </div>
 
         {/* Deadline */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Deadline *</label>
-          <input
-            type="date"
-            value={form.deadline}
-            onChange={e => setForm(f => ({ ...f, deadline: e.target.value }))}
-            className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-[#5DB347] focus:border-transparent"
-          />
+          <input type="date" value={form.deadline} onChange={e => setForm(f => ({ ...f, deadline: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-[#5DB347] focus:border-transparent" />
         </div>
 
         {/* Target Price + Currency */}
         <div className="flex gap-2">
           <div className="flex-1">
             <label className="block text-sm font-medium text-gray-700 mb-1">Target Price *</label>
-            <input
-              type="number"
-              step="0.01"
-              value={form.target_price}
-              onChange={e => setForm(f => ({ ...f, target_price: e.target.value }))}
-              placeholder="per unit"
-              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-[#5DB347] focus:border-transparent"
-            />
+            <input type="number" step="0.01" value={form.target_price} onChange={e => setForm(f => ({ ...f, target_price: e.target.value }))} placeholder="per unit" className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-[#5DB347] focus:border-transparent" />
           </div>
           <div className="w-28">
             <label className="block text-sm font-medium text-gray-700 mb-1">Currency</label>
-            <select
-              value={form.currency}
-              onChange={e => setForm(f => ({ ...f, currency: e.target.value }))}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-[#5DB347] focus:border-transparent"
-            >
-              <option value="USD">USD</option>
-              <option value="KES">KES</option>
-              <option value="UGX">UGX</option>
-              <option value="TZS">TZS</option>
-              <option value="RWF">RWF</option>
-              <option value="ETB">ETB</option>
-              <option value="NGN">NGN</option>
-              <option value="ZAR">ZAR</option>
+            <select value={form.currency} onChange={e => setForm(f => ({ ...f, currency: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-[#5DB347] focus:border-transparent">
+              <option value="USD">USD</option><option value="KES">KES</option><option value="UGX">UGX</option>
+              <option value="TZS">TZS</option><option value="RWF">RWF</option><option value="ETB">ETB</option>
+              <option value="NGN">NGN</option><option value="ZAR">ZAR</option>
             </select>
           </div>
+        </div>
+
+        {/* Urgency + Recurring */}
+        <div className="sm:col-span-2 flex flex-wrap gap-4">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" checked={form.is_urgent} onChange={e => setForm(f => ({ ...f, is_urgent: e.target.checked }))} className="w-4 h-4 rounded border-gray-300 text-[#5DB347] focus:ring-[#5DB347]" />
+            <Zap className="w-4 h-4 text-amber-500" />
+            <span className="text-sm font-medium text-gray-700">Urgent Order</span>
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" checked={form.is_recurring} onChange={e => setForm(f => ({ ...f, is_recurring: e.target.checked }))} className="w-4 h-4 rounded border-gray-300 text-[#5DB347] focus:ring-[#5DB347]" />
+            <Repeat className="w-4 h-4 text-blue-500" />
+            <span className="text-sm font-medium text-gray-700">Recurring Order</span>
+          </label>
+          {form.is_recurring && (
+            <select value={form.recurring_interval} onChange={e => setForm(f => ({ ...f, recurring_interval: e.target.value }))} className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#5DB347] focus:border-transparent">
+              <option value="weekly">Weekly</option><option value="biweekly">Bi-weekly</option><option value="monthly">Monthly</option><option value="quarterly">Quarterly</option>
+            </select>
+          )}
         </div>
 
         {/* Notes */}
         <div className="sm:col-span-2">
           <label className="block text-sm font-medium text-gray-700 mb-1">Notes (optional)</label>
-          <textarea
-            value={form.notes}
-            onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
-            rows={2}
-            placeholder="Any additional requirements..."
-            className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-[#5DB347] focus:border-transparent"
-          />
+          <textarea value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} rows={2} placeholder="Any additional requirements..." className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-[#5DB347] focus:border-transparent" />
         </div>
       </div>
 
       {error && (
         <div className="flex items-center gap-2 text-red-600 text-sm bg-red-50 px-4 py-2 rounded-xl">
-          <AlertCircle className="w-4 h-4 shrink-0" />
-          {error}
+          <AlertCircle className="w-4 h-4 shrink-0" /> {error}
         </div>
       )}
       {success && (
         <div className="flex items-center gap-2 text-green-700 text-sm bg-green-50 px-4 py-2 rounded-xl">
-          <CheckCircle className="w-4 h-4 shrink-0" />
-          {success}
+          <CheckCircle className="w-4 h-4 shrink-0" /> {success}
         </div>
       )}
 
       <button
         onClick={() => handleSubmit(type)}
         disabled={loading}
-        className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#5DB347] hover:bg-[#449933] text-white font-semibold px-6 py-3 rounded-xl transition-colors disabled:opacity-50"
+        className={`w-full sm:w-auto flex items-center justify-center gap-2 text-white font-semibold px-6 py-3 rounded-xl transition-colors disabled:opacity-50 ${
+          form.is_urgent ? 'bg-amber-500 hover:bg-amber-600' : 'bg-[#5DB347] hover:bg-[#449933]'
+        }`}
       >
         {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
         {type === 'buy' ? 'Submit Buy Request' : 'Submit Sell Offer'}
+        {form.is_urgent && <Zap className="w-4 h-4" />}
       </button>
     </div>
   );
@@ -372,8 +448,9 @@ export default function FarmTradePage() {
   const tabs: { key: Tab; label: string; icon: React.ReactNode }[] = [
     { key: 'buy', label: 'I Need', icon: <ShoppingCart className="w-4 h-4" /> },
     { key: 'sell', label: 'I Have', icon: <Package className="w-4 h-4" /> },
-    { key: 'orders', label: 'My Orders', icon: <ClipboardList className="w-4 h-4" /> },
+    { key: 'orders', label: 'My Trades', icon: <ClipboardList className="w-4 h-4" /> },
     { key: 'prices', label: 'Price Board', icon: <BarChart3 className="w-4 h-4" /> },
+    { key: 'history', label: 'Price History', icon: <LineChart className="w-4 h-4" /> },
   ];
 
   return (
@@ -398,13 +475,10 @@ export default function FarmTradePage() {
             key={tab.key}
             onClick={() => { setActiveTab(tab.key); setError(''); setSuccess(''); }}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
-              activeTab === tab.key
-                ? 'bg-white text-[#1B2A4A] shadow-sm'
-                : 'text-gray-500 hover:text-gray-700'
+              activeTab === tab.key ? 'bg-white text-[#1B2A4A] shadow-sm' : 'text-gray-500 hover:text-gray-700'
             }`}
           >
-            {tab.icon}
-            {tab.label}
+            {tab.icon} {tab.label}
           </button>
         ))}
       </div>
@@ -429,7 +503,7 @@ export default function FarmTradePage() {
           </div>
         )}
 
-        {/* ─── My Orders ─── */}
+        {/* ─── My Trades (Enhanced) ─── */}
         {activeTab === 'orders' && (
           <div>
             <h2 className="text-lg font-semibold text-[#1B2A4A] mb-4">My Trade Orders</h2>
@@ -461,12 +535,32 @@ export default function FarmTradePage() {
                           }
                         </div>
                         <div className="min-w-0">
-                          <p className="text-sm font-semibold text-[#1B2A4A] truncate">
-                            {order.order_number} — {order.commodity}
-                          </p>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <p className="text-sm font-semibold text-[#1B2A4A] truncate">
+                              {order.order_number} — {order.commodity}
+                            </p>
+                            {order.is_urgent && (
+                              <span className="px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded text-[10px] font-bold flex items-center gap-0.5">
+                                <Zap className="w-3 h-3" /> URGENT
+                              </span>
+                            )}
+                            {order.is_recurring && (
+                              <span className="px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded text-[10px] font-bold flex items-center gap-0.5">
+                                <Repeat className="w-3 h-3" /> Recurring
+                              </span>
+                            )}
+                          </div>
                           <p className="text-xs text-gray-500">
                             {order.quantity} {order.unit} &bull; {order.country} &bull; {new Date(order.created_at).toLocaleDateString()}
                           </p>
+                          {/* Enhanced: delivery + payment + counterparty */}
+                          <div className="flex gap-2 mt-1 flex-wrap">
+                            {getDeliveryBadge(order.delivery_status || (order.status === 'delivered' ? 'delivered' : order.status === 'accepted' ? 'in_transit' : undefined))}
+                            {getPaymentBadge(order.payment_status || (order.status === 'completed' ? 'paid' : order.status === 'delivered' ? 'pending' : undefined))}
+                            {order.counterparty_name && (
+                              <span className="text-[10px] text-gray-400">Counterparty: {order.counterparty_name}</span>
+                            )}
+                          </div>
                         </div>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
@@ -488,15 +582,10 @@ export default function FarmTradePage() {
           <div>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
               <h2 className="text-lg font-semibold text-[#1B2A4A]">Commodity Prices</h2>
-              <select
-                value={priceCountry}
-                onChange={e => setPriceCountry(e.target.value)}
-                className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#5DB347] focus:border-transparent"
-              >
+              <select value={priceCountry} onChange={e => setPriceCountry(e.target.value)} className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#5DB347] focus:border-transparent">
                 {COUNTRIES.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
-
             {pricesLoading ? (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="w-6 h-6 animate-spin text-[#5DB347]" />
@@ -535,15 +624,67 @@ export default function FarmTradePage() {
                           </span>
                         </td>
                         <td className="py-3 px-3 text-right text-gray-500">/{p.unit}</td>
-                        <td className="py-3 px-3 text-right text-gray-400 text-xs">
-                          {new Date(p.updated_at).toLocaleDateString()}
-                        </td>
+                        <td className="py-3 px-3 text-right text-gray-400 text-xs">{new Date(p.updated_at).toLocaleDateString()}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
             )}
+          </div>
+        )}
+
+        {/* ─── Price History ─── */}
+        {activeTab === 'history' && (
+          <div>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
+              <h2 className="text-lg font-semibold text-[#1B2A4A]">Price History</h2>
+              <div className="flex gap-2">
+                <select value={histCommodity} onChange={e => setHistCommodity(e.target.value)} className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#5DB347] focus:border-transparent">
+                  {['Maize', 'Wheat', 'Coffee', 'Rice', 'Beans', 'Soybeans'].map(c => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+                <select value={histDays} onChange={e => setHistDays(Number(e.target.value))} className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-[#5DB347] focus:border-transparent">
+                  <option value={30}>30 Days</option>
+                  <option value={60}>60 Days</option>
+                  <option value={90}>90 Days</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="h-72 sm:h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <RechartsLine data={priceHistoryData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis dataKey="date" tick={{ fontSize: 11 }} />
+                  <YAxis tick={{ fontSize: 11 }} />
+                  <Tooltip contentStyle={{ borderRadius: 12, fontSize: 12 }} />
+                  <Legend />
+                  <Line type="monotone" dataKey="buy" stroke="#5DB347" strokeWidth={2} dot={false} name="Buy Price" />
+                  <Line type="monotone" dataKey="sell" stroke="#3B82F6" strokeWidth={2} dot={false} name="Sell Price" />
+                </RechartsLine>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="bg-green-50 rounded-lg p-3 text-center">
+                <p className="text-xs text-gray-500">Current Buy</p>
+                <p className="text-lg font-bold text-green-700">${priceHistoryData[priceHistoryData.length - 1]?.buy}</p>
+              </div>
+              <div className="bg-blue-50 rounded-lg p-3 text-center">
+                <p className="text-xs text-gray-500">Current Sell</p>
+                <p className="text-lg font-bold text-blue-700">${priceHistoryData[priceHistoryData.length - 1]?.sell}</p>
+              </div>
+              <div className="bg-gray-50 rounded-lg p-3 text-center">
+                <p className="text-xs text-gray-500">{histDays}d Low</p>
+                <p className="text-lg font-bold text-gray-700">${Math.min(...priceHistoryData.map(d => d.buy)).toFixed(2)}</p>
+              </div>
+              <div className="bg-gray-50 rounded-lg p-3 text-center">
+                <p className="text-xs text-gray-500">{histDays}d High</p>
+                <p className="text-lg font-bold text-gray-700">${Math.max(...priceHistoryData.map(d => d.sell)).toFixed(2)}</p>
+              </div>
+            </div>
           </div>
         )}
       </div>

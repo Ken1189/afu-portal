@@ -25,7 +25,7 @@ export const FARMER_TIERS = {
     emoji: '\u{1F333}',
     color: '#449933',
     description: 'Financial tools',
-    features: ['financing', 'insurance', 'payments', 'wallet', 'money'],
+    features: ['financing', 'insurance', 'payments', 'wallet', 'money', 'warehouse'],
     requiredCourse: 'financial-literacy',
   },
   harvest: {
@@ -62,8 +62,10 @@ export const FARM_SIDEBAR_ITEMS = [
   { href: '/farm/journal', label: 'Farm Journal', icon: 'BookOpen', tier: 'sprout' as FarmerTier },
   { href: '/farm/crops', label: 'My Crops', icon: 'Sprout', tier: 'sprout' as FarmerTier },
   { href: '/farm/cooperatives', label: 'Cooperatives', icon: 'UsersRound', tier: 'sprout' as FarmerTier },
+  { href: '/farm/cooperatives/dashboard', label: 'My Cooperative', icon: 'UsersRound', tier: 'sprout' as FarmerTier },
 
   // Growth tier
+  { href: '/farm/warehouse', label: 'Warehouse', icon: 'Warehouse', tier: 'growth' as FarmerTier },
   { href: '/farm/financing', label: 'Financing', icon: 'Wallet', tier: 'growth' as FarmerTier },
   { href: '/farm/insurance', label: 'Insurance', icon: 'Shield', tier: 'growth' as FarmerTier },
   { href: '/farm/insurance/parametric', label: 'Parametric', icon: 'Zap', tier: 'growth' as FarmerTier },
