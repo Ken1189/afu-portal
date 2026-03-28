@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -181,16 +182,75 @@ export default function DisbursementsPage() {
   const [showRejectModal, setShowRejectModal] = useState<string | null>(null);
   const [approvedIds, setApprovedIds] = useState<Set<string>>(new Set());
   const [rejectedIds, setRejectedIds] = useState<Set<string>>(new Set());
+  const [dbPending, setDbPending] = useState<PendingDisbursement[]>([]);
+  const [dbRecent, setDbRecent] = useState<RecentDisbursement[]>([]);
+  const [dbLoading, setDbLoading] = useState(true);
 
-  const pendingValue = pendingDisbursements.reduce((s, d) => s + d.amount, 0);
-  const todaysApproved = recentDisbursements.filter((d) => {
+  useEffect(() => {
+    const supabase = createClient();
+    async function fetchDisbursements() {
+      try {
+        // Fetch loans with disbursement-related statuses
+        const { data: loans } = await supabase
+          .from('loans')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (loans && loans.length > 0) {
+          const pending: PendingDisbursement[] = loans
+            .filter((l: Record<string, unknown>) => l.status === 'approved')
+            .map((l: Record<string, unknown>, idx: number) => ({
+              id: `DIS-DB-${idx + 1}`,
+              appId: (l.loan_number as string) || '',
+              memberName: (l.member_id as string) || 'Unknown',
+              memberId: (l.member_id as string) || '',
+              amount: (l.amount as number) || 0,
+              loanType: (l.loan_type as string) || 'Working Capital',
+              riskGrade: 'B' as const,
+              officer: (l.approved_by as string) || 'Unassigned',
+              country: '',
+              crop: (l.purpose as string) || '',
+              submittedDate: ((l.created_at as string) || '').slice(0, 10),
+              approvedDate: ((l.approved_at as string) || (l.updated_at as string) || '').slice(0, 10),
+              notes: '',
+            }));
+          if (pending.length > 0) setDbPending(pending);
+
+          const recent: RecentDisbursement[] = loans
+            .filter((l: Record<string, unknown>) => l.status === 'disbursed' || l.disbursed_at)
+            .map((l: Record<string, unknown>, idx: number) => ({
+              id: `RD-DB-${idx + 1}`,
+              memberName: (l.member_id as string) || 'Unknown',
+              amount: (l.amount as number) || 0,
+              loanType: (l.loan_type as string) || '',
+              status: 'completed' as const,
+              disbursedAt: (l.disbursed_at as string) || (l.updated_at as string) || '',
+              processedBy: (l.approved_by as string) || '',
+              country: '',
+            }));
+          if (recent.length > 0) setDbRecent(recent);
+        }
+      } catch {
+        // keep fallback
+      } finally {
+        setDbLoading(false);
+      }
+    }
+    fetchDisbursements();
+  }, []);
+
+  // Use DB data if available, otherwise fallback
+  const activePending = dbPending.length > 0 ? dbPending : pendingDisbursements;
+  const activeRecent = dbRecent.length > 0 ? dbRecent : recentDisbursements;
+
+  const pendingValue = activePending.reduce((s, d) => s + d.amount, 0);
+  const todaysApproved = activeRecent.filter((d) => {
     const date = new Date(d.disbursedAt);
     return date.toDateString() === new Date('2026-03-15').toDateString() && d.status === 'completed';
   });
   const todaysApprovedValue = todaysApproved.reduce((s, d) => s + d.amount, 0);
 
   const visiblePending = useMemo(() => {
-    let result = pendingDisbursements.filter(
+    let result = activePending.filter(
       (d) => !approvedIds.has(d.id) && !rejectedIds.has(d.id)
     );
     if (searchQuery) {
@@ -561,7 +621,7 @@ export default function DisbursementsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              {recentDisbursements.map((disb, i) => {
+              {activeRecent.map((disb, i) => {
                 const cfg = disbursementStatusConfig[disb.status] || disbursementStatusConfig.completed;
                 const date = new Date(disb.disbursedAt);
                 return (

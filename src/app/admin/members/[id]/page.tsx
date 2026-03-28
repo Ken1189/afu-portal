@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { createClient } from '@/lib/supabase/client';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -348,10 +349,91 @@ export default function MemberDetailPage() {
   const params = useParams();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabId>('profile');
+  const [dbMember, setDbMember] = useState<Member | null>(null);
+  const [dbLoans, setDbLoans] = useState<Loan[]>([]);
+  const [dbLoading, setDbLoading] = useState(true);
 
   const memberId = params.id as string;
-  const member = useMemo(() => members.find((m) => m.id === memberId), [memberId]);
-  const memberLoans = useMemo(() => loans.filter((l) => l.memberId === memberId), [memberId]);
+
+  useEffect(() => {
+    const supabase = createClient();
+    async function fetchMemberData() {
+      try {
+        // Try fetching from members table joined with profiles
+        const { data: memberData } = await supabase
+          .from('members')
+          .select('*, profiles:profile_id(full_name, email, phone, country, region, avatar_url)')
+          .eq('member_id', memberId)
+          .single();
+
+        if (memberData) {
+          const profile = memberData.profiles as Record<string, unknown> | null;
+          const fullName = (profile?.full_name as string) || '';
+          const [firstName = '', ...lastParts] = fullName.split(' ');
+          setDbMember({
+            id: memberData.member_id,
+            firstName,
+            lastName: lastParts.join(' '),
+            email: (profile?.email as string) || '',
+            phone: (profile?.phone as string) || '',
+            tier: memberData.tier || 'smallholder',
+            country: ((profile?.country as string) || 'Unknown') as MemberCountry,
+            region: (profile?.region as string) || '',
+            status: memberData.status || 'active',
+            kycStatus: 'pending',
+            profileCompleteness: 0,
+            farmName: memberData.farm_name || '',
+            farmSize: memberData.farm_size_ha || 0,
+            primaryCrops: memberData.primary_crops || [],
+            joinDate: memberData.join_date || '',
+            lastActive: memberData.updated_at || '',
+            avatar: null,
+            creditScore: memberData.credit_score || 0,
+          });
+        }
+
+        // Fetch loans for this member
+        const { data: loansData } = await supabase
+          .from('loans')
+          .select('*')
+          .eq('member_id', memberId);
+
+        if (loansData && loansData.length > 0) {
+          const mapped: Loan[] = loansData.map((l: Record<string, unknown>) => ({
+            id: (l.loan_number as string) || (l.id as string) || '',
+            memberId: (l.member_id as string) || '',
+            memberName: '',
+            type: ((l.loan_type as string) || 'working-capital') as Loan['type'],
+            amount: (l.amount as number) || 0,
+            outstanding: (l.amount as number || 0) - (l.amount_repaid as number || 0),
+            interestRate: (l.interest_rate as number) || 0,
+            tenor: ((l.term_months as number) || 0) * 30,
+            status: ((l.status as string) || 'active') as Loan['status'],
+            disbursementDate: ((l.disbursed_at as string) || '').slice(0, 10),
+            maturityDate: ((l.due_date as string) || '').slice(0, 10),
+            nextPaymentDate: ((l.due_date as string) || '').slice(0, 10),
+            nextPaymentAmount: 0,
+            repaidPercentage: (l.amount as number) ? Math.round(((l.amount_repaid as number) || 0) / (l.amount as number) * 100) : 0,
+            crop: (l.purpose as string) || '',
+            buyer: null,
+            country: '',
+          }));
+          setDbLoans(mapped);
+        }
+      } catch {
+        // keep fallback
+      } finally {
+        setDbLoading(false);
+      }
+    }
+    fetchMemberData();
+  }, [memberId]);
+
+  // Use DB data if available, otherwise fallback to mock
+  const fallbackMember = useMemo(() => members.find((m) => m.id === memberId), [memberId]);
+  const fallbackLoans = useMemo(() => loans.filter((l) => l.memberId === memberId), [memberId]);
+  const member = dbMember || fallbackMember;
+  const memberLoans = dbLoans.length > 0 ? dbLoans : fallbackLoans;
 
   // ── Not Found State ─────────────────────────────────────────────────────
   if (!member) {

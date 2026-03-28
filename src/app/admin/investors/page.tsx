@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createClient } from '@/lib/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Users,
@@ -226,8 +227,69 @@ export default function AllInvestorsPage() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('All');
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [dbInvestors, setDbInvestors] = useState<Investor[]>([]);
+  const [dbLoading, setDbLoading] = useState(true);
 
-  const filtered = demoInvestors.filter((inv) => {
+  useEffect(() => {
+    const supabase = createClient();
+    async function fetchInvestors() {
+      try {
+        // Fetch profiles with investor role
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('role', 'investor');
+        if (profiles && profiles.length > 0) {
+          // Also fetch their interests
+          const profileIds = profiles.map((p: Record<string, unknown>) => p.id as string);
+          const { data: interests } = await supabase
+            .from('investor_interests')
+            .select('*')
+            .in('profile_id', profileIds);
+
+          const mapped: Investor[] = profiles.map((p: Record<string, unknown>, idx: number) => {
+            const myInterests = (interests || []).filter((i: Record<string, unknown>) => i.profile_id === p.id);
+            const totalInvested = myInterests.reduce((s: number, i: Record<string, unknown>) => s + ((i.amount as number) || 0), 0);
+            return {
+              id: String(idx + 1),
+              name: (p.full_name as string) || 'Unknown',
+              entity: (p.company_name as string) || '',
+              email: (p.email as string) || '',
+              phone: (p.phone as string) || '',
+              type: 'Individual' as const,
+              status: 'Active' as const,
+              totalInvested,
+              currentValue: totalInvested,
+              returns: 0,
+              joinDate: ((p.created_at as string) || '').slice(0, 10),
+              country: (p.country as string) || '',
+              kycStatus: 'Pending' as const,
+              investments: myInterests.map((i: Record<string, unknown>) => ({
+                name: (i.opportunity as string) || (i.interest_type as string) || 'Investment',
+                type: 'Debt',
+                amount: (i.amount as number) || 0,
+                irr: 0,
+                status: 'Active' as const,
+              })),
+              lastActivity: ((p.updated_at as string) || '').slice(0, 10),
+              relationshipManager: '',
+            };
+          });
+          setDbInvestors(mapped);
+        }
+      } catch {
+        // keep fallback
+      } finally {
+        setDbLoading(false);
+      }
+    }
+    fetchInvestors();
+  }, []);
+
+  // Use DB data if available, otherwise fallback
+  const investors = dbInvestors.length > 0 ? dbInvestors : demoInvestors;
+
+  const filtered = investors.filter((inv) => {
     const matchesSearch =
       inv.name.toLowerCase().includes(search.toLowerCase()) ||
       inv.entity.toLowerCase().includes(search.toLowerCase()) ||
@@ -236,10 +298,10 @@ export default function AllInvestorsPage() {
     return matchesSearch && matchesStatus;
   });
 
-  const totalAUM = demoInvestors.reduce((s, i) => s + i.totalInvested, 0);
-  const totalValue = demoInvestors.reduce((s, i) => s + i.currentValue, 0);
-  const activeCount = demoInvestors.filter((i) => i.status === 'Active').length;
-  const onboardingCount = demoInvestors.filter((i) => i.status === 'Onboarding').length;
+  const totalAUM = investors.reduce((s, i) => s + i.totalInvested, 0);
+  const totalValue = investors.reduce((s, i) => s + i.currentValue, 0);
+  const activeCount = investors.filter((i) => i.status === 'Active').length;
+  const onboardingCount = investors.filter((i) => i.status === 'Onboarding').length;
 
   return (
     <motion.div className="space-y-6" variants={container} initial="hidden" animate="show">

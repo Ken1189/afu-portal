@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createClient } from '@/lib/supabase/client';
 import { motion } from 'framer-motion';
 import {
   BarChart3,
@@ -118,13 +119,43 @@ const item = {
 
 export default function TotalInvestmentsPage() {
   const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'geography'>('overview');
+  const [dbStats, setDbStats] = useState<{ totalAUM: number; totalInvestors: number; totalInterests: number } | null>(null);
+  const [dbLoading, setDbLoading] = useState(true);
 
-  const totalAUM = 4750000;
-  const totalDeployed = 3450000;
+  useEffect(() => {
+    const supabase = createClient();
+    async function fetchInvestmentData() {
+      try {
+        const [{ data: interests }, { data: ledger }] = await Promise.all([
+          supabase.from('investor_interests').select('*'),
+          supabase.from('ledger_accounts').select('*'),
+        ]);
+        if ((interests && interests.length > 0) || (ledger && ledger.length > 0)) {
+          const totalFromInterests = (interests || []).reduce((s: number, i: Record<string, unknown>) => s + ((i.amount as number) || 0), 0);
+          const totalFromLedger = (ledger || []).reduce((s: number, l: Record<string, unknown>) => s + ((l.balance as number) || 0), 0);
+          const uniqueInvestors = new Set((interests || []).map((i: Record<string, unknown>) => i.investor_id || i.profile_id)).size;
+          setDbStats({
+            totalAUM: totalFromInterests > 0 ? totalFromInterests : totalFromLedger > 0 ? totalFromLedger : 0,
+            totalInvestors: uniqueInvestors || 0,
+            totalInterests: (interests || []).length,
+          });
+        }
+      } catch {
+        // keep fallback
+      } finally {
+        setDbLoading(false);
+      }
+    }
+    fetchInvestmentData();
+  }, []);
+
+  // Use DB data if available, otherwise fallback to demo
+  const totalAUM = dbStats && dbStats.totalAUM > 0 ? dbStats.totalAUM : 4750000;
+  const totalDeployed = dbStats && dbStats.totalAUM > 0 ? Math.round(dbStats.totalAUM * 0.73) : 3450000;
   const totalReturns = 236000;
   const weightedIRR = 19.8;
-  const totalInvestors = 6;
-  const activeDeals = 6;
+  const totalInvestors = dbStats && dbStats.totalInvestors > 0 ? dbStats.totalInvestors : 6;
+  const activeDeals = dbStats && dbStats.totalInterests > 0 ? dbStats.totalInterests : 6;
   const deploymentRatio = Math.round((totalDeployed / totalAUM) * 100);
 
   const maxQuarterly = Math.max(...quarterlyData.map((q) => q.invested));

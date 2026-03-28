@@ -1,5 +1,7 @@
 'use client';
 
+import { useState, useEffect } from 'react';
+import { createClient } from '@/lib/supabase/client';
 import { motion } from 'framer-motion';
 import {
   ArrowLeft,
@@ -115,6 +117,30 @@ const contracts = [
 // ═══════════════════════════════════════════════════════
 
 export default function AdminBlockchainPage() {
+  const [platformStats, setPlatformStats] = useState({ totalMembers: 0, totalProfiles: 0 });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const supabase = createClient();
+    async function fetchStats() {
+      try {
+        const [{ count: profileCount }, { count: memberCount }] = await Promise.all([
+          supabase.from('profiles').select('*', { count: 'exact', head: true }),
+          supabase.from('members').select('*', { count: 'exact', head: true }),
+        ]);
+        setPlatformStats({
+          totalProfiles: profileCount ?? 0,
+          totalMembers: memberCount ?? 0,
+        });
+      } catch {
+        // keep fallback zeros
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchStats();
+  }, []);
+
   return (
     <motion.div variants={containerVariants} initial="hidden" animate="show" className="space-y-6">
 
@@ -182,9 +208,9 @@ export default function AdminBlockchainPage() {
               <Users className="w-5 h-5" />
             </div>
           </div>
-          <p className="text-2xl font-bold text-[#1B2A4A]">0</p>
+          <p className="text-2xl font-bold text-[#1B2A4A]">{loading ? '...' : platformStats.totalMembers}</p>
           <p className="text-xs text-gray-400 mt-0.5">Active Stakers</p>
-          <p className="text-[10px] text-gray-300 mt-1">members</p>
+          <p className="text-[10px] text-gray-300 mt-1">{platformStats.totalMembers > 0 ? `${platformStats.totalMembers} members on platform` : 'members'}</p>
         </div>
 
         {/* Referral Cashback */}

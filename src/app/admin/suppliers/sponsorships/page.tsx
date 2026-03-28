@@ -1,6 +1,7 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
+import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import {
@@ -268,10 +269,63 @@ const pieColors: Record<SponsorshipTier, string> = {
 // ═══════════════════════════════════════════════════════════════════════════
 
 export default function SponsorshipsPage() {
+  const [dbSuppliers, setDbSuppliers] = useState<Supplier[]>([]);
+  const [dbLoading, setDbLoading] = useState(true);
+
+  useEffect(() => {
+    const supabase = createClient();
+    async function fetchSuppliers() {
+      try {
+        const { data } = await supabase
+          .from('supplier_directory')
+          .select('*')
+          .not('sponsorship_tier', 'is', null)
+          .order('created_at', { ascending: false });
+        if (data && data.length > 0) {
+          const mapped: Supplier[] = data.map((s: Record<string, unknown>) => ({
+            id: (s.id as string) || '',
+            companyName: (s.company_name as string) || '',
+            contactName: (s.contact_name as string) || '',
+            email: (s.email as string) || '',
+            phone: (s.phone as string) || '',
+            country: ((s.country as string) || 'Zimbabwe') as SupplierCountry,
+            region: (s.region as string) || '',
+            category: ((s.category as string) || 'input-supplier') as SupplierCategory,
+            status: ((s.status as string) || 'active') as 'active' | 'pending' | 'suspended',
+            joinDate: ((s.join_date as string) || (s.created_at as string) || '').slice(0, 10),
+            logo: (s.logo_url as string) || '',
+            description: (s.description as string) || '',
+            productsCount: (s.products_count as number) || 0,
+            totalSales: (s.total_sales as number) || 0,
+            totalOrders: (s.total_orders as number) || 0,
+            rating: (s.rating as number) || 0,
+            reviewCount: (s.review_count as number) || 0,
+            memberDiscountPercent: (s.member_discount_percent as number) || 0,
+            commissionRate: (s.commission_rate as number) || 0,
+            isFounding: (s.is_founding as boolean) || false,
+            sponsorshipTier: (s.sponsorship_tier as SponsorshipTier) || null,
+            verified: (s.verified as boolean) || false,
+            website: (s.website as string) || '',
+            certifications: (s.certifications as string[]) || [],
+          }));
+          setDbSuppliers(mapped);
+        }
+      } catch {
+        // keep fallback
+      } finally {
+        setDbLoading(false);
+      }
+    }
+    fetchSuppliers();
+  }, []);
+
+  // Use DB data if available, otherwise fallback
+  const activeSuppliers = dbSuppliers.length > 0 ? dbSuppliers : suppliers;
+
   // ── Compute sponsor data ──────────────────────────────────────────────
   const sponsoredSuppliers = useMemo(
-    () => suppliers.filter((s) => s.sponsorshipTier !== null),
-    []
+    () => activeSuppliers.filter((s) => s.sponsorshipTier !== null),
+    [activeSuppliers]
   );
 
   const sponsorsByTier = useMemo(() => {

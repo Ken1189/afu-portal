@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createClient } from '@/lib/supabase/client';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import {
@@ -79,7 +80,7 @@ const services = [
   },
 ];
 
-const storageMetrics = [
+const defaultStorageMetrics = [
   { label: 'Database Size', used: 2.4, total: 8, unit: 'GB', icon: Database },
   { label: 'File Storage', used: 1.2, total: 5, unit: 'GB', icon: FolderOpen },
   { label: 'API Calls (Month)', used: 125432, total: 500000, unit: '', icon: Zap },
@@ -132,11 +133,60 @@ function formatStorageValue(used: number, total: number, unit: string): string {
 
 export default function SystemHealthPage() {
   const [refreshing, setRefreshing] = useState(false);
+  const [systemStats, setSystemStats] = useState({
+    totalUsers: 0,
+    totalMembers: 0,
+    totalLoans: 0,
+    totalPayments: 0,
+  });
+  const [statsLoading, setStatsLoading] = useState(true);
+
+  const fetchSystemStats = async () => {
+    const supabase = createClient();
+    try {
+      const [
+        { count: userCount },
+        { count: memberCount },
+        { count: loanCount },
+        { count: paymentCount },
+      ] = await Promise.all([
+        supabase.from('profiles').select('*', { count: 'exact', head: true }),
+        supabase.from('members').select('*', { count: 'exact', head: true }),
+        supabase.from('loans').select('*', { count: 'exact', head: true }),
+        supabase.from('payments').select('*', { count: 'exact', head: true }),
+      ]);
+      setSystemStats({
+        totalUsers: userCount ?? 0,
+        totalMembers: memberCount ?? 0,
+        totalLoans: loanCount ?? 0,
+        totalPayments: paymentCount ?? 0,
+      });
+    } catch {
+      // keep defaults
+    } finally {
+      setStatsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchSystemStats();
+  }, []);
 
   const handleRefresh = () => {
     setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 1500);
+    setStatsLoading(true);
+    fetchSystemStats().then(() => {
+      setTimeout(() => setRefreshing(false), 500);
+    });
   };
+
+  // Dynamic storage metrics using DB stats
+  const storageMetrics = [
+    { label: 'Database Size', used: 2.4, total: 8, unit: 'GB', icon: Database },
+    { label: 'File Storage', used: 1.2, total: 5, unit: 'GB', icon: FolderOpen },
+    { label: 'Total Records', used: systemStats.totalUsers + systemStats.totalMembers + systemStats.totalLoans + systemStats.totalPayments, total: 100000, unit: '', icon: Zap },
+    { label: 'Active Users', used: systemStats.totalUsers || defaultStorageMetrics[3].used, total: 200, unit: '', icon: Users },
+  ];
 
   return (
     <div className="min-h-screen p-6 md:p-8 space-y-8">

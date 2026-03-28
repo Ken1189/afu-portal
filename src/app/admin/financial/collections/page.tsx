@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import {
@@ -171,14 +172,57 @@ export default function CollectionsPage() {
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [sortField, setSortField] = useState<SortField>('daysOverdue');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
+  const [dbLoans, setDbLoans] = useState<OverdueLoan[]>([]);
+  const [dbLoading, setDbLoading] = useState(true);
 
-  const totalOverdue = overdueLoans.reduce((s, l) => s + l.outstandingAmount, 0);
-  const thirtyDayOverdue = overdueLoans.filter((l) => l.daysOverdue <= 30);
-  const sixtyDayOverdue = overdueLoans.filter((l) => l.daysOverdue > 30 && l.daysOverdue <= 60);
-  const ninetyPlusOverdue = overdueLoans.filter((l) => l.daysOverdue > 60);
+  useEffect(() => {
+    const supabase = createClient();
+    async function fetchOverduePayments() {
+      try {
+        const { data } = await supabase
+          .from('payments')
+          .select('*')
+          .in('purpose', ['loan_repayment', 'collection', 'repayment'])
+          .order('created_at', { ascending: false });
+        if (data && data.length > 0) {
+          const mapped: OverdueLoan[] = data.map((p: Record<string, unknown>, idx: number) => ({
+            id: `COL-DB-${idx + 1}`,
+            memberId: (p.member_id as string) || '',
+            memberName: (p.member_id as string) || 'Unknown',
+            loanId: (p.related_entity_id as string) || '',
+            amount: (p.amount as number) || 0,
+            outstandingAmount: (p.amount as number) || 0,
+            daysOverdue: Math.floor((Date.now() - new Date((p.created_at as string) || '').getTime()) / 86400000),
+            lastPaymentDate: ((p.completed_at as string) || (p.created_at as string) || '').slice(0, 10),
+            lastPaymentAmount: 0,
+            status: 'reminder-sent' as const,
+            country: '',
+            phone: (p.phone_number as string) || '',
+            email: '',
+            crop: '',
+            loanType: (p.purpose as string) || '',
+          }));
+          setDbLoans(mapped);
+        }
+      } catch {
+        // keep fallback
+      } finally {
+        setDbLoading(false);
+      }
+    }
+    fetchOverduePayments();
+  }, []);
+
+  // Use DB data if available, otherwise fallback
+  const activeLoans = dbLoans.length > 0 ? dbLoans : overdueLoans;
+
+  const totalOverdue = activeLoans.reduce((s, l) => s + l.outstandingAmount, 0);
+  const thirtyDayOverdue = activeLoans.filter((l) => l.daysOverdue <= 30);
+  const sixtyDayOverdue = activeLoans.filter((l) => l.daysOverdue > 30 && l.daysOverdue <= 60);
+  const ninetyPlusOverdue = activeLoans.filter((l) => l.daysOverdue > 60);
 
   const filteredAndSorted = useMemo(() => {
-    let result = [...overdueLoans];
+    let result = [...activeLoans];
 
     // Search
     if (searchQuery) {
@@ -218,7 +262,7 @@ export default function CollectionsPage() {
     });
 
     return result;
-  }, [searchQuery, filterStatus, sortField, sortOrder]);
+  }, [searchQuery, filterStatus, sortField, sortOrder, activeLoans]);
 
   const toggleSort = (field: SortField) => {
     if (sortField === field) {
@@ -265,7 +309,7 @@ export default function CollectionsPage() {
           {
             label: 'Total Overdue',
             value: formatCurrency(totalOverdue),
-            count: overdueLoans.length,
+            count: activeLoans.length,
             icon: <AlertTriangle className="w-5 h-5" />,
             color: 'text-red-600',
             bgColor: 'bg-red-50',

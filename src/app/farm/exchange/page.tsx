@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
 import {
   Coins,
@@ -110,6 +111,72 @@ const STATUS_ICONS: Record<string, React.ComponentType<{ className?: string }>> 
 
 // ── Page ──
 export default function FarmExchangePage() {
+  const [dbTransactions, setDbTransactions] = useState<Transaction[]>([]);
+  const [dbListings, setDbListings] = useState<MyListing[]>([]);
+  const [dbTrades, setDbTrades] = useState<Trade[]>([]);
+  const [dbLoading, setDbLoading] = useState(true);
+
+  useEffect(() => {
+    const supabase = createClient();
+    async function fetchExchangeData() {
+      try {
+        const { data: orders } = await supabase
+          .from('trade_orders')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(50);
+        if (orders && orders.length > 0) {
+          // Map trade_orders to transactions
+          const txns: Transaction[] = orders.slice(0, 10).map((o: Record<string, unknown>, idx: number) => ({
+            id: String(idx + 1),
+            type: ((o.order_type as string) === 'sell' ? 'earned' : 'spent') as 'earned' | 'spent',
+            description: (o.description as string) || (o.commodity as string) || 'Trade',
+            amount: (o.total_amount as number) || (o.amount as number) || 0,
+            date: ((o.created_at as string) || '').slice(0, 10),
+          }));
+          if (txns.length > 0) setDbTransactions(txns);
+
+          // Map to listings (my orders with status marketplace/active)
+          const listings: MyListing[] = orders
+            .filter((o: Record<string, unknown>) => o.status === 'marketplace' || o.status === 'active' || o.status === 'open')
+            .map((o: Record<string, unknown>, idx: number) => ({
+              id: String(idx + 1),
+              title: (o.title as string) || (o.commodity as string) || 'Listing',
+              category: (o.category as string) || 'produce',
+              price: String((o.price as number) || (o.total_amount as number) || 0),
+              priceType: 'credits',
+              status: 'active' as const,
+              views: 0,
+            }));
+          if (listings.length > 0) setDbListings(listings);
+
+          // Map to trades
+          const trades: Trade[] = orders.map((o: Record<string, unknown>, idx: number) => ({
+            id: String(idx + 1),
+            type: ((o.order_type as string) === 'sell' ? 'sale' : 'purchase') as 'purchase' | 'sale',
+            title: (o.title as string) || (o.commodity as string) || 'Trade',
+            counterparty: (o.counterparty as string) || (o.buyer_id as string) || (o.seller_id as string) || 'Unknown',
+            amount: (o.total_amount as number) || (o.amount as number) || 0,
+            status: ((o.status as string) === 'completed' ? 'completed' : (o.status as string) === 'disputed' ? 'disputed' : 'pending') as 'pending' | 'completed' | 'disputed',
+            date: ((o.created_at as string) || '').slice(0, 10),
+            rated: false,
+          }));
+          if (trades.length > 0) setDbTrades(trades);
+        }
+      } catch {
+        // keep fallback demo data
+      } finally {
+        setDbLoading(false);
+      }
+    }
+    fetchExchangeData();
+  }, []);
+
+  // Use DB data if available, otherwise fallback to demo
+  const transactions = dbTransactions.length > 0 ? dbTransactions : DEMO_TRANSACTIONS;
+  const myListings = dbListings.length > 0 ? dbListings : DEMO_MY_LISTINGS;
+  const trades = dbTrades.length > 0 ? dbTrades : DEMO_TRADES;
+
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [form, setForm] = useState({
     title: '',
@@ -210,7 +277,7 @@ export default function FarmExchangePage() {
           <div className="flex-1 bg-white/10 rounded-xl p-4">
             <p className="text-white/60 text-xs uppercase tracking-wider mb-3">Recent Transactions</p>
             <div className="space-y-2">
-              {DEMO_TRANSACTIONS.slice(0, 5).map((tx) => (
+              {transactions.slice(0, 5).map((tx) => (
                 <div key={tx.id} className="flex items-center gap-3 text-sm">
                   <div
                     className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${
@@ -256,7 +323,7 @@ export default function FarmExchangePage() {
           </button>
         </div>
 
-        {DEMO_MY_LISTINGS.length === 0 ? (
+        {myListings.length === 0 ? (
           <div className="py-12 text-center">
             <ShoppingBag className="w-10 h-10 text-gray-300 mx-auto mb-2" />
             <p className="text-gray-500 text-sm font-medium">No listings yet</p>
@@ -264,7 +331,7 @@ export default function FarmExchangePage() {
           </div>
         ) : (
           <div className="divide-y divide-gray-50">
-            {DEMO_MY_LISTINGS.map((listing) => (
+            {myListings.map((listing) => (
               <div key={listing.id} className="px-5 py-4 flex items-center gap-4 hover:bg-gray-50/50 transition-colors">
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-sm text-[#1B2A4A] truncate">{listing.title}</p>
@@ -310,7 +377,7 @@ export default function FarmExchangePage() {
         </div>
 
         <div className="divide-y divide-gray-50">
-          {DEMO_TRADES.map((trade) => {
+          {trades.map((trade) => {
             const StatusIcon = STATUS_ICONS[trade.status] || Clock;
             return (
               <div key={trade.id} className="px-5 py-4 flex items-center gap-4 hover:bg-gray-50/50 transition-colors">

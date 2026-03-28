@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createClient } from '@/lib/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Landmark,
@@ -157,14 +158,14 @@ const statusStyles: Record<ExpressionStatus, string> = {
   Declined: 'bg-red-100 text-red-700',
 };
 
-const statusCounts = {
+const defaultStatusCounts = {
   total: expressions.length,
   pending: expressions.filter((e) => e.status === 'Pending').length,
   inDiscussion: expressions.filter((e) => e.status === 'In Discussion').length,
   committed: expressions.filter((e) => e.status === 'Committed').length,
 };
 
-const totalPipelineValue = expressions.reduce((sum, e) => sum + e.amount, 0);
+const defaultPipelineValue = expressions.reduce((sum, e) => sum + e.amount, 0);
 
 // ── Animation Variants ────────────────────────────────────────────────────────
 
@@ -194,10 +195,61 @@ export default function InvestorRelationsPage() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [statusEditing, setStatusEditing] = useState<string | null>(null);
   const [localStatuses, setLocalStatuses] = useState<Record<string, ExpressionStatus>>({});
+  const [dbExpressions, setDbExpressions] = useState<Expression[]>([]);
+  const [dbLoading, setDbLoading] = useState(true);
 
-  const uniqueOpportunities = Array.from(new Set(expressions.map((e) => e.opportunity)));
+  useEffect(() => {
+    const supabase = createClient();
+    async function fetchInterests() {
+      try {
+        const { data } = await supabase
+          .from('investor_interests')
+          .select('*, profiles!investor_interests_profile_id_fkey(full_name, email)')
+          .order('created_at', { ascending: false });
+        if (data && data.length > 0) {
+          const mapped: Expression[] = data.map((row: Record<string, unknown>, idx: number) => {
+            const profile = row.profiles as Record<string, unknown> | null;
+            return {
+              id: (row.id as string) || String(idx + 1),
+              date: ((row.created_at as string) || '').slice(0, 10),
+              investorName: (profile?.full_name as string) || (row.investor_name as string) || 'Unknown',
+              entityName: (row.entity_name as string) || (row.company_name as string) || '',
+              opportunity: (row.opportunity as string) || (row.interest_type as string) || 'General',
+              amount: (row.amount as number) || 0,
+              status: (((row.status as string) || 'Pending').charAt(0).toUpperCase() + ((row.status as string) || 'pending').slice(1)) as ExpressionStatus,
+              email: (profile?.email as string) || (row.email as string) || '',
+              phone: (row.phone as string) || '',
+              notes: (row.notes as string) || '',
+            };
+          });
+          setDbExpressions(mapped);
+        }
+      } catch {
+        // keep fallback demo data
+      } finally {
+        setDbLoading(false);
+      }
+    }
+    fetchInterests();
+  }, []);
 
-  const filtered = expressions.filter((e) => {
+  // Use DB data if available, otherwise fallback
+  const activeExpressions = dbExpressions.length > 0 ? dbExpressions : expressions;
+
+  const statusCounts = dbExpressions.length > 0 ? {
+    total: activeExpressions.length,
+    pending: activeExpressions.filter((e) => e.status === 'Pending').length,
+    inDiscussion: activeExpressions.filter((e) => e.status === 'In Discussion').length,
+    committed: activeExpressions.filter((e) => e.status === 'Committed').length,
+  } : defaultStatusCounts;
+
+  const totalPipelineValue = dbExpressions.length > 0
+    ? activeExpressions.reduce((sum, e) => sum + e.amount, 0)
+    : defaultPipelineValue;
+
+  const uniqueOpportunities = Array.from(new Set(activeExpressions.map((e) => e.opportunity)));
+
+  const filtered = activeExpressions.filter((e) => {
     const currentStatus = localStatuses[e.id] || e.status;
     if (statusFilter !== 'All' && currentStatus !== statusFilter) return false;
     if (opportunityFilter !== 'All' && e.opportunity !== opportunityFilter) return false;
