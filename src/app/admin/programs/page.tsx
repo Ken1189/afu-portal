@@ -162,7 +162,7 @@ function SkeletonRow() {
 
 export default function AdminProgramsPage() {
   const [programs, setPrograms] = useState<Program[]>([]);
-  const [_loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [togglingId, setTogglingId] = useState<string | null>(null);
 
@@ -184,7 +184,7 @@ export default function AdminProgramsPage() {
       if (!res.ok) throw new Error('Failed to fetch programs');
       const data = await res.json();
       setPrograms(data.programs ?? []);
-    } catch (_err) {
+    } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
       setLoading(false);

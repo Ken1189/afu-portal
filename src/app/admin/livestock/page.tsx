@@ -89,7 +89,7 @@ export default function LivestockManagementPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all');
   const [livestockRecords, setLivestockRecords] = useState<LivestockRecord[]>(fallback_livestockRecords);
-  const [_isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const supabase = createClient();

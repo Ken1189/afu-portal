@@ -582,7 +582,7 @@ export default function AdminCompliancePage() {
   const [complianceIssues, setComplianceIssues] = useState<ComplianceIssue[]>(fallback_complianceIssues);
   const [certifications, setCertifications] = useState<Certification[]>(fallback_certifications);
   const [auditRecords, setAuditRecords] = useState<AuditRecord[]>(fallback_auditRecords);
-  const [_isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const supabase = createClient();

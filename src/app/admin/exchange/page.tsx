@@ -123,7 +123,7 @@ export default function AdminExchangePage() {
   const [tab, setTab] = useState<'listings' | 'transactions'>('listings');
   const [listings, setListings] = useState<ExchangeListing[]>(DEMO_LISTINGS);
   const [transactions, setTransactions] = useState<ExchangeTransaction[]>(DEMO_TRANSACTIONS);
-  const [_isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const supabase = createClient();

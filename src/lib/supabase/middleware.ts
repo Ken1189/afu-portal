@@ -66,7 +66,7 @@ export async function updateSession(request: NextRequest) {
   const publicExceptions = ['/farmers', '/farms', '/investors', '/investor-login'];
   const isPublicException = publicExceptions.some((p) => pathname.startsWith(p));
 
-  const protectedPaths = ['/dashboard', '/farm', '/supplier', '/admin', '/investor'];
+  const protectedPaths = ['/dashboard', '/farm', '/supplier', '/admin', '/investor', '/ambassador'];
   const isProtected = !isPublicException && protectedPaths.some((p) => pathname.startsWith(p));
 
   // If accessing a protected route without a session → redirect to login
@@ -107,6 +107,15 @@ export async function updateSession(request: NextRequest) {
   if (user && pathname.startsWith('/investor')) {
     const role = await getUserRole(user.id);
     if (!role || !['investor', 'admin', 'super_admin'].includes(role)) {
+      const forbiddenUrl = request.nextUrl.clone();
+      forbiddenUrl.pathname = '/dashboard';
+      return NextResponse.redirect(forbiddenUrl);
+    }
+  }
+
+  if (user && pathname.startsWith('/ambassador')) {
+    const role = await getUserRole(user.id);
+    if (!role || !['ambassador', 'admin', 'super_admin'].includes(role)) {
       const forbiddenUrl = request.nextUrl.clone();
       forbiddenUrl.pathname = '/dashboard';
       return NextResponse.redirect(forbiddenUrl);

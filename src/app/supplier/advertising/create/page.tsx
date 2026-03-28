@@ -12,7 +12,6 @@ import {
   Image as ImageIcon,
   LayoutTemplate,
   Target,
-  Palette,
   DollarSign,
   ClipboardCheck,
   Upload,
@@ -20,14 +19,12 @@ import {
   Star,
   Eye,
   MousePointerClick,
-  Calendar,
   Globe,
-  Users,
-  LayoutDashboard,
-  ShoppingBag,
-  Sprout,
-  GraduationCap,
   Megaphone,
+  Loader2,
+  AlertCircle,
+  Link as LinkIcon,
+  FileText,
 } from 'lucide-react';
 
 // ── Animation variants ──────────────────────────────────────────────────────
@@ -36,10 +33,7 @@ const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: {
-      staggerChildren: 0.06,
-      delayChildren: 0.1,
-    },
+    transition: { staggerChildren: 0.06, delayChildren: 0.1 },
   },
 };
 
@@ -48,11 +42,7 @@ const cardVariants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: {
-      type: 'spring' as const,
-      stiffness: 260,
-      damping: 24,
-    },
+    transition: { type: 'spring' as const, stiffness: 260, damping: 24 },
   },
 };
 
@@ -61,10 +51,7 @@ const fadeUp = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: {
-      duration: 0.5,
-      ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
-    },
+    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
   },
 };
 
@@ -87,80 +74,56 @@ const slideVariants = {
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
+interface AdPackage {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  price_cents: number;
+  max_impressions: number;
+  allowed_types: string[];
+  max_placements: number;
+  duration_days: number;
+  includes_newsletter: boolean;
+  includes_push_notification: boolean;
+  sort_order: number;
+}
+
+interface CountryTier {
+  country_code: string;
+  country_name: string;
+  tier: string;
+  banner_price_cents: number;
+  featured_price_cents: number;
+  directory_price_cents: number;
+  newsletter_price_cents: number;
+  is_active: boolean;
+}
+
 interface FormData {
-  campaignType: string;
-  placements: string[];
+  packageId: string;
   countries: string[];
-  memberTiers: string[];
   title: string;
   description: string;
-  hasImage: boolean;
-  budget: number;
-  dailyBudgetEnabled: boolean;
-  dailyBudget: number;
-  startDate: string;
-  endDate: string;
+  imageUrl: string;
+  targetUrl: string;
+  placementType: string;
 }
 
 // ── Step definitions ────────────────────────────────────────────────────────
 
 const steps = [
-  { id: 1, label: 'Campaign Type', icon: <LayoutTemplate className="w-4 h-4" /> },
-  { id: 2, label: 'Targeting', icon: <Target className="w-4 h-4" /> },
-  { id: 3, label: 'Creative', icon: <Palette className="w-4 h-4" /> },
-  { id: 4, label: 'Budget & Schedule', icon: <DollarSign className="w-4 h-4" /> },
-  { id: 5, label: 'Review', icon: <ClipboardCheck className="w-4 h-4" /> },
+  { id: 1, label: 'Choose Package', icon: <DollarSign className="w-4 h-4" /> },
+  { id: 2, label: 'Select Countries', icon: <Globe className="w-4 h-4" /> },
+  { id: 3, label: 'Upload Creative', icon: <ImageIcon className="w-4 h-4" /> },
+  { id: 4, label: 'Review & Submit', icon: <ClipboardCheck className="w-4 h-4" /> },
 ];
 
-// ── Campaign types ──────────────────────────────────────────────────────────
-
-const campaignTypes = [
-  {
-    id: 'banner',
-    label: 'Banner Ad',
-    description: 'Full-width banner displayed at the top of portal pages. High visibility, ideal for brand awareness and seasonal promotions.',
-    recommended: '$500 - $5,000',
-    icon: <LayoutTemplate className="w-6 h-6" />,
-  },
-  {
-    id: 'featured-product',
-    label: 'Featured Product',
-    description: 'Highlight a specific product in marketplace listings with a "Featured" badge. Drives product-level conversions and visibility.',
-    recommended: '$200 - $2,000',
-    icon: <Star className="w-6 h-6" />,
-  },
-  {
-    id: 'sponsored-content',
-    label: 'Sponsored Content',
-    description: 'Native content placement in training modules and resource sections. Great for educational marketing and building authority.',
-    recommended: '$300 - $3,000',
-    icon: <Megaphone className="w-6 h-6" />,
-  },
-  {
-    id: 'sidebar',
-    label: 'Sidebar Ad',
-    description: 'Compact sidebar placements across portal pages. Cost-effective with sustained visibility across browsing sessions.',
-    recommended: '$100 - $1,500',
-    icon: <ImageIcon className="w-6 h-6" />,
-  },
-];
-
-// ── Placement options ───────────────────────────────────────────────────────
-
-const placementOptions = [
-  { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" />, reach: '~3,200 daily views' },
-  { id: 'marketplace', label: 'Marketplace', icon: <ShoppingBag className="w-5 h-5" />, reach: '~5,800 daily views' },
-  { id: 'farm-portal', label: 'Farm Portal', icon: <Sprout className="w-5 h-5" />, reach: '~2,100 daily views' },
-  { id: 'training', label: 'Training', icon: <GraduationCap className="w-5 h-5" />, reach: '~1,400 daily views' },
-];
-
-const countryOptions = ['Botswana', 'Kenya', 'Mozambique', 'Nigeria', 'Sierra Leone', 'South Africa', 'Tanzania', 'Uganda', 'Zambia', 'Zimbabwe'];
-
-const tierOptions = [
-  { id: 'smallholder', label: 'Smallholder', count: 834 },
-  { id: 'commercial', label: 'Commercial', count: 287 },
-  { id: 'enterprise', label: 'Enterprise', count: 89 },
-  { id: 'partner', label: 'Partner', count: 30 },
+const placementTypes = [
+  { id: 'banner', label: 'Banner Ad', icon: <LayoutTemplate className="w-5 h-5" />, desc: 'Full-width banner on portal pages' },
+  { id: 'featured-product', label: 'Featured Product', icon: <Star className="w-5 h-5" />, desc: 'Highlighted in marketplace listings' },
+  { id: 'sponsored-content', label: 'Sponsored Content', icon: <Megaphone className="w-5 h-5" />, desc: 'Native content in training/resources' },
+  { id: 'sidebar', label: 'Sidebar Ad', icon: <ImageIcon className="w-5 h-5" />, desc: 'Compact sidebar placement' },
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -168,26 +131,91 @@ const tierOptions = [
 // ═══════════════════════════════════════════════════════════════════════════
 
 export default function CreateCampaign() {
+  const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [direction, setDirection] = useState(1);
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  // Data from API
+  const [packages, setPackages] = useState<AdPackage[]>([]);
+  const [countryTiers, setCountryTiers] = useState<CountryTier[]>([]);
+  const [loadingPackages, setLoadingPackages] = useState(true);
+  const [supplierId, setSupplierId] = useState<string | null>(null);
+
   const [formData, setFormData] = useState<FormData>({
-    campaignType: '',
-    placements: [],
-    countries: ['Botswana', 'Zimbabwe', 'Tanzania'],
-    memberTiers: ['smallholder', 'commercial', 'enterprise', 'partner'],
+    packageId: '',
+    countries: [],
     title: '',
     description: '',
-    hasImage: false,
-    budget: 1000,
-    dailyBudgetEnabled: false,
-    dailyBudget: 50,
-    startDate: '2026-04-01',
-    endDate: '2026-06-30',
+    imageUrl: '',
+    targetUrl: '',
+    placementType: 'banner',
   });
 
+  // ── Fetch packages and country tiers ────────────────────────────────────
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const res = await fetch('/api/ads/packages');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.packages) setPackages(data.packages);
+          if (data.countryTiers) setCountryTiers(data.countryTiers);
+        }
+      } catch {
+        // Will show fallback
+      }
+
+      // Also fallback to direct Supabase query
+      if (packages.length === 0) {
+        try {
+          const supabase = createClient();
+          const { data: pkgs } = await supabase
+            .from('ad_packages')
+            .select('*')
+            .eq('is_active', true)
+            .order('sort_order', { ascending: true });
+          if (pkgs && pkgs.length > 0) setPackages(pkgs);
+
+          const { data: tiers } = await supabase
+            .from('ad_country_tiers')
+            .select('*')
+            .eq('is_active', true)
+            .order('tier', { ascending: true });
+          if (tiers && tiers.length > 0) setCountryTiers(tiers);
+        } catch {
+          // Use empty arrays
+        }
+      }
+
+      setLoadingPackages(false);
+    }
+    fetchData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ── Get supplier ID ─────────────────────────────────────────────────────
+  useEffect(() => {
+    async function getSupplierId() {
+      try {
+        const supabase = createClient();
+        const { data: supplier } = await supabase
+          .from('suppliers')
+          .select('id')
+          .eq('email', user?.email ?? '')
+          .single();
+        if (supplier) setSupplierId(supplier.id);
+      } catch {
+        // Fallback
+      }
+    }
+    if (user) getSupplierId();
+  }, [user]);
+
   const goNext = () => {
-    if (currentStep < 5) {
+    if (currentStep < 4) {
       setDirection(1);
       setCurrentStep((s) => s + 1);
     }
@@ -200,74 +228,92 @@ export default function CreateCampaign() {
     }
   };
 
-  const toggleArrayItem = (field: 'placements' | 'countries' | 'memberTiers', item: string) => {
-    setFormData((prev) => {
-      const arr = prev[field];
-      return {
-        ...prev,
-        [field]: arr.includes(item) ? arr.filter((i) => i !== item) : [...arr, item],
-      };
+  const toggleCountry = (code: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      countries: prev.countries.includes(code)
+        ? prev.countries.filter((c) => c !== code)
+        : [...prev.countries, code],
+    }));
+  };
+
+  // ── Selected package ────────────────────────────────────────────────────
+  const selectedPackage = packages.find((p) => p.id === formData.packageId);
+
+  // ── Total cost calculation ──────────────────────────────────────────────
+  const calculateTotalCost = (): number => {
+    let total = 0;
+    if (selectedPackage) {
+      total += selectedPackage.price_cents;
+    }
+    // Add per-country pricing
+    formData.countries.forEach((code) => {
+      const tier = countryTiers.find((t) => t.country_code === code);
+      if (tier) {
+        if (formData.placementType === 'banner') total += tier.banner_price_cents;
+        else if (formData.placementType === 'featured-product') total += tier.featured_price_cents;
+        else total += tier.banner_price_cents; // default
+      }
     });
+    return total;
   };
 
-  const { user } = useAuth();
-  const [supplierId, setSupplierId] = useState<string | null>(null);
+  const totalCostCents = calculateTotalCost();
+  const totalCostFormatted = `$${(totalCostCents / 100).toFixed(2)}`;
 
-  // ── Get supplier ID for current user ────────────────────────────────────
-  useEffect(() => {
-    async function getSupplierId() {
-      try {
-        const supabase = createClient();
-        const { data: supplier } = await supabase
-          .from('suppliers')
-          .select('id')
-          .eq('email', user?.email ?? '')
-          .single();
-        if (supplier) setSupplierId(supplier.id);
-      } catch (_err) {
-        // Fallback: no supplier id
-      }
+  // ── Step validation ─────────────────────────────────────────────────────
+  const canProceed = (): boolean => {
+    switch (currentStep) {
+      case 1:
+        return !!formData.packageId;
+      case 2:
+        return formData.countries.length > 0;
+      case 3:
+        return !!formData.title && !!formData.placementType;
+      default:
+        return true;
     }
-    if (user) getSupplierId();
-  }, [user]);
+  };
 
+  // ── Submit ──────────────────────────────────────────────────────────────
   const handleSubmit = async () => {
-    // ── POST to Supabase if supplier is known ────────────────────────────
-    if (supplierId) {
-      try {
-        const supabase = createClient();
-        await supabase.from('advertisements').insert({
-          supplier_id: supplierId,
-          title: formData.title,
-          description: formData.description,
-          budget: formData.budget,
-          status: 'pending-review',
-          start_date: formData.startDate,
-          end_date: formData.endDate,
-          target_countries: formData.countries,
-        });
-      } catch (_err) {
-        // Silent fallback — still show success UI
+    setSubmitting(true);
+    setSubmitError(null);
+
+    try {
+      const supabase = createClient();
+
+      if (!supplierId) {
+        throw new Error('Supplier account not found. Please contact support.');
       }
+
+      const { error } = await supabase.from('advertisements').insert({
+        supplier_id: supplierId,
+        title: formData.title,
+        description: formData.description,
+        image_url: formData.imageUrl || null,
+        target_url: formData.targetUrl || null,
+        target_countries: formData.countries,
+        package_id: formData.packageId || null,
+        placement_type: formData.placementType,
+        creative_type: 'image',
+        status: 'pending',
+        budget: totalCostCents / 100,
+        spent: 0,
+        impressions: 0,
+        clicks: 0,
+      });
+
+      if (error) throw error;
+      setSubmitted(true);
+    } catch (err: any) {
+      setSubmitError(err?.message || 'Failed to submit ad. Please try again.');
+    } finally {
+      setSubmitting(false);
     }
-    setSubmitted(true);
   };
 
-  // ── Estimated reach calculation ─────────────────────────────────────────
-  const estimatedDailyReach =
-    formData.placements.reduce((sum, p) => {
-      const opt = placementOptions.find((o) => o.id === p);
-      if (!opt) return sum;
-      const num = parseInt(opt.reach.replace(/[^0-9]/g, ''));
-      return sum + num;
-    }, 0) * (formData.countries.length / 3);
-
-  const estimatedTotalImpressions = Math.round(estimatedDailyReach * 90 * 0.4);
-  const estimatedClicks = Math.round(estimatedTotalImpressions * 0.055);
-
-  // ── Campaign type label ─────────────────────────────────────────────────
-  const selectedType = campaignTypes.find((t) => t.id === formData.campaignType);
-
+  // ── Success state ───────────────────────────────────────────────────────
   if (submitted) {
     return (
       <motion.div
@@ -288,10 +334,10 @@ export default function CreateCampaign() {
           >
             <Check className="w-8 h-8 text-[#8CB89C]" />
           </motion.div>
-          <h2 className="text-xl font-bold text-[#1B2A4A] mb-2">Campaign Submitted!</h2>
+          <h2 className="text-xl font-bold text-[#1B2A4A] mb-2">Ad Submitted for Review!</h2>
           <p className="text-sm text-gray-500 mb-6">
-            Your campaign &ldquo;{formData.title || 'Untitled'}&rdquo; has been submitted for review.
-            Our team will review and approve it within 24 hours.
+            Your ad &ldquo;{formData.title || 'Untitled'}&rdquo; has been submitted.
+            Our team will review and approve it within 24 hours. You&apos;ll receive a notification once it&apos;s live.
           </p>
           <div className="flex items-center gap-3 justify-center">
             <Link
@@ -305,18 +351,13 @@ export default function CreateCampaign() {
                 setSubmitted(false);
                 setCurrentStep(1);
                 setFormData({
-                  campaignType: '',
-                  placements: [],
-                  countries: ['Botswana', 'Zimbabwe', 'Tanzania'],
-                  memberTiers: ['smallholder', 'commercial', 'enterprise', 'partner'],
+                  packageId: '',
+                  countries: [],
                   title: '',
                   description: '',
-                  hasImage: false,
-                  budget: 1000,
-                  dailyBudgetEnabled: false,
-                  dailyBudget: 50,
-                  startDate: '2026-04-01',
-                  endDate: '2026-06-30',
+                  imageUrl: '',
+                  targetUrl: '',
+                  placementType: 'banner',
                 });
               }}
               className="px-5 py-2.5 rounded-lg text-sm font-medium border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
@@ -336,25 +377,18 @@ export default function CreateCampaign() {
       animate="visible"
       className="space-y-6 max-w-4xl mx-auto"
     >
-      {/* ══════════════════════════════════════════════════════════════════
-          HEADER
-      ═════════════════════════════════════════════════════════════════ */}
+      {/* HEADER */}
       <motion.div variants={fadeUp} className="flex items-center gap-3">
-        <Link
-          href="/supplier/advertising"
-          className="p-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-500"
-        >
+        <Link href="/supplier/advertising" className="p-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-500">
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <div>
-          <h1 className="text-2xl font-bold text-[#1B2A4A]">Create Campaign</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Set up a new advertising campaign in 5 simple steps</p>
+          <h1 className="text-2xl font-bold text-[#1B2A4A]">Create New Ad</h1>
+          <p className="text-sm text-gray-500 mt-0.5">Set up a new advertisement in 4 simple steps</p>
         </div>
       </motion.div>
 
-      {/* ══════════════════════════════════════════════════════════════════
-          STEP INDICATOR
-      ═════════════════════════════════════════════════════════════════ */}
+      {/* STEP INDICATOR */}
       <motion.div variants={cardVariants} className="bg-white rounded-xl border border-gray-100 p-5">
         <div className="flex items-center justify-between">
           {steps.map((step, i) => (
@@ -362,29 +396,15 @@ export default function CreateCampaign() {
               <div className="flex flex-col items-center flex-shrink-0">
                 <motion.div
                   animate={{
-                    backgroundColor:
-                      currentStep > step.id
-                        ? '#8CB89C'
-                        : currentStep === step.id
-                          ? '#8CB89C'
-                          : '#E5E7EB',
-                    color:
-                      currentStep >= step.id ? '#FFFFFF' : '#9CA3AF',
+                    backgroundColor: currentStep > step.id ? '#8CB89C' : currentStep === step.id ? '#8CB89C' : '#E5E7EB',
+                    color: currentStep >= step.id ? '#FFFFFF' : '#9CA3AF',
                   }}
                   transition={{ duration: 0.3 }}
                   className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold"
                 >
-                  {currentStep > step.id ? (
-                    <Check className="w-4 h-4" />
-                  ) : (
-                    step.id
-                  )}
+                  {currentStep > step.id ? <Check className="w-4 h-4" /> : step.id}
                 </motion.div>
-                <span
-                  className={`text-[10px] mt-1.5 font-medium text-center hidden sm:block ${
-                    currentStep >= step.id ? 'text-[#8CB89C]' : 'text-gray-400'
-                  }`}
-                >
+                <span className={`text-[10px] mt-1.5 font-medium text-center hidden sm:block ${currentStep >= step.id ? 'text-[#8CB89C]' : 'text-gray-400'}`}>
                   {step.label}
                 </span>
               </div>
@@ -392,9 +412,7 @@ export default function CreateCampaign() {
                 <div className="flex-1 h-0.5 mx-2 mt-[-18px] sm:mt-[-6px]">
                   <motion.div
                     className="h-full rounded-full"
-                    animate={{
-                      backgroundColor: currentStep > step.id ? '#8CB89C' : '#E5E7EB',
-                    }}
+                    animate={{ backgroundColor: currentStep > step.id ? '#8CB89C' : '#E5E7EB' }}
                     transition={{ duration: 0.3 }}
                   />
                 </div>
@@ -404,12 +422,10 @@ export default function CreateCampaign() {
         </div>
       </motion.div>
 
-      {/* ══════════════════════════════════════════════════════════════════
-          STEP CONTENT
-      ═════════════════════════════════════════════════════════════════ */}
+      {/* STEP CONTENT */}
       <div className="relative overflow-hidden min-h-[420px]">
         <AnimatePresence mode="wait" custom={direction}>
-          {/* ── STEP 1: Campaign Type ──────────────────────────────────── */}
+          {/* ── STEP 1: Choose Package ──────────────────────────────────── */}
           {currentStep === 1 && (
             <motion.div
               key="step1"
@@ -420,55 +436,79 @@ export default function CreateCampaign() {
               exit="exit"
               className="space-y-4"
             >
-              <h2 className="text-lg font-semibold text-[#1B2A4A]">Choose Campaign Type</h2>
-              <p className="text-sm text-gray-500">Select the type of advertisement you want to create.</p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {campaignTypes.map((type) => (
-                  <motion.button
-                    key={type.id}
-                    whileHover={{ y: -2 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => setFormData((prev) => ({ ...prev, campaignType: type.id }))}
-                    className={`text-left p-5 rounded-xl border-2 transition-all ${
-                      formData.campaignType === type.id
-                        ? 'border-[#8CB89C] bg-[#8CB89C]/5 shadow-sm'
-                        : 'border-gray-100 bg-white hover:border-gray-200'
-                    }`}
-                  >
-                    <div className="flex items-start gap-3">
-                      <div
-                        className={`w-11 h-11 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                          formData.campaignType === type.id
-                            ? 'bg-[#8CB89C]/10 text-[#8CB89C]'
-                            : 'bg-gray-100 text-gray-500'
-                        }`}
-                      >
-                        {type.icon}
+              <h2 className="text-lg font-semibold text-[#1B2A4A]">Choose an Ad Package</h2>
+              <p className="text-sm text-gray-500">Select the package that best fits your advertising goals and budget.</p>
+
+              {loadingPackages ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="w-6 h-6 text-[#8CB89C] animate-spin" />
+                </div>
+              ) : packages.length === 0 ? (
+                <div className="bg-gray-50 rounded-xl p-8 text-center">
+                  <p className="text-sm text-gray-500">No ad packages available at this time. Please check back later.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {packages.map((pkg) => (
+                    <motion.button
+                      key={pkg.id}
+                      whileHover={{ y: -2 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => setFormData((prev) => ({ ...prev, packageId: pkg.id }))}
+                      className={`relative text-left p-5 rounded-xl border-2 transition-all ${
+                        formData.packageId === pkg.id
+                          ? 'border-[#8CB89C] bg-[#8CB89C]/5 shadow-sm'
+                          : 'border-gray-100 bg-white hover:border-gray-200'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between mb-3">
+                        <h3 className="font-semibold text-[#1B2A4A]">{pkg.name}</h3>
+                        <span className="text-lg font-bold text-[#D4A843]">
+                          ${(pkg.price_cents / 100).toFixed(0)}
+                        </span>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-[#1B2A4A] text-sm">{type.label}</h3>
-                        <p className="text-xs text-gray-500 mt-1 leading-relaxed">{type.description}</p>
-                        <p className="text-xs font-medium text-[#D4A843] mt-2">
-                          Recommended: {type.recommended}
-                        </p>
+                      <p className="text-xs text-gray-500 mb-3">{pkg.description || 'Standard advertising package'}</p>
+                      <div className="space-y-1 text-xs text-gray-400">
+                        <div className="flex items-center gap-1.5">
+                          <Eye className="w-3 h-3" />
+                          Up to {pkg.max_impressions.toLocaleString()} impressions
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <Target className="w-3 h-3" />
+                          {pkg.duration_days} days duration
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <LayoutTemplate className="w-3 h-3" />
+                          {pkg.max_placements} placement{pkg.max_placements > 1 ? 's' : ''}
+                        </div>
+                        {pkg.includes_newsletter && (
+                          <div className="flex items-center gap-1.5 text-[#8CB89C]">
+                            <Check className="w-3 h-3" /> Newsletter inclusion
+                          </div>
+                        )}
+                        {pkg.includes_push_notification && (
+                          <div className="flex items-center gap-1.5 text-[#8CB89C]">
+                            <Check className="w-3 h-3" /> Push notifications
+                          </div>
+                        )}
                       </div>
-                    </div>
-                    {formData.campaignType === type.id && (
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        className="absolute top-3 right-3 w-5 h-5 rounded-full bg-[#8CB89C] flex items-center justify-center"
-                      >
-                        <Check className="w-3 h-3 text-white" />
-                      </motion.div>
-                    )}
-                  </motion.button>
-                ))}
-              </div>
+                      {formData.packageId === pkg.id && (
+                        <motion.div
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          className="absolute top-3 right-3 w-5 h-5 rounded-full bg-[#8CB89C] flex items-center justify-center"
+                        >
+                          <Check className="w-3 h-3 text-white" />
+                        </motion.div>
+                      )}
+                    </motion.button>
+                  ))}
+                </div>
+              )}
             </motion.div>
           )}
 
-          {/* ── STEP 2: Targeting ──────────────────────────────────────── */}
+          {/* ── STEP 2: Select Countries ───────────────────────────────── */}
           {currentStep === 2 && (
             <motion.div
               key="step2"
@@ -477,104 +517,87 @@ export default function CreateCampaign() {
               initial="enter"
               animate="center"
               exit="exit"
-              className="space-y-6"
+              className="space-y-4"
             >
-              <h2 className="text-lg font-semibold text-[#1B2A4A]">Targeting Options</h2>
+              <h2 className="text-lg font-semibold text-[#1B2A4A]">Select Target Countries</h2>
+              <p className="text-sm text-gray-500">Choose which countries to show your ad in. Pricing varies by market.</p>
 
-              {/* Placement */}
-              <div className="bg-white rounded-xl border border-gray-100 p-5">
-                <h3 className="font-medium text-[#1B2A4A] text-sm mb-3 flex items-center gap-2">
-                  <LayoutDashboard className="w-4 h-4 text-[#8CB89C]" />
-                  Placement
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {placementOptions.map((opt) => (
-                    <label
-                      key={opt.id}
-                      className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
-                        formData.placements.includes(opt.id)
-                          ? 'border-[#8CB89C] bg-[#8CB89C]/5'
-                          : 'border-gray-100 hover:border-gray-200'
-                      }`}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={formData.placements.includes(opt.id)}
-                        onChange={() => toggleArrayItem('placements', opt.id)}
-                        className="w-4 h-4 rounded border-gray-300 text-[#8CB89C] focus:ring-[#8CB89C]"
-                      />
-                      <div className={`${formData.placements.includes(opt.id) ? 'text-[#8CB89C]' : 'text-gray-400'}`}>
-                        {opt.icon}
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-[#1B2A4A]">{opt.label}</p>
-                        <p className="text-[10px] text-gray-400">{opt.reach}</p>
-                      </div>
-                    </label>
-                  ))}
-                </div>
-              </div>
+              {/* Tier groups */}
+              {['tier_1', 'tier_2', 'tier_3'].map((tier) => {
+                const tierCountries = countryTiers.filter((c) => c.tier === tier);
+                if (tierCountries.length === 0) return null;
+                const tierLabel = tier === 'tier_1' ? 'Tier 1 — Large Markets' : tier === 'tier_2' ? 'Tier 2 — Medium Markets' : 'Tier 3 — Emerging Markets';
+                return (
+                  <div key={tier} className="bg-white rounded-xl border border-gray-100 p-5">
+                    <h3 className="font-medium text-[#1B2A4A] text-sm mb-3 flex items-center gap-2">
+                      <Globe className="w-4 h-4 text-[#8CB89C]" />
+                      {tierLabel}
+                    </h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {tierCountries.map((country) => {
+                        const price = formData.placementType === 'featured-product'
+                          ? country.featured_price_cents
+                          : country.banner_price_cents;
+                        return (
+                          <label
+                            key={country.country_code}
+                            className={`flex items-center justify-between gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
+                              formData.countries.includes(country.country_code)
+                                ? 'border-[#8CB89C] bg-[#8CB89C]/5'
+                                : 'border-gray-100 hover:border-gray-200'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="checkbox"
+                                checked={formData.countries.includes(country.country_code)}
+                                onChange={() => toggleCountry(country.country_code)}
+                                className="w-4 h-4 rounded border-gray-300 text-[#8CB89C] focus:ring-[#8CB89C]"
+                              />
+                              <div>
+                                <span className="text-sm font-medium text-[#1B2A4A]">{country.country_name}</span>
+                                <span className="text-xs text-gray-400 ml-1">({country.country_code})</span>
+                              </div>
+                            </div>
+                            <span className="text-xs font-medium text-[#D4A843]">
+                              +${(price / 100).toFixed(0)}
+                            </span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
 
-              {/* Country targeting */}
-              <div className="bg-white rounded-xl border border-gray-100 p-5">
-                <h3 className="font-medium text-[#1B2A4A] text-sm mb-3 flex items-center gap-2">
-                  <Globe className="w-4 h-4 text-[#8CB89C]" />
-                  Country Targeting
-                </h3>
-                <div className="flex flex-wrap gap-3">
-                  {countryOptions.map((country) => (
-                    <label
-                      key={country}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-lg border cursor-pointer transition-all ${
-                        formData.countries.includes(country)
-                          ? 'border-[#8CB89C] bg-[#8CB89C]/5'
-                          : 'border-gray-100 hover:border-gray-200'
-                      }`}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={formData.countries.includes(country)}
-                        onChange={() => toggleArrayItem('countries', country)}
-                        className="w-4 h-4 rounded border-gray-300 text-[#8CB89C] focus:ring-[#8CB89C]"
-                      />
-                      <span className="text-sm text-[#1B2A4A]">{country}</span>
-                    </label>
-                  ))}
+              {countryTiers.length === 0 && (
+                <div className="bg-gray-50 rounded-xl p-8 text-center">
+                  <p className="text-sm text-gray-500">Country pricing information not available. Your ad will target all countries by default.</p>
                 </div>
-              </div>
+              )}
 
-              {/* Member tier targeting */}
-              <div className="bg-white rounded-xl border border-gray-100 p-5">
-                <h3 className="font-medium text-[#1B2A4A] text-sm mb-3 flex items-center gap-2">
-                  <Users className="w-4 h-4 text-[#8CB89C]" />
-                  Member Tier Targeting
-                </h3>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  {tierOptions.map((tier) => (
-                    <label
-                      key={tier.id}
-                      className={`flex flex-col items-center p-3 rounded-lg border cursor-pointer transition-all text-center ${
-                        formData.memberTiers.includes(tier.id)
-                          ? 'border-[#8CB89C] bg-[#8CB89C]/5'
-                          : 'border-gray-100 hover:border-gray-200'
-                      }`}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={formData.memberTiers.includes(tier.id)}
-                        onChange={() => toggleArrayItem('memberTiers', tier.id)}
-                        className="w-4 h-4 rounded border-gray-300 text-[#8CB89C] focus:ring-[#8CB89C] mb-2"
-                      />
-                      <span className="text-sm font-medium text-[#1B2A4A]">{tier.label}</span>
-                      <span className="text-[10px] text-gray-400">{tier.count.toLocaleString()} members</span>
-                    </label>
-                  ))}
+              {/* Selected summary */}
+              {formData.countries.length > 0 && (
+                <div className="bg-[#8CB89C]/5 border border-[#8CB89C]/20 rounded-xl p-4">
+                  <p className="text-sm text-[#1B2A4A] font-medium">
+                    {formData.countries.length} countries selected
+                  </p>
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {formData.countries.map((code) => {
+                      const c = countryTiers.find((t) => t.country_code === code);
+                      return (
+                        <span key={code} className="text-[10px] px-2 py-0.5 rounded-full bg-[#8CB89C]/10 text-[#8CB89C] font-medium">
+                          {c?.country_name || code}
+                        </span>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
+              )}
             </motion.div>
           )}
 
-          {/* ── STEP 3: Creative ──────────────────────────────────────── */}
+          {/* ── STEP 3: Upload Creative ────────────────────────────────── */}
           {currentStep === 3 && (
             <motion.div
               key="step3"
@@ -585,12 +608,36 @@ export default function CreateCampaign() {
               exit="exit"
               className="space-y-6"
             >
-              <h2 className="text-lg font-semibold text-[#1B2A4A]">Campaign Creative</h2>
+              <h2 className="text-lg font-semibold text-[#1B2A4A]">Ad Creative</h2>
 
               <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-5">
+                {/* Placement type */}
+                <div>
+                  <label className="block text-sm font-medium text-[#1B2A4A] mb-2">Placement Type</label>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    {placementTypes.map((pt) => (
+                      <button
+                        key={pt.id}
+                        onClick={() => setFormData((prev) => ({ ...prev, placementType: pt.id }))}
+                        className={`text-left p-3 rounded-lg border-2 transition-all ${
+                          formData.placementType === pt.id
+                            ? 'border-[#8CB89C] bg-[#8CB89C]/5'
+                            : 'border-gray-100 hover:border-gray-200'
+                        }`}
+                      >
+                        <div className={`mb-2 ${formData.placementType === pt.id ? 'text-[#8CB89C]' : 'text-gray-400'}`}>
+                          {pt.icon}
+                        </div>
+                        <p className="text-xs font-medium text-[#1B2A4A]">{pt.label}</p>
+                        <p className="text-[10px] text-gray-400 mt-0.5">{pt.desc}</p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 {/* Title */}
                 <div>
-                  <label className="block text-sm font-medium text-[#1B2A4A] mb-1.5">Campaign Title</label>
+                  <label className="block text-sm font-medium text-[#1B2A4A] mb-1.5">Ad Title *</label>
                   <input
                     type="text"
                     value={formData.title}
@@ -606,49 +653,41 @@ export default function CreateCampaign() {
                   <textarea
                     value={formData.description}
                     onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
-                    placeholder="Describe your campaign offer, product, or message..."
-                    rows={4}
+                    placeholder="Describe your offer, product, or message..."
+                    rows={3}
                     className="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm text-[#1B2A4A] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition-all resize-none"
                   />
                 </div>
 
-                {/* Image upload area */}
+                {/* Image URL */}
                 <div>
-                  <label className="block text-sm font-medium text-[#1B2A4A] mb-1.5">Campaign Image</label>
-                  {!formData.hasImage ? (
-                    <button
-                      onClick={() => setFormData((prev) => ({ ...prev, hasImage: true }))}
-                      className="w-full border-2 border-dashed border-gray-200 rounded-xl p-8 flex flex-col items-center gap-3 hover:border-[#8CB89C]/40 hover:bg-[#8CB89C]/5 transition-all cursor-pointer group"
-                    >
-                      <div className="w-12 h-12 rounded-full bg-gray-100 group-hover:bg-[#8CB89C]/10 flex items-center justify-center transition-colors">
-                        <Upload className="w-5 h-5 text-gray-400 group-hover:text-[#8CB89C] transition-colors" />
-                      </div>
-                      <div className="text-center">
-                        <p className="text-sm font-medium text-gray-600">
-                          Drag & drop your image here or <span className="text-[#8CB89C]">browse</span>
-                        </p>
-                        <p className="text-xs text-gray-400 mt-1">PNG, JPG up to 2MB. Recommended: 800x400px</p>
-                      </div>
-                    </button>
-                  ) : (
-                    <div className="relative border border-gray-200 rounded-xl p-4 bg-gray-50">
-                      <div className="flex items-center gap-3">
-                        <div className="w-16 h-10 bg-[#8CB89C]/20 rounded-lg flex items-center justify-center">
-                          <ImageIcon className="w-5 h-5 text-[#8CB89C]" />
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-[#1B2A4A]">campaign-banner.jpg</p>
-                          <p className="text-xs text-gray-400">800 x 400px &bull; 342 KB</p>
-                        </div>
-                        <button
-                          onClick={() => setFormData((prev) => ({ ...prev, hasImage: false }))}
-                          className="p-1.5 rounded-lg hover:bg-gray-200 transition-colors"
-                        >
-                          <X className="w-4 h-4 text-gray-400" />
-                        </button>
-                      </div>
-                    </div>
-                  )}
+                  <label className="block text-sm font-medium text-[#1B2A4A] mb-1.5">
+                    <ImageIcon className="w-4 h-4 inline mr-1" />
+                    Image URL
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.imageUrl}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, imageUrl: e.target.value }))}
+                    placeholder="https://example.com/your-ad-image.jpg"
+                    className="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm text-[#1B2A4A] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition-all"
+                  />
+                  <p className="text-xs text-gray-400 mt-1">Recommended: 800x400px, PNG or JPG</p>
+                </div>
+
+                {/* Target URL */}
+                <div>
+                  <label className="block text-sm font-medium text-[#1B2A4A] mb-1.5">
+                    <LinkIcon className="w-4 h-4 inline mr-1" />
+                    Target URL *
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.targetUrl}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, targetUrl: e.target.value }))}
+                    placeholder="https://your-website.com/landing-page"
+                    className="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm text-[#1B2A4A] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition-all"
+                  />
                 </div>
               </div>
 
@@ -662,9 +701,18 @@ export default function CreateCampaign() {
                   <div className="rounded-lg border border-gray-200 overflow-hidden">
                     <div className="bg-gradient-to-r from-[#8CB89C]/10 to-[#1B2A4A]/5 p-6">
                       <div className="flex items-start gap-4">
-                        <div className="w-24 h-16 bg-[#8CB89C]/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <ImageIcon className="w-6 h-6 text-[#8CB89C]" />
-                        </div>
+                        {formData.imageUrl ? (
+                          <img
+                            src={formData.imageUrl}
+                            alt="Ad preview"
+                            className="w-24 h-16 object-cover rounded-lg flex-shrink-0"
+                            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                          />
+                        ) : (
+                          <div className="w-24 h-16 bg-[#8CB89C]/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <ImageIcon className="w-6 h-6 text-[#8CB89C]" />
+                          </div>
+                        )}
                         <div>
                           <span className="inline-block text-[9px] px-2 py-0.5 rounded-full bg-[#D4A843]/20 text-[#D4A843] font-semibold uppercase tracking-wider mb-1">
                             Sponsored
@@ -682,7 +730,7 @@ export default function CreateCampaign() {
             </motion.div>
           )}
 
-          {/* ── STEP 4: Budget & Schedule ──────────────────────────────── */}
+          {/* ── STEP 4: Review & Submit ─────────────────────────────────── */}
           {currentStep === 4 && (
             <motion.div
               key="step4"
@@ -693,235 +741,101 @@ export default function CreateCampaign() {
               exit="exit"
               className="space-y-6"
             >
-              <h2 className="text-lg font-semibold text-[#1B2A4A]">Budget & Schedule</h2>
-
-              {/* Budget */}
-              <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-4">
-                <h3 className="font-medium text-[#1B2A4A] text-sm flex items-center gap-2">
-                  <DollarSign className="w-4 h-4 text-[#8CB89C]" />
-                  Total Budget
-                </h3>
-                <div className="flex items-center gap-4">
-                  <span className="text-3xl font-bold text-[#1B2A4A] tabular-nums">
-                    ${formData.budget.toLocaleString()}
-                  </span>
-                </div>
-                <input
-                  type="range"
-                  min={100}
-                  max={10000}
-                  step={100}
-                  value={formData.budget}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, budget: parseInt(e.target.value) }))}
-                  className="w-full h-2 rounded-full appearance-none cursor-pointer"
-                  style={{
-                    background: `linear-gradient(to right, #8CB89C ${((formData.budget - 100) / 9900) * 100}%, #E5E7EB ${((formData.budget - 100) / 9900) * 100}%)`,
-                  }}
-                />
-                <div className="flex justify-between text-xs text-gray-400">
-                  <span>$100</span>
-                  <span>$10,000</span>
-                </div>
-              </div>
-
-              {/* Schedule */}
-              <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-4">
-                <h3 className="font-medium text-[#1B2A4A] text-sm flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-[#8CB89C]" />
-                  Schedule
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs text-gray-500 mb-1">Start Date</label>
-                    <input
-                      type="date"
-                      value={formData.startDate}
-                      onChange={(e) => setFormData((prev) => ({ ...prev, startDate: e.target.value }))}
-                      className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm text-[#1B2A4A] focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C]"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-500 mb-1">End Date</label>
-                    <input
-                      type="date"
-                      value={formData.endDate}
-                      onChange={(e) => setFormData((prev) => ({ ...prev, endDate: e.target.value }))}
-                      className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm text-[#1B2A4A] focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C]"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Daily budget toggle */}
-              <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-medium text-[#1B2A4A] text-sm">Daily Budget Limit</h3>
-                  <button
-                    onClick={() =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        dailyBudgetEnabled: !prev.dailyBudgetEnabled,
-                      }))
-                    }
-                    className={`relative w-11 h-6 rounded-full transition-colors ${
-                      formData.dailyBudgetEnabled ? 'bg-[#8CB89C]' : 'bg-gray-200'
-                    }`}
-                  >
-                    <motion.div
-                      animate={{ x: formData.dailyBudgetEnabled ? 20 : 2 }}
-                      transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                      className="absolute top-1 w-4 h-4 rounded-full bg-white shadow-sm"
-                    />
-                  </button>
-                </div>
-                {formData.dailyBudgetEnabled && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    className="space-y-2"
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="text-sm text-gray-600">Max</span>
-                      <input
-                        type="number"
-                        value={formData.dailyBudget}
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            dailyBudget: parseInt(e.target.value) || 0,
-                          }))
-                        }
-                        className="w-28 px-3 py-2 rounded-lg border border-gray-200 text-sm text-[#1B2A4A] focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C]"
-                      />
-                      <span className="text-sm text-gray-600">per day</span>
-                    </div>
-                    <p className="text-xs text-gray-400">
-                      Campaign will pause automatically when the daily limit is reached.
-                    </p>
-                  </motion.div>
-                )}
-              </div>
-            </motion.div>
-          )}
-
-          {/* ── STEP 5: Review ─────────────────────────────────────────── */}
-          {currentStep === 5 && (
-            <motion.div
-              key="step5"
-              custom={direction}
-              variants={slideVariants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              className="space-y-6"
-            >
-              <h2 className="text-lg font-semibold text-[#1B2A4A]">Review Your Campaign</h2>
+              <h2 className="text-lg font-semibold text-[#1B2A4A]">Review & Submit</h2>
 
               <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-5">
-                {/* Summary rows */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-3">
                     <div>
-                      <p className="text-xs text-gray-500">Campaign Type</p>
+                      <p className="text-xs text-gray-500">Package</p>
                       <p className="text-sm font-medium text-[#1B2A4A]">
-                        {selectedType?.label || 'Not selected'}
+                        {selectedPackage?.name || 'Not selected'}
+                        {selectedPackage && <span className="text-[#D4A843] ml-1">(${(selectedPackage.price_cents / 100).toFixed(0)})</span>}
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500">Campaign Title</p>
+                      <p className="text-xs text-gray-500">Ad Title</p>
                       <p className="text-sm font-medium text-[#1B2A4A]">{formData.title || 'Untitled'}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500">Placements</p>
-                      <div className="flex flex-wrap gap-1 mt-1">
-                        {formData.placements.length > 0 ? (
-                          formData.placements.map((p) => (
-                            <span
-                              key={p}
-                              className="text-[10px] px-2 py-0.5 rounded-full bg-[#8CB89C]/10 text-[#8CB89C] font-medium"
-                            >
-                              {placementOptions.find((o) => o.id === p)?.label || p}
-                            </span>
-                          ))
-                        ) : (
-                          <span className="text-xs text-gray-400">No placements selected</span>
-                        )}
-                      </div>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500">Countries</p>
-                      <p className="text-sm text-[#1B2A4A]">{formData.countries.join(', ') || 'None'}</p>
+                      <p className="text-xs text-gray-500">Placement Type</p>
+                      <p className="text-sm text-[#1B2A4A]">
+                        {placementTypes.find((t) => t.id === formData.placementType)?.label || formData.placementType}
+                      </p>
                     </div>
                   </div>
                   <div className="space-y-3">
                     <div>
-                      <p className="text-xs text-gray-500">Member Tiers</p>
-                      <p className="text-sm text-[#1B2A4A]">
-                        {formData.memberTiers
-                          .map((t) => tierOptions.find((o) => o.id === t)?.label || t)
-                          .join(', ') || 'None'}
-                      </p>
+                      <p className="text-xs text-gray-500">Target Countries ({formData.countries.length})</p>
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {formData.countries.length > 0 ? (
+                          formData.countries.map((code) => {
+                            const c = countryTiers.find((t) => t.country_code === code);
+                            return (
+                              <span key={code} className="text-[10px] px-2 py-0.5 rounded-full bg-[#8CB89C]/10 text-[#8CB89C] font-medium">
+                                {c?.country_name || code}
+                              </span>
+                            );
+                          })
+                        ) : (
+                          <span className="text-xs text-gray-400">None selected</span>
+                        )}
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-xs text-gray-500">Total Budget</p>
-                      <p className="text-sm font-semibold text-[#1B2A4A]">${formData.budget.toLocaleString()}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500">Schedule</p>
-                      <p className="text-sm text-[#1B2A4A]">
-                        {formData.startDate} to {formData.endDate}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500">Daily Budget</p>
-                      <p className="text-sm text-[#1B2A4A]">
-                        {formData.dailyBudgetEnabled ? `$${formData.dailyBudget}/day` : 'No limit'}
-                      </p>
-                    </div>
+                    {formData.description && (
+                      <div>
+                        <p className="text-xs text-gray-500">Description</p>
+                        <p className="text-sm text-gray-600 line-clamp-2">{formData.description}</p>
+                      </div>
+                    )}
+                    {formData.targetUrl && (
+                      <div>
+                        <p className="text-xs text-gray-500">Target URL</p>
+                        <p className="text-sm text-blue-600 truncate">{formData.targetUrl}</p>
+                      </div>
+                    )}
                   </div>
                 </div>
 
-                {/* Estimated reach */}
+                {/* Total cost */}
                 <div className="border-t border-gray-100 pt-4">
-                  <h3 className="text-sm font-medium text-[#1B2A4A] mb-3">Estimated Performance</h3>
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="bg-[#8CB89C]/5 rounded-lg p-3 text-center">
-                      <Eye className="w-4 h-4 text-[#8CB89C] mx-auto mb-1" />
-                      <p className="text-lg font-bold text-[#1B2A4A] tabular-nums">
-                        {estimatedTotalImpressions > 0 ? `${(estimatedTotalImpressions / 1000).toFixed(0)}K` : '--'}
-                      </p>
-                      <p className="text-[10px] text-gray-500">Est. Impressions</p>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-[#1B2A4A]">Total Cost</p>
+                      <p className="text-xs text-gray-400">Package + country targeting fees</p>
                     </div>
-                    <div className="bg-[#D4A843]/5 rounded-lg p-3 text-center">
-                      <MousePointerClick className="w-4 h-4 text-[#D4A843] mx-auto mb-1" />
-                      <p className="text-lg font-bold text-[#1B2A4A] tabular-nums">
-                        {estimatedClicks > 0 ? `${(estimatedClicks / 1000).toFixed(1)}K` : '--'}
-                      </p>
-                      <p className="text-[10px] text-gray-500">Est. Clicks</p>
-                    </div>
-                    <div className="bg-blue-50 rounded-lg p-3 text-center">
-                      <Users className="w-4 h-4 text-blue-600 mx-auto mb-1" />
-                      <p className="text-lg font-bold text-[#1B2A4A] tabular-nums">
-                        {estimatedDailyReach > 0 ? `${(estimatedDailyReach / 1000).toFixed(1)}K` : '--'}
-                      </p>
-                      <p className="text-[10px] text-gray-500">Daily Reach</p>
-                    </div>
+                    <p className="text-2xl font-bold text-[#D4A843]">{totalCostFormatted}</p>
                   </div>
                 </div>
+              </div>
+
+              {/* Submit error */}
+              {submitError && (
+                <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3">
+                  <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+                  <p className="text-sm text-red-700">{submitError}</p>
+                </div>
+              )}
+
+              {/* Notice */}
+              <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
+                <p className="text-xs text-blue-700">
+                  <FileText className="w-3.5 h-3.5 inline mr-1" />
+                  Your ad will be reviewed by our team before going live. Typical review time is within 24 hours.
+                  You will be notified when your ad is approved or if changes are needed.
+                </p>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
-      {/* ══════════════════════════════════════════════════════════════════
-          NAVIGATION BUTTONS
-      ═════════════════════════════════════════════════════════════════ */}
-      <motion.div variants={fadeUp} className="flex items-center justify-between pt-2">
+      {/* NAVIGATION BUTTONS */}
+      <motion.div variants={cardVariants} className="flex items-center justify-between bg-white rounded-xl border border-gray-100 p-4">
         <button
           onClick={goBack}
           disabled={currentStep === 1}
-          className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+          className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
             currentStep === 1
               ? 'text-gray-300 cursor-not-allowed'
               : 'text-gray-600 hover:bg-gray-100'
@@ -931,10 +845,19 @@ export default function CreateCampaign() {
           Back
         </button>
 
-        {currentStep < 5 ? (
+        <div className="text-xs text-gray-400">
+          Step {currentStep} of {steps.length}
+        </div>
+
+        {currentStep < 4 ? (
           <button
             onClick={goNext}
-            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-medium bg-[#8CB89C] text-white hover:bg-[#729E82] transition-colors"
+            disabled={!canProceed()}
+            className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all ${
+              canProceed()
+                ? 'bg-[#8CB89C] text-white hover:bg-[#729E82] shadow-sm'
+                : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+            }`}
           >
             Next
             <ArrowRight className="w-4 h-4" />
@@ -942,11 +865,25 @@ export default function CreateCampaign() {
         ) : (
           <button
             onClick={handleSubmit}
-            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-medium text-white transition-all hover:shadow-lg"
-            style={{ background: 'linear-gradient(135deg, #D4A843 0%, #B8912E 100%)' }}
+            disabled={submitting || !formData.title}
+            className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-medium transition-all ${
+              submitting || !formData.title
+                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                : 'text-white shadow-sm hover:shadow-md'
+            }`}
+            style={!submitting && formData.title ? { background: 'linear-gradient(135deg, #D4A843 0%, #B8912E 100%)' } : {}}
           >
-            <ClipboardCheck className="w-4 h-4" />
-            Submit for Review
+            {submitting ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Submitting...
+              </>
+            ) : (
+              <>
+                <Check className="w-4 h-4" />
+                Submit Ad for Review
+              </>
+            )}
           </button>
         )}
       </motion.div>

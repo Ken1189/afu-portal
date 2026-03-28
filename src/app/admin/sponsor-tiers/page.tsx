@@ -77,7 +77,7 @@ function Toast({ message, type, onClose }: { message: string; type: 'success' | 
 
 export default function SponsorTiersAdmin() {
   const [tiers, setTiers] = useState<SponsorTier[]>([]);
-  const [_loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);

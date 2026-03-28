@@ -64,7 +64,7 @@ const statusBadge: Record<string, string> = {
 
 export default function AdminTradeFinancePage() {
   const [loans, setLoans] = useState<LoanRow[]>([]);
-  const [_loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   const [filters, setFilters] = useState<FilterValues>({

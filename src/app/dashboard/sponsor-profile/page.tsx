@@ -150,7 +150,7 @@ const inputCls =
 export default function SponsorProfilePage() {
   const { user, profile } = useAuth();
   const [farmerProfile, setFarmerProfile] = useState<FarmerProfile | null>(null);
-  const [_loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [copied, setCopied] = useState(false);
   const [showWizard, setShowWizard] = useState(false);
@@ -296,7 +296,7 @@ export default function SponsorProfilePage() {
         setShowWizard(false);
       }
       if (error) console.error('Sponsor profile save error:', error);
-    } catch (_err) {
+    } catch (err) {
       console.error('Sponsor profile save exception:', err);
     } finally {
       setSaving(false);

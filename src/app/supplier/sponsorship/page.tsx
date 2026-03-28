@@ -399,7 +399,7 @@ function CustomTooltip({
 export default function SponsorshipProgram() {
   const { user } = useAuth();
   const [liveSupplier, setLiveSupplier] = useState(currentSupplier);
-  const [_loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   // ── Fetch supplier data from Supabase ───────────────────────────────────
   useEffect(() => {
@@ -427,7 +427,7 @@ export default function SponsorshipProgram() {
             joinDate: supplier.join_date || currentSupplier.joinDate,
           });
         }
-      } catch (_err) {
+      } catch (err) {
         // Keep fallback
       } finally {
         setLoading(false);

@@ -203,7 +203,7 @@ export default function LegalServicesPage() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [legalCases, setLegalCases] = useState<LegalCase[]>(fallback_legalCases);
   const [statCounts, setStatCounts] = useState(fallback_statCounts);
-  const [_isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const supabase = createClient();

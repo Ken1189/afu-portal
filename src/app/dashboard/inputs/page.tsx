@@ -276,7 +276,7 @@ export default function InputsMarketplacePage() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
   const [products, setProducts] = useState<Product[]>(defaultProducts);
-  const [_loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   // Fetch products from Supabase
   useEffect(() => {

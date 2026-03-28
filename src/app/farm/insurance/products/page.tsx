@@ -233,7 +233,7 @@ export default function ProductsPage() {
   const ti = t.insurance;
 
   const [insuranceProducts, setInsuranceProducts] = useState<InsuranceProduct[]>(mockInsuranceProducts);
-  const [_dataLoading, setDataLoading] = useState(true);
+  const [dataLoading, setDataLoading] = useState(true);
 
   useEffect(() => {
     const supabase = createClient();

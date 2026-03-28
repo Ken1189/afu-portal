@@ -200,7 +200,7 @@ export default function PoliciesPage() {
   const { user } = useAuth();
 
   const [insurancePolicies, setInsurancePolicies] = useState<InsurancePolicy[]>(mockInsurancePolicies);
-  const [_dataLoading, setDataLoading] = useState(true);
+  const [dataLoading, setDataLoading] = useState(true);
 
   useEffect(() => {
     const supabase = createClient();

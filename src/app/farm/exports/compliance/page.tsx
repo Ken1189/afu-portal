@@ -817,7 +817,7 @@ export default function ExportCompliancePage() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<TabType>('requirements');
   const [kycDocs, setKycDocs] = useState<any[]>([]);
-  const [_dataLoading, setDataLoading] = useState(true);
+  const [dataLoading, setDataLoading] = useState(true);
 
   useEffect(() => {
     const supabase = createClient();

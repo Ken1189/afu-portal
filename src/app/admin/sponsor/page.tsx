@@ -101,7 +101,7 @@ export default function AdminSponsorPage() {
   const [tierFilter, setTierFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [_loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   // ── Stats derived from mock data ──
   const totalActive = sponsorships.filter((s) => s.status === 'active').length;

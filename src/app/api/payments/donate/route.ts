@@ -42,7 +42,8 @@ export async function POST(req: NextRequest) {
       ? program.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
       : 'General Fund';
 
-    const sessionParams: Parameters<ReturnType<typeof getStripe>['checkout']['sessions']['create']>[0] = {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const sessionParams: any = {
       mode: isMonthly ? 'subscription' : 'payment',
       payment_method_types: ['card'],
       line_items: [

@@ -297,7 +297,7 @@ export default function SupplierProductDetailPage() {
   const { user } = useAuth();
   const productId = params.id as string;
   const [dbProduct, setDbProduct] = useState<SupplierProduct | null>(null);
-  const [_loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   // ── Fetch single product from Supabase ──────────────────────────────────
   useEffect(() => {
@@ -333,7 +333,7 @@ export default function SupplierProductDetailPage() {
           };
           setDbProduct(mapped);
         }
-      } catch (_err) {
+      } catch (err) {
         // Fall back to static data
       } finally {
         setLoading(false);

@@ -531,7 +531,7 @@ export default function ExportDocumentsPage() {
   );
   const [searchQuery, setSearchQuery] = useState('');
   const [liveDocs, setLiveDocs] = useState<ExportDocument[]>(exportDocuments);
-  const [_dataLoading, setDataLoading] = useState(true);
+  const [dataLoading, setDataLoading] = useState(true);
 
   useEffect(() => {
     const supabase = createClient();

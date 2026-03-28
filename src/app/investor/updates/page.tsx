@@ -136,7 +136,7 @@ const demoUpdates: InvestorUpdate[] = [
 export default function UpdatesPage() {
   const { user } = useAuth();
   const [updates, setUpdates] = useState<InvestorUpdate[]>(demoUpdates);
-  const [_loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState<string>('all');
   const supabase = createClient();

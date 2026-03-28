@@ -113,7 +113,7 @@ export default function TrainingPage() {
 
   const [courses, setCourses] = useState<Course[]>([]);
   const [completions, setCompletions] = useState<CourseCompletion[]>([]);
-  const [_loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [completing, setCompleting] = useState<string | null>(null);
   const [currentTier, setCurrentTier] = useState<FarmerTier>('seedling');
   const [celebrateCourse, setCelebrateCourse] = useState<string | null>(null);

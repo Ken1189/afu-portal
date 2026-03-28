@@ -290,7 +290,7 @@ export default function AdminContentPage() {
 function SiteContentTab({ showToast }: { showToast: (m: string, t?: 'success' | 'error') => void }) {
   const supabase = createClient();
   const [content, setContent] = useState<SiteContent[]>([]);
-  const [_loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<string | null>(null);
   const [editedValues, setEditedValues] = useState<Record<string, string>>({});
   const [collapsedPages, setCollapsedPages] = useState<Record<string, boolean>>({});
@@ -453,7 +453,7 @@ function SiteContentTab({ showToast }: { showToast: (m: string, t?: 'success' | 
 function FeatureFlagsTab({ showToast }: { showToast: (m: string, t?: 'success' | 'error') => void }) {
   const supabase = createClient();
   const [flags, setFlags] = useState<FeatureFlag[]>([]);
-  const [_loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [toggling, setToggling] = useState<string | null>(null);
   const [editingFlag, setEditingFlag] = useState<FeatureFlag | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -725,7 +725,7 @@ function FlagEditModal({
 function SiteConfigTab({ showToast }: { showToast: (m: string, t?: 'success' | 'error') => void }) {
   const supabase = createClient();
   const [configs, setConfigs] = useState<SiteConfig[]>([]);
-  const [_loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<string | null>(null);
   const [editedValues, setEditedValues] = useState<Record<string, string>>({});
 
@@ -883,7 +883,7 @@ function SiteConfigTab({ showToast }: { showToast: (m: string, t?: 'success' | '
 function NotificationTemplatesTab({ showToast }: { showToast: (m: string, t?: 'success' | 'error') => void }) {
   const supabase = createClient();
   const [templates, setTemplates] = useState<NotificationTemplate[]>([]);
-  const [_loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [editingTemplate, setEditingTemplate] = useState<NotificationTemplate | null>(null);
   const [previewMode, setPreviewMode] = useState(false);
 
@@ -1151,7 +1151,7 @@ function TemplateEditModal({
 function BroadcastsTab({ showToast }: { showToast: (m: string, t?: 'success' | 'error') => void }) {
   const supabase = createClient();
   const [broadcasts, setBroadcasts] = useState<Broadcast[]>([]);
-  const [_loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
@@ -1413,7 +1413,7 @@ function BroadcastsTab({ showToast }: { showToast: (m: string, t?: 'success' | '
 
 function CountryTeamsTab({ showToast }: { showToast: (m: string, t?: 'success' | 'error') => void }) {
   const supabase = createClient();
-  const [_loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState<string>('');
   const [teamData, setTeamData] = useState<CountryTeamData | null>(null);
@@ -1758,7 +1758,7 @@ function BrandingTab({ showToast }: { showToast: (msg: string, type?: 'success' 
   const [logoUrl, setLogoUrl] = useState('');
   const [previewUrl, setPreviewUrl] = useState('');
   const [saving, setSaving] = useState(false);
-  const [_loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   useEffect(() => {
@@ -1938,7 +1938,7 @@ function HeroBannerTab({ showToast }: { showToast: (msg: string, type?: 'success
   const supabase = createClient();
   const [values, setValues] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
-  const [_loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {

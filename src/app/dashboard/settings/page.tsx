@@ -336,7 +336,7 @@ export default function SettingsPage() {
   // ---- Save state ---------------------------------------------------------
   const [saveToast, setSaveToast] = useState(false);
   const [settingsLoaded, setSettingsLoaded] = useState(false);
-  const [_loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   // ---- Member record for tier info ----------------------------------------
   const [memberData, setMemberData] = useState<Member | null>(null);

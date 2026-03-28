@@ -79,7 +79,7 @@ function Toast({ message, type, onClose }: { message: string; type: 'success' | 
 
 export default function LegalAdmin() {
   const [pages, setPages] = useState<LegalPage[]>([]);
-  const [_loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);

@@ -131,7 +131,7 @@ function Toast({
 
 export default function AdminJobsPage() {
   const [jobs, setJobs] = useState<JobListing[]>([]);
-  const [_loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [toast, setToast] = useState<{
     message: string;

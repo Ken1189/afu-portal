@@ -81,7 +81,7 @@ export default function AdminAdvertisingPage() {
   const [expanded, setExpanded] = useState<string | null>(null);
   const [kpis, setKpis] = useState(fallback_kpis);
   const [ads, setAds] = useState(fallback_ads);
-  const [_isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const supabase = createClient();
@@ -123,9 +123,23 @@ export default function AdminAdvertisingPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Advertising Management</h1>
-        <p className="text-gray-500 mt-1">Review campaigns, track revenue, manage ad packages</p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Advertising Management</h1>
+          <p className="text-gray-500 mt-1">Review campaigns, track revenue, manage ad packages</p>
+        </div>
+        <a
+          href="/admin/advertising/review"
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#5DB347] text-white rounded-lg text-sm font-medium hover:bg-[#449933] transition-colors"
+        >
+          <Clock className="w-4 h-4" />
+          Review Queue
+          {ads.filter(a => a.status === 'pending').length > 0 && (
+            <span className="px-1.5 py-0.5 bg-white/20 rounded-full text-[10px]">
+              {ads.filter(a => a.status === 'pending').length}
+            </span>
+          )}
+        </a>
       </div>
 
       {/* KPIs */}

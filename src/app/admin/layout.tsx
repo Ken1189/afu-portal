@@ -57,6 +57,7 @@ import {
   BarChart3,
   Scale as ScaleIcon,
   Stethoscope,
+  ArrowLeftRight,
 } from 'lucide-react';
 
 // ── Navigation structure with collapsible groups ──
@@ -113,6 +114,13 @@ const navGroups: NavGroup[] = [
       { href: '/admin/investor-relations', label: 'Investor Pipeline', icon: <Landmark className="w-4 h-4" /> },
       { href: '/admin/investors', label: 'All Investors', icon: <Users className="w-4 h-4" /> },
       { href: '/admin/investments', label: 'Total Investments', icon: <BarChart3 className="w-4 h-4" /> },
+    ],
+  },
+  {
+    label: 'Trading',
+    defaultOpen: false,
+    links: [
+      { href: '/admin/trading', label: 'Trade Desk', icon: <ArrowLeftRight className="w-4 h-4" /> },
     ],
   },
   {

@@ -20,6 +20,7 @@ import {
   Menu,
   X,
   ChevronLeft,
+  ArrowLeftRight,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -34,6 +35,7 @@ const supplierLinks = [
   { href: '/supplier/sponsorship', label: 'Sponsorship', icon: Award },
   { href: '/supplier/analytics', label: 'Analytics', icon: BarChart3 },
   { href: '/supplier/reviews', label: 'Reviews', icon: Star },
+  { href: '/supplier/trade', label: 'Trade Marketplace', icon: ArrowLeftRight },
   { href: '/supplier/marketplace', label: 'Marketplace', icon: Store },
   { href: '/supplier/profile', label: 'Profile', icon: Building2 },
   { href: '/supplier/settings', label: 'Settings', icon: Settings },

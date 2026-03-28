@@ -274,7 +274,7 @@ export default function InvestorDashboard() {
   const { user, profile } = useAuth();
   const [investorProfile, setInvestorProfile] = useState<InvestorProfile | null>(null);
   const [updates, setUpdates] = useState<InvestorUpdate[]>(demoUpdates);
-  const [_loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   const supabase = createClient();
   const displayName = profile?.full_name || 'Investor';

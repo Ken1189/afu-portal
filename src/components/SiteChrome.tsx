@@ -10,7 +10,7 @@ import ChatWidget from '@/components/chat/ChatWidget';
  * Hidden on portal routes (/farm/*, /supplier/*) which have their own layout chrome.
  */
 
-const PORTAL_PREFIXES = ['/farm', '/supplier', '/admin', '/dashboard', '/investor-login', '/investor', '/login'];
+const PORTAL_PREFIXES = ['/farm', '/supplier', '/admin', '/dashboard', '/investor-login', '/investor', '/ambassador', '/login'];
 
 function isPortalRoute(pathname: string) {
   return PORTAL_PREFIXES.some((prefix) => pathname.startsWith(prefix));

@@ -33,6 +33,7 @@ import {
   HelpCircle,
   Scale,
   Stethoscope,
+  ArrowLeftRight,
 } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
@@ -80,6 +81,7 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   Lock,
   Scale,
   Stethoscope,
+  ArrowLeftRight,
 };
 
 // Bottom nav keys — always show core items regardless of tier

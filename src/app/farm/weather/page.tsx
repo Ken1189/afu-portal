@@ -204,7 +204,7 @@ export default function WeatherPage() {
   const [selectedDay, setSelectedDay] = useState<number>(0);
   const [current, setCurrent] = useState<CurrentWeather | null>(null);
   const [forecast, setForecast] = useState<DayForecast[]>([]);
-  const [_loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [location, setLocation] = useState('');
 
