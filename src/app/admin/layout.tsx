@@ -60,6 +60,7 @@ import {
   Stethoscope,
   ArrowLeftRight,
   ShieldCheck,
+  Wallet,
 } from 'lucide-react';
 
 // ── Navigation structure with collapsible groups ──
@@ -107,6 +108,7 @@ const navGroups: NavGroup[] = [
       { href: '/admin/credit-scores', label: 'Credit Scoring', icon: <Gauge className="w-4 h-4" /> },
       { href: '/admin/trade-finance', label: 'Trade Finance', icon: <Ship className="w-4 h-4" /> },
       { href: '/admin/banking', label: 'Banking Operations', icon: <Landmark className="w-4 h-4" /> },
+      { href: '/admin/wallet', label: 'Wallet Management', icon: <Wallet className="w-4 h-4" /> },
     ],
   },
   {

@@ -23,10 +23,12 @@ import {
   Gift,
   MoreHorizontal,
 } from 'lucide-react';
+import { Wallet, ArrowDownToLine, Send, CreditCard } from 'lucide-react';
 import { useFarmPlots, type FarmPlotRow } from '@/lib/supabase/use-farm-plots';
 import { useFarmTransactions } from '@/lib/supabase/use-farm-transactions';
 import { useAuth } from '@/lib/supabase/auth-context';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
+import { createClient } from '@/lib/supabase/client';
 import type { Translations } from '@/lib/i18n/translations';
 
 // ---------------------------------------------------------------------------
@@ -337,6 +339,41 @@ export default function MoneyTrackerPage() {
   const { plots: livePlots } = useFarmPlots();
   const farmPlots = livePlots.length > 0 ? livePlots.map(adaptFarmPlot) : mockFarmPlots;
   const summary = useMemo(() => getMockFarmSummary(), []);
+  const supabase = createClient();
+
+  // ── Wallet balance state ──
+  const [walletBalance, setWalletBalance] = useState<number | null>(null);
+  const [walletCurrency, setWalletCurrency] = useState('USD');
+  const [walletLoading, setWalletLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchWallet() {
+      if (!user?.id) { setWalletLoading(false); return; }
+      try {
+        const { data: wallets } = await supabase
+          .from('wallet_accounts')
+          .select('*, ledger_accounts!wallet_accounts_ledger_account_id_fkey(balance)')
+          .eq('user_id', user.id)
+          .limit(1);
+        if (wallets && wallets.length > 0) {
+          const ledger = (wallets[0] as any).ledger_accounts;
+          setWalletBalance(ledger?.balance ?? 0);
+          setWalletCurrency(wallets[0].currency || 'USD');
+        } else {
+          setWalletBalance(2847.50); // demo fallback
+        }
+      } catch {
+        setWalletBalance(2847.50);
+      } finally {
+        setWalletLoading(false);
+      }
+    }
+    fetchWallet();
+  }, [user?.id, supabase]);
+
+  const formatWalletCurrency = (amount: number, currency = 'USD') =>
+    new Intl.NumberFormat('en-US', { style: 'currency', currency, minimumFractionDigits: 2 }).format(amount);
+
   const [filter, setFilter] = useState<FilterTab>('all');
   const [expandedTxn, setExpandedTxn] = useState<string | null>(null);
 
@@ -490,6 +527,55 @@ export default function MoneyTrackerPage() {
         animate="visible"
         className="space-y-5 py-4"
       >
+        {/* ================================================================= */}
+        {/* 0. WALLET BALANCE SUMMARY                                         */}
+        {/* ================================================================= */}
+        <motion.section variants={itemVariants} className="px-4">
+          <div className="rounded-2xl bg-gradient-to-br from-[#1B2A4A] to-[#2d4470] p-5 text-white shadow-lg">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+                  <Wallet className="w-4 h-4" />
+                </div>
+                <span className="text-sm font-medium text-white/70">AFU Wallet</span>
+              </div>
+              <Link
+                href="/dashboard/wallet"
+                className="flex items-center gap-1 text-xs font-medium text-white/60 hover:text-white transition-colors"
+              >
+                Full Wallet <ArrowRight className="w-3 h-3" />
+              </Link>
+            </div>
+            <p className="text-3xl font-bold tracking-tight mb-4">
+              {walletLoading ? (
+                <span className="inline-block w-32 h-8 bg-white/10 rounded animate-pulse" />
+              ) : (
+                formatWalletCurrency(walletBalance ?? 0, walletCurrency)
+              )}
+            </p>
+            <div className="flex gap-2">
+              <Link
+                href="/dashboard/wallet"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-[#5DB347] hover:bg-[#4ea03d] rounded-lg text-xs font-medium transition-colors"
+              >
+                <ArrowDownToLine className="w-3 h-3" /> Deposit
+              </Link>
+              <Link
+                href="/dashboard/wallet"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-xs font-medium border border-white/20 transition-colors"
+              >
+                <Send className="w-3 h-3" /> Transfer
+              </Link>
+              <Link
+                href="/dashboard/wallet"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-xs font-medium border border-white/20 transition-colors"
+              >
+                <CreditCard className="w-3 h-3" /> Pay
+              </Link>
+            </div>
+          </div>
+        </motion.section>
+
         {/* ================================================================= */}
         {/* 1. PROFIT SUMMARY CARD                                            */}
         {/* ================================================================= */}
