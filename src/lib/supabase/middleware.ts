@@ -1,6 +1,7 @@
 import { createServerClient } from '@supabase/ssr';
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse, type NextRequest } from 'next/server';
+import { rateLimit } from '@/lib/rateLimit';
 
 /**
  * Creates a service-role Supabase client that bypasses RLS.
@@ -31,6 +32,12 @@ async function getUserRole(userId: string): Promise<string | null> {
  * protects authenticated routes.
  */
 export async function updateSession(request: NextRequest) {
+  // ── Rate limiting on API routes ──────────────────────────────────────
+  if (request.nextUrl.pathname.startsWith('/api/')) {
+    const rateLimitResponse = rateLimit(request);
+    if (rateLimitResponse) return rateLimitResponse;
+  }
+
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(

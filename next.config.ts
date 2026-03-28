@@ -49,7 +49,7 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: blob: https://images.unsplash.com https://*.supabase.co https://flagcdn.com",
               "font-src 'self' data:",
-              "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://eth-mainnet.g.alchemy.com https://*.edma.app https://*.sentry.io https://*.ingest.sentry.io",
+              "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://eth-mainnet.g.alchemy.com https://*.edma.app https://*.sentry.io https://*.ingest.sentry.io https://checkout.stripe.com https://api.stripe.com https://*.resend.com",
               "frame-ancestors 'none'",
               "base-uri 'self'",
               "form-action 'self'",
