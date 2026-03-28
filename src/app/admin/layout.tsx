@@ -321,7 +321,7 @@ function SidebarContent({
             pathname={pathname}
             collapsed={collapsedGroups[group.label] ?? false}
             onToggle={() => toggleGroup(group.label)}
-            isSuperAdmin={effectiveSuperAdmin}
+            isSuperAdmin={isSuperAdmin}
           />
         ))}
       </nav>
