@@ -52,7 +52,7 @@ interface BoardMember {
 const boardOfDirectors: BoardMember[] = [
   {
     name: 'Peter Watson',
-    title: 'CEO & Founder',
+    title: 'CEO',
     org: 'African Farming Union',
     bio: 'Commercial farmer and agricultural finance visionary with decades of hands-on experience across African markets. Background in commodity trading, farm management, and capital markets. Passionate about building infrastructure that helps real farmers thrive.',
     country: 'Zimbabwe',
@@ -66,15 +66,6 @@ const boardOfDirectors: BoardMember[] = [
     bio: 'Technology leader and platform architect driving AFU\u2019s digital infrastructure. Built the full-stack agriculture operating system from the ground up \u2014 AI integration, 5 payment gateways, and real-time farm intelligence across 20 countries.',
     country: 'Canada',
     flag: '\u{1F1E8}\u{1F1E6}',
-    linkedin: '#',
-  },
-  {
-    name: 'Duncan Kennaird',
-    title: 'Co-Founder & Head of Commercial Agriculture',
-    org: 'African Farming Union',
-    bio: 'Commercial farming expert with deep operational experience across Southern African agriculture. Specializes in livestock management, crop production systems, and building scalable farm operations from the ground up.',
-    country: 'Zimbabwe',
-    flag: '\u{1F1FF}\u{1F1FC}',
     linkedin: '#',
   },
 ];
@@ -177,7 +168,7 @@ export default function LeadershipSection() {
           </div>
         </FadeInWhenVisible>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16 max-w-4xl mx-auto">
           {boardOfDirectors.map((member, i) => (
             <MemberCard key={member.name} member={member} delay={i * 0.08} />
           ))}
