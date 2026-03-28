@@ -61,6 +61,7 @@ import {
   ArrowLeftRight,
   ShieldCheck,
   Wallet,
+  Send,
 } from 'lucide-react';
 
 // ── Navigation structure with collapsible groups ──
@@ -187,6 +188,15 @@ const navGroups: NavGroup[] = [
       { href: '/admin/notifications', label: 'Notifications', icon: <Bell className="w-4 h-4" /> },
       { href: '/admin/settings', label: 'Settings', icon: <Settings className="w-4 h-4" /> },
       { href: '/admin/run-migration', label: 'Run Migrations', icon: <Database className="w-4 h-4" /> },
+    ],
+  },
+  {
+    label: 'Messaging',
+    defaultOpen: false,
+    links: [
+      { href: '/admin/messaging', label: 'Dashboard', icon: <MessageSquare className="w-4 h-4" /> },
+      { href: '/admin/messaging/templates', label: 'Templates', icon: <FileText className="w-4 h-4" /> },
+      { href: '/admin/messaging/campaigns', label: 'Campaigns', icon: <Send className="w-4 h-4" /> },
     ],
   },
   {
