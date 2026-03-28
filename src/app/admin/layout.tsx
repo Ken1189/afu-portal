@@ -62,6 +62,7 @@ import {
   ShieldCheck,
   Wallet,
   Send,
+  Zap,
 } from 'lucide-react';
 
 // ── Navigation structure with collapsible groups ──
@@ -137,6 +138,7 @@ const navGroups: NavGroup[] = [
       { href: '/admin/farm-overview', label: 'Farm Overview', icon: <Gauge className="w-4 h-4" /> },
       { href: '/admin/equipment', label: 'Equipment', icon: <Wrench className="w-4 h-4" /> },
       { href: '/admin/insurance', label: 'Insurance', icon: <Shield className="w-4 h-4" /> },
+      { href: '/admin/insurance/parametric', label: 'Parametric Insurance', icon: <Zap className="w-4 h-4" /> },
       { href: '/admin/crops', label: 'Crops', icon: <Sprout className="w-4 h-4" /> },
       { href: '/admin/livestock', label: 'Livestock', icon: <Beef className="w-4 h-4" /> },
       { href: '/admin/legal-services', label: 'Legal Services', icon: <ScaleIcon className="w-4 h-4" /> },
