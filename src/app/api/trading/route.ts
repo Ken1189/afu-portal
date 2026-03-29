@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase/server';
+import { emitEventAsync } from '@/lib/events/event-bus';
+import '@/lib/events/handlers';
 
 /**
  * GET /api/trading
@@ -109,6 +111,20 @@ export async function POST(req: NextRequest) {
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
+
+    // Emit cross-system event (fire-and-forget)
+    emitEventAsync({
+      type: 'TRADE_ORDER_CREATED',
+      data: {
+        orderId: order.id,
+        userId: user.id,
+        type,
+        commodity,
+        quantity: parseFloat(quantity),
+        country: country || undefined,
+        orderNumber,
+      },
+    });
 
     return NextResponse.json({ order }, { status: 201 });
   } catch (err) {

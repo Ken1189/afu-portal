@@ -61,6 +61,7 @@ import {
   Star,
   LogOut,
   X,
+  Activity,
 } from 'lucide-react';
 
 // ── Navigation structure with collapsible groups ──
@@ -190,6 +191,7 @@ const navGroups: NavGroup[] = [
       { href: '/admin/users/permissions', label: 'Permissions', icon: <ShieldCheck className={ICON_CLS} />, superAdminOnly: true },
       { href: '/admin/audit', label: 'Audit Trail', icon: <ScrollText className={ICON_CLS} /> },
       { href: '/admin/compliance', label: 'Compliance', icon: <Shield className={ICON_CLS} /> },
+      { href: '/admin/events', label: 'Event Monitor', icon: <Activity className={ICON_CLS} /> },
       { href: '/admin/notifications', label: 'Notifications', icon: <Bell className={ICON_CLS} /> },
       { href: '/admin/settings', label: 'Settings', icon: <Settings className={ICON_CLS} /> },
       { href: '/admin/run-migration', label: 'Run Migrations', icon: <Database className={ICON_CLS} /> },

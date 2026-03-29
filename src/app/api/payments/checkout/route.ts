@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getStripe, MEMBERSHIP_PRICES, SPONSOR_PRICES } from '@/lib/stripe';
+import { emitEventAsync } from '@/lib/events/event-bus';
+import '@/lib/events/handlers';
 
 const checkoutSchema = z.object({
   type: z.enum(['membership', 'sponsorship']),
@@ -82,6 +84,21 @@ export async function POST(req: NextRequest) {
         ...(farmerId ? { farmerId } : {}),
       },
     });
+
+    // Emit PAYMENT_RECEIVED event for the checkout session initiation
+    // Note: Full payment confirmation happens via Stripe webhook
+    if (session.id) {
+      emitEventAsync({
+        type: 'PAYMENT_RECEIVED',
+        data: {
+          paymentId: session.id,
+          userId: farmerId || 'anonymous',
+          amount: price.amount / 100, // Convert from cents
+          currency: price.currency.toUpperCase(),
+          method: 'stripe',
+        },
+      });
+    }
 
     return NextResponse.json({ url: session.url });
   } catch (err) {

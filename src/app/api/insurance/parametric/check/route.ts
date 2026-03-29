@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase/server';
 import { ParametricEngine } from '@/lib/insurance/parametric';
+import { emitEventAsync } from '@/lib/events/event-bus';
+import '@/lib/events/handlers';
 
 /**
  * POST /api/insurance/parametric/check
@@ -26,6 +28,32 @@ export async function POST() {
     const admin = await createAdminClient();
     const engine = new ParametricEngine(admin);
     const result = await engine.checkAllPolicies();
+
+    // Emit INSURANCE_PAYOUT events for each triggered payout (fire-and-forget)
+    if (result.details && Array.isArray(result.details)) {
+      for (const detail of result.details) {
+        if (detail.triggered && detail.payoutAmount) {
+          // Look up policy owner from the database
+          const { data: policy } = await admin
+            .from('parametric_policies')
+            .select('user_id')
+            .eq('id', detail.policyId)
+            .single();
+
+          if (policy?.user_id) {
+            emitEventAsync({
+              type: 'INSURANCE_PAYOUT',
+              data: {
+                policyId: detail.policyId,
+                userId: policy.user_id,
+                amount: detail.payoutAmount,
+                triggerType: 'parametric',
+              },
+            });
+          }
+        }
+      }
+    }
 
     return NextResponse.json({
       success: true,

@@ -3,6 +3,8 @@ import { createServerClient } from '@supabase/ssr';
 import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 import crypto from 'crypto';
+import { emitEventAsync } from '@/lib/events/event-bus';
+import '@/lib/events/handlers';
 
 /**
  * POST /api/admin/applications/approve
@@ -165,6 +167,18 @@ export async function POST(request: Request) {
     if (updateError) {
       console.error('Failed to update application status:', updateError.message);
     }
+
+    // Emit cross-system event (fire-and-forget)
+    emitEventAsync({
+      type: 'APPLICATION_APPROVED',
+      data: {
+        applicationId,
+        userId,
+        tempPassword,
+        email: application.email,
+        fullName: application.full_name,
+      },
+    });
 
     return NextResponse.json({
       success: true,

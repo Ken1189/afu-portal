@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase/server';
+import { emitEventAsync } from '@/lib/events/event-bus';
+import '@/lib/events/handlers';
 
 /**
  * GET /api/trading/quotes?order_id=xxx
@@ -100,6 +102,17 @@ export async function POST(req: NextRequest) {
       .update({ status: 'quoted', updated_at: new Date().toISOString() })
       .eq('id', order_id);
 
+    // Emit QUOTE_RECEIVED event (fire-and-forget)
+    emitEventAsync({
+      type: 'QUOTE_RECEIVED',
+      data: {
+        quoteId: quote.id,
+        orderId: order_id,
+        supplierId: user.id,
+        price: parseFloat(price_per_unit),
+      },
+    });
+
     return NextResponse.json({ quote }, { status: 201 });
   } catch (err) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -158,6 +171,28 @@ export async function PATCH(req: NextRequest) {
         .eq('order_id', order_id)
         .eq('status', 'pending')
         .neq('id', quote_id);
+
+      // Emit TRADE_ORDER_MATCHED event — look up order owner and quote details
+      const { data: matchedOrder } = await adminClient
+        .from('trade_orders')
+        .select('user_id, commodity, quantity')
+        .eq('id', order_id)
+        .single();
+
+      if (matchedOrder) {
+        emitEventAsync({
+          type: 'TRADE_ORDER_MATCHED',
+          data: {
+            orderId: order_id,
+            buyerId: matchedOrder.user_id,
+            sellerId: quote.supplier_id,
+            commodity: matchedOrder.commodity,
+            quantity: matchedOrder.quantity,
+            price: quote.price_per_unit,
+            quoteId: quote_id,
+          },
+        });
+      }
     }
 
     return NextResponse.json({ quote });

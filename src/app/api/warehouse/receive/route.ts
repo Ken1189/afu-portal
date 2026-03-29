@@ -7,6 +7,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase/server';
+import { emitEventAsync } from '@/lib/events/event-bus';
+import '@/lib/events/handlers';
 
 interface ReceiveBody {
   farmer_id: string | null;
@@ -166,6 +168,22 @@ export async function POST(request: NextRequest) {
         // SMS is non-critical
       }
     }
+
+    // Emit cross-system event (fire-and-forget)
+    emitEventAsync({
+      type: 'COMMODITY_RECEIVED',
+      data: {
+        receiptId: receipt.id,
+        farmerId: body.farmer_id,
+        commodity: body.commodity,
+        quantity: body.net_weight_kg,
+        grade: body.quality_data.grade,
+        warehouseId: undefined,
+        value: body.total_value,
+        farmerName: body.farmer_name,
+        receiptNumber,
+      },
+    });
 
     return NextResponse.json({
       receipt: {

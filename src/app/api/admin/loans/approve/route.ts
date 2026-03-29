@@ -5,6 +5,8 @@ import { cookies } from 'next/headers';
 import { sendNotification } from '@/lib/notifications/engine';
 import { loanApprovedTemplate } from '@/lib/notifications/templates';
 import { loanApproveSchema } from '@/lib/validation/schemas';
+import { emitEventAsync } from '@/lib/events/event-bus';
+import '@/lib/events/handlers';
 
 export async function POST(request: NextRequest) {
   try {
@@ -95,6 +97,19 @@ export async function POST(request: NextRequest) {
           ? template.body
           : `Your loan application (${loan.loan_number || loanId}) has been rejected.${notes ? ` Reason: ${notes}` : ''}`,
       }).catch(() => {});
+    }
+
+    // Emit cross-system event (fire-and-forget)
+    if (action === 'approve' && loan.member_id) {
+      emitEventAsync({
+        type: 'LOAN_APPROVED',
+        data: {
+          loanId: loan.id,
+          userId: loan.member_id,
+          amount: loan.amount,
+          loanNumber: loan.loan_number || loanId,
+        },
+      });
     }
 
     return NextResponse.json({ success: true, loan });
