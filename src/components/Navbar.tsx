@@ -36,6 +36,7 @@ import {
   Scale,
   Stethoscope,
   Megaphone,
+  Leaf,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useAuth } from "@/lib/supabase/auth-context";
@@ -100,6 +101,7 @@ const exploreLinks: { label: string; href: string; desc: string; icon: LucideIco
   { label: "Blockchain", href: "/blockchain", desc: "EDMA technology roadmap", icon: Blocks },
   { label: "Podcasts", href: "/podcasts", desc: "Listen & learn", icon: Headphones },
   { label: "Newsletter", href: "/newsletter", desc: "Weekly intelligence", icon: Mail },
+  { label: "Carbon Credits", href: "/carbon", desc: "Offset your footprint", icon: Leaf },
 ];
 
 type OpenDropdown = null | "services" | "education" | "community" | "explore";

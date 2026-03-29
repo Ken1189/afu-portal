@@ -62,6 +62,10 @@ import {
   LogOut,
   X,
   Activity,
+  Leaf,
+  FolderOpen,
+  Coins,
+  ClipboardCheck,
 } from 'lucide-react';
 
 // ── Navigation structure with collapsible groups ──
@@ -130,6 +134,16 @@ const navGroups: NavGroup[] = [
     defaultOpen: false,
     links: [
       { href: '/admin/trading', label: 'Trade Desk', icon: <ArrowLeftRight className={ICON_CLS} /> },
+    ],
+  },
+  {
+    label: 'Carbon',
+    defaultOpen: false,
+    links: [
+      { href: '/admin/carbon', label: 'Carbon Dashboard', icon: <Leaf className={ICON_CLS} /> },
+      { href: '/admin/carbon/projects', label: 'Projects', icon: <FolderOpen className={ICON_CLS} /> },
+      { href: '/admin/carbon/credits', label: 'Credits', icon: <Coins className={ICON_CLS} /> },
+      { href: '/admin/carbon/verifications', label: 'Verifications', icon: <ClipboardCheck className={ICON_CLS} /> },
     ],
   },
   {

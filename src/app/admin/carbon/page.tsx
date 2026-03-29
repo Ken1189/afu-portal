@@ -163,7 +163,7 @@ export default function AdminCarbonDashboard() {
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
               <XAxis dataKey="month" tick={{ fontSize: 12 }} />
               <YAxis tick={{ fontSize: 12 }} />
-              <Tooltip formatter={(value: number) => [`$${value}`, 'Revenue']} />
+              <Tooltip formatter={(value) => [`$${value}`, 'Revenue']} />
               <Area type="monotone" dataKey="revenue" stroke="#5DB347" fill="#5DB347" fillOpacity={0.1} />
             </AreaChart>
           </ResponsiveContainer>

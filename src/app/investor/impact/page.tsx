@@ -261,6 +261,8 @@ export default function InvestorImpactPage() {
   const [hectares, setHectares] = useState<number | null>(null);
   const [countriesCount, setCountriesCount] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
+  const [carbonCreditsSold, setCarbonCreditsSold] = useState<number | null>(null);
+  const [carbonCO2Offset, setCarbonCO2Offset] = useState<number | null>(null);
 
   useEffect(() => {
     async function fetchStats() {
@@ -316,6 +318,19 @@ export default function InvestorImpactPage() {
             countryData.map((r: Record<string, unknown>) => String(r.country)).filter(Boolean)
           );
           if (uniqueCountries.size > 0) setCountriesCount(uniqueCountries.size);
+        }
+
+        // Fetch carbon credits data
+        const { data: carbonData } = await supabase
+          .from('carbon_credits')
+          .select('quantity, status');
+        if (carbonData && carbonData.length > 0) {
+          const sold = carbonData
+            .filter((c: any) => c.status === 'sold' || c.status === 'retired')
+            .reduce((sum: number, c: any) => sum + (c.quantity || 0), 0);
+          const totalOffset = carbonData.reduce((sum: number, c: any) => sum + (c.quantity || 0), 0);
+          if (sold > 0) setCarbonCreditsSold(sold);
+          if (totalOffset > 0) setCarbonCO2Offset(totalOffset);
         }
       } catch {
         // keep fallbacks
@@ -544,6 +559,56 @@ export default function InvestorImpactPage() {
               </motion.div>
             );
           })}
+        </div>
+      </motion.div>
+
+      {/* ─── Carbon Offset ─── */}
+      <motion.div variants={cardVariants} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+        <div className="flex items-center gap-2 mb-2">
+          <TreePine className="w-5 h-5 text-[#5DB347]" />
+          <h2 className="text-lg font-bold text-[#1B2A4A]">Carbon Offset</h2>
+        </div>
+        <p className="text-sm text-gray-500 mb-6">
+          Carbon credit marketplace supporting regenerative agriculture across Africa
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <motion.div
+            variants={fadeUp}
+            className="bg-green-50 rounded-xl p-5"
+          >
+            <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center mb-3">
+              <BadgeCheck className="w-5 h-5 text-green-700" />
+            </div>
+            <h3 className="text-sm font-semibold text-[#1B2A4A] mb-1">Credits Sold</h3>
+            {loading ? (
+              <Loader2 className="w-5 h-5 text-gray-300 animate-spin" />
+            ) : (
+              <p className="text-2xl font-bold text-[#1B2A4A]">
+                {carbonCreditsSold !== null ? carbonCreditsSold.toLocaleString() : '960'}
+              </p>
+            )}
+            <p className="text-xs text-gray-500 mt-1">tonnes of verified carbon credits</p>
+          </motion.div>
+          <motion.div
+            variants={fadeUp}
+            className="bg-emerald-50 rounded-xl p-5"
+          >
+            <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center mb-3">
+              <TreePine className="w-5 h-5 text-emerald-700" />
+            </div>
+            <h3 className="text-sm font-semibold text-[#1B2A4A] mb-1">CO2 Offset</h3>
+            {loading ? (
+              <Loader2 className="w-5 h-5 text-gray-300 animate-spin" />
+            ) : (
+              <p className="text-2xl font-bold text-[#1B2A4A]">
+                {carbonCO2Offset !== null ? carbonCO2Offset.toLocaleString() : '2,520'}
+              </p>
+            )}
+            <p className="text-xs text-gray-500 mt-1">total tonnes CO2 offset through projects</p>
+          </motion.div>
+        </div>
+        <div className="mt-4 bg-[#5DB347]/5 rounded-xl p-4 text-sm text-gray-600">
+          Revenue from carbon credit sales is distributed: <strong>70% to farmers</strong>, 20% to AFU operations, and 10% to the environmental buffer pool.
         </div>
       </motion.div>
 

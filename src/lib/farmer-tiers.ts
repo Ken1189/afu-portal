@@ -78,6 +78,7 @@ export const FARM_SIDEBAR_ITEMS = [
   { href: '/farm/ai-tools', label: 'AI Tools', icon: 'Brain', tier: 'harvest' as FarmerTier },
   { href: '/farm/doctor', label: 'Crop Doctor', icon: 'Camera', tier: 'harvest' as FarmerTier },
   { href: '/farm/sustainability', label: 'Sustainability', icon: 'Leaf', tier: 'harvest' as FarmerTier },
+  { href: '/farm/sustainability/credits', label: 'Carbon Credits', icon: 'Leaf', tier: 'harvest' as FarmerTier },
   { href: '/farm/exports', label: 'Exports', icon: 'Ship', tier: 'harvest' as FarmerTier },
 
   // Pioneer tier
