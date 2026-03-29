@@ -19,7 +19,7 @@ function getApiKey(): string {
 }
 
 function getFromAddress(): string {
-  return process.env.EMAIL_FROM || 'AFU Portal <noreply@afu.org>';
+  return process.env.EMAIL_FROM || 'AFU Portal <noreply@noreply.africanfarmingunion.org>';
 }
 
 /**

@@ -53,7 +53,7 @@ export interface DirectEmailParams {
 // ---------------------------------------------------------------------------
 
 const DEFAULT_FROM =
-  process.env.EMAIL_FROM ?? 'AFU Portal <noreply@afu-portal.vercel.app>';
+  process.env.EMAIL_FROM ?? 'AFU Portal <noreply@noreply.africanfarmingunion.org>';
 
 // ---------------------------------------------------------------------------
 // Template variable substitution

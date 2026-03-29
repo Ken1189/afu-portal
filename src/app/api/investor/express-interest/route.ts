@@ -92,8 +92,8 @@ export async function POST(request: Request) {
           : 'Not specified';
 
         await resend.emails.send({
-          from: 'AFU Investor Relations <noreply@africanfarmersunion.org>',
-          to: ['devonk@africanfarmersunion.org', 'peterw@africanfarmersunion.org'],
+          from: 'AFU Investor Relations <noreply@noreply.africanfarmingunion.org>',
+          to: ['devonk@africanfarmingunion.org', 'peterw@africanfarmingunion.org'],
           subject: `New Investment Interest: ${expression.opportunityName} — ${expression.entityName}`,
           html: `
             <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff;">
