@@ -52,14 +52,14 @@ export default function Footer() {
   };
 
   return (
-    <footer style={{ background: 'linear-gradient(180deg, #1B2A4A 0%, #0F1A30 100%)' }}>
+    <footer className="bg-[linear-gradient(180deg,var(--color-navy)_0%,var(--color-navy-dark)_100%)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
           {/* Brand + Logo */}
           <div className="lg:col-span-2">
             <div className="flex items-center gap-3 mb-5">
               {/* Inline SVG logo — green square with leaf + AFU text */}
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-[#5DB347]/20" style={{ background: 'linear-gradient(135deg, #5DB347, #449933)' }}>
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-[#5DB347]/20 gradient-green">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10c1.85 0 3.58-.5 5.07-1.38C14.46 18.36 12 15.45 12 12c0-3.45 2.46-6.36 5.07-8.62A9.93 9.93 0 0012 2z" fill="white" opacity="0.9"/>
                   <path d="M17 6s-2 2.5-2 5c0 2.5 2 5 2 5s2-2.5 2-5c0-2.5-2-5-2-5z" fill="white" opacity="0.7"/>
@@ -68,7 +68,7 @@ export default function Footer() {
               <div>
                 <span className="text-white font-bold text-xl tracking-tight">AFU</span>
                 <span className="block text-xs text-gray-400 -mt-0.5">African Farming Union</span>
-                <span className="block text-xs font-medium mt-1" style={{ color: '#5DB347' }}>Let&apos;s Grow Together</span>
+                <span className="block text-xs font-medium mt-1 text-green">Let&apos;s Grow Together</span>
               </div>
             </div>
             <p className="text-gray-400 text-sm leading-relaxed mb-6 max-w-sm">
@@ -158,8 +158,7 @@ export default function Footer() {
               <button
                 type="submit"
                 disabled={status === "loading"}
-                className="px-4 py-2.5 rounded-xl text-white text-sm font-semibold transition-all duration-300 hover:-translate-y-0.5 shadow-lg shadow-[#5DB347]/20 disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{ background: 'linear-gradient(135deg, #5DB347, #449933)' }}
+                className="px-4 py-2.5 rounded-xl text-white text-sm font-semibold transition-all duration-300 hover:-translate-y-0.5 shadow-lg shadow-[#5DB347]/20 disabled:opacity-50 disabled:cursor-not-allowed gradient-green"
               >
                 {status === "loading" ? "..." : "\u2192"}
               </button>

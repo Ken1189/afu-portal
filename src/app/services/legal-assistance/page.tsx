@@ -13,11 +13,13 @@ import {
   Handshake,
 } from "lucide-react";
 
-export const metadata = {
-  title: "Legal Assistance - AFU Services",
-  description:
-    "Professional legal support for African farmers. Land rights, contract review, dispute resolution, regulatory compliance, and cooperative governance services across 20 countries.",
-};
+import { createPageMetadata } from '@/lib/seo/metadata';
+
+export const metadata = createPageMetadata({
+  title: 'Legal Assistance',
+  description: 'Professional legal support for African farmers. Land rights, contract review, dispute resolution, and regulatory compliance services.',
+  path: '/services/legal-assistance',
+});
 
 const steps = [
   {

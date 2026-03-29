@@ -358,8 +358,9 @@ export default function LoginPage() {
           {/* Bottom: Stats bar */}
           <div className="grid grid-cols-3 gap-6 pt-8 border-t border-white/10">
             {[
+              // S5.6: Updated to reflect actual platform scope (20 countries)
               { icon: Users, label: 'Members', value: '5,000+' },
-              { icon: Globe, label: 'Countries', value: '12' },
+              { icon: Globe, label: 'Countries', value: '20' },
               { icon: DollarSign, label: 'Financed', value: '$50M+' },
             ].map((stat, i) => (
               <motion.div

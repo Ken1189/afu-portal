@@ -2,6 +2,9 @@
 
 import React from 'react';
 
+// S6.9: Badge variant naming convention:
+// - Semantic (for status): success, warning, error, info, neutral
+// - Brand (for decoration): teal, navy, gold
 type BadgeVariant =
   | 'success'
   | 'warning'

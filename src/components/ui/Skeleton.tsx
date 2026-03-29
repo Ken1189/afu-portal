@@ -60,46 +60,8 @@ function SkeletonText({
   );
 }
 
-function SkeletonBlockStyled({
-  className = '',
-  style,
-}: SkeletonBaseProps & { style?: React.CSSProperties }) {
-  return (
-    <div
-      className={`${shimmerClass} ${className}`}
-      style={style}
-      aria-hidden="true"
-    />
-  );
-}
-
-function SkeletonTextWithWidths({
-  lines = 3,
-  widths,
-  className = '',
-}: SkeletonTextProps) {
-  const defaultWidths = ['100%', '90%', '75%', '85%', '60%'];
-
-  return (
-    <div
-      className={`space-y-2.5 ${className}`}
-      role="status"
-      aria-label="Loading text"
-    >
-      {Array.from({ length: lines }).map((_, i) => {
-        const width = widths?.[i] ?? defaultWidths[i % defaultWidths.length];
-        return (
-          <SkeletonBlockStyled
-            key={i}
-            className="h-4"
-            style={{ width }}
-          />
-        );
-      })}
-      <span className="sr-only">Loading...</span>
-    </div>
-  );
-}
+// S6.11: Removed duplicate SkeletonBlockStyled (identical to SkeletonBlock)
+// and SkeletonTextWithWidths (identical to SkeletonText)
 
 const avatarSizeClasses: Record<string, string> = {
   sm: 'h-8 w-8',
@@ -188,7 +150,7 @@ function SkeletonTable({
 
 export {
   SkeletonBlock,
-  SkeletonTextWithWidths as SkeletonText,
+  SkeletonText,
   SkeletonAvatar,
   SkeletonCard,
   SkeletonTable,

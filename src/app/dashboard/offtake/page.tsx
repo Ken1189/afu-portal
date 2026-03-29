@@ -46,7 +46,7 @@ interface OfftakeContract {
   incoterm: string;
 }
 
-function adaptContract(row: any): OfftakeContract {
+function adaptContract(row: { id: string; buyer_name?: string; commodity?: string; quantity?: number; price_per_unit?: number; created_at?: string; delivery_date?: string; status?: string; member_id?: string }): OfftakeContract {
   return {
     id: row.id,
     buyer: row.buyer_name || '',
@@ -59,7 +59,7 @@ function adaptContract(row: any): OfftakeContract {
     deliveredVolume: 0,
     deliveredPercentage: 0,
     qualityGrade: 'A' as const,
-    status: row.status || 'active',
+    status: (row.status as 'completed' | 'active' | 'pending-renewal') || 'active',
     country: '',
     memberId: row.member_id || '',
     memberName: '',
@@ -94,7 +94,8 @@ function formatPeriod(period: { start: string; end: string }) {
 
 export default function OfftakePage() {
   const { contracts: liveContracts, loading: contractsLoading } = useContracts();
-  const contracts: OfftakeContract[] = liveContracts.length > 0 ? liveContracts.map(adaptContract) as OfftakeContract[] : mockContracts;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const contracts: OfftakeContract[] = liveContracts.length > 0 ? liveContracts.map((c: any) => adaptContract(c)) : mockContracts;
 
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [expanded, setExpanded] = useState<string | null>(null);

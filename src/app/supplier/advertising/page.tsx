@@ -240,8 +240,8 @@ export default function AdvertisingDashboard() {
             setAds(mapped);
           }
         }
-      } catch (err: any) {
-        setError(err?.message || 'Failed to load advertisements');
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Failed to load advertisements');
       } finally {
         setLoading(false);
       }
@@ -264,8 +264,8 @@ export default function AdvertisingDashboard() {
       setAds((prev) =>
         prev.map((ad) => (ad.id === adId ? { ...ad, status: newStatus } : ad))
       );
-    } catch (err: any) {
-      showToast('error', 'Failed to update: ' + (err?.message || 'Unknown error'));
+    } catch (err: unknown) {
+      showToast('error', 'Failed to update: ' + (err instanceof Error ? err.message : 'Unknown error'));
     } finally {
       setTogglingId(null);
     }

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
 import { getStripe } from '@/lib/stripe';
 import Stripe from 'stripe';
+import { emitEventAsync } from '@/lib/events/event-bus';
+import '@/lib/events/handlers';
 
 /**
  * POST /api/payments/webhook/stripe
@@ -149,6 +151,21 @@ export async function POST(request: NextRequest) {
             .update({ status: 'completed', provider_response: intent as unknown as Record<string, unknown> })
             .eq('payment_id', paymentId)
             .eq('status', 'pending');
+
+          // S2.6: Emit PAYMENT_RECEIVED event on confirmed payment (not at checkout)
+          const userId = intent.metadata?.user_id || intent.metadata?.farmerId;
+          if (userId) {
+            emitEventAsync({
+              type: 'PAYMENT_RECEIVED',
+              data: {
+                paymentId,
+                userId,
+                amount: intent.amount / 100,
+                currency: intent.currency.toUpperCase(),
+                method: 'stripe',
+              },
+            });
+          }
         }
         break;
       }
@@ -208,7 +225,7 @@ export async function POST(request: NextRequest) {
       }
 
       default:
-        console.log(`Unhandled Stripe event type: ${event.type}`);
+        console.warn(`Unhandled Stripe event type: ${event.type}`);
     }
 
     // Audit log the webhook event

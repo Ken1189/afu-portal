@@ -461,7 +461,7 @@ function ProgramCard({ program, onApply }: { program: Program; onApply: (p: Prog
           <button
             onClick={() => !isClosed && onApply(program)}
             disabled={isClosed}
-            className="w-full gradient-navy text-white rounded-xl py-2.5 text-sm font-semibold hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity flex items-center justify-center gap-2"
+            className="w-full gradient-navy text-white rounded-xl py-2.5 text-sm font-semibold hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity flex items-center justify-center gap-2"
           >
             <Sprout className="w-4 h-4" />
             {isClosed ? 'Applications Closed' : 'Apply to Join'}

@@ -244,7 +244,7 @@ export default function AdDetailPage() {
           const byDate: Record<string, { impressions: number; clicks: number }> = {};
           const byCountry: Record<string, { impressions: number; clicks: number }> = {};
 
-          impressionData.forEach((imp: any) => {
+          impressionData.forEach((imp: { created_at: string; event_type: string; country_code?: string }) => {
             const date = new Date(imp.created_at).toISOString().split('T')[0];
             if (!byDate[date]) byDate[date] = { impressions: 0, clicks: 0 };
             if (imp.event_type === 'impression') byDate[date].impressions++;
@@ -274,8 +274,8 @@ export default function AdDetailPage() {
               .sort((a, b) => b.impressions - a.impressions)
           );
         }
-      } catch (err: any) {
-        setError(err?.message || 'Failed to load ad details');
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Failed to load ad details');
       } finally {
         setLoading(false);
       }
@@ -297,8 +297,8 @@ export default function AdDetailPage() {
         .eq('id', ad.id);
       if (error) throw error;
       setAd((prev) => prev ? { ...prev, status: newStatus } : prev);
-    } catch (err: any) {
-      showToast('error', 'Failed to update: ' + (err?.message || 'Unknown error'));
+    } catch (err: unknown) {
+      showToast('error', 'Failed to update: ' + (err instanceof Error ? err.message : 'Unknown error'));
     } finally {
       setTogglingStatus(false);
     }

@@ -239,9 +239,15 @@ export class MpesaGateway implements PaymentGateway {
     const callbackUrl = requireEnv('mpesa', 'MPESA_CALLBACK_URL');
     const transactionId = generateTransactionId();
 
+    // S1.15: SecurityCredential must be the initiator password encrypted with
+    // Safaricom's public certificate, not the raw shortcode.
+    // In sandbox mode, use the test credential; in production, encrypt with cert.
+    const initiatorPassword = requireEnv('mpesa', 'MPESA_INITIATOR_PASSWORD');
+    const securityCredential = process.env.MPESA_SECURITY_CREDENTIAL || initiatorPassword;
+
     const payload = {
-      Initiator: 'apiuser',
-      SecurityCredential: shortcode, // In production, this would be encrypted
+      Initiator: process.env.MPESA_INITIATOR_NAME || 'apiuser',
+      SecurityCredential: securityCredential,
       CommandID: 'TransactionReversal',
       TransactionID: providerReference,
       Amount: amount ?? 0, // 0 = full reversal

@@ -12,11 +12,13 @@ import {
   Store,
 } from "lucide-react";
 
-export const metadata = {
-  title: "Guaranteed Offtake & Market Access - AFU Services",
-  description:
-    "Pre-arranged buyer contracts before planting season. AFU connects farmers to exporters, retailers, and food processors with price-floor guarantees that eliminate market risk.",
-};
+import { createPageMetadata } from '@/lib/seo/metadata';
+
+export const metadata = createPageMetadata({
+  title: 'Guaranteed Offtake',
+  description: 'Pre-arranged buyer contracts before planting season. AFU connects farmers to exporters, retailers, and processors with price-floor guarantees.',
+  path: '/services/offtake',
+});
 
 const steps = [
   {

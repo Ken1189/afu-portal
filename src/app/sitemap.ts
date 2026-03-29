@@ -1,6 +1,8 @@
 import type { MetadataRoute } from 'next';
+import { createClient } from '@supabase/supabase-js';
 
-export default function sitemap(): MetadataRoute.Sitemap {
+// S4.10: Expanded sitemap with dynamic content
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://africanfarmingunion.org';
 
   const pages: { path: string; priority: number; freq: 'daily' | 'weekly' | 'monthly' }[] = [
@@ -84,10 +86,80 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: '/legal/privacy', priority: 0.4, freq: 'monthly' },
   ];
 
-  return pages.map((p) => ({
+  const staticEntries = pages.map((p) => ({
     url: `${baseUrl}${p.path}`,
     lastModified: new Date(),
-    changeFrequency: p.freq,
+    changeFrequency: p.freq as MetadataRoute.Sitemap[number]['changeFrequency'],
     priority: p.priority,
   }));
+
+  // S4.10: Fetch dynamic content for sitemap
+  const dynamicEntries: MetadataRoute.Sitemap = [];
+
+  try {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (supabaseUrl && supabaseKey) {
+      const svc = createClient(supabaseUrl, supabaseKey);
+
+      // Country pages
+      const { data: countries } = await svc
+        .from('countries')
+        .select('slug, updated_at')
+        .limit(50);
+
+      if (countries) {
+        for (const c of countries) {
+          dynamicEntries.push({
+            url: `${baseUrl}/countries/${c.slug}`,
+            lastModified: c.updated_at ? new Date(c.updated_at) : new Date(),
+            changeFrequency: 'monthly',
+            priority: 0.7,
+          });
+        }
+      }
+
+      // Farmer profiles (public)
+      const { data: farmers } = await svc
+        .from('farmer_public_profiles')
+        .select('id, updated_at')
+        .eq('is_active', true)
+        .limit(500);
+
+      if (farmers) {
+        for (const f of farmers) {
+          dynamicEntries.push({
+            url: `${baseUrl}/farmers/${f.id}`,
+            lastModified: f.updated_at ? new Date(f.updated_at) : new Date(),
+            changeFrequency: 'weekly',
+            priority: 0.5,
+          });
+        }
+      }
+
+      // Blog posts (published)
+      const { data: posts } = await svc
+        .from('blog_posts')
+        .select('slug, updated_at')
+        .eq('status', 'published')
+        .limit(200);
+
+      if (posts) {
+        for (const p of posts) {
+          dynamicEntries.push({
+            url: `${baseUrl}/blog/${p.slug}`,
+            lastModified: p.updated_at ? new Date(p.updated_at) : new Date(),
+            changeFrequency: 'weekly',
+            priority: 0.6,
+          });
+        }
+      }
+    }
+  } catch {
+    // Dynamic content fetch failed — return static entries only
+    console.warn('[sitemap] Failed to fetch dynamic content');
+  }
+
+  return [...staticEntries, ...dynamicEntries];
 }

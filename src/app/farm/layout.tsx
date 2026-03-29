@@ -111,11 +111,26 @@ export default function FarmLayout({ children }: { children: React.ReactNode }) 
 function FarmLayoutInner({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, profile, signOut } = useAuth();
+  const { user, profile, signOut, isLoading: authLoading } = useAuth();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
   const [sidebarLangOpen, setSidebarLangOpen] = useState(false);
   const { locale, setLocale, t } = useLanguage();
+
+  // S1.13: Auth guard — redirect unauthenticated users to login
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push('/login?redirect=' + encodeURIComponent(pathname));
+    }
+  }, [authLoading, user, router, pathname]);
+
+  if (authLoading || !user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#5DB347]" />
+      </div>
+    );
+  }
 
   // Tier state
   const [currentTier, setCurrentTier] = useState<FarmerTier>('seedling');

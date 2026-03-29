@@ -7,19 +7,37 @@ import { AuthProvider } from "@/lib/supabase/auth-context";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import CookieConsent from "@/components/CookieConsent";
 import SessionTimeout from "@/components/SessionTimeout";
+import { JsonLd, AFU_ORGANIZATION, AFU_WEBSITE } from "@/components/JsonLd";
+import { WebVitals } from "@/components/WebVitals";
 
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
 });
 
+// S4.3: Canonical URL base
+const SITE_URL = 'https://africanfarmingunion.org';
+
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "African Farming Union (AFU) - Africa's Agriculture Development Platform",
   description:
     "By Farmers, For Farmers. Financing, insurance, legal assistance, veterinary services, training, and market access for farmers across 20 African countries.",
-  keywords: ["agriculture", "Africa", "farming", "financing", "trade finance", "agri-bank", "insurance", "training", "market access"],
   manifest: "/manifest.json",
   themeColor: "#5DB347",
+  // S4.3: Canonical URL
+  alternates: {
+    canonical: SITE_URL,
+    // S4.4: Hreflang tags for multi-country/language targeting
+    languages: {
+      'en': SITE_URL,
+      'fr': `${SITE_URL}/fr`,
+      'pt': `${SITE_URL}/pt`,
+      'sw': `${SITE_URL}/sw`,
+      'ar': `${SITE_URL}/ar`,
+      'x-default': SITE_URL,
+    },
+  },
   openGraph: {
     title: "African Farming Union (AFU) - Africa's Agriculture Development Platform",
     description:
@@ -61,8 +79,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        {/* S4.8: JSON-LD structured data */}
+        <JsonLd data={AFU_ORGANIZATION} />
+        <JsonLd data={AFU_WEBSITE} />
+      </head>
       <body className={`${inter.variable} font-sans antialiased`}>
         <AuthProvider>
+          <WebVitals />
           <ServiceWorkerRegister />
           <AnnouncementBanner />
           <SiteNavbar />

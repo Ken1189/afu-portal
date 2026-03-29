@@ -88,8 +88,19 @@ function parsePost(raw: BlogPost): ParsedPost {
 }
 
 // Simple markdown renderer
+// S1.7: Sanitize HTML before rendering to prevent XSS
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 function renderMarkdown(md: string): string {
-  return md
+  // Escape HTML first to prevent XSS, then apply markdown transforms
+  return escapeHtml(md)
     .replace(/^### (.+)$/gm, '<h3 class="text-lg font-semibold mt-4 mb-2">$1</h3>')
     .replace(/^## (.+)$/gm, '<h2 class="text-xl font-bold mt-4 mb-2">$1</h2>')
     .replace(/^# (.+)$/gm, '<h1 class="text-2xl font-bold mt-4 mb-2">$1</h1>')
@@ -358,7 +369,7 @@ export default function AdminBlogPage() {
               <button onClick={() => setPreviewPost(null)} className="p-1.5 rounded-lg hover:bg-gray-100"><X className="w-5 h-5 text-gray-400" /></button>
             </div>
             {previewPost.featured_image && (
-              <img src={previewPost.featured_image} alt="" className="w-full h-48 object-cover rounded-xl" />
+              <img src={previewPost.featured_image} alt={`Featured image for ${previewPost.title}`} className="w-full h-48 object-cover rounded-xl" />
             )}
             <div>
               <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${CATEGORY_COLORS[previewPost.category] || 'bg-gray-100 text-gray-600'}`}>{previewPost.category}</span>

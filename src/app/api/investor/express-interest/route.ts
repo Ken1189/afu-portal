@@ -79,7 +79,6 @@ export async function POST(request: Request) {
       }
     } catch {
       // Table may not exist yet — that's fine
-      console.log('[express-interest] Supabase insert skipped (table may not exist yet)');
     }
 
     // ── Send email notification via Resend ────────────────────────────────

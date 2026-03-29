@@ -68,7 +68,7 @@ interface FarmPlot {
   progressPercent: number;
   healthScore: number;
   lastActivity: string;
-  activities: any[];
+  activities: { date: string; type: string; description: string }[];
   image: string;
   soilPH: number;
   location: string;

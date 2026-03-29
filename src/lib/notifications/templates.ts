@@ -232,3 +232,89 @@ export function securityAlertTemplate(
     smsBody: `AFU SECURITY: ${action} from ${location}. If not you, secure your account now.`,
   };
 }
+
+// ---------------------------------------------------------------------------
+// S5.7: Onboarding email templates — Day 0, Day 3, Day 7 nurture sequence
+// ---------------------------------------------------------------------------
+
+/** Day 0: Welcome email sent immediately after signup */
+export function onboardingWelcomeTemplate(name: string): NotificationTemplate {
+  const title = 'Welcome to African Farming Union!';
+  const body = `Welcome${name ? `, ${name}` : ''}! Complete your profile to unlock financing, insurance, and training.`;
+
+  return {
+    title,
+    body,
+    emailSubject: 'Welcome to AFU - Complete Your Profile',
+    emailHtml: emailWrapper(
+      'Welcome to AFU!',
+      `<p>Hi${name ? ` ${name}` : ''},</p>
+       <p>Welcome to the African Farming Union! You&rsquo;ve taken the first step toward transforming your farming operation.</p>
+       <p><strong>Complete your profile</strong> to unlock:</p>
+       <ul>
+         <li>Access to financing (working capital, input finance)</li>
+         <li>Crop &amp; livestock insurance</li>
+         <li>Training courses &amp; certifications</li>
+         <li>Market access &amp; guaranteed offtake</li>
+       </ul>
+       <p>It only takes 2 minutes.</p>`,
+      'https://africanfarmingunion.org/onboarding',
+      'Complete Your Profile',
+    ),
+    smsBody: `AFU: Welcome${name ? ` ${name}` : ''}! Complete your profile at africanfarmingunion.org/onboarding to unlock financing & training.`,
+  };
+}
+
+/** Day 3: Reminder for users who signed up but didn't complete onboarding */
+export function onboardingReminderDay3Template(name: string): NotificationTemplate {
+  const title = 'You\'re Almost There!';
+  const body = `${name ? `${name}, y` : 'Y'}our AFU profile is incomplete. Finish setup to access financing and insurance.`;
+
+  return {
+    title,
+    body,
+    emailSubject: 'Finish Your AFU Profile - 2 Minutes Left',
+    emailHtml: emailWrapper(
+      'You&rsquo;re Almost There!',
+      `<p>Hi${name ? ` ${name}` : ''},</p>
+       <p>You started your AFU membership but haven&rsquo;t finished setting up. You&rsquo;re just a few steps away from:</p>
+       <ul>
+         <li><strong>$500 - $50,000</strong> in working capital financing</li>
+         <li><strong>Crop insurance</strong> backed by Lloyd&rsquo;s of London</li>
+         <li><strong>Free training courses</strong> to boost your yields</li>
+       </ul>
+       <p>Complete your profile now &mdash; it only takes 2 minutes.</p>`,
+      'https://africanfarmingunion.org/onboarding',
+      'Complete My Profile',
+    ),
+    smsBody: `AFU: ${name ? `${name}, f` : 'F'}inish your profile to unlock financing & insurance. 2 min: africanfarmingunion.org/onboarding`,
+  };
+}
+
+/** Day 7: Final nudge for users who haven't completed onboarding */
+export function onboardingReminderDay7Template(name: string): NotificationTemplate {
+  const title = 'Don\'t Miss Out on AFU Benefits';
+  const body = `${name ? `${name}, y` : 'Y'}our AFU membership is pending. Complete setup to access all services.`;
+
+  return {
+    title,
+    body,
+    emailSubject: 'Last Chance - Complete Your AFU Membership',
+    emailHtml: emailWrapper(
+      'Don&rsquo;t Miss Out',
+      `<p>Hi${name ? ` ${name}` : ''},</p>
+       <p>It&rsquo;s been a week since you signed up for the African Farming Union, but your profile is still incomplete.</p>
+       <p>Thousands of farmers across 20 countries are already using AFU to:</p>
+       <ul>
+         <li>Access affordable financing</li>
+         <li>Protect their crops with insurance</li>
+         <li>Sell their harvest at guaranteed prices</li>
+         <li>Learn modern farming techniques</li>
+       </ul>
+       <p>Don&rsquo;t get left behind. Complete your profile today.</p>`,
+      'https://africanfarmingunion.org/onboarding',
+      'Finish Setup Now',
+    ),
+    smsBody: `AFU: Last reminder! Complete your profile to access financing, insurance & training: africanfarmingunion.org/onboarding`,
+  };
+}

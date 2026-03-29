@@ -5,6 +5,8 @@ import { cookies } from 'next/headers';
 import { sendNotification } from '@/lib/notifications/engine';
 import { kycVerifiedTemplate } from '@/lib/notifications/templates';
 import { kycApproveSchema } from '@/lib/validation/schemas';
+import { emitEventAsync } from '@/lib/events/event-bus';
+import '@/lib/events/handlers';
 
 export async function POST(request: NextRequest) {
   try {
@@ -118,6 +120,14 @@ export async function POST(request: NextRequest) {
         body: `Your ${tierLabel} identity verification was not approved.${notes ? ` Reason: ${notes}` : ''} Please resubmit your documents.`,
         actionUrl: '/dashboard/kyc',
       }).catch(() => {});
+    }
+
+    // S2.10: Emit KYC_APPROVED event for cross-system workflows
+    if (action === 'approve') {
+      emitEventAsync({
+        type: 'KYC_APPROVED',
+        data: { userId: memberId },
+      });
     }
 
     return NextResponse.json({ success: true, verification });

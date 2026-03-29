@@ -216,7 +216,8 @@ export default function InvestorSettingsPage() {
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
     } catch {
-      // Silently fail -- the UI still shows the local state
+      // S2.15: Show error instead of silently failing
+      alert('Failed to save settings. Please try again.');
     }
     setSaving(false);
   };

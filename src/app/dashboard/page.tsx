@@ -57,6 +57,7 @@ import type { LucideIcon } from 'lucide-react';
 import { useAuth } from '@/lib/supabase/auth-context';
 import { createClient } from '@/lib/supabase/client';
 import { ProgramBanner } from '@/components/programs/ProgramBanner';
+import OnboardingChecklist from '@/components/dashboard/OnboardingChecklist';
 
 // ---------------------------------------------------------------------------
 // Static data (inlined to remove @/lib/data/ mock imports)
@@ -138,15 +139,16 @@ const MARKET_PRICES: CommodityPrice[] = [
   },
 ];
 
+// S2.5: Fixed column names to match DB schema
 interface Notification {
   id: string;
   type: string;
   title: string;
-  message: string;
-  timestamp: string;
-  read: boolean;
-  link: string;
-  priority: 'high' | 'medium' | 'low';
+  body: string;
+  created_at: string;
+  is_read: boolean;
+  action_url?: string;
+  priority?: 'high' | 'medium' | 'low';
 }
 
 /** Fallback notifications — empty until real data loads from API. */
@@ -181,7 +183,8 @@ interface DashboardData {
   };
   recentOrders: Array<{ id: string; order_number: string; total: number; status: string; created_at: string }>;
   recentLoans: Array<{ id: string; loan_number: string; loan_type: string; amount: number; status: string }>;
-  notifications: Array<{ id: string; title: string; message: string; type: string; read: boolean }>;
+  // S2.5: Fixed column names to match DB schema
+  notifications: Array<{ id: string; title: string; body: string; type: string; is_read: boolean }>;
 }
 
 // ---------------------------------------------------------------------------
@@ -389,7 +392,7 @@ export default function DashboardPage() {
 
   // Unread high-priority notifications
   const urgentNotifications = useMemo(
-    () => notifications.filter((n) => !n.read && (('priority' in n) ? n.priority === 'high' : false)),
+    () => notifications.filter((n) => !n.is_read && (('priority' in n) ? n.priority === 'high' : false)),
     [notifications]
   );
 
@@ -465,6 +468,9 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
+      {/* S5.3: Post-onboarding checklist */}
+      <OnboardingChecklist />
+
       {/* ----------------------------------------------------------------- */}
       {/* 0. PROGRAM BANNER */}
       {/* ----------------------------------------------------------------- */}
@@ -490,7 +496,7 @@ export default function DashboardPage() {
             <p className="text-sm font-semibold text-amber-800">
               {urgentNotifications.length} urgent notification{urgentNotifications.length > 1 ? 's' : ''}
             </p>
-            <p className="text-sm text-amber-700 truncate">{urgentNotifications[0].message}</p>
+            <p className="text-sm text-amber-700 truncate">{urgentNotifications[0].body}</p>
           </div>
           <button
             onClick={() => setAlertDismissed(true)}

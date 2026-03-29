@@ -220,8 +220,9 @@ export default function InvestorOpportunities() {
     const opp = opportunities.find((o) => o.id === oppId);
     const form = getFormData(opp!);
 
+    // S2.14: Check response status instead of always showing success
     try {
-      await fetch('/api/investor/express-interest', {
+      const res = await fetch('/api/investor/express-interest', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -235,8 +236,15 @@ export default function InvestorOpportunities() {
           investorName: profile?.full_name || user?.email,
         }),
       });
-    } catch (e) {
-      // still show success even if API fails
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({ error: 'Failed to submit interest' }));
+        alert(errData.error || 'Failed to submit expression of interest. Please try again.');
+        return;
+      }
+    } catch {
+      alert('Network error. Please check your connection and try again.');
+      return;
     }
 
     setSubmittedIds((prev) => new Set(prev).add(oppId));
@@ -628,6 +636,24 @@ export default function InvestorOpportunities() {
           Schedule a Meeting with Peter Watson, CEO
         </a>
       </motion.div>
+
+      {/* S3.9: Investment disclaimer — required for financial compliance */}
+      <div className="mt-8 p-6 bg-amber-50 border border-amber-200 rounded-xl">
+        <h3 className="text-sm font-semibold text-amber-800 mb-2">Important Investment Disclaimer</h3>
+        <p className="text-xs text-amber-700 leading-relaxed">
+          All target IRR figures shown are projections based on financial models and historical
+          data, and are not guaranteed. Past performance is not indicative of future results.
+          Investing in agriculture and emerging markets involves significant risks, including
+          but not limited to: currency risk, political risk, weather and climate risk, crop
+          failure, market price volatility, and liquidity risk. Capital invested may be at risk
+          and you may receive back less than your original investment. These opportunities are
+          available only to qualified/accredited investors as defined by applicable securities
+          regulations. This does not constitute an offer to sell or a solicitation of an offer
+          to buy any securities. Prospective investors should consult their own legal, tax, and
+          financial advisors before making any investment decision. AFU is not a registered
+          investment adviser or broker-dealer.
+        </p>
+      </div>
     </div>
   );
 }

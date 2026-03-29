@@ -120,7 +120,7 @@ const dashboardStats = {
   milestones: [
     { label: '500 Members', target: 500, current: 247, deadline: 'Q4 2026' },
     { label: '$10M Deployed', target: 10000000, current: 4200000, deadline: 'Q2 2027' },
-    { label: '10 Countries', target: 10, current: 10, deadline: 'Q1 2026' },
+    { label: '20 Countries', target: 20, current: 20, deadline: 'Q1 2026' },
     { label: 'Default Rate <5%', target: 5, current: 2.3, deadline: 'Ongoing', inverted: true },
     { label: '60% Training Rate', target: 60, current: 60.3, deadline: 'Q1 2026' },
   ],

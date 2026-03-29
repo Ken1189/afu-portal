@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase/server';
+import { notifyUser, notifyAdmins } from '@/lib/events/notifications';
 
 async function getAuthMember(supabase: Awaited<ReturnType<typeof createServerSupabaseClient>>) {
   const { data: { user } } = await supabase.auth.getUser();
@@ -44,5 +45,23 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  // S3.4: Notify user and admins of insurance purchase
+  if (data) {
+    notifyUser(
+      auth.userId,
+      'Insurance Policy Created',
+      `Your insurance policy ${policyNumber} has been created. Coverage is now active.`,
+      'all',
+      { type: 'insurance', actionUrl: '/dashboard/insurance' },
+    ).catch(() => {});
+
+    notifyAdmins(
+      'New Insurance Policy',
+      `Policy ${policyNumber} created for member ${auth.memberId}`,
+      { type: 'insurance', actionUrl: '/admin/insurance' },
+    ).catch(() => {});
+  }
+
   return NextResponse.json({ policy: data }, { status: 201 });
 }

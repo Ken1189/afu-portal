@@ -493,7 +493,7 @@ export default function ReceivePage() {
           <button
             onClick={() => setStep(2)}
             disabled={!canProceedStep1}
-            className="w-full flex items-center justify-center gap-2 bg-[#5DB347] text-white py-4 rounded-xl font-bold text-lg min-h-[56px] hover:bg-[#4ea03c] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center gap-2 bg-[#5DB347] text-white py-4 rounded-xl font-bold text-lg min-h-[56px] hover:bg-[#4ea03c] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Next: Commodity Details
             <ArrowRight className="w-5 h-5" />
@@ -602,7 +602,7 @@ export default function ReceivePage() {
             <button
               onClick={() => setStep(3)}
               disabled={!canProceedStep2}
-              className="flex-[2] flex items-center justify-center gap-2 bg-[#5DB347] text-white py-4 rounded-xl font-bold text-lg min-h-[56px] hover:bg-[#4ea03c] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              className="flex-[2] flex items-center justify-center gap-2 bg-[#5DB347] text-white py-4 rounded-xl font-bold text-lg min-h-[56px] hover:bg-[#4ea03c] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Next: Quality
               <ArrowRight className="w-5 h-5" />
@@ -755,7 +755,7 @@ export default function ReceivePage() {
             <button
               onClick={() => setStep(4)}
               disabled={!canProceedStep3}
-              className="flex-[2] flex items-center justify-center gap-2 bg-[#5DB347] text-white py-4 rounded-xl font-bold text-lg min-h-[56px] hover:bg-[#4ea03c] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              className="flex-[2] flex items-center justify-center gap-2 bg-[#5DB347] text-white py-4 rounded-xl font-bold text-lg min-h-[56px] hover:bg-[#4ea03c] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Next: Confirm
               <ArrowRight className="w-5 h-5" />

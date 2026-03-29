@@ -12,11 +12,13 @@ import {
   CheckCircle2,
 } from "lucide-react";
 
-export const metadata = {
-  title: "Agricultural Inputs & Equipment - AFU Services",
-  description:
-    "Bulk procurement of seeds, fertilizers, pesticides, and irrigation equipment at wholesale prices. Input credit facilities and equipment leasing for African farmers.",
-};
+import { createPageMetadata } from '@/lib/seo/metadata';
+
+export const metadata = createPageMetadata({
+  title: 'Farm Inputs & Equipment',
+  description: 'Bulk procurement of seeds, fertilizers, pesticides, and irrigation equipment at wholesale prices. Input credit and equipment leasing for African farmers.',
+  path: '/services/inputs',
+});
 
 const steps = [
   {

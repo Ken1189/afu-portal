@@ -106,7 +106,10 @@ export default function SupplierTradePage() {
         .eq('status', 'marketplace')
         .order('created_at', { ascending: false });
       setOrders(data || []);
-    } catch { /* ignore */ }
+    } catch {
+      // S2.16: Surface error instead of silently swallowing
+      console.error('[SupplierTrade] Failed to fetch orders');
+    }
     setOrdersLoading(false);
   }, [supabase]);
 
@@ -133,7 +136,10 @@ export default function SupplierTradePage() {
       } else {
         setMyQuotes([]);
       }
-    } catch { /* ignore */ }
+    } catch {
+      // S2.16: Surface error instead of silently swallowing
+      console.error('[SupplierTrade] Failed to fetch quotes');
+    }
     setQuotesLoading(false);
   }, [user, supabase]);
 

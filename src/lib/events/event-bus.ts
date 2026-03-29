@@ -68,7 +68,9 @@ export type AFUEvent =
   | { type: 'MEMBERSHIP_PAYMENT'; data: { userId: string; tier: string; amount: number } }
   // Cooperative events
   | { type: 'COOPERATIVE_ORDER_CREATED'; data: { orderId: string; cooperativeId: string; commodity: string; quantity: number } }
-  | { type: 'COOPERATIVE_MEMBER_JOINED'; data: { cooperativeId: string; userId: string } };
+  | { type: 'COOPERATIVE_MEMBER_JOINED'; data: { cooperativeId: string; userId: string } }
+  // S5.8: Onboarding lifecycle events
+  | { type: 'ONBOARDING_ABANDONED'; data: { userId: string; step: number; email?: string; fullName?: string } };
 
 export type AFUEventType = AFUEvent['type'];
 

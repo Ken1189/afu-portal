@@ -381,7 +381,7 @@ function UpdateCard({ update }: { update: FarmerUpdate }) {
               key={i}
               className="relative w-20 h-20 rounded-lg overflow-hidden bg-gray-100"
             >
-              <img src={url} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
+              <img src={url} alt={`Farm update photo ${i + 1}`} loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
             </div>
           ))}
         </div>
@@ -674,7 +674,7 @@ export default function FarmerProfilePage({
                     >
                       <img
                         src={url}
-                        alt=""
+                        alt={`${farmer.display_name} farm photo ${i + 1}`}
                         className="absolute inset-0 w-full h-full object-cover"
                       />
                     </div>

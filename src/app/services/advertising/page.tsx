@@ -15,10 +15,13 @@ import {
   Zap,
 } from 'lucide-react';
 
-export const metadata = {
-  title: 'Advertise with AFU - Reach 1M+ African Farmers',
-  description: 'Advertise your agricultural products and services to verified farmers across 20 African countries. Banner ads, featured listings, sponsored content, and newsletter sponsorships.',
-};
+import { createPageMetadata } from '@/lib/seo/metadata';
+
+export const metadata = createPageMetadata({
+  title: 'Advertising',
+  description: 'Advertise your agricultural products and services to verified farmers across Africa. Banner ads, featured listings, and sponsored content.',
+  path: '/services/advertising',
+});
 
 const stats = [
   { value: '1M+', label: 'Verified Farmers', icon: Users },

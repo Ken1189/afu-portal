@@ -81,6 +81,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'Application is already approved' }, { status: 400 });
     }
 
+    // S1.2: Assign role based on application type instead of hardcoding 'member'
+    const ROLE_MAP: Record<string, string> = {
+      farmer: 'farmer',
+      supplier: 'supplier',
+      ambassador: 'ambassador',
+      partner: 'partner',
+    };
+    const assignedRole = ROLE_MAP[application.application_type] || 'member';
+
     // Generate a temporary password
     const tempPassword = `AFU-${crypto.randomBytes(4).toString('hex').toUpperCase()}`;
 
@@ -90,7 +99,7 @@ export async function POST(request: Request) {
       password: tempPassword,
       email_confirm: true,
       user_metadata: {
-        role: 'member',
+        role: assignedRole,
         full_name: application.full_name,
       },
     });
@@ -132,7 +141,7 @@ export async function POST(request: Request) {
         email: application.email,
         full_name: application.full_name,
         phone: application.phone || null,
-        role: 'member',
+        role: assignedRole,
         country: application.country || null,
         region: application.region || null,
       });

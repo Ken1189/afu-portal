@@ -1,10 +1,11 @@
 import Link from "next/link";
+import { createPageMetadata } from '@/lib/seo/metadata';
 
-export const metadata = {
-  title: "Terms of Service - AFU",
-  description:
-    "African Farming Union (AFU) Terms of Service. Review the terms and conditions governing the use of our platform and services.",
-};
+export const metadata = createPageMetadata({
+  title: 'Terms of Service',
+  description: 'African Farming Union terms and conditions governing the use of our platform and agricultural services.',
+  path: '/legal/terms',
+});
 
 export default function TermsOfServicePage() {
   return (

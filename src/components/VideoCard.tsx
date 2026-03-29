@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 
 interface VideoCardProps {
@@ -36,10 +37,12 @@ export default function VideoCard({
       >
         {/* Thumbnail */}
         <div className="relative w-28 h-20 rounded-2xl overflow-hidden shrink-0">
-          <img
+          <Image
             src={thumbnailUrl}
             alt={title}
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover"
+            loading="lazy"
           />
           <div className="absolute inset-0 bg-black/30 group-hover:bg-black/20 transition-colors" />
           {/* Play button */}
@@ -79,10 +82,12 @@ export default function VideoCard({
       className="relative w-full aspect-video rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300 group cursor-pointer block"
     >
       {/* Background image */}
-      <img
+      <Image
         src={thumbnailUrl}
         alt={title}
-        className="absolute inset-0 w-full h-full object-cover"
+        fill
+        className="object-cover"
+        loading="lazy"
       />
       {/* Dark overlay */}
       <div className="absolute inset-0 bg-black/40 group-hover:bg-black/30 transition-colors duration-300" />

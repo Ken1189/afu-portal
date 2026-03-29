@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
+import { emitEventAsync } from '@/lib/events/event-bus';
+import '@/lib/events/handlers';
 
 const KNOWN_PROVIDERS = ['ecocash', 'mtn', 'orange', 'airtel'] as const;
 type MobileProvider = (typeof KNOWN_PROVIDERS)[number];
@@ -83,6 +85,28 @@ export async function POST(request: NextRequest) {
       })
       .eq('payment_id', payment.id)
       .eq('status', 'pending');
+
+    // S2.8: Emit PAYMENT_RECEIVED event on successful mobile money payment
+    if (mappedStatus === 'completed' && payment) {
+      const { data: paymentData } = await adminClient
+        .from('payments')
+        .select('user_id')
+        .eq('id', payment.id)
+        .single();
+
+      if (paymentData?.user_id) {
+        emitEventAsync({
+          type: 'PAYMENT_RECEIVED',
+          data: {
+            paymentId: payment.id,
+            userId: paymentData.user_id,
+            amount: amount || 0,
+            currency: currency || 'USD',
+            method: normalizedProvider,
+          },
+        });
+      }
+    }
 
     // Audit log
     await adminClient.from('audit_log').insert({

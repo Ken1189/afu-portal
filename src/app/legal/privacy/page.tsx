@@ -1,10 +1,11 @@
 import Link from "next/link";
+import { createPageMetadata } from '@/lib/seo/metadata';
 
-export const metadata = {
-  title: "Privacy Policy - AFU",
-  description:
-    "African Farming Union (AFU) Privacy Policy. Learn how we collect, use, and protect your personal information.",
-};
+export const metadata = createPageMetadata({
+  title: 'Privacy Policy',
+  description: 'African Farming Union privacy policy. Learn how we collect, use, and protect your personal information.',
+  path: '/legal/privacy',
+});
 
 export default function PrivacyPolicyPage() {
   return (

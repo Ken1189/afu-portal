@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { Radio, ShieldAlert, Wifi, MapPin, Lock, Phone } from "lucide-react";
 import { type LucideIcon } from "lucide-react";
+import { createPageMetadata } from '@/lib/seo/metadata';
 
-export const metadata = {
-  title: "Agri-Alert — Farm Security & Protection - AFU",
-  description:
-    "Protecting your farm, your livestock, and your livelihood. Drone surveillance, rapid response teams, smart fencing, livestock tracking, and 24/7 emergency response.",
-};
+export const metadata = createPageMetadata({
+  title: 'Farm Security',
+  description: 'Protecting your farm, livestock, and livelihood. Drone surveillance, rapid response teams, smart fencing, livestock tracking, and 24/7 emergency support.',
+  path: '/services/security',
+});
 
 const services: { icon: LucideIcon; title: string; description: string }[] = [
   {

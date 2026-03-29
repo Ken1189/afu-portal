@@ -44,7 +44,7 @@ function Card({
           ? { y: -4, boxShadow: '0 12px 24px -4px rgba(27, 42, 74, 0.12)' }
           : undefined
       }
-      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 25 }}
       className={[
         'bg-white rounded-xl border border-gray-200 shadow-sm',
         'transition-colors duration-200',

@@ -123,8 +123,8 @@ export default function AdminAdReviewPage() {
           }));
           setAds(mapped);
         }
-      } catch (err: any) {
-        setError(err?.message || 'Failed to load ads');
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Failed to load ads');
       } finally {
         setLoading(false);
       }
@@ -154,8 +154,8 @@ export default function AdminAdReviewPage() {
           ad.id === adId ? { ...ad, status: 'active' } : ad
         )
       );
-    } catch (err: any) {
-      showToast('Failed to approve: ' + (err?.message || 'Unknown error'), 'error');
+    } catch (err: unknown) {
+      showToast('Failed to approve: ' + (err instanceof Error ? err.message : 'Unknown error'), 'error');
     } finally {
       setProcessingId(null);
     }
@@ -194,8 +194,8 @@ export default function AdminAdReviewPage() {
         delete copy[adId];
         return copy;
       });
-    } catch (err: any) {
-      showToast('Failed to reject: ' + (err?.message || 'Unknown error'), 'error');
+    } catch (err: unknown) {
+      showToast('Failed to reject: ' + (err instanceof Error ? err.message : 'Unknown error'), 'error');
     } finally {
       setProcessingId(null);
     }

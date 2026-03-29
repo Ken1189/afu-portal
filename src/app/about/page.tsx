@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Sprout, Tractor, Building2, ShieldCheck, Settings, Globe, BarChart3, Lock, HeartHandshake, UtensilsCrossed, Heart, type LucideIcon } from "lucide-react";
 import LeadershipSection from "@/components/LeadershipSection";
 // CountryTeams removed — will be added when real team members are confirmed
@@ -36,10 +37,13 @@ export default function AboutPage() {
       {/* ─── HERO ─── */}
       <section className="relative py-28 text-white overflow-hidden">
         <div className="absolute inset-0">
-          <img
+          <Image
             src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1920&h=700&fit=crop"
             alt=""
-            className="absolute inset-0 w-full h-full object-cover"
+            aria-hidden="true"
+            fill
+            className="object-cover"
+            priority
           />
           <div
             className="absolute inset-0"
@@ -49,8 +53,7 @@ export default function AboutPage() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <span
-              className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5 text-sm font-medium mb-6"
-              style={{ color: '#6ABF4B' }}
+              className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5 text-sm font-medium mb-6 text-[var(--color-green-bar)]"
             >
               🌍 Pan-African Agriculture Development Platform
             </span>
@@ -90,7 +93,7 @@ export default function AboutPage() {
       <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
-            <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#5DB347' }}>
+            <span className="text-sm font-semibold uppercase tracking-wider text-green">
               Our Story
             </span>
           </div>
@@ -107,7 +110,7 @@ export default function AboutPage() {
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-10">
-            <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#5DB347' }}>
+            <span className="text-sm font-semibold uppercase tracking-wider text-green">
               The Problem
             </span>
             <h2 className="text-3xl md:text-4xl font-bold mt-2 mb-2">
@@ -127,8 +130,7 @@ export default function AboutPage() {
                 className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 text-center shadow-lg shadow-[#5DB347]/5 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 border-l-4 border-[#5DB347]"
               >
                 <div
-                  className="w-14 h-14 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-lg font-bold shadow-lg shadow-[#5DB347]/30 hover:scale-110 transition-transform duration-300"
-                  style={{ background: 'linear-gradient(135deg, #5DB347, #3d8a2e)' }}
+                  className="w-14 h-14 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-lg font-bold shadow-lg shadow-[#5DB347]/30 hover:scale-110 transition-transform duration-300 gradient-green"
                 >
                   {i + 1}
                 </div>
@@ -140,17 +142,17 @@ export default function AboutPage() {
           <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 mt-8 shadow-lg shadow-[#5DB347]/5 border-l-4 border-[#5DB347]">
             <p className="text-[#1B2A4A] text-center font-medium">
               Africa&apos;s agriculture doesn&apos;t fail at farming &mdash; it fails at{' '}
-              <strong style={{ color: '#5DB347' }}>finance + trade finance + offtake + processing</strong>.
+              <strong className="text-green">finance + trade finance + offtake + processing</strong>.
             </p>
           </div>
         </div>
       </section>
 
       {/* ─── OPERATING MODEL ─── */}
-      <section className="py-16" style={{ background: '#EDF4EF' }}>
+      <section className="py-16 bg-[var(--color-teal-light)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-10">
-            <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#5DB347' }}>
+            <span className="text-sm font-semibold uppercase tracking-wider text-green">
               How We Work
             </span>
             <h2 className="text-3xl md:text-4xl font-bold mt-2 mb-2">
@@ -198,12 +200,11 @@ export default function AboutPage() {
                 className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-lg shadow-[#5DB347]/5 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 border-l-4 border-[#5DB347]"
               >
                 <div
-                  className="w-14 h-14 rounded-full flex items-center justify-center mb-4 shadow-lg shadow-[#5DB347]/30 hover:scale-110 transition-transform duration-300"
-                  style={{ background: 'linear-gradient(135deg, #5DB347, #3d8a2e)' }}
+                  className="w-14 h-14 rounded-full flex items-center justify-center mb-4 shadow-lg shadow-[#5DB347]/30 hover:scale-110 transition-transform duration-300 gradient-green"
                 >
                   {item.icon}
                 </div>
-                <div className="text-sm font-semibold uppercase tracking-wider mb-1" style={{ color: '#5DB347' }}>
+                <div className="text-sm font-semibold uppercase tracking-wider mb-1 text-green">
                   {item.tier}
                 </div>
                 <h3 className="text-xl font-bold text-[#1B2A4A] mb-4">{item.name}</h3>
@@ -211,8 +212,7 @@ export default function AboutPage() {
                   {item.items.map((li, j) => (
                     <li key={j} className="flex items-start gap-2 text-gray-600 text-sm">
                       <svg
-                        className="w-4 h-4 mt-0.5 shrink-0"
-                        style={{ color: '#5DB347' }}
+                        className="w-4 h-4 mt-0.5 shrink-0 text-green"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -233,7 +233,7 @@ export default function AboutPage() {
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-10">
-            <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#5DB347' }}>
+            <span className="text-sm font-semibold uppercase tracking-wider text-green">
               Risk Management
             </span>
             <h2 className="text-3xl md:text-4xl font-bold mt-2">
@@ -253,8 +253,7 @@ export default function AboutPage() {
                 className="flex flex-col md:flex-row md:items-center gap-4 md:gap-8 bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-lg shadow-[#5DB347]/5 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 border-l-4 border-[#5DB347]"
               >
                 <div
-                  className="w-14 h-14 rounded-full flex items-center justify-center shrink-0 shadow-lg shadow-[#5DB347]/30 hover:scale-110 transition-transform duration-300"
-                  style={{ background: 'linear-gradient(135deg, #5DB347, #3d8a2e)' }}
+                  className="w-14 h-14 rounded-full flex items-center justify-center shrink-0 shadow-lg shadow-[#5DB347]/30 hover:scale-110 transition-transform duration-300 gradient-green"
                 >
                   {item.icon}
                 </div>
@@ -267,10 +266,10 @@ export default function AboutPage() {
       </section>
 
       {/* ─── OUR PROMISE TO AFRICA ─── */}
-      <section className="py-16" style={{ background: 'linear-gradient(135deg, #0F1A30 0%, #1B2A4A 60%, #1e3a3a 100%)' }}>
+      <section className="py-16 bg-[linear-gradient(135deg,var(--color-navy-dark)_0%,var(--color-navy)_60%,#1e3a3a_100%)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#6ABF4B' }}>
+            <span className="text-sm font-semibold uppercase tracking-wider text-[var(--color-green-bar)]">
               Giving Back
             </span>
             <h2 className="text-3xl md:text-4xl font-bold mt-2 mb-4 text-white">
@@ -340,13 +339,12 @@ export default function AboutPage() {
 
       {/* ─── FINAL CTA ─── */}
       <section
-        className="py-16 text-white relative overflow-hidden"
-        style={{ background: 'linear-gradient(135deg, #0F1A30 0%, #1B2A4A 60%, #1e3a3a 100%)' }}
+        className="py-16 text-white relative overflow-hidden bg-[linear-gradient(135deg,var(--color-navy-dark)_0%,var(--color-navy)_60%,#1e3a3a_100%)]"
       >
         {/* Green glow effect */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] rounded-full opacity-15 blur-3xl" style={{ background: '#5DB347' }} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] rounded-full opacity-15 blur-3xl bg-[var(--color-green)]" />
         <div className="relative max-w-4xl mx-auto px-4 text-center">
-          <span className="text-sm font-semibold uppercase tracking-wider mb-4 block" style={{ color: '#6ABF4B' }}>
+          <span className="text-sm font-semibold uppercase tracking-wider mb-4 block text-[var(--color-green-bar)]">
             Join the Movement
           </span>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6">
@@ -357,8 +355,7 @@ export default function AboutPage() {
           </p>
           <Link
             href="/apply"
-            className="inline-block font-semibold text-lg px-10 py-4 rounded-2xl transition-all duration-300 text-white shadow-xl shadow-[#5DB347]/30 hover:-translate-y-1 hover:shadow-2xl hover:shadow-[#5DB347]/40"
-            style={{ background: 'linear-gradient(135deg, #5DB347, #449933)' }}
+            className="inline-block font-semibold text-lg px-10 py-4 rounded-2xl transition-all duration-300 text-white shadow-xl shadow-[#5DB347]/30 hover:-translate-y-1 hover:shadow-2xl hover:shadow-[#5DB347]/40 gradient-green"
           >
             Join Our Farming Family →
           </Link>

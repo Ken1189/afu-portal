@@ -84,9 +84,11 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
+  // S1.16: Fetch role ONCE and reuse for all checks (was 5 redundant DB calls)
+  const role = user ? await getUserRole(user.id) : null;
+
   // If logged in and visiting /login → redirect based on role
   if (pathname === '/login' && user) {
-    const role = await getUserRole(user.id);
     const dest = request.nextUrl.clone();
     switch (role) {
       case 'super_admin':
@@ -111,9 +113,8 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(dest);
   }
 
-  // ── Role-based access ───────────────────────────────────────────────
+  // ── Role-based access (single role lookup reused) ─────────────────
   if (user && pathname.startsWith('/admin')) {
-    const role = await getUserRole(user.id);
     if (!role || !['admin', 'super_admin'].includes(role)) {
       const forbiddenUrl = request.nextUrl.clone();
       forbiddenUrl.pathname = '/dashboard';
@@ -122,7 +123,6 @@ export async function updateSession(request: NextRequest) {
   }
 
   if (user && pathname.startsWith('/supplier')) {
-    const role = await getUserRole(user.id);
     if (!role || !['supplier', 'admin', 'super_admin'].includes(role)) {
       const forbiddenUrl = request.nextUrl.clone();
       forbiddenUrl.pathname = '/dashboard';
@@ -131,7 +131,6 @@ export async function updateSession(request: NextRequest) {
   }
 
   if (user && pathname.startsWith('/investor')) {
-    const role = await getUserRole(user.id);
     if (!role || !['investor', 'admin', 'super_admin'].includes(role)) {
       const forbiddenUrl = request.nextUrl.clone();
       forbiddenUrl.pathname = '/dashboard';
@@ -140,7 +139,6 @@ export async function updateSession(request: NextRequest) {
   }
 
   if (user && pathname.startsWith('/ambassador')) {
-    const role = await getUserRole(user.id);
     if (!role || !['ambassador', 'admin', 'super_admin'].includes(role)) {
       const forbiddenUrl = request.nextUrl.clone();
       forbiddenUrl.pathname = '/dashboard';
@@ -149,7 +147,6 @@ export async function updateSession(request: NextRequest) {
   }
 
   if (user && pathname.startsWith('/warehouse')) {
-    const role = await getUserRole(user.id);
     if (!role || !['warehouse_operator', 'admin', 'super_admin'].includes(role)) {
       const forbiddenUrl = request.nextUrl.clone();
       forbiddenUrl.pathname = '/dashboard';

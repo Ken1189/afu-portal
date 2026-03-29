@@ -669,14 +669,14 @@ export default function WalletPage() {
                   <button
                     onClick={() => setTxnPage((p) => Math.max(1, p - 1))}
                     disabled={txnPage === 1}
-                    className="p-1.5 rounded-lg hover:bg-gray-100 disabled:opacity-40 transition-colors"
+                    className="p-1.5 rounded-lg hover:bg-gray-100 disabled:opacity-50 transition-colors"
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => setTxnPage((p) => Math.min(totalPages, p + 1))}
                     disabled={txnPage === totalPages}
-                    className="p-1.5 rounded-lg hover:bg-gray-100 disabled:opacity-40 transition-colors"
+                    className="p-1.5 rounded-lg hover:bg-gray-100 disabled:opacity-50 transition-colors"
                   >
                     <ChevronRight className="w-4 h-4" />
                   </button>

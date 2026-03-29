@@ -104,7 +104,7 @@ export function FileUpload({ accept = '.pdf,.jpg,.jpeg,.png', maxSize = 10, mult
         {files.map((f) => (
           <motion.div key={f.id} initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-lg">
             {f.preview ? (
-              <img src={f.preview} alt="" className="w-10 h-10 rounded object-cover" />
+              <img src={f.preview} alt={`Preview of ${f.file.name}`} className="w-10 h-10 rounded object-cover" />
             ) : (
               <div className="w-10 h-10 rounded bg-gray-100 flex items-center justify-center">{getFileIcon(f.file.type)}</div>
             )}

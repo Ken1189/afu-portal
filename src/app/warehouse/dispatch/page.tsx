@@ -414,7 +414,7 @@ export default function DispatchPage() {
             <button
               onClick={handleCreateDispatch}
               disabled={creating || selectedReceipts.length === 0 || !destination || !transporter}
-              className="w-full flex items-center justify-center gap-2 bg-[#5DB347] text-white py-4 rounded-xl font-bold text-lg min-h-[56px] hover:bg-[#4ea03c] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              className="w-full flex items-center justify-center gap-2 bg-[#5DB347] text-white py-4 rounded-xl font-bold text-lg min-h-[56px] hover:bg-[#4ea03c] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {creating ? (
                 <>

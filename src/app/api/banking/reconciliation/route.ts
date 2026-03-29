@@ -8,12 +8,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient, createServerSupabaseClient } from '@/lib/supabase/server';
 import { ReconciliationService } from '@/lib/banking';
 
+// S1.9: Check role from DB, not JWT metadata
 async function requireAdmin() {
   const supabase = await createServerSupabaseClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
-  const role = user.user_metadata?.role;
-  if (role !== 'admin' && role !== 'super_admin') return null;
+  const db = await createAdminClient();
+  const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
+  if (!profile || !['admin', 'super_admin'].includes(profile.role)) return null;
   return user;
 }
 

@@ -12,11 +12,13 @@ import {
   Sprout,
 } from "lucide-react";
 
-export const metadata = {
-  title: "Training & Capacity Building - AFU Services",
-  description:
-    "Online and in-person training for African farmers. Agronomy, financial literacy, digital skills, and business management courses with industry-recognised certifications.",
-};
+import { createPageMetadata } from '@/lib/seo/metadata';
+
+export const metadata = createPageMetadata({
+  title: 'Training & Capacity Building',
+  description: 'Online and in-person training for African farmers. Agronomy, financial literacy, digital skills, and business management with certifications.',
+  path: '/services/training',
+});
 
 const steps = [
   {

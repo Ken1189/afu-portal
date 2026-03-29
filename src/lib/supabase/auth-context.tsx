@@ -98,22 +98,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // ── Auth methods ──────────────────────────────────────────────────────
 
+  // S1.3: Self-signup creates pending profile — requires admin approval to activate
   const signUp = async (email: string, password: string, fullName: string) => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: { full_name: fullName, role: 'member' },
+        data: { full_name: fullName, role: 'pending' },
       },
     });
 
-    // If signup succeeded and we have a user, create their profile record
+    // Create profile with pending status — user cannot access protected portals until approved
     if (!error && data?.user) {
       await supabase.from('profiles').upsert({
         id: data.user.id,
         email,
         full_name: fullName,
-        role: 'member',
+        role: 'pending',
+      });
+
+      // Also create a membership application for admin review
+      await supabase.from('membership_applications').insert({
+        email,
+        full_name: fullName,
+        status: 'pending',
+        application_type: 'member',
+        profile_id: data.user.id,
       });
     }
 

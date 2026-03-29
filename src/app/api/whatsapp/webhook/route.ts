@@ -10,7 +10,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
 import { WhatsAppService } from '@/lib/messaging/whatsapp';
 
-const VERIFY_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN || 'afu_whatsapp_verify_2024';
+// S1.11: Remove hardcoded fallback — require env var
+const VERIFY_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN;
+if (!VERIFY_TOKEN) {
+  console.warn('[whatsapp/webhook] WHATSAPP_VERIFY_TOKEN not set — webhook verification will fail');
+}
 
 /**
  * GET — Webhook verification.
@@ -23,7 +27,6 @@ export async function GET(request: NextRequest) {
   const challenge = searchParams.get('hub.challenge');
 
   if (mode === 'subscribe' && token === VERIFY_TOKEN) {
-    console.log('[whatsapp/webhook] Verification successful');
     return new NextResponse(challenge || '', {
       status: 200,
       headers: { 'Content-Type': 'text/plain' },

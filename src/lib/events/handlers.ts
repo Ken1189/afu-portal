@@ -44,8 +44,9 @@ async function logAmbassadorCommission(
   const supabase = getAdmin();
   try {
     // Look up if user was referred
+    // S2.2: Fixed table name from 'referrals' to 'referral_links'
     const { data: referral } = await supabase
-      .from('referrals')
+      .from('referral_links')
       .select('ambassador_id, referral_code')
       .eq('referred_user_id', referredUserId)
       .single();
@@ -53,13 +54,23 @@ async function logAmbassadorCommission(
     if (!referral) return;
 
     const commission = amount * 0.1; // 10% commission
-    await supabase.from('ambassador_commissions').insert({
+    // S2.3: Fixed table name from 'ambassador_commissions' to 'commission_entries'
+    await supabase.from('commission_entries').insert({
       ambassador_id: referral.ambassador_id,
       referred_user_id: referredUserId,
-      amount: commission,
+      commission_amount: commission,
       reason,
       status: 'pending',
     });
+
+    // S3.5 + S3.6: Notify the ambassador about the referral and commission
+    await notifyUser(
+      referral.ambassador_id,
+      'New Commission Earned!',
+      `You earned a $${commission.toFixed(2)} commission from a referral. Reason: ${reason}`,
+      'all',
+      { type: 'commission', actionUrl: '/ambassador/commissions' },
+    );
   } catch {
     // Commission logging is non-critical
   }
@@ -67,33 +78,79 @@ async function logAmbassadorCommission(
 
 // ── Helper: create ledger entry (double-entry) ──
 
+// S2.4 (fixed): Create double-entry ledger entries using the real schema
+// ledger_entries uses account_id (UUID FK to ledger_accounts), not string names
 async function createLedgerEntry(
-  debitAccount: string,
-  creditAccount: string,
+  debitAccountName: string,
+  creditAccountName: string,
   amount: number,
   description: string,
   referenceId?: string,
 ): Promise<void> {
   const supabase = getAdmin();
   try {
+    // Look up or create accounts by name
+    const getOrCreateAccount = async (name: string) => {
+      const { data: existing } = await supabase
+        .from('ledger_accounts')
+        .select('id')
+        .eq('name', name)
+        .limit(1)
+        .single();
+
+      if (existing) return existing.id;
+
+      // Auto-create system account
+      const isSystem = name.startsWith('afu:');
+      const { data: created } = await supabase
+        .from('ledger_accounts')
+        .insert({
+          name,
+          account_type: isSystem ? 'revenue' : 'member',
+          is_system: isSystem,
+          currency: 'USD',
+        })
+        .select('id')
+        .single();
+
+      return created?.id;
+    };
+
+    const debitId = await getOrCreateAccount(debitAccountName);
+    const creditId = await getOrCreateAccount(creditAccountName);
+
+    if (!debitId || !creditId) return;
+
+    const txnId = crypto.randomUUID();
+
     await supabase.from('ledger_entries').insert([
       {
-        account: debitAccount,
+        transaction_id: txnId,
+        account_id: debitId,
+        contra_account_id: creditId,
         entry_type: 'debit',
         amount,
+        currency: 'USD',
+        balance_after: 0, // Will be updated by trigger if exists
         description,
-        reference_id: referenceId || null,
+        reference: referenceId || null,
+        reference_type: 'event',
       },
       {
-        account: creditAccount,
+        transaction_id: txnId,
+        account_id: creditId,
+        contra_account_id: debitId,
         entry_type: 'credit',
         amount,
+        currency: 'USD',
+        balance_after: 0,
         description,
-        reference_id: referenceId || null,
+        reference: referenceId || null,
+        reference_type: 'event',
       },
     ]);
   } catch {
-    // Ledger table may not exist — non-critical
+    // Ledger tables may not exist yet — non-critical
   }
 }
 
@@ -635,5 +692,30 @@ registerHandler('COOPERATIVE_MEMBER_JOINED', async (event: AFUEvent) => {
     'Cooperative Member Added',
     `New member joined cooperative: ${coop?.name || cooperativeId}`,
     { type: 'cooperative', actionUrl: '/admin/cooperatives' },
+  );
+});
+
+// ══════════════════════════════════════════════════════════════════════════
+// S5.8: ONBOARDING LIFECYCLE EVENTS
+// ══════════════════════════════════════════════════════════════════════════
+
+registerHandler('ONBOARDING_ABANDONED', async (event: AFUEvent) => {
+  if (event.type !== 'ONBOARDING_ABANDONED') return;
+  const { userId, step, email, fullName } = event.data;
+
+  // Send reminder based on which step they abandoned at
+  await notifyUser(
+    userId,
+    'Complete Your AFU Profile',
+    `You're almost done! Complete your onboarding to unlock financing, insurance, and training.`,
+    'all',
+    { type: 'system', actionUrl: '/onboarding' },
+  );
+
+  // Notify admins of abandonment for analytics
+  await notifyAdmins(
+    'Onboarding Abandoned',
+    `User ${fullName || email || userId} abandoned onboarding at step ${step + 1}/4`,
+    { type: 'system', actionUrl: '/admin/analytics' },
   );
 });

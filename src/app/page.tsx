@@ -395,7 +395,7 @@ export default function Home() {
               </div>
               <div className="flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/10 px-4 py-2 rounded-full text-white/70">
                 <Globe2 className="w-4 h-4 text-[#5DB347]" />
-                <span>10 Countries Active</span>
+                <span>20 Countries Active</span>
               </div>
               <div className="flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/10 px-4 py-2 rounded-full text-white/70">
                 <Users className="w-4 h-4 text-[#5DB347]" />

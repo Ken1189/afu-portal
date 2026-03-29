@@ -47,11 +47,11 @@ export async function verifyStripeWebhook(
   try {
     const event = stripe.webhooks.constructEvent(payload, signature, webhookSecret);
     return event;
-  } catch (err: any) {
+  } catch (err: unknown) {
     throw new PaymentGatewayError(
       'stripe',
       'WEBHOOK_VERIFICATION_FAILED',
-      `Stripe webhook signature verification failed: ${err.message}`
+      `Stripe webhook signature verification failed: ${err instanceof Error ? err.message : String(err)}`
     );
   }
 }
@@ -88,6 +88,7 @@ interface MpesaCallbackBody {
  * @returns true if the callback has a valid M-Pesa structure
  * @throws PaymentGatewayError if validation fails
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function verifyMpesaCallback(body: any): body is MpesaCallbackBody {
   if (!body || typeof body !== 'object') {
     throw new PaymentGatewayError(
@@ -217,6 +218,7 @@ interface PaynowCallbackBody {
  * @returns true if the callback is valid
  * @throws PaymentGatewayError if validation fails
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function verifyPaynowCallback(body: any): Promise<boolean> {
   if (!body || typeof body !== 'object') {
     throw new PaymentGatewayError(

@@ -217,7 +217,7 @@ export default function ChatWidget() {
                 <button
                   type="submit"
                   disabled={!input.trim() || isTyping}
-                  className="p-1.5 bg-teal rounded-lg text-white disabled:opacity-40 hover:bg-teal-dark transition-colors disabled:cursor-not-allowed"
+                  className="p-1.5 bg-teal rounded-lg text-white disabled:opacity-50 hover:bg-teal-dark transition-colors disabled:cursor-not-allowed"
                   aria-label="Send message"
                 >
                   <Send className="w-3.5 h-3.5" />

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase/server';
+import { notifyUser } from '@/lib/events/notifications';
 
 const ALLOWED_ENTITIES = ['membership_applications', 'loans', 'claims'] as const;
 type ApproveEntity = (typeof ALLOWED_ENTITIES)[number];
@@ -129,6 +130,49 @@ export async function POST(request: NextRequest) {
         const batch = auditEntries.slice(i, i + 100);
         await adminClient.from('audit_log').insert(batch);
       }
+    }
+
+    // S3.1: Send notifications to all affected users
+    if (entity === 'membership_applications' && updatedRows && updatedRows.length > 0) {
+      const notifyPromises = updatedRows.map(async (row) => {
+        try {
+          const { data: app } = await adminClient
+            .from('membership_applications')
+            .select('email, full_name, profile_id')
+            .eq('id', row.id)
+            .single();
+
+          if (app?.profile_id) {
+            const title = action === 'approve' ? 'Application Approved!' : 'Application Update';
+            const body = action === 'approve'
+              ? `Welcome${app.full_name ? `, ${app.full_name}` : ''}! Your membership application has been approved.`
+              : `Your membership application has been reviewed.${reason ? ` Note: ${reason}` : ''}`;
+            await notifyUser(app.profile_id, title, body, 'all', { type: 'system', actionUrl: '/dashboard' });
+          }
+        } catch { /* non-critical */ }
+      });
+      await Promise.allSettled(notifyPromises);
+    }
+
+    if (entity === 'loans' && updatedRows && updatedRows.length > 0) {
+      const notifyPromises = updatedRows.map(async (row) => {
+        try {
+          const { data: loan } = await adminClient
+            .from('loans')
+            .select('member_id, amount, loan_number')
+            .eq('id', row.id)
+            .single();
+
+          if (loan?.member_id) {
+            const title = action === 'approve' ? 'Loan Approved!' : 'Loan Application Update';
+            const body = action === 'approve'
+              ? `Your loan${loan.loan_number ? ` #${loan.loan_number}` : ''} for $${Number(loan.amount).toLocaleString()} has been approved!`
+              : `Your loan application has been reviewed.${reason ? ` Note: ${reason}` : ''}`;
+            await notifyUser(loan.member_id, title, body, 'all', { type: 'loan', actionUrl: '/dashboard/financing' });
+          }
+        } catch { /* non-critical */ }
+      });
+      await Promise.allSettled(notifyPromises);
     }
 
     return NextResponse.json({ processed, failed });

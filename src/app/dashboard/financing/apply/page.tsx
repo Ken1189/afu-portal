@@ -108,7 +108,41 @@ export default function FinancingApplyPage() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [applicationRef, setApplicationRef] = useState('');
   const [autoSaved, setAutoSaved] = useState(false);
+  const [draftRestored, setDraftRestored] = useState(false);
   const redirectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const DRAFT_KEY = 'afu_financing_draft';
+
+  // S5.11: Restore draft from localStorage on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(DRAFT_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.formData && parsed.step) {
+          setFormData((prev) => ({ ...prev, ...parsed.formData }));
+          setStep(parsed.step);
+          setDraftRestored(true);
+        }
+      }
+    } catch {
+      localStorage.removeItem(DRAFT_KEY);
+    }
+  }, []);
+
+  // S5.11: Auto-save draft to localStorage on changes
+  useEffect(() => {
+    if (submitted) {
+      localStorage.removeItem(DRAFT_KEY);
+      return;
+    }
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify({ formData, step, updatedAt: Date.now() }));
+      setAutoSaved(true);
+      const timer = setTimeout(() => setAutoSaved(false), 2000);
+      return () => clearTimeout(timer);
+    } catch { /* non-critical */ }
+  }, [formData, step, submitted]);
 
   // Clean up redirect timer on unmount
   useEffect(() => {

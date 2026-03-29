@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { Landmark, Globe, FlaskConical, Tractor, Sprout, Package, Home, type LucideIcon } from "lucide-react";
+import { createPageMetadata } from '@/lib/seo/metadata';
 
-export const metadata = {
-  title: "Financial Services - AFU",
-  description:
-    "Comprehensive agricultural financing from AFU. Access loans, banking, asset finance, mortgages, and more tailored for African farmers.",
-};
+export const metadata = createPageMetadata({
+  title: 'Agricultural Finance',
+  description: 'Comprehensive agricultural financing from AFU. Access loans, banking, asset finance, and mortgages tailored for African farmers.',
+  path: '/services/finance',
+});
 
 const products: { icon: LucideIcon; title: string; description: string; stat: string; link: string }[] = [
   {

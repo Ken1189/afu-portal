@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/lib/supabase/auth-context";
+import DashboardNotificationBell from "@/components/dashboard/DashboardNotificationBell";
 
 /* ------------------------------------------------------------------ */
 /*  Navigation structure with collapsible groups                       */
@@ -166,8 +167,23 @@ function NavSection({
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { profile, signOut, isAdmin } = useAuth();
+  const { user, profile, signOut, isAdmin, isLoading: authLoading } = useAuth();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+
+  // S1.14: Auth guard — redirect unauthenticated users to login
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push('/login?redirect=' + encodeURIComponent(pathname));
+    }
+  }, [authLoading, user, router, pathname]);
+
+  if (authLoading || !user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-cream">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#5DB347]" />
+      </div>
+    );
+  }
 
   // Initialize collapsed state: auto-expand section with active link
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>(() => {
@@ -323,12 +339,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <h2 className="text-base sm:text-lg font-semibold text-navy">Member Portal</h2>
           </div>
           <div className="flex items-center gap-3 sm:gap-4">
-            <button className="relative text-gray-400 hover:text-navy transition-colors">
-              <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-              </svg>
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] rounded-full flex items-center justify-center">3</span>
-            </button>
+            {/* S8.10: Notification bell wired to real data */}
+            <DashboardNotificationBell userId={user?.id} />
             {isAdmin && (
               <Link
                 href="/admin"

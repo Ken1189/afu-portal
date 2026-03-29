@@ -12,11 +12,13 @@ import {
   BadgeDollarSign,
 } from "lucide-react";
 
-export const metadata = {
-  title: "Trade Finance & Export Support - AFU Services",
-  description:
-    "Letters of credit, export guarantees, forex management, and pre-export financing. AFU facilitates cross-border agricultural trade across COMESA, SADC, and AfCFTA corridors.",
-};
+import { createPageMetadata } from '@/lib/seo/metadata';
+
+export const metadata = createPageMetadata({
+  title: 'Trade Finance',
+  description: 'Letters of credit, export guarantees, forex management, and pre-export financing for cross-border agricultural trade across Africa.',
+  path: '/services/trade-finance',
+});
 
 const steps = [
   {

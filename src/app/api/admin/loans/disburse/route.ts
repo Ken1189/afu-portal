@@ -5,6 +5,8 @@ import { cookies } from 'next/headers';
 import { sendNotification } from '@/lib/notifications/engine';
 import { paymentReceivedTemplate } from '@/lib/notifications/templates';
 import { loanDisburseSchema } from '@/lib/validation/schemas';
+import { emitEventAsync } from '@/lib/events/event-bus';
+import '@/lib/events/handlers';
 
 export async function POST(request: NextRequest) {
   try {
@@ -115,6 +117,19 @@ export async function POST(request: NextRequest) {
         title: 'Loan Disbursed',
         body: `Your loan of ${cur} ${amount.toLocaleString()} has been disbursed via ${method}.`,
       }).catch(() => {});
+    }
+
+    // S2.9: Emit LOAN_DISBURSED event for cross-system workflows
+    if (loan.member_id) {
+      emitEventAsync({
+        type: 'LOAN_DISBURSED',
+        data: {
+          loanId,
+          userId: loan.member_id,
+          amount,
+          walletId: undefined,
+        },
+      });
     }
 
     return NextResponse.json({ success: true, disbursement });

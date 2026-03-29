@@ -306,8 +306,8 @@ export default function CreateCampaign() {
 
       if (error) throw error;
       setSubmitted(true);
-    } catch (err: any) {
-      setSubmitError(err?.message || 'Failed to submit ad. Please try again.');
+    } catch (err: unknown) {
+      setSubmitError(err instanceof Error ? err.message : 'Failed to submit ad. Please try again.');
     } finally {
       setSubmitting(false);
     }

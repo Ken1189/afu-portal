@@ -14,11 +14,13 @@ import {
   Wheat,
 } from "lucide-react";
 
-export const metadata = {
-  title: "Farm Energy Solutions - AFU",
-  description:
-    "Powering African agriculture sustainably. Solar-powered irrigation, off-grid solutions, biogas systems, and energy financing for farms.",
-};
+import { createPageMetadata } from '@/lib/seo/metadata';
+
+export const metadata = createPageMetadata({
+  title: 'Energy Solutions',
+  description: 'Powering African agriculture sustainably. Solar-powered irrigation, off-grid solutions, biogas systems, and energy financing for farms.',
+  path: '/services/energy',
+});
 
 const solarSolutions = [
   {

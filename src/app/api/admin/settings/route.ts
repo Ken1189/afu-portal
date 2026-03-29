@@ -23,10 +23,20 @@ async function getAuthUser() {
 
 /**
  * GET /api/admin/settings — returns all platform settings
+ * Requires admin authentication.
  */
 export async function GET() {
   try {
+    // S1.6: Auth guard for GET
+    const user = await getAuthUser();
+    if (!user) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+
     const svc = getSvc();
+
+    const { data: profile } = await svc.from('profiles').select('role').eq('id', user.id).single();
+    if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
     const { data, error } = await svc.from('platform_settings').select('*');
 
     if (error?.message?.includes('does not exist')) {

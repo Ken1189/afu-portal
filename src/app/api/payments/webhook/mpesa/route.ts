@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
+import { emitEventAsync } from '@/lib/events/event-bus';
+import '@/lib/events/handlers';
 
 interface MpesaStkCallback {
   MerchantRequestID: string;
@@ -70,6 +72,29 @@ export async function POST(request: NextRequest) {
       })
       .eq('payment_id', payment.id)
       .eq('status', 'pending');
+
+    // S2.7: Emit PAYMENT_RECEIVED event on successful M-Pesa payment
+    if (isSuccess && payment) {
+      // Look up user from payment record
+      const { data: paymentData } = await adminClient
+        .from('payments')
+        .select('user_id, amount, currency')
+        .eq('id', payment.id)
+        .single();
+
+      if (paymentData?.user_id) {
+        emitEventAsync({
+          type: 'PAYMENT_RECEIVED',
+          data: {
+            paymentId: payment.id,
+            userId: paymentData.user_id,
+            amount: Number(paymentData.amount),
+            currency: paymentData.currency || 'KES',
+            method: 'mpesa',
+          },
+        });
+      }
+    }
 
     // Audit log
     await adminClient.from('audit_log').insert({

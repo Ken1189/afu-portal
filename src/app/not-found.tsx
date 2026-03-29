@@ -1,5 +1,13 @@
 import Link from 'next/link';
 import { Home, Search, ArrowLeft, HelpCircle } from 'lucide-react';
+import type { Metadata } from 'next';
+
+// S7.7: Metadata for 404 page
+export const metadata: Metadata = {
+  title: 'Page Not Found | African Farming Union',
+  description: 'The page you are looking for could not be found.',
+  robots: { index: false, follow: true },
+};
 
 export default function NotFound() {
   return (

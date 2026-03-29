@@ -85,20 +85,9 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Emit PAYMENT_RECEIVED event for the checkout session initiation
-    // Note: Full payment confirmation happens via Stripe webhook
-    if (session.id) {
-      emitEventAsync({
-        type: 'PAYMENT_RECEIVED',
-        data: {
-          paymentId: session.id,
-          userId: farmerId || 'anonymous',
-          amount: price.amount / 100, // Convert from cents
-          currency: price.currency.toUpperCase(),
-          method: 'stripe',
-        },
-      });
-    }
+    // S2.1: Removed premature PAYMENT_RECEIVED event.
+    // Payment is NOT received yet — this is just a checkout session creation.
+    // PAYMENT_RECEIVED should only fire from the Stripe webhook after actual payment.
 
     return NextResponse.json({ url: session.url });
   } catch (err) {

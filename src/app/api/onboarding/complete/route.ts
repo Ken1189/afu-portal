@@ -18,6 +18,15 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
 
+    // S1.1: Whitelist allowed roles to prevent privilege escalation
+    const ALLOWED_ONBOARDING_ROLES = ['farmer', 'supplier', 'partner', 'member'];
+    if (!body.role || !ALLOWED_ONBOARDING_ROLES.includes(body.role)) {
+      return NextResponse.json(
+        { error: `Invalid role. Allowed: ${ALLOWED_ONBOARDING_ROLES.join(', ')}` },
+        { status: 400 }
+      );
+    }
+
     const {
       role,
       country,

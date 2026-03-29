@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { Rocket, Sprout, School, Trophy, Handshake, type LucideIcon } from "lucide-react";
+import { createPageMetadata } from '@/lib/seo/metadata';
 
-export const metadata = {
-  title: "Young Farmers — The Next Generation - AFU",
-  description:
-    "Inspiring the future of African agriculture. Youth incubators, training programs, school partnerships, entrepreneurship awards, and mentorship for young farmers.",
-};
+export const metadata = createPageMetadata({
+  title: 'Young Farmers Program',
+  description: 'Inspiring the future of African agriculture. Youth incubators, training programs, school partnerships, and mentorship for young farmers.',
+  path: '/young-farmers',
+});
 
 const programs: { icon: LucideIcon; title: string; description: string; highlight: string }[] = [
   {

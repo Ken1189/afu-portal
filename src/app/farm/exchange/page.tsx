@@ -255,8 +255,8 @@ export default function FarmExchangePage() {
         setShowCreateModal(false);
         setFormMessage(null);
       }, 1500);
-    } catch (err: any) {
-      setFormMessage({ type: 'error', text: err?.message || 'Failed to create listing. Please try again.' });
+    } catch (err: unknown) {
+      setFormMessage({ type: 'error', text: err instanceof Error ? err.message : 'Failed to create listing. Please try again.' });
     } finally {
       setFormSubmitting(false);
     }

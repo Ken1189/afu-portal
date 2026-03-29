@@ -13,11 +13,13 @@ import {
   Wheat,
 } from "lucide-react";
 
-export const metadata = {
-  title: "Processing & Value Addition - AFU Services",
-  description:
-    "Milling, drying, cold chain, and packaging facilities operated near farming clusters. Shared-use processing hubs that multiply crop value and reduce post-harvest waste.",
-};
+import { createPageMetadata } from '@/lib/seo/metadata';
+
+export const metadata = createPageMetadata({
+  title: 'Processing Hubs',
+  description: 'Milling, drying, cold chain, and packaging facilities near farming clusters. Shared-use processing hubs that multiply crop value and reduce waste.',
+  path: '/services/processing',
+});
 
 const steps = [
   {

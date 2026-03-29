@@ -336,7 +336,7 @@ export default function DonatePage() {
                 <button
                   type="submit"
                   disabled={!donationAmount || donationAmount <= 0 || processing}
-                  className="w-full py-4 bg-[#5DB347] text-white rounded-xl font-semibold text-base hover:bg-[#449933] transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-[#5DB347]/25 hover:shadow-xl hover:-translate-y-0.5"
+                  className="w-full py-4 bg-[#5DB347] text-white rounded-xl font-semibold text-base hover:bg-[#449933] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-[#5DB347]/25 hover:shadow-xl hover:-translate-y-0.5"
                 >
                   {processing ? (
                     <span className="flex items-center justify-center gap-2">

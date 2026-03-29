@@ -13,11 +13,13 @@ import {
   Clock,
 } from "lucide-react";
 
-export const metadata = {
-  title: "Veterinary Services - AFU Services",
-  description:
-    "Professional veterinary care for African livestock farmers. On-farm visits, disease prevention, vaccination programs, breeding support, and 24/7 emergency hotline across 20 countries.",
-};
+import { createPageMetadata } from '@/lib/seo/metadata';
+
+export const metadata = createPageMetadata({
+  title: 'Veterinary Services',
+  description: 'Professional veterinary care for African livestock farmers. On-farm visits, disease prevention, vaccination programs, and 24/7 emergency hotline.',
+  path: '/services/veterinary',
+});
 
 const steps = [
   {

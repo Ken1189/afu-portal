@@ -692,7 +692,7 @@ export default function AssistantPage() {
           <button
             type="submit"
             disabled={!inputValue.trim() || isTyping}
-            className="shrink-0 w-11 h-11 flex items-center justify-center rounded-full bg-teal text-white active:bg-teal-dark disabled:opacity-40 disabled:active:bg-teal transition-all"
+            className="shrink-0 w-11 h-11 flex items-center justify-center rounded-full bg-teal text-white active:bg-teal-dark disabled:opacity-50 disabled:active:bg-teal transition-all"
             aria-label="Send message"
           >
             <SendHorizontal size={20} />

@@ -278,3 +278,25 @@ html {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
+
+/* S8.2: RTL Support — CSS logical properties */
+/* When dir="rtl" is set on <html>, these ensure proper text alignment and spacing */
+[dir="rtl"] {
+  text-align: right;
+}
+
+[dir="rtl"] .rtl\:flip {
+  transform: scaleX(-1);
+}
+
+/* Logical property helpers for RTL-aware spacing */
+.ms-auto { margin-inline-start: auto; }
+.me-auto { margin-inline-end: auto; }
+.ps-4 { padding-inline-start: 1rem; }
+.pe-4 { padding-inline-end: 1rem; }
+.ps-6 { padding-inline-start: 1.5rem; }
+.pe-6 { padding-inline-end: 1.5rem; }
+
+/* RTL-aware border radius */
+.rounded-s-xl { border-start-start-radius: 0.75rem; border-end-start-radius: 0.75rem; }
+.rounded-e-xl { border-start-end-radius: 0.75rem; border-end-end-radius: 0.75rem; }

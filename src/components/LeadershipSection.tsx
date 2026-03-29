@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 
@@ -86,10 +87,13 @@ function MemberCard({ member, delay }: { member: BoardMember; delay: number }) {
       <div className="bg-white rounded-2xl p-6 border border-gray-100 hover:border-[#5DB347]/30 hover:shadow-lg transition-all duration-300 h-full flex flex-col">
         {/* Avatar + Name */}
         <div className="flex items-center gap-4 mb-4">
-          <img
+          <Image
             src={avatarUrl(member.name)}
             alt={member.name}
+            width={64}
+            height={64}
             className="w-16 h-16 rounded-full ring-2 ring-[#5DB347]/20 shrink-0"
+            loading="lazy"
           />
           <div className="min-w-0">
             <h3 className="font-bold text-[#1B2A4A] text-base leading-tight truncate">{member.name}</h3>

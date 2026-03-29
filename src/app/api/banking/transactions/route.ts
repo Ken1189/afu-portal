@@ -23,9 +23,10 @@ export async function GET(req: NextRequest) {
     const wallet = await walletService.getWallet(walletId);
     if (!wallet) return NextResponse.json({ error: 'Wallet not found' }, { status: 404 });
     if (wallet.user_id !== user.id) {
-      // Allow admins to view any wallet
-      const role = user.user_metadata?.role;
-      if (role !== 'admin' && role !== 'super_admin') {
+      // S1.9: Check role from DB, not JWT metadata
+      const db2 = await createAdminClient();
+      const { data: profile } = await db2.from('profiles').select('role').eq('id', user.id).single();
+      if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       }
     }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -74,7 +74,8 @@ const initialData: OnboardingData = {
   organizationName: '',
   partnershipType: '',
   preferredLanguage: 'English',
-  notifications: ['Email'],
+  // S5.5: SMS + WhatsApp first for Africa (most reliable channels)
+  notifications: ['SMS', 'WhatsApp'],
   currency: 'USD',
 };
 
@@ -188,6 +189,8 @@ function Chip({
 /* ------------------------------------------------------------------ */
 /*  Main Component                                                     */
 /* ------------------------------------------------------------------ */
+const STORAGE_KEY = 'afu_onboarding_draft';
+
 export default function OnboardingPage() {
   const { t } = useLanguage();
   const router = useRouter();
@@ -195,9 +198,52 @@ export default function OnboardingPage() {
   const [direction, setDirection] = useState(1);
   const [data, setData] = useState<OnboardingData>(initialData);
   const [submitting, setSubmitting] = useState(false);
+  const [resumed, setResumed] = useState(false);
+
+  // S5.1: Restore from localStorage on mount
+  useEffect(() => {
+    // S8.12: Geo-IP country detection (before localStorage restore)
+    fetch('https://ipapi.co/json/')
+      .then((res) => res.json())
+      .then((geo: Record<string, string>) => {
+        if (geo?.country_name) {
+          const match = COUNTRIES.find((c) => c.name.toLowerCase() === geo.country_name.toLowerCase());
+          if (match) {
+            setData((prev) => prev.country ? prev : { ...prev, country: match.name, currency: match.currency });
+          }
+        }
+      })
+      .catch(() => { /* Geo-IP non-critical */ });
+
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.data && parsed.step >= 0) {
+          setData({ ...initialData, ...parsed.data });
+          setStep(parsed.step);
+          setResumed(true);
+        }
+      }
+    } catch {
+      // Corrupted data — start fresh
+      localStorage.removeItem(STORAGE_KEY);
+    }
+  }, []);
+
+  // S5.1: Save to localStorage on every change
+  const persistDraft = useCallback((d: OnboardingData, s: number) => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ data: d, step: s, updatedAt: Date.now() }));
+    } catch { /* storage full — non-critical */ }
+  }, []);
 
   const update = <K extends keyof OnboardingData>(key: K, value: OnboardingData[K]) =>
-    setData((prev) => ({ ...prev, [key]: value }));
+    setData((prev) => {
+      const next = { ...prev, [key]: value };
+      persistDraft(next, step);
+      return next;
+    });
 
   const toggleArrayItem = (key: 'primaryCrops' | 'productCategories' | 'notifications', item: string) => {
     setData((prev) => {
@@ -218,12 +264,20 @@ export default function OnboardingPage() {
   const goNext = () => {
     if (!canAdvance()) return;
     setDirection(1);
-    setStep((s) => Math.min(s + 1, 3));
+    setStep((s) => {
+      const next = Math.min(s + 1, 3);
+      persistDraft(data, next);
+      return next;
+    });
   };
 
   const goBack = () => {
     setDirection(-1);
-    setStep((s) => Math.max(s - 1, 0));
+    setStep((s) => {
+      const next = Math.max(s - 1, 0);
+      persistDraft(data, next);
+      return next;
+    });
   };
 
   const handleComplete = async () => {
@@ -235,6 +289,8 @@ export default function OnboardingPage() {
         body: JSON.stringify(data),
       });
       if (res.ok) {
+        // S5.1: Clear draft on successful completion
+        localStorage.removeItem(STORAGE_KEY);
         // Redirect based on selected role
         const role = data.role;
         if (role === 'farmer') {
@@ -266,6 +322,22 @@ export default function OnboardingPage() {
   const renderStep0 = () => (
     <div className="space-y-8">
       <div className="text-center">
+        {/* S5.2: Resume banner when returning with saved progress */}
+        {resumed && step > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-xl text-sm text-blue-700 flex items-center justify-between"
+          >
+            <span>Welcome back! We saved your progress from last time.</span>
+            <button
+              onClick={() => { setData(initialData); setStep(0); setResumed(false); localStorage.removeItem(STORAGE_KEY); }}
+              className="text-xs text-blue-500 underline ml-2 shrink-0"
+            >
+              Start over
+            </button>
+          </motion.div>
+        )}
         <motion.h1
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -331,6 +403,20 @@ export default function OnboardingPage() {
       <div className="text-center mb-2">
         <h2 className="text-2xl font-bold text-[#1B2A4A]">Your Profile</h2>
         <p className="text-gray-500 mt-1">Tell us a bit about yourself</p>
+      </div>
+
+      {/* S5.4: KYC Awareness — show what completing profile unlocks */}
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-xl p-4">
+        <div className="flex items-start gap-3">
+          <ShieldCheck className="w-5 h-5 text-blue-500 mt-0.5 shrink-0" />
+          <div>
+            <p className="text-sm font-medium text-blue-800">Profile = KYC Tier 1</p>
+            <p className="text-xs text-blue-600 mt-0.5">
+              Completing your profile automatically unlocks Tier 1 verification.
+              After onboarding, upload ID documents for Tier 2 to access financing and insurance.
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Common fields */}
@@ -686,6 +772,25 @@ export default function OnboardingPage() {
         })}
       </div>
 
+      {/* S5.10: Referral invite section */}
+      <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl">
+        <div className="flex items-center gap-3 mb-2">
+          <UserPlus className="w-5 h-5 text-emerald-600" />
+          <span className="text-sm font-semibold text-emerald-800">Invite a Fellow Farmer</span>
+        </div>
+        <p className="text-xs text-emerald-600 mb-3">
+          Share AFU with friends and earn 10% commission on their first transaction.
+          Your referral link will be available in your dashboard.
+        </p>
+        <Link
+          href="/dashboard/referral"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700 transition-colors"
+        >
+          <UserPlus className="w-4 h-4" />
+          Get My Referral Code
+        </Link>
+      </div>
+
       <div className="pt-4">
         <button
           type="button"
@@ -806,7 +911,7 @@ export default function OnboardingPage() {
                   type="button"
                   onClick={goNext}
                   disabled={!canAdvance()}
-                  className="flex items-center gap-1.5 px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#1B2A4A] to-[#8CB89C] text-white text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="flex items-center gap-1.5 px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#1B2A4A] to-[#8CB89C] text-white text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Next
                   <ChevronRight className="w-4 h-4" />

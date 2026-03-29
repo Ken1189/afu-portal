@@ -192,23 +192,22 @@ export default function CampaignsPage() {
     }
   };
 
+  // S3.7: Call the campaign send API instead of just updating status
   const handleSendCampaign = async (campaignId: string) => {
     setSending(campaignId);
     try {
-      const supabase = createClient();
-      // In production, this would call the campaign service
-      // For now, update the status directly
-      const { error } = await supabase
-        .from('message_campaigns')
-        .update({
-          status: 'sending',
-          started_at: new Date().toISOString(),
-        })
-        .eq('id', campaignId);
+      const res = await fetch('/api/admin/campaigns/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ campaignId }),
+      });
 
-      if (error) throw error;
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({ error: 'Send failed' }));
+        throw new Error(data.error || 'Send failed');
+      }
 
-      showToast('success', 'Campaign sending started');
+      showToast('success', 'Campaign sent successfully');
       fetchData();
     } catch (err) {
       showToast('error', `Failed: ${err instanceof Error ? err.message : 'Unknown error'}`);

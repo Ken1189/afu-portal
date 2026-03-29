@@ -12,11 +12,13 @@ import {
   Wifi,
 } from "lucide-react";
 
-export const metadata = {
-  title: "Agricultural Technology - AFU",
-  description:
-    "Digital transformation for African farming. Precision agriculture, farm management software, mobile apps, IoT sensors, AI analytics, and open data platforms.",
-};
+import { createPageMetadata } from '@/lib/seo/metadata';
+
+export const metadata = createPageMetadata({
+  title: 'AgriTech Solutions',
+  description: 'Digital transformation for African farming. Precision agriculture, farm management software, mobile apps, IoT sensors, and AI analytics.',
+  path: '/services/technology',
+});
 
 const techOfferings = [
   {

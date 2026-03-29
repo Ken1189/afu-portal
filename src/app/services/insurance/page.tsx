@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { Tractor, Wheat, Hospital, Home, Ship, Beef, ShieldCheck, Cog, Landmark, Truck, type LucideIcon } from "lucide-react";
+import { createPageMetadata } from '@/lib/seo/metadata';
 
-export const metadata = {
-  title: "Farm Insurance - AFU",
-  description:
-    "Protect your farm, crops, livestock, and family with AFU Insurance. Comprehensive agricultural insurance products with fast claims and affordable premiums.",
-};
+export const metadata = createPageMetadata({
+  title: 'Insurance Products',
+  description: 'Protect your farm, crops, livestock, and family with AFU Insurance. Comprehensive agricultural insurance with fast claims and affordable premiums.',
+  path: '/services/insurance',
+});
 
 const products: { icon: LucideIcon; name: string; description: string; premium: string; link: string }[] = [
   {

@@ -6,7 +6,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient, createServerSupabaseClient } from '@/lib/supabase/server';
-import { WalletService } from '@/lib/banking';
+import { WalletService, MonitoringService } from '@/lib/banking';
 
 async function getAuthUser() {
   const supabase = await createServerSupabaseClient();
@@ -49,7 +49,7 @@ export async function GET(req: NextRequest) {
 
       // Get user's wallet IDs first
       const wallets = await walletService.getUserWallets(user.id);
-      const walletIds = wallets.map((w: any) => w.id);
+      const walletIds = wallets.map((w: { id: string }) => w.id);
 
       if (walletIds.length === 0) {
         return NextResponse.json({ transactions: [], total: 0, page, limit });
@@ -121,6 +121,21 @@ export async function POST(req: NextRequest) {
 
     const db = await createAdminClient();
     const walletService = new WalletService(db);
+    const monitoringService = new MonitoringService(db);
+
+    // S8.1: AML screening helper — screen after transaction
+    const screenTxn = async (amount: number, currency: string, type: string) => {
+      try {
+        const { data: profile } = await db.from('profiles').select('country').eq('id', user.id).single();
+        await monitoringService.screenTransaction({
+          user_id: user.id,
+          amount,
+          currency,
+          country_code: profile?.country || '',
+          transaction_type: type,
+        });
+      } catch { /* AML screening is non-blocking */ }
+    };
 
     switch (action) {
       case 'create': {
@@ -137,6 +152,10 @@ export async function POST(req: NextRequest) {
         if (!body.wallet_id || !body.amount) {
           return NextResponse.json({ error: 'wallet_id and amount required' }, { status: 400 });
         }
+        // S1.12: Verify wallet ownership before deposit
+        const depositWallet = await walletService.getWallet(body.wallet_id);
+        if (!depositWallet) return NextResponse.json({ error: 'Wallet not found' }, { status: 404 });
+        if (depositWallet.user_id !== user.id) return NextResponse.json({ error: 'Forbidden: not your wallet' }, { status: 403 });
         const txn = await walletService.deposit({
           wallet_id: body.wallet_id,
           amount: body.amount,
@@ -144,6 +163,8 @@ export async function POST(req: NextRequest) {
           reference: body.reference,
           operator_id: user.id,
         });
+        // S8.1: AML screening
+        await screenTxn(body.amount, depositWallet.currency || 'USD', 'deposit');
         return NextResponse.json(txn);
       }
 
@@ -151,6 +172,10 @@ export async function POST(req: NextRequest) {
         if (!body.wallet_id || !body.amount) {
           return NextResponse.json({ error: 'wallet_id and amount required' }, { status: 400 });
         }
+        // S1.12: Verify wallet ownership before withdrawal
+        const withdrawWallet = await walletService.getWallet(body.wallet_id);
+        if (!withdrawWallet) return NextResponse.json({ error: 'Wallet not found' }, { status: 404 });
+        if (withdrawWallet.user_id !== user.id) return NextResponse.json({ error: 'Forbidden: not your wallet' }, { status: 403 });
         const txn = await walletService.withdraw({
           wallet_id: body.wallet_id,
           amount: body.amount,
@@ -158,6 +183,8 @@ export async function POST(req: NextRequest) {
           reference: body.reference,
           operator_id: user.id,
         });
+        // S8.1: AML screening
+        await screenTxn(body.amount, withdrawWallet.currency || 'USD', 'withdrawal');
         return NextResponse.json(txn);
       }
 

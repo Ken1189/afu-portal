@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { DollarSign, Sprout, Factory, Handshake, Globe, GraduationCap, Scale, Stethoscope } from "lucide-react";
 import { type LucideIcon } from "lucide-react";
+import { createPageMetadata } from '@/lib/seo/metadata';
 
-export const metadata = {
-  title: "Services - AFU",
-  description: "Explore AFU's integrated services: Financing, Inputs, Processing, Offtake, Trade Finance, Training, Legal Assistance, and Veterinary Services.",
-};
+export const metadata = createPageMetadata({
+  title: 'Services',
+  description: 'Comprehensive agricultural services including financing, inputs, processing, offtake, trade finance, training, legal, and veterinary support.',
+  path: '/services',
+});
 
 const services: { title: string; desc: string; features: string[]; link: string; icon: LucideIcon }[] = [
   {

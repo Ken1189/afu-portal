@@ -52,7 +52,7 @@ export async function GET() {
         .order('created_at', { ascending: false })
         .limit(5),
       svc.from('notifications')
-        .select('id, title, message, type, read, created_at')
+        .select('id, title, body, type, is_read, created_at')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(10),
@@ -69,7 +69,8 @@ export async function GET() {
     const totalLoanAmount = loans.reduce((s, l) => s + (Number(l.amount) || 0), 0);
     const totalRepaid = loans.reduce((s, l) => s + (Number(l.amount_repaid) || 0), 0);
     const activeLoans = loans.filter(l => ['approved', 'disbursed', 'repaying'].includes(l.status));
-    const unreadNotifications = notifications.filter(n => !n.read).length;
+    // S2.5: Fixed column names to match DB schema (body/is_read instead of message/read)
+    const unreadNotifications = notifications.filter(n => !n.is_read).length;
 
     return NextResponse.json({
       profile,
