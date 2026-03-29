@@ -66,6 +66,8 @@ import {
   FolderOpen,
   Coins,
   ClipboardCheck,
+  PenSquare,
+  ImageIcon,
 } from 'lucide-react';
 
 // ── Navigation structure with collapsible groups ──
@@ -190,6 +192,10 @@ const navGroups: NavGroup[] = [
     defaultOpen: false,
     links: [
       { href: '/admin/content', label: 'Site Content', icon: <FileEdit className={ICON_CLS} /> },
+      { href: '/admin/blog', label: 'Blog / News', icon: <PenSquare className={ICON_CLS} /> },
+      { href: '/admin/announcements', label: 'Announcements', icon: <Bell className={ICON_CLS} /> },
+      { href: '/admin/partners', label: 'Partners', icon: <Handshake className={ICON_CLS} /> },
+      { href: '/admin/media', label: 'Media Library', icon: <ImageIcon className={ICON_CLS} /> },
       { href: '/admin/research', label: 'Research Centres', icon: <FlaskConical className={ICON_CLS} /> },
       { href: '/admin/ambassadors', label: 'Ambassadors', icon: <Megaphone className={ICON_CLS} /> },
       { href: '/admin/faq', label: 'FAQ Manager', icon: <HelpCircle className={ICON_CLS} /> },
