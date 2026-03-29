@@ -130,8 +130,14 @@ const roleColors: Record<string, { bg: string; text: string; dot: string }> = {
 };
 
 const roleLabels: Record<string, string> = {
+  super_admin: 'Super Admin',
   'super-admin': 'Super Admin',
   admin: 'Admin',
+  member: 'Member',
+  investor: 'Investor',
+  supplier: 'Supplier',
+  ambassador: 'Ambassador',
+  warehouse_operator: 'Warehouse Operator',
   'finance-officer': 'Finance Officer',
   'loan-officer': 'Loan Officer',
   'support-agent': 'Support Agent',

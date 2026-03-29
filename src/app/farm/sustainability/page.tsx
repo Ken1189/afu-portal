@@ -838,6 +838,48 @@ export default function SustainabilityPage() {
       </motion.section>
 
       {/* ================================================================= */}
+      {/* CARBON CREDITS SUMMARY CARD                                       */}
+      {/* ================================================================= */}
+      <motion.section variants={itemVariants} className="px-4">
+        <Link href="/farm/sustainability/credits" className="block">
+          <div className="rounded-2xl border border-green-100 bg-gradient-to-r from-green-50 to-emerald-50 p-5 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <div className="w-10 h-10 rounded-xl bg-[#5DB347]/15 flex items-center justify-center">
+                  <Award size={20} className="text-[#5DB347]" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-[#1B2A4A]">Carbon Credits</h3>
+                  <p className="text-xs text-gray-500">Earn income from sustainable practices</p>
+                </div>
+              </div>
+              <ChevronRight size={20} className="text-gray-400" />
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              <div className="bg-white/70 rounded-xl p-3 text-center">
+                <p className="text-lg font-bold text-[#5DB347]">
+                  {carbonCredits.reduce((s, c) => s + c.credits, 0).toLocaleString()}
+                </p>
+                <p className="text-[10px] text-gray-500 uppercase font-medium">Credits Earned</p>
+              </div>
+              <div className="bg-white/70 rounded-xl p-3 text-center">
+                <p className="text-lg font-bold text-[#1B2A4A]">
+                  {formatCurrency(carbonCredits.reduce((s, c) => s + c.totalValue, 0))}
+                </p>
+                <p className="text-[10px] text-gray-500 uppercase font-medium">Total Value</p>
+              </div>
+              <div className="bg-white/70 rounded-xl p-3 text-center">
+                <p className="text-lg font-bold text-[#1B2A4A]">
+                  {carbonCredits.filter(c => c.status === 'verified').length}
+                </p>
+                <p className="text-[10px] text-gray-500 uppercase font-medium">Verified</p>
+              </div>
+            </div>
+          </div>
+        </Link>
+      </motion.section>
+
+      {/* ================================================================= */}
       {/* 3. TAB SWITCHER                                                   */}
       {/* ================================================================= */}
       <motion.section variants={itemVariants} className="px-4">

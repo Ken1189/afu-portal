@@ -397,8 +397,26 @@ export default function AdminApplicationsPage() {
                   </button>
                 </div>
                 <p className="text-xs text-amber-600 mt-3">
-                  Share these credentials securely with the applicant. They should change their password on first login.
+                  Share these credentials securely with the applicant.
                 </p>
+                <div className="flex gap-2 mt-3">
+                  <a
+                    href={`https://wa.me/?text=${encodeURIComponent(`Welcome to African Farming Union!\n\nYour account has been approved.\n\nLogin: https://africanfarmingunion.org/login\nEmail: ${tempPasswordModal.email}\nPassword: ${tempPasswordModal.tempPassword}\n\nPlease change your password after first login.`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 py-2 bg-green-600 text-white rounded-lg text-xs font-semibold text-center hover:bg-green-700 transition-colors"
+                  >
+                    Share via WhatsApp
+                  </a>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(`Login: https://africanfarmingunion.org/login\nEmail: ${tempPasswordModal.email}\nPassword: ${tempPasswordModal.tempPassword}`);
+                    }}
+                    className="flex-1 py-2 bg-blue-600 text-white rounded-lg text-xs font-semibold text-center hover:bg-blue-700 transition-colors"
+                  >
+                    Copy All Details
+                  </button>
+                </div>
               </div>
             )}
             <button

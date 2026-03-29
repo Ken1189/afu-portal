@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Sprout,
@@ -189,6 +190,7 @@ function Chip({
 /* ------------------------------------------------------------------ */
 export default function OnboardingPage() {
   const { t } = useLanguage();
+  const router = useRouter();
   const [step, setStep] = useState(0);
   const [direction, setDirection] = useState(1);
   const [data, setData] = useState<OnboardingData>(initialData);
@@ -227,14 +229,25 @@ export default function OnboardingPage() {
   const handleComplete = async () => {
     setSubmitting(true);
     try {
-      console.log('Onboarding data:', data);
-      await fetch('/api/onboarding/complete', {
+      const res = await fetch('/api/onboarding/complete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
-    } catch (err) {
-      console.error('Onboarding submit error:', err);
+      if (res.ok) {
+        // Redirect based on selected role
+        const role = data.role;
+        if (role === 'farmer') {
+          router.push('/farm');
+        } else if (role === 'supplier') {
+          router.push('/supplier');
+        } else {
+          router.push('/dashboard');
+        }
+      }
+    } catch (_err) {
+      // Still redirect to dashboard on error — onboarding is best-effort
+      router.push('/dashboard');
     } finally {
       setSubmitting(false);
     }
