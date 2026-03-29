@@ -167,23 +167,9 @@ function NavSection({
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, profile, signOut, isAdmin, isLoading: authLoading } = useAuth();
+  const { user, profile, signOut, isAdmin } = useAuth();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-
-  // S1.14: Auth guard — redirect unauthenticated users to login
-  useEffect(() => {
-    if (!authLoading && !user) {
-      router.push('/login?redirect=' + encodeURIComponent(pathname));
-    }
-  }, [authLoading, user, router, pathname]);
-
-  if (authLoading || !user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-cream">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#5DB347]" />
-      </div>
-    );
-  }
+  // Auth redirect handled by middleware — no duplicate guard needed
 
   // Initialize collapsed state: auto-expand section with active link
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>(() => {
