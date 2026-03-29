@@ -385,28 +385,23 @@ export default function LoginPage() {
       {/*  RIGHT PANEL  (login form)                                    */}
       {/* ============================================================ */}
       <div className="flex-1 flex items-center justify-center bg-cream px-4 py-12 sm:px-8 lg:px-12 xl:px-20">
-        <motion.div
-          variants={formContainer}
-          initial="hidden"
-          animate="visible"
-          className="w-full max-w-md"
-        >
+        <div className="w-full max-w-md">
           {/* Mobile-only logo */}
-          <motion.div variants={formItem} className="text-center mb-8 lg:hidden">
+          <div className="text-center mb-8 lg:hidden">
             <Link href="/" className="inline-flex items-center gap-2.5">
               <img src="/afu-logo.svg" alt="African Farming Union" className="h-12 w-auto object-contain" />
             </Link>
-          </motion.div>
+          </div>
 
           {/* Heading */}
-          <motion.div variants={formItem} className="mb-8">
+          <div className="mb-8">
             <h1 className="text-3xl font-bold text-navy">
               {isSignUp ? 'Create your account' : 'Welcome back'}
             </h1>
             <p className="text-gray-500 mt-2">
               {isSignUp ? 'Join the African Farming Union' : 'Sign in to your portal'}
             </p>
-          </motion.div>
+          </div>
 
           {/* Success message */}
           <AnimatePresence>
@@ -426,8 +421,7 @@ export default function LoginPage() {
           </AnimatePresence>
 
           {/* Form card */}
-          <motion.div
-            variants={formItem}
+          <div
             className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 sm:p-8 shadow-lg shadow-[#5DB347]/5 border border-white/60"
           >
             {/* Error */}
@@ -630,13 +624,10 @@ export default function LoginPage() {
               Continue with WhatsApp
               <span className="absolute -top-2 right-3 text-[10px] font-bold bg-[#5DB347] text-white px-2 py-0.5 rounded-full">Coming Soon</span>
             </motion.button>
-          </motion.div>
+          </div>
 
           {/* Toggle sign-in / sign-up */}
-          <motion.p
-            variants={formItem}
-            className="text-center text-gray-500 text-sm mt-6"
-          >
+          <p className="text-center text-gray-500 text-sm mt-6">
             {isSignUp ? (
               <>
                 Already have an account?{' '}
@@ -660,17 +651,14 @@ export default function LoginPage() {
                 </button>
               </>
             )}
-          </motion.p>
+          </p>
 
           {/* Security footer */}
-          <motion.div
-            variants={formItem}
-            className="flex items-center justify-center gap-1.5 mt-4 text-gray-400 text-xs"
-          >
+          <div className="flex items-center justify-center gap-1.5 mt-4 text-gray-400 text-xs">
             <Shield className="w-3.5 h-3.5" />
             <span>256-bit SSL encrypted &middot; SOC 2 compliant</span>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -246,7 +246,7 @@ export default function InvestorLoginPage() {
       <div className="flex-1 flex items-center justify-center bg-[#F8F9FB] px-4 py-12 sm:px-8 lg:px-12 xl:px-20">
         <motion.div
           variants={formContainer}
-          initial="hidden"
+          initial={{ opacity: 1 }}
           animate="visible"
           className="w-full max-w-md"
         >
