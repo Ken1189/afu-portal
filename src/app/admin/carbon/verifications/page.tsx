@@ -428,8 +428,13 @@ export default function AdminCarbonVerificationsPage() {
                   </button>
                   {v.status === 'pending' && (
                     <button
-                      onClick={() => {
+                      onClick={async () => {
                         setVerifications(prev => prev.map(x => x.id === v.id ? { ...x, status: 'in_progress' } : x));
+                        try {
+                          await supabase.from('carbon_verifications').update({ status: 'in_progress' }).eq('id', v.id);
+                        } catch {
+                          // UI already updated optimistically
+                        }
                         showToast('success', 'Verification started');
                       }}
                       className="px-4 py-2 rounded-xl border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50"

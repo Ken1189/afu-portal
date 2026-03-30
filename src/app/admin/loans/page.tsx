@@ -808,7 +808,7 @@ export default function LoansPage() {
                             <motion.button
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
-                              onClick={() => handleLoanAction(app.id, 'approve')}
+                              onClick={(e) => { e.stopPropagation(); handleLoanAction(app.id, 'approve'); }}
                               disabled={actionLoading === app.id}
                               className="flex items-center gap-1 px-2.5 py-1 bg-green-500 text-white text-[11px] font-medium rounded-lg hover:bg-green-600 transition-colors disabled:opacity-50"
                             >
@@ -818,7 +818,7 @@ export default function LoansPage() {
                             <motion.button
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
-                              onClick={() => handleLoanAction(app.id, 'reject')}
+                              onClick={(e) => { e.stopPropagation(); handleLoanAction(app.id, 'reject'); }}
                               disabled={actionLoading === app.id}
                               className="flex items-center gap-1 px-2.5 py-1 bg-red-500 text-white text-[11px] font-medium rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50"
                             >
@@ -828,6 +828,19 @@ export default function LoansPage() {
                             <motion.button
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedCase({
+                                  id: app.id,
+                                  type: 'loan',
+                                  status: app.status,
+                                  memberName: app.memberName,
+                                  amount: app.amountRequested,
+                                  purpose: app.purpose,
+                                  country: app.country,
+                                  createdAt: app.appliedDate,
+                                });
+                              }}
                               className="flex items-center gap-1 px-2.5 py-1 border border-gray-200 text-gray-600 text-[11px] font-medium rounded-lg hover:bg-gray-50 transition-colors"
                             >
                               <Eye className="w-3 h-3" />

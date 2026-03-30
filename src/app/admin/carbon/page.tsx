@@ -161,11 +161,11 @@ export default function AdminCarbonDashboard() {
 
   const kpiCards = [
     { label: 'Total Projects', value: kpis.totalProjects, icon: TreePine, color: '#5DB347', href: '/admin/carbon/projects' },
-    { label: 'Active Enrollments', value: kpis.activeEnrollments, icon: Users, color: '#6366F1' },
+    { label: 'Active Enrollments', value: kpis.activeEnrollments, icon: Users, color: '#6366F1', href: '/admin/carbon/verifications' },
     { label: 'Credits Issued', value: `${kpis.creditsIssued.toLocaleString()}t`, icon: Award, color: '#10B981', href: '/admin/carbon/credits' },
-    { label: 'Credits Sold', value: `${kpis.creditsSold.toLocaleString()}t`, icon: TrendingUp, color: '#F59E0B' },
-    { label: 'Revenue', value: `$${kpis.totalRevenue.toLocaleString()}`, icon: DollarSign, color: '#8B5CF6' },
-    { label: 'Buffer Pool', value: `$${kpis.bufferPool.toLocaleString()}`, icon: ShieldCheck, color: '#EF4444' },
+    { label: 'Credits Sold', value: `${kpis.creditsSold.toLocaleString()}t`, icon: TrendingUp, color: '#F59E0B', href: '/admin/carbon/credits' },
+    { label: 'Revenue', value: `$${kpis.totalRevenue.toLocaleString()}`, icon: DollarSign, color: '#8B5CF6', href: '/admin/analytics' },
+    { label: 'Buffer Pool', value: `$${kpis.bufferPool.toLocaleString()}`, icon: ShieldCheck, color: '#EF4444', href: '/admin/carbon/credits' },
   ];
 
   return (

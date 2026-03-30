@@ -20,6 +20,7 @@ import {
   Archive,
   Filter,
   DollarSign,
+  Trash2,
 } from 'lucide-react';
 
 // ── Types ─────────────────────────────────────────────────────────────────
@@ -165,6 +166,8 @@ export default function AdminProgramsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [togglingId, setTogglingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [toast, setToast] = useState<{message: string, type: 'success'|'error'}|null>(null);
   const showToast = (message: string, type: 'success'|'error' = 'success') => { setToast({message, type}); setTimeout(() => setToast(null), 3000); };
 
@@ -222,6 +225,26 @@ export default function AdminProgramsPage() {
       showToast('Failed to update program status', 'error');
     } finally {
       setTogglingId(null);
+    }
+  };
+
+  // ── Delete program ──────────────────────────────────────────────────
+  const handleDelete = async (programId: string) => {
+    setDeletingId(programId);
+    try {
+      const res = await fetch(`/api/programs/${programId}`, { method: 'DELETE' });
+      if (!res.ok) {
+        const data = await res.json();
+        showToast(data.error ?? 'Failed to delete program', 'error');
+        return;
+      }
+      setPrograms(prev => prev.filter(p => p.id !== programId));
+      showToast('Program deleted');
+    } catch {
+      showToast('Failed to delete program', 'error');
+    } finally {
+      setDeletingId(null);
+      setConfirmDeleteId(null);
     }
   };
 
@@ -533,6 +556,17 @@ export default function AdminProgramsPage() {
                               {cfg.nextLabel}
                             </button>
                           )}
+                          <button
+                            onClick={() => setConfirmDeleteId(program.id)}
+                            disabled={deletingId === program.id}
+                            className="inline-flex items-center gap-1 text-xs font-medium text-red-500 px-2 py-1 rounded hover:bg-red-50 transition-colors disabled:opacity-50"
+                          >
+                            {deletingId === program.id ? (
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            ) : (
+                              <Trash2 className="w-3.5 h-3.5" />
+                            )}
+                          </button>
                         </div>
                       </td>
                     </motion.tr>
@@ -543,6 +577,34 @@ export default function AdminProgramsPage() {
           </div>
         )}
       </motion.div>
+
+      {/* Delete Confirmation Modal */}
+      {confirmDeleteId && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setConfirmDeleteId(null)}>
+          <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 space-y-4" onClick={e => e.stopPropagation()}>
+            <h3 className="text-lg font-bold text-navy">Delete Program</h3>
+            <p className="text-sm text-gray-600">
+              Are you sure you want to delete this program? This will also remove all enrollments and inclusions. This action cannot be undone.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setConfirmDeleteId(null)}
+                className="px-4 py-2 text-sm font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDelete(confirmDeleteId)}
+                disabled={deletingId === confirmDeleteId}
+                className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 disabled:opacity-50"
+              >
+                {deletingId === confirmDeleteId && <Loader2 className="w-4 h-4 animate-spin" />}
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Toast */}
       {toast && (

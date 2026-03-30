@@ -23,6 +23,7 @@ import {
   Sprout,
   AlertCircle,
   RefreshCw,
+  Trash2,
 } from 'lucide-react';
 
 // ── Types ─────────────────────────────────────────────────────────────────
@@ -212,6 +213,8 @@ export default function AdminProgramDetailPage() {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [selectedEnrollments, setSelectedEnrollments] = useState<Set<string>>(new Set());
   const [bulkLoading, setBulkLoading] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deletingProgram, setDeletingProgram] = useState(false);
   const [toast, setToast] = useState<{message: string, type: 'success'|'error'}|null>(null);
   const showToast = (message: string, type: 'success'|'error' = 'success') => { setToast({message, type}); setTimeout(() => setToast(null), 3000); };
 
@@ -316,6 +319,25 @@ export default function AdminProgramDetailPage() {
     }
   };
 
+  // ── Delete program ────────────────────────────────────────────────────
+  const handleDeleteProgram = async () => {
+    setDeletingProgram(true);
+    try {
+      const res = await fetch(`/api/programs/${programId}`, { method: 'DELETE' });
+      if (!res.ok) {
+        const data = await res.json();
+        showToast(data.error ?? 'Failed to delete program', 'error');
+        return;
+      }
+      router.push('/admin/programs');
+    } catch {
+      showToast('Failed to delete program', 'error');
+    } finally {
+      setDeletingProgram(false);
+      setConfirmDelete(false);
+    }
+  };
+
   // ── Toggle row selection ──────────────────────────────────────────────
   const toggleSelect = (id: string) => {
     setSelectedEnrollments(prev => {
@@ -388,12 +410,21 @@ export default function AdminProgramDetailPage() {
             {program.season_number ? ` · Season ${program.season_number}` : ''}
           </p>
         </div>
-        <Link
-          href={`/admin/programs/${programId}?tab=edit`}
-          className="hidden sm:inline-flex items-center gap-1.5 text-sm text-gray-500 border border-gray-200 px-3 py-1.5 rounded-lg hover:bg-gray-50 hover:text-navy transition-colors"
-        >
-          Edit Program
-        </Link>
+        <div className="hidden sm:flex items-center gap-2">
+          <Link
+            href={`/admin/programs/${programId}?tab=edit`}
+            className="inline-flex items-center gap-1.5 text-sm text-gray-500 border border-gray-200 px-3 py-1.5 rounded-lg hover:bg-gray-50 hover:text-navy transition-colors"
+          >
+            Edit Program
+          </Link>
+          <button
+            onClick={() => setConfirmDelete(true)}
+            className="inline-flex items-center gap-1.5 text-sm text-red-500 border border-red-200 px-3 py-1.5 rounded-lg hover:bg-red-50 transition-colors"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+            Delete
+          </button>
+        </div>
       </motion.div>
 
       {/* ── Tabs ──────────────────────────────────────────────────────── */}
@@ -839,6 +870,34 @@ export default function AdminProgramDetailPage() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Delete Confirmation Modal */}
+      {confirmDelete && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setConfirmDelete(false)}>
+          <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 space-y-4" onClick={e => e.stopPropagation()}>
+            <h3 className="text-lg font-bold text-navy">Delete Program</h3>
+            <p className="text-sm text-gray-600">
+              Are you sure you want to delete &ldquo;{program?.title}&rdquo;? This will also remove all enrollments and inclusions. This action cannot be undone.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setConfirmDelete(false)}
+                className="px-4 py-2 text-sm font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteProgram}
+                disabled={deletingProgram}
+                className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 disabled:opacity-50"
+              >
+                {deletingProgram && <Loader2 className="w-4 h-4 animate-spin" />}
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Toast */}
       {toast && (

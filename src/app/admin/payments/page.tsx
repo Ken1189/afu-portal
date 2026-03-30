@@ -327,9 +327,13 @@ export default function PaymentsPage() {
     }
   };
 
-  // Keep lint-happy reference for approve/refund (used in future UI actions)
-  void updatePaymentStatus;
-  void isLoading;
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+  const handlePaymentAction = async (paymentId: string, action: 'refunded' | 'verified') => {
+    setActionLoading(paymentId);
+    await updatePaymentStatus(paymentId, action === 'verified' ? 'completed' : 'reversed');
+    setActionLoading(null);
+  };
 
   // ── Computed stats ────────────────────────────────────────────────────
 
@@ -730,6 +734,7 @@ export default function PaymentsPage() {
                 <th className="text-center py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Currency</th>
                 <th className="text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
                 <th className="text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Reference</th>
+                <th className="text-right py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
@@ -774,6 +779,28 @@ export default function PaymentsPage() {
                       {payment.reference.length > 20
                         ? payment.reference.slice(0, 20) + '...'
                         : payment.reference}
+                    </td>
+                    <td className="py-2.5 px-4 text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        {payment.status === 'pending' && (
+                          <button
+                            onClick={() => handlePaymentAction(payment.id, 'verified')}
+                            disabled={actionLoading === payment.id}
+                            className="px-2 py-1 text-[11px] font-medium bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors disabled:opacity-50"
+                          >
+                            {actionLoading === payment.id ? 'Processing...' : 'Verify'}
+                          </button>
+                        )}
+                        {(payment.status === 'completed' || payment.status === 'pending') && (
+                          <button
+                            onClick={() => handlePaymentAction(payment.id, 'refunded')}
+                            disabled={actionLoading === payment.id}
+                            className="px-2 py-1 text-[11px] font-medium bg-amber-50 text-amber-700 rounded-lg hover:bg-amber-100 transition-colors disabled:opacity-50"
+                          >
+                            {actionLoading === payment.id ? 'Processing...' : 'Refund'}
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </motion.tr>
                 ))}

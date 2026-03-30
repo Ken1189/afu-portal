@@ -208,3 +208,44 @@ export async function PATCH(
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
+/**
+ * DELETE /api/programs/[id]
+ * Deletes a program and its inclusions. Admin only.
+ */
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const db = svc();
+    const user = await requireAdmin(req);
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { id } = await params;
+
+    // Delete inclusions first (child records)
+    await db.from('program_inclusions').delete().eq('program_id', id);
+
+    // Delete enrollments
+    await db.from('program_enrollments').delete().eq('program_id', id);
+
+    // Delete the program
+    const { error } = await db
+      .from('programs')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('DELETE /api/programs/[id] error:', error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    console.error('DELETE /api/programs/[id] unexpected error:', err);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}

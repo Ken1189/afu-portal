@@ -28,6 +28,8 @@ import {
   CreditCard,
   UserPlus,
   Settings2,
+  Loader2,
+  X,
 } from 'lucide-react';
 
 // ── Animation variants ──
@@ -179,6 +181,10 @@ export default function AdminNotificationsPage() {
   const [sentNotifs, setSentNotifs] = useState<SentNotification[]>(FALLBACK_SENT_NOTIFICATIONS);
   const [templatesList, setTemplatesList] = useState<NotificationTemplate[]>(FALLBACK_TEMPLATES);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [showCompose, setShowCompose] = useState(false);
+  const [composeForm, setComposeForm] = useState({ title: '', body: '', type: 'info', targetRoles: '' });
+  const [composeSaving, setComposeSaving] = useState(false);
 
   // Fetch live notifications from Supabase
   useEffect(() => {
@@ -344,9 +350,42 @@ export default function AdminNotificationsPage() {
     return !error;
   };
 
-  // Keep lint-happy references for future UI wiring
-  void sendNotification;
-  void createBroadcast;
+  const archiveSelected = async () => {
+    if (selectedIds.size === 0) return;
+    const ids = Array.from(selectedIds);
+    setNotifState((prev) => prev.filter((n) => !selectedIds.has(n.id)));
+    setSelectedIds(new Set());
+    const supabase = createClient();
+    await supabase.from('notifications').delete().in('id', ids);
+  };
+
+  const toggleSelect = (id: number) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
+  const handleComposeSend = async () => {
+    if (!composeForm.title || !composeForm.body) return;
+    setComposeSaving(true);
+    const roles = composeForm.targetRoles.split(',').map((r) => r.trim()).filter(Boolean);
+    const ok = await createBroadcast(composeForm.title, composeForm.body, composeForm.type, roles.length ? roles : ['all']);
+    if (ok) {
+      setSentNotifs((prev) => [{
+        id: Date.now(),
+        recipients: roles.length ? roles.join(', ') : 'All',
+        subject: composeForm.title,
+        sentDate: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        status: 'delivered',
+        openRate: '-',
+      }, ...prev]);
+      setComposeForm({ title: '', body: '', type: 'info', targetRoles: '' });
+      setShowCompose(false);
+    }
+    setComposeSaving(false);
+  };
 
   return (
     <motion.div variants={containerVariants} initial="hidden" animate="show" className="space-y-6">
@@ -361,7 +400,89 @@ export default function AdminNotificationsPage() {
             <p className="text-gray-500 text-sm mt-0.5">Manage alerts, messages, and notification preferences</p>
           </div>
         </div>
+        <button
+          onClick={() => setShowCompose(true)}
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-white text-sm font-medium"
+          style={{ background: 'linear-gradient(135deg, #1B2A4A, #2a3f6a)' }}
+        >
+          <Send className="w-4 h-4" /> Compose Broadcast
+        </button>
       </motion.div>
+
+      {/* Compose Broadcast Modal */}
+      {showCompose && (
+        <motion.div
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+          onClick={() => setShowCompose(false)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-semibold text-[#1B2A4A] text-lg">Compose Broadcast</h3>
+              <button onClick={() => setShowCompose(false)} className="p-1 hover:bg-gray-100 rounded-lg">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+                <input
+                  value={composeForm.title}
+                  onChange={(e) => setComposeForm((f) => ({ ...f, title: e.target.value }))}
+                  placeholder="Notification title..."
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/50"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Message *</label>
+                <textarea
+                  rows={4}
+                  value={composeForm.body}
+                  onChange={(e) => setComposeForm((f) => ({ ...f, body: e.target.value }))}
+                  placeholder="Write your message..."
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/50"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                  <select
+                    value={composeForm.type}
+                    onChange={(e) => setComposeForm((f) => ({ ...f, type: e.target.value }))}
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/50"
+                  >
+                    <option value="info">Info</option>
+                    <option value="system">System</option>
+                    <option value="financial">Financial</option>
+                    <option value="member">Member</option>
+                    <option value="critical">Critical</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Target Roles</label>
+                  <input
+                    value={composeForm.targetRoles}
+                    onChange={(e) => setComposeForm((f) => ({ ...f, targetRoles: e.target.value }))}
+                    placeholder="farmer, supplier (or leave blank for all)"
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/50"
+                  />
+                </div>
+              </div>
+              <button
+                onClick={handleComposeSend}
+                disabled={composeSaving || !composeForm.title || !composeForm.body}
+                className="w-full py-3 rounded-xl text-white font-medium text-sm transition hover:opacity-90 disabled:opacity-50"
+                style={{ background: 'linear-gradient(135deg, #1B2A4A, #2a3f6a)' }}
+              >
+                {composeSaving ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Send Broadcast'}
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      )}
 
       {/* ── Stats Row ── */}
       <motion.div variants={cardVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -443,8 +564,12 @@ export default function AdminNotificationsPage() {
               >
                 <CheckCircle2 className="w-3.5 h-3.5" /> Mark All Read
               </button>
-              <button className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-gray-500 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
-                <Archive className="w-3.5 h-3.5" /> Archive Selected
+              <button
+                onClick={archiveSelected}
+                disabled={selectedIds.size === 0}
+                className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-gray-500 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <Archive className="w-3.5 h-3.5" /> Archive Selected {selectedIds.size > 0 && `(${selectedIds.size})`}
               </button>
             </div>
           </motion.div>
@@ -462,6 +587,13 @@ export default function AdminNotificationsPage() {
                   }`}
                 >
                   <div className="flex items-start gap-3">
+                    {/* Selection checkbox */}
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.has(notif.id)}
+                      onChange={() => toggleSelect(notif.id)}
+                      className="mt-2.5 w-4 h-4 rounded border-gray-300 text-[#8CB89C] focus:ring-[#8CB89C] flex-shrink-0 cursor-pointer"
+                    />
                     {/* Type Icon */}
                     <div className={`w-9 h-9 ${config.bg} rounded-lg flex items-center justify-center flex-shrink-0 ${config.color}`}>
                       {config.icon}
