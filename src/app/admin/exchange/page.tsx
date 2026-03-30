@@ -137,18 +137,23 @@ export default function AdminExchangePage() {
           .order('created_at', { ascending: false });
         if (!error && data && data.length > 0) {
           setListings(
-            data.map((row: Record<string, unknown>) => ({
-              id: (row.id as string) || '',
-              title: (row.title as string) || 'Untitled',
-              seller: (row.seller_name as string) || (row.seller as string) || 'Unknown',
-              category: (row.category as string) || 'Other',
-              price: (row.price as number) || 0,
-              priceType: (row.price_type as string) || '',
-              status: ((row.status as string) || 'active') as ExchangeListing['status'],
-              views: (row.views as number) || 0,
-              country: (row.country as string) || '',
-              created_at: ((row.created_at as string) || '')?.split('T')[0] || '',
-            }))
+            data.map((row: Record<string, unknown>) => {
+              let uiStatus = (row.status as string) || 'active';
+              if (uiStatus === 'cancelled') uiStatus = 'removed';
+              if (row.is_featured) uiStatus = 'featured';
+              return {
+                id: (row.id as string) || '',
+                title: (row.title as string) || 'Untitled',
+                seller: (row.seller_name as string) || (row.seller as string) || 'Unknown',
+                category: (row.category as string) || 'Other',
+                price: (row.price_credits as number) || (row.price as number) || 0,
+                priceType: (row.price_type as string) || '',
+                status: uiStatus as ExchangeListing['status'],
+                views: (row.views_count as number) || (row.views as number) || 0,
+                country: (row.country as string) || '',
+                created_at: ((row.created_at as string) || '')?.split('T')[0] || '',
+              };
+            })
           );
         }
       } catch { /* fallback */ }
@@ -161,9 +166,14 @@ export default function AdminExchangePage() {
 
   const handleListingAction = async (id: string, newStatus: 'active' | 'featured' | 'removed') => {
     setActionLoading(id);
-    const { error } = await supabaseRef.from('exchange_listings').update({ status: newStatus }).eq('id', id);
+    // Map UI status to valid DB values: 'removed' -> 'cancelled', 'featured' uses is_featured column
+    const isFeaturedToggle = newStatus === 'featured';
+    const listing = listings.find(l => l.id === id);
+    const dbUpdate: Record<string, unknown> = isFeaturedToggle
+      ? { is_featured: !(listing?.status === 'featured'), status: listing?.status === 'featured' ? 'active' : (listing?.status || 'active') }
+      : { status: newStatus === 'removed' ? 'cancelled' : newStatus, is_featured: false };
+    const { error } = await supabaseRef.from('exchange_listings').update(dbUpdate).eq('id', id);
     if (error) {
-      // If table doesn't exist yet, update local state as fallback
       setListings((prev) => prev.map((l) => (l.id === id ? { ...l, status: newStatus } : l)));
       setToast({ message: `Listing ${newStatus === 'removed' ? 'removed' : newStatus === 'featured' ? 'featured' : 'approved'}`, type: 'success' });
     } else {

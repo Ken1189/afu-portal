@@ -213,8 +213,8 @@ const fallbackTestimonials = [
   },
 ];
 
-/* ─── Partner logos (styled brand-color cards) ─── */
-const partners = [
+/* ─── Partner logos (styled brand-color cards) — fallback ─── */
+const FALLBACK_PARTNERS = [
   { name: 'Stripe', initials: 'ST', color: '#635BFF' },
   { name: 'Supabase', initials: 'SB', color: '#3ECF8E' },
   { name: 'Vercel', initials: 'VL', color: '#000000' },
@@ -249,6 +249,7 @@ const HERO_DEFAULTS = {
 
 export default function Home() {
   const [testimonials, setTestimonials] = useState(fallbackTestimonials);
+  const [partners, setPartners] = useState(FALLBACK_PARTNERS);
   const [hero, setHero] = useState(HERO_DEFAULTS);
 
   useEffect(() => {
@@ -299,6 +300,31 @@ export default function Home() {
       }
     }
     fetchTestimonials();
+  }, []);
+
+  useEffect(() => {
+    async function fetchPartners() {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from('managed_partners')
+          .select('*')
+          .eq('is_published', true)
+          .order('display_order', { ascending: true });
+        if (data && data.length > 0) {
+          setPartners(
+            data.map((p: Record<string, unknown>) => ({
+              name: (p.name as string) || (p.company_name as string) || '',
+              initials: (p.initials as string) || ((p.name as string) || '').slice(0, 2).toUpperCase(),
+              color: (p.brand_color as string) || (p.color as string) || '#5DB347',
+            }))
+          );
+        }
+      } catch {
+        // keep fallback
+      }
+    }
+    fetchPartners();
   }, []);
 
   return (

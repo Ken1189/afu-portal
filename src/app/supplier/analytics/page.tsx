@@ -485,7 +485,7 @@ export default function SupplierAnalyticsPage() {
         </div>
         <div className="h-80">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={revenueTrendData} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
+            <AreaChart data={liveRevenueTrend} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
               <defs>
                 <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#8CB89C" stopOpacity={0.3} />
@@ -581,7 +581,7 @@ export default function SupplierAnalyticsPage() {
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
-                data={topProductsData}
+                data={liveTopProducts}
                 layout="vertical"
                 margin={{ top: 5, right: 30, left: 0, bottom: 5 }}
               >

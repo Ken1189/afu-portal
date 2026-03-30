@@ -165,19 +165,24 @@ export default function CropManagementPage() {
         .order('created_at', { ascending: false });
       if (!error && data && data.length > 0) {
         setCropRecords(
-          data.map((row: Record<string, unknown>) => ({
-            id: (row.id as string) || '',
-            cropName: (row.crop_type as string) || (row.crop_name as string) || 'Unknown',
-            variety: (row.variety as string) || '',
-            memberName: (row.member_name as string) || (row.farmer_name as string) || 'Unknown',
-            farmName: (row.farm_name as string) || '',
-            hectares: (row.size_hectares as number) || 0,
-            stage: ((row.stage as string) || 'growing') as CropRecord['stage'],
-            healthScore: (row.health_score as number) || 0,
-            plantingDate: ((row.planting_date as string) || '')?.split('T')[0] || '',
-            expectedHarvest: ((row.expected_harvest as string) || '')?.split('T')[0] || '',
-            estimatedRevenue: (row.estimated_revenue as number) || 0,
-          }))
+          data.map((row: Record<string, unknown>) => {
+            const notes = (row.notes as string) || '';
+            const memberMatch = notes.match(/Member:\s*([^|]+)/);
+            const revenueMatch = notes.match(/Est\. Revenue:\s*\$?([\d.]+)/);
+            return {
+              id: (row.id as string) || '',
+              cropName: (row.crop as string) || (row.crop_type as string) || 'Unknown',
+              variety: (row.variety as string) || '',
+              memberName: memberMatch ? memberMatch[1].trim() : 'Unknown',
+              farmName: (row.name as string) || '',
+              hectares: (row.size_ha as number) || 0,
+              stage: ((row.stage as string) || 'growing') as CropRecord['stage'],
+              healthScore: (row.health_score as number) || 0,
+              plantingDate: ((row.planting_date as string) || '')?.split('T')[0] || '',
+              expectedHarvest: ((row.expected_harvest as string) || '')?.split('T')[0] || '',
+              estimatedRevenue: revenueMatch ? parseFloat(revenueMatch[1]) : 0,
+            };
+          })
         );
       }
     } catch { /* fallback */ }
@@ -253,16 +258,15 @@ export default function CropManagementPage() {
     }
     setSaving(true);
     const payload = {
-      crop_type: form.cropName.trim(),
+      crop: form.cropName.trim(),
       variety: form.variety.trim() || null,
-      member_name: form.memberName.trim(),
-      farm_name: form.farmName.trim() || null,
-      size_hectares: parseFloat(form.hectares) || 0,
+      name: form.farmName.trim() || form.cropName.trim(),
+      size_ha: parseFloat(form.hectares) || 0,
       stage: form.stage,
       health_score: parseInt(form.healthScore) || 0,
       planting_date: form.plantingDate || null,
       expected_harvest: form.expectedHarvest || null,
-      estimated_revenue: parseFloat(form.estimatedRevenue) || 0,
+      notes: form.memberName.trim() ? `Member: ${form.memberName.trim()}` + (form.estimatedRevenue ? ` | Est. Revenue: $${form.estimatedRevenue}` : '') : null,
     };
 
     let error;

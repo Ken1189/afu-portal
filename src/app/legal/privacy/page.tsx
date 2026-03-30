@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { createClient } from '@supabase/supabase-js';
 import { createPageMetadata } from '@/lib/seo/metadata';
 
 export const metadata = createPageMetadata({
@@ -7,7 +8,23 @@ export const metadata = createPageMetadata({
   path: '/legal/privacy',
 });
 
-export default function PrivacyPolicyPage() {
+export default async function PrivacyPolicyPage() {
+  let dbContent: string | null = null;
+  try {
+    const svc = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+    const { data } = await svc
+      .from('legal_pages')
+      .select('content')
+      .eq('slug', 'privacy')
+      .single();
+    if (data?.content) dbContent = data.content;
+  } catch {
+    // use fallback
+  }
+
   return (
     <>
       {/* ─── HERO ─── */}
@@ -39,6 +56,12 @@ export default function PrivacyPolicyPage() {
       <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="prose prose-lg max-w-none">
+            {dbContent ? (
+              <div
+                className="bg-white rounded-3xl p-8 md:p-12 shadow-lg shadow-[#5DB347]/5 border border-[#EBF7E5]"
+                dangerouslySetInnerHTML={{ __html: dbContent }}
+              />
+            ) : (
             <div className="bg-white rounded-3xl p-8 md:p-12 shadow-lg shadow-[#5DB347]/5 border border-[#EBF7E5]">
               <h2
                 className="text-2xl font-bold mb-4"
@@ -217,6 +240,7 @@ export default function PrivacyPolicyPage() {
                 .
               </p>
             </div>
+            )}
           </div>
         </div>
       </section>

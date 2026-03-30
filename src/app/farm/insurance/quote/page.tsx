@@ -309,7 +309,7 @@ export default function QuotePage() {
 
   const selectedProduct = useMemo(
     () => insuranceProducts.find((p) => p.id === selectedProductId) ?? null,
-    [selectedProductId],
+    [selectedProductId, insuranceProducts],
   );
 
   /* ── When a product is selected, set default coverage to midpoint ── */
@@ -371,9 +371,42 @@ export default function QuotePage() {
   }, [selectedProduct, farmSize, coverageAmount, livestock, equipmentValue]);
 
   const canCalculate = selectedProduct !== null && (selectedCountry !== '' || true);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
 
   const handleCalculate = () => {
     setShowEstimate(true);
+  };
+
+  const handleSubmitQuote = async () => {
+    if (!premiumEstimate || !selectedProduct || !user) return;
+    setSubmitting(true);
+    try {
+      const supabase = createClient();
+      await supabase.from('insurance_quotes').insert({
+        user_id: user.id,
+        product_id: selectedProduct.id,
+        product_name: selectedProduct.name,
+        product_type: selectedProduct.type,
+        coverage_amount: premiumEstimate.coverage,
+        monthly_premium: premiumEstimate.monthly,
+        annual_premium: premiumEstimate.annual,
+        deductible_percent: premiumEstimate.deductiblePercent,
+        deductible_amount: premiumEstimate.deductible,
+        farm_size: farmSize,
+        selected_crops: selectedCrops,
+        livestock_counts: livestock,
+        equipment_value: equipmentValue,
+        country: selectedCountry,
+        region: selectedRegion,
+        status: 'pending',
+      });
+      setSubmitSuccess(true);
+    } catch {
+      // Silently fail — quote was still calculated and shown
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -844,11 +877,22 @@ export default function QuotePage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.6 }}
                   >
-                    <button className="w-full bg-gold hover:bg-gold/90 active:bg-gold/80 text-navy py-4 rounded-xl text-base font-bold transition-colors flex items-center justify-center gap-2 min-h-[52px] shadow-lg">
-                      <Shield className="w-5 h-5" />
-                      {ti.getInsured}
-                      <ArrowRight className="w-5 h-5" />
-                    </button>
+                    {submitSuccess ? (
+                      <div className="w-full bg-green-500/20 text-green-200 py-4 rounded-xl text-base font-bold flex items-center justify-center gap-2 min-h-[52px]">
+                        <CheckCircle2 className="w-5 h-5" />
+                        Quote Submitted Successfully
+                      </div>
+                    ) : (
+                      <button
+                        onClick={handleSubmitQuote}
+                        disabled={submitting}
+                        className="w-full bg-gold hover:bg-gold/90 active:bg-gold/80 disabled:opacity-60 text-navy py-4 rounded-xl text-base font-bold transition-colors flex items-center justify-center gap-2 min-h-[52px] shadow-lg"
+                      >
+                        <Shield className="w-5 h-5" />
+                        {submitting ? 'Submitting...' : ti.getInsured}
+                        {!submitting && <ArrowRight className="w-5 h-5" />}
+                      </button>
+                    )}
                     <p className="text-[11px] text-center opacity-50 mt-2">
                       This is an estimate. Final premium may vary after verification.
                     </p>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BarChart3, Wheat, Users, Sprout } from "lucide-react";
 import { type LucideIcon } from "lucide-react";
+import { createClient } from '@supabase/supabase-js';
 
 /* ─── Country Data ─── */
 
@@ -717,11 +718,36 @@ export function generateMetadata({ params }: { params: { slug: string } }) {
 
 /* ─── Page Component ─── */
 
-export default function CountryPage({ params }: { params: { slug: string } }) {
-  const country = countries.find((c) => c.slug === params.slug);
+export default async function CountryPage({ params }: { params: { slug: string } }) {
+  const fallback = countries.find((c) => c.slug === params.slug);
 
-  if (!country) {
+  if (!fallback) {
     notFound();
+  }
+
+  // Attempt to enrich with DB data; fallback to hardcoded if unavailable
+  let country = { ...fallback };
+  try {
+    const svc = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+    const { data } = await svc
+      .from('country_settings')
+      .select('*')
+      .eq('country_code', params.slug)
+      .single();
+    if (data) {
+      if (data.description) country.description = data.description;
+      if (data.key_crops && Array.isArray(data.key_crops) && data.key_crops.length > 0) {
+        country.crops = data.key_crops.map((c: string) => ({ name: c, icon: '' }));
+      }
+      if (data.highlights && Array.isArray(data.highlights) && data.highlights.length > 0) {
+        country.highlights = data.highlights;
+      }
+    }
+  } catch {
+    // use fallback
   }
 
   return (

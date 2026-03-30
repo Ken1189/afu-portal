@@ -129,22 +129,24 @@ export default function InsuranceOverviewPage() {
     try {
       const { data, error } = await supabase
         .from('insurance_claims')
-        .select('id, claim_type, amount, status, created_at, profiles!insurance_claims_farmer_id_fkey(full_name)')
-        .order('created_at', { ascending: false });
+        .select('id, description, claim_amount, status, submitted_at, members!insurance_claims_member_id_fkey(profiles(full_name))')
+        .order('submitted_at', { ascending: false });
 
       if (error) throw error;
 
       if (data && data.length > 0) {
         setClaims(
           data.map((row: Record<string, unknown>) => {
-            const profileData = row.profiles as Record<string, unknown> | null;
+            const membersData = row.members as Record<string, unknown> | null;
+            const profilesData = membersData?.profiles as Record<string, unknown> | null;
+            const statusVal = (row.status as string) || 'submitted';
             return {
               id: row.id as string,
-              claim_type: (row.claim_type as string) || 'Unknown',
-              amount: (row.amount as number) || 0,
-              status: (row.status as string) || 'pending',
-              created_at: (row.created_at as string) || '',
-              farmer_name: profileData?.full_name as string || 'Unknown Farmer',
+              claim_type: (row.description as string) || 'Unknown',
+              amount: (row.claim_amount as number) || 0,
+              status: statusVal === 'submitted' ? 'pending' : statusVal,
+              created_at: (row.submitted_at as string) || '',
+              farmer_name: (profilesData?.full_name as string) || 'Unknown Farmer',
             };
           })
         );
@@ -163,23 +165,28 @@ export default function InsuranceOverviewPage() {
     try {
       const { data, error } = await supabase
         .from('insurance_policies')
-        .select('*')
+        .select('id, policy_number, coverage_amount, premium, status, start_date, end_date, insurance_products(name), members!insurance_policies_member_id_fkey(profiles(full_name))')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
       if (data && data.length > 0) {
         setPolicies(
-          data.map((row: Record<string, unknown>) => ({
-            id: row.id as string,
-            policyNumber: (row.policy_number as string) || (row.id as string),
-            memberName: (row.member_name as string) || 'Unknown',
-            productType: (row.product_type as string) || 'General',
-            coverageAmount: (row.coverage_amount as number) || 0,
-            premium: (row.premium as number) || 0,
-            status: ((row.status as string) || 'active') as InsurancePolicy['status'],
-            expiryDate: (row.expiry_date as string) || '',
-          }))
+          data.map((row: Record<string, unknown>) => {
+            const membersData = row.members as Record<string, unknown> | null;
+            const profilesData = membersData?.profiles as Record<string, unknown> | null;
+            const productData = row.insurance_products as Record<string, unknown> | null;
+            return {
+              id: row.id as string,
+              policyNumber: (row.policy_number as string) || (row.id as string),
+              memberName: (profilesData?.full_name as string) || 'Unknown',
+              productType: (productData?.name as string) || 'General',
+              coverageAmount: (row.coverage_amount as number) || 0,
+              premium: (row.premium as number) || 0,
+              status: ((row.status as string) || 'active') as InsurancePolicy['status'],
+              expiryDate: ((row.end_date as string) || '')?.split('T')[0] || '',
+            };
+          })
         );
       } else {
         setPolicies(FALLBACK_POLICIES);

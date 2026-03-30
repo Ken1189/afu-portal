@@ -29,7 +29,8 @@ import {
   ArrowUpDown,
   X,
 } from 'lucide-react';
-import { useLivestock } from '@/lib/supabase/use-livestock';
+import { useLivestock, useCreateLivestock } from '@/lib/supabase/use-livestock';
+import { useAuth } from '@/lib/supabase/auth-context';
 
 // ---------------------------------------------------------------------------
 // Inlined types & data (previously from @/lib/data/livestock)
@@ -563,18 +564,21 @@ function QuickActionCard({
   description,
   bgColor,
   iconColor,
+  onClick,
 }: {
   icon: React.ReactNode;
   title: string;
   description: string;
   bgColor: string;
   iconColor: string;
+  onClick?: () => void;
 }) {
   return (
     <motion.button
       variants={cardVariants}
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
+      onClick={onClick}
       className="flex flex-col items-center gap-3 p-5 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-shadow text-center min-h-[140px]"
     >
       <div
@@ -646,7 +650,46 @@ function AlertCard({
 
 export default function LivestockPage() {
   // --- Live Supabase data (available when real data is entered) ---
-  const { livestock: liveLivestock } = useLivestock();
+  const { livestock: liveLivestock, fetchLivestock } = useLivestock();
+  const { createLivestock } = useCreateLivestock();
+  const { user } = useAuth();
+
+  // --- Add Animal form state ---
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [addFormSubmitting, setAddFormSubmitting] = useState(false);
+  const [addFormData, setAddFormData] = useState({
+    type: 'cattle' as string,
+    breed: '',
+    count: 1,
+    health_status: 'healthy',
+    location: '',
+  });
+
+  const handleAddAnimal = async () => {
+    if (!user) return;
+    setAddFormSubmitting(true);
+    try {
+      await createLivestock({
+        member_id: user.id,
+        type: addFormData.type,
+        breed: addFormData.breed || null,
+        count: addFormData.count,
+        tag_id: null,
+        health_status: addFormData.health_status,
+        location: addFormData.location || null,
+        value_estimate: null,
+        date_acquired: new Date().toISOString().split('T')[0],
+        notes: null,
+      });
+      setShowAddForm(false);
+      setAddFormData({ type: 'cattle', breed: '', count: 1, health_status: 'healthy', location: '' });
+      fetchLivestock();
+    } catch {
+      // silent fail
+    } finally {
+      setAddFormSubmitting(false);
+    }
+  };
 
   // --- State ---
   const [activeTab, setActiveTab] = useState<TabKey>('herd');
@@ -1175,6 +1218,7 @@ export default function LivestockPage() {
                   description="Register a new animal to your herd"
                   bgColor="bg-green-50"
                   iconColor="text-green-600"
+                  onClick={() => setShowAddForm(true)}
                 />
                 <QuickActionCard
                   icon={<Baby size={24} />}
@@ -1274,6 +1318,116 @@ export default function LivestockPage() {
           )}
         </AnimatePresence>
       </div>
+
+      {/* ═══════════════════════════════════════════════════════════════ */}
+      {/* ADD ANIMAL MODAL                                                */}
+      {/* ═══════════════════════════════════════════════════════════════ */}
+      <AnimatePresence>
+        {showAddForm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
+            onClick={() => setShowAddForm(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 24 }}
+              className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-bold text-[#1B2A4A]">Add Animal</h2>
+                <button
+                  onClick={() => setShowAddForm(false)}
+                  className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-colors"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+
+              {/* Type */}
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Animal Type</label>
+                <select
+                  value={addFormData.type}
+                  onChange={(e) => setAddFormData((p) => ({ ...p, type: e.target.value }))}
+                  className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C]"
+                >
+                  <option value="cattle">Cattle</option>
+                  <option value="goat">Goat</option>
+                  <option value="sheep">Sheep</option>
+                  <option value="poultry">Poultry</option>
+                  <option value="pig">Pig</option>
+                </select>
+              </div>
+
+              {/* Breed */}
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Breed</label>
+                <input
+                  type="text"
+                  value={addFormData.breed}
+                  onChange={(e) => setAddFormData((p) => ({ ...p, breed: e.target.value }))}
+                  placeholder="e.g. Brahman, Nguni, Boer"
+                  className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C]"
+                />
+              </div>
+
+              {/* Count */}
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Count</label>
+                <input
+                  type="number"
+                  min={1}
+                  value={addFormData.count}
+                  onChange={(e) => setAddFormData((p) => ({ ...p, count: parseInt(e.target.value) || 1 }))}
+                  className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C]"
+                />
+              </div>
+
+              {/* Health Status */}
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Health Status</label>
+                <select
+                  value={addFormData.health_status}
+                  onChange={(e) => setAddFormData((p) => ({ ...p, health_status: e.target.value }))}
+                  className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C]"
+                >
+                  <option value="healthy">Healthy</option>
+                  <option value="sick">Sick</option>
+                  <option value="pregnant">Pregnant</option>
+                  <option value="quarantine">Quarantine</option>
+                </select>
+              </div>
+
+              {/* Location */}
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Location</label>
+                <input
+                  type="text"
+                  value={addFormData.location}
+                  onChange={(e) => setAddFormData((p) => ({ ...p, location: e.target.value }))}
+                  placeholder="e.g. Paddock A, North pasture"
+                  className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C]"
+                />
+              </div>
+
+              {/* Submit */}
+              <button
+                onClick={handleAddAnimal}
+                disabled={addFormSubmitting}
+                className="w-full bg-[#8CB89C] hover:bg-[#729E82] disabled:opacity-60 text-white py-3 rounded-xl text-sm font-bold transition-colors flex items-center justify-center gap-2 min-h-[44px]"
+              >
+                {addFormSubmitting ? 'Adding...' : 'Add Animal'}
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

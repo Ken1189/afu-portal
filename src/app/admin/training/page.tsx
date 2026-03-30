@@ -247,7 +247,9 @@ export default function AdminTrainingPage() {
   const handleSaveCourse = async () => {
     if (!courseForm.title.trim()) { setToast({ message: 'Course title is required', type: 'error' }); return; }
     setCourseSaving(true);
-    const payload = { title: courseForm.title.trim(), category: courseForm.category.trim() || 'General', duration: courseForm.duration.trim() || '4 weeks', capacity: parseInt(courseForm.capacity) || 50, instructor: courseForm.instructor.trim() || 'TBA', status: courseForm.status };
+    const durationText = courseForm.duration.trim() || '4 weeks';
+    const durationWeeks = parseInt(durationText) || 4;
+    const payload = { title: courseForm.title.trim(), category: courseForm.category.trim() || 'General', duration_minutes: durationWeeks * 7 * 60, description: `Duration: ${durationText} | Capacity: ${parseInt(courseForm.capacity) || 50}`, instructor: courseForm.instructor.trim() || 'TBA', is_published: courseForm.status === 'active' };
     let error;
     if (editingCourseId) {
       ({ error } = await supabase.from('courses').update(payload).eq('id', editingCourseId));
@@ -270,7 +272,7 @@ export default function AdminTrainingPage() {
 
   const handleTogglePublish = async (prog: Program) => {
     const newStatus: ProgramStatus = prog.status === 'active' ? 'completed' : 'active';
-    const { error } = await supabase.from('courses').update({ status: newStatus }).eq('id', prog.id);
+    const { error } = await supabase.from('courses').update({ is_published: newStatus === 'active' }).eq('id', prog.id);
     if (error) { setPrograms(prev => prev.map(p => p.id === prog.id ? { ...p, status: newStatus } : p)); }
     else { setPrograms(prev => prev.map(p => p.id === prog.id ? { ...p, status: newStatus } : p)); }
     setToast({ message: newStatus === 'active' ? 'Course published' : 'Course unpublished', type: 'success' });

@@ -71,13 +71,18 @@ export default function EquipmentRegistryPage() {
     try {
       const { data, error } = await supabase.from('equipment').select('*').order('created_at', { ascending: false });
       if (!error && data && data.length > 0) {
-        setEquipment(data.map((row: Record<string, unknown>) => ({
-          id: (row.id as string) || '', name: (row.name as string) || 'Unknown',
-          type: (row.equipment_type as string) || (row.type as string) || 'Other',
-          ownerName: (row.owner_name as string) || 'Unknown', farmName: (row.farm_name as string) || '',
-          status: ((row.status as string) || 'available') as EquipmentRecord['status'],
-          dailyRate: (row.daily_rate as number) || 0, location: (row.location as string) || (row.country as string) || '',
-        })));
+        setEquipment(data.map((row: Record<string, unknown>) => {
+          const desc = (row.description as string) || '';
+          const ownerMatch = desc.match(/Owner:\s*([^|]+)/);
+          const farmMatch = desc.match(/Farm:\s*(.+)/);
+          return {
+            id: (row.id as string) || '', name: (row.name as string) || 'Unknown',
+            type: (row.type as string) || 'Other',
+            ownerName: ownerMatch ? ownerMatch[1].trim() : 'Unknown', farmName: farmMatch ? farmMatch[1].trim() : '',
+            status: ((row.status as string) || 'available') as EquipmentRecord['status'],
+            dailyRate: (row.daily_rate as number) || 0, location: (row.location as string) || (row.country as string) || '',
+          };
+        }));
       }
     } catch { /* fallback */ }
     setIsLoading(false);
@@ -118,7 +123,7 @@ export default function EquipmentRegistryPage() {
   const handleSave = async () => {
     if (!form.name.trim() || !form.ownerName.trim()) { setToast({ message: 'Equipment name and owner are required', type: 'error' }); return; }
     setSaving(true);
-    const payload = { name: form.name.trim(), equipment_type: form.type.trim(), owner_name: form.ownerName.trim(), farm_name: form.farmName.trim() || null, status: form.status, daily_rate: parseFloat(form.dailyRate) || 0, location: form.location.trim() || null };
+    const payload = { name: form.name.trim(), type: form.type.trim(), status: form.status, daily_rate: parseFloat(form.dailyRate) || 0, location: form.location.trim() || null, description: form.ownerName.trim() ? `Owner: ${form.ownerName.trim()}` + (form.farmName.trim() ? ` | Farm: ${form.farmName.trim()}` : '') : null };
     let error;
     if (editingId) { ({ error } = await supabase.from('equipment').update(payload).eq('id', editingId)); }
     else { ({ error } = await supabase.from('equipment').insert(payload)); }

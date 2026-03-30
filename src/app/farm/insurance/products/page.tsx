@@ -276,7 +276,7 @@ export default function ProductsPage() {
       activeFilter === 'all'
         ? insuranceProducts
         : insuranceProducts.filter((p) => p.type === activeFilter),
-    [activeFilter],
+    [activeFilter, insuranceProducts],
   );
 
   const toggleCoverageExpand = (id: string) => {

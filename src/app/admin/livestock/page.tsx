@@ -107,13 +107,18 @@ export default function LivestockManagementPage() {
     try {
       const { data, error } = await supabase.from('livestock').select('*').order('created_at', { ascending: false });
       if (!error && data && data.length > 0) {
-        setLivestockRecords(data.map((row: Record<string, unknown>) => ({
-          id: (row.id as string) || '', animalType: (row.animal_type as string) || 'Other',
-          breed: (row.breed as string) || '', memberName: (row.member_name as string) || (row.farmer_name as string) || 'Unknown',
-          farmName: (row.farm_name as string) || '', count: (row.count as number) || (row.head_count as number) || 1,
-          healthStatus: ((row.health_status as string) || 'healthy') as LivestockRecord['healthStatus'],
-          location: (row.location as string) || (row.country as string) || '', valueEstimate: (row.value_estimate as number) || 0,
-        })));
+        setLivestockRecords(data.map((row: Record<string, unknown>) => {
+          const notes = (row.notes as string) || '';
+          const memberMatch = notes.match(/Member:\s*([^|]+)/);
+          const farmMatch = notes.match(/Farm:\s*(.+)/);
+          return {
+            id: (row.id as string) || '', animalType: (row.type as string) || 'Other',
+            breed: (row.breed as string) || '', memberName: memberMatch ? memberMatch[1].trim() : 'Unknown',
+            farmName: farmMatch ? farmMatch[1].trim() : '', count: (row.count as number) || 1,
+            healthStatus: ((row.health_status as string) || 'healthy') as LivestockRecord['healthStatus'],
+            location: (row.location as string) || '', valueEstimate: (row.value_estimate as number) || 0,
+          };
+        }));
       }
     } catch { /* fallback */ }
     setIsLoading(false);
@@ -159,7 +164,7 @@ export default function LivestockManagementPage() {
   const handleSave = async () => {
     if (!form.animalType.trim() || !form.memberName.trim()) { setToast({ message: 'Animal type and member name are required', type: 'error' }); return; }
     setSaving(true);
-    const payload = { animal_type: form.animalType.trim(), breed: form.breed.trim() || null, member_name: form.memberName.trim(), farm_name: form.farmName.trim() || null, count: parseInt(form.count) || 1, health_status: form.healthStatus, location: form.location.trim() || null, value_estimate: parseFloat(form.valueEstimate) || 0 };
+    const payload = { type: form.animalType.trim(), breed: form.breed.trim() || null, count: parseInt(form.count) || 1, health_status: form.healthStatus, location: form.location.trim() || null, value_estimate: parseFloat(form.valueEstimate) || 0, notes: form.memberName.trim() ? `Member: ${form.memberName.trim()}` + (form.farmName.trim() ? ` | Farm: ${form.farmName.trim()}` : '') : null };
     let error;
     if (editingId) { ({ error } = await supabase.from('livestock').update(payload).eq('id', editingId)); }
     else { ({ error } = await supabase.from('livestock').insert(payload)); }
