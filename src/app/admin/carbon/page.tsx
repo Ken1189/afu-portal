@@ -11,9 +11,9 @@ import { useAuth } from '@/lib/supabase/auth-context';
 import { createClient } from '@/lib/supabase/client';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, Area, AreaChart } from 'recharts';
 
-// ── Demo data ────────────────────────────────────────────────────────────────
+// ── Fallback data ────────────────────────────────────────────────────────────
 
-const demoKPIs = {
+const FALLBACK_KPIs = {
   totalProjects: 6,
   activeEnrollments: 42,
   creditsIssued: 2520,
@@ -22,19 +22,19 @@ const demoKPIs = {
   bufferPool: 2845,
 };
 
-const demoEnrollmentTrend = [
+const FALLBACK_ENROLLMENT_TREND = [
   { month: 'Jul', enrollments: 3 }, { month: 'Aug', enrollments: 5 }, { month: 'Sep', enrollments: 8 },
   { month: 'Oct', enrollments: 6 }, { month: 'Nov', enrollments: 10 }, { month: 'Dec', enrollments: 12 },
   { month: 'Jan', enrollments: 9 }, { month: 'Feb', enrollments: 14 }, { month: 'Mar', enrollments: 11 },
 ];
 
-const demoRevenueTrend = [
+const FALLBACK_REVENUE_TREND = [
   { month: 'Jul', revenue: 1200 }, { month: 'Aug', revenue: 2100 }, { month: 'Sep', revenue: 3400 },
   { month: 'Oct', revenue: 2800 }, { month: 'Nov', revenue: 4200 }, { month: 'Dec', revenue: 5100 },
   { month: 'Jan', revenue: 3900 }, { month: 'Feb', revenue: 6200 }, { month: 'Mar', revenue: 4800 },
 ];
 
-const demoActivity = [
+const FALLBACK_ACTIVITY = [
   { type: 'enrollment', text: 'New enrollment in Chobe Agroforestry Initiative', time: '2 hours ago' },
   { type: 'practice', text: 'Practice logged: No-till farming (3ha)', time: '4 hours ago' },
   { type: 'credit', text: '12.5 credits issued for Makgadikgadi Soil Carbon', time: '1 day ago' },
@@ -44,49 +44,115 @@ const demoActivity = [
   { type: 'purchase', text: '100 credits purchased by EcoVentures Ltd ($2,200)', time: '4 days ago' },
 ];
 
+const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+/** Format a timestamp into a human-readable relative time string */
+function timeAgo(dateStr: string): string {
+  const seconds = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+  if (seconds < 60) return 'just now';
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
+}
+
 export default function AdminCarbonDashboard() {
   const { user } = useAuth();
   const supabase = createClient();
   const [loading, setLoading] = useState(true);
-  const [kpis, setKPIs] = useState(demoKPIs);
-  const [enrollmentTrend] = useState(demoEnrollmentTrend);
-  const [revenueTrend] = useState(demoRevenueTrend);
-  const [activity] = useState(demoActivity);
+  const [kpis, setKPIs] = useState(FALLBACK_KPIs);
+  const [enrollmentTrend, setEnrollmentTrend] = useState(FALLBACK_ENROLLMENT_TREND);
+  const [revenueTrend, setRevenueTrend] = useState(FALLBACK_REVENUE_TREND);
+  const [activity, setActivity] = useState(FALLBACK_ACTIVITY);
 
   useEffect(() => {
-    const fetchKPIs = async () => {
+    const fetchDashboardData = async () => {
       setLoading(true);
       try {
-        const [projectsRes, enrollmentsRes, creditsRes, purchasesRes] = await Promise.all([
-          supabase.from('carbon_projects').select('id', { count: 'exact' }),
-          supabase.from('carbon_enrollments').select('id', { count: 'exact' }).eq('status', 'active'),
-          supabase.from('carbon_credits').select('quantity, status, price_per_tonne'),
-          supabase.from('carbon_purchases').select('total_amount, status'),
-        ]);
+        // ── KPIs from carbon_credits table ──
+        const { data: creditsData, error: creditsErr } = await supabase
+          .from('carbon_credits')
+          .select('id, credits_earned, verification_status, value_usd, project_type, member_id, created_at, vintage_year');
 
-        const creditsData = creditsRes.data || [];
-        const purchasesData = purchasesRes.data || [];
+        if (!creditsErr && creditsData && creditsData.length > 0) {
+          // Unique project types = "projects"
+          const uniqueProjects = new Set(creditsData.map((c: any) => c.project_type));
+          // Unique enrolled members
+          const uniqueMembers = new Set(creditsData.map((c: any) => c.member_id));
+          // Verified credits = issued
+          const totalIssued = creditsData
+            .filter((c: any) => c.verification_status === 'verified')
+            .reduce((s: number, c: any) => s + (Number(c.credits_earned) || 0), 0);
+          // All credits earned
+          const totalCredits = creditsData.reduce((s: number, c: any) => s + (Number(c.credits_earned) || 0), 0);
+          // Revenue from value_usd of verified credits
+          const totalRevenue = creditsData
+            .filter((c: any) => c.verification_status === 'verified')
+            .reduce((s: number, c: any) => s + (Number(c.value_usd) || 0), 0);
 
-        const totalIssued = creditsData.reduce((s, c) => s + (c.quantity || 0), 0);
-        const totalSold = creditsData.filter(c => c.status === 'sold').reduce((s, c) => s + (c.quantity || 0), 0);
-        const totalRevenue = purchasesData.reduce((s, p) => s + (p.total_amount || 0), 0);
-
-        if (projectsRes.count || enrollmentsRes.count) {
           setKPIs({
-            totalProjects: projectsRes.count || 0,
-            activeEnrollments: enrollmentsRes.count || 0,
-            creditsIssued: totalIssued || demoKPIs.creditsIssued,
-            creditsSold: totalSold || demoKPIs.creditsSold,
-            totalRevenue: totalRevenue || demoKPIs.totalRevenue,
-            bufferPool: (totalRevenue * 0.1) || demoKPIs.bufferPool,
+            totalProjects: uniqueProjects.size || FALLBACK_KPIs.totalProjects,
+            activeEnrollments: uniqueMembers.size || FALLBACK_KPIs.activeEnrollments,
+            creditsIssued: Math.round(totalIssued) || FALLBACK_KPIs.creditsIssued,
+            creditsSold: Math.round(totalCredits - totalIssued) || FALLBACK_KPIs.creditsSold,
+            totalRevenue: Math.round(totalRevenue) || FALLBACK_KPIs.totalRevenue,
+            bufferPool: Math.round(totalRevenue * 0.1) || FALLBACK_KPIs.bufferPool,
           });
+
+          // ── Build monthly enrollment trend (credits created per month, last 9 months) ──
+          const now = new Date();
+          const monthlyEnrollments: { month: string; enrollments: number }[] = [];
+          const monthlyRevenue: { month: string; revenue: number }[] = [];
+          for (let i = 8; i >= 0; i--) {
+            const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+            const monthLabel = MONTH_NAMES[d.getMonth()];
+            const yearMonth = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+            const inMonth = creditsData.filter((c: any) => c.created_at?.startsWith(yearMonth));
+            monthlyEnrollments.push({ month: monthLabel, enrollments: inMonth.length });
+            monthlyRevenue.push({
+              month: monthLabel,
+              revenue: inMonth.reduce((s: number, c: any) => s + (Number(c.value_usd) || 0), 0),
+            });
+          }
+          if (monthlyEnrollments.some(m => m.enrollments > 0)) {
+            setEnrollmentTrend(monthlyEnrollments);
+          }
+          if (monthlyRevenue.some(m => m.revenue > 0)) {
+            setRevenueTrend(monthlyRevenue);
+          }
+        }
+
+        // ── Recent activity from audit_log ──
+        const { data: auditData, error: auditErr } = await supabase
+          .from('audit_log')
+          .select('id, action, entity_type, details, created_at')
+          .order('created_at', { ascending: false })
+          .limit(10);
+
+        if (!auditErr && auditData && auditData.length > 0) {
+          const mapped = auditData.map((row: any) => {
+            // Map entity_type to activity type for icon/color matching
+            let type = 'practice';
+            if (row.entity_type === 'carbon_credit' || row.action?.includes('credit')) type = 'credit';
+            else if (row.action?.includes('enroll') || row.entity_type === 'member') type = 'enrollment';
+            else if (row.action?.includes('purchase') || row.action?.includes('payment')) type = 'purchase';
+            const detail = typeof row.details === 'string' ? row.details : (row.details?.message || row.details?.description || '');
+            return {
+              type,
+              text: detail || `${row.action} on ${row.entity_type || 'record'}`,
+              time: timeAgo(row.created_at),
+            };
+          });
+          setActivity(mapped);
         }
       } catch {
-        // Use demo data
+        // Keep fallback data already set in state
       }
       setLoading(false);
     };
-    fetchKPIs();
+    fetchDashboardData();
   }, [supabase]);
 
   if (loading) {

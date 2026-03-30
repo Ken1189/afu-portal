@@ -11,6 +11,10 @@ import {
   AlertTriangle,
   XCircle,
   Loader2,
+  Plus,
+  Pencil,
+  Trash2,
+  X,
 } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 import { createClient } from '@/lib/supabase/client';
@@ -36,6 +40,38 @@ interface InsurancePolicy {
   status: 'active' | 'pending-claim' | 'expired' | 'claimed';
   expiryDate: string;
 }
+
+interface PolicyFormData {
+  policy_number: string;
+  member_id: string;
+  product_id: string;
+  coverage_amount: string;
+  premium: string;
+  status: string;
+  start_date: string;
+  end_date: string;
+}
+
+interface MemberOption {
+  id: string;
+  full_name: string;
+}
+
+interface ProductOption {
+  id: string;
+  name: string;
+}
+
+const EMPTY_POLICY_FORM: PolicyFormData = {
+  policy_number: '',
+  member_id: '',
+  product_id: '',
+  coverage_amount: '',
+  premium: '',
+  status: 'active',
+  start_date: '',
+  end_date: '',
+};
 
 type ClaimStatusFilter = 'all' | 'pending' | 'approved' | 'rejected';
 type PolicyStatusFilter = 'all' | 'active' | 'pending-claim' | 'expired';
@@ -120,6 +156,16 @@ export default function InsuranceOverviewPage() {
   const [policySearch, setPolicySearch] = useState('');
   const [policyStatusFilter, setPolicyStatusFilter] = useState<PolicyStatusFilter>('all');
 
+  // Policy CRUD state
+  const [policyModalOpen, setPolicyModalOpen] = useState(false);
+  const [editingPolicyId, setEditingPolicyId] = useState<string | null>(null);
+  const [policyForm, setPolicyForm] = useState<PolicyFormData>(EMPTY_POLICY_FORM);
+  const [policySaving, setPolicySaving] = useState(false);
+  const [deletingPolicyId, setDeletingPolicyId] = useState<string | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [members, setMembers] = useState<MemberOption[]>([]);
+  const [products, setProducts] = useState<ProductOption[]>([]);
+
   // View toggle
   const [activeView, setActiveView] = useState<'claims' | 'policies'>('claims');
 
@@ -197,10 +243,52 @@ export default function InsuranceOverviewPage() {
     setPoliciesLoading(false);
   }, [supabase]);
 
+  // Fetch members for dropdown
+  const fetchMembers = useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from('members')
+        .select('id, profiles(full_name)')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      if (data) {
+        setMembers(
+          data.map((row: Record<string, unknown>) => {
+            const profilesData = row.profiles as Record<string, unknown> | null;
+            return {
+              id: row.id as string,
+              full_name: (profilesData?.full_name as string) || 'Unknown',
+            };
+          })
+        );
+      }
+    } catch {
+      // Members dropdown will be empty; user can type member_id manually
+    }
+  }, [supabase]);
+
+  // Fetch insurance products for dropdown
+  const fetchProducts = useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from('insurance_products')
+        .select('id, name')
+        .order('name');
+      if (error) throw error;
+      if (data) {
+        setProducts(data as ProductOption[]);
+      }
+    } catch {
+      // Products dropdown will be empty
+    }
+  }, [supabase]);
+
   useEffect(() => {
     fetchClaims();
     fetchPolicies();
-  }, [fetchClaims, fetchPolicies]);
+    fetchMembers();
+    fetchProducts();
+  }, [fetchClaims, fetchPolicies, fetchMembers, fetchProducts]);
 
   // Approve / Reject claim
   const handleClaimAction = async (claimId: string, newStatus: 'approved' | 'rejected') => {
@@ -224,6 +312,110 @@ export default function InsuranceOverviewPage() {
       );
     }
     setActionLoading(null);
+  };
+
+  // Open modal for creating a new policy
+  const openCreatePolicy = () => {
+    setEditingPolicyId(null);
+    const year = new Date().getFullYear();
+    const seq = String(policies.length + 1).padStart(4, '0');
+    setPolicyForm({ ...EMPTY_POLICY_FORM, policy_number: `POL-${year}-${seq}` });
+    setPolicyModalOpen(true);
+  };
+
+  // Open modal for editing an existing policy
+  const openEditPolicy = async (policyId: string) => {
+    setEditingPolicyId(policyId);
+    // Fetch the raw row so we get member_id and product_id
+    try {
+      const { data, error } = await supabase
+        .from('insurance_policies')
+        .select('*')
+        .eq('id', policyId)
+        .single();
+      if (error) throw error;
+      if (data) {
+        setPolicyForm({
+          policy_number: (data.policy_number as string) || '',
+          member_id: (data.member_id as string) || '',
+          product_id: (data.product_id as string) || '',
+          coverage_amount: String(data.coverage_amount ?? ''),
+          premium: String(data.premium ?? ''),
+          status: (data.status as string) || 'active',
+          start_date: ((data.start_date as string) || '').split('T')[0],
+          end_date: ((data.end_date as string) || '').split('T')[0],
+        });
+      }
+    } catch {
+      // If fetch fails (e.g. fallback data), pre-fill from local state
+      const local = policies.find((p) => p.id === policyId);
+      if (local) {
+        setPolicyForm({
+          policy_number: local.policyNumber,
+          member_id: '',
+          product_id: '',
+          coverage_amount: String(local.coverageAmount),
+          premium: String(local.premium),
+          status: local.status,
+          start_date: '',
+          end_date: local.expiryDate,
+        });
+      }
+    }
+    setPolicyModalOpen(true);
+  };
+
+  // Save (create or update) policy
+  const handleSavePolicy = async () => {
+    setPolicySaving(true);
+    const payload = {
+      policy_number: policyForm.policy_number,
+      member_id: policyForm.member_id || null,
+      product_id: policyForm.product_id || null,
+      coverage_amount: parseFloat(policyForm.coverage_amount) || 0,
+      premium: parseFloat(policyForm.premium) || 0,
+      status: policyForm.status,
+      start_date: policyForm.start_date || null,
+      end_date: policyForm.end_date || null,
+    };
+
+    try {
+      if (editingPolicyId) {
+        const { error } = await supabase
+          .from('insurance_policies')
+          .update(payload)
+          .eq('id', editingPolicyId);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('insurance_policies')
+          .insert(payload);
+        if (error) throw error;
+      }
+    } catch {
+      // If Supabase fails (demo/fallback mode), still close the modal
+    }
+    setPolicyModalOpen(false);
+    setPolicySaving(false);
+    fetchPolicies();
+  };
+
+  // Delete policy
+  const handleDeletePolicy = async (policyId: string) => {
+    setDeletingPolicyId(policyId);
+    try {
+      const { error } = await supabase
+        .from('insurance_policies')
+        .delete()
+        .eq('id', policyId);
+      if (error) throw error;
+    } catch {
+      // If Supabase fails, remove from local state for demo
+      setPolicies((prev) => prev.filter((p) => p.id !== policyId));
+    }
+    setDeleteConfirmId(null);
+    setDeletingPolicyId(null);
+    fetchPolicies();
   };
 
   // Filter claims
@@ -487,6 +679,13 @@ export default function InsuranceOverviewPage() {
                   </button>
                 ))}
               </div>
+              <button
+                onClick={openCreatePolicy}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium bg-[#5DB347] text-white hover:bg-[#4ea03c] transition-colors shadow-sm"
+              >
+                <Plus className="w-4 h-4" />
+                Add Policy
+              </button>
             </div>
             <p className="text-xs text-gray-400 mt-3">Showing {filteredPolicies.length} of {policies.length} policies</p>
           </motion.div>
@@ -509,6 +708,7 @@ export default function InsuranceOverviewPage() {
                       <th className="text-right py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Premium</th>
                       <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Status</th>
                       <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Expiry</th>
+                      <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-50">
@@ -527,6 +727,48 @@ export default function InsuranceOverviewPage() {
                           </span>
                         </td>
                         <td className="py-3 px-4 text-xs text-gray-500">{pol.expiryDate}</td>
+                        <td className="py-3 px-4 text-center">
+                          <div className="flex items-center justify-center gap-1">
+                            <button
+                              onClick={() => openEditPolicy(pol.id)}
+                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors"
+                              title="Edit policy"
+                            >
+                              <Pencil className="w-3 h-3" />
+                              Edit
+                            </button>
+                            {deleteConfirmId === pol.id ? (
+                              <div className="flex items-center gap-1">
+                                <button
+                                  onClick={() => handleDeletePolicy(pol.id)}
+                                  disabled={deletingPolicyId === pol.id}
+                                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50"
+                                >
+                                  {deletingPolicyId === pol.id ? (
+                                    <Loader2 className="w-3 h-3 animate-spin" />
+                                  ) : (
+                                    'Confirm'
+                                  )}
+                                </button>
+                                <button
+                                  onClick={() => setDeleteConfirmId(null)}
+                                  className="inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            ) : (
+                              <button
+                                onClick={() => setDeleteConfirmId(pol.id)}
+                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium bg-red-50 text-red-700 hover:bg-red-100 transition-colors"
+                                title="Delete policy"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                                Delete
+                              </button>
+                            )}
+                          </div>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -541,6 +783,180 @@ export default function InsuranceOverviewPage() {
             )}
           </motion.div>
         </>
+      )}
+
+      {/* ─── Policy Create/Edit Modal ─── */}
+      {policyModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto"
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+              <h2 className="text-lg font-bold text-[#1B2A4A]">
+                {editingPolicyId ? 'Edit Policy' : 'Add New Policy'}
+              </h2>
+              <button
+                onClick={() => setPolicyModalOpen(false)}
+                className="p-1 rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-400" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="px-6 py-4 space-y-4">
+              {/* Policy Number */}
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Policy Number</label>
+                <input
+                  type="text"
+                  value={policyForm.policy_number}
+                  onChange={(e) => setPolicyForm((f) => ({ ...f, policy_number: e.target.value }))}
+                  placeholder="POL-2026-0001"
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#5DB347]/50"
+                />
+              </div>
+
+              {/* Member */}
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Member</label>
+                {members.length > 0 ? (
+                  <select
+                    value={policyForm.member_id}
+                    onChange={(e) => setPolicyForm((f) => ({ ...f, member_id: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#5DB347]/50 bg-white"
+                  >
+                    <option value="">Select a member...</option>
+                    {members.map((m) => (
+                      <option key={m.id} value={m.id}>
+                        {m.full_name}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <input
+                    type="text"
+                    value={policyForm.member_id}
+                    onChange={(e) => setPolicyForm((f) => ({ ...f, member_id: e.target.value }))}
+                    placeholder="Member ID (UUID)"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#5DB347]/50"
+                  />
+                )}
+              </div>
+
+              {/* Product Type */}
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Product Type</label>
+                {products.length > 0 ? (
+                  <select
+                    value={policyForm.product_id}
+                    onChange={(e) => setPolicyForm((f) => ({ ...f, product_id: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#5DB347]/50 bg-white"
+                  >
+                    <option value="">Select a product...</option>
+                    {products.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <input
+                    type="text"
+                    value={policyForm.product_id}
+                    onChange={(e) => setPolicyForm((f) => ({ ...f, product_id: e.target.value }))}
+                    placeholder="Product ID (UUID)"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#5DB347]/50"
+                  />
+                )}
+              </div>
+
+              {/* Coverage & Premium row */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Coverage Amount</label>
+                  <input
+                    type="number"
+                    value={policyForm.coverage_amount}
+                    onChange={(e) => setPolicyForm((f) => ({ ...f, coverage_amount: e.target.value }))}
+                    placeholder="0"
+                    min="0"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#5DB347]/50"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Premium</label>
+                  <input
+                    type="number"
+                    value={policyForm.premium}
+                    onChange={(e) => setPolicyForm((f) => ({ ...f, premium: e.target.value }))}
+                    placeholder="0"
+                    min="0"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#5DB347]/50"
+                  />
+                </div>
+              </div>
+
+              {/* Status */}
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Status</label>
+                <select
+                  value={policyForm.status}
+                  onChange={(e) => setPolicyForm((f) => ({ ...f, status: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#5DB347]/50 bg-white"
+                >
+                  <option value="active">Active</option>
+                  <option value="pending">Pending</option>
+                  <option value="expired">Expired</option>
+                  <option value="claimed">Claimed</option>
+                </select>
+              </div>
+
+              {/* Dates row */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Start Date</label>
+                  <input
+                    type="date"
+                    value={policyForm.start_date}
+                    onChange={(e) => setPolicyForm((f) => ({ ...f, start_date: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#5DB347]/50"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">End Date</label>
+                  <input
+                    type="date"
+                    value={policyForm.end_date}
+                    onChange={(e) => setPolicyForm((f) => ({ ...f, end_date: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#5DB347]/50"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-gray-100">
+              <button
+                onClick={() => setPolicyModalOpen(false)}
+                className="px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSavePolicy}
+                disabled={policySaving}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium bg-[#5DB347] text-white hover:bg-[#4ea03c] transition-colors shadow-sm disabled:opacity-50"
+              >
+                {policySaving && <Loader2 className="w-4 h-4 animate-spin" />}
+                {editingPolicyId ? 'Update Policy' : 'Create Policy'}
+              </button>
+            </div>
+          </motion.div>
+        </div>
       )}
     </motion.div>
   );

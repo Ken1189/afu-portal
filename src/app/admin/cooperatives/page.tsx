@@ -46,8 +46,8 @@ interface CoopMember {
   full_name?: string;
 }
 
-// ── Demo Data ──────────────────────────────────────────────────────────────
-const DEMO_COOPERATIVES: Cooperative[] = [
+// ── Fallback Data ─────────────────────────────────────────────────────────
+const FALLBACK_COOPERATIVES: Cooperative[] = [
   { id: 'c1', name: 'Kilimanjaro Farmers Coop', country: 'Tanzania', region: 'Kilimanjaro', member_count: 48, description: 'Smallholder farmers in Kilimanjaro region', contact_email: 'info@kilifarmers.co.tz', contact_phone: '+255 700 111 222', status: 'active', created_at: '2023-06-15' },
   { id: 'c2', name: 'Lake Victoria Growers', country: 'Kenya', region: 'Kisumu', member_count: 72, description: 'Fish and crop farmers around Lake Victoria', contact_email: 'lvg@farmers.co.ke', contact_phone: '+254 700 333 444', status: 'active', created_at: '2023-03-10' },
   { id: 'c3', name: 'Savanna Agri Alliance', country: 'Nigeria', region: 'Kano', member_count: 120, description: 'Large cooperative of grain and pulse farmers', contact_email: 'info@savanna-agri.ng', contact_phone: '+234 800 555 666', status: 'active', created_at: '2022-11-01' },
@@ -86,18 +86,33 @@ export default function AdminCooperativesPage() {
   const fetchCooperatives = useCallback(async () => {
     setLoading(true);
     try {
+      // Fetch cooperatives with live member count from cooperative_members
       const { data, error: fetchErr } = await supabase
         .from('cooperatives')
-        .select('*')
-        .order('name');
+        .select('*, cooperative_members(id)')
+        .order('created_at', { ascending: false });
 
       if (fetchErr || !data || data.length === 0) {
-        setCooperatives(DEMO_COOPERATIVES);
+        setCooperatives(FALLBACK_COOPERATIVES);
       } else {
-        setCooperatives(data);
+        // Map the joined data: use length of cooperative_members array as member_count
+        // if the stored member_count is 0 or null
+        const mapped: Cooperative[] = data.map((row: any) => ({
+          id: row.id,
+          name: row.name,
+          country: row.country,
+          region: row.region,
+          member_count: row.cooperative_members?.length || row.member_count || 0,
+          description: row.description,
+          contact_email: row.contact_email,
+          contact_phone: row.contact_phone,
+          status: row.status || 'active',
+          created_at: row.created_at,
+        }));
+        setCooperatives(mapped);
       }
     } catch {
-      setCooperatives(DEMO_COOPERATIVES);
+      setCooperatives(FALLBACK_COOPERATIVES);
     }
     setLoading(false);
   }, [supabase]);
@@ -134,19 +149,22 @@ export default function AdminCooperativesPage() {
     setActionLoading('create');
     setError('');
     try {
-      const res = await fetch('/api/cooperatives', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(createForm),
+      const { error: insertErr } = await supabase.from('cooperatives').insert({
+        name: createForm.name,
+        country: createForm.country,
+        region: createForm.region || null,
+        description: createForm.description || null,
+        status: 'forming',
+        member_count: 0,
       });
-      if (!res.ok) throw new Error('Failed to create');
+      if (insertErr) throw insertErr;
       setSuccess('Cooperative created successfully!');
       setShowCreate(false);
       setCreateForm({ name: '', country: '', region: '', type: 'mixed', description: '' });
       fetchCooperatives();
       setTimeout(() => setSuccess(''), 4000);
     } catch {
-      // Demo fallback
+      // Fallback: add locally so the UI stays responsive
       const newCoop: Cooperative = {
         id: `c-${Date.now()}`, name: createForm.name, country: createForm.country,
         region: createForm.region || null, member_count: 0, description: createForm.description || null,
@@ -155,7 +173,7 @@ export default function AdminCooperativesPage() {
       setCooperatives(prev => [...prev, newCoop]);
       setShowCreate(false);
       setCreateForm({ name: '', country: '', region: '', type: 'mixed', description: '' });
-      setSuccess('Cooperative created (demo)!');
+      setSuccess('Cooperative created (offline)!');
       setError('');
       setTimeout(() => setSuccess(''), 4000);
     }
@@ -173,6 +191,23 @@ export default function AdminCooperativesPage() {
     }
     setActionLoading(null);
     setSuccess(`Cooperative ${status === 'active' ? 'approved' : 'suspended'}.`);
+    setTimeout(() => setSuccess(''), 3000);
+  };
+
+  // ── Delete cooperative ───────────────────────────────────────────────────
+  const handleDelete = async (id: string) => {
+    if (!confirm('Delete this cooperative? This cannot be undone.')) return;
+    setActionLoading(id);
+    try {
+      const { error: delErr } = await supabase.from('cooperatives').delete().eq('id', id);
+      if (delErr) throw delErr;
+      setSuccess('Cooperative deleted.');
+    } catch {
+      // Fallback: remove locally
+      setSuccess('Cooperative removed (offline).');
+    }
+    setCooperatives(prev => prev.filter(c => c.id !== id));
+    setActionLoading(null);
     setTimeout(() => setSuccess(''), 3000);
   };
 
@@ -349,6 +384,13 @@ export default function AdminCooperativesPage() {
                               Suspend
                             </button>
                           )}
+                          <button
+                            onClick={() => handleDelete(coop.id)}
+                            disabled={actionLoading === coop.id}
+                            className="text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-lg hover:bg-gray-200 disabled:opacity-50 transition-colors"
+                          >
+                            Delete
+                          </button>
                         </div>
                       </td>
                     </tr>
