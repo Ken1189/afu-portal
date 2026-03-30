@@ -18,16 +18,18 @@ export async function POST(req: NextRequest) {
     const supabase = await createAdminClient();
 
     // Upsert into site_content so duplicate emails don't cause errors
+    // site_content has UNIQUE(page, section, key)
     const { error } = await supabase
       .from('site_content')
       .upsert(
         {
+          page: 'global',
           section: 'newsletter_subscribers',
           key: email.toLowerCase().trim(),
           value: new Date().toISOString(),
-          type: 'text',
+          content_type: 'text',
         },
-        { onConflict: 'section,key' }
+        { onConflict: 'page,section,key' }
       );
 
     if (error) {

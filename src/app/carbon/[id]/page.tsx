@@ -198,9 +198,9 @@ export default function CreditDetailPage() {
                 <div className="flex justify-between text-sm"><span className="text-gray-500">Vintage Year</span><span className="font-medium">{credit.vintage_year}</span></div>
                 <div className="flex justify-between text-sm"><span className="text-gray-500">Serial Number</span><span className="font-mono text-[#5DB347]">{credit.serial_number}</span></div>
               </div>
-              <a href="#" className="inline-flex items-center gap-1 text-sm text-[#5DB347] hover:underline mt-4">
-                View on Registry <ExternalLink className="w-3.5 h-3.5" />
-              </a>
+              <span className="inline-flex items-center gap-1 text-sm text-gray-400 mt-4 cursor-default">
+                Registry link coming soon <ExternalLink className="w-3.5 h-3.5" />
+              </span>
             </div>
 
             {/* Co-Benefits */}

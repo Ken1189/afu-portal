@@ -650,7 +650,7 @@ export default function SupplierDashboard() {
           </div>
           <div className="flex items-center gap-3">
             <Link
-              href="/supplier/products/new"
+              href="/supplier/products"
               className="flex items-center gap-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm px-4 py-2 rounded-lg text-sm font-medium transition-colors"
             >
               <Plus className="w-4 h-4" />
@@ -996,7 +996,7 @@ export default function SupplierDashboard() {
               Active Advertisements
             </h3>
             <Link
-              href="/supplier/advertisements"
+              href="/supplier/advertising"
               className="text-[#8CB89C] text-xs font-medium hover:text-[#729E82] flex items-center gap-1 transition-colors"
             >
               Manage Ads <ChevronRight className="w-3.5 h-3.5" />
