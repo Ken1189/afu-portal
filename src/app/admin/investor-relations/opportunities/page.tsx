@@ -151,7 +151,7 @@ const FALLBACK_OPPORTUNITIES: Opportunity[] = [
     description: 'Senior secured lending to verified African farmers. Portfolio diversified across 20 countries, 15+ crop types.',
     target: 5000000,
     min_investment: 100000,
-    target_irr: '18-22%',
+    target_irr: '12-16%',
     term: '3 years',
     subscribed_percent: 62,
     subscribed_amount: 3100000,
@@ -168,7 +168,7 @@ const FALLBACK_OPPORTUNITIES: Opportunity[] = [
     description: 'Expand blueberry operation from 25ha to 100ha. EU export contracts secured. $18/kg farm-gate price.',
     target: 2000000,
     min_investment: 250000,
-    target_irr: '24-30%',
+    target_irr: '15-20%',
     term: '5 years',
     subscribed_percent: 45,
     subscribed_amount: 900000,
@@ -185,7 +185,7 @@ const FALLBACK_OPPORTUNITIES: Opportunity[] = [
     description: "Parametric weather-triggered insurance products with 38% historical claims ratio. Covers 12,000+ farmers.",
     target: 3000000,
     min_investment: 150000,
-    target_irr: '15-20%',
+    target_irr: '10-14%',
     term: '2 years (renewable)',
     subscribed_percent: 78,
     subscribed_amount: 2340000,
@@ -202,7 +202,7 @@ const FALLBACK_OPPORTUNITIES: Opportunity[] = [
     description: 'Fund SBLCs, Letters of Credit, and export pre-financing for agricultural commodity exports. Average deal tenor: 90 days.',
     target: 10000000,
     min_investment: 500000,
-    target_irr: '16-20%',
+    target_irr: '11-15%',
     term: '1 year (revolving)',
     subscribed_percent: 35,
     subscribed_amount: 3500000,
@@ -219,7 +219,7 @@ const FALLBACK_OPPORTUNITIES: Opportunity[] = [
     description: '19,000 pre-identified farmers. MTN MoMo disbursement. 94% repayment rate on existing Zimbabwe portfolio.',
     target: 1500000,
     min_investment: 50000,
-    target_irr: '20-24%',
+    target_irr: '13-16%',
     term: '2 years',
     subscribed_percent: 100,
     subscribed_amount: 1500000,
@@ -413,7 +413,7 @@ function OpportunityFormModal({
             <input
               value={form.target_irr}
               onChange={(e) => onChange({ ...form, target_irr: e.target.value })}
-              placeholder="e.g. 18-22%"
+              placeholder="e.g. 12-16%"
               className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#5DB347]/20 focus:border-[#5DB347]"
             />
           </div>

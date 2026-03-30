@@ -636,7 +636,7 @@ export default function InvestorsPage() {
               {
                 tier: "Tier 1 — Seed Investor",
                 min: "$1M",
-                returns: "10% target annual return",
+                returns: "8% target annual return",
                 features: [
                   "Quarterly distributions",
                   "Investor portal access",
@@ -650,7 +650,7 @@ export default function InvestorsPage() {
               {
                 tier: "Tier 2 — Growth Partner",
                 min: "$10M",
-                returns: "15% target annual return",
+                returns: "10% target annual return",
                 features: [
                   "Quarterly distributions",
                   "Investor portal access",
@@ -667,7 +667,7 @@ export default function InvestorsPage() {
               {
                 tier: "Tier 3 — Strategic Partner",
                 min: "$100M",
-                returns: "20% target annual return",
+                returns: "13% target annual return",
                 features: [
                   "Quarterly distributions",
                   "Investor portal access",

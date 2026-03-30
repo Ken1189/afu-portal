@@ -113,8 +113,8 @@ const FALLBACK_KEY_METRICS = [
   },
   {
     label: 'Net IRR',
-    value: '21.3%',
-    badge: 'Target: 18-24%',
+    value: '14.2%',
+    badge: 'Target: 12-16%',
     badgeColor: 'bg-emerald-100 text-emerald-700',
     icon: TrendingUp,
     iconBg: 'bg-emerald-600',
@@ -449,8 +449,8 @@ export default function InvestorDashboard() {
       {
         label: 'Net Returns',
         value: `${returnsPct}%`,
-        badge: 'Target: 18-24%',
-        badgeColor: Number(returnsPct) >= 18 ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700',
+        badge: 'Target: 12-16%',
+        badgeColor: Number(returnsPct) >= 12 ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700',
         icon: TrendingUp,
         iconBg: 'bg-emerald-600',
       },

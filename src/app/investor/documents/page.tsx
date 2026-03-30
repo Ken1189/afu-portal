@@ -66,7 +66,7 @@ const FALLBACK_DOCUMENTS: InvestorDocument[] = [
     file_url: '#',
     file_size: '3.2 MB',
     uploaded_at: '2026-03-20T00:00:00Z',
-    description: 'Performance report covering January to March 2026. Fund I returned 5.2% for the quarter.',
+    description: 'Performance report covering January to March 2026. Fund I returned 3.5% for the quarter.',
   },
   {
     id: '4',

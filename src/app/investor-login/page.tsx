@@ -27,7 +27,7 @@ const highlights = [
   {
     icon: TrendingUp,
     label: 'Target Returns',
-    value: '18-24% IRR',
+    value: '12-16% IRR',
     desc: 'Risk-adjusted returns backed by real agricultural assets',
   },
   {

@@ -102,7 +102,7 @@ export default function OfftakeServicePage() {
           className="absolute inset-0 bg-cover bg-center"
           style={{
             backgroundImage:
-              "url('https://images.unsplash.com/photo-1542838132-92c53300491e?w=1920&q=80')",
+              "url('https://images.unsplash.com/photo-1605000797499-95a51c5269ae?w=1920&h=1080&fit=crop')",
           }}
         />
         <div

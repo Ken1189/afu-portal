@@ -86,7 +86,7 @@ export async function getChatResponse(
   // --- Investment ---
   if (/invest|investor|return|roi|fund|capital|seed\s*round|equity/.test(lowerMessage)) {
     return {
-      text: "AFU is raising a $500M seed round with three investor tiers:\n\n\u2022 **Seed Investor** ($1M min) \u2014 10% target annual return\n\u2022 **Growth Partner** ($10M min) \u2014 15% target return + board observer\n\u2022 **Strategic Partner** ($100M min) \u2014 20% target return + board seat + co-investment rights\n\nReturns paid quarterly via revenue participation notes.\n\nVisit /investors for the full opportunity, or /contact?subject=investor to request the investor pack.",
+      text: "AFU is raising a $500M seed round with three investor tiers:\n\n\u2022 **Seed Investor** ($1M min) \u2014 8% target annual return\n\u2022 **Growth Partner** ($10M min) \u2014 10% target return + board observer\n\u2022 **Strategic Partner** ($100M min) \u2014 13% target return + board seat + co-investment rights\n\nReturns paid quarterly via revenue participation notes.\n\nVisit /investors for the full opportunity, or /contact?subject=investor to request the investor pack.",
       suggestions: ['Investor page', 'Request investor pack', 'View demo'],
     };
   }

@@ -36,12 +36,12 @@ interface Investment {
 /* ------------------------------------------------------------------ */
 
 const FALLBACK_INVESTMENTS: Investment[] = [
-  { id: '1', name: 'Zim Blueberry Export Program', type: 'Equity', committed: 125000, deployed: 125000, returns: 24.5, irr: 24.5, status: 'Active', vintage: 2025 },
-  { id: '2', name: 'Uganda Smallholder Lending Pool', type: 'Debt', committed: 500000, deployed: 420000, returns: 19.2, irr: 19.2, status: 'Active', vintage: 2026 },
-  { id: '3', name: 'East Africa Crop Insurance Fund', type: 'Insurance', committed: 500000, deployed: 380000, returns: 16.8, irr: 16.8, status: 'Active', vintage: 2026 },
-  { id: '4', name: 'Zimbabwe Maize Lending', type: 'Debt', committed: 500000, deployed: 500000, returns: 22.1, irr: 22.1, status: 'Active', vintage: 2025 },
-  { id: '5', name: 'Kenya Trade Finance Facility', type: 'Debt', committed: 375000, deployed: 290000, returns: 18.5, irr: 18.5, status: 'Active', vintage: 2026 },
-  { id: '6', name: 'Zimbabwe Input Finance', type: 'Debt', committed: 500000, deployed: 470000, returns: 20.3, irr: 20.3, status: 'Active', vintage: 2025 },
+  { id: '1', name: 'Zim Blueberry Export Program', type: 'Equity', committed: 125000, deployed: 125000, returns: 16.2, irr: 16.2, status: 'Active', vintage: 2025 },
+  { id: '2', name: 'Uganda Smallholder Lending Pool', type: 'Debt', committed: 500000, deployed: 420000, returns: 12.8, irr: 12.8, status: 'Active', vintage: 2026 },
+  { id: '3', name: 'East Africa Crop Insurance Fund', type: 'Insurance', committed: 500000, deployed: 380000, returns: 11.2, irr: 11.2, status: 'Active', vintage: 2026 },
+  { id: '4', name: 'Zimbabwe Maize Lending', type: 'Debt', committed: 500000, deployed: 500000, returns: 14.7, irr: 14.7, status: 'Active', vintage: 2025 },
+  { id: '5', name: 'Kenya Trade Finance Facility', type: 'Debt', committed: 375000, deployed: 290000, returns: 12.8, irr: 12.8, status: 'Active', vintage: 2026 },
+  { id: '6', name: 'Zimbabwe Input Finance', type: 'Debt', committed: 500000, deployed: 470000, returns: 13.5, irr: 13.5, status: 'Active', vintage: 2025 },
 ];
 
 const FALLBACK_ALLOCATION = [
@@ -52,11 +52,11 @@ const FALLBACK_ALLOCATION = [
 ];
 
 const FALLBACK_QUARTERLY_RETURNS = [
-  { label: 'Q1 2025', value: 4.2 },
-  { label: 'Q2 2025', value: 5.1 },
-  { label: 'Q3 2025', value: 5.6 },
-  { label: 'Q4 2025', value: 4.8 },
-  { label: 'Q1 2026', value: 4.9 },
+  { label: 'Q1 2025', value: 2.8 },
+  { label: 'Q2 2025', value: 3.4 },
+  { label: 'Q3 2025', value: 3.7 },
+  { label: 'Q4 2025', value: 3.2 },
+  { label: 'Q1 2026', value: 3.3 },
 ];
 
 /* ------------------------------------------------------------------ */

@@ -70,10 +70,10 @@ const FALLBACK_UPDATES: InvestorUpdate[] = [
   {
     id: '1',
     title: 'Q1 2026 Quarterly Report Published',
-    body: 'Fund I delivered 5.2% quarterly return, bringing YTD IRR to 21.3%. Zimbabwe blueberry program exceeded export targets by 15%. The loan portfolio maintained a 96.1% repayment rate with PAR30 improving to 3.9%. Total AUM reached $12.4M with new capital deployments into Kenya maize and Uganda coffee value chains.',
+    body: 'Fund I delivered 3.5% quarterly return, bringing YTD IRR to 14.2%. Zimbabwe blueberry program exceeded export targets by 15%. The loan portfolio maintained a 96.1% repayment rate with PAR30 improving to 3.9%. Total AUM reached $12.4M with new capital deployments into Kenya maize and Uganda coffee value chains.',
     update_type: 'quarterly_report',
     published_at: '2026-03-15T00:00:00Z',
-    metrics_snapshot: { 'Quarterly Return': '5.2%', 'YTD IRR': '21.3%', 'Repayment Rate': '96.1%' },
+    metrics_snapshot: { 'Quarterly Return': '3.5%', 'YTD IRR': '14.2%', 'Repayment Rate': '96.1%' },
   },
   {
     id: '2',
@@ -118,10 +118,10 @@ const FALLBACK_UPDATES: InvestorUpdate[] = [
   {
     id: '7',
     title: 'FY2025 Audited Results',
-    body: 'Full year results: 18.7% net IRR, $8.2M deployed, 94.2% repayment rate. Exceeded all fund targets set at inception. The blended finance model proved resilient through commodity price volatility. Independent audit by Deloitte confirmed clean opinion on all financial statements.',
+    body: 'Full year results: 12.5% net IRR, $8.2M deployed, 94.2% repayment rate. Exceeded all fund targets set at inception. The blended finance model proved resilient through commodity price volatility. Independent audit by Deloitte confirmed clean opinion on all financial statements.',
     update_type: 'quarterly_report',
     published_at: '2025-12-05T00:00:00Z',
-    metrics_snapshot: { 'Net IRR': '18.7%', 'Capital Deployed': '$8.2M', 'Repayment Rate': '94.2%' },
+    metrics_snapshot: { 'Net IRR': '12.5%', 'Capital Deployed': '$8.2M', 'Repayment Rate': '94.2%' },
   },
   {
     id: '8',

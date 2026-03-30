@@ -138,7 +138,7 @@ const FALLBACK_SERVICES = [
     title: 'Financing',
     desc: 'Working capital, invoice finance, and crop financing from smallholder to commercial scale.',
     link: '/services/financing',
-    img: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&h=500&fit=crop',
+    img: 'https://images.unsplash.com/photo-1589923188651-268a9765e432?w=800&h=500&fit=crop',
   },
   {
     icon: Cog,
@@ -152,28 +152,28 @@ const FALLBACK_SERVICES = [
     title: 'Processing Hubs',
     desc: 'Milling, drying, cold chain, and packaging. Value-addition at source.',
     link: '/services/processing',
-    img: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&q=80',
+    img: 'https://images.unsplash.com/photo-1605000797499-95a51c5269ae?w=800&h=500&fit=crop',
   },
   {
     icon: ShieldCheck,
     title: 'Guaranteed Offtake',
     desc: 'Pre-arranged buyers and distribution. No more selling cheap or wasting crops.',
     link: '/services/offtake',
-    img: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=800&q=80',
+    img: 'https://images.unsplash.com/photo-1473172707857-f9e276582ab6?w=800&h=500&fit=crop',
   },
   {
     icon: CircleDollarSign,
     title: 'Trade Finance',
     desc: 'SBLCs, Letters of Credit, export pre-financing, and FX services via our banking partners.',
     link: '/services/trade-finance',
-    img: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800&q=80',
+    img: 'https://images.unsplash.com/photo-1560493676-04071c5f467b?w=800&h=500&fit=crop',
   },
   {
     icon: GraduationCap,
     title: 'Training & Certification',
     desc: 'Vocational partnerships to build scalable farmer capacity, compliance, and export readiness.',
     link: '/services/training',
-    img: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=800&h=500&fit=crop',
+    img: 'https://images.unsplash.com/photo-1595508064774-5ff825a8213f?w=800&h=500&fit=crop',
   },
 ];
 
@@ -208,7 +208,7 @@ const fallbackTestimonials = [
     name: 'Kabo Mothibi',
     role: 'Sesame Grower, Botswana',
     quote: 'From seed to sale, AFU handled the inputs, training, and buyer contracts. I just focused on growing.',
-    img: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop&crop=face',
+    img: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop&crop=face',
     rating: 5,
   },
 ];
@@ -244,7 +244,7 @@ const HERO_DEFAULTS = {
   hero_subtitle: 'By farmers, for farmers. Run by Africans, for Africans. We bring the financing, inputs, processing, and guaranteed buyers — you bring the land and the passion. Together, we turn your harvest into real, sustainable income.',
   hero_cta_text: 'Join Our Farming Family',
   hero_cta_link: '/apply',
-  hero_bg_image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1920&h=1080&fit=crop',
+  hero_bg_image: 'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=1920&h=1080&fit=crop',
 };
 
 /* ─── Programs fallback ─── */
@@ -373,7 +373,7 @@ export default function Home() {
               name: (t.name as string) || (t.author_name as string) || '',
               role: (t.role as string) || (t.author_role as string) || '',
               quote: (t.quote as string) || (t.content as string) || '',
-              img: (t.img as string) || (t.avatar_url as string) || (t.photo_url as string) || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face',
+              img: (t.img as string) || (t.avatar_url as string) || (t.photo_url as string) || 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop&crop=face',
               rating: (t.rating as number) || 5,
             }))
           );
@@ -448,7 +448,7 @@ export default function Home() {
               title: (s.title as string) || '',
               desc: (s.description as string) || (s.content as string) || '',
               link: (s.link as string) || (s.url as string) || '/services',
-              img: (s.image_url as string) || (s.img as string) || 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&h=500&fit=crop',
+              img: (s.image_url as string) || (s.img as string) || 'https://images.unsplash.com/photo-1589923188651-268a9765e432?w=800&h=500&fit=crop',
             }))
           );
         }
@@ -880,7 +880,7 @@ export default function Home() {
               <VideoCard
                 title="AFU Platform Demo"
                 duration="3 min"
-                thumbnailUrl="https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=800&h=450&fit=crop"
+                thumbnailUrl="https://images.unsplash.com/photo-1589923188651-268a9765e432?w=800&h=450&fit=crop"
                 size="large"
               />
             </FadeInWhenVisible>
@@ -891,7 +891,7 @@ export default function Home() {
                 {
                   title: 'How Farmers Use AFU',
                   duration: '2 min',
-                  thumb: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400&h=300&fit=crop',
+                  thumb: 'https://images.unsplash.com/photo-1595508064774-5ff825a8213f?w=400&h=300&fit=crop',
                 },
                 {
                   title: 'Sponsor a Farmer Story',
@@ -901,7 +901,7 @@ export default function Home() {
                 {
                   title: 'Investor Overview',
                   duration: '5 min',
-                  thumb: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=400&h=300&fit=crop',
+                  thumb: 'https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=400&h=300&fit=crop',
                 },
               ].map((v, i) => (
                 <FadeInWhenVisible key={v.title} delay={i * 0.12}>
@@ -926,7 +926,7 @@ export default function Home() {
             <FadeInWhenVisible direction="right">
               <div className="relative rounded-3xl overflow-hidden shadow-2xl">
                 <Image
-                  src="https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=800&h=600&fit=crop"
+                  src="https://images.unsplash.com/photo-1595508064774-5ff825a8213f?w=800&h=600&fit=crop"
                   alt="African farmer inspecting crops"
                   width={800}
                   height={600}
@@ -1347,7 +1347,7 @@ export default function Home() {
                   {
                     tier: 'Seed Investor',
                     min: '$250,000',
-                    returns: '18-24% target',
+                    returns: '12-16% target',
                     features: ['Quarterly distributions', 'Annual impact report', 'Investor portal access'],
                     color: 'border-[#5DB347]/40 bg-[#5DB347]/5',
                     badge: 'bg-[#5DB347]/20 text-[#5DB347]',
@@ -1355,7 +1355,7 @@ export default function Home() {
                   {
                     tier: 'Growth Partner',
                     min: '$1,000,000',
-                    returns: '24-32% target',
+                    returns: '15-20% target',
                     features: ['Monthly distributions', 'Advisory board seat', 'Direct deal co-investment', 'Priority pipeline access'],
                     color: 'border-gold/40 bg-gold/5 ring-1 ring-gold/20',
                     badge: 'bg-gold/20 text-gold',
@@ -1494,7 +1494,7 @@ export default function Home() {
             <FadeInWhenVisible direction="left">
               <div className="relative rounded-3xl overflow-hidden shadow-2xl">
                 <Image
-                  src="https://images.unsplash.com/photo-1592982537447-6f2a6a0c8b8b?w=800&q=80"
+                  src="https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=800&h=600&fit=crop"
                   alt="African farmer in field"
                   width={800}
                   height={600}
@@ -1662,7 +1662,7 @@ export default function Home() {
       {showSection('cta') && <section className="relative py-32 overflow-hidden">
         <div className="absolute inset-0">
           <Image
-            src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=1920&q=80"
+            src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=1920&h=1080&fit=crop"
             alt="Green crop field"
             fill
             className="object-cover"

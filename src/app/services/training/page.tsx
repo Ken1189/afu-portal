@@ -102,7 +102,7 @@ export default function TrainingServicePage() {
           className="absolute inset-0 bg-cover bg-center"
           style={{
             backgroundImage:
-              "url('https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=1920&q=80')",
+              "url('https://images.unsplash.com/photo-1595508064774-5ff825a8213f?w=1920&h=1080&fit=crop')",
           }}
         />
         <div

@@ -83,11 +83,11 @@ const COUNTRY_COLORS: Record<string, string> = {
 };
 
 const FALLBACK_FUND_PRODUCTS: FundProduct[] = [
-  { name: 'AFU Agricultural Debt Fund', aum: 2375000, deployed: 1680000, investors: 5, irr: 20.1, color: '#1B2A4A' },
-  { name: 'AFU Insurance Premium Pool', aum: 950000, deployed: 580000, investors: 3, irr: 16.8, color: '#5DB347' },
-  { name: 'AFU Trade Finance Facility', aum: 675000, deployed: 540000, investors: 3, irr: 18.5, color: '#3B82F6' },
-  { name: 'AFU Direct Farm Equity', aum: 375000, deployed: 375000, investors: 2, irr: 24.5, color: '#8B5CF6' },
-  { name: 'AFU Blended Finance Vehicle', aum: 375000, deployed: 275000, investors: 2, irr: 21.2, color: '#F59E0B' },
+  { name: 'AFU Agricultural Debt Fund', aum: 2375000, deployed: 1680000, investors: 5, irr: 13.5, color: '#1B2A4A' },
+  { name: 'AFU Insurance Premium Pool', aum: 950000, deployed: 580000, investors: 3, irr: 11.2, color: '#5DB347' },
+  { name: 'AFU Trade Finance Facility', aum: 675000, deployed: 540000, investors: 3, irr: 12.8, color: '#3B82F6' },
+  { name: 'AFU Direct Farm Equity', aum: 375000, deployed: 375000, investors: 2, irr: 16.2, color: '#8B5CF6' },
+  { name: 'AFU Blended Finance Vehicle', aum: 375000, deployed: 275000, investors: 2, irr: 14.1, color: '#F59E0B' },
 ];
 
 const FALLBACK_COUNTRY_ALLOCATIONS: CountryAllocation[] = [
@@ -108,12 +108,12 @@ const FALLBACK_QUARTERLY_DATA: QuarterlyData[] = [
 ];
 
 const FALLBACK_TOP_INVESTMENTS: TopInvestment[] = [
-  { name: 'Zimbabwe Maize Lending', type: 'Debt', totalCommitted: 900000, investors: 3, irr: 22.1, status: 'Active' },
-  { name: 'Uganda Smallholder Lending Pool', type: 'Debt', totalCommitted: 750000, investors: 2, irr: 19.2, status: 'Active' },
-  { name: 'East Africa Crop Insurance Fund', type: 'Insurance', totalCommitted: 950000, investors: 3, irr: 16.8, status: 'Active' },
-  { name: 'Kenya Trade Finance Facility', type: 'Debt', totalCommitted: 925000, investors: 4, irr: 18.5, status: 'Active' },
-  { name: 'Zimbabwe Input Finance', type: 'Debt', totalCommitted: 850000, investors: 2, irr: 20.3, status: 'Active' },
-  { name: 'Zim Blueberry Export Program', type: 'Equity', totalCommitted: 375000, investors: 2, irr: 24.5, status: 'Active' },
+  { name: 'Zimbabwe Maize Lending', type: 'Debt', totalCommitted: 900000, investors: 3, irr: 14.7, status: 'Active' },
+  { name: 'Uganda Smallholder Lending Pool', type: 'Debt', totalCommitted: 750000, investors: 2, irr: 12.8, status: 'Active' },
+  { name: 'East Africa Crop Insurance Fund', type: 'Insurance', totalCommitted: 950000, investors: 3, irr: 11.2, status: 'Active' },
+  { name: 'Kenya Trade Finance Facility', type: 'Debt', totalCommitted: 925000, investors: 4, irr: 12.8, status: 'Active' },
+  { name: 'Zimbabwe Input Finance', type: 'Debt', totalCommitted: 850000, investors: 2, irr: 13.5, status: 'Active' },
+  { name: 'Zim Blueberry Export Program', type: 'Equity', totalCommitted: 375000, investors: 2, irr: 16.2, status: 'Active' },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -260,7 +260,7 @@ export default function TotalInvestmentsPage() {
   const totalAUM = dbStats && dbStats.totalAUM > 0 ? dbStats.totalAUM : 4750000;
   const totalDeployed = dbStats && dbStats.totalDeployed > 0 ? dbStats.totalDeployed : 3450000;
   const totalReturns = dbStats && dbStats.totalReturns > 0 ? dbStats.totalReturns : 236000;
-  const weightedIRR = dbStats && dbStats.weightedIRR > 0 ? dbStats.weightedIRR : 19.8;
+  const weightedIRR = dbStats && dbStats.weightedIRR > 0 ? dbStats.weightedIRR : 13.2;
   const totalInvestors = dbStats && dbStats.totalInvestors > 0 ? dbStats.totalInvestors : 6;
   const activeDeals = dbStats && dbStats.activeDeals > 0 ? dbStats.activeDeals : 6;
   const deploymentRatio = Math.round((totalDeployed / totalAUM) * 100);
