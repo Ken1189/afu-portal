@@ -25,7 +25,7 @@ END $$;
 DO $$ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='commissions' AND policyname='users_read_own_commissions') THEN
     EXECUTE 'CREATE POLICY users_read_own_commissions ON commissions FOR SELECT USING (
-      member_id IN (SELECT id FROM members WHERE profile_id = auth.uid())
+      supplier_id IN (SELECT id FROM suppliers WHERE profile_id = auth.uid())
       OR is_admin()
     )';
   END IF;
