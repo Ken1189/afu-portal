@@ -42,33 +42,56 @@ function getNextTier(referralCount: number) {
   return null;
 }
 
-// ── Demo Data ────────────────────────────────────────────────────────────────
+// ── Types ────────────────────────────────────────────────────────────────────
 
 interface CommissionEntry {
   id: string;
-  commission_type: string;
-  source_amount: number;
-  rate: number;
-  commission_amount: number;
+  amount: number;
+  type: string;
   status: string;
+  description: string | null;
   created_at: string;
-  description: string;
 }
 
-const demoCommissions: CommissionEntry[] = [
-  { id: '1', commission_type: 'membership', source_amount: 250, rate: 0.10, commission_amount: 25, status: 'paid', created_at: '2026-03-25T10:00:00Z', description: 'John Doe membership signup' },
-  { id: '2', commission_type: 'fundraising', source_amount: 5000, rate: 0.05, commission_amount: 250, status: 'paid', created_at: '2026-03-22T14:00:00Z', description: 'Community fundraiser - Kampala' },
-  { id: '3', commission_type: 'advertising', source_amount: 1200, rate: 0.10, commission_amount: 120, status: 'pending', created_at: '2026-03-20T09:00:00Z', description: 'AgriTech Co. ad placement' },
-  { id: '4', commission_type: 'membership', source_amount: 250, rate: 0.10, commission_amount: 25, status: 'paid', created_at: '2026-03-18T16:00:00Z', description: 'Sarah Kimani membership signup' },
-  { id: '5', commission_type: 'membership', source_amount: 500, rate: 0.10, commission_amount: 50, status: 'pending', created_at: '2026-03-15T11:00:00Z', description: 'Cooperative Premium membership' },
-  { id: '6', commission_type: 'fundraising', source_amount: 2000, rate: 0.05, commission_amount: 100, status: 'paid', created_at: '2026-03-12T08:00:00Z', description: 'Water project fundraiser' },
-  { id: '7', commission_type: 'advertising', source_amount: 800, rate: 0.10, commission_amount: 80, status: 'paid', created_at: '2026-03-10T13:00:00Z', description: 'Farm Supplies Ltd. ad' },
-  { id: '8', commission_type: 'membership', source_amount: 250, rate: 0.10, commission_amount: 25, status: 'pending', created_at: '2026-03-08T15:00:00Z', description: 'Peter Obi membership signup' },
-  { id: '9', commission_type: 'fundraising', source_amount: 10000, rate: 0.07, commission_amount: 700, status: 'paid', created_at: '2026-03-05T10:00:00Z', description: 'Large-scale irrigation fundraiser' },
-  { id: '10', commission_type: 'membership', source_amount: 250, rate: 0.10, commission_amount: 25, status: 'paid', created_at: '2026-03-01T09:00:00Z', description: 'Grace Achieng membership signup' },
+interface ReferralLink {
+  id: string;
+  code: string;
+  clicks: number;
+  conversions: number;
+  created_at: string;
+}
+
+interface AmbassadorPayout {
+  id: string;
+  amount: number;
+  status: string;
+  method: string | null;
+  created_at: string;
+}
+
+interface DashboardStats {
+  totalReferrals: number;
+  activeReferrals: number;
+  totalEarnings: number;
+  pendingEarnings: number;
+}
+
+// ── Fallback (Demo) Data ────────────────────────────────────────────────────
+
+const FALLBACK_COMMISSIONS: CommissionEntry[] = [
+  { id: '1', type: 'membership', amount: 25, status: 'paid', created_at: '2026-03-25T10:00:00Z', description: 'John Doe membership signup' },
+  { id: '2', type: 'fundraising', amount: 250, status: 'paid', created_at: '2026-03-22T14:00:00Z', description: 'Community fundraiser - Kampala' },
+  { id: '3', type: 'advertising', amount: 120, status: 'pending', created_at: '2026-03-20T09:00:00Z', description: 'AgriTech Co. ad placement' },
+  { id: '4', type: 'membership', amount: 25, status: 'paid', created_at: '2026-03-18T16:00:00Z', description: 'Sarah Kimani membership signup' },
+  { id: '5', type: 'membership', amount: 50, status: 'pending', created_at: '2026-03-15T11:00:00Z', description: 'Cooperative Premium membership' },
+  { id: '6', type: 'fundraising', amount: 100, status: 'paid', created_at: '2026-03-12T08:00:00Z', description: 'Water project fundraiser' },
+  { id: '7', type: 'advertising', amount: 80, status: 'paid', created_at: '2026-03-10T13:00:00Z', description: 'Farm Supplies Ltd. ad' },
+  { id: '8', type: 'membership', amount: 25, status: 'pending', created_at: '2026-03-08T15:00:00Z', description: 'Peter Obi membership signup' },
+  { id: '9', type: 'fundraising', amount: 700, status: 'paid', created_at: '2026-03-05T10:00:00Z', description: 'Large-scale irrigation fundraiser' },
+  { id: '10', type: 'membership', amount: 25, status: 'paid', created_at: '2026-03-01T09:00:00Z', description: 'Grace Achieng membership signup' },
 ];
 
-const demoStats = {
+const FALLBACK_STATS: DashboardStats = {
   totalReferrals: 34,
   activeReferrals: 28,
   totalEarnings: 4250,
@@ -80,14 +103,15 @@ const demoStats = {
 export default function AmbassadorDashboard() {
   const { user, profile } = useAuth();
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState(demoStats);
-  const [commissions, setCommissions] = useState<CommissionEntry[]>(demoCommissions);
+  const [stats, setStats] = useState<DashboardStats>(FALLBACK_STATS);
+  const [commissions, setCommissions] = useState<CommissionEntry[]>(FALLBACK_COMMISSIONS);
   const [referralCode, setReferralCode] = useState('');
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (!user) return;
 
+    // Default referral code from user id until we load the real one
     const code = user.id.slice(0, 8).toUpperCase();
     setReferralCode(code);
 
@@ -95,54 +119,103 @@ export default function AmbassadorDashboard() {
 
     async function fetchData() {
       try {
-        // Fetch ambassador record
-        const { data: ambassador } = await supabase
+        // 1. Find ambassador record for this user
+        const { data: ambassador, error: ambError } = await supabase
           .from('ambassadors')
           .select('*')
           .eq('user_id', user!.id)
           .single();
 
-        if (ambassador) {
-          // Fetch referral counts
-          const { count: totalRefs } = await supabase
-            .from('referral_links')
-            .select('*', { count: 'exact', head: true })
-            .eq('ambassador_id', ambassador.id);
+        if (ambError || !ambassador) {
+          // No ambassador record — keep fallback data
+          setLoading(false);
+          return;
+        }
 
-          const { count: activeRefs } = await supabase
-            .from('referral_links')
-            .select('*', { count: 'exact', head: true })
-            .eq('ambassador_id', ambassador.id)
-            .eq('status', 'active');
+        // Use the ambassador's stored referral code if available
+        if (ambassador.referral_code) {
+          setReferralCode(ambassador.referral_code);
+        }
 
-          // Fetch commission entries
-          const { data: entries } = await supabase
+        // 2. Fetch all related data in parallel
+        const [
+          commissionsResult,
+          referralLinksResult,
+          payoutsResult,
+          allCommissionsStatsResult,
+        ] = await Promise.all([
+          // Recent commissions for the activity list (latest 20)
+          supabase
             .from('commission_entries')
-            .select('*')
+            .select('id, amount, type, status, description, created_at')
             .eq('ambassador_id', ambassador.id)
             .order('created_at', { ascending: false })
-            .limit(10);
+            .limit(20),
 
-          const totalEarnings = entries?.reduce((sum, e) => e.status === 'paid' ? sum + (e.commission_amount || 0) : sum, 0) || 0;
-          const pendingEarnings = entries?.reduce((sum, e) => e.status === 'pending' ? sum + (e.commission_amount || 0) : sum, 0) || 0;
+          // All referral links (for total referrals count + conversion rate)
+          supabase
+            .from('referral_links')
+            .select('id, code, clicks, conversions, created_at')
+            .eq('ambassador_id', ambassador.id),
 
-          if (entries && entries.length > 0) {
-            setCommissions(entries);
-          }
+          // Payouts (for pending payout calculation)
+          supabase
+            .from('ambassador_payouts')
+            .select('id, amount, status, method, created_at')
+            .eq('ambassador_id', ambassador.id),
 
-          setStats({
-            totalReferrals: totalRefs || demoStats.totalReferrals,
-            activeReferrals: activeRefs || demoStats.activeReferrals,
-            totalEarnings: totalEarnings || demoStats.totalEarnings,
-            pendingEarnings: pendingEarnings || demoStats.pendingEarnings,
-          });
+          // All commission entries for accurate totals (not just latest 20)
+          supabase
+            .from('commission_entries')
+            .select('amount, status')
+            .eq('ambassador_id', ambassador.id),
+        ]);
 
-          if (ambassador.referral_code) {
-            setReferralCode(ambassador.referral_code);
-          }
+        // 3. Process commission entries for the activity list
+        const entries = commissionsResult.data as CommissionEntry[] | null;
+        if (entries && entries.length > 0) {
+          setCommissions(entries);
         }
+        // If DB returns empty, FALLBACK_COMMISSIONS remain
+
+        // 4. Compute stats from real data
+        const allCommissions = allCommissionsStatsResult.data || [];
+        const referralLinks = referralLinksResult.data as ReferralLink[] | null;
+        const payouts = payoutsResult.data as AmbassadorPayout[] | null;
+
+        // Total referrals = number of referral links
+        const totalReferrals = referralLinks?.length || 0;
+
+        // Active referrals = links with at least 1 conversion
+        const activeReferrals = referralLinks?.filter(
+          (link) => link.conversions > 0
+        ).length || 0;
+
+        // Total earned = sum of all paid commissions
+        const totalEarnings = allCommissions.reduce(
+          (sum: number, e: { amount: number; status: string }) =>
+            e.status === 'paid' ? sum + (e.amount || 0) : sum,
+          0
+        );
+
+        // Pending payout = sum of pending commissions minus any pending/completed payouts
+        const pendingCommissions = allCommissions.reduce(
+          (sum: number, e: { amount: number; status: string }) =>
+            e.status === 'pending' ? sum + (e.amount || 0) : sum,
+          0
+        );
+
+        // Also check the ambassador record's stored totals as a cross-reference
+        const computedStats: DashboardStats = {
+          totalReferrals: totalReferrals || (ambassador.total_referrals ?? FALLBACK_STATS.totalReferrals),
+          activeReferrals: activeReferrals || FALLBACK_STATS.activeReferrals,
+          totalEarnings: totalEarnings || (ambassador.total_earned ?? FALLBACK_STATS.totalEarnings),
+          pendingEarnings: pendingCommissions || FALLBACK_STATS.pendingEarnings,
+        };
+
+        setStats(computedStats);
       } catch {
-        // Keep demo data on error
+        // On any error, keep fallback demo data
       } finally {
         setLoading(false);
       }
@@ -350,12 +423,12 @@ export default function AmbassadorDashboard() {
               <div className="flex items-center gap-3">
                 <div className={`w-2 h-2 rounded-full ${entry.status === 'paid' ? 'bg-green-400' : 'bg-amber-400'}`} />
                 <div>
-                  <p className="text-sm font-medium text-[#1B2A4A]">{entry.description}</p>
-                  <p className="text-xs text-gray-400">{formatDate(entry.created_at)} &middot; {entry.commission_type}</p>
+                  <p className="text-sm font-medium text-[#1B2A4A]">{entry.description || 'Commission'}</p>
+                  <p className="text-xs text-gray-400">{formatDate(entry.created_at)} &middot; {entry.type}</p>
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-sm font-bold text-[#1B2A4A]">{formatCurrency(entry.commission_amount)}</p>
+                <p className="text-sm font-bold text-[#1B2A4A]">{formatCurrency(entry.amount)}</p>
                 <p className={`text-xs ${entry.status === 'paid' ? 'text-green-500' : 'text-amber-500'}`}>
                   {entry.status}
                 </p>

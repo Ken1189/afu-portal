@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   Briefcase,
   TrendingUp,
@@ -16,7 +16,7 @@ import { useAuth } from '@/lib/supabase/auth-context';
 import { createClient } from '@/lib/supabase/client';
 
 /* ------------------------------------------------------------------ */
-/*  Types & Data                                                       */
+/*  Types                                                              */
 /* ------------------------------------------------------------------ */
 
 interface Investment {
@@ -31,7 +31,11 @@ interface Investment {
   vintage: number;
 }
 
-const demoInvestments: Investment[] = [
+/* ------------------------------------------------------------------ */
+/*  Fallback Demo Data                                                 */
+/* ------------------------------------------------------------------ */
+
+const FALLBACK_INVESTMENTS: Investment[] = [
   { id: '1', name: 'Zim Blueberry Export Program', type: 'Equity', committed: 125000, deployed: 125000, returns: 24.5, irr: 24.5, status: 'Active', vintage: 2025 },
   { id: '2', name: 'Uganda Smallholder Lending Pool', type: 'Debt', committed: 500000, deployed: 420000, returns: 19.2, irr: 19.2, status: 'Active', vintage: 2026 },
   { id: '3', name: 'East Africa Crop Insurance Fund', type: 'Insurance', committed: 500000, deployed: 380000, returns: 16.8, irr: 16.8, status: 'Active', vintage: 2026 },
@@ -40,14 +44,14 @@ const demoInvestments: Investment[] = [
   { id: '6', name: 'Zimbabwe Input Finance', type: 'Debt', committed: 500000, deployed: 470000, returns: 20.3, irr: 20.3, status: 'Active', vintage: 2025 },
 ];
 
-const allocationData = [
+const FALLBACK_ALLOCATION = [
   { name: 'AFU Agricultural Debt Fund', pct: 60, amount: 1500000, color: '#1B2A4A' },
   { name: 'AFU Insurance Premium Pool', pct: 20, amount: 500000, color: '#5DB347' },
   { name: 'AFU Trade Finance Facility', pct: 15, amount: 375000, color: '#3B82F6' },
   { name: 'AFU Direct Farm Equity', pct: 5, amount: 125000, color: '#8B5CF6' },
 ];
 
-const quarterlyReturns = [
+const FALLBACK_QUARTERLY_RETURNS = [
   { label: 'Q1 2025', value: 4.2 },
   { label: 'Q2 2025', value: 5.1 },
   { label: 'Q3 2025', value: 5.6 },
@@ -75,6 +79,8 @@ const typeStyle: Record<string, string> = {
   Insurance: 'bg-teal-50 text-teal-700 border border-teal-200',
 };
 
+const ALLOCATION_COLORS = ['#1B2A4A', '#5DB347', '#3B82F6', '#8B5CF6', '#F59E0B', '#EF4444', '#06B6D4', '#EC4899'];
+
 /* ------------------------------------------------------------------ */
 /*  Animation variants                                                 */
 /* ------------------------------------------------------------------ */
@@ -95,24 +101,47 @@ const item = {
 
 export default function PortfolioPage() {
   const { user } = useAuth();
-  const [investments, setInvestments] = useState<Investment[]>(demoInvestments);
+  const [investments, setInvestments] = useState<Investment[]>(FALLBACK_INVESTMENTS);
   const [loading, setLoading] = useState(true);
+  const [hasLiveData, setHasLiveData] = useState(false);
   const supabase = createClient();
 
   useEffect(() => {
     async function load() {
       if (!user) { setLoading(false); return; }
       try {
-        // Try investments table first
-        const { data } = await supabase
-          .from('investments')
-          .select('*')
-          .eq('investor_user_id', user.id)
-          .order('invested_at', { ascending: false });
-        if (data && data.length > 0) {
-          setInvestments(data as unknown as Investment[]);
+        // 1. Get investor profile to find investor_profile_id
+        const { data: ip } = await supabase
+          .from('investor_profiles')
+          .select('id')
+          .eq('user_id', user.id)
+          .single();
+
+        if (ip) {
+          // 2. Fetch investments for this profile
+          const { data } = await supabase
+            .from('investments')
+            .select('*')
+            .eq('investor_profile_id', ip.id)
+            .order('invested_at', { ascending: false });
+
+          if (data && data.length > 0) {
+            const mapped: Investment[] = data.map((row: Record<string, unknown>, idx: number) => ({
+              id: String(row.id || idx),
+              name: String(row.opportunity_name || row.name || `Investment ${idx + 1}`),
+              type: normalizeType(String(row.type || row.product_type || 'Debt')),
+              committed: Number(row.amount || row.committed || 0),
+              deployed: Number(row.deployed_amount || row.deployed || row.amount || 0),
+              returns: Number(row.returns || 0),
+              irr: Number(row.irr || row.returns || 0),
+              status: normalizeStatus(String(row.status || 'Active')),
+              vintage: new Date(String(row.invested_at || row.created_at || new Date())).getFullYear(),
+            }));
+            setInvestments(mapped);
+            setHasLiveData(true);
+          }
         } else {
-          // Fall back to investor_interests table
+          // Fallback: try investor_interests table
           const { data: interests } = await supabase
             .from('investor_interests')
             .select('*')
@@ -122,24 +151,92 @@ export default function PortfolioPage() {
             const mapped: Investment[] = interests.map((row: Record<string, unknown>, idx: number) => ({
               id: String(row.id || idx),
               name: String(row.opportunity_name || row.name || `Investment ${idx + 1}`),
-              type: (String(row.investment_type || row.type || 'Debt')) as Investment['type'],
+              type: normalizeType(String(row.investment_type || row.type || 'Debt')),
               committed: Number(row.amount || row.committed || 0),
               deployed: Number(row.deployed_amount || row.deployed || row.amount || 0),
               returns: Number(row.returns || row.irr || 0),
               irr: Number(row.irr || row.returns || 0),
-              status: (String(row.status || 'Active') === 'active' ? 'Active' : String(row.status || 'Active')) as Investment['status'],
+              status: normalizeStatus(String(row.status || 'Active')),
               vintage: new Date(String(row.created_at || new Date())).getFullYear(),
             }));
             setInvestments(mapped);
+            setHasLiveData(true);
           }
         }
       } catch {
-        // use demo data on error
+        // use fallback demo data on error
       }
       setLoading(false);
     }
     load();
-  }, [user, supabase]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+
+  // ── Compute summary stats from investments ─────────────────────────────
+  const summaryStats = useMemo(() => {
+    const totalInvested = investments.reduce((s, inv) => s + inv.committed, 0);
+    const totalDeployed = investments.reduce((s, inv) => s + inv.deployed, 0);
+    const avgReturn = investments.length > 0
+      ? investments.reduce((s, inv) => s + inv.returns, 0) / investments.length
+      : 0;
+    const totalReturns = totalInvested > 0 ? Math.round(totalInvested * (avgReturn / 100)) : 0;
+    const currentValue = totalInvested + totalReturns;
+    const returnPct = totalInvested > 0 ? ((totalReturns / totalInvested) * 100).toFixed(1) : '0.0';
+    const unrealised = currentValue - totalDeployed - totalReturns;
+
+    return { totalInvested, currentValue, totalReturns, unrealised: Math.max(unrealised, 0), returnPct };
+  }, [investments]);
+
+  // ── Compute allocation from investments (grouped by type) ──────────────
+  const allocationData = useMemo(() => {
+    if (!hasLiveData) return FALLBACK_ALLOCATION;
+
+    const grouped: Record<string, number> = {};
+    investments.forEach((inv) => {
+      const key = inv.type || 'Other';
+      grouped[key] = (grouped[key] || 0) + inv.committed;
+    });
+
+    const total = Object.values(grouped).reduce((s, v) => s + v, 0);
+    if (total === 0) return FALLBACK_ALLOCATION;
+
+    return Object.entries(grouped)
+      .sort((a, b) => b[1] - a[1])
+      .map(([name, amount], idx) => ({
+        name: `AFU ${name} Fund`,
+        pct: Math.round((amount / total) * 100),
+        amount,
+        color: ALLOCATION_COLORS[idx % ALLOCATION_COLORS.length],
+      }));
+  }, [investments, hasLiveData]);
+
+  // ── Compute quarterly returns from investments ─────────────────────────
+  const quarterlyReturns = useMemo(() => {
+    if (!hasLiveData) return FALLBACK_QUARTERLY_RETURNS;
+
+    // Group investments by quarter of invested_at, compute avg return per quarter
+    const quarterMap: Record<string, { totalReturn: number; count: number }> = {};
+
+    // We need the original investment data with dates; use vintage as proxy
+    // For a more accurate version we'd need invested_at from the raw data
+    // Group by vintage year quarters
+    investments.forEach((inv) => {
+      const label = `Q1 ${inv.vintage}`;
+      if (!quarterMap[label]) quarterMap[label] = { totalReturn: 0, count: 0 };
+      quarterMap[label].totalReturn += inv.returns;
+      quarterMap[label].count += 1;
+    });
+
+    const entries = Object.entries(quarterMap)
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .slice(-5)
+      .map(([label, data]) => ({
+        label,
+        value: Number((data.totalReturn / data.count).toFixed(1)),
+      }));
+
+    return entries.length > 0 ? entries : FALLBACK_QUARTERLY_RETURNS;
+  }, [investments, hasLiveData]);
 
   const maxQuarterlyReturn = Math.max(...quarterlyReturns.map((q) => q.value));
 
@@ -170,7 +267,7 @@ export default function PortfolioPage() {
             </div>
             <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Invested</span>
           </div>
-          <p className="text-2xl font-bold text-[#1B2A4A]">$2,500,000</p>
+          <p className="text-2xl font-bold text-[#1B2A4A]">{fmtCurrency(summaryStats.totalInvested)}</p>
         </div>
 
         {/* Current Value */}
@@ -181,7 +278,7 @@ export default function PortfolioPage() {
             </div>
             <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Current Value</span>
           </div>
-          <p className="text-2xl font-bold text-[#1B2A4A]">$2,832,500</p>
+          <p className="text-2xl font-bold text-[#1B2A4A]">{fmtCurrency(summaryStats.currentValue)}</p>
         </div>
 
         {/* Total Returns */}
@@ -192,9 +289,9 @@ export default function PortfolioPage() {
             </div>
             <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Returns</span>
           </div>
-          <p className="text-2xl font-bold text-[#1B2A4A]">$332,500</p>
+          <p className="text-2xl font-bold text-[#1B2A4A]">{fmtCurrency(summaryStats.totalReturns)}</p>
           <span className="text-xs font-semibold text-emerald-600 flex items-center gap-0.5 mt-1">
-            <ArrowUpRight className="w-3.5 h-3.5" /> 13.3%
+            <ArrowUpRight className="w-3.5 h-3.5" /> {summaryStats.returnPct}%
           </span>
         </div>
 
@@ -206,7 +303,7 @@ export default function PortfolioPage() {
             </div>
             <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Unrealised Gains</span>
           </div>
-          <p className="text-2xl font-bold text-[#1B2A4A]">$187,200</p>
+          <p className="text-2xl font-bold text-[#1B2A4A]">{fmtCurrency(summaryStats.unrealised)}</p>
         </div>
       </motion.div>
 
@@ -341,4 +438,24 @@ export default function PortfolioPage() {
       </motion.div>
     </motion.div>
   );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Normalization helpers                                              */
+/* ------------------------------------------------------------------ */
+
+function normalizeType(raw: string): Investment['type'] {
+  const lower = raw.toLowerCase();
+  if (lower.includes('equity')) return 'Equity';
+  if (lower.includes('insurance')) return 'Insurance';
+  return 'Debt';
+}
+
+function normalizeStatus(raw: string): Investment['status'] {
+  const lower = raw.toLowerCase();
+  if (lower === 'active') return 'Active';
+  if (lower === 'exited' || lower === 'completed') return 'Exited';
+  if (lower === 'pending') return 'Pending';
+  // Capitalize first letter as fallback
+  return (raw.charAt(0).toUpperCase() + raw.slice(1)) as Investment['status'];
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import {
@@ -49,6 +49,7 @@ const staticProducts: SupplierProduct[] = [
   { id: 'SPROD-036', supplierId: 'SUP-001', supplierName: 'Zambezi Agri-Supplies', name: 'Soil pH Test Kit (50 tests)', description: 'Portable soil pH testing kit with colour chart. 50 individual tests per kit. Includes sampling tools and interpretation guide. Results in 60 seconds.', category: 'tools', price: 28, memberPrice: 24.64, currency: 'USD', unit: 'per kit', image: 'https://images.unsplash.com/photo-1585336261022-680e295ce3fe?w=400&h=300&fit=crop', availability: 'in-stock', rating: 4.4, reviewCount: 56, soldCount: 789, tags: ['soil-testing', 'pH', 'portable', 'quick-results'], featured: false, minOrder: 1 },
   { id: 'SPROD-038', supplierId: 'SUP-001', supplierName: 'Zambezi Agri-Supplies', name: 'Pruning Shears (Bypass, Professional)', description: 'Professional bypass pruning shears with SK5 steel blades. Ergonomic grip with safety lock. Essential for orchard management and vineyard work.', category: 'tools', price: 12, memberPrice: 10.56, currency: 'USD', unit: 'per unit', image: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop', availability: 'in-stock', rating: 4.5, reviewCount: 67, soldCount: 1234, tags: ['pruning', 'shears', 'professional', 'orchard'], featured: false, minOrder: 2 },
 ];
+import { createClient } from '@/lib/supabase/client';
 import { useProducts, type ProductRow } from '@/lib/supabase/use-products';
 import { useAuth } from '@/lib/supabase/auth-context';
 
@@ -163,8 +164,25 @@ function formatCurrency(value: number): string {
 // ═══════════════════════════════════════════════════════════════════════════
 
 export default function SupplierProductsPage() {
-  const { products: dbProducts, loading: productsLoading, toggleStock } = useProducts();
-  const { profile } = useAuth();
+  const { user, profile } = useAuth();
+  const supabase = createClient();
+
+  // Look up the current user's supplier_id so useProducts fetches only their products
+  const [mySupplierIds, setMySupplierIds] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from('suppliers')
+      .select('id')
+      .eq('profile_id', user.id)
+      .single()
+      .then(({ data }) => {
+        if (data) setMySupplierIds(data.id);
+      });
+  }, [user, supabase]);
+
+  const { products: dbProducts, loading: productsLoading, toggleStock } = useProducts(mySupplierIds);
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');

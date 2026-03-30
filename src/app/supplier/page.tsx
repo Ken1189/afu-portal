@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import {
@@ -35,8 +35,7 @@ import {
   BarChart3,
   MousePointerClick,
 } from 'lucide-react';
-import { useSuppliers } from '@/lib/supabase/use-suppliers';
-import { useProducts } from '@/lib/supabase/use-products';
+import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/supabase/auth-context';
 
 // ── Inline types ────────────────────────────────────────────────────────────
@@ -259,10 +258,10 @@ const fadeUp = {
 
 // ── Static fallback context ──────────────────────────────────────────────────
 
-const staticSupplier = staticSuppliers.find((s) => s.id === 'SUP-001')!;
-const supplierProductsList = supplierProducts.filter((p) => p.supplierId === 'SUP-001');
-const supplierCommissions = commissions.filter((c) => c.supplierId === 'SUP-001');
-const supplierAds = advertisements.filter((a) => a.supplierId === 'SUP-001');
+const FALLBACK_SUPPLIER = staticSuppliers.find((s) => s.id === 'SUP-001')!;
+const FALLBACK_PRODUCTS = supplierProducts.filter((p) => p.supplierId === 'SUP-001');
+const FALLBACK_COMMISSIONS = commissions.filter((c) => c.supplierId === 'SUP-001');
+const FALLBACK_ADS = advertisements.filter((a) => a.supplierId === 'SUP-001');
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -278,16 +277,16 @@ function formatCompact(value: number): string {
   return value.toLocaleString();
 }
 
-// ── KPI calculations ────────────────────────────────────────────────────────
+// ── Fallback KPI calculations ───────────────────────────────────────────────
 
-const totalRevenue = staticSupplier.totalSales;
-const activeProductsCount = supplierProductsList.length;
-const pendingOrdersCount = 8;
-const commissionBalance = supplierCommissions
+const FALLBACK_TOTAL_REVENUE = FALLBACK_SUPPLIER.totalSales;
+const FALLBACK_ACTIVE_PRODUCTS = FALLBACK_PRODUCTS.length;
+const FALLBACK_PENDING_ORDERS = 8;
+const FALLBACK_COMMISSION_BALANCE = FALLBACK_COMMISSIONS
   .filter((c) => c.status === 'pending')
   .reduce((sum, c) => sum + c.commissionAmount, 0);
-const totalAdImpressions = supplierAds.reduce((sum, a) => sum + a.impressions, 0);
-const memberReach = 1240;
+const FALLBACK_AD_IMPRESSIONS = FALLBACK_ADS.reduce((sum, a) => sum + a.impressions, 0);
+const FALLBACK_MEMBER_REACH = 1240;
 
 // ── Order status colors ─────────────────────────────────────────────────────
 
@@ -340,27 +339,27 @@ const salesTrendData = [
 
 // ── Commission donut data ───────────────────────────────────────────────────
 
-const commissionPaid = supplierCommissions
+const FALLBACK_COMMISSION_PAID = FALLBACK_COMMISSIONS
   .filter((c) => c.status === 'paid')
   .reduce((sum, c) => sum + c.commissionAmount, 0);
-const commissionApproved = supplierCommissions
+const FALLBACK_COMMISSION_APPROVED = FALLBACK_COMMISSIONS
   .filter((c) => c.status === 'approved')
   .reduce((sum, c) => sum + c.commissionAmount, 0);
-const commissionPending = supplierCommissions
+const FALLBACK_COMMISSION_PENDING = FALLBACK_COMMISSIONS
   .filter((c) => c.status === 'pending')
   .reduce((sum, c) => sum + c.commissionAmount, 0);
 
-const commissionDonutData = [
-  { name: 'Paid', value: commissionPaid, color: '#8CB89C' },
-  { name: 'Approved', value: commissionApproved, color: '#D4A843' },
-  { name: 'Pending', value: commissionPending, color: '#1B2A4A' },
+const FALLBACK_COMMISSION_DONUT = [
+  { name: 'Paid', value: FALLBACK_COMMISSION_PAID, color: '#8CB89C' },
+  { name: 'Approved', value: FALLBACK_COMMISSION_APPROVED, color: '#D4A843' },
+  { name: 'Pending', value: FALLBACK_COMMISSION_PENDING, color: '#1B2A4A' },
 ];
 
-const commissionTotal = commissionPaid + commissionApproved + commissionPending;
+const FALLBACK_COMMISSION_TOTAL = FALLBACK_COMMISSION_PAID + FALLBACK_COMMISSION_APPROVED + FALLBACK_COMMISSION_PENDING;
 
 // ── Active ads (top 3) ──────────────────────────────────────────────────────
 
-const activeAds = advertisements
+const FALLBACK_ACTIVE_ADS = advertisements
   .filter((a) => a.status === 'active')
   .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime())
   .slice(0, 3);
@@ -421,6 +420,144 @@ function CustomTooltip({
 
 export default function SupplierDashboard() {
   const [hoveredProduct, setHoveredProduct] = useState<number | null>(null);
+
+  // ── Live data from Supabase ─────────────────────────────────────────────
+  const { user, profile } = useAuth();
+  const supabase = createClient();
+
+  // Live supplier profile for the logged-in user
+  const [liveSupplier, setLiveSupplier] = useState<Supplier | null>(null);
+  // Live dashboard stats
+  const [liveStats, setLiveStats] = useState<{
+    totalRevenue: number;
+    activeProducts: number;
+    pendingOrders: number;
+    totalOrders: number;
+  } | null>(null);
+  // Live recent orders
+  const [liveRecentOrders, setLiveRecentOrders] = useState<typeof recentOrders | null>(null);
+  const [dbLoading, setDbLoading] = useState(true);
+
+  const fetchLiveDashboard = useCallback(async () => {
+    if (!user) { setDbLoading(false); return; }
+
+    try {
+      // 1. Fetch supplier profile linked to current user
+      const { data: supplierRow } = await supabase
+        .from('suppliers')
+        .select('*')
+        .eq('profile_id', user.id)
+        .single();
+
+      if (!supplierRow) { setDbLoading(false); return; }
+
+      const supplierId = supplierRow.id;
+
+      // Map DB row to local Supplier shape
+      setLiveSupplier({
+        id: supplierRow.id,
+        companyName: supplierRow.company_name,
+        contactName: supplierRow.contact_name,
+        email: supplierRow.email,
+        phone: supplierRow.phone || '',
+        country: supplierRow.country as Country,
+        region: supplierRow.region || '',
+        category: supplierRow.category as SupplierCategory,
+        status: supplierRow.status,
+        joinDate: supplierRow.join_date || supplierRow.created_at,
+        logo: supplierRow.logo_url || '',
+        description: supplierRow.description || '',
+        productsCount: supplierRow.products_count || 0,
+        totalSales: supplierRow.total_sales || 0,
+        totalOrders: supplierRow.total_orders || 0,
+        rating: supplierRow.rating || 0,
+        reviewCount: supplierRow.review_count || 0,
+        memberDiscountPercent: supplierRow.member_discount_percent || 0,
+        commissionRate: supplierRow.commission_rate || 0,
+        isFounding: supplierRow.is_founding || false,
+        sponsorshipTier: supplierRow.sponsorship_tier || null,
+        verified: supplierRow.verified || false,
+        website: supplierRow.website || '',
+        certifications: supplierRow.certifications || [],
+      });
+
+      // 2. Fetch dashboard stats in parallel
+      const [ordersRes, productsRes, revenueRes, pendingRes] = await Promise.all([
+        supabase
+          .from('orders')
+          .select('id', { count: 'exact', head: true })
+          .eq('supplier_id', supplierId),
+        supabase
+          .from('products')
+          .select('id', { count: 'exact', head: true })
+          .eq('supplier_id', supplierId),
+        supabase
+          .from('orders')
+          .select('total_amount')
+          .eq('supplier_id', supplierId),
+        supabase
+          .from('orders')
+          .select('id', { count: 'exact', head: true })
+          .eq('supplier_id', supplierId)
+          .in('status', ['pending', 'processing', 'new']),
+      ]);
+
+      const totalRev = (revenueRes.data || []).reduce(
+        (sum: number, o: { total_amount: number }) => sum + (o.total_amount || 0),
+        0
+      );
+
+      setLiveStats({
+        totalRevenue: totalRev || supplierRow.total_sales || 0,
+        activeProducts: productsRes.count || supplierRow.products_count || 0,
+        pendingOrders: pendingRes.count || 0,
+        totalOrders: ordersRes.count || supplierRow.total_orders || 0,
+      });
+
+      // 3. Fetch recent orders
+      const { data: ordersData } = await supabase
+        .from('orders')
+        .select('id, total_amount, status, created_at, member:profiles!orders_member_id_fkey(full_name)')
+        .eq('supplier_id', supplierId)
+        .order('created_at', { ascending: false })
+        .limit(8);
+
+      if (ordersData && ordersData.length > 0) {
+        setLiveRecentOrders(
+          ordersData.map((o: Record<string, unknown>) => ({
+            id: o.id as string,
+            product: 'Order',
+            buyer: ((o.member as Record<string, unknown>)?.full_name as string) || 'Customer',
+            amount: (o.total_amount as number) || 0,
+            status: (o.status as string) || 'new',
+            date: new Date(o.created_at as string).toISOString().slice(0, 10),
+          }))
+        );
+      }
+    } catch {
+      // On any error, fallback data will be used (liveSupplier stays null)
+    } finally {
+      setDbLoading(false);
+    }
+  }, [user, supabase]);
+
+  useEffect(() => {
+    fetchLiveDashboard();
+  }, [fetchLiveDashboard]);
+
+  // ── Resolve live vs fallback data ─────────────────────────────────────────
+  const supplier = liveSupplier || FALLBACK_SUPPLIER;
+  const totalRevenue = liveStats?.totalRevenue ?? FALLBACK_TOTAL_REVENUE;
+  const activeProductsCount = liveStats?.activeProducts ?? FALLBACK_ACTIVE_PRODUCTS;
+  const pendingOrdersCount = liveStats?.pendingOrders ?? FALLBACK_PENDING_ORDERS;
+  const commissionBalance = FALLBACK_COMMISSION_BALANCE; // commissions not yet in DB — keep fallback
+  const totalAdImpressions = FALLBACK_AD_IMPRESSIONS;    // ads not yet in DB — keep fallback
+  const memberReach = FALLBACK_MEMBER_REACH;
+  const displayRecentOrders = liveRecentOrders || recentOrders;
+  const commissionDonutData = FALLBACK_COMMISSION_DONUT;
+  const commissionTotal = FALLBACK_COMMISSION_TOTAL;
+  const activeAds = FALLBACK_ACTIVE_ADS;
+  const supplierCommissionsForMonth = FALLBACK_COMMISSIONS;
 
   // ── Top-level stat cards data ───────────────────────────────────────────
   const statCards: { label: string; value: string; change: string | null; changeType: 'up' | 'down' | 'neutral'; icon: React.ReactNode; color: string; bgColor: string }[] = [
@@ -503,12 +640,12 @@ export default function SupplierDashboard() {
         </div>
         <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold">Welcome back, {staticSupplier.companyName}!</h1>
+            <h1 className="text-2xl font-bold">Welcome back, {supplier.companyName}!</h1>
             <p className="text-white/80 text-sm mt-1">
-              {staticSupplier.sponsorshipTier
-                ? `${staticSupplier.sponsorshipTier.charAt(0).toUpperCase() + staticSupplier.sponsorshipTier.slice(1)} Sponsor`
+              {supplier.sponsorshipTier
+                ? `${supplier.sponsorshipTier.charAt(0).toUpperCase() + supplier.sponsorshipTier.slice(1)} Sponsor`
                 : 'Active Supplier'}{' '}
-              &bull; Member since {new Date(staticSupplier.joinDate).getFullYear()}
+              &bull; Member since {new Date(supplier.joinDate).getFullYear()}
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -665,7 +802,7 @@ export default function SupplierDashboard() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
-                {recentOrders.map((order) => (
+                {displayRecentOrders.map((order) => (
                   <motion.tr
                     key={order.id}
                     initial={{ opacity: 0 }}
@@ -838,7 +975,7 @@ export default function SupplierDashboard() {
                 <p className="text-xs text-gray-500 mb-0.5">This Month</p>
                 <p className="text-lg font-bold text-navy tabular-nums">
                   {formatCurrency(
-                    supplierCommissions
+                    supplierCommissionsForMonth
                       .filter((c) => c.orderDate.startsWith('2026-03'))
                       .reduce((sum, c) => sum + c.commissionAmount, 0)
                   )}

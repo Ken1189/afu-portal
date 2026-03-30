@@ -81,9 +81,10 @@ export interface SupplierOrder {
   paymentMethod: string;
 }
 
-// ── Mock orders data (20 orders) ────────────────────────────────────────────
+// ── Fallback orders data (20 orders) — used if DB fetch fails or returns empty
 
-export const supplierOrders: SupplierOrder[] = [
+export { FALLBACK_ORDERS as supplierOrders };
+const FALLBACK_ORDERS: SupplierOrder[] = [
   {
     id: 'ORD-001',
     productName: 'Groundnut Seed (Nyanda)',
@@ -432,50 +433,110 @@ export default function SupplierOrdersPage() {
   const [activeTab, setActiveTab] = useState<'all' | OrderStatus>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-  const [orders, setOrders] = useState<SupplierOrder[]>(supplierOrders);
+  const [orders, setOrders] = useState<SupplierOrder[]>(FALLBACK_ORDERS);
   const [loading, setLoading] = useState(true);
+  const [supplierId, setSupplierId] = useState<string | null>(null);
 
   // ── Fetch orders from Supabase ──────────────────────────────────────────
   useEffect(() => {
     async function fetchOrders() {
       try {
         const supabase = createClient();
-        // Get supplier record for current user
+
+        // 1. Find supplier record via profile_id = auth.uid()
         const { data: supplier } = await supabase
           .from('suppliers')
           .select('id')
-          .eq('email', user?.email ?? '')
+          .eq('profile_id', user!.id)
           .single();
 
-        if (supplier) {
-          const { data: orderItems } = await supabase
-            .from('order_items')
-            .select('*, order:orders(*), product:products(name)')
-            .eq('supplier_id', supplier.id)
-            .order('created_at', { ascending: false });
+        if (!supplier) {
+          setLoading(false);
+          return; // keep fallback data
+        }
+        setSupplierId(supplier.id);
 
-          if (orderItems && orderItems.length > 0) {
-            const mapped: SupplierOrder[] = orderItems.map((item: any) => ({
-              id: item.order?.order_number || item.order_id,
-              productName: item.product?.name || 'Product',
+        // 2. Fetch order_items for this supplier, joining orders, products,
+        //    and the buyer profile (orders -> members -> profiles)
+        const { data: orderItems } = await supabase
+          .from('order_items')
+          .select(`
+            id,
+            order_id,
+            product_id,
+            quantity,
+            unit_price,
+            total_price,
+            created_at,
+            product:products ( name ),
+            order:orders (
+              id,
+              order_number,
+              status,
+              shipping_address,
+              currency,
+              created_at,
+              updated_at,
+              member:members (
+                tier,
+                profile:profiles ( full_name )
+              )
+            )
+          `)
+          .eq('supplier_id', supplier.id)
+          .order('created_at', { ascending: false });
+
+        if (orderItems && orderItems.length > 0) {
+          // Map DB rows -> SupplierOrder shape
+          const mapped: SupplierOrder[] = orderItems.map((item: any) => {
+            const order = item.order;
+            const memberTier: string = order?.member?.tier || 'commercial';
+            const buyerName: string = order?.member?.profile?.full_name || 'Customer';
+            const addr = order?.shipping_address;
+
+            // Map member tier -> buyerType
+            const tierMap: Record<string, SupplierOrder['buyerType']> = {
+              smallholder: 'smallholder',
+              commercial_farmer: 'commercial',
+              new_enterprise: 'enterprise',
+              cooperative: 'cooperative',
+            };
+
+            // Map DB order status -> local OrderStatus
+            const statusMap: Record<string, OrderStatus> = {
+              pending: 'new',
+              processing: 'processing',
+              shipped: 'shipped',
+              delivered: 'delivered',
+              cancelled: 'cancelled',
+            };
+
+            return {
+              id: order?.order_number || item.order_id,
+              productName: (item.product as any)?.name || 'Product',
               productId: item.product_id,
-              buyerName: item.order?.shipping_address?.name || 'Customer',
-              buyerType: 'commercial' as const,
+              buyerName,
+              buyerType: tierMap[memberTier] || 'commercial',
               quantity: item.quantity,
-              amount: item.total_price,
-              status: (item.order?.status === 'pending' ? 'new' : item.order?.status) || 'new',
-              orderDate: item.order?.created_at?.split('T')[0] || '',
-              deliveryDate: item.order?.updated_at?.split('T')[0] || null,
-              shippingAddress: item.order?.shipping_address
-                ? Object.values(item.order.shipping_address).join(', ')
+              amount: Number(item.total_price),
+              status: statusMap[order?.status] || 'new',
+              orderDate: order?.created_at?.split('T')[0] || '',
+              deliveryDate: order?.status === 'delivered'
+                ? (order?.updated_at?.split('T')[0] || null)
+                : null,
+              shippingAddress: addr
+                ? (typeof addr === 'string' ? addr : Object.values(addr).filter(Boolean).join(', '))
                 : '',
               paymentMethod: 'Bank Transfer',
-            }));
-            setOrders(mapped);
-          }
+              _orderId: order?.id, // internal: real order UUID for status updates
+            } as SupplierOrder & { _orderId?: string };
+          });
+          setOrders(mapped);
         }
+        // If orderItems is empty, keep FALLBACK_ORDERS
       } catch (err) {
-        // Keep fallback demo data
+        console.error('Failed to fetch supplier orders:', err);
+        // Keep fallback demo data on error
       } finally {
         setLoading(false);
       }
@@ -521,9 +582,10 @@ export default function SupplierOrdersPage() {
     return result;
   }, [orders, activeTab, searchQuery]);
 
-  // ── Handle status update ────────────────────────────────────────────────
+  // ── Handle status update (writes to Supabase, falls back to local) ─────
 
-  const handleStatusUpdate = (orderId: string, newStatus: OrderStatus) => {
+  const handleStatusUpdate = async (orderId: string, newStatus: OrderStatus) => {
+    // Optimistic local update
     setOrders((prev) =>
       prev.map((o) =>
         o.id === orderId
@@ -536,6 +598,32 @@ export default function SupplierOrdersPage() {
       )
     );
     setOpenDropdown(null);
+
+    // Persist to Supabase
+    try {
+      const orderRecord = orders.find((o) => o.id === orderId) as any;
+      const realOrderId = orderRecord?._orderId;
+      if (!realOrderId) return; // fallback order, no DB row
+
+      // Map local status back to DB enum
+      const dbStatusMap: Record<OrderStatus, string> = {
+        new: 'pending',
+        processing: 'processing',
+        shipped: 'shipped',
+        delivered: 'delivered',
+        cancelled: 'cancelled',
+      };
+
+      const supabase = createClient();
+      const { error } = await supabase
+        .from('orders')
+        .update({ status: dbStatusMap[newStatus] })
+        .eq('id', realOrderId);
+
+      if (error) console.error('Failed to update order status:', error);
+    } catch (err) {
+      console.error('Status update error:', err);
+    }
   };
 
   // ── Export CSV (mock) ───────────────────────────────────────────────────

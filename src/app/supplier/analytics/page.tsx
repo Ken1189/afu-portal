@@ -84,9 +84,9 @@ function formatCurrencyFull(value: number): string {
   return `$${value.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
 }
 
-// -- Revenue trend data (12 months) -------------------------------------------
+// -- Fallback revenue trend data (12 months) ----------------------------------
 
-const revenueTrendData = [
+const FALLBACK_REVENUE_TREND = [
   { month: 'Apr 25', revenue: 98400, orders: 312 },
   { month: 'May 25', revenue: 112800, orders: 345 },
   { month: 'Jun 25', revenue: 134200, orders: 378 },
@@ -101,9 +101,9 @@ const revenueTrendData = [
   { month: 'Mar 26', revenue: 210400, orders: 478 },
 ];
 
-// -- Top products data --------------------------------------------------------
+// -- Fallback top products data -----------------------------------------------
 
-const topProductsData = [
+const FALLBACK_TOP_PRODUCTS = [
   { name: 'Groundnut Seed (Nyanda)', revenue: 115000 },
   { name: 'Knapsack Sprayer (16L)', revenue: 106680 },
   { name: 'Metalaxyl + Mancozeb', revenue: 47075 },
@@ -111,26 +111,26 @@ const topProductsData = [
   { name: 'Pruning Shears (Pro)', revenue: 14808 },
 ];
 
-// -- Customer demographics ----------------------------------------------------
+// -- Fallback customer demographics -------------------------------------------
 
-const demographicsData = [
+const FALLBACK_DEMOGRAPHICS = [
   { name: 'Smallholder', value: 45, color: '#8CB89C' },
   { name: 'Commercial', value: 30, color: '#1B2A4A' },
   { name: 'Enterprise', value: 15, color: '#D4A843' },
   { name: 'Cooperative', value: 10, color: '#729E82' },
 ];
 
-// -- Revenue by country -------------------------------------------------------
+// -- Fallback revenue by country ----------------------------------------------
 
-const countryRevenueData = [
+const FALLBACK_COUNTRY_REVENUE = [
   { country: 'Botswana', revenue: 78400, orders: 186 },
   { country: 'Zimbabwe', revenue: 98200, orders: 224 },
   { country: 'Tanzania', revenue: 33800, orders: 68 },
 ];
 
-// -- Monthly comparison (6 months) --------------------------------------------
+// -- Fallback monthly comparison (6 months) -----------------------------------
 
-const monthlyComparison = [
+const FALLBACK_MONTHLY_COMPARISON = [
   { month: 'Oct 2025', revenue: 165400, orders: 412, avgOrder: 401.46, prevChange: 7.8 },
   { month: 'Nov 2025', revenue: 192600, orders: 445, avgOrder: 432.81, prevChange: 16.4 },
   { month: 'Dec 2025', revenue: 148200, orders: 367, avgOrder: 403.81, prevChange: -23.1 },
@@ -144,9 +144,9 @@ const monthlyComparison = [
 const dateRanges = ['This Month', 'Quarter', 'Year', 'All Time'] as const;
 type DateRange = (typeof dateRanges)[number];
 
-// -- Stat card data -----------------------------------------------------------
+// -- Fallback stat card data --------------------------------------------------
 
-const statCards = [
+const FALLBACK_STAT_CARDS = [
   {
     label: 'Total Revenue',
     value: '$1.89M',
@@ -283,65 +283,122 @@ export default function SupplierAnalyticsPage() {
   const [chartView, setChartView] = useState<ChartView>('Revenue');
   const [dateDropdownOpen, setDateDropdownOpen] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [liveRevenueTrend, setLiveRevenueTrend] = useState(revenueTrendData);
-  const [liveTopProducts, setLiveTopProducts] = useState(topProductsData);
+  const [liveRevenueTrend, setLiveRevenueTrend] = useState(FALLBACK_REVENUE_TREND);
+  const [liveTopProducts, setLiveTopProducts] = useState(FALLBACK_TOP_PRODUCTS);
+  const [liveStatCards, setLiveStatCards] = useState(FALLBACK_STAT_CARDS);
+  const [liveMonthlyComparison, setLiveMonthlyComparison] = useState(FALLBACK_MONTHLY_COMPARISON);
 
   // ── Fetch analytics data from Supabase ──────────────────────────────────
   useEffect(() => {
     async function fetchAnalytics() {
       try {
         const supabase = createClient();
+
+        // 1. Find supplier via profile_id = auth.uid()
         const { data: supplier } = await supabase
           .from('suppliers')
           .select('id')
-          .eq('email', user?.email ?? '')
+          .eq('profile_id', user!.id)
           .single();
 
-        if (supplier) {
-          // Fetch order items for revenue data
-          const { data: orderItems } = await supabase
-            .from('order_items')
-            .select('total_price, created_at, product:products(name)')
-            .eq('supplier_id', supplier.id)
-            .order('created_at', { ascending: true });
+        if (!supplier) {
+          setLoading(false);
+          return; // keep fallback data
+        }
 
-          if (orderItems && orderItems.length > 0) {
-            // Group by month for revenue trend
-            const monthMap = new Map<string, { revenue: number; orders: number }>();
-            orderItems.forEach((item: any) => {
-              const d = new Date(item.created_at);
-              const key = `${d.toLocaleString('en', { month: 'short' })} ${String(d.getFullYear()).slice(2)}`;
-              const existing = monthMap.get(key) || { revenue: 0, orders: 0 };
-              monthMap.set(key, {
-                revenue: existing.revenue + (item.total_price || 0),
-                orders: existing.orders + 1,
-              });
-            });
-            if (monthMap.size > 0) {
-              setLiveRevenueTrend(
-                Array.from(monthMap.entries()).map(([month, data]) => ({
-                  month,
-                  revenue: data.revenue,
-                  orders: data.orders,
-                }))
-              );
-            }
+        // 2. Fetch all order_items for this supplier with order + product info
+        const { data: orderItems } = await supabase
+          .from('order_items')
+          .select(`
+            total_price,
+            quantity,
+            created_at,
+            order_id,
+            product:products ( name ),
+            order:orders ( id, status, created_at, total, member_id )
+          `)
+          .eq('supplier_id', supplier.id)
+          .order('created_at', { ascending: true });
 
-            // Top products by revenue
-            const productMap = new Map<string, number>();
-            orderItems.forEach((item: any) => {
-              const name = (item.product as any)?.name || 'Unknown';
-              productMap.set(name, (productMap.get(name) || 0) + (item.total_price || 0));
+        if (!orderItems || orderItems.length === 0) {
+          setLoading(false);
+          return; // keep fallback data
+        }
+
+        // ── Revenue trend: group by month ──────────────────────────────
+        const monthMap = new Map<string, { revenue: number; orders: Set<string> }>();
+        orderItems.forEach((item: any) => {
+          const d = new Date(item.created_at);
+          const key = `${d.toLocaleString('en', { month: 'short' })} ${String(d.getFullYear()).slice(2)}`;
+          const existing = monthMap.get(key) || { revenue: 0, orders: new Set<string>() };
+          existing.revenue += Number(item.total_price) || 0;
+          if (item.order_id) existing.orders.add(item.order_id);
+          monthMap.set(key, existing);
+        });
+
+        if (monthMap.size > 0) {
+          const trendData = Array.from(monthMap.entries()).map(([month, data]) => ({
+            month,
+            revenue: Math.round(data.revenue),
+            orders: data.orders.size,
+          }));
+          setLiveRevenueTrend(trendData);
+
+          // ── Monthly comparison (last 6 months) ────────────────────────
+          const last6 = trendData.slice(-6);
+          if (last6.length > 0) {
+            const comparison = last6.map((row, i) => {
+              const avgOrder = row.orders > 0 ? row.revenue / row.orders : 0;
+              const prev = i > 0 ? last6[i - 1].revenue : row.revenue;
+              const prevChange = prev > 0 ? ((row.revenue - prev) / prev) * 100 : 0;
+              return {
+                month: row.month,
+                revenue: row.revenue,
+                orders: row.orders,
+                avgOrder: Math.round(avgOrder * 100) / 100,
+                prevChange: Math.round(prevChange * 10) / 10,
+              };
             });
-            const topProds = Array.from(productMap.entries())
-              .sort((a, b) => b[1] - a[1])
-              .slice(0, 5)
-              .map(([name, revenue]) => ({ name, revenue }));
-            if (topProds.length > 0) setLiveTopProducts(topProds);
+            setLiveMonthlyComparison(comparison);
           }
         }
+
+        // ── Top products by revenue ──────────────────────────────────────
+        const productMap = new Map<string, number>();
+        orderItems.forEach((item: any) => {
+          const name = (item.product as any)?.name || 'Unknown';
+          productMap.set(name, (productMap.get(name) || 0) + (Number(item.total_price) || 0));
+        });
+        const topProds = Array.from(productMap.entries())
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 5)
+          .map(([name, revenue]) => ({ name, revenue: Math.round(revenue) }));
+        if (topProds.length > 0) setLiveTopProducts(topProds);
+
+        // ── KPI stat cards (computed from live data) ─────────────────────
+        const totalRevenue = orderItems.reduce((s: number, i: any) => s + (Number(i.total_price) || 0), 0);
+        const uniqueOrders = new Set(orderItems.map((i: any) => i.order_id));
+        const totalOrders = uniqueOrders.size;
+        const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+
+        setLiveStatCards([
+          {
+            ...FALLBACK_STAT_CARDS[0],
+            value: formatCurrency(totalRevenue),
+          },
+          {
+            ...FALLBACK_STAT_CARDS[1],
+            value: totalOrders.toLocaleString(),
+          },
+          {
+            ...FALLBACK_STAT_CARDS[2],
+            value: `$${avgOrderValue.toFixed(2)}`,
+          },
+        ]);
+
       } catch (err) {
-        // Keep fallback demo data
+        console.error('Failed to fetch supplier analytics:', err);
+        // Keep fallback demo data on error
       } finally {
         setLoading(false);
       }
@@ -420,7 +477,7 @@ export default function SupplierAnalyticsPage() {
         variants={containerVariants}
         className="grid grid-cols-1 md:grid-cols-3 gap-4"
       >
-        {statCards.map((stat, i) => (
+        {liveStatCards.map((stat, i) => (
           <motion.div
             key={i}
             variants={cardVariants}
@@ -628,7 +685,7 @@ export default function SupplierAnalyticsPage() {
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={demographicsData}
+                    data={FALLBACK_DEMOGRAPHICS}
                     cx="50%"
                     cy="50%"
                     innerRadius={55}
@@ -638,7 +695,7 @@ export default function SupplierAnalyticsPage() {
                     nameKey="name"
                     stroke="none"
                   >
-                    {demographicsData.map((entry, index) => (
+                    {FALLBACK_DEMOGRAPHICS.map((entry, index) => (
                       <Cell key={index} fill={entry.color} />
                     ))}
                   </Pie>
@@ -655,7 +712,7 @@ export default function SupplierAnalyticsPage() {
               </ResponsiveContainer>
             </div>
             <div className="flex-1 space-y-3 w-full">
-              {demographicsData.map((item) => (
+              {FALLBACK_DEMOGRAPHICS.map((item) => (
                 <div key={item.name}>
                   <div className="flex items-center justify-between mb-1">
                     <div className="flex items-center gap-2">
@@ -704,7 +761,7 @@ export default function SupplierAnalyticsPage() {
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
-                data={countryRevenueData}
+                data={FALLBACK_COUNTRY_REVENUE}
                 margin={{ top: 5, right: 10, left: -10, bottom: 5 }}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -781,7 +838,7 @@ export default function SupplierAnalyticsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
-                {monthlyComparison.map((row, i) => (
+                {liveMonthlyComparison.map((row, i) => (
                   <motion.tr
                     key={row.month}
                     initial={{ opacity: 0 }}

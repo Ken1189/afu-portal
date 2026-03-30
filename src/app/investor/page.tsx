@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import {
   DollarSign,
@@ -47,16 +47,30 @@ interface InvestorUpdate {
   published_at: string;
 }
 
-// ── Demo Data ───────────────────────────────────────────────────────────────
+interface InvestmentRow {
+  id: string;
+  investor_profile_id: string;
+  opportunity_name: string;
+  amount: number;
+  status: string;
+  invested_at: string;
+  returns: number;
+  created_at: string;
+  type?: string;
+  country?: string;
+  product_type?: string;
+}
 
-const demoStats = {
+// ── Fallback Demo Data ─────────────────────────────────────────────────────
+
+const FALLBACK_STATS = {
   totalCommitted: 2500000,
   totalDeployed: 1850000,
   returnsToDate: 312000,
   activeProjects: 8,
 };
 
-const demoUpdates: InvestorUpdate[] = [
+const FALLBACK_UPDATES: InvestorUpdate[] = [
   {
     id: '1',
     title: 'Q4 2025 Portfolio Performance Report',
@@ -80,9 +94,7 @@ const demoUpdates: InvestorUpdate[] = [
   },
 ];
 
-// ── Key Metrics (top row) ───────────────────────────────────────────────────
-
-const keyMetrics = [
+const FALLBACK_KEY_METRICS = [
   {
     label: 'Total AUM',
     value: '$12.5M',
@@ -133,9 +145,9 @@ const keyMetrics = [
   },
 ];
 
-// ── Capital Deployment by Product ───────────────────────────────────────────
+// ── Capital Deployment by Product (Fallback) ──────────────────────────────
 
-const productDeployment = [
+const FALLBACK_PRODUCT_DEPLOYMENT = [
   { label: 'Agricultural Loans', value: 3.8, pct: 46, icon: Banknote },
   { label: 'Crop Insurance', value: 1.9, pct: 23, icon: ShieldPlus },
   { label: 'Trade Finance', value: 1.5, pct: 18, icon: Handshake },
@@ -143,12 +155,12 @@ const productDeployment = [
   { label: 'Equipment Finance', value: 0.4, pct: 5, icon: Wrench },
 ];
 
-// ── Deployment by Country ───────────────────────────────────────────────────
+// ── Deployment by Country (Fallback) ──────────────────────────────────────
 
-const countryDeployment = [
-  { label: 'Zimbabwe', value: 4.1, pct: 50, flag: '🇿🇼' },
-  { label: 'Uganda', value: 2.5, pct: 30, flag: '🇺🇬' },
-  { label: 'Kenya', value: 1.6, pct: 20, flag: '🇰🇪' },
+const FALLBACK_COUNTRY_DEPLOYMENT = [
+  { label: 'Zimbabwe', value: 4.1, pct: 50, flag: '\u{1F1FF}\u{1F1FC}' },
+  { label: 'Uganda', value: 2.5, pct: 30, flag: '\u{1F1FA}\u{1F1EC}' },
+  { label: 'Kenya', value: 1.6, pct: 20, flag: '\u{1F1F0}\u{1F1EA}' },
 ];
 
 // ── Activity Feed ───────────────────────────────────────────────────────────
@@ -199,7 +211,7 @@ const activityFeed = [
     icon: Rocket,
     iconColor: 'text-rose-600',
     iconBg: 'bg-rose-50',
-    title: 'Kenya country launch completed — operations live',
+    title: 'Kenya country launch completed \u2014 operations live',
     time: '5 days ago',
   },
   {
@@ -249,6 +261,35 @@ const quickLinks = [
   },
 ];
 
+// ── Helpers ─────────────────────────────────────────────────────────────────
+
+const PRODUCT_ICON_MAP: Record<string, typeof Banknote> = {
+  'agricultural loans': Banknote,
+  'crop insurance': ShieldPlus,
+  'trade finance': Handshake,
+  'input financing': Sprout,
+  'equipment finance': Wrench,
+};
+
+const COUNTRY_FLAG_MAP: Record<string, string> = {
+  Zimbabwe: '\u{1F1FF}\u{1F1FC}',
+  Uganda: '\u{1F1FA}\u{1F1EC}',
+  Kenya: '\u{1F1F0}\u{1F1EA}',
+  Tanzania: '\u{1F1F9}\u{1F1FF}',
+  Mozambique: '\u{1F1F2}\u{1F1FF}',
+  Malawi: '\u{1F1F2}\u{1F1FC}',
+  Zambia: '\u{1F1FF}\u{1F1F2}',
+  Rwanda: '\u{1F1F7}\u{1F1FC}',
+  Ethiopia: '\u{1F1EA}\u{1F1F9}',
+};
+
+function fmtCompact(val: number): string {
+  if (val >= 1_000_000_000) return `$${(val / 1_000_000_000).toFixed(1)}B`;
+  if (val >= 1_000_000) return `$${(val / 1_000_000).toFixed(1)}M`;
+  if (val >= 1_000) return `$${(val / 1_000).toFixed(0)}K`;
+  return `$${val.toFixed(0)}`;
+}
+
 // ── Animation Variants ──────────────────────────────────────────────────────
 
 const fadeUp = {
@@ -273,7 +314,8 @@ const fadeIn = {
 export default function InvestorDashboard() {
   const { user, profile } = useAuth();
   const [investorProfile, setInvestorProfile] = useState<InvestorProfile | null>(null);
-  const [updates, setUpdates] = useState<InvestorUpdate[]>(demoUpdates);
+  const [updates, setUpdates] = useState<InvestorUpdate[]>(FALLBACK_UPDATES);
+  const [investments, setInvestments] = useState<InvestmentRow[]>([]);
   const [loading, setLoading] = useState(true);
 
   const supabase = createClient();
@@ -286,16 +328,28 @@ export default function InvestorDashboard() {
         return;
       }
       try {
-        // Try investor_profiles first, then fall back to ledger/wallet accounts
+        // 1. Fetch investor profile
         const { data: ip } = await supabase
           .from('investor_profiles')
           .select('*')
           .eq('user_id', user.id)
           .single();
+
         if (ip) {
           setInvestorProfile(ip);
+
+          // 2. Fetch investments for this investor profile
+          const { data: invData } = await supabase
+            .from('investments')
+            .select('*')
+            .eq('investor_profile_id', ip.id)
+            .order('created_at', { ascending: false });
+
+          if (invData && invData.length > 0) {
+            setInvestments(invData as InvestmentRow[]);
+          }
         } else {
-          // Attempt to build profile from ledger_accounts and wallet_accounts
+          // Attempt to build profile from ledger/wallet accounts
           let totalCommitted = 0;
           let totalDeployed = 0;
           let returnsToDate = 0;
@@ -338,6 +392,7 @@ export default function InvestorDashboard() {
           }
         }
 
+        // 3. Fetch recent investor updates
         const { data: upd } = await supabase
           .from('investor_updates')
           .select('*')
@@ -346,24 +401,136 @@ export default function InvestorDashboard() {
           .limit(5);
         if (upd && upd.length > 0) setUpdates(upd);
       } catch {
-        // Fall back to demo data
+        // Fall back to demo data on error
       }
       setLoading(false);
     }
     loadData();
-  }, [user, supabase]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
-  // Use fetched profile data if available, otherwise demo
-  const _stats = investorProfile
+  // ── Compute live stats from profile ────────────────────────────────────
+  const stats = investorProfile
     ? {
         totalCommitted: investorProfile.total_committed,
         totalDeployed: investorProfile.total_deployed,
         returnsToDate: investorProfile.returns_to_date,
+        activeProjects: investments.filter((inv) => inv.status === 'active' || inv.status === 'Active').length || FALLBACK_STATS.activeProjects,
       }
-    : demoStats;
+    : FALLBACK_STATS;
 
-  // Keep _stats reference to maintain the Supabase pattern (used for future dynamic cards)
-  void _stats;
+  // ── Compute key metrics from live data ─────────────────────────────────
+  const keyMetrics = useMemo(() => {
+    if (!investorProfile) return FALLBACK_KEY_METRICS;
+
+    const totalAUM = stats.totalCommitted;
+    const deployed = stats.totalDeployed;
+    const deployedPct = totalAUM > 0 ? ((deployed / totalAUM) * 100).toFixed(1) : '0.0';
+    const returnsPct = totalAUM > 0 ? ((stats.returnsToDate / totalAUM) * 100).toFixed(1) : '0.0';
+    const uniqueCountries = new Set(investments.map((inv) => inv.country).filter(Boolean));
+
+    return [
+      {
+        label: 'Total AUM',
+        value: fmtCompact(totalAUM),
+        badge: null as string | null,
+        badgeColor: '',
+        icon: DollarSign,
+        iconBg: 'bg-[#5DB347]',
+      },
+      {
+        label: 'Capital Deployed',
+        value: fmtCompact(deployed),
+        badge: `${deployedPct}% of AUM`,
+        badgeColor: 'bg-blue-100 text-blue-700',
+        icon: PieChart,
+        iconBg: 'bg-[#1B2A4A]',
+      },
+      {
+        label: 'Net Returns',
+        value: `${returnsPct}%`,
+        badge: 'Target: 18-24%',
+        badgeColor: Number(returnsPct) >= 18 ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700',
+        icon: TrendingUp,
+        iconBg: 'bg-emerald-600',
+      },
+      {
+        label: 'Active Investments',
+        value: String(stats.activeProjects),
+        badge: null as string | null,
+        badgeColor: '',
+        icon: ShieldCheck,
+        iconBg: 'bg-sky-600',
+      },
+      {
+        label: 'Total Returns',
+        value: fmtCompact(stats.returnsToDate),
+        badge: null as string | null,
+        badgeColor: '',
+        icon: Users,
+        iconBg: 'bg-amber-500',
+      },
+      {
+        label: 'Countries',
+        value: String(uniqueCountries.size || investments.length > 0 ? uniqueCountries.size : 0),
+        badge: null as string | null,
+        badgeColor: '',
+        icon: Globe,
+        iconBg: 'bg-violet-600',
+      },
+    ];
+  }, [investorProfile, stats, investments]);
+
+  // ── Compute product deployment from live investments ────────────────────
+  const productDeployment = useMemo(() => {
+    if (investments.length === 0) return FALLBACK_PRODUCT_DEPLOYMENT;
+
+    const grouped: Record<string, number> = {};
+    investments.forEach((inv) => {
+      const key = inv.product_type || inv.type || 'Other';
+      grouped[key] = (grouped[key] || 0) + (inv.amount || 0);
+    });
+
+    const total = Object.values(grouped).reduce((s, v) => s + v, 0);
+    if (total === 0) return FALLBACK_PRODUCT_DEPLOYMENT;
+
+    return Object.entries(grouped)
+      .sort((a, b) => b[1] - a[1])
+      .map(([label, value]) => ({
+        label,
+        value: Number((value / 1_000_000).toFixed(1)),
+        pct: Math.round((value / total) * 100),
+        icon: PRODUCT_ICON_MAP[label.toLowerCase()] || Banknote,
+      }));
+  }, [investments]);
+
+  // ── Compute country deployment from live investments ────────────────────
+  const countryDeployment = useMemo(() => {
+    if (investments.length === 0) return FALLBACK_COUNTRY_DEPLOYMENT;
+
+    const grouped: Record<string, number> = {};
+    investments.forEach((inv) => {
+      const key = inv.country || 'Unknown';
+      if (key !== 'Unknown') {
+        grouped[key] = (grouped[key] || 0) + (inv.amount || 0);
+      }
+    });
+
+    const total = Object.values(grouped).reduce((s, v) => s + v, 0);
+    if (total === 0) return FALLBACK_COUNTRY_DEPLOYMENT;
+
+    return Object.entries(grouped)
+      .sort((a, b) => b[1] - a[1])
+      .map(([label, value]) => ({
+        label,
+        value: Number((value / 1_000_000).toFixed(1)),
+        pct: Math.round((value / total) * 100),
+        flag: COUNTRY_FLAG_MAP[label] || '\u{1F30D}',
+      }));
+  }, [investments]);
+
+  // Total deployed for the mini legend
+  const totalDeployedByCountry = countryDeployment.reduce((s, c) => s + c.value, 0);
 
   return (
     <div className="space-y-8">
@@ -513,7 +680,7 @@ export default function InvestorDashboard() {
           <div className="mt-6 pt-4 border-t border-gray-100">
             <div className="flex items-center justify-between text-xs text-gray-400">
               <span>Total Deployed</span>
-              <span className="font-semibold text-[#1B2A4A] text-sm">$8.2M</span>
+              <span className="font-semibold text-[#1B2A4A] text-sm">${totalDeployedByCountry.toFixed(1)}M</span>
             </div>
           </div>
         </motion.div>
