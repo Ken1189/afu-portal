@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -162,6 +162,12 @@ export default function ProfilePage() {
   const [editPhone, setEditPhone] = useState('');
   const [editCountry, setEditCountry] = useState('');
 
+  // Avatar upload
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const [avatarError, setAvatarError] = useState<string | null>(null);
+
   // Extra data from members + kyc tables
   const [member, setMember] = useState<MemberRecord | null>(null);
   const [kycStatus, setKycStatus] = useState<string>('not_started');
@@ -204,8 +210,69 @@ export default function ProfilePage() {
       setEditName(profile.full_name || '');
       setEditPhone(profile.phone || '');
       setEditCountry(profile.country || '');
+      setAvatarUrl(profile.avatar_url || null);
     }
   }, [profile, editing]);
+
+  // ── Avatar upload handler ──
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+      setAvatarError('Please select a JPG, PNG, or WebP image.');
+      setTimeout(() => setAvatarError(null), 4000);
+      return;
+    }
+
+    // Validate file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      setAvatarError('Image must be under 2MB.');
+      setTimeout(() => setAvatarError(null), 4000);
+      return;
+    }
+
+    setAvatarUploading(true);
+    setAvatarError(null);
+
+    try {
+      const ext = file.name.split('.').pop() || 'jpg';
+      const filePath = `${user.id}.${ext}`;
+
+      const { data, error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      if (data) {
+        const { data: { publicUrl } } = supabase.storage
+          .from('avatars')
+          .getPublicUrl(data.path);
+
+        // Add cache-buster to force reload
+        const urlWithBuster = `${publicUrl}?t=${Date.now()}`;
+
+        await supabase
+          .from('profiles')
+          .update({ avatar_url: publicUrl })
+          .eq('id', user.id);
+
+        setAvatarUrl(urlWithBuster);
+        await refreshProfile();
+      }
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Upload failed. Please try again.';
+      setAvatarError(message);
+      setTimeout(() => setAvatarError(null), 4000);
+    } finally {
+      setAvatarUploading(false);
+      // Reset file input so same file can be re-selected
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
 
   // ── Save handler ──
   const handleSave = async () => {
@@ -320,20 +387,55 @@ export default function ProfilePage() {
               {/* Avatar */}
               <div className="flex items-center gap-4 mb-6">
                 <div className="relative">
-                  <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border-2 border-white/30">
-                    <span className="text-white text-xl font-bold">{initials}</span>
-                  </div>
-                  {editing && (
-                    <button className="absolute -bottom-1 -right-1 w-7 h-7 bg-white rounded-full flex items-center justify-center shadow-md">
-                      <Camera className="w-3.5 h-3.5 text-navy" />
-                    </button>
-                  )}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={handleAvatarUpload}
+                    className="hidden"
+                  />
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={avatarUploading}
+                    className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border-2 border-white/30 overflow-hidden cursor-pointer hover:border-white/60 transition-colors group relative"
+                    title="Click to upload avatar"
+                  >
+                    {avatarUploading ? (
+                      <Loader2 className="w-6 h-6 text-white animate-spin" />
+                    ) : avatarUrl ? (
+                      <>
+                        <Image
+                          src={avatarUrl}
+                          alt={displayName}
+                          width={64}
+                          height={64}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-full">
+                          <Camera className="w-4 h-4 text-white" />
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <span className="text-white text-xl font-bold group-hover:hidden">{initials}</span>
+                        <Camera className="w-5 h-5 text-white hidden group-hover:block" />
+                      </>
+                    )}
+                  </button>
                 </div>
                 <div>
                   <h2 className="text-lg font-bold">{displayName}</h2>
                   <p className="text-white/70 text-sm">{tier.label}</p>
                 </div>
               </div>
+
+              {/* Avatar error toast */}
+              {avatarError && (
+                <div className="bg-red-500/20 backdrop-blur-sm border border-red-400/30 rounded-lg p-2 mb-2 flex items-center gap-2 text-sm text-white">
+                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                  {avatarError}
+                </div>
+              )}
 
               {/* Member ID */}
               <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 flex items-center justify-between mb-4">

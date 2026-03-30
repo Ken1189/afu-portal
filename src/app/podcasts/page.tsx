@@ -171,8 +171,16 @@ export default function PodcastsPage() {
       ? episodes
       : episodes.filter((ep) => ep.category === activeFilter);
 
-  function handlePlay() {
-    setToast('Episode coming soon — subscribe to be notified when new episodes drop!');
+  const [playingEpisode, setPlayingEpisode] = useState<string | null>(null);
+
+  function handlePlay(episodeTitle?: string) {
+    if (episodeTitle && playingEpisode === episodeTitle) {
+      // Toggle off
+      setPlayingEpisode(null);
+      return;
+    }
+    setPlayingEpisode(episodeTitle || null);
+    setToast('Audio streaming coming soon. Subscribe to our newsletter for updates.');
     setTimeout(() => setToast(null), 4000);
   }
 
@@ -230,12 +238,18 @@ export default function PodcastsPage() {
               {/* Play Button */}
               <div className="w-28 h-28 md:w-36 md:h-36 bg-gradient-to-br from-[#EBF7E5] to-white rounded-3xl flex items-center justify-center shrink-0 shadow-lg shadow-[#5DB347]/10">
                 <button
-                  onClick={handlePlay}
-                  className="w-16 h-16 bg-gradient-to-br from-[#5DB347] to-[#449933] rounded-full flex items-center justify-center cursor-pointer hover:scale-110 transition-all duration-300 shadow-lg shadow-[#5DB347]/30"
+                  onClick={() => handlePlay(featured.title)}
+                  className={`w-16 h-16 bg-gradient-to-br from-[#5DB347] to-[#449933] rounded-full flex items-center justify-center cursor-pointer hover:scale-110 transition-all duration-300 shadow-lg shadow-[#5DB347]/30 ${playingEpisode === featured.title ? 'animate-pulse ring-4 ring-[#5DB347]/30' : ''}`}
                 >
-                  <svg className="w-7 h-7 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
+                  {playingEpisode === featured.title ? (
+                    <svg className="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
+                    </svg>
+                  ) : (
+                    <svg className="w-7 h-7 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  )}
                 </button>
               </div>
               <div className="flex-1">
@@ -310,16 +324,18 @@ export default function PodcastsPage() {
                       <div className="flex items-center gap-3 mb-3">
                         {/* Mini Play Button */}
                         <button
-                          onClick={handlePlay}
-                          className="w-11 h-11 bg-gradient-to-br from-[#5DB347] to-[#449933] rounded-full flex items-center justify-center shrink-0 cursor-pointer hover:scale-110 transition-all duration-300 shadow-md shadow-[#5DB347]/20"
+                          onClick={() => handlePlay(ep.title)}
+                          className={`w-11 h-11 bg-gradient-to-br from-[#5DB347] to-[#449933] rounded-full flex items-center justify-center shrink-0 cursor-pointer hover:scale-110 transition-all duration-300 shadow-md shadow-[#5DB347]/20 ${playingEpisode === ep.title ? 'animate-pulse ring-4 ring-[#5DB347]/20' : ''}`}
                         >
-                          <svg
-                            className="w-4 h-4 text-white ml-0.5"
-                            fill="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path d="M8 5v14l11-7z" />
-                          </svg>
+                          {playingEpisode === ep.title ? (
+                            <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
+                            </svg>
+                          ) : (
+                            <svg className="w-4 h-4 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M8 5v14l11-7z" />
+                            </svg>
+                          )}
                         </button>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 text-xs text-gray-400 mb-0.5">

@@ -591,7 +591,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   // ── Search state ──
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchModalOpen, setSearchModalOpen] = useState(false);
+  const [searchModalQuery, setSearchModalQuery] = useState('');
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const searchModalInputRef = useRef<HTMLInputElement>(null);
 
   // ── Favorites state ──
   const [favorites, setFavorites] = useState<string[]>([]);
@@ -702,17 +705,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     const handler = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
-        if (sidebarCollapsed && !hoverExpanded) {
-          setHoverExpanded(true);
-        }
+        setSearchModalOpen(true);
+        setSearchModalQuery('');
         setTimeout(() => {
-          searchInputRef.current?.focus();
+          searchModalInputRef.current?.focus();
         }, 50);
+      }
+      if (e.key === 'Escape' && searchModalOpen) {
+        setSearchModalOpen(false);
+        setSearchModalQuery('');
       }
     };
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
-  }, [sidebarCollapsed, hoverExpanded]);
+  }, [searchModalOpen]);
 
   // ── Role guard: redirect non-admins ──
   // DON'T redirect on errors — let middleware handle auth
@@ -1139,6 +1145,121 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </header>
         <main className="flex-1 p-4 sm:p-6">{children}</main>
       </div>
+
+      {/* ── Search Modal Overlay (Ctrl+K) ─────────────────── */}
+      <AnimatePresence>
+        {searchModalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="fixed inset-0 z-[100] flex items-start justify-center pt-[15vh]"
+            onClick={() => { setSearchModalOpen(false); setSearchModalQuery(''); }}
+          >
+            {/* Backdrop */}
+            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+
+            {/* Modal */}
+            <motion.div
+              initial={{ opacity: 0, y: -20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 0.95 }}
+              transition={{ duration: 0.15 }}
+              className="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Search Input */}
+              <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-100">
+                <Search className="w-5 h-5 text-gray-400 shrink-0" />
+                <input
+                  ref={searchModalInputRef}
+                  type="text"
+                  value={searchModalQuery}
+                  onChange={(e) => setSearchModalQuery(e.target.value)}
+                  placeholder="Search admin pages..."
+                  className="flex-1 text-sm text-[#1B2A4A] placeholder-gray-400 outline-none bg-transparent"
+                  autoFocus
+                />
+                <kbd className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-mono text-gray-400 bg-gray-100 rounded border border-gray-200">
+                  ESC
+                </kbd>
+              </div>
+
+              {/* Results */}
+              <div className="max-h-80 overflow-y-auto py-2">
+                {(() => {
+                  const q = searchModalQuery.toLowerCase().trim();
+                  const results = q
+                    ? allLinks.filter(
+                        (l) =>
+                          l.label.toLowerCase().includes(q) ||
+                          l.groupLabel.toLowerCase().includes(q) ||
+                          l.href.toLowerCase().includes(q)
+                      )
+                    : allLinks.slice(0, 10);
+
+                  if (results.length === 0) {
+                    return (
+                      <div className="px-4 py-8 text-center">
+                        <p className="text-sm text-gray-400">No matching pages found</p>
+                        <p className="text-xs text-gray-300 mt-1">Try a different search term</p>
+                      </div>
+                    );
+                  }
+
+                  // Group by section
+                  const grouped: Record<string, typeof results> = {};
+                  results.forEach((r) => {
+                    if (!grouped[r.groupLabel]) grouped[r.groupLabel] = [];
+                    grouped[r.groupLabel].push(r);
+                  });
+
+                  return Object.entries(grouped).map(([group, links]) => (
+                    <div key={group}>
+                      <p className="px-4 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                        {group}
+                      </p>
+                      {links.map((link) => {
+                        const isActive = isLinkActive(link.href, pathname);
+                        return (
+                          <button
+                            key={link.href}
+                            onClick={() => {
+                              router.push(link.href);
+                              setSearchModalOpen(false);
+                              setSearchModalQuery('');
+                            }}
+                            className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors text-left ${
+                              isActive
+                                ? 'bg-[#EBF7E5] text-[#5DB347] font-semibold'
+                                : 'text-[#1B2A4A] hover:bg-gray-50'
+                            }`}
+                          >
+                            <span className="text-gray-400">{link.icon}</span>
+                            <span className="flex-1">{link.label}</span>
+                            {isActive && (
+                              <span className="text-[10px] text-[#5DB347] bg-[#5DB347]/10 px-2 py-0.5 rounded-full">
+                                Current
+                              </span>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ));
+                })()}
+              </div>
+
+              {/* Footer */}
+              <div className="border-t border-gray-100 px-4 py-2 flex items-center justify-between text-[10px] text-gray-400">
+                <span>Navigate with arrow keys</span>
+                <span>Press <kbd className="px-1 py-0.5 bg-gray-100 rounded text-[10px] font-mono">Enter</kbd> to select</span>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

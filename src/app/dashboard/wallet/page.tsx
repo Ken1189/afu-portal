@@ -260,17 +260,40 @@ export default function WalletPage() {
 
   const TXN_PER_PAGE = 5;
 
+  // ── Helper: generate reference ─────────────────────────────────────
+  const genRef = () => `AFU-${Date.now().toString(36).toUpperCase()}`;
+
   // ── Fetch Data ────────────────────────────────────────────────────────
   const fetchWalletData = useCallback(async () => {
     if (!user?.id) { setLoading(false); return; }
     setLoading(true);
     try {
       // Fetch wallet
-      const { data: wallets } = await supabase
+      let { data: wallets } = await supabase
         .from('wallet_accounts')
         .select('*, ledger_accounts!wallet_accounts_ledger_account_id_fkey(balance)')
         .eq('user_id', user.id)
         .limit(1);
+
+      // Auto-create wallet if none exists
+      if (!wallets || wallets.length === 0) {
+        try {
+          const res = await fetch('/api/banking/wallet', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'create', currency: 'USD', display_name: 'Main Wallet' }),
+          });
+          if (res.ok) {
+            // Re-fetch after creation
+            const { data: newWallets } = await supabase
+              .from('wallet_accounts')
+              .select('*, ledger_accounts!wallet_accounts_ledger_account_id_fkey(balance)')
+              .eq('user_id', user.id)
+              .limit(1);
+            wallets = newWallets;
+          }
+        } catch { /* wallet creation failed, will fallback to demo */ }
+      }
 
       if (wallets && wallets.length > 0) {
         const w = wallets[0];
@@ -368,6 +391,9 @@ export default function WalletPage() {
   const handleDeposit = async () => {
     if (!wallet || !depositAmount) return;
     setModalLoading(true);
+    const amt = parseFloat(depositAmount);
+    const ref = genRef();
+    const method = MOBILE_MONEY_METHODS.find((m) => m.id === depositMethod)?.label || 'Deposit';
     try {
       const res = await fetch('/api/banking/wallet', {
         method: 'POST',
@@ -375,14 +401,33 @@ export default function WalletPage() {
         body: JSON.stringify({
           action: 'deposit',
           wallet_id: wallet.id,
-          amount: parseFloat(depositAmount),
-          description: `${MOBILE_MONEY_METHODS.find((m) => m.id === depositMethod)?.label} deposit`,
-          reference: `DEP-${Date.now()}`,
+          amount: amt,
+          description: `${method} deposit`,
+          reference: ref,
         }),
       });
       if (!res.ok) throw new Error('Deposit failed');
+
+      // Instant local update — show transaction immediately
+      const newTxn: WalletTransaction = {
+        id: `local-${Date.now()}`,
+        wallet_id: wallet.id,
+        type: 'deposit',
+        amount: amt,
+        currency: wallet.currency || 'USD',
+        balance_after: (wallet.balance ?? 0) + amt,
+        description: `${method} deposit`,
+        reference: ref,
+        counterparty: null,
+        status: 'completed',
+        created_at: new Date().toISOString(),
+      };
+      setTransactions((prev) => [newTxn, ...prev]);
+      setWallet((prev) => prev ? { ...prev, balance: (prev.balance ?? 0) + amt } : prev);
+
       setDepositStep('instructions');
       showToast('Deposit initiated successfully');
+      // Also refresh from server for authoritative data
       fetchWalletData();
     } catch {
       showToast('Deposit failed. Please try again.', 'error');
@@ -394,6 +439,9 @@ export default function WalletPage() {
   const handleWithdraw = async () => {
     if (!wallet || !withdrawAmount) return;
     setModalLoading(true);
+    const amt = parseFloat(withdrawAmount);
+    const ref = genRef();
+    const method = MOBILE_MONEY_METHODS.find((m) => m.id === withdrawMethod)?.label || 'Withdrawal';
     try {
       const res = await fetch('/api/banking/wallet', {
         method: 'POST',
@@ -401,17 +449,38 @@ export default function WalletPage() {
         body: JSON.stringify({
           action: 'withdraw',
           wallet_id: wallet.id,
-          amount: parseFloat(withdrawAmount),
-          description: `${MOBILE_MONEY_METHODS.find((m) => m.id === withdrawMethod)?.label} withdrawal to ${withdrawDest}`,
-          reference: `WDR-${Date.now()}`,
+          amount: amt,
+          description: `${method} withdrawal to ${withdrawDest}`,
+          reference: ref,
         }),
       });
-      if (!res.ok) throw new Error('Withdrawal failed');
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || 'Withdrawal failed');
+      }
+
+      // Instant local update
+      const newTxn: WalletTransaction = {
+        id: `local-${Date.now()}`,
+        wallet_id: wallet.id,
+        type: 'withdrawal',
+        amount: amt,
+        currency: wallet.currency || 'USD',
+        balance_after: (wallet.balance ?? 0) - amt,
+        description: `${method} withdrawal to ${withdrawDest}`,
+        reference: ref,
+        counterparty: null,
+        status: 'completed',
+        created_at: new Date().toISOString(),
+      };
+      setTransactions((prev) => [newTxn, ...prev]);
+      setWallet((prev) => prev ? { ...prev, balance: (prev.balance ?? 0) - amt } : prev);
+
       closeModal();
       showToast('Withdrawal request submitted');
       fetchWalletData();
-    } catch {
-      showToast('Withdrawal failed. Please try again.', 'error');
+    } catch (err) {
+      showToast((err as Error).message || 'Withdrawal failed. Please try again.', 'error');
     } finally {
       setModalLoading(false);
     }
@@ -420,6 +489,9 @@ export default function WalletPage() {
   const handleTransfer = async () => {
     if (!wallet || !transferAmount || !transferRecipient) return;
     setModalLoading(true);
+    const amt = parseFloat(transferAmount);
+    const ref = genRef();
+    const desc = transferNote || `P2P transfer to ${transferRecipient}`;
     try {
       const res = await fetch('/api/banking/wallet', {
         method: 'POST',
@@ -427,18 +499,39 @@ export default function WalletPage() {
         body: JSON.stringify({
           action: 'transfer',
           from_wallet_id: wallet.id,
-          to_wallet_id: transferRecipient, // In production this would resolve from search
-          amount: parseFloat(transferAmount),
-          description: transferNote || `P2P transfer`,
-          reference: `TRF-${Date.now()}`,
+          recipient: transferRecipient, // API resolves by email or phone
+          amount: amt,
+          description: desc,
+          reference: ref,
         }),
       });
-      if (!res.ok) throw new Error('Transfer failed');
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || 'Transfer failed');
+      }
+
+      // Instant local update
+      const newTxn: WalletTransaction = {
+        id: `local-${Date.now()}`,
+        wallet_id: wallet.id,
+        type: 'transfer',
+        amount: amt,
+        currency: wallet.currency || 'USD',
+        balance_after: (wallet.balance ?? 0) - amt,
+        description: desc,
+        reference: ref,
+        counterparty: transferRecipient,
+        status: 'completed',
+        created_at: new Date().toISOString(),
+      };
+      setTransactions((prev) => [newTxn, ...prev]);
+      setWallet((prev) => prev ? { ...prev, balance: (prev.balance ?? 0) - amt } : prev);
+
       closeModal();
       showToast('Transfer completed successfully');
       fetchWalletData();
-    } catch {
-      showToast('Transfer failed. Please try again.', 'error');
+    } catch (err) {
+      showToast((err as Error).message || 'Transfer failed. Please try again.', 'error');
     } finally {
       setModalLoading(false);
     }

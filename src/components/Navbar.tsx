@@ -43,6 +43,8 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useAuth } from "@/lib/supabase/auth-context";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { localeNames, type Locale } from "@/lib/i18n/translations";
 
 /* ─── Data ─── */
 
@@ -496,6 +498,14 @@ export default function Navbar() {
   const [mobileInsuranceOpen, setMobileInsuranceOpen] = useState(false);
   const [mobileMoreOpen, setMobileMoreOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [langMenuOpen, setLangMenuOpen] = useState(false);
+  const { locale, setLocale } = useLanguage();
+
+  // Language code display map
+  const localeCodeDisplay: Record<string, string> = {
+    en: 'EN', sn: 'SN', nd: 'ND', sw: 'SW', tn: 'TN', pt: 'PT',
+    ha: 'HA', yo: 'YO', zu: 'ZU', af: 'AF', bem: 'BM', kri: 'KR', lg: 'LG',
+  };
 
   const handleSignOut = async () => {
     await signOut();
@@ -511,6 +521,7 @@ export default function Navbar() {
     function handleClick(e: MouseEvent) {
       if (navRef.current && !navRef.current.contains(e.target as Node)) {
         setOpenDropdown(null);
+        setLangMenuOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClick);
@@ -971,6 +982,46 @@ export default function Navbar() {
             </Link>
               </>
             )}
+          </div>
+
+          {/* ── Language Switcher (Desktop) ── */}
+          <div className="hidden lg:block relative shrink-0">
+            <button
+              onClick={() => setLangMenuOpen(!langMenuOpen)}
+              className="flex items-center gap-1.5 text-sm font-medium px-2.5 py-2 rounded-lg text-navy hover:text-[#5DB347] hover:bg-[#EBF7E5]/50 transition-colors"
+              aria-label="Switch language"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+              </svg>
+              <span className="text-xs font-bold">{localeCodeDisplay[locale] || 'EN'}</span>
+            </button>
+            <AnimatePresence>
+              {langMenuOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute right-0 top-full mt-1 w-48 bg-white border border-gray-100 rounded-xl shadow-lg py-2 z-50 max-h-80 overflow-y-auto"
+                >
+                  {(Object.entries(localeNames) as [Locale, string][]).map(([code, name]) => (
+                    <button
+                      key={code}
+                      onClick={() => { setLocale(code); setLangMenuOpen(false); }}
+                      className={`w-full text-left px-4 py-2 text-sm transition-colors flex items-center justify-between ${
+                        locale === code
+                          ? 'bg-[#EBF7E5] text-[#5DB347] font-semibold'
+                          : 'text-navy hover:bg-[#EBF7E5]/50 hover:text-[#5DB347]'
+                      }`}
+                    >
+                      <span>{name}</span>
+                      <span className="text-[10px] text-gray-400 font-mono">{localeCodeDisplay[code]}</span>
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* ── Desktop CTA ── */}
@@ -1455,6 +1506,27 @@ export default function Navbar() {
                 </Link>
                 </>
                 )}
+
+                {/* Language Switcher (Mobile) */}
+                <hr className="border-gray-200 my-4" />
+                <div className="px-3 pb-2">
+                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Language</p>
+                  <div className="grid grid-cols-3 gap-1.5">
+                    {(Object.entries(localeNames) as [Locale, string][]).map(([code, name]) => (
+                      <button
+                        key={code}
+                        onClick={() => setLocale(code)}
+                        className={`text-xs py-2 px-2 rounded-lg text-center transition-colors ${
+                          locale === code
+                            ? 'bg-[#5DB347] text-white font-semibold'
+                            : 'bg-gray-100 text-navy hover:bg-[#EBF7E5] hover:text-[#5DB347]'
+                        }`}
+                      >
+                        {name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
 
                 {/* CTA Section */}
                 <hr className="border-gray-200 my-4" />

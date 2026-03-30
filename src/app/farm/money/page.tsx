@@ -335,10 +335,9 @@ type FilterTab = 'all' | 'income' | 'expense';
 export default function MoneyTrackerPage() {
   const { t } = useLanguage();
   const { user } = useAuth();
-  const { createTransaction: createDbTransaction } = useFarmTransactions(user?.id);
+  const { transactions: dbTransactions, createTransaction: createDbTransaction, fetchTransactions: refetchDbTransactions } = useFarmTransactions(user?.id);
   const { plots: livePlots } = useFarmPlots();
   const farmPlots = livePlots.length > 0 ? livePlots.map(adaptFarmPlot) : mockFarmPlots;
-  const summary = useMemo(() => getMockFarmSummary(), []);
   const supabase = createClient();
 
   // ── Wallet balance state ──
@@ -386,16 +385,47 @@ export default function MoneyTrackerPage() {
   const [modalPlotId, setModalPlotId] = useState('');
   const [modalDate, setModalDate] = useState('2026-03-14');
 
-  // Local transactions state (allows "adding")
-  const farmTransactions = mockFarmTransactions;
-  const [transactions, setTransactions] = useState<FarmTransaction[]>(farmTransactions);
+  // Local transactions state — use real DB data when available, fallback to mock
+  const [localTxns, setLocalTxns] = useState<FarmTransaction[]>([]);
   const [savingTxn, setSavingTxn] = useState(false);
   const [txnToast, setTxnToast] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
+  // Adapt DB transactions to FarmTransaction shape
+  const adaptedDbTxns: FarmTransaction[] = useMemo(() => {
+    return dbTransactions.map((row) => ({
+      id: row.id,
+      type: row.type as TransactionType,
+      category: (row.category || 'other') as TransactionCategory,
+      amount: row.amount,
+      currency: row.currency || 'USD',
+      date: row.date,
+      description: row.description || '',
+      plotId: row.plot_id || undefined,
+      plotName: row.plot_id ? farmPlots.find((p) => p.id === row.plot_id)?.name : undefined,
+    }));
+  }, [dbTransactions, farmPlots]);
+
+  // Merge: real DB transactions + any locally-added ones not yet in DB, fallback to mock if empty
+  const transactions = useMemo(() => {
+    if (adaptedDbTxns.length > 0) {
+      // Combine DB transactions with any local-only ones
+      const dbIds = new Set(adaptedDbTxns.map((t) => t.id));
+      const onlyLocal = localTxns.filter((t) => !dbIds.has(t.id));
+      return [...onlyLocal, ...adaptedDbTxns];
+    }
+    if (localTxns.length > 0) return localTxns;
+    return mockFarmTransactions;
+  }, [adaptedDbTxns, localTxns]);
+
+  // Compute real totals from whichever transactions are displayed
+  const totalIncome = useMemo(() => transactions.filter((t) => t.type === 'income').reduce((s, t) => s + t.amount, 0), [transactions]);
+  const totalExpenses = useMemo(() => transactions.filter((t) => t.type === 'expense').reduce((s, t) => s + t.amount, 0), [transactions]);
+  const totalProfit = totalIncome - totalExpenses;
+
   // Animated counters
-  const animatedProfit = useAnimatedCounter(summary.profit);
-  const animatedIncome = useAnimatedCounter(summary.totalIncome);
-  const animatedExpenses = useAnimatedCounter(summary.totalExpenses);
+  const animatedProfit = useAnimatedCounter(totalProfit);
+  const animatedIncome = useAnimatedCounter(totalIncome);
+  const animatedExpenses = useAnimatedCounter(totalExpenses);
 
   // Filtered transactions
   const filtered = useMemo(() => {
@@ -459,7 +489,8 @@ export default function MoneyTrackerPage() {
       plotId: modalPlotId || undefined,
       plotName: modalPlotId ? farmPlots.find((p) => p.id === modalPlotId)?.name : undefined,
     };
-    setTransactions((prev) => [newTxn, ...prev]);
+    // Add to local state for instant display
+    setLocalTxns((prev) => [newTxn, ...prev]);
     setModalOpen(false);
 
     // Persist to Supabase
@@ -479,6 +510,8 @@ export default function MoneyTrackerPage() {
           setTxnToast({ type: 'error', text: error });
         } else {
           setTxnToast({ type: 'success', text: `${modalType === 'income' ? 'Income' : 'Expense'} saved successfully` });
+          // Refetch from DB to get authoritative data
+          refetchDbTransactions();
         }
       } catch {
         setTxnToast({ type: 'error', text: 'Could not save to database' });
@@ -489,7 +522,7 @@ export default function MoneyTrackerPage() {
 
     setSavingTxn(false);
     setTimeout(() => setTxnToast(null), 3000);
-  }, [modalAmount, modalCategory, modalType, modalDate, modalDescription, modalPlotId, t, user, createDbTransaction]);
+  }, [modalAmount, modalCategory, modalType, modalDate, modalDescription, modalPlotId, t, user, createDbTransaction, refetchDbTransactions, farmPlots]);
 
   // Income categories for modal
   const incomeCategories: TransactionCategory[] = ['harvest-sale', 'contract-payment', 'subsidy', 'other'];

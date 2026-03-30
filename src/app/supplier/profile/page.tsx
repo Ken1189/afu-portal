@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/supabase/auth-context';
@@ -26,68 +26,37 @@ import {
   Briefcase,
   Smartphone,
   Save,
+  Loader2,
 } from 'lucide-react';
-// ── Inline supplier type & fallback data (replaces @/lib/data/suppliers import) ──
 
-type SupplierCategory = 'input-supplier' | 'equipment' | 'logistics' | 'processing' | 'technology' | 'financial-services';
-type SponsorshipTier = 'platinum' | 'gold' | 'silver' | 'bronze';
-type Country = 'Botswana' | 'Kenya' | 'Mozambique' | 'Nigeria' | 'Sierra Leone' | 'South Africa' | 'Tanzania' | 'Uganda' | 'Zambia' | 'Zimbabwe';
+// ── Fallback data (shown when no supplier record exists) ──
 
-interface Supplier {
-  id: string;
-  companyName: string;
-  contactName: string;
-  email: string;
-  phone: string;
-  country: Country;
-  region: string;
-  category: SupplierCategory;
-  status: 'active' | 'pending' | 'suspended';
-  joinDate: string;
-  logo: string;
-  description: string;
-  productsCount: number;
-  totalSales: number;
-  totalOrders: number;
-  rating: number;
-  reviewCount: number;
-  memberDiscountPercent: number;
-  commissionRate: number;
-  isFounding: boolean;
-  sponsorshipTier: SponsorshipTier | null;
-  verified: boolean;
-  website: string;
-  certifications: string[];
-}
-
-const suppliers: Supplier[] = [
-  {
-    id: 'SUP-001',
-    companyName: 'Zambezi Agri-Supplies',
-    contactName: 'Farai Ndlovu',
-    email: 'farai@zambezi-agri.co.zw',
-    phone: '+263 77 200 1001',
-    country: 'Zimbabwe',
-    region: 'Harare',
-    category: 'input-supplier',
-    status: 'active',
-    joinDate: '2024-06-15',
-    logo: 'https://images.unsplash.com/photo-1560693225-b8507d6f3aa9?w=400&h=300&fit=crop',
-    description: 'Leading agricultural input supplier across Southern Africa. Specializing in certified seeds, fertilizers, and crop protection products for commercial and smallholder farmers.',
-    productsCount: 38,
-    totalSales: 1847320,
-    totalOrders: 4215,
-    rating: 4.8,
-    reviewCount: 312,
-    memberDiscountPercent: 12,
-    commissionRate: 8,
-    isFounding: true,
-    sponsorshipTier: 'platinum',
-    verified: true,
-    website: 'https://zambezi-agri.co.zw',
-    certifications: ['ISO 9001', 'GlobalGAP Approved', 'SADC Trade Certified'],
-  },
-];
+const fallbackSupplier = {
+  id: '',
+  companyName: 'Zambezi Agri-Supplies',
+  contactName: 'Farai Ndlovu',
+  email: 'farai@zambezi-agri.co.zw',
+  phone: '+263 77 200 1001',
+  country: 'Zimbabwe',
+  region: 'Harare',
+  category: 'input-supplier',
+  status: 'active' as const,
+  joinDate: '2024-06-15',
+  description:
+    'Leading agricultural input supplier across Southern Africa. Specializing in certified seeds, fertilizers, and crop protection products for commercial and smallholder farmers.',
+  productsCount: 38,
+  totalSales: 1847320,
+  totalOrders: 4215,
+  rating: 4.8,
+  reviewCount: 312,
+  memberDiscountPercent: 12,
+  commissionRate: 8,
+  isFounding: true,
+  sponsorshipTier: 'platinum' as const,
+  verified: true,
+  website: 'https://zambezi-agri.co.zw',
+  certifications: ['ISO 9001', 'GlobalGAP Approved', 'SADC Trade Certified'],
+};
 
 // -- Animation variants -------------------------------------------------------
 
@@ -95,10 +64,7 @@ const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: {
-      staggerChildren: 0.06,
-      delayChildren: 0.1,
-    },
+    transition: { staggerChildren: 0.06, delayChildren: 0.1 },
   },
 };
 
@@ -107,11 +73,7 @@ const cardVariants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: {
-      type: 'spring' as const,
-      stiffness: 260,
-      damping: 24,
-    },
+    transition: { type: 'spring' as const, stiffness: 260, damping: 24 },
   },
 };
 
@@ -120,18 +82,11 @@ const fadeUp = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: {
-      duration: 0.5,
-      ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
-    },
+    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
   },
 };
 
-// -- Current supplier ---------------------------------------------------------
-
-const currentSupplier = suppliers.find((s) => s.id === 'SUP-001')!;
-
-// -- Category labels ----------------------------------------------------------
+// -- Category helpers ---------------------------------------------------------
 
 const categoryLabels: Record<string, string> = {
   'input-supplier': 'Input Supplier',
@@ -156,84 +111,129 @@ const categoryOptions = [
 // =============================================================================
 
 export default function SupplierProfilePage() {
-  const { user } = useAuth();
+  const { user, profile, refreshProfile } = useAuth();
+  const supabase = createClient();
+
   const [supplierId, setSupplierId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  const [usingFallback, setUsingFallback] = useState(false);
 
-  // -- Company details form state
-  const [companyName, setCompanyName] = useState(currentSupplier.companyName);
-  const [contactPerson, setContactPerson] = useState(currentSupplier.contactName);
-  const [email, setEmail] = useState(currentSupplier.email);
-  const [phone, setPhone] = useState(currentSupplier.phone);
-  const [website, setWebsite] = useState(currentSupplier.website);
-  const [description, setDescription] = useState(currentSupplier.description);
+  // -- Editable form state
+  const [companyName, setCompanyName] = useState('');
+  const [contactPerson, setContactPerson] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [website, setWebsite] = useState('');
+  const [description, setDescription] = useState('');
+  const [country, setCountry] = useState('');
+  const [region, setRegion] = useState('');
+  const [category, setCategory] = useState('');
+  const [address, setAddress] = useState('');
 
-  // -- Business information form state
-  const [country, setCountry] = useState(currentSupplier.country);
-  const [region, setRegion] = useState(currentSupplier.region);
-  const [category, setCategory] = useState(currentSupplier.category);
-  const [regNumber, setRegNumber] = useState('ZW-BR-2024-001847');
+  // -- Display-only from DB
+  const [joinDate, setJoinDate] = useState('');
+  const [rating, setRating] = useState(0);
+  const [reviewCount, setReviewCount] = useState(0);
+  const [verified, setVerified] = useState(false);
+  const [sponsorshipTier, setSponsorshipTier] = useState<string | null>(null);
 
-  // -- Banking details
+  // -- Certifications
+  const [certifications, setCertifications] = useState<string[]>([]);
+  const [newCert, setNewCert] = useState('');
+  const [showAddCert, setShowAddCert] = useState(false);
+
+  // -- Banking (display-only)
   const [bankName] = useState('Standard Chartered Zimbabwe');
   const [accountNumber] = useState('****-****-****-4821');
   const [routingCode] = useState('SCBLZWHX');
   const [mobileMoneyNumber] = useState('+263 77 200 1001');
 
-  // -- Certifications
-  const [certifications, setCertifications] = useState<string[]>([
-    'ISO 9001',
-    'Africa Green Mark',
-    'Fair Trade',
-  ]);
-  const [newCert, setNewCert] = useState('');
-  const [showAddCert, setShowAddCert] = useState(false);
+  // ── Populate from data (supplier record or fallback) ──
+  const populateFields = useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (data: any, isFallback: boolean) => {
+      if (isFallback) {
+        setCompanyName(data.companyName);
+        setContactPerson(data.contactName);
+        setEmail(data.email);
+        setPhone(data.phone);
+        setWebsite(data.website);
+        setDescription(data.description);
+        setCountry(data.country);
+        setRegion(data.region);
+        setCategory(data.category);
+        setAddress('');
+        setJoinDate(data.joinDate);
+        setRating(data.rating);
+        setReviewCount(data.reviewCount);
+        setVerified(data.verified);
+        setSponsorshipTier(data.sponsorshipTier);
+        setCertifications(data.certifications || []);
+      } else {
+        setCompanyName(data.company_name || '');
+        setContactPerson(data.contact_name || '');
+        setEmail(data.email || '');
+        setPhone(data.phone || '');
+        setWebsite(data.website || '');
+        setDescription(data.description || '');
+        setCountry(data.country || '');
+        setRegion(data.region || '');
+        setCategory(data.category || 'input-supplier');
+        setAddress(data.address || '');
+        setJoinDate(data.created_at || data.join_date || '');
+        setRating(data.rating ?? 0);
+        setReviewCount(data.review_count ?? 0);
+        setVerified(data.verified ?? false);
+        setSponsorshipTier(data.sponsorship_tier || null);
+        setCertifications(data.certifications || []);
+      }
+    },
+    []
+  );
 
-  // -- Save states
-  const [companySaved, setCompanySaved] = useState(false);
-  const [businessSaved, setBusinessSaved] = useState(false);
-
-  // ── Fetch profile from Supabase ─────────────────────────────────────────
+  // ── Fetch supplier record ──
   useEffect(() => {
     async function fetchProfile() {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
       try {
-        const supabase = createClient();
         const { data: supplier } = await supabase
           .from('suppliers')
           .select('*')
-          .eq('email', user?.email ?? '')
-          .single();
+          .eq('profile_id', user.id)
+          .maybeSingle();
 
         if (supplier) {
           setSupplierId(supplier.id);
-          setCompanyName(supplier.company_name || currentSupplier.companyName);
-          setContactPerson(supplier.contact_name || currentSupplier.contactName);
-          setEmail(supplier.email || currentSupplier.email);
-          setPhone(supplier.phone || currentSupplier.phone);
-          setWebsite(supplier.website || currentSupplier.website);
-          setDescription(supplier.description || currentSupplier.description);
-          setCountry(supplier.country || currentSupplier.country);
-          setRegion(supplier.region || currentSupplier.region);
-          setCategory(supplier.category || currentSupplier.category);
-          if (supplier.certifications && supplier.certifications.length > 0) {
-            setCertifications(supplier.certifications);
-          }
+          setUsingFallback(false);
+          populateFields(supplier, false);
+        } else {
+          setUsingFallback(true);
+          populateFields(fallbackSupplier, true);
         }
-      } catch (err) {
-        // Keep fallback
+      } catch {
+        setUsingFallback(true);
+        populateFields(fallbackSupplier, true);
       } finally {
         setLoading(false);
       }
     }
-    if (user) fetchProfile();
-    else setLoading(false);
-  }, [user]);
+    fetchProfile();
+  }, [user, supabase, populateFields]);
 
-  const handleSaveCompany = async () => {
-    // ── Save to Supabase ──────────────────────────────────────────────────
-    if (supplierId) {
-      try {
-        const supabase = createClient();
+  // ── Save all changes ──
+  const handleSave = async () => {
+    if (!user) return;
+    setSaving(true);
+
+    try {
+      // Update supplier record
+      if (supplierId) {
         await supabase
           .from('suppliers')
           .update({
@@ -243,38 +243,53 @@ export default function SupplierProfilePage() {
             phone,
             website,
             description,
-          })
-          .eq('id', supplierId);
-      } catch (err) {
-        // Silent fallback
-      }
-    }
-    setCompanySaved(true);
-    setTimeout(() => setCompanySaved(false), 2000);
-  };
-
-  const handleSaveBusiness = async () => {
-    // ── Save to Supabase ──────────────────────────────────────────────────
-    if (supplierId) {
-      try {
-        const supabase = createClient();
-        await supabase
-          .from('suppliers')
-          .update({
             country,
             region,
             category,
+            address,
             certifications,
           })
           .eq('id', supplierId);
-      } catch (err) {
-        // Silent fallback
       }
+
+      // Also update profiles table for name/phone
+      await supabase
+        .from('profiles')
+        .update({
+          full_name: contactPerson || undefined,
+          phone: phone || null,
+        })
+        .eq('id', user.id);
+
+      await refreshProfile();
+
+      setSaveSuccess(true);
+      setEditing(false);
+      setTimeout(() => setSaveSuccess(false), 2500);
+    } catch {
+      // Silent — could add error toast
+    } finally {
+      setSaving(false);
     }
-    setBusinessSaved(true);
-    setTimeout(() => setBusinessSaved(false), 2000);
   };
 
+  // ── Cancel editing ──
+  const handleCancel = async () => {
+    // Re-fetch to reset fields
+    if (supplierId) {
+      const { data: supplier } = await supabase
+        .from('suppliers')
+        .select('*')
+        .eq('id', supplierId)
+        .single();
+      if (supplier) populateFields(supplier, false);
+    } else {
+      populateFields(fallbackSupplier, true);
+    }
+    setEditing(false);
+  };
+
+  // ── Certification helpers ──
   const handleAddCertification = () => {
     if (newCert.trim() && !certifications.includes(newCert.trim())) {
       setCertifications((prev) => [...prev, newCert.trim()]);
@@ -286,6 +301,71 @@ export default function SupplierProfilePage() {
   const handleRemoveCertification = (cert: string) => {
     setCertifications((prev) => prev.filter((c) => c !== cert));
   };
+
+  // ── Derived ──
+  const companyInitials = companyName
+    .split(' ')
+    .map((w) => w[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2) || 'ZA';
+
+  // ── Loading ──
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="w-8 h-8 text-[#5DB347] animate-spin" />
+      </div>
+    );
+  }
+
+  // ── Reusable display / input field ──
+  function DisplayField({
+    label,
+    value,
+    icon: Icon,
+    isEditing,
+    onChange,
+    type = 'text',
+    placeholder,
+  }: {
+    label: string;
+    value: string;
+    icon?: React.ElementType;
+    isEditing: boolean;
+    onChange?: (v: string) => void;
+    type?: string;
+    placeholder?: string;
+  }) {
+    const isEmpty = !value;
+    return (
+      <div>
+        <label className="block text-xs font-medium text-gray-500 mb-1.5">{label}</label>
+        <div className="relative">
+          {Icon && (
+            <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          )}
+          {isEditing && onChange ? (
+            <input
+              type={type}
+              value={value}
+              onChange={(e) => onChange(e.target.value)}
+              placeholder={placeholder || `Enter ${label.toLowerCase()}...`}
+              className={`w-full ${Icon ? 'pl-10' : 'pl-4'} pr-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347] transition-colors bg-gray-50`}
+            />
+          ) : (
+            <div
+              className={`w-full ${Icon ? 'pl-10' : 'pl-4'} pr-4 py-2.5 rounded-lg border border-gray-100 text-sm bg-gray-50/70 ${
+                isEmpty ? 'text-gray-400 italic' : 'text-[#1B2A4A]'
+              }`}
+            >
+              {value || 'Not set'}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -302,14 +382,14 @@ export default function SupplierProfilePage() {
         className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
       >
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#8CB89C]/10 flex items-center justify-center">
-            <Building2 className="w-5 h-5 text-[#8CB89C]" />
+          <div className="w-10 h-10 rounded-xl bg-[#5DB347]/10 flex items-center justify-center">
+            <Building2 className="w-5 h-5 text-[#5DB347]" />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-bold text-[#1B2A4A]">Company Profile</h1>
-              {currentSupplier.verified && (
-                <span className="inline-flex items-center gap-1 bg-[#8CB89C]/10 text-[#8CB89C] text-xs font-semibold px-2.5 py-1 rounded-full">
+              {verified && (
+                <span className="inline-flex items-center gap-1 bg-[#5DB347]/10 text-[#5DB347] text-xs font-semibold px-2.5 py-1 rounded-full">
                   <CheckCircle2 className="w-3.5 h-3.5" />
                   Verified
                 </span>
@@ -320,7 +400,50 @@ export default function SupplierProfilePage() {
             </p>
           </div>
         </div>
+
+        {/* Edit / Cancel toggle */}
+        <button
+          onClick={() => {
+            if (editing) {
+              handleCancel();
+            } else {
+              setEditing(true);
+            }
+          }}
+          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors shadow-sm ${
+            editing
+              ? 'bg-gray-200 text-[#1B2A4A] hover:bg-gray-300'
+              : 'bg-[#5DB347] hover:bg-[#449933] text-white'
+          }`}
+        >
+          {editing ? <X className="w-4 h-4" /> : <Edit3 className="w-4 h-4" />}
+          {editing ? 'Cancel Editing' : 'Edit Profile'}
+        </button>
       </motion.div>
+
+      {/* Fallback notice */}
+      {usingFallback && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-700 flex items-start gap-2">
+          <Shield className="w-4 h-4 mt-0.5 flex-shrink-0" />
+          <span>
+            No supplier record found for your account. Showing sample data. Your edits will be saved
+            once a supplier record is linked to your profile.
+          </span>
+        </div>
+      )}
+
+      {/* Save success banner */}
+      {saveSuccess && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0 }}
+          className="bg-green-50 border border-green-200 rounded-xl p-4 text-sm text-green-700 flex items-center gap-2"
+        >
+          <CheckCircle2 className="w-4 h-4" />
+          Profile saved successfully!
+        </motion.div>
+      )}
 
       {/* =====================================================================
           2. PROFILE HEADER CARD
@@ -330,73 +453,65 @@ export default function SupplierProfilePage() {
         className="bg-white rounded-xl border border-gray-100 p-6"
       >
         <div className="flex flex-col sm:flex-row items-start gap-6">
-          {/* Logo placeholder */}
           <div className="relative group">
-            <div className="w-24 h-24 rounded-2xl bg-[#8CB89C] flex items-center justify-center text-white text-3xl font-bold shadow-lg">
-              ZA
+            <div className="w-24 h-24 rounded-2xl bg-[#5DB347] flex items-center justify-center text-white text-3xl font-bold shadow-lg">
+              {companyInitials}
             </div>
-            <button className="absolute inset-0 w-24 h-24 rounded-2xl bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
-              <Upload className="w-5 h-5" />
-            </button>
+            {editing && (
+              <button className="absolute inset-0 w-24 h-24 rounded-2xl bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
+                <Upload className="w-5 h-5" />
+              </button>
+            )}
           </div>
 
-          {/* Company info */}
           <div className="flex-1">
             <div className="flex flex-wrap items-center gap-3 mb-2">
-              <h2 className="text-xl font-bold text-[#1B2A4A]">{currentSupplier.companyName}</h2>
-              {currentSupplier.sponsorshipTier && (
+              <h2 className="text-xl font-bold text-[#1B2A4A]">{companyName || 'Company Name'}</h2>
+              {sponsorshipTier && (
                 <span className="inline-flex items-center gap-1 bg-[#D4A843]/10 text-[#D4A843] text-xs font-semibold px-2.5 py-1 rounded-full">
                   <Award className="w-3.5 h-3.5" />
-                  {currentSupplier.sponsorshipTier.charAt(0).toUpperCase() +
-                    currentSupplier.sponsorshipTier.slice(1)}{' '}
-                  Sponsor
+                  {sponsorshipTier.charAt(0).toUpperCase() + sponsorshipTier.slice(1)} Sponsor
                 </span>
               )}
             </div>
             <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-3">
               <span className="flex items-center gap-1">
                 <Briefcase className="w-3.5 h-3.5" />
-                {categoryLabels[currentSupplier.category] || currentSupplier.category}
+                {categoryLabels[category] || category || 'Not set'}
               </span>
               <span className="flex items-center gap-1">
                 <MapPin className="w-3.5 h-3.5" />
-                {currentSupplier.region}, {currentSupplier.country}
+                {[region, country].filter(Boolean).join(', ') || 'Not set'}
               </span>
-              <span className="flex items-center gap-1">
-                <Calendar className="w-3.5 h-3.5" />
-                Member since{' '}
-                {new Date(currentSupplier.joinDate).toLocaleDateString('en-US', {
-                  month: 'long',
-                  year: 'numeric',
-                })}
-              </span>
+              {joinDate && (
+                <span className="flex items-center gap-1">
+                  <Calendar className="w-3.5 h-3.5" />
+                  Member since{' '}
+                  {new Date(joinDate).toLocaleDateString('en-US', {
+                    month: 'long',
+                    year: 'numeric',
+                  })}
+                </span>
+              )}
             </div>
-            <div className="flex flex-wrap items-center gap-4">
+            {rating > 0 && (
               <div className="flex items-center gap-1">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <Star
                     key={i}
                     className={`w-4 h-4 ${
-                      i < Math.floor(currentSupplier.rating)
+                      i < Math.floor(rating)
                         ? 'text-[#D4A843] fill-[#D4A843]'
-                        : i < currentSupplier.rating
+                        : i < rating
                           ? 'text-[#D4A843] fill-[#D4A843]/50'
                           : 'text-gray-200'
                     }`}
                   />
                 ))}
-                <span className="text-sm font-semibold text-[#1B2A4A] ml-1">
-                  {currentSupplier.rating}
-                </span>
-                <span className="text-xs text-gray-400">
-                  ({currentSupplier.reviewCount} reviews)
-                </span>
+                <span className="text-sm font-semibold text-[#1B2A4A] ml-1">{rating}</span>
+                <span className="text-xs text-gray-400">({reviewCount} reviews)</span>
               </div>
-              <button className="text-xs text-[#8CB89C] hover:text-[#729E82] font-medium flex items-center gap-1 transition-colors">
-                <Upload className="w-3.5 h-3.5" />
-                Upload Logo
-              </button>
-            </div>
+            )}
           </div>
         </div>
       </motion.div>
@@ -409,117 +524,81 @@ export default function SupplierProfilePage() {
         className="bg-white rounded-xl border border-gray-100 p-6"
       >
         <h3 className="font-semibold text-[#1B2A4A] text-base flex items-center gap-2 mb-5">
-          <FileText className="w-4.5 h-4.5 text-[#8CB89C]" />
+          <FileText className="w-4.5 h-4.5 text-[#5DB347]" />
           Company Details
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {/* Company Name */}
-          <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1.5">Company Name</label>
-            <div className="relative">
-              <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input
-                type="text"
-                value={companyName}
-                onChange={(e) => setCompanyName(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition-colors bg-gray-50"
-              />
-            </div>
-          </div>
-
-          {/* Contact Person */}
-          <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1.5">
-              Contact Person
-            </label>
-            <div className="relative">
-              <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input
-                type="text"
-                value={contactPerson}
-                onChange={(e) => setContactPerson(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition-colors bg-gray-50"
-              />
-            </div>
-          </div>
-
-          {/* Email */}
-          <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1.5">Email Address</label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition-colors bg-gray-50"
-              />
-            </div>
-          </div>
-
-          {/* Phone */}
-          <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1.5">Phone Number</label>
-            <div className="relative">
-              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition-colors bg-gray-50"
-              />
-            </div>
-          </div>
-
-          {/* Website */}
+          <DisplayField
+            label="Company Name"
+            value={companyName}
+            icon={Building2}
+            isEditing={editing}
+            onChange={setCompanyName}
+          />
+          <DisplayField
+            label="Contact Person"
+            value={contactPerson}
+            icon={User}
+            isEditing={editing}
+            onChange={setContactPerson}
+          />
+          <DisplayField
+            label="Email Address"
+            value={email}
+            icon={Mail}
+            isEditing={editing}
+            onChange={setEmail}
+            type="email"
+          />
+          <DisplayField
+            label="Phone Number"
+            value={phone}
+            icon={Phone}
+            isEditing={editing}
+            onChange={setPhone}
+            type="tel"
+          />
           <div className="md:col-span-2">
-            <label className="block text-xs font-medium text-gray-500 mb-1.5">Website</label>
-            <div className="relative">
-              <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input
-                type="url"
-                value={website}
-                onChange={(e) => setWebsite(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition-colors bg-gray-50"
-              />
-            </div>
+            <DisplayField
+              label="Website"
+              value={website}
+              icon={Globe}
+              isEditing={editing}
+              onChange={setWebsite}
+              type="url"
+            />
           </div>
-
-          {/* Description */}
+          <div className="md:col-span-2">
+            <DisplayField
+              label="Address"
+              value={address}
+              icon={MapPin}
+              isEditing={editing}
+              onChange={setAddress}
+            />
+          </div>
           <div className="md:col-span-2">
             <label className="block text-xs font-medium text-gray-500 mb-1.5">
               Company Description
             </label>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={4}
-              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition-colors bg-gray-50 resize-none"
-            />
-            <p className="text-[10px] text-gray-400 mt-1">{description.length}/500 characters</p>
-          </div>
-        </div>
-        <div className="flex justify-end mt-5">
-          <button
-            onClick={handleSaveCompany}
-            className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm ${
-              companySaved
-                ? 'bg-green-500 text-white'
-                : 'bg-[#8CB89C] hover:bg-[#729E82] text-white'
-            }`}
-          >
-            {companySaved ? (
+            {editing ? (
               <>
-                <CheckCircle2 className="w-4 h-4" />
-                Saved!
+                <textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  rows={4}
+                  className="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347] transition-colors bg-gray-50 resize-none"
+                />
+                <p className="text-[10px] text-gray-400 mt-1">
+                  {description.length}/500 characters
+                </p>
               </>
             ) : (
-              <>
-                <Save className="w-4 h-4" />
-                Save Changes
-              </>
+              <div className="w-full px-4 py-2.5 rounded-lg border border-gray-100 text-sm bg-gray-50/70 text-[#1B2A4A] whitespace-pre-wrap">
+                {description || <span className="text-gray-400 italic">Not set</span>}
+              </div>
             )}
-          </button>
+          </div>
         </div>
       </motion.div>
 
@@ -531,7 +610,7 @@ export default function SupplierProfilePage() {
         className="bg-white rounded-xl border border-gray-100 p-6"
       >
         <h3 className="font-semibold text-[#1B2A4A] text-base flex items-center gap-2 mb-5">
-          <Briefcase className="w-4.5 h-4.5 text-[#8CB89C]" />
+          <Briefcase className="w-4.5 h-4.5 text-[#5DB347]" />
           Business Information
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -540,100 +619,99 @@ export default function SupplierProfilePage() {
             <label className="block text-xs font-medium text-gray-500 mb-1.5">Country</label>
             <div className="relative">
               <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <select
-                value={country}
-                onChange={(e) => setCountry(e.target.value as typeof country)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition-colors bg-gray-50 appearance-none"
-              >
-                <option value="Botswana">Botswana</option>
-                <option value="Kenya">Kenya</option>
-                <option value="Mozambique">Mozambique</option>
-                <option value="Nigeria">Nigeria</option>
-                <option value="Sierra Leone">Sierra Leone</option>
-                <option value="South Africa">South Africa</option>
-                <option value="Tanzania">Tanzania</option>
-                <option value="Uganda">Uganda</option>
-                <option value="Zambia">Zambia</option>
-                <option value="Zimbabwe">Zimbabwe</option>
-              </select>
+              {editing ? (
+                <select
+                  value={country}
+                  onChange={(e) => setCountry(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347] transition-colors bg-gray-50 appearance-none"
+                >
+                  <option value="">Select country...</option>
+                  {['Botswana', 'Kenya', 'Mozambique', 'Nigeria', 'Sierra Leone', 'South Africa', 'Tanzania', 'Uganda', 'Zambia', 'Zimbabwe'].map(
+                    (c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    )
+                  )}
+                </select>
+              ) : (
+                <div className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-100 text-sm bg-gray-50/70 text-[#1B2A4A]">
+                  {country || <span className="text-gray-400 italic">Not set</span>}
+                </div>
+              )}
             </div>
           </div>
 
           {/* Region */}
-          <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1.5">Region</label>
-            <div className="relative">
-              <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input
-                type="text"
-                value={region}
-                onChange={(e) => setRegion(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition-colors bg-gray-50"
-              />
-            </div>
-          </div>
+          <DisplayField
+            label="Region"
+            value={region}
+            icon={MapPin}
+            isEditing={editing}
+            onChange={setRegion}
+          />
 
           {/* Category */}
           <div>
             <label className="block text-xs font-medium text-gray-500 mb-1.5">Category</label>
             <div className="relative">
               <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value as typeof category)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition-colors bg-gray-50 appearance-none"
-              >
-                {categoryOptions.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
+              {editing ? (
+                <select
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347] transition-colors bg-gray-50 appearance-none"
+                >
+                  {categoryOptions.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <div className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-100 text-sm bg-gray-50/70 text-[#1B2A4A]">
+                  {categoryLabels[category] || category || (
+                    <span className="text-gray-400 italic">Not set</span>
+                  )}
+                </div>
+              )}
             </div>
           </div>
-
-          {/* Registration Number */}
-          <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1.5">
-              Business Registration Number
-            </label>
-            <div className="relative">
-              <FileText className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input
-                type="text"
-                value={regNumber}
-                onChange={(e) => setRegNumber(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition-colors bg-gray-50"
-              />
-            </div>
-          </div>
-        </div>
-        <div className="flex justify-end mt-5">
-          <button
-            onClick={handleSaveBusiness}
-            className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm ${
-              businessSaved
-                ? 'bg-green-500 text-white'
-                : 'bg-[#8CB89C] hover:bg-[#729E82] text-white'
-            }`}
-          >
-            {businessSaved ? (
-              <>
-                <CheckCircle2 className="w-4 h-4" />
-                Saved!
-              </>
-            ) : (
-              <>
-                <Save className="w-4 h-4" />
-                Save Changes
-              </>
-            )}
-          </button>
         </div>
       </motion.div>
 
       {/* =====================================================================
-          5. BANKING DETAILS
+          5. SAVE BUTTON (editing mode only)
+      ====================================================================== */}
+      {editing && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex gap-3"
+        >
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="flex items-center gap-2 bg-[#5DB347] hover:bg-[#449933] text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition-colors shadow-sm disabled:opacity-60"
+          >
+            {saving ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Save className="w-4 h-4" />
+            )}
+            {saving ? 'Saving...' : 'Save All Changes'}
+          </button>
+          <button
+            onClick={handleCancel}
+            className="px-6 py-2.5 rounded-xl font-semibold text-sm border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
+          >
+            Cancel
+          </button>
+        </motion.div>
+      )}
+
+      {/* =====================================================================
+          6. BANKING DETAILS (display only)
       ====================================================================== */}
       <motion.div
         variants={cardVariants}
@@ -641,10 +719,10 @@ export default function SupplierProfilePage() {
       >
         <div className="flex items-center justify-between mb-5">
           <h3 className="font-semibold text-[#1B2A4A] text-base flex items-center gap-2">
-            <CreditCard className="w-4.5 h-4.5 text-[#8CB89C]" />
+            <CreditCard className="w-4.5 h-4.5 text-[#5DB347]" />
             Banking Details
           </h3>
-          <button className="inline-flex items-center gap-1.5 bg-[#8CB89C]/10 text-[#8CB89C] hover:bg-[#8CB89C]/20 px-4 py-2 rounded-lg text-xs font-medium transition-colors">
+          <button className="inline-flex items-center gap-1.5 bg-[#5DB347]/10 text-[#5DB347] hover:bg-[#5DB347]/20 px-4 py-2 rounded-lg text-xs font-medium transition-colors">
             <Edit3 className="w-3.5 h-3.5" />
             Edit Banking
           </button>
@@ -682,7 +760,7 @@ export default function SupplierProfilePage() {
       </motion.div>
 
       {/* =====================================================================
-          6. CERTIFICATIONS
+          7. CERTIFICATIONS
       ====================================================================== */}
       <motion.div
         variants={cardVariants}
@@ -690,36 +768,38 @@ export default function SupplierProfilePage() {
       >
         <div className="flex items-center justify-between mb-5">
           <h3 className="font-semibold text-[#1B2A4A] text-base flex items-center gap-2">
-            <Award className="w-4.5 h-4.5 text-[#8CB89C]" />
+            <Award className="w-4.5 h-4.5 text-[#5DB347]" />
             Certifications
           </h3>
-          <button
-            onClick={() => setShowAddCert(!showAddCert)}
-            className="inline-flex items-center gap-1.5 bg-[#8CB89C]/10 text-[#8CB89C] hover:bg-[#8CB89C]/20 px-4 py-2 rounded-lg text-xs font-medium transition-colors"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            Add Certification
-          </button>
+          {editing && (
+            <button
+              onClick={() => setShowAddCert(!showAddCert)}
+              className="inline-flex items-center gap-1.5 bg-[#5DB347]/10 text-[#5DB347] hover:bg-[#5DB347]/20 px-4 py-2 rounded-lg text-xs font-medium transition-colors"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              Add Certification
+            </button>
+          )}
         </div>
 
-        {/* Certification badges */}
         <div className="flex flex-wrap gap-2 mb-4">
           {certifications.map((cert) => (
             <motion.div
               key={cert}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className="inline-flex items-center gap-2 bg-[#8CB89C]/10 text-[#8CB89C] text-sm font-medium px-4 py-2 rounded-full"
+              className="inline-flex items-center gap-2 bg-[#5DB347]/10 text-[#5DB347] text-sm font-medium px-4 py-2 rounded-full"
             >
               <CheckCircle2 className="w-3.5 h-3.5" />
               {cert}
-              <button
-                onClick={() => handleRemoveCertification(cert)}
-                className="hover:bg-[#8CB89C]/20 rounded-full p-0.5 transition-colors"
-              >
-                <X className="w-3 h-3" />
-              </button>
+              {editing && (
+                <button
+                  onClick={() => handleRemoveCertification(cert)}
+                  className="hover:bg-[#5DB347]/20 rounded-full p-0.5 transition-colors"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              )}
             </motion.div>
           ))}
           {certifications.length === 0 && (
@@ -727,8 +807,7 @@ export default function SupplierProfilePage() {
           )}
         </div>
 
-        {/* Add certification input */}
-        {showAddCert && (
+        {showAddCert && editing && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
@@ -740,11 +819,11 @@ export default function SupplierProfilePage() {
               onChange={(e) => setNewCert(e.target.value)}
               placeholder="Enter certification name..."
               onKeyDown={(e) => e.key === 'Enter' && handleAddCertification()}
-              className="flex-1 px-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition-colors bg-gray-50"
+              className="flex-1 px-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347] transition-colors bg-gray-50"
             />
             <button
               onClick={handleAddCertification}
-              className="bg-[#8CB89C] hover:bg-[#729E82] text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors"
+              className="bg-[#5DB347] hover:bg-[#449933] text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors"
             >
               Add
             </button>
@@ -762,7 +841,7 @@ export default function SupplierProfilePage() {
       </motion.div>
 
       {/* =====================================================================
-          7. PUBLIC PROFILE PREVIEW
+          8. PUBLIC PROFILE PREVIEW
       ====================================================================== */}
       <motion.div
         variants={cardVariants}
@@ -770,66 +849,71 @@ export default function SupplierProfilePage() {
       >
         <div className="flex items-center justify-between mb-5">
           <h3 className="font-semibold text-[#1B2A4A] text-base flex items-center gap-2">
-            <Eye className="w-4.5 h-4.5 text-[#8CB89C]" />
+            <Eye className="w-4.5 h-4.5 text-[#5DB347]" />
             Public Profile Preview
           </h3>
           <span className="text-xs text-gray-400">How your profile appears to buyers</span>
         </div>
 
-        {/* Preview card */}
         <div className="border border-gray-200 rounded-xl p-5 bg-gradient-to-br from-gray-50 to-white max-w-md">
           <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-xl bg-[#8CB89C] flex items-center justify-center text-white text-lg font-bold flex-shrink-0">
-              ZA
+            <div className="w-14 h-14 rounded-xl bg-[#5DB347] flex items-center justify-center text-white text-lg font-bold flex-shrink-0">
+              {companyInitials}
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
-                <h4 className="text-sm font-bold text-[#1B2A4A] truncate">{companyName}</h4>
-                {currentSupplier.verified && (
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#8CB89C] flex-shrink-0" />
+                <h4 className="text-sm font-bold text-[#1B2A4A] truncate">{companyName || 'Company'}</h4>
+                {verified && (
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#5DB347] flex-shrink-0" />
                 )}
               </div>
-              <div className="flex items-center gap-1 mb-1.5">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star
-                    key={i}
-                    className={`w-3 h-3 ${
-                      i < Math.floor(currentSupplier.rating)
-                        ? 'text-[#D4A843] fill-[#D4A843]'
-                        : 'text-gray-200'
-                    }`}
-                  />
-                ))}
-                <span className="text-[10px] text-gray-400 ml-1">
-                  {currentSupplier.rating} ({currentSupplier.reviewCount})
-                </span>
-              </div>
+              {rating > 0 && (
+                <div className="flex items-center gap-1 mb-1.5">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star
+                      key={i}
+                      className={`w-3 h-3 ${
+                        i < Math.floor(rating)
+                          ? 'text-[#D4A843] fill-[#D4A843]'
+                          : 'text-gray-200'
+                      }`}
+                    />
+                  ))}
+                  <span className="text-[10px] text-gray-400 ml-1">
+                    {rating} ({reviewCount})
+                  </span>
+                </div>
+              )}
               <div className="flex flex-wrap items-center gap-2 text-[10px] text-gray-400">
                 <span className="flex items-center gap-0.5">
                   <MapPin className="w-2.5 h-2.5" />
-                  {region}, {country}
+                  {[region, country].filter(Boolean).join(', ') || 'Location not set'}
                 </span>
                 <span className="flex items-center gap-0.5">
                   <Briefcase className="w-2.5 h-2.5" />
-                  {categoryLabels[category] || category}
+                  {categoryLabels[category] || category || 'Category not set'}
                 </span>
               </div>
-              <p className="text-xs text-gray-500 mt-2 line-clamp-2">{description}</p>
-              <div className="flex flex-wrap gap-1 mt-2">
-                {certifications.slice(0, 3).map((cert) => (
-                  <span
-                    key={cert}
-                    className="text-[9px] bg-[#8CB89C]/10 text-[#8CB89C] font-medium px-1.5 py-0.5 rounded-full"
-                  >
-                    {cert}
-                  </span>
-                ))}
-                {certifications.length > 3 && (
-                  <span className="text-[9px] text-gray-400">
-                    +{certifications.length - 3} more
-                  </span>
-                )}
-              </div>
+              {description && (
+                <p className="text-xs text-gray-500 mt-2 line-clamp-2">{description}</p>
+              )}
+              {certifications.length > 0 && (
+                <div className="flex flex-wrap gap-1 mt-2">
+                  {certifications.slice(0, 3).map((cert) => (
+                    <span
+                      key={cert}
+                      className="text-[9px] bg-[#5DB347]/10 text-[#5DB347] font-medium px-1.5 py-0.5 rounded-full"
+                    >
+                      {cert}
+                    </span>
+                  ))}
+                  {certifications.length > 3 && (
+                    <span className="text-[9px] text-gray-400">
+                      +{certifications.length - 3} more
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>

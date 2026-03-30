@@ -646,6 +646,17 @@ export default function ExportHubPage() {
   const [liveDocs, setLiveDocs] = useState<ExportDocument[]>(exportDocuments);
   const [dataLoading, setDataLoading] = useState(true);
 
+  // ── Create Export Document state ──
+  const [showCreateDoc, setShowCreateDoc] = useState(false);
+  const [createDocLoading, setCreateDocLoading] = useState(false);
+  const [createDocForm, setCreateDocForm] = useState({
+    document_type: 'phytosanitary' as DocumentType,
+    product: '',
+    destination_country: '',
+    quantity: '',
+    notes: '',
+  });
+
   useEffect(() => {
     const supabase = createClient();
     const load = async () => {
@@ -673,6 +684,57 @@ export default function ExportHubPage() {
     };
     load();
   }, [user]);
+
+  // ── Create Export Document handler ──
+  const handleCreateDocument = async () => {
+    if (!createDocForm.product || !createDocForm.destination_country || !createDocForm.quantity) return;
+    setCreateDocLoading(true);
+    try {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from('export_documents')
+        .insert({
+          member_id: user?.id || null,
+          document_type: createDocForm.document_type,
+          product: createDocForm.product,
+          destination: createDocForm.destination_country,
+          quantity: createDocForm.quantity,
+          status: 'draft',
+          notes: createDocForm.notes,
+        })
+        .select()
+        .single();
+
+      if (!error && data) {
+        // Add to live docs list
+        const newDoc: ExportDocument = {
+          id: data.id,
+          shipmentId: user?.id || '',
+          type: createDocForm.document_type,
+          title: `${createDocForm.document_type.replace(/-/g, ' ')} - ${createDocForm.product}`,
+          status: 'not-started',
+          issuedBy: '',
+          issuedDate: new Date().toISOString().split('T')[0],
+          expiryDate: null,
+          reference: data.id,
+          notes: createDocForm.notes,
+        };
+        setLiveDocs((prev) => [newDoc, ...prev]);
+      }
+      // Reset form
+      setCreateDocForm({
+        document_type: 'phytosanitary',
+        product: '',
+        destination_country: '',
+        quantity: '',
+        notes: '',
+      });
+      setShowCreateDoc(false);
+    } catch {
+      // Silent fail — keep form open
+    }
+    setCreateDocLoading(false);
+  };
 
   // Computed data
   const activeShipments = useMemo(
@@ -788,6 +850,13 @@ export default function ExportHubPage() {
                 <CheckCircle2 className="w-4 h-4" />
                 Compliance
               </Link>
+              <button
+                onClick={() => setShowCreateDoc(true)}
+                className="flex items-center gap-1.5 text-sm font-semibold bg-[#5DB347] hover:bg-[#449933] transition-colors px-4 py-2 rounded-xl text-white"
+              >
+                <Plus className="w-4 h-4" />
+                Create Export Document
+              </button>
             </div>
           </motion.div>
         </div>
@@ -995,6 +1064,148 @@ export default function ExportHubPage() {
           )}
         </AnimatePresence>
       </div>
+
+      {/* ── Create Export Document Modal ── */}
+      <AnimatePresence>
+        {showCreateDoc && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            onClick={() => setShowCreateDoc(false)}
+          >
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+            <motion.div
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.95 }}
+              className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="bg-gradient-to-r from-[#1B2A4A] to-[#1B2A4A]/90 text-white px-6 py-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-white/10 rounded-xl">
+                    <FileText className="w-5 h-5" />
+                  </div>
+                  <h2 className="text-lg font-bold">Create Export Document</h2>
+                </div>
+                <button onClick={() => setShowCreateDoc(false)} className="text-white/60 hover:text-white transition-colors">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Form */}
+              <div className="p-6 space-y-4">
+                <div>
+                  <label className="block text-xs font-semibold text-[#1B2A4A] uppercase tracking-wide mb-1.5">
+                    Document Type
+                  </label>
+                  <select
+                    value={createDocForm.document_type}
+                    onChange={(e) => setCreateDocForm((f) => ({ ...f, document_type: e.target.value as DocumentType }))}
+                    className="w-full text-sm border border-gray-200 rounded-xl px-3 py-2.5 text-[#1B2A4A] focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347] bg-white"
+                  >
+                    <option value="phytosanitary">Phytosanitary Certificate</option>
+                    <option value="certificate-of-origin">Certificate of Origin</option>
+                    <option value="bill-of-lading">Bill of Lading</option>
+                    <option value="packing-list">Packing List</option>
+                    <option value="commercial-invoice">Commercial Invoice</option>
+                    <option value="fumigation-cert">Fumigation Certificate</option>
+                    <option value="quality-cert">Quality Certificate</option>
+                    <option value="customs-declaration">Customs Declaration</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-[#1B2A4A] uppercase tracking-wide mb-1.5">
+                    Product
+                  </label>
+                  <input
+                    type="text"
+                    value={createDocForm.product}
+                    onChange={(e) => setCreateDocForm((f) => ({ ...f, product: e.target.value }))}
+                    placeholder="e.g. Flue-Cured Virginia Tobacco"
+                    className="w-full text-sm border border-gray-200 rounded-xl px-3 py-2.5 text-[#1B2A4A] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-[#1B2A4A] uppercase tracking-wide mb-1.5">
+                    Destination Country
+                  </label>
+                  <input
+                    type="text"
+                    value={createDocForm.destination_country}
+                    onChange={(e) => setCreateDocForm((f) => ({ ...f, destination_country: e.target.value }))}
+                    placeholder="e.g. Netherlands"
+                    className="w-full text-sm border border-gray-200 rounded-xl px-3 py-2.5 text-[#1B2A4A] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-[#1B2A4A] uppercase tracking-wide mb-1.5">
+                    Quantity
+                  </label>
+                  <input
+                    type="text"
+                    value={createDocForm.quantity}
+                    onChange={(e) => setCreateDocForm((f) => ({ ...f, quantity: e.target.value }))}
+                    placeholder="e.g. 36,000 kg"
+                    className="w-full text-sm border border-gray-200 rounded-xl px-3 py-2.5 text-[#1B2A4A] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-[#1B2A4A] uppercase tracking-wide mb-1.5">
+                    Notes (optional)
+                  </label>
+                  <textarea
+                    value={createDocForm.notes}
+                    onChange={(e) => setCreateDocForm((f) => ({ ...f, notes: e.target.value }))}
+                    placeholder="Additional information..."
+                    rows={3}
+                    className="w-full text-sm border border-gray-200 rounded-xl px-3 py-2.5 text-[#1B2A4A] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347] resize-none"
+                  />
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-end gap-3">
+                <button
+                  onClick={() => setShowCreateDoc(false)}
+                  className="text-sm font-medium text-gray-500 hover:text-[#1B2A4A] px-4 py-2 rounded-xl transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleCreateDocument}
+                  disabled={createDocLoading || !createDocForm.product || !createDocForm.destination_country || !createDocForm.quantity}
+                  className="text-sm font-semibold text-white px-6 py-2.5 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{ background: '#5DB347' }}
+                  onMouseEnter={(e) => { if (!createDocLoading) e.currentTarget.style.background = '#449933'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = '#5DB347'; }}
+                >
+                  {createDocLoading ? (
+                    <span className="flex items-center gap-2">
+                      <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                      </svg>
+                      Creating...
+                    </span>
+                  ) : (
+                    'Create Document'
+                  )}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
