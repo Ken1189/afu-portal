@@ -29,7 +29,7 @@ import {
   ArrowUpDown,
   X,
 } from 'lucide-react';
-import { useLivestock, useCreateLivestock } from '@/lib/supabase/use-livestock';
+import { useLivestock, useCreateLivestock, useUpdateLivestock, type LivestockRow } from '@/lib/supabase/use-livestock';
 import { useAuth } from '@/lib/supabase/auth-context';
 
 // ---------------------------------------------------------------------------
@@ -333,7 +333,7 @@ function daysUntil(dateStr: string): number {
 
 // ─── Component: AnimalCard ───────────────────────────────────────────────────
 
-function AnimalCard({ animal }: { animal: Animal }) {
+function AnimalCard({ animal, onEdit }: { animal: Animal; onEdit?: () => void }) {
   const [expanded, setExpanded] = useState(false);
 
   const animalVetRecords = useMemo(
@@ -534,18 +534,27 @@ function AnimalCard({ animal }: { animal: Animal }) {
               )}
 
               {/* Action buttons */}
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-4 gap-2">
                 <button className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl bg-[#8CB89C]/10 text-[#8CB89C] active:bg-[#8CB89C]/20 transition-colors min-h-[64px]">
                   <Heart className="w-5 h-5" />
-                  <span className="text-[11px] font-semibold">Record Health</span>
+                  <span className="text-[11px] font-semibold">Health</span>
                 </button>
+                {onEdit && (
+                  <button
+                    onClick={onEdit}
+                    className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl bg-[#1B2A4A]/10 text-[#1B2A4A] active:bg-[#1B2A4A]/20 transition-colors min-h-[64px]"
+                  >
+                    <FileText className="w-5 h-5" />
+                    <span className="text-[11px] font-semibold">Edit</span>
+                  </button>
+                )}
                 <button className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl bg-amber-50 text-amber-600 active:bg-amber-100 transition-colors min-h-[64px]">
                   <Scale className="w-5 h-5" />
-                  <span className="text-[11px] font-semibold">Add Weight</span>
+                  <span className="text-[11px] font-semibold">Weight</span>
                 </button>
                 <button className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl bg-[#D4A843]/10 text-[#D4A843] active:bg-[#D4A843]/20 transition-colors min-h-[64px]">
                   <DollarSign className="w-5 h-5" />
-                  <span className="text-[11px] font-semibold">Mark for Sale</span>
+                  <span className="text-[11px] font-semibold">Sell</span>
                 </button>
               </div>
             </div>
@@ -654,35 +663,73 @@ export default function LivestockPage() {
   const { createLivestock } = useCreateLivestock();
   const { user } = useAuth();
 
-  // --- Add Animal form state ---
+  const { updateLivestock } = useUpdateLivestock();
+
+  // --- Add/Edit Animal form state ---
   const [showAddForm, setShowAddForm] = useState(false);
   const [addFormSubmitting, setAddFormSubmitting] = useState(false);
+  const [editingLivestockId, setEditingLivestockId] = useState<string | null>(null);
   const [addFormData, setAddFormData] = useState({
     type: 'cattle' as string,
     breed: '',
     count: 1,
     health_status: 'healthy',
     location: '',
+    tag_number: '',
+    notes: '',
   });
+
+  const openEditForm = (row: LivestockRow) => {
+    setEditingLivestockId(row.id);
+    setAddFormData({
+      type: row.type || 'cattle',
+      breed: row.breed || '',
+      count: row.count || 1,
+      health_status: row.health_status || 'healthy',
+      location: row.location || '',
+      tag_number: row.tag_id || '',
+      notes: row.notes || '',
+    });
+    setShowAddForm(true);
+  };
+
+  const handleCloseAddForm = () => {
+    setShowAddForm(false);
+    setEditingLivestockId(null);
+    setAddFormData({ type: 'cattle', breed: '', count: 1, health_status: 'healthy', location: '', tag_number: '', notes: '' });
+  };
 
   const handleAddAnimal = async () => {
     if (!user) return;
     setAddFormSubmitting(true);
     try {
-      await createLivestock({
-        member_id: user.id,
-        type: addFormData.type,
-        breed: addFormData.breed || null,
-        count: addFormData.count,
-        tag_id: null,
-        health_status: addFormData.health_status,
-        location: addFormData.location || null,
-        value_estimate: null,
-        date_acquired: new Date().toISOString().split('T')[0],
-        notes: null,
-      });
-      setShowAddForm(false);
-      setAddFormData({ type: 'cattle', breed: '', count: 1, health_status: 'healthy', location: '' });
+      if (editingLivestockId) {
+        // Update existing
+        await updateLivestock(editingLivestockId, {
+          type: addFormData.type,
+          breed: addFormData.breed || null,
+          count: addFormData.count,
+          tag_id: addFormData.tag_number || null,
+          health_status: addFormData.health_status,
+          location: addFormData.location || null,
+          notes: addFormData.notes || null,
+        });
+      } else {
+        // Create new
+        await createLivestock({
+          member_id: user.id,
+          type: addFormData.type,
+          breed: addFormData.breed || null,
+          count: addFormData.count,
+          tag_id: addFormData.tag_number || null,
+          health_status: addFormData.health_status,
+          location: addFormData.location || null,
+          value_estimate: null,
+          date_acquired: new Date().toISOString().split('T')[0],
+          notes: addFormData.notes || null,
+        });
+      }
+      handleCloseAddForm();
       fetchLivestock();
     } catch {
       // silent fail
@@ -1141,7 +1188,17 @@ export default function LivestockPage() {
                   className="grid grid-cols-1 lg:grid-cols-2 gap-4"
                 >
                   {filteredAnimals.map((animal) => (
-                    <AnimalCard key={animal.id} animal={animal} />
+                    <AnimalCard
+                      key={animal.id}
+                      animal={animal}
+                      onEdit={liveLivestock.length > 0
+                        ? () => {
+                            const row = liveLivestock.find((l) => l.id === animal.id);
+                            if (row) openEditForm(row);
+                          }
+                        : undefined
+                      }
+                    />
                   ))}
                 </motion.div>
               ) : (
@@ -1329,20 +1386,22 @@ export default function LivestockPage() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
-            onClick={() => setShowAddForm(false)}
+            onClick={handleCloseAddForm}
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ type: 'spring', stiffness: 300, damping: 24 }}
-              className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4"
+              className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4 max-h-[85vh] overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-bold text-[#1B2A4A]">Add Animal</h2>
+                <h2 className="text-lg font-bold text-[#1B2A4A]">
+                  {editingLivestockId ? 'Edit Animal' : 'Add Animal'}
+                </h2>
                 <button
-                  onClick={() => setShowAddForm(false)}
+                  onClick={handleCloseAddForm}
                   className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-colors"
                 >
                   <X size={16} />
@@ -1377,16 +1436,28 @@ export default function LivestockPage() {
                 />
               </div>
 
-              {/* Count */}
-              <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">Count</label>
-                <input
-                  type="number"
-                  min={1}
-                  value={addFormData.count}
-                  onChange={(e) => setAddFormData((p) => ({ ...p, count: parseInt(e.target.value) || 1 }))}
-                  className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C]"
-                />
+              {/* Count + Tag Number row */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Count</label>
+                  <input
+                    type="number"
+                    min={1}
+                    value={addFormData.count}
+                    onChange={(e) => setAddFormData((p) => ({ ...p, count: parseInt(e.target.value) || 1 }))}
+                    className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Tag Number</label>
+                  <input
+                    type="text"
+                    value={addFormData.tag_number}
+                    onChange={(e) => setAddFormData((p) => ({ ...p, tag_number: e.target.value }))}
+                    placeholder="e.g. BW-C-0041"
+                    className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C]"
+                  />
+                </div>
               </div>
 
               {/* Health Status */}
@@ -1400,6 +1471,7 @@ export default function LivestockPage() {
                   <option value="healthy">Healthy</option>
                   <option value="sick">Sick</option>
                   <option value="pregnant">Pregnant</option>
+                  <option value="lactating">Lactating</option>
                   <option value="quarantine">Quarantine</option>
                 </select>
               </div>
@@ -1416,13 +1488,28 @@ export default function LivestockPage() {
                 />
               </div>
 
+              {/* Notes */}
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Notes</label>
+                <textarea
+                  value={addFormData.notes}
+                  onChange={(e) => setAddFormData((p) => ({ ...p, notes: e.target.value }))}
+                  placeholder="Any additional details about this animal..."
+                  rows={3}
+                  className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] resize-none"
+                />
+              </div>
+
               {/* Submit */}
               <button
                 onClick={handleAddAnimal}
                 disabled={addFormSubmitting}
                 className="w-full bg-[#8CB89C] hover:bg-[#729E82] disabled:opacity-60 text-white py-3 rounded-xl text-sm font-bold transition-colors flex items-center justify-center gap-2 min-h-[44px]"
               >
-                {addFormSubmitting ? 'Adding...' : 'Add Animal'}
+                {addFormSubmitting
+                  ? (editingLivestockId ? 'Updating...' : 'Adding...')
+                  : (editingLivestockId ? 'Save Changes' : 'Add Animal')
+                }
               </button>
             </motion.div>
           </motion.div>

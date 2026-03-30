@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import Link from 'next/link';
 import {
   Briefcase,
   TrendingUp,
@@ -10,6 +11,7 @@ import {
   ArrowUpRight,
   Wallet,
   Activity,
+  Sparkles,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/lib/supabase/auth-context';
@@ -254,6 +256,35 @@ export default function PortfolioPage() {
           Comprehensive overview of your investment portfolio with AFU.
         </p>
       </motion.div>
+
+      {/* ============================================================ */}
+      {/*  EMPTY STATE CTA (when using demo data)                       */}
+      {/* ============================================================ */}
+      {!hasLiveData && !loading && (
+        <motion.div
+          variants={item}
+          className="bg-gradient-to-r from-[#1B2A4A] to-[#2a3f6e] rounded-2xl p-6 text-white"
+        >
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-2">
+                <Sparkles className="w-5 h-5 text-[#5DB347]" />
+                <h3 className="font-semibold">Build Your Portfolio</h3>
+              </div>
+              <p className="text-sm text-gray-300">
+                The data below is sample portfolio data. Express interest in opportunities to build your real portfolio with AFU.
+              </p>
+            </div>
+            <Link
+              href="/investor/opportunities"
+              className="inline-flex items-center gap-2 bg-[#5DB347] hover:bg-[#4ea03c] text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors whitespace-nowrap"
+            >
+              <ArrowUpRight className="w-4 h-4" />
+              View Opportunities
+            </Link>
+          </div>
+        </motion.div>
+      )}
 
       {/* ============================================================ */}
       {/*  PORTFOLIO SUMMARY HEADER                                     */}

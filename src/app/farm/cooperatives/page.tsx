@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -30,8 +30,13 @@ import {
   Sprout,
   BarChart3,
   Globe,
+  CheckCircle,
+  Loader2,
+  UserPlus,
 } from 'lucide-react';
-import { useCooperatives, type CooperativeRow } from '@/lib/supabase/use-cooperatives';
+import { useCooperatives, useJoinCooperative, type CooperativeRow } from '@/lib/supabase/use-cooperatives';
+import { useAuth } from '@/lib/supabase/auth-context';
+import { createClient } from '@/lib/supabase/client';
 
 // ---------------------------------------------------------------------------
 // Types (inlined from @/lib/data/cooperatives)
@@ -386,6 +391,7 @@ const filterTabs = ['All', 'Crop', 'Livestock', 'Mixed', 'Processing', 'Marketin
 // ---------------------------------------------------------------------------
 
 export default function CooperativesPage() {
+  const { user } = useAuth();
   const { cooperatives: liveCoops, loading: coopsLoading } = useCooperatives();
   const cooperatives: Cooperative[] = liveCoops.length > 0 ? liveCoops.map(adaptCooperative) : mockCooperatives;
 
@@ -407,6 +413,53 @@ export default function CooperativesPage() {
   const [activeFilter, setActiveFilter] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
+
+  // ── Join cooperative state ──
+  const { joinCooperative } = useJoinCooperative();
+  const [myMemberships, setMyMemberships] = useState<Set<string>>(new Set());
+  const [joiningCoop, setJoiningCoop] = useState<string | null>(null);
+  const [joinConfirm, setJoinConfirm] = useState<{ id: string; name: string } | null>(null);
+  const [joinSuccess, setJoinSuccess] = useState<string | null>(null);
+  const [memberId, setMemberId] = useState<string | null>(null);
+
+  // Load member ID and existing memberships
+  useEffect(() => {
+    if (!user) return;
+    const loadMemberships = async () => {
+      const supabase = createClient();
+      const { data: member } = await supabase
+        .from('members')
+        .select('id')
+        .eq('profile_id', user.id)
+        .single();
+      if (!member) return;
+      setMemberId(member.id);
+
+      const { data: memberships } = await supabase
+        .from('cooperative_members')
+        .select('cooperative_id')
+        .eq('member_id', member.id);
+      if (memberships) {
+        setMyMemberships(new Set(memberships.map((m: any) => m.cooperative_id)));
+      }
+    };
+    loadMemberships();
+  }, [user]);
+
+  const handleJoinCoop = useCallback(async (coopId: string) => {
+    if (!memberId) return;
+    setJoiningCoop(coopId);
+    try {
+      const { error } = await joinCooperative(coopId, memberId);
+      if (!error) {
+        setMyMemberships(prev => new Set([...prev, coopId]));
+        setJoinSuccess(coopId);
+        setTimeout(() => setJoinSuccess(null), 3000);
+      }
+    } catch { /* ignore */ }
+    setJoiningCoop(null);
+    setJoinConfirm(null);
+  }, [memberId, joinCooperative]);
 
   const filteredCooperatives = useMemo(() => {
     return cooperatives.filter((coop) => {
@@ -1018,21 +1071,56 @@ export default function CooperativesPage() {
                     )}
                   </AnimatePresence>
 
-                  {/* Learn More button */}
-                  <button
-                    onClick={() =>
-                      setExpandedCard(expandedCard === coop.id ? null : coop.id)
-                    }
-                    className="flex items-center justify-center gap-1.5 w-full mt-3 py-2.5 rounded-xl text-xs font-semibold text-[#8CB89C] bg-[#8CB89C]/5 hover:bg-[#8CB89C]/10 active:bg-[#8CB89C]/15 transition-colors min-h-[40px]"
-                  >
-                    {expandedCard === coop.id ? 'Show Less' : 'Learn More'}
-                    <ChevronDown
-                      size={14}
-                      className={`transition-transform duration-200 ${
-                        expandedCard === coop.id ? 'rotate-180' : ''
-                      }`}
-                    />
-                  </button>
+                  {/* Join + Learn More buttons */}
+                  <div className="flex gap-2 mt-3">
+                    {myMemberships.has(coop.id) ? (
+                      <div className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-semibold text-[#5DB347] bg-[#5DB347]/5 border border-[#5DB347]/20 min-h-[40px]">
+                        <CheckCircle size={14} />
+                        Member
+                      </div>
+                    ) : joinSuccess === coop.id ? (
+                      <motion.div
+                        initial={{ scale: 0.95 }}
+                        animate={{ scale: 1 }}
+                        className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-semibold text-[#5DB347] bg-[#5DB347]/10 min-h-[40px]"
+                      >
+                        <CheckCircle size={14} />
+                        Joined!
+                      </motion.div>
+                    ) : (
+                      <button
+                        onClick={() => setJoinConfirm({ id: coop.id, name: coop.name })}
+                        disabled={joiningCoop === coop.id}
+                        className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-semibold text-white bg-[#5DB347] hover:bg-[#449933] active:scale-[0.97] transition-all min-h-[40px] disabled:opacity-60"
+                      >
+                        {joiningCoop === coop.id ? (
+                          <>
+                            <Loader2 size={14} className="animate-spin" />
+                            Joining...
+                          </>
+                        ) : (
+                          <>
+                            <UserPlus size={14} />
+                            Join
+                          </>
+                        )}
+                      </button>
+                    )}
+                    <button
+                      onClick={() =>
+                        setExpandedCard(expandedCard === coop.id ? null : coop.id)
+                      }
+                      className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-[#8CB89C] bg-[#8CB89C]/5 hover:bg-[#8CB89C]/10 active:bg-[#8CB89C]/15 transition-colors min-h-[40px]"
+                    >
+                      {expandedCard === coop.id ? 'Less' : 'More'}
+                      <ChevronDown
+                        size={14}
+                        className={`transition-transform duration-200 ${
+                          expandedCard === coop.id ? 'rotate-180' : ''
+                        }`}
+                      />
+                    </button>
+                  </div>
                 </div>
               </motion.div>
             ))}
@@ -1116,6 +1204,68 @@ export default function CooperativesPage() {
 
       {/* Bottom spacer for mobile nav */}
       <div className="h-4 lg:h-0" />
+
+      {/* ══════════════════════════════════════════════════════════════ */}
+      {/* JOIN CONFIRMATION DIALOG                                      */}
+      {/* ══════════════════════════════════════════════════════════════ */}
+      <AnimatePresence>
+        {joinConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
+            onClick={() => setJoinConfirm(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 rounded-xl bg-[#5DB347]/10 flex items-center justify-center">
+                  <UserPlus size={22} className="text-[#5DB347]" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-[#1B2A4A]">Join Cooperative</h3>
+                  <p className="text-xs text-gray-400">Confirm membership</p>
+                </div>
+              </div>
+
+              <p className="text-sm text-gray-600 leading-relaxed mb-6">
+                Join <span className="font-semibold text-[#1B2A4A]">{joinConfirm.name}</span>?
+                This will add you as a member of this cooperative.
+              </p>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setJoinConfirm(null)}
+                  className="flex-1 py-2.5 rounded-xl text-sm font-medium text-gray-600 border border-gray-200 hover:bg-gray-50 transition-colors min-h-[44px]"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => handleJoinCoop(joinConfirm.id)}
+                  disabled={joiningCoop === joinConfirm.id}
+                  className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white bg-[#5DB347] hover:bg-[#449933] active:scale-[0.97] transition-all min-h-[44px] flex items-center justify-center gap-2 disabled:opacity-60"
+                >
+                  {joiningCoop === joinConfirm.id ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" />
+                      Joining...
+                    </>
+                  ) : (
+                    'Yes, Join'
+                  )}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

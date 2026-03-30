@@ -30,7 +30,7 @@ import {
   Check,
   Loader2,
 } from 'lucide-react';
-import { useFarmPlots, useCreateFarmPlot, useCreateFarmActivity, type FarmPlotRow } from '@/lib/supabase/use-farm-plots';
+import { useFarmPlots, useCreateFarmPlot, useUpdateFarmPlot, useCreateFarmActivity, type FarmPlotRow } from '@/lib/supabase/use-farm-plots';
 import { useFarmActivities } from '@/lib/supabase/use-farm-activities';
 import { useAuth } from '@/lib/supabase/auth-context';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
@@ -687,65 +687,142 @@ function LogActivityModal({
 
 // ─── Component: Add Plot Modal ───────────────────────────────────────────────
 
-function AddPlotModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+const CROP_TYPE_OPTIONS = [
+  'Maize', 'Coffee', 'Cotton', 'Tobacco', 'Tea', 'Wheat', 'Sorghum',
+  'Groundnuts', 'Blueberries', 'Sesame', 'Cassava', 'Rice', 'Beans',
+  'Tomatoes', 'Potatoes', 'Sugarcane', 'Sunflower', 'Soybeans', 'Other',
+];
+
+function AddPlotModal({
+  open,
+  onClose,
+  editPlot,
+}: {
+  open: boolean;
+  onClose: () => void;
+  editPlot?: FarmPlotRow | null;
+}) {
   const { t } = useLanguage();
   const { user } = useAuth();
   const { createPlot } = useCreateFarmPlot();
+  const { updatePlot } = useUpdateFarmPlot();
   const [plotName, setPlotName] = useState('');
   const [crop, setCrop] = useState('');
   const [variety, setVariety] = useState('');
   const [size, setSize] = useState('');
   const [plantingDate, setPlantingDate] = useState('');
+  const [country, setCountry] = useState('');
+  const [region, setRegion] = useState('');
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+
+  // Pre-fill when editing
+  useState(() => {
+    if (editPlot) {
+      setPlotName(editPlot.name || '');
+      setCrop(editPlot.crop || '');
+      setVariety(editPlot.variety || '');
+      setSize(editPlot.size_ha ? String(editPlot.size_ha) : '');
+      setPlantingDate(editPlot.planting_date || '');
+      // location may contain "country / region" format
+      const loc = editPlot.location || '';
+      if (loc.includes('/')) {
+        const parts = loc.split('/').map((s: string) => s.trim());
+        setCountry(parts[0] || '');
+        setRegion(parts[1] || '');
+      } else {
+        setCountry(loc);
+      }
+    }
+  });
+
+  // Reset form when editPlot changes
+  const prevEditRef = useState<string | null>(null);
+  if (open) {
+    const editId = editPlot?.id ?? null;
+    if (editId !== prevEditRef[0]) {
+      prevEditRef[0] = editId;
+      if (editPlot) {
+        setPlotName(editPlot.name || '');
+        setCrop(editPlot.crop || '');
+        setVariety(editPlot.variety || '');
+        setSize(editPlot.size_ha ? String(editPlot.size_ha) : '');
+        setPlantingDate(editPlot.planting_date || '');
+        const loc = editPlot.location || '';
+        if (loc.includes('/')) {
+          const parts = loc.split('/').map((s: string) => s.trim());
+          setCountry(parts[0] || '');
+          setRegion(parts[1] || '');
+        } else {
+          setCountry(loc);
+          setRegion('');
+        }
+      } else {
+        setPlotName(''); setCrop(''); setVariety(''); setSize('');
+        setPlantingDate(''); setCountry(''); setRegion('');
+      }
+      setSaved(false); setSaveError(null);
+    }
+  }
 
   const handleSave = async () => {
     if (!plotName.trim() || !crop.trim() || !user) return;
     setSaving(true);
     setSaveError(null);
-    const { error } = await createPlot({
-      member_id: user.id,
-      name: plotName.trim(),
-      crop: crop.trim(),
-      variety: variety.trim() || null,
-      size_ha: size ? parseFloat(size) : null,
-      planting_date: plantingDate || null,
-      expected_harvest: null,
-      stage: 'planning',
-      soil_ph: null,
-      location: null,
-      notes: null,
-    });
-    setSaving(false);
-    if (error) {
-      setSaveError(error);
-      return;
+
+    const locationStr = [country.trim(), region.trim()].filter(Boolean).join(' / ') || null;
+
+    if (editPlot) {
+      // Update existing plot
+      const { error } = await updatePlot(editPlot.id, {
+        name: plotName.trim(),
+        crop: crop.trim(),
+        variety: variety.trim() || null,
+        size_ha: size ? parseFloat(size) : null,
+        planting_date: plantingDate || null,
+        location: locationStr,
+      });
+      setSaving(false);
+      if (error) { setSaveError(error); return; }
+    } else {
+      // Create new plot
+      const { error } = await createPlot({
+        member_id: user.id,
+        name: plotName.trim(),
+        crop: crop.trim(),
+        variety: variety.trim() || null,
+        size_ha: size ? parseFloat(size) : null,
+        planting_date: plantingDate || null,
+        expected_harvest: null,
+        stage: 'planning',
+        soil_ph: null,
+        location: locationStr,
+        notes: null,
+      });
+      setSaving(false);
+      if (error) { setSaveError(error); return; }
     }
+
     setSaved(true);
     setTimeout(() => {
       setSaved(false);
-      setPlotName('');
-      setCrop('');
-      setVariety('');
-      setSize('');
-      setPlantingDate('');
+      setPlotName(''); setCrop(''); setVariety(''); setSize('');
+      setPlantingDate(''); setCountry(''); setRegion('');
       setSaveError(null);
       onClose();
     }, 1200);
   };
 
   const handleClose = () => {
-    setPlotName('');
-    setCrop('');
-    setVariety('');
-    setSize('');
-    setPlantingDate('');
+    setPlotName(''); setCrop(''); setVariety(''); setSize('');
+    setPlantingDate(''); setCountry(''); setRegion('');
     setSaved(false);
     onClose();
   };
 
   const isValid = plotName.trim() && crop.trim();
+  const isEditing = !!editPlot;
 
   return (
     <AnimatePresence>
@@ -770,8 +847,12 @@ function AddPlotModal({ open, onClose }: { open: boolean; onClose: () => void })
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-100">
               <div>
-                <h3 className="text-base font-bold text-navy">{t.cropTracker.addPlot}</h3>
-                <p className="text-xs text-gray-500">Register a new planting area</p>
+                <h3 className="text-base font-bold text-navy">
+                  {isEditing ? 'Edit Plot' : t.cropTracker.addPlot}
+                </h3>
+                <p className="text-xs text-gray-500">
+                  {isEditing ? 'Update your crop plot details' : 'Register a new planting area'}
+                </p>
               </div>
               <button
                 onClick={handleClose}
@@ -794,16 +875,31 @@ function AddPlotModal({ open, onClose }: { open: boolean; onClose: () => void })
                 />
               </div>
 
-              {/* Crop */}
+              {/* Crop Type (dropdown) */}
               <div>
                 <label className="text-xs font-semibold text-navy block mb-1">{t.cropTracker.crop} *</label>
-                <input
-                  type="text"
-                  value={crop}
-                  onChange={(e) => setCrop(e.target.value)}
-                  placeholder="e.g. Tomatoes"
-                  className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-navy placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#5DB347]/40 focus:border-[#5DB347]"
-                />
+                <select
+                  value={CROP_TYPE_OPTIONS.includes(crop) ? crop : crop ? '__custom__' : ''}
+                  onChange={(e) => {
+                    if (e.target.value === '__custom__') return;
+                    setCrop(e.target.value);
+                  }}
+                  className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-navy focus:outline-none focus:ring-2 focus:ring-[#5DB347]/40 focus:border-[#5DB347]"
+                >
+                  <option value="">Select crop type...</option>
+                  {CROP_TYPE_OPTIONS.map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+                {/* Allow custom entry if "Other" is selected */}
+                {crop === 'Other' && (
+                  <input
+                    type="text"
+                    placeholder="Enter custom crop name"
+                    className="w-full mt-2 rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-navy placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#5DB347]/40 focus:border-[#5DB347]"
+                    onChange={(e) => setCrop(e.target.value || 'Other')}
+                  />
+                )}
               </div>
 
               {/* Variety */}
@@ -845,6 +941,30 @@ function AddPlotModal({ open, onClose }: { open: boolean; onClose: () => void })
                 </div>
               </div>
 
+              {/* Country and Region row */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-semibold text-navy block mb-1">Country</label>
+                  <input
+                    type="text"
+                    value={country}
+                    onChange={(e) => setCountry(e.target.value)}
+                    placeholder="e.g. Zimbabwe"
+                    className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-navy placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#5DB347]/40 focus:border-[#5DB347]"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-navy block mb-1">Region</label>
+                  <input
+                    type="text"
+                    value={region}
+                    onChange={(e) => setRegion(e.target.value)}
+                    placeholder="e.g. Mashonaland"
+                    className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-navy placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#5DB347]/40 focus:border-[#5DB347]"
+                  />
+                </div>
+              </div>
+
               {/* Error message */}
               {saveError && (
                 <div className="px-3 py-2 rounded-xl bg-red-50 border border-red-200 text-xs text-red-600">
@@ -865,7 +985,12 @@ function AddPlotModal({ open, onClose }: { open: boolean; onClose: () => void })
                 }`}
               >
                 {saving && <Loader2 className="w-4 h-4 animate-spin" />}
-                {saved ? 'Plot Added!' : saving ? 'Saving...' : t.cropTracker.addPlot}
+                {saved
+                  ? (isEditing ? 'Updated!' : 'Plot Added!')
+                  : saving
+                    ? 'Saving...'
+                    : (isEditing ? 'Save Changes' : t.cropTracker.addPlot)
+                }
               </button>
             </div>
           </motion.div>
@@ -877,7 +1002,7 @@ function AddPlotModal({ open, onClose }: { open: boolean; onClose: () => void })
 
 // ─── Component: Plot Card ────────────────────────────────────────────────────
 
-function PlotCard({ plot }: { plot: FarmPlot }) {
+function PlotCard({ plot, onEdit }: { plot: FarmPlot; onEdit?: () => void }) {
   const { t } = useLanguage();
   const stageLabels = t.cropTracker.stages;
   const [expanded, setExpanded] = useState(false);
@@ -1028,7 +1153,7 @@ function PlotCard({ plot }: { plot: FarmPlot }) {
                 <ActivityLog plotId={plot.id} />
 
                 {/* Quick Actions */}
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-4 gap-2">
                   <button
                     onClick={() => setLogModalOpen(true)}
                     className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl bg-[#5DB347]/10 text-[#5DB347] active:bg-[#5DB347]/20 transition-colors min-h-[64px]"
@@ -1036,6 +1161,15 @@ function PlotCard({ plot }: { plot: FarmPlot }) {
                     <ClipboardPlus className="w-5 h-5" />
                     <span className="text-[11px] font-semibold">{t.cropTracker.logActivity}</span>
                   </button>
+                  {onEdit && (
+                    <button
+                      onClick={onEdit}
+                      className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl bg-[#1B2A4A]/10 text-[#1B2A4A] active:bg-[#1B2A4A]/20 transition-colors min-h-[64px]"
+                    >
+                      <MoreHorizontal className="w-5 h-5" />
+                      <span className="text-[11px] font-semibold">Edit</span>
+                    </button>
+                  )}
                   <Link
                     href="/farm/doctor"
                     className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl bg-amber-50 text-amber-600 active:bg-amber-100 transition-colors min-h-[64px]"
@@ -1069,8 +1203,22 @@ function PlotCard({ plot }: { plot: FarmPlot }) {
 
 export default function CropsPage() {
   const [addPlotOpen, setAddPlotOpen] = useState(false);
+  const [editingPlot, setEditingPlot] = useState<FarmPlotRow | null>(null);
   const { plots: livePlots, loading } = useFarmPlots();
   const farmPlots: FarmPlot[] = livePlots.length > 0 ? livePlots.map(adaptFarmPlot) as FarmPlot[] : mockFarmPlots;
+
+  const handleEdit = (plotId: string) => {
+    const dbPlot = livePlots.find((p) => p.id === plotId);
+    if (dbPlot) {
+      setEditingPlot(dbPlot);
+      setAddPlotOpen(true);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setAddPlotOpen(false);
+    setEditingPlot(null);
+  };
 
   if (loading) {
     return (
@@ -1094,13 +1242,17 @@ export default function CropsPage() {
         animate="visible"
       >
         {farmPlots.map((plot) => (
-          <PlotCard key={plot.id} plot={plot} />
+          <PlotCard
+            key={plot.id}
+            plot={plot}
+            onEdit={livePlots.length > 0 ? () => handleEdit(plot.id) : undefined}
+          />
         ))}
       </motion.div>
 
       {/* Floating Action Button */}
       <motion.button
-        onClick={() => setAddPlotOpen(true)}
+        onClick={() => { setEditingPlot(null); setAddPlotOpen(true); }}
         variants={fabVariants}
         initial="rest"
         whileHover="hover"
@@ -1111,8 +1263,8 @@ export default function CropsPage() {
         <Plus className="w-6 h-6" />
       </motion.button>
 
-      {/* Add Plot Modal */}
-      <AddPlotModal open={addPlotOpen} onClose={() => setAddPlotOpen(false)} />
+      {/* Add/Edit Plot Modal */}
+      <AddPlotModal open={addPlotOpen} onClose={handleCloseModal} editPlot={editingPlot} />
     </div>
   );
 }

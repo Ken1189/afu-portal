@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Package,
   Plus,
@@ -18,8 +18,11 @@ import {
   ShoppingCart,
   Tag,
   Filter,
+  X,
+  Trash2,
 } from 'lucide-react';
-// ── Inline supplier-product type & fallback data (replaces @/lib/data/supplierProducts import) ──
+
+// ── Inline supplier-product type & fallback data ──
 
 interface SupplierProduct {
   id: string;
@@ -27,7 +30,7 @@ interface SupplierProduct {
   supplierName: string;
   name: string;
   description: string;
-  category: 'seeds' | 'fertilizer' | 'pesticides' | 'equipment' | 'irrigation' | 'technology' | 'packaging' | 'storage' | 'tools';
+  category: string;
   price: number;
   memberPrice: number;
   currency: string;
@@ -40,6 +43,7 @@ interface SupplierProduct {
   tags: string[];
   featured: boolean;
   minOrder: number;
+  stockQuantity?: number;
 }
 
 const staticProducts: SupplierProduct[] = [
@@ -49,6 +53,7 @@ const staticProducts: SupplierProduct[] = [
   { id: 'SPROD-036', supplierId: 'SUP-001', supplierName: 'Zambezi Agri-Supplies', name: 'Soil pH Test Kit (50 tests)', description: 'Portable soil pH testing kit with colour chart. 50 individual tests per kit. Includes sampling tools and interpretation guide. Results in 60 seconds.', category: 'tools', price: 28, memberPrice: 24.64, currency: 'USD', unit: 'per kit', image: 'https://images.unsplash.com/photo-1585336261022-680e295ce3fe?w=400&h=300&fit=crop', availability: 'in-stock', rating: 4.4, reviewCount: 56, soldCount: 789, tags: ['soil-testing', 'pH', 'portable', 'quick-results'], featured: false, minOrder: 1 },
   { id: 'SPROD-038', supplierId: 'SUP-001', supplierName: 'Zambezi Agri-Supplies', name: 'Pruning Shears (Bypass, Professional)', description: 'Professional bypass pruning shears with SK5 steel blades. Ergonomic grip with safety lock. Essential for orchard management and vineyard work.', category: 'tools', price: 12, memberPrice: 10.56, currency: 'USD', unit: 'per unit', image: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop', availability: 'in-stock', rating: 4.5, reviewCount: 67, soldCount: 1234, tags: ['pruning', 'shears', 'professional', 'orchard'], featured: false, minOrder: 2 },
 ];
+
 import { createClient } from '@/lib/supabase/client';
 import { useProducts, type ProductRow } from '@/lib/supabase/use-products';
 import { useAuth } from '@/lib/supabase/auth-context';
@@ -59,10 +64,7 @@ const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: {
-      staggerChildren: 0.06,
-      delayChildren: 0.1,
-    },
+    transition: { staggerChildren: 0.06, delayChildren: 0.1 },
   },
 };
 
@@ -71,11 +73,7 @@ const cardVariants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: {
-      type: 'spring' as const,
-      stiffness: 260,
-      damping: 24,
-    },
+    transition: { type: 'spring' as const, stiffness: 260, damping: 24 },
   },
 };
 
@@ -84,10 +82,7 @@ const fadeUp = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: {
-      duration: 0.5,
-      ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
-    },
+    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
   },
 };
 
@@ -95,45 +90,26 @@ const fadeUp = {
 
 const staticMyProducts = staticProducts.filter((p) => p.supplierId === 'SUP-001');
 
-// ── All categories from SupplierProduct ─────────────────────────────────────
+// ── All categories ──────────────────────────────────────────────────────────
 
-const allCategories: SupplierProduct['category'][] = [
-  'seeds',
-  'fertilizer',
-  'pesticides',
-  'equipment',
-  'irrigation',
-  'technology',
-  'packaging',
-  'storage',
-  'tools',
+const allCategories = [
+  'seeds', 'fertilizer', 'pesticides', 'equipment', 'irrigation',
+  'technology', 'packaging', 'storage', 'tools',
 ];
 
 const categoryLabels: Record<string, string> = {
-  seeds: 'Seeds',
-  fertilizer: 'Fertilizer',
-  pesticides: 'Pesticides',
-  equipment: 'Equipment',
-  irrigation: 'Irrigation',
-  technology: 'Technology',
-  packaging: 'Packaging',
-  storage: 'Storage',
-  tools: 'Tools',
+  seeds: 'Seeds', fertilizer: 'Fertilizer', pesticides: 'Pesticides',
+  equipment: 'Equipment', irrigation: 'Irrigation', technology: 'Technology',
+  packaging: 'Packaging', storage: 'Storage', tools: 'Tools',
 };
 
 const categoryColors: Record<string, string> = {
-  seeds: 'bg-green-100 text-green-700',
-  fertilizer: 'bg-amber-100 text-amber-700',
-  pesticides: 'bg-red-100 text-red-700',
-  equipment: 'bg-blue-100 text-blue-700',
-  irrigation: 'bg-cyan-100 text-cyan-700',
-  technology: 'bg-purple-100 text-purple-700',
-  packaging: 'bg-orange-100 text-orange-700',
-  storage: 'bg-slate-100 text-slate-700',
+  seeds: 'bg-green-100 text-green-700', fertilizer: 'bg-amber-100 text-amber-700',
+  pesticides: 'bg-red-100 text-red-700', equipment: 'bg-blue-100 text-blue-700',
+  irrigation: 'bg-cyan-100 text-cyan-700', technology: 'bg-purple-100 text-purple-700',
+  packaging: 'bg-orange-100 text-orange-700', storage: 'bg-slate-100 text-slate-700',
   tools: 'bg-indigo-100 text-indigo-700',
 };
-
-// ── Availability badge config ───────────────────────────────────────────────
 
 const availabilityConfig: Record<string, { label: string; color: string }> = {
   'in-stock': { label: 'In Stock', color: 'bg-green-100 text-green-700' },
@@ -141,8 +117,6 @@ const availabilityConfig: Record<string, { label: string; color: string }> = {
   'pre-order': { label: 'Pre-Order', color: 'bg-blue-100 text-blue-700' },
   'out-of-stock': { label: 'Out of Stock', color: 'bg-red-100 text-red-700' },
 };
-
-// ── Sort options ────────────────────────────────────────────────────────────
 
 type SortKey = 'name' | 'price' | 'rating' | 'sold';
 
@@ -153,21 +127,43 @@ const sortOptions: { value: SortKey; label: string }[] = [
   { value: 'sold', label: 'Units Sold' },
 ];
 
-// ── Helpers ─────────────────────────────────────────────────────────────────
+const unitOptions = ['kg', 'bag', 'litre', 'each', 'per unit', 'per kit', 'per 25kg bag'];
+const currencyOptions = ['USD', 'ZAR', 'KES'];
 
 function formatCurrency(value: number): string {
   return `$${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
+
+// ── Product Form State ──────────────────────────────────────────────────────
+
+interface ProductFormData {
+  name: string;
+  description: string;
+  price: string;
+  currency: string;
+  stock_quantity: string;
+  category: string;
+  unit: string;
+}
+
+const emptyForm: ProductFormData = {
+  name: '',
+  description: '',
+  price: '',
+  currency: 'USD',
+  stock_quantity: '',
+  category: 'seeds',
+  unit: 'kg',
+};
 
 // ═══════════════════════════════════════════════════════════════════════════
 //  MAIN COMPONENT
 // ═══════════════════════════════════════════════════════════════════════════
 
 export default function SupplierProductsPage() {
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
   const supabase = createClient();
 
-  // Look up the current user's supplier_id so useProducts fetches only their products
   const [mySupplierIds, setMySupplierIds] = useState<string | undefined>(undefined);
 
   useEffect(() => {
@@ -182,13 +178,24 @@ export default function SupplierProductsPage() {
       });
   }, [user, supabase]);
 
-  const { products: dbProducts, loading: productsLoading, toggleStock } = useProducts(mySupplierIds);
+  const { products: dbProducts, loading: productsLoading, addProduct, updateProduct, fetchProducts } = useProducts(mySupplierIds);
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [availabilityFilter, setAvailabilityFilter] = useState<string>('all');
   const [sortBy, setSortBy] = useState<SortKey>('name');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+
+  // Modal state
+  const [showModal, setShowModal] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<SupplierProduct | null>(null);
+  const [formData, setFormData] = useState<ProductFormData>(emptyForm);
+  const [saving, setSaving] = useState(false);
+  const [formError, setFormError] = useState('');
+
+  // Delete confirmation
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   // Convert Supabase products to the UI shape if available
   const myProducts: SupplierProduct[] = useMemo(() => {
@@ -198,7 +205,7 @@ export default function SupplierProductsPage() {
         supplierId: p.supplier_id,
         name: p.name,
         description: p.description || '',
-        category: p.category === 'input-supplier' ? 'seeds' : p.category === 'financial-services' ? 'finance' : p.category,
+        category: p.category === 'input-supplier' ? 'seeds' : p.category === 'financial-services' ? 'seeds' : p.category,
         price: p.price,
         memberPrice: p.member_price || p.price,
         discount: p.discount_percent,
@@ -215,6 +222,8 @@ export default function SupplierProductsPage() {
         tags: p.tags || [],
         soldCount: p.sold_count || 0,
         stockQuantity: p.stock_quantity || 0,
+        supplierName: p.supplier?.company_name || 'My Products',
+        minOrder: 1,
       } as unknown as SupplierProduct));
     }
     return staticMyProducts;
@@ -224,7 +233,6 @@ export default function SupplierProductsPage() {
   const filteredProducts = useMemo(() => {
     let products = [...myProducts];
 
-    // Search filter
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       products = products.filter(
@@ -235,38 +243,27 @@ export default function SupplierProductsPage() {
       );
     }
 
-    // Category filter
     if (categoryFilter !== 'all') {
       products = products.filter((p) => p.category === categoryFilter);
     }
 
-    // Availability filter
     if (availabilityFilter !== 'all') {
       products = products.filter((p) => p.availability === availabilityFilter);
     }
 
-    // Sort
     products.sort((a, b) => {
       let cmp = 0;
       switch (sortBy) {
-        case 'name':
-          cmp = a.name.localeCompare(b.name);
-          break;
-        case 'price':
-          cmp = a.price - b.price;
-          break;
-        case 'rating':
-          cmp = a.rating - b.rating;
-          break;
-        case 'sold':
-          cmp = a.soldCount - b.soldCount;
-          break;
+        case 'name': cmp = a.name.localeCompare(b.name); break;
+        case 'price': cmp = a.price - b.price; break;
+        case 'rating': cmp = a.rating - b.rating; break;
+        case 'sold': cmp = a.soldCount - b.soldCount; break;
       }
       return sortDirection === 'asc' ? cmp : -cmp;
     });
 
     return products;
-  }, [searchQuery, categoryFilter, availabilityFilter, sortBy, sortDirection]);
+  }, [myProducts, searchQuery, categoryFilter, availabilityFilter, sortBy, sortDirection]);
 
   const toggleSort = (key: SortKey) => {
     if (sortBy === key) {
@@ -274,6 +271,94 @@ export default function SupplierProductsPage() {
     } else {
       setSortBy(key);
       setSortDirection('asc');
+    }
+  };
+
+  // ── Modal handlers ────────────────────────────────────────────────────────
+
+  const openAddModal = () => {
+    setEditingProduct(null);
+    setFormData(emptyForm);
+    setFormError('');
+    setShowModal(true);
+  };
+
+  const openEditModal = (product: SupplierProduct) => {
+    setEditingProduct(product);
+    setFormData({
+      name: product.name,
+      description: product.description,
+      price: String(product.price),
+      currency: product.currency || 'USD',
+      stock_quantity: String((product as any).stockQuantity || 0),
+      category: product.category,
+      unit: product.unit,
+    });
+    setFormError('');
+    setShowModal(true);
+  };
+
+  const handleFormChange = (field: keyof ProductFormData, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleSubmit = async () => {
+    if (!formData.name.trim()) { setFormError('Product name is required.'); return; }
+    if (!formData.price || Number(formData.price) <= 0) { setFormError('Enter a valid price.'); return; }
+    if (!mySupplierIds) { setFormError('Supplier profile not found.'); return; }
+
+    setSaving(true);
+    setFormError('');
+
+    try {
+      if (editingProduct) {
+        // Update existing
+        const { error } = await updateProduct(editingProduct.id, {
+          name: formData.name.trim(),
+          description: formData.description.trim() || null,
+          price: Number(formData.price),
+          currency: formData.currency,
+          stock_quantity: Number(formData.stock_quantity) || 0,
+          category: formData.category as any,
+          unit: formData.unit,
+          in_stock: Number(formData.stock_quantity) > 0,
+        } as any);
+        if (error) { setFormError(error); return; }
+      } else {
+        // Create new
+        const { error } = await addProduct({
+          supplier_id: mySupplierIds,
+          name: formData.name.trim(),
+          description: formData.description.trim() || undefined,
+          price: Number(formData.price),
+          category: formData.category as any,
+          unit: formData.unit,
+          stock_quantity: Number(formData.stock_quantity) || 0,
+          in_stock: Number(formData.stock_quantity) > 0,
+        });
+        if (error) { setFormError(error); return; }
+      }
+
+      setShowModal(false);
+    } catch {
+      setFormError('Something went wrong. Please try again.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    setDeleting(true);
+    try {
+      const { error } = await supabase.from('products').delete().eq('id', id);
+      if (!error) {
+        await fetchProducts();
+      }
+    } catch {
+      // silent
+    } finally {
+      setDeleting(false);
+      setDeletingId(null);
     }
   };
 
@@ -305,13 +390,13 @@ export default function SupplierProductsPage() {
             <p className="text-sm text-gray-500 mt-0.5">Manage your product listings and inventory</p>
           </div>
         </div>
-        <Link
-          href="/supplier/products/new"
+        <button
+          onClick={openAddModal}
           className="inline-flex items-center gap-2 bg-[#8CB89C] hover:bg-[#729E82] text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors shadow-sm"
         >
           <Plus className="w-4 h-4" />
           Add Product
-        </Link>
+        </button>
       </motion.div>
 
       {/* ══════════════════════════════════════════════════════════════════
@@ -322,7 +407,6 @@ export default function SupplierProductsPage() {
         className="bg-white rounded-xl border border-gray-100 p-4"
       >
         <div className="flex flex-col lg:flex-row lg:items-center gap-3">
-          {/* Search */}
           <div className="relative flex-1 min-w-0">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
@@ -335,7 +419,6 @@ export default function SupplierProductsPage() {
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            {/* Category Filter */}
             <div className="relative">
               <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
               <select
@@ -345,15 +428,12 @@ export default function SupplierProductsPage() {
               >
                 <option value="all">All Categories</option>
                 {allCategories.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {categoryLabels[cat]}
-                  </option>
+                  <option key={cat} value={cat}>{categoryLabels[cat]}</option>
                 ))}
               </select>
               <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
             </div>
 
-            {/* Availability Filter */}
             <div className="relative">
               <SlidersHorizontal className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
               <select
@@ -370,7 +450,6 @@ export default function SupplierProductsPage() {
               <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
             </div>
 
-            {/* Sort By */}
             <div className="relative">
               <ArrowUpDown className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
               <select
@@ -379,15 +458,12 @@ export default function SupplierProductsPage() {
                 className="appearance-none pl-9 pr-8 py-2.5 rounded-lg border border-gray-200 text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] transition-colors cursor-pointer"
               >
                 {sortOptions.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    Sort: {opt.label}
-                  </option>
+                  <option key={opt.value} value={opt.value}>Sort: {opt.label}</option>
                 ))}
               </select>
               <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
             </div>
 
-            {/* Sort Direction Toggle */}
             <button
               onClick={() => setSortDirection((d) => (d === 'asc' ? 'desc' : 'asc'))}
               className="p-2.5 rounded-lg border border-gray-200 bg-gray-50 hover:bg-gray-100 transition-colors"
@@ -396,29 +472,19 @@ export default function SupplierProductsPage() {
               <ArrowUpDown className={`w-4 h-4 text-gray-500 transition-transform ${sortDirection === 'desc' ? 'rotate-180' : ''}`} />
             </button>
 
-            {/* Divider */}
             <div className="w-px h-8 bg-gray-200 hidden lg:block" />
 
-            {/* View Toggle */}
             <div className="flex items-center bg-gray-100 rounded-lg p-0.5">
               <button
                 onClick={() => setViewMode('grid')}
-                className={`p-2 rounded-md transition-all ${
-                  viewMode === 'grid'
-                    ? 'bg-white text-[#8CB89C] shadow-sm'
-                    : 'text-gray-400 hover:text-gray-600'
-                }`}
+                className={`p-2 rounded-md transition-all ${viewMode === 'grid' ? 'bg-white text-[#8CB89C] shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
                 title="Grid View"
               >
                 <LayoutGrid className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setViewMode('table')}
-                className={`p-2 rounded-md transition-all ${
-                  viewMode === 'table'
-                    ? 'bg-white text-[#8CB89C] shadow-sm'
-                    : 'text-gray-400 hover:text-gray-600'
-                }`}
+                className={`p-2 rounded-md transition-all ${viewMode === 'table' ? 'bg-white text-[#8CB89C] shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
                 title="Table View"
               >
                 <List className="w-4 h-4" />
@@ -427,18 +493,11 @@ export default function SupplierProductsPage() {
           </div>
         </div>
 
-        {/* Active filter count */}
         {(searchQuery || categoryFilter !== 'all' || availabilityFilter !== 'all') && (
           <div className="mt-3 flex items-center gap-2 text-xs text-gray-500">
-            <span>
-              Showing {filteredProducts.length} of {myProducts.length} products
-            </span>
+            <span>Showing {filteredProducts.length} of {myProducts.length} products</span>
             <button
-              onClick={() => {
-                setSearchQuery('');
-                setCategoryFilter('all');
-                setAvailabilityFilter('all');
-              }}
+              onClick={() => { setSearchQuery(''); setCategoryFilter('all'); setAvailabilityFilter('all'); }}
               className="text-[#8CB89C] hover:text-[#729E82] font-medium transition-colors"
             >
               Clear Filters
@@ -448,13 +507,10 @@ export default function SupplierProductsPage() {
       </motion.div>
 
       {/* ══════════════════════════════════════════════════════════════════
-          3. PRODUCTS — GRID VIEW
+          3. PRODUCTS - GRID VIEW
       ═════════════════════════════════════════════════════════════════ */}
       {viewMode === 'grid' && (
-        <motion.div
-          variants={containerVariants}
-          className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5"
-        >
+        <motion.div variants={containerVariants} className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
           {filteredProducts.map((product) => (
             <motion.div
               key={product.id}
@@ -462,81 +518,42 @@ export default function SupplierProductsPage() {
               whileHover={{ y: -3, boxShadow: '0 12px 30px rgba(27,42,74,0.08)' }}
               className="bg-white rounded-xl border border-gray-100 overflow-hidden group"
             >
-              {/* Product Image */}
               <div className="relative h-[200px] overflow-hidden">
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                {/* Featured Badge */}
+                <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                 {product.featured && (
                   <div className="absolute top-3 left-3 inline-flex items-center gap-1 bg-[#D4A843] text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm">
-                    <Star className="w-3 h-3 fill-white" />
-                    Featured
+                    <Star className="w-3 h-3 fill-white" /> Featured
                   </div>
                 )}
-                {/* Availability Badge */}
                 <div className="absolute top-3 right-3">
-                  <span
-                    className={`inline-block text-[10px] font-semibold px-2.5 py-1 rounded-full ${
-                      availabilityConfig[product.availability]?.color || 'bg-gray-100 text-gray-600'
-                    }`}
-                  >
+                  <span className={`inline-block text-[10px] font-semibold px-2.5 py-1 rounded-full ${availabilityConfig[product.availability]?.color || 'bg-gray-100 text-gray-600'}`}>
                     {availabilityConfig[product.availability]?.label || product.availability}
                   </span>
                 </div>
               </div>
 
-              {/* Product Info */}
               <div className="p-4 space-y-3">
-                {/* Name & Category */}
                 <div>
                   <div className="flex items-start justify-between gap-2 mb-1.5">
-                    <h3 className="font-semibold text-[#1B2A4A] text-sm leading-tight line-clamp-2">
-                      {product.name}
-                    </h3>
+                    <h3 className="font-semibold text-[#1B2A4A] text-sm leading-tight line-clamp-2">{product.name}</h3>
                   </div>
-                  <span
-                    className={`inline-block text-[10px] font-medium px-2 py-0.5 rounded-full ${
-                      categoryColors[product.category] || 'bg-gray-100 text-gray-600'
-                    }`}
-                  >
-                    {categoryLabels[product.category]}
+                  <span className={`inline-block text-[10px] font-medium px-2 py-0.5 rounded-full ${categoryColors[product.category] || 'bg-gray-100 text-gray-600'}`}>
+                    {categoryLabels[product.category] || product.category}
                   </span>
                 </div>
 
-                {/* Price */}
                 <div className="flex items-baseline gap-2">
-                  <span className="text-lg font-bold text-[#8CB89C]">
-                    {formatCurrency(product.memberPrice)}
-                  </span>
-                  <span className="text-sm text-gray-400 line-through">
-                    {formatCurrency(product.price)}
-                  </span>
-                  <span className="text-[10px] font-medium text-[#8CB89C] bg-[#8CB89C]/10 px-1.5 py-0.5 rounded-full">
-                    Member
-                  </span>
+                  <span className="text-lg font-bold text-[#8CB89C]">{formatCurrency(product.memberPrice)}</span>
+                  <span className="text-sm text-gray-400 line-through">{formatCurrency(product.price)}</span>
+                  <span className="text-[10px] font-medium text-[#8CB89C] bg-[#8CB89C]/10 px-1.5 py-0.5 rounded-full">Member</span>
                 </div>
 
-                {/* Rating & Sold */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1">
                     {Array.from({ length: 5 }).map((_, si) => (
-                      <Star
-                        key={si}
-                        className={`w-3.5 h-3.5 ${
-                          si < Math.floor(product.rating)
-                            ? 'text-[#D4A843] fill-[#D4A843]'
-                            : si < product.rating
-                              ? 'text-[#D4A843] fill-[#D4A843]/50'
-                              : 'text-gray-200'
-                        }`}
-                      />
+                      <Star key={si} className={`w-3.5 h-3.5 ${si < Math.floor(product.rating) ? 'text-[#D4A843] fill-[#D4A843]' : 'text-gray-200'}`} />
                     ))}
-                    <span className="text-xs text-gray-400 ml-1">
-                      {product.rating} ({product.reviewCount})
-                    </span>
+                    <span className="text-xs text-gray-400 ml-1">{product.rating} ({product.reviewCount})</span>
                   </div>
                   <div className="flex items-center gap-1 text-xs text-gray-500">
                     <ShoppingCart className="w-3 h-3" />
@@ -545,18 +562,22 @@ export default function SupplierProductsPage() {
                   </div>
                 </div>
 
-                {/* Actions */}
                 <div className="flex items-center gap-2 pt-2 border-t border-gray-100">
-                  <Link
-                    href={`/supplier/products/${product.id}`}
-                    className="flex-1 inline-flex items-center justify-center gap-1.5 bg-[#8CB89C]/10 text-[#8CB89C] hover:bg-[#8CB89C]/20 px-3 py-2 rounded-lg text-xs font-medium transition-colors"
-                  >
-                    <Eye className="w-3.5 h-3.5" />
-                    View
+                  <Link href={`/supplier/products/${product.id}`} className="flex-1 inline-flex items-center justify-center gap-1.5 bg-[#8CB89C]/10 text-[#8CB89C] hover:bg-[#8CB89C]/20 px-3 py-2 rounded-lg text-xs font-medium transition-colors">
+                    <Eye className="w-3.5 h-3.5" /> View
                   </Link>
-                  <button className="flex-1 inline-flex items-center justify-center gap-1.5 bg-[#1B2A4A]/5 text-[#1B2A4A] hover:bg-[#1B2A4A]/10 px-3 py-2 rounded-lg text-xs font-medium transition-colors">
-                    <Pencil className="w-3.5 h-3.5" />
-                    Edit
+                  <button
+                    onClick={() => openEditModal(product)}
+                    className="flex-1 inline-flex items-center justify-center gap-1.5 bg-[#1B2A4A]/5 text-[#1B2A4A] hover:bg-[#1B2A4A]/10 px-3 py-2 rounded-lg text-xs font-medium transition-colors"
+                  >
+                    <Pencil className="w-3.5 h-3.5" /> Edit
+                  </button>
+                  <button
+                    onClick={() => setDeletingId(product.id)}
+                    className="inline-flex items-center justify-center bg-red-50 text-red-500 hover:bg-red-100 p-2 rounded-lg text-xs font-medium transition-colors"
+                    title="Delete"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </div>
               </div>
@@ -566,68 +587,31 @@ export default function SupplierProductsPage() {
       )}
 
       {/* ══════════════════════════════════════════════════════════════════
-          4. PRODUCTS — TABLE VIEW
+          4. PRODUCTS - TABLE VIEW
       ═════════════════════════════════════════════════════════════════ */}
       {viewMode === 'table' && (
-        <motion.div
-          variants={cardVariants}
-          className="bg-white rounded-xl border border-gray-100 overflow-hidden"
-        >
+        <motion.div variants={cardVariants} className="bg-white rounded-xl border border-gray-100 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50/50">
-                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider w-16">
-                    Image
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider w-16">Image</th>
+                  <th onClick={() => toggleSort('name')} className="text-left py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer hover:text-[#1B2A4A]">
+                    <span className="flex items-center gap-1">Name <ArrowUpDown className="w-3 h-3" /></span>
                   </th>
-                  <th
-                    onClick={() => toggleSort('name')}
-                    className="text-left py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer hover:text-[#1B2A4A] transition-colors"
-                  >
-                    <span className="flex items-center gap-1">
-                      Name
-                      <ArrowUpDown className="w-3 h-3" />
-                    </span>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Category</th>
+                  <th onClick={() => toggleSort('price')} className="text-right py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer hover:text-[#1B2A4A]">
+                    <span className="flex items-center justify-end gap-1">Price <ArrowUpDown className="w-3 h-3" /></span>
                   </th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">
-                    Category
+                  <th className="text-right py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Member Price</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Stock</th>
+                  <th onClick={() => toggleSort('sold')} className="text-right py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer hover:text-[#1B2A4A]">
+                    <span className="flex items-center justify-end gap-1">Sold <ArrowUpDown className="w-3 h-3" /></span>
                   </th>
-                  <th
-                    onClick={() => toggleSort('price')}
-                    className="text-right py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer hover:text-[#1B2A4A] transition-colors"
-                  >
-                    <span className="flex items-center justify-end gap-1">
-                      Price
-                      <ArrowUpDown className="w-3 h-3" />
-                    </span>
+                  <th onClick={() => toggleSort('rating')} className="text-right py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer hover:text-[#1B2A4A]">
+                    <span className="flex items-center justify-end gap-1">Rating <ArrowUpDown className="w-3 h-3" /></span>
                   </th>
-                  <th className="text-right py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">
-                    Member Price
-                  </th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">
-                    Stock
-                  </th>
-                  <th
-                    onClick={() => toggleSort('sold')}
-                    className="text-right py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer hover:text-[#1B2A4A] transition-colors"
-                  >
-                    <span className="flex items-center justify-end gap-1">
-                      Sold
-                      <ArrowUpDown className="w-3 h-3" />
-                    </span>
-                  </th>
-                  <th
-                    onClick={() => toggleSort('rating')}
-                    className="text-right py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer hover:text-[#1B2A4A] transition-colors"
-                  >
-                    <span className="flex items-center justify-end gap-1">
-                      Rating
-                      <ArrowUpDown className="w-3 h-3" />
-                    </span>
-                  </th>
-                  <th className="text-center py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">
-                    Actions
-                  </th>
+                  <th className="text-center py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
@@ -639,60 +623,30 @@ export default function SupplierProductsPage() {
                     transition={{ delay: index * 0.04 }}
                     className="hover:bg-[#8CB89C]/[0.02] transition-colors"
                   >
-                    {/* Thumbnail */}
                     <td className="py-3 px-4">
                       <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
-                        <img
-                          src={product.image}
-                          alt={product.name}
-                          className="w-full h-full object-cover"
-                        />
+                        <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
                       </div>
                     </td>
-                    {/* Name */}
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-2 min-w-0">
-                        <span className="font-medium text-[#1B2A4A] text-sm truncate max-w-[200px]">
-                          {product.name}
-                        </span>
-                        {product.featured && (
-                          <Star className="w-3.5 h-3.5 text-[#D4A843] fill-[#D4A843] flex-shrink-0" />
-                        )}
+                        <span className="font-medium text-[#1B2A4A] text-sm truncate max-w-[200px]">{product.name}</span>
+                        {product.featured && <Star className="w-3.5 h-3.5 text-[#D4A843] fill-[#D4A843] flex-shrink-0" />}
                       </div>
                     </td>
-                    {/* Category */}
                     <td className="py-3 px-4">
-                      <span
-                        className={`inline-block text-[10px] font-medium px-2 py-0.5 rounded-full ${
-                          categoryColors[product.category] || 'bg-gray-100 text-gray-600'
-                        }`}
-                      >
-                        {categoryLabels[product.category]}
+                      <span className={`inline-block text-[10px] font-medium px-2 py-0.5 rounded-full ${categoryColors[product.category] || 'bg-gray-100 text-gray-600'}`}>
+                        {categoryLabels[product.category] || product.category}
                       </span>
                     </td>
-                    {/* Price */}
-                    <td className="py-3 px-4 text-right font-medium text-[#1B2A4A] tabular-nums text-sm">
-                      {formatCurrency(product.price)}
-                    </td>
-                    {/* Member Price */}
-                    <td className="py-3 px-4 text-right font-bold text-[#8CB89C] tabular-nums text-sm">
-                      {formatCurrency(product.memberPrice)}
-                    </td>
-                    {/* Stock Status */}
+                    <td className="py-3 px-4 text-right font-medium text-[#1B2A4A] tabular-nums text-sm">{formatCurrency(product.price)}</td>
+                    <td className="py-3 px-4 text-right font-bold text-[#8CB89C] tabular-nums text-sm">{formatCurrency(product.memberPrice)}</td>
                     <td className="py-3 px-4">
-                      <span
-                        className={`inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full ${
-                          availabilityConfig[product.availability]?.color || 'bg-gray-100 text-gray-600'
-                        }`}
-                      >
+                      <span className={`inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full ${availabilityConfig[product.availability]?.color || 'bg-gray-100 text-gray-600'}`}>
                         {availabilityConfig[product.availability]?.label || product.availability}
                       </span>
                     </td>
-                    {/* Sold */}
-                    <td className="py-3 px-4 text-right text-sm text-gray-600 tabular-nums">
-                      {product.soldCount.toLocaleString()}
-                    </td>
-                    {/* Rating */}
+                    <td className="py-3 px-4 text-right text-sm text-gray-600 tabular-nums">{product.soldCount.toLocaleString()}</td>
                     <td className="py-3 px-4">
                       <div className="flex items-center justify-end gap-1">
                         <Star className="w-3.5 h-3.5 text-[#D4A843] fill-[#D4A843]" />
@@ -700,21 +654,16 @@ export default function SupplierProductsPage() {
                         <span className="text-[10px] text-gray-400">({product.reviewCount})</span>
                       </div>
                     </td>
-                    {/* Actions */}
                     <td className="py-3 px-4">
                       <div className="flex items-center justify-center gap-1">
-                        <Link
-                          href={`/supplier/products/${product.id}`}
-                          className="p-2 rounded-lg text-[#8CB89C] hover:bg-[#8CB89C]/10 transition-colors"
-                          title="View"
-                        >
+                        <Link href={`/supplier/products/${product.id}`} className="p-2 rounded-lg text-[#8CB89C] hover:bg-[#8CB89C]/10 transition-colors" title="View">
                           <Eye className="w-4 h-4" />
                         </Link>
-                        <button
-                          className="p-2 rounded-lg text-[#1B2A4A] hover:bg-[#1B2A4A]/10 transition-colors"
-                          title="Edit"
-                        >
+                        <button onClick={() => openEditModal(product)} className="p-2 rounded-lg text-[#1B2A4A] hover:bg-[#1B2A4A]/10 transition-colors" title="Edit">
                           <Pencil className="w-4 h-4" />
+                        </button>
+                        <button onClick={() => setDeletingId(product.id)} className="p-2 rounded-lg text-red-500 hover:bg-red-50 transition-colors" title="Delete">
+                          <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
                     </td>
@@ -723,16 +672,8 @@ export default function SupplierProductsPage() {
               </tbody>
             </table>
           </div>
-
-          {/* Table Footer */}
           <div className="px-4 py-3 border-t border-gray-100 bg-gray-50/50 flex items-center justify-between">
-            <span className="text-xs text-gray-500">
-              Showing {filteredProducts.length} of {myProducts.length} products
-            </span>
-            <div className="flex items-center gap-1 text-xs text-gray-400">
-              <Tag className="w-3 h-3" />
-              <span>Zambezi Agri-Supplies (SUP-001)</span>
-            </div>
+            <span className="text-xs text-gray-500">Showing {filteredProducts.length} of {myProducts.length} products</span>
           </div>
         </motion.div>
       )}
@@ -741,10 +682,7 @@ export default function SupplierProductsPage() {
           5. EMPTY STATE
       ═════════════════════════════════════════════════════════════════ */}
       {filteredProducts.length === 0 && (
-        <motion.div
-          variants={fadeUp}
-          className="bg-white rounded-xl border border-gray-100 p-12 text-center"
-        >
+        <motion.div variants={fadeUp} className="bg-white rounded-xl border border-gray-100 p-12 text-center">
           <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <Package className="w-8 h-8 text-gray-400" />
           </div>
@@ -756,26 +694,221 @@ export default function SupplierProductsPage() {
           </p>
           {searchQuery || categoryFilter !== 'all' || availabilityFilter !== 'all' ? (
             <button
-              onClick={() => {
-                setSearchQuery('');
-                setCategoryFilter('all');
-                setAvailabilityFilter('all');
-              }}
+              onClick={() => { setSearchQuery(''); setCategoryFilter('all'); setAvailabilityFilter('all'); }}
               className="inline-flex items-center gap-2 bg-[#8CB89C]/10 text-[#8CB89C] hover:bg-[#8CB89C]/20 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors"
             >
               Clear All Filters
             </button>
           ) : (
-            <Link
-              href="/supplier/products/new"
+            <button
+              onClick={openAddModal}
               className="inline-flex items-center gap-2 bg-[#8CB89C] hover:bg-[#729E82] text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors"
             >
-              <Plus className="w-4 h-4" />
-              Add Your First Product
-            </Link>
+              <Plus className="w-4 h-4" /> Add Your First Product
+            </button>
           )}
         </motion.div>
       )}
+
+      {/* ══════════════════════════════════════════════════════════════════
+          ADD / EDIT PRODUCT MODAL
+      ═════════════════════════════════════════════════════════════════ */}
+      <AnimatePresence>
+        {showModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+            onClick={() => setShowModal(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ duration: 0.2 }}
+              className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Modal Header */}
+              <div className="flex items-center justify-between p-6 border-b border-gray-100">
+                <h2 className="text-lg font-bold text-[#1B2A4A]">
+                  {editingProduct ? 'Edit Product' : 'Add New Product'}
+                </h2>
+                <button onClick={() => setShowModal(false)} className="p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                  <X className="w-5 h-5 text-gray-400" />
+                </button>
+              </div>
+
+              {/* Modal Body */}
+              <div className="p-6 space-y-4">
+                {formError && (
+                  <div className="bg-red-50 text-red-700 text-sm px-4 py-3 rounded-xl border border-red-100">
+                    {formError}
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-sm font-medium text-[#1B2A4A] mb-1.5">Product Name *</label>
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => handleFormChange('name', e.target.value)}
+                    placeholder="e.g., Hybrid Maize Seed (10kg)"
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-[#1B2A4A] mb-1.5">Description</label>
+                  <textarea
+                    value={formData.description}
+                    onChange={(e) => handleFormChange('description', e.target.value)}
+                    placeholder="Describe your product..."
+                    rows={3}
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] resize-none"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-[#1B2A4A] mb-1.5">Price *</label>
+                    <input
+                      type="number"
+                      value={formData.price}
+                      onChange={(e) => handleFormChange('price', e.target.value)}
+                      placeholder="0.00"
+                      min="0"
+                      step="0.01"
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[#1B2A4A] mb-1.5">Currency</label>
+                    <select
+                      value={formData.currency}
+                      onChange={(e) => handleFormChange('currency', e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] bg-white"
+                    >
+                      {currencyOptions.map((c) => (
+                        <option key={c} value={c}>{c}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-[#1B2A4A] mb-1.5">Stock Quantity</label>
+                    <input
+                      type="number"
+                      value={formData.stock_quantity}
+                      onChange={(e) => handleFormChange('stock_quantity', e.target.value)}
+                      placeholder="0"
+                      min="0"
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[#1B2A4A] mb-1.5">Unit</label>
+                    <select
+                      value={formData.unit}
+                      onChange={(e) => handleFormChange('unit', e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] bg-white"
+                    >
+                      {unitOptions.map((u) => (
+                        <option key={u} value={u}>{u}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-[#1B2A4A] mb-1.5">Category</label>
+                  <select
+                    value={formData.category}
+                    onChange={(e) => handleFormChange('category', e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] bg-white"
+                  >
+                    {allCategories.map((cat) => (
+                      <option key={cat} value={cat}>{categoryLabels[cat]}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Modal Footer */}
+              <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-100">
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="px-5 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSubmit}
+                  disabled={saving}
+                  className="inline-flex items-center gap-2 bg-[#8CB89C] hover:bg-[#729E82] disabled:bg-gray-300 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors"
+                >
+                  {saving ? (
+                    <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                  ) : null}
+                  {editingProduct ? 'Save Changes' : 'Add Product'}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ══════════════════════════════════════════════════════════════════
+          DELETE CONFIRMATION MODAL
+      ═════════════════════════════════════════════════════════════════ */}
+      <AnimatePresence>
+        {deletingId && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+            onClick={() => setDeletingId(null)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <Trash2 className="w-6 h-6 text-red-500" />
+              </div>
+              <h3 className="text-lg font-bold text-[#1B2A4A] text-center mb-2">Delete Product?</h3>
+              <p className="text-sm text-gray-500 text-center mb-6">
+                This action cannot be undone. The product will be permanently removed from your catalogue.
+              </p>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setDeletingId(null)}
+                  className="flex-1 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors border border-gray-200"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => handleDelete(deletingId)}
+                  disabled={deleting}
+                  className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-red-500 hover:bg-red-600 disabled:bg-red-300 transition-colors"
+                >
+                  {deleting ? 'Deleting...' : 'Delete'}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

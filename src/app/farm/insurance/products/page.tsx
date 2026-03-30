@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/lib/supabase/auth-context';
@@ -16,8 +16,14 @@ import {
   Bot,
   ArrowLeft,
   ArrowRight,
+  X,
+  Loader2,
+  Calendar,
+  DollarSign,
+  MapPin,
 } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
+import type { FarmPlotRow } from '@/lib/supabase/use-farm-plots';
 
 /* ------------------------------------------------------------------ */
 /* Inline mock data (formerly from @/lib/data/insurance)               */
@@ -283,6 +289,124 @@ export default function ProductsPage() {
     setShowAllCoverage((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
+  // ── Apply Modal State ──
+  const [applyProduct, setApplyProduct] = useState<InsuranceProduct | null>(null);
+  const [farmPlots, setFarmPlots] = useState<FarmPlotRow[]>([]);
+  const [plotsLoading, setPlotsLoading] = useState(false);
+  const [applyForm, setApplyForm] = useState({
+    coverage_amount: '',
+    farm_plot_id: '',
+    start_date: '',
+  });
+  const [applySubmitting, setApplySubmitting] = useState(false);
+  const [applySuccess, setApplySuccess] = useState(false);
+  const [applyError, setApplyError] = useState('');
+
+  const openApplyModal = useCallback(async (product: InsuranceProduct) => {
+    setApplyProduct(product);
+    setApplyForm({
+      coverage_amount: String(product.coverageRange.min),
+      farm_plot_id: '',
+      start_date: new Date().toISOString().split('T')[0],
+    });
+    setApplySuccess(false);
+    setApplyError('');
+
+    // Load user's farm plots
+    if (user) {
+      setPlotsLoading(true);
+      try {
+        const supabase = createClient();
+        const { data: member } = await supabase
+          .from('members')
+          .select('id')
+          .eq('profile_id', user.id)
+          .single();
+        if (member) {
+          const { data: plots } = await supabase
+            .from('farm_plots')
+            .select('*')
+            .eq('member_id', member.id)
+            .order('name');
+          setFarmPlots((plots as FarmPlotRow[]) || []);
+        }
+      } catch { /* ignore */ }
+      setPlotsLoading(false);
+    }
+  }, [user]);
+
+  const calculatePremium = useCallback((product: InsuranceProduct, coverageAmount: number): number => {
+    const range = product.premiumRange;
+    const covRange = product.coverageRange;
+    const ratio = (coverageAmount - covRange.min) / (covRange.max - covRange.min || 1);
+    const premium = range.min + ratio * (range.max - range.min);
+    return Math.round(premium * 100) / 100;
+  }, []);
+
+  const handleApplySubmit = useCallback(async () => {
+    if (!applyProduct || !user) return;
+    const coverageAmt = parseFloat(applyForm.coverage_amount);
+    if (isNaN(coverageAmt) || coverageAmt < applyProduct.coverageRange.min || coverageAmt > applyProduct.coverageRange.max) {
+      setApplyError(`Coverage must be between $${applyProduct.coverageRange.min.toLocaleString()} and $${applyProduct.coverageRange.max.toLocaleString()}`);
+      return;
+    }
+    if (!applyForm.start_date) {
+      setApplyError('Please select a start date');
+      return;
+    }
+
+    setApplySubmitting(true);
+    setApplyError('');
+
+    try {
+      const supabase = createClient();
+      const { data: member } = await supabase
+        .from('members')
+        .select('id')
+        .eq('profile_id', user.id)
+        .single();
+
+      if (!member) {
+        setApplyError('Member profile not found. Please complete your profile first.');
+        setApplySubmitting(false);
+        return;
+      }
+
+      const premium = calculatePremium(applyProduct, coverageAmt);
+      const startDate = new Date(applyForm.start_date);
+      const endDate = new Date(startDate);
+      endDate.setFullYear(endDate.getFullYear() + 1);
+
+      const policyNumber = `POL-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+
+      const { error: insertError } = await supabase
+        .from('insurance_policies')
+        .insert({
+          member_id: member.id,
+          product_id: applyProduct.id,
+          policy_number: policyNumber,
+          coverage_amount: coverageAmt,
+          premium,
+          status: 'pending',
+          start_date: applyForm.start_date,
+          end_date: endDate.toISOString().split('T')[0],
+        });
+
+      if (insertError) {
+        setApplyError(insertError.message);
+      } else {
+        setApplySuccess(true);
+      }
+    } catch (err: any) {
+      setApplyError(err?.message || 'Something went wrong. Please try again.');
+    }
+    setApplySubmitting(false);
+  }, [applyProduct, applyForm, user, calculatePremium]);
+
+  const estimatedPremium = applyProduct
+    ? calculatePremium(applyProduct, parseFloat(applyForm.coverage_amount) || applyProduct.coverageRange.min)
+    : 0;
+
   return (
     <div className="px-4 py-5 sm:px-6 lg:px-8 space-y-6">
       {/* ── Back link ── */}
@@ -443,13 +567,13 @@ export default function ProductsPage() {
 
                   {/* Action Buttons */}
                   <div className="flex gap-3">
-                    <Link
-                      href="/farm/insurance/quote"
-                      className="flex-1 bg-teal hover:bg-teal-dark active:bg-teal-dark text-white py-3 rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-2 min-h-[44px]"
+                    <button
+                      onClick={() => openApplyModal(product)}
+                      className="flex-1 bg-[#5DB347] hover:bg-[#449933] active:bg-[#449933] text-white py-3 rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-2 min-h-[44px]"
                     >
-                      {ti.getQuote}
+                      Apply Now
                       <ArrowRight className="w-4 h-4" />
-                    </Link>
+                    </button>
                     <button
                       onClick={() =>
                         setExpandedProduct(isExpanded ? null : product.id)
@@ -547,6 +671,182 @@ export default function ProductsPage() {
           </div>
         </div>
       </motion.div>
+
+      {/* ══════════════════════════════════════════════════════════════ */}
+      {/* APPLY MODAL                                                   */}
+      {/* ══════════════════════════════════════════════════════════════ */}
+      <AnimatePresence>
+        {applyProduct && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm"
+            onClick={() => !applySubmitting && setApplyProduct(null)}
+          >
+            <motion.div
+              initial={{ y: 100, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 100, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 28 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl max-h-[90vh] overflow-y-auto shadow-xl"
+            >
+              {applySuccess ? (
+                /* ── Success State ── */
+                <div className="p-6 text-center">
+                  <div className="w-16 h-16 rounded-full bg-[#5DB347]/10 flex items-center justify-center mx-auto mb-4">
+                    <CheckCircle2 className="w-8 h-8 text-[#5DB347]" />
+                  </div>
+                  <h3 className="text-lg font-bold text-[#1B2A4A] mb-2">Application Submitted!</h3>
+                  <p className="text-sm text-gray-500 leading-relaxed mb-6">
+                    Your insurance application for <span className="font-semibold">{applyProduct.name}</span> has been submitted.
+                    We will review it within 48 hours and notify you of the outcome.
+                  </p>
+                  <button
+                    onClick={() => setApplyProduct(null)}
+                    className="w-full py-3 rounded-xl bg-[#5DB347] text-white text-sm font-semibold hover:bg-[#449933] transition-colors min-h-[44px]"
+                  >
+                    Done
+                  </button>
+                </div>
+              ) : (
+                /* ── Form State ── */
+                <>
+                  {/* Header */}
+                  <div className="flex items-center justify-between p-4 border-b border-gray-100">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-[#5DB347]/10 flex items-center justify-center text-xl">
+                        {applyProduct.icon}
+                      </div>
+                      <div>
+                        <h3 className="text-base font-bold text-[#1B2A4A]">Apply for Insurance</h3>
+                        <p className="text-xs text-gray-400">{applyProduct.name}</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setApplyProduct(null)}
+                      className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:bg-gray-100 transition-colors"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  {/* Form */}
+                  <div className="p-4 space-y-4">
+                    {/* Coverage Amount */}
+                    <div>
+                      <label className="block text-xs font-semibold text-[#1B2A4A] mb-1.5">
+                        <DollarSign className="w-3.5 h-3.5 inline mr-1" />
+                        Coverage Amount (USD)
+                      </label>
+                      <input
+                        type="number"
+                        min={applyProduct.coverageRange.min}
+                        max={applyProduct.coverageRange.max}
+                        value={applyForm.coverage_amount}
+                        onChange={(e) => setApplyForm(prev => ({ ...prev, coverage_amount: e.target.value }))}
+                        className="w-full px-3.5 py-3 rounded-xl border border-gray-200 text-sm text-[#1B2A4A] focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347] transition-all"
+                        placeholder={`$${applyProduct.coverageRange.min} - $${applyProduct.coverageRange.max}`}
+                      />
+                      <p className="text-[11px] text-gray-400 mt-1">
+                        Range: ${applyProduct.coverageRange.min.toLocaleString()} - ${applyProduct.coverageRange.max.toLocaleString()}
+                      </p>
+                    </div>
+
+                    {/* Farm Plot */}
+                    <div>
+                      <label className="block text-xs font-semibold text-[#1B2A4A] mb-1.5">
+                        <MapPin className="w-3.5 h-3.5 inline mr-1" />
+                        Farm Plot (optional)
+                      </label>
+                      {plotsLoading ? (
+                        <div className="flex items-center gap-2 py-3 text-xs text-gray-400">
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          Loading your plots...
+                        </div>
+                      ) : (
+                        <select
+                          value={applyForm.farm_plot_id}
+                          onChange={(e) => setApplyForm(prev => ({ ...prev, farm_plot_id: e.target.value }))}
+                          className="w-full px-3.5 py-3 rounded-xl border border-gray-200 text-sm text-[#1B2A4A] bg-white focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347] transition-all"
+                        >
+                          <option value="">-- Select a plot --</option>
+                          {farmPlots.map(plot => (
+                            <option key={plot.id} value={plot.id}>
+                              {plot.name} {plot.size_ha ? `(${plot.size_ha} ha)` : ''} {plot.crop ? `- ${plot.crop}` : ''}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                    </div>
+
+                    {/* Start Date */}
+                    <div>
+                      <label className="block text-xs font-semibold text-[#1B2A4A] mb-1.5">
+                        <Calendar className="w-3.5 h-3.5 inline mr-1" />
+                        Start Date
+                      </label>
+                      <input
+                        type="date"
+                        value={applyForm.start_date}
+                        min={new Date().toISOString().split('T')[0]}
+                        onChange={(e) => setApplyForm(prev => ({ ...prev, start_date: e.target.value }))}
+                        className="w-full px-3.5 py-3 rounded-xl border border-gray-200 text-sm text-[#1B2A4A] focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347] transition-all"
+                      />
+                    </div>
+
+                    {/* Premium Estimate */}
+                    <div className="rounded-xl bg-[#5DB347]/5 border border-[#5DB347]/20 p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs text-gray-500">Estimated Monthly Premium</p>
+                          <p className="text-xl font-bold text-[#5DB347]">${estimatedPremium.toFixed(2)}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-xs text-gray-500">Deductible</p>
+                          <p className="text-sm font-semibold text-[#1B2A4A]">{applyProduct.deductible}%</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Error */}
+                    {applyError && (
+                      <div className="rounded-xl bg-red-50 border border-red-200 p-3 flex items-start gap-2">
+                        <XCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+                        <p className="text-xs text-red-600">{applyError}</p>
+                      </div>
+                    )}
+
+                    {/* Submit */}
+                    <button
+                      onClick={handleApplySubmit}
+                      disabled={applySubmitting}
+                      className="w-full py-3 rounded-xl bg-[#5DB347] text-white text-sm font-semibold hover:bg-[#449933] active:scale-[0.98] transition-all min-h-[44px] flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                      {applySubmitting ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          Submitting...
+                        </>
+                      ) : (
+                        <>
+                          <Shield className="w-4 h-4" />
+                          Submit Application
+                        </>
+                      )}
+                    </button>
+
+                    <p className="text-[11px] text-gray-400 text-center leading-relaxed">
+                      Your application will be reviewed by our team. Status: pending until approved.
+                    </p>
+                  </div>
+                </>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -872,7 +872,24 @@ export default function FarmJournalPage() {
     [grouped],
   );
 
-  const handleSaveEntry = (entry: JournalEntry) => {
+  const handleSaveEntry = async (entry: JournalEntry) => {
+    // Save to DB first
+    const supabase = createClient();
+    try {
+      await supabase.from('farm_activities').insert({
+        member_id: user?.id || null,
+        plot_id: entry.plotId || null,
+        type: entry.type,
+        date: entry.date,
+        description: entry.description || entry.title,
+        notes: entry.description || null,
+        photo_url: entry.photo || null,
+        cost: entry.cost || 0,
+        currency: entry.currency || 'USD',
+      });
+    } catch {
+      // fallback: still add to local state even if DB fails
+    }
     setEntries((prev) => [entry, ...prev]);
     setShowNewEntry(false);
   };

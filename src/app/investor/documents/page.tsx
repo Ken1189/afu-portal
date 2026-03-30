@@ -408,14 +408,21 @@ export default function DocumentsPage() {
         ) : filtered.length === 0 ? (
           <div className="bg-white rounded-2xl p-12 text-center">
             <FolderOpen className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-400 text-sm">No documents found.</p>
-            {search && (
-              <button
-                onClick={() => setSearch('')}
-                className="mt-2 text-[#5DB347] text-sm font-medium hover:underline"
-              >
-                Clear search
-              </button>
+            {search ? (
+              <>
+                <p className="text-gray-400 text-sm">No documents found matching your search.</p>
+                <button
+                  onClick={() => setSearch('')}
+                  className="mt-2 text-[#5DB347] text-sm font-medium hover:underline"
+                >
+                  Clear search
+                </button>
+              </>
+            ) : (
+              <>
+                <p className="text-gray-500 text-sm font-medium mb-1">No documents available yet.</p>
+                <p className="text-gray-400 text-sm">Check back after your first investment.</p>
+              </>
             )}
           </div>
         ) : (
