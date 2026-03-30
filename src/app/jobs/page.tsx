@@ -49,6 +49,7 @@ interface JobListing {
   job_type: string;
   pay_rate: string | null;
   pay_type: string | null;
+  pay_description?: string | null;
   duration?: string | null;          // fallback field
   duration_description?: string | null; // DB field
   workers_needed: number | null;
@@ -424,6 +425,12 @@ export default function JobsPage() {
                       <div className="flex items-center gap-2">
                         <Users className="w-3.5 h-3.5 text-gray-400" />
                         <span>{job.workers_needed} worker{job.workers_needed !== 1 ? 's' : ''} needed</span>
+                      </div>
+                    )}
+                    {(job.pay_description || job.pay_rate) && (
+                      <div className="flex items-center gap-2">
+                        <Banknote className="w-3.5 h-3.5 text-gray-400" />
+                        <span className="text-[#5DB347] font-medium">{job.pay_description || (job.pay_rate ? `$${job.pay_rate}/${job.pay_type || 'month'}` : '')}</span>
                       </div>
                     )}
                   </div>

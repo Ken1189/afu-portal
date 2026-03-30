@@ -129,6 +129,7 @@ const navGroups: NavGroup[] = [
       { href: '/admin/investor-relations', label: 'Investor Pipeline', icon: <Landmark className={ICON_CLS} /> },
       { href: '/admin/investors', label: 'All Investors', icon: <Users className={ICON_CLS} /> },
       { href: '/admin/investments', label: 'Total Investments', icon: <BarChart3 className={ICON_CLS} /> },
+      { href: '/admin/investor-relations/opportunities', label: 'Opportunities', icon: <TrendingUp className={ICON_CLS} /> },
     ],
   },
   {
@@ -156,6 +157,7 @@ const navGroups: NavGroup[] = [
       { href: '/admin/farm-overview', label: 'Farm Overview', icon: <Gauge className={ICON_CLS} /> },
       { href: '/admin/equipment', label: 'Equipment', icon: <Wrench className={ICON_CLS} /> },
       { href: '/admin/insurance', label: 'Insurance', icon: <Shield className={ICON_CLS} /> },
+      { href: '/admin/insurance/products', label: 'Insurance Products', icon: <Shield className={ICON_CLS} /> },
       { href: '/admin/insurance/parametric', label: 'Parametric Insurance', icon: <Zap className={ICON_CLS} /> },
       { href: '/admin/crops', label: 'Crops', icon: <Sprout className={ICON_CLS} /> },
       { href: '/admin/livestock', label: 'Livestock', icon: <Beef className={ICON_CLS} /> },

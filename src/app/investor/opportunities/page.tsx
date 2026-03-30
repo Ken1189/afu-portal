@@ -190,6 +190,31 @@ export default function InvestorOpportunities() {
   useEffect(() => {
     const supabase = createClient();
     async function load() {
+      // 1) Try dedicated investment_opportunities table (admin CRUD)
+      try {
+        const { data } = await supabase
+          .from('investment_opportunities')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (data && data.length > 0) {
+          const mapped: Opportunity[] = data.map((row: Record<string, unknown>) => ({
+            id: String(row.id),
+            name: String(row.name || 'Investment Opportunity'),
+            type: (String(row.type || 'Debt')) as OpportunityType,
+            target: Number(row.target || 0),
+            minInvestment: Number(row.min_investment || 100000),
+            targetIRR: String(row.target_irr || '18-22%'),
+            term: String(row.term || '3 years'),
+            subscribed: Number(row.subscribed_percent || 0),
+            subscribedAmount: Number(row.subscribed_amount || 0),
+            status: (String(row.status || 'Open')) as OpportunityStatus,
+            description: String(row.description || ''),
+          }));
+          setOpportunities(mapped);
+          return;
+        }
+      } catch { /* try site_content next */ }
+      // 2) Try site_content JSON
       try {
         const { data } = await supabase
           .from('site_content')
@@ -201,6 +226,7 @@ export default function InvestorOpportunities() {
           return;
         }
       } catch { /* try investor_interests next */ }
+      // 3) Try investor_interests
       try {
         const { data } = await supabase
           .from('investor_interests')

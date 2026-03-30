@@ -35,6 +35,7 @@ interface JobListing {
   job_type: string;
   pay_rate: string | null;
   pay_type: string | null;
+  pay_description: string | null;
   duration: string | null;
   workers_needed: number | null;
   farm_name: string | null;
@@ -54,6 +55,7 @@ interface JobFormData {
   job_type: string;
   pay_rate: string;
   pay_type: string;
+  pay_description: string;
   duration: string;
   workers_needed: string;
   farm_name: string;
@@ -69,6 +71,7 @@ const EMPTY_FORM: JobFormData = {
   job_type: 'Full-time',
   pay_rate: '',
   pay_type: 'Monthly',
+  pay_description: '',
   duration: '',
   workers_needed: '1',
   farm_name: '',
@@ -318,6 +321,17 @@ function JobFormModal({
             </select>
           </div>
 
+          {/* Pay Description */}
+          <div className="col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Compensation Description</label>
+            <input
+              value={form.pay_description}
+              onChange={(e) => onChange({ ...form, pay_description: e.target.value })}
+              placeholder="e.g. Competitive + Equity — Based on experience"
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#5DB347]/20 focus:border-[#5DB347]"
+            />
+          </div>
+
           {/* Duration */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Duration</label>
@@ -565,6 +579,7 @@ export default function AdminJobsPage() {
       job_type: job.job_type,
       pay_rate: job.pay_rate || '',
       pay_type: job.pay_type || 'Monthly',
+      pay_description: job.pay_description || '',
       duration: job.duration || '',
       workers_needed: String(job.workers_needed || 1),
       farm_name: job.farm_name || '',
@@ -588,6 +603,7 @@ export default function AdminJobsPage() {
       job_type: formData.job_type,
       pay_rate: formData.pay_rate || null,
       pay_type: formData.pay_type || null,
+      pay_description: formData.pay_description || null,
       duration: formData.duration || null,
       workers_needed: formData.workers_needed ? parseInt(formData.workers_needed, 10) : null,
       farm_name: formData.farm_name || null,
@@ -798,7 +814,7 @@ export default function AdminJobsPage() {
                     <td className="py-3 px-4 text-gray-600">{job.sector}</td>
                     <td className="py-3 px-4 text-gray-600">{job.country}</td>
                     <td className="py-3 px-4 text-gray-600">{job.job_type}</td>
-                    <td className="py-3 px-4 text-gray-600">{job.pay_rate || '-'}</td>
+                    <td className="py-3 px-4 text-gray-600">{job.pay_description || job.pay_rate || '-'}</td>
                     <td className="py-3 px-4 text-center text-gray-600">{job.workers_needed ?? '-'}</td>
                     <td className="py-3 px-4 text-center">
                       <span className="inline-flex items-center gap-1 text-xs font-medium text-purple-600">
