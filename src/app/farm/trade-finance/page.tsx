@@ -36,7 +36,7 @@ interface TradeInstrument {
   bank?: string;
 }
 
-const mockInstruments: TradeInstrument[] = [
+const FALLBACK_INSTRUMENTS: TradeInstrument[] = [
   {
     id: 'TF-001',
     type: 'SBLC',
@@ -193,7 +193,7 @@ export default function TradeFinancePage() {
       <section>
         <h2 className="text-lg font-bold text-navy mb-4">Active Instruments</h2>
         <div className="space-y-3">
-          {mockInstruments.map((inst) => {
+          {FALLBACK_INSTRUMENTS.map((inst) => {
             const Icon = instrumentIcons[inst.type] || Ship;
             return (
               <motion.div

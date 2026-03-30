@@ -73,7 +73,7 @@ interface Supplier {
   certifications: string[];
 }
 
-const suppliers: Supplier[] = [
+const FALLBACK_SUPPLIERS: Supplier[] = [
   {
     id: 'SUP-001',
     companyName: 'Zambezi Agri-Supplies',
@@ -142,7 +142,7 @@ const fadeUp = {
 
 // ── Supplier context ────────────────────────────────────────────────────────
 
-const currentSupplier = suppliers.find((s) => s.id === 'SUP-001')!;
+const FALLBACK_SUPPLIER = FALLBACK_SUPPLIERS.find((s) => s.id === 'SUP-001')!;
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -398,7 +398,7 @@ function CustomTooltip({
 
 export default function SponsorshipProgram() {
   const { user } = useAuth();
-  const [liveSupplier, setLiveSupplier] = useState(currentSupplier);
+  const [liveSupplier, setLiveSupplier] = useState(FALLBACK_SUPPLIER);
   const [loading, setLoading] = useState(true);
 
   // ── Fetch supplier data from Supabase ───────────────────────────────────
@@ -409,22 +409,22 @@ export default function SponsorshipProgram() {
         const { data: supplier } = await supabase
           .from('suppliers')
           .select('*')
-          .eq('email', user?.email ?? '')
+          .eq('profile_id', user?.id ?? '')
           .single();
 
         if (supplier) {
           setLiveSupplier({
-            ...currentSupplier,
+            ...FALLBACK_SUPPLIER,
             id: supplier.id,
             companyName: supplier.company_name,
-            sponsorshipTier: supplier.sponsorship_tier || currentSupplier.sponsorshipTier,
-            totalSales: supplier.total_sales ?? currentSupplier.totalSales,
-            totalOrders: supplier.total_orders ?? currentSupplier.totalOrders,
-            productsCount: supplier.products_count ?? currentSupplier.productsCount,
-            rating: supplier.rating ?? currentSupplier.rating,
-            reviewCount: supplier.review_count ?? currentSupplier.reviewCount,
-            isFounding: supplier.is_founding ?? currentSupplier.isFounding,
-            joinDate: supplier.join_date || currentSupplier.joinDate,
+            sponsorshipTier: supplier.sponsorship_tier || FALLBACK_SUPPLIER.sponsorshipTier,
+            totalSales: supplier.total_sales ?? FALLBACK_SUPPLIER.totalSales,
+            totalOrders: supplier.total_orders ?? FALLBACK_SUPPLIER.totalOrders,
+            productsCount: supplier.products_count ?? FALLBACK_SUPPLIER.productsCount,
+            rating: supplier.rating ?? FALLBACK_SUPPLIER.rating,
+            reviewCount: supplier.review_count ?? FALLBACK_SUPPLIER.reviewCount,
+            isFounding: supplier.is_founding ?? FALLBACK_SUPPLIER.isFounding,
+            joinDate: supplier.join_date || FALLBACK_SUPPLIER.joinDate,
           });
         }
       } catch (err) {

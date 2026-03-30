@@ -55,11 +55,11 @@ interface Commission {
   orderDate: string; paymentDate: string | null;
 }
 
-const suppliers: Supplier[] = [
+const FALLBACK_SUPPLIERS: Supplier[] = [
   { id: 'SUP-001', companyName: 'Zambezi Agri-Supplies', contactName: 'Farai Ndlovu', email: 'farai@zambezi-agri.co.zw', phone: '+263 77 200 1001', country: 'Zimbabwe', region: 'Harare', category: 'input-supplier', status: 'active', joinDate: '2024-06-15', logo: 'https://images.unsplash.com/photo-1560693225-b8507d6f3aa9?w=400&h=300&fit=crop', description: 'Leading agricultural input supplier across Southern Africa.', productsCount: 38, totalSales: 1847320, totalOrders: 4215, rating: 4.8, reviewCount: 312, memberDiscountPercent: 12, commissionRate: 8, isFounding: true, sponsorshipTier: 'platinum', verified: true, website: 'https://zambezi-agri.co.zw', certifications: ['ISO 9001', 'GlobalGAP Approved', 'SADC Trade Certified'] },
 ];
 
-const commissions: Commission[] = [
+const FALLBACK_ALL_COMMISSIONS: Commission[] = [
   { id: 'COM-001', supplierId: 'SUP-001', supplierName: 'Zambezi Agri-Supplies', orderId: 'ORD-2025-0412', productName: 'Groundnut Seed (Nyanda) x 50 bags', buyerName: 'Kgosi Mosweu', buyerType: 'smallholder', orderAmount: 3900, commissionRate: 8, commissionAmount: 312, status: 'paid', orderDate: '2025-09-15', paymentDate: '2025-10-15' },
   { id: 'COM-002', supplierId: 'SUP-002', supplierName: 'Kalahari Seeds Co.', orderId: 'ORD-2025-0489', productName: 'Hybrid Maize Seed (PAN 4M-21) x 20 bags', buyerName: 'Tendai Moyo', buyerType: 'smallholder', orderAmount: 960, commissionRate: 7, commissionAmount: 67.20, status: 'paid', orderDate: '2025-10-02', paymentDate: '2025-11-02' },
   { id: 'COM-003', supplierId: 'SUP-009', supplierName: 'Chobe Irrigation Systems', orderId: 'ORD-2025-0523', productName: 'Drip Irrigation Kit (1 Hectare) x 3', buyerName: 'Mosweu Cooperative', buyerType: 'cooperative', orderAmount: 5550, commissionRate: 11, commissionAmount: 610.50, status: 'paid', orderDate: '2025-10-18', paymentDate: '2025-11-18' },
@@ -132,8 +132,8 @@ const fadeUp = {
 
 // ── Supplier context ────────────────────────────────────────────────────────
 
-const currentSupplier = suppliers.find((s) => s.id === 'SUP-001')!;
-const supplierCommissions = commissions.filter((c) => c.supplierId === currentSupplier.id);
+const FALLBACK_SUPPLIER = FALLBACK_SUPPLIERS.find((s) => s.id === 'SUP-001')!;
+const FALLBACK_COMMISSIONS = FALLBACK_ALL_COMMISSIONS.filter((c) => c.supplierId === FALLBACK_SUPPLIER.id);
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -149,17 +149,17 @@ function formatCurrencyExact(value: number): string {
 
 // ── Summary calculations ────────────────────────────────────────────────────
 
-const totalEarned = supplierCommissions.reduce((sum, c) => sum + c.commissionAmount, 0);
-const pendingBalance = supplierCommissions
+const totalEarned = FALLBACK_COMMISSIONS.reduce((sum, c) => sum + c.commissionAmount, 0);
+const pendingBalance = FALLBACK_COMMISSIONS
   .filter((c) => c.status === 'pending')
   .reduce((sum, c) => sum + c.commissionAmount, 0);
-const approvedBalance = supplierCommissions
+const approvedBalance = FALLBACK_COMMISSIONS
   .filter((c) => c.status === 'approved')
   .reduce((sum, c) => sum + c.commissionAmount, 0);
-const paidOut = supplierCommissions
+const paidOut = FALLBACK_COMMISSIONS
   .filter((c) => c.status === 'paid')
   .reduce((sum, c) => sum + c.commissionAmount, 0);
-const disputedAmount = supplierCommissions
+const disputedAmount = FALLBACK_COMMISSIONS
   .filter((c) => c.status === 'disputed')
   .reduce((sum, c) => sum + c.commissionAmount, 0);
 
@@ -287,7 +287,7 @@ export default function CommissionTracking() {
   const { user } = useAuth();
   const [selectedPeriod, setSelectedPeriod] = useState<Period>('all-time');
   const [showPayoutModal, setShowPayoutModal] = useState(false);
-  const [liveCommissions, setLiveCommissions] = useState<Commission[]>(supplierCommissions);
+  const [liveCommissions, setLiveCommissions] = useState<Commission[]>(FALLBACK_COMMISSIONS);
   const [loading, setLoading] = useState(true);
 
   // ── Fetch commissions from Supabase ─────────────────────────────────────
@@ -298,7 +298,7 @@ export default function CommissionTracking() {
         const { data: supplier } = await supabase
           .from('suppliers')
           .select('id, company_name')
-          .eq('email', user?.email ?? '')
+          .eq('profile_id', user?.id ?? '')
           .single();
 
         if (supplier) {

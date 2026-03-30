@@ -98,7 +98,7 @@ interface LivestockSummary {
   upcomingVaccinations: number;
 }
 
-const animals: Animal[] = [
+const FALLBACK_ANIMALS: Animal[] = [
   { id: 'ANM-001', name: 'Mosi', type: 'cattle', breed: 'Brahman', tag: 'BW-C-0041', dateOfBirth: '2021-06-15', gender: 'male', weight: 620, status: 'healthy', parentSire: null, parentDam: null, acquisitionDate: '2022-01-10', acquisitionMethod: 'purchased', purchasePrice: 1200, currentValue: 1850, image: 'https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?w=400&h=300&fit=crop', notes: 'Herd bull. Excellent temperament and conformation. Purchased from Makalamabedi Ranch, Botswana.' },
   { id: 'ANM-002', name: 'Thandi', type: 'cattle', breed: 'Tuli', tag: 'BW-C-0042', dateOfBirth: '2020-09-22', gender: 'female', weight: 480, status: 'lactating', parentSire: null, parentDam: null, acquisitionDate: '2021-03-05', acquisitionMethod: 'purchased', purchasePrice: 950, currentValue: 1400, image: 'https://images.unsplash.com/photo-1596733430284-f7437764b1a9?w=400&h=300&fit=crop', notes: 'Strong milker. Third lactation. Calved January 2026 — calf Lesedi (ANM-009).' },
   { id: 'ANM-003', name: 'Bongani', type: 'cattle', breed: 'Bonsmara', tag: 'ZW-C-0118', dateOfBirth: '2022-02-10', gender: 'male', weight: 560, status: 'healthy', parentSire: null, parentDam: null, acquisitionDate: '2022-02-10', acquisitionMethod: 'born', purchasePrice: null, currentValue: 1650, image: 'https://images.unsplash.com/photo-1527153907836-6c575e1ce12b?w=400&h=300&fit=crop', notes: 'Born on farm in Masvingo, Zimbabwe. Growing well — potential breeding bull.' },
@@ -126,7 +126,7 @@ const animals: Animal[] = [
   { id: 'ANM-025', name: 'Ayana', type: 'pig', breed: 'Large White', tag: 'ZW-PG-0702', dateOfBirth: '2024-01-20', gender: 'female', weight: 145, status: 'pregnant', parentSire: null, parentDam: null, acquisitionDate: '2024-06-10', acquisitionMethod: 'purchased', purchasePrice: 350, currentValue: 600, image: 'https://images.unsplash.com/photo-1604848698030-c434ba08ece1?w=400&h=300&fit=crop', notes: 'First-time sow. Bred to Themba. Expected to farrow mid-April 2026. Good body condition score.' },
 ];
 
-const vetRecords: VetRecord[] = [
+const FALLBACK_VET_RECORDS: VetRecord[] = [
   { id: 'VET-001', animalId: 'ANM-001', animalName: 'Mosi', type: 'vaccination', description: 'Foot-and-Mouth Disease (FMD) vaccination — trivalent SAT1/SAT2/SAT3', date: '2025-03-15', veterinarian: 'Dr. Keabetswe Molefe', clinic: 'Maun Veterinary Services', cost: 18, nextDueDate: '2025-09-15', medications: ['FMD Trivalent Vaccine'], notes: 'Bi-annual FMD vaccination as per Botswana DVS protocol. No adverse reaction.' },
   { id: 'VET-002', animalId: 'ANM-002', animalName: 'Thandi', type: 'vaccination', description: 'Lumpy Skin Disease (LSD) vaccination', date: '2025-04-02', veterinarian: 'Dr. Keabetswe Molefe', clinic: 'Maun Veterinary Services', cost: 12, nextDueDate: '2026-04-02', medications: ['Lumpy Skin Disease Vaccine (Neethling strain)'], notes: 'Annual LSD vaccination. Mild swelling at injection site — resolved in 48 hours.' },
   { id: 'VET-003', animalId: 'ANM-003', animalName: 'Bongani', type: 'vaccination', description: 'Anthrax vaccination — annual booster', date: '2025-05-20', veterinarian: 'Dr. Tatenda Mhike', clinic: 'Masvingo Vet Clinic', cost: 8, nextDueDate: '2026-05-20', medications: ['Anthrax Spore Vaccine (Sterne 34F2)'], notes: 'Anthrax endemic area — annual vaccination mandatory in Masvingo district.' },
@@ -159,7 +159,7 @@ const vetRecords: VetRecord[] = [
   { id: 'VET-030', animalId: 'ANM-006', animalName: 'Simba', type: 'dipping', description: 'Cattle dipping — cypermethrin spray', date: '2026-02-10', veterinarian: 'Dr. Tatenda Mhike', clinic: 'Masvingo Vet Clinic', cost: 5, nextDueDate: '2026-02-24', medications: ['Cypermethrin (Ectomin)'], notes: 'Hand-spray application. Young bull cooperated well in the race. Moderate blue tick presence.' },
 ];
 
-const breedingRecords: BreedingRecord[] = [
+const FALLBACK_BREEDING_RECORDS: BreedingRecord[] = [
   { id: 'BRD-001', sireId: 'ANM-001', sireName: 'Mosi', damId: 'ANM-002', damName: 'Thandi', matingDate: '2025-04-10', expectedDueDate: '2026-01-15', actualBirthDate: '2026-01-12', method: 'natural', status: 'delivered', offspring: [{ id: 'ANM-009', name: 'Lesedi', gender: 'female' }], notes: 'Successful natural mating. Heifer calf born 3 days early. Easy calving, no assistance needed.' },
   { id: 'BRD-002', sireId: 'ANM-001', sireName: 'Mosi', damId: 'ANM-004', damName: 'Naledi', matingDate: '2025-07-05', expectedDueDate: '2026-04-10', actualBirthDate: null, method: 'natural', status: 'confirmed-pregnant', offspring: [], notes: 'Pregnancy confirmed at 90-day check via ultrasound. Single calf. First calving for Naledi.' },
   { id: 'BRD-003', sireId: 'ANM-003', sireName: 'Bongani', damId: 'ANM-008', damName: 'Tafara', matingDate: '2025-08-15', expectedDueDate: '2026-05-22', actualBirthDate: null, method: 'natural', status: 'confirmed-pregnant', offspring: [], notes: 'Bonsmara x Tuli cross. Expecting good hybrid vigour. Tafara in excellent condition.' },
@@ -170,8 +170,8 @@ const breedingRecords: BreedingRecord[] = [
   { id: 'BRD-008', sireId: 'ANM-011', sireName: 'Tau', damId: 'ANM-015', damName: 'Zuri', matingDate: '2026-02-28', expectedDueDate: '2026-07-27', actualBirthDate: null, method: 'natural', status: 'mated', offspring: [], notes: 'First mating for Zuri. Buck exposure for 35 days. Pregnancy check scheduled for April 2026.' },
 ];
 
-function getLivestockSummary(): LivestockSummary {
-  const activeAnimals = animals.filter((a) => a.status !== 'sold' && a.status !== 'deceased');
+function getLivestockSummary(animalsList: Animal[], vetRecordsList: VetRecord[]): LivestockSummary {
+  const activeAnimals = animalsList.filter((a) => a.status !== 'sold' && a.status !== 'deceased');
   const totalAnimals = activeAnimals.length;
   const totalValue = activeAnimals.reduce((sum, a) => sum + a.currentValue, 0);
   const byType: Record<AnimalType, number> = { cattle: 0, goat: 0, sheep: 0, poultry: 0, pig: 0 };
@@ -181,7 +181,7 @@ function getLivestockSummary(): LivestockSummary {
   const pregnantCount = activeAnimals.filter((a) => a.status === 'pregnant').length;
   const today = new Date().toISOString().split('T')[0];
   const thirtyDaysFromNow = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-  const upcomingVaccinations = vetRecords.filter((v) => v.type === 'vaccination' && v.nextDueDate !== null && v.nextDueDate >= today && v.nextDueDate <= thirtyDaysFromNow).length;
+  const upcomingVaccinations = vetRecordsList.filter((v) => v.type === 'vaccination' && v.nextDueDate !== null && v.nextDueDate >= today && v.nextDueDate <= thirtyDaysFromNow).length;
   return { totalAnimals, totalValue, byType, healthyPercentage, pregnantCount, upcomingVaccinations };
 }
 
@@ -333,16 +333,16 @@ function daysUntil(dateStr: string): number {
 
 // ─── Component: AnimalCard ───────────────────────────────────────────────────
 
-function AnimalCard({ animal, onEdit }: { animal: Animal; onEdit?: () => void }) {
+function AnimalCard({ animal, onEdit, allVetRecords = FALLBACK_VET_RECORDS, allAnimals = FALLBACK_ANIMALS }: { animal: Animal; onEdit?: () => void; allVetRecords?: VetRecord[]; allAnimals?: Animal[] }) {
   const [expanded, setExpanded] = useState(false);
 
   const animalVetRecords = useMemo(
     () =>
-      vetRecords
+      allVetRecords
         .filter((v) => v.animalId === animal.id)
         .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
         .slice(0, 3),
-    [animal.id]
+    [animal.id, allVetRecords]
   );
 
   return (
@@ -489,13 +489,13 @@ function AnimalCard({ animal, onEdit }: { animal: Animal; onEdit?: () => void })
                     {animal.parentSire && (
                       <div className="flex items-center gap-1.5 bg-blue-50 text-blue-700 px-3 py-1.5 rounded-lg text-xs font-medium">
                         <span className="text-blue-400">{'\u2642'}</span>
-                        Sire: {animals.find((a) => a.id === animal.parentSire)?.name ?? animal.parentSire}
+                        Sire: {allAnimals.find((a) => a.id === animal.parentSire)?.name ?? animal.parentSire}
                       </div>
                     )}
                     {animal.parentDam && (
                       <div className="flex items-center gap-1.5 bg-pink-50 text-pink-700 px-3 py-1.5 rounded-lg text-xs font-medium">
                         <span className="text-pink-400">{'\u2640'}</span>
-                        Dam: {animals.find((a) => a.id === animal.parentDam)?.name ?? animal.parentDam}
+                        Dam: {allAnimals.find((a) => a.id === animal.parentDam)?.name ?? animal.parentDam}
                       </div>
                     )}
                   </div>
@@ -657,6 +657,37 @@ function AlertCard({
 
 // ─── Main Page ───────────────────────────────────────────────────────────────
 
+// ─── Animal image mapping for DB rows ────────────────────────────────────────
+const ANIMAL_IMAGES: Record<string, string> = {
+  cattle: 'https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?w=400&h=300&fit=crop',
+  goat: 'https://images.unsplash.com/photo-1524024973431-2ad916746264?w=400&h=300&fit=crop',
+  sheep: 'https://images.unsplash.com/photo-1588943211346-0908a1fb0b01?w=400&h=300&fit=crop',
+  poultry: 'https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?w=400&h=300&fit=crop',
+  pig: 'https://images.unsplash.com/photo-1516467508483-a7212febe31a?w=400&h=300&fit=crop',
+};
+
+function adaptLivestockRow(row: LivestockRow): Animal {
+  return {
+    id: row.id,
+    name: row.tag_id || row.type,
+    type: row.type as AnimalType,
+    breed: row.breed || 'Unknown',
+    tag: row.tag_id || '',
+    dateOfBirth: row.date_acquired || '',
+    gender: 'male' as const,
+    weight: 0,
+    status: (row.health_status || 'healthy') as AnimalStatus,
+    parentSire: null,
+    parentDam: null,
+    acquisitionDate: row.date_acquired || '',
+    acquisitionMethod: 'purchased' as const,
+    purchasePrice: null,
+    currentValue: row.value_estimate || 0,
+    image: ANIMAL_IMAGES[row.type] || ANIMAL_IMAGES.cattle,
+    notes: row.notes || '',
+  };
+}
+
 export default function LivestockPage() {
   // --- Live Supabase data (available when real data is entered) ---
   const { livestock: liveLivestock, fetchLivestock } = useLivestock();
@@ -664,6 +695,13 @@ export default function LivestockPage() {
   const { user } = useAuth();
 
   const { updateLivestock } = useUpdateLivestock();
+
+  // --- Resolve data: prefer DB, fall back to mock ---
+  const animals: Animal[] = liveLivestock.length > 0
+    ? liveLivestock.map(adaptLivestockRow)
+    : FALLBACK_ANIMALS;
+  const vetRecords: VetRecord[] = FALLBACK_VET_RECORDS;
+  const breedingRecords: BreedingRecord[] = FALLBACK_BREEDING_RECORDS;
 
   // --- Add/Edit Animal form state ---
   const [showAddForm, setShowAddForm] = useState(false);
@@ -747,11 +785,11 @@ export default function LivestockPage() {
   const [showSortDropdown, setShowSortDropdown] = useState(false);
 
   // --- Derived ---
-  const summary = useMemo(() => getLivestockSummary(), []);
+  const summary = useMemo(() => getLivestockSummary(animals, vetRecords), [animals, vetRecords]);
 
   const activeAnimals = useMemo(
     () => animals.filter((a) => a.status !== 'sold' && a.status !== 'deceased'),
-    []
+    [animals]
   );
 
   const filteredAnimals = useMemo(() => {
@@ -1191,6 +1229,8 @@ export default function LivestockPage() {
                     <AnimalCard
                       key={animal.id}
                       animal={animal}
+                      allVetRecords={vetRecords}
+                      allAnimals={animals}
                       onEdit={liveLivestock.length > 0
                         ? () => {
                             const row = liveLivestock.find((l) => l.id === animal.id);

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -31,8 +31,9 @@ import {
   CircleDot,
   X,
 } from 'lucide-react';
-import { useFarmPlots } from '@/lib/supabase/use-farm-plots';
+import { useFarmPlots, useFarmActivities, useFarmTransactions } from '@/lib/supabase/use-farm-plots';
 import type { FarmPlotRow } from '@/lib/supabase/use-farm-plots';
+import { useAuth } from '@/lib/supabase/auth-context';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 import { QuickStartCard } from '@/components/farm/QuickStartCard';
 
@@ -173,14 +174,14 @@ function adaptFarmPlot(row: FarmPlotRow) {
 // Inline fallback data (from @/lib/data/farm)
 // ---------------------------------------------------------------------------
 
-const mockFarmPlots: FarmPlot[] = [
+const FALLBACK_FARM_PLOTS: FarmPlot[] = [
   { id: 'PLT-001', name: 'Main Blueberry Field', size: 1.5, sizeUnit: 'hectares', crop: 'Blueberries', variety: 'Duke', stage: 'fruiting', plantingDate: '2025-09-15', expectedHarvest: '2026-04-10', daysToHarvest: 27, progressPercent: 78, healthScore: 92, lastActivity: '2026-03-12', activities: [], image: 'https://images.unsplash.com/photo-1498579809087-ef1e558fd1da?w=400&h=300&fit=crop', soilPH: 4.8, location: 'Plot A \u2014 North Field' },
   { id: 'PLT-002', name: 'Cassava Plot', size: 2.0, sizeUnit: 'hectares', crop: 'Cassava', variety: 'TMS 30572', stage: 'vegetative', plantingDate: '2025-12-01', expectedHarvest: '2026-09-30', daysToHarvest: 200, progressPercent: 35, healthScore: 78, lastActivity: '2026-03-10', activities: [], image: 'https://images.unsplash.com/photo-1590682680695-43b964a3ae17?w=400&h=300&fit=crop', soilPH: 6.2, location: 'Plot B \u2014 South Field' },
   { id: 'PLT-003', name: 'Sesame Strip', size: 0.8, sizeUnit: 'hectares', crop: 'Sesame', variety: 'S42 White', stage: 'flowering', plantingDate: '2025-11-20', expectedHarvest: '2026-04-25', daysToHarvest: 42, progressPercent: 65, healthScore: 85, lastActivity: '2026-03-11', activities: [], image: 'https://images.unsplash.com/photo-1595855759920-86582396756a?w=400&h=300&fit=crop', soilPH: 6.8, location: 'Plot C \u2014 East Strip' },
   { id: 'PLT-004', name: 'Maize Field', size: 1.0, sizeUnit: 'hectares', crop: 'Maize', variety: 'SC 513', stage: 'planted', plantingDate: '2026-03-01', expectedHarvest: '2026-07-15', daysToHarvest: 123, progressPercent: 8, healthScore: 95, lastActivity: '2026-03-01', activities: [], image: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400&h=300&fit=crop', soilPH: 6.5, location: 'Plot D \u2014 West Field' },
 ];
 
-const mockFarmActivities: FarmActivity[] = [
+const FALLBACK_FARM_ACTIVITIES: FarmActivity[] = [
   { id: 'ACT-001', plotId: 'PLT-001', plotName: 'Main Blueberry Field', type: 'fertilizing', date: '2026-03-12', time: '07:30', description: 'Applied sulfur-based acidifier around drip lines', cost: 45, currency: 'USD' },
   { id: 'ACT-002', plotId: 'PLT-001', plotName: 'Main Blueberry Field', type: 'scouting', date: '2026-03-11', time: '06:00', description: 'Checked for aphid presence \u2014 minimal activity spotted on north rows', currency: 'USD' },
   { id: 'ACT-003', plotId: 'PLT-002', plotName: 'Cassava Plot', type: 'weeding', date: '2026-03-10', time: '08:00', description: 'Manual weeding between rows, 3 laborers for 4 hours', cost: 36, currency: 'USD' },
@@ -212,7 +213,7 @@ const weatherForecast: WeatherDay[] = [
   { date: '2026-03-20', day: 'Fri', condition: 'sunny', tempHigh: 32, tempLow: 18, humidity: 50, rainChance: 10, windSpeed: 10, advice: 'Warm and dry. Resume normal spraying schedule.' },
 ];
 
-const farmTransactions: FarmTransaction[] = [
+const FALLBACK_FARM_TRANSACTIONS: FarmTransaction[] = [
   { id: 'TXN-001', type: 'income', category: 'harvest-sale', amount: 960, currency: 'USD', date: '2026-03-07', description: 'Blueberries 120kg @ $8/kg' },
   { id: 'TXN-002', type: 'income', category: 'contract-payment', amount: 500, currency: 'USD', date: '2026-03-01', description: 'Advance payment' },
   { id: 'TXN-003', type: 'expense', category: 'fertilizer', amount: 45, currency: 'USD', date: '2026-03-12', description: 'Sulfur-based soil acidifier' },
@@ -227,15 +228,15 @@ const farmTransactions: FarmTransaction[] = [
   { id: 'TXN-012', type: 'expense', category: 'labor', amount: 48, currency: 'USD', date: '2026-02-20', description: 'Harvesting labor' },
 ];
 
-function getMockFarmSummary() {
-  const totalIncome = farmTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
-  const totalExpenses = farmTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+function getFallbackFarmSummary() {
+  const totalIncome = FALLBACK_FARM_TRANSACTIONS.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+  const totalExpenses = FALLBACK_FARM_TRANSACTIONS.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
   const profit = totalIncome - totalExpenses;
-  const totalHectares = mockFarmPlots.reduce((sum, p) => sum + p.size, 0);
-  const avgHealthScore = Math.round(mockFarmPlots.reduce((sum, p) => sum + p.healthScore, 0) / mockFarmPlots.length);
+  const totalHectares = FALLBACK_FARM_PLOTS.reduce((sum, p) => sum + p.size, 0);
+  const avgHealthScore = Math.round(FALLBACK_FARM_PLOTS.reduce((sum, p) => sum + p.healthScore, 0) / FALLBACK_FARM_PLOTS.length);
   const pendingTasks = initialFarmTasks.filter(t => !t.completed).length;
   const highPriorityTasks = initialFarmTasks.filter(t => !t.completed && t.priority === 'high').length;
-  return { totalIncome, totalExpenses, profit, totalHectares, avgHealthScore, pendingTasks, highPriorityTasks, plotCount: mockFarmPlots.length };
+  return { totalIncome, totalExpenses, profit, totalHectares, avgHealthScore, pendingTasks, highPriorityTasks, plotCount: FALLBACK_FARM_PLOTS.length };
 }
 
 // ---------------------------------------------------------------------------
@@ -378,9 +379,49 @@ const priorityBadge: Record<string, { bg: string; dot: string; label: string }> 
 
 export default function FarmDashboardPage() {
   const { t } = useLanguage();
-  const { plots: livePlots } = useFarmPlots();
-  const farmPlots = livePlots.length > 0 ? livePlots.map(adaptFarmPlot) : mockFarmPlots;
-  const summary = useMemo(() => getMockFarmSummary(), []);
+  const { user } = useAuth();
+  const { plots: livePlots } = useFarmPlots(user?.id);
+  const { activities: liveActivities } = useFarmActivities();
+  const { transactions: liveTransactions, income: liveIncome, expenses: liveExpenses } = useFarmTransactions(user?.id);
+
+  const farmPlots = livePlots.length > 0 ? livePlots.map(adaptFarmPlot) : FALLBACK_FARM_PLOTS;
+
+  const farmActivities: FarmActivity[] = liveActivities.length > 0
+    ? liveActivities.map((a) => ({
+        id: a.id,
+        plotId: a.plot_id || '',
+        plotName: '',
+        type: a.type as ActivityType,
+        date: a.date,
+        time: '',
+        description: a.description || '',
+        cost: a.cost || undefined,
+        currency: a.currency || 'USD',
+      }))
+    : FALLBACK_FARM_ACTIVITIES;
+
+  const summary = useMemo(() => {
+    if (livePlots.length > 0 || liveTransactions.length > 0) {
+      const totalHectares = farmPlots.reduce((sum, p) => sum + p.size, 0);
+      const avgHealthScore = farmPlots.length
+        ? Math.round(farmPlots.reduce((sum, p) => sum + p.healthScore, 0) / farmPlots.length)
+        : 0;
+      const pendingTasks = initialFarmTasks.filter(t => !t.completed).length;
+      const highPriorityTasks = initialFarmTasks.filter(t => !t.completed && t.priority === 'high').length;
+      return {
+        totalIncome: liveIncome,
+        totalExpenses: liveExpenses,
+        profit: liveIncome - liveExpenses,
+        totalHectares,
+        avgHealthScore,
+        pendingTasks,
+        highPriorityTasks,
+        plotCount: farmPlots.length,
+      };
+    }
+    return getFallbackFarmSummary();
+  }, [livePlots, liveTransactions, farmPlots, liveIncome, liveExpenses]);
+
   const today = weatherForecast[0];
 
   // Task completion state
@@ -787,7 +828,7 @@ export default function FarmDashboardPage() {
         </div>
 
         <div className="rounded-2xl bg-white border border-gray-100 divide-y divide-gray-50 overflow-hidden">
-          {mockFarmActivities.slice(0, 5).map((activity) => (
+          {farmActivities.slice(0, 5).map((activity) => (
             <div
               key={activity.id}
               className="flex items-center gap-3 p-3 min-h-[44px]"

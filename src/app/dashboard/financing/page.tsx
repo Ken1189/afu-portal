@@ -24,11 +24,12 @@ import {
   Plus,
   Inbox,
   ArrowUpCircle,
+  Loader2,
 } from 'lucide-react';
-import { useLoans } from '@/lib/supabase/use-loans';
+import { useLoans, type LoanRow } from '@/lib/supabase/use-loans';
 
 /* ------------------------------------------------------------------ */
-/*  Loan types & data (inlined from @/lib/data/loans)                   */
+/*  Loan types & data                                                   */
 /* ------------------------------------------------------------------ */
 
 type LoanType = 'working-capital' | 'invoice-finance' | 'equipment' | 'input-bundle';
@@ -54,7 +55,65 @@ interface Loan {
   country: string;
 }
 
-const loans: Loan[] = [
+/** Map a Supabase LoanRow to the UI Loan shape */
+function mapLoanRow(row: LoanRow): Loan {
+  const amount = Number(row.amount) || 0;
+  const repaid = Number(row.amount_repaid) || 0;
+  const outstanding = Math.max(amount - repaid, 0);
+  const repaidPercentage = amount > 0 ? Math.round((repaid / amount) * 100) : 0;
+
+  // Map DB status values to UI status
+  const statusMap: Record<string, LoanStatus> = {
+    approved: 'approved',
+    disbursed: 'disbursed',
+    repaying: 'active',
+    active: 'active',
+    completed: 'completed',
+    overdue: 'overdue',
+    submitted: 'approved',
+    under_review: 'approved',
+    draft: 'approved',
+  };
+
+  // Map DB loan_type to UI type
+  const typeMap: Record<string, LoanType> = {
+    working_capital: 'working-capital',
+    'working-capital': 'working-capital',
+    invoice_finance: 'invoice-finance',
+    'invoice-finance': 'invoice-finance',
+    equipment: 'equipment',
+    input_bundle: 'input-bundle',
+    'input-bundle': 'input-bundle',
+  };
+
+  const termDays = (row.term_months || 0) * 30;
+  const disbursedAt = row.disbursed_at || row.approved_at || row.created_at;
+  const maturityDate = row.due_date || (disbursedAt
+    ? new Date(new Date(disbursedAt).getTime() + termDays * 86400000).toISOString()
+    : '');
+
+  return {
+    id: row.loan_number || row.id,
+    memberId: row.member_id,
+    memberName: '',
+    type: typeMap[row.loan_type] || 'working-capital',
+    amount,
+    outstanding,
+    interestRate: Number(row.interest_rate) || 0,
+    tenor: termDays,
+    status: statusMap[row.status] || 'active',
+    disbursementDate: disbursedAt || '',
+    maturityDate,
+    nextPaymentDate: row.due_date || '',
+    nextPaymentAmount: outstanding > 0 ? Math.round(outstanding / Math.max((row.term_months || 1), 1)) : 0,
+    repaidPercentage,
+    crop: row.purpose || '',
+    buyer: null,
+    country: '',
+  };
+}
+
+const FALLBACK_LOANS: Loan[] = [
   { id: 'FIN-2024-001', memberId: 'AFU-2024-036', memberName: 'Thabo Molefe', type: 'working-capital', amount: 85000, outstanding: 42500, interestRate: 12.5, tenor: 180, status: 'active', disbursementDate: '2025-10-15', maturityDate: '2026-04-13', nextPaymentDate: '2026-03-15', nextPaymentAmount: 14800, repaidPercentage: 50, crop: 'Blueberries', buyer: null, country: 'Botswana' },
   { id: 'FIN-2024-002', memberId: 'AFU-2024-037', memberName: 'Rudo Chidyamakono', type: 'invoice-finance', amount: 120000, outstanding: 36000, interestRate: 10.0, tenor: 90, status: 'active', disbursementDate: '2026-01-10', maturityDate: '2026-04-10', nextPaymentDate: '2026-03-20', nextPaymentAmount: 18500, repaidPercentage: 70, crop: 'Tobacco', buyer: 'Berry Fresh UK', country: 'Zimbabwe' },
   { id: 'FIN-2024-003', memberId: 'AFU-2024-003', memberName: 'Tendai Moyo', type: 'input-bundle', amount: 8500, outstanding: 5950, interestRate: 15.0, tenor: 120, status: 'active', disbursementDate: '2025-12-20', maturityDate: '2026-04-19', nextPaymentDate: '2026-03-20', nextPaymentAmount: 2200, repaidPercentage: 30, crop: 'Maize', buyer: null, country: 'Zimbabwe' },
@@ -209,8 +268,15 @@ const filterButtons: { key: StatusFilter; label: string }[] = [
 /* ------------------------------------------------------------------ */
 
 export default function FinancingPage() {
+  const { loans: dbLoans, loading: loansLoading } = useLoans();
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [expanded, setExpanded] = useState<string | null>(null);
+
+  /* Map DB loans to UI shape, fall back to mock data */
+  const loans: Loan[] = useMemo(() => {
+    if (dbLoans.length > 0) return dbLoans.map(mapLoanRow);
+    return FALLBACK_LOANS;
+  }, [dbLoans]);
 
   /* Filtered loans */
   const filtered = useMemo(
@@ -218,18 +284,18 @@ export default function FinancingPage() {
       statusFilter === 'all'
         ? loans
         : loans.filter((l) => l.status === statusFilter),
-    [statusFilter],
+    [statusFilter, loans],
   );
 
   /* Summary stats */
-  const totalFinanced = useMemo(() => loans.reduce((s, l) => s + l.amount, 0), []);
+  const totalFinanced = useMemo(() => loans.reduce((s, l) => s + l.amount, 0), [loans]);
   const outstandingBalance = useMemo(
     () => loans.reduce((s, l) => s + l.outstanding, 0),
-    [],
+    [loans],
   );
   const activeCount = useMemo(
     () => loans.filter((l) => l.status === 'active').length,
-    [],
+    [loans],
   );
 
   const nextPayment = useMemo(() => {
@@ -241,7 +307,7 @@ export default function FinancingPage() {
           new Date(b.nextPaymentDate).getTime(),
       );
     return upcoming.length > 0 ? upcoming[0] : null;
-  }, []);
+  }, [loans]);
 
   /* Count per status for filter badges */
   const countByStatus = useMemo(() => {
@@ -250,7 +316,15 @@ export default function FinancingPage() {
       map[l.status] = (map[l.status] || 0) + 1;
     }
     return map;
-  }, []);
+  }, [loans]);
+
+  if (loansLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="w-8 h-8 text-[#5DB347] animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div>

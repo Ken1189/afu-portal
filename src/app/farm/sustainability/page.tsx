@@ -90,7 +90,7 @@ interface SustainabilityMetric {
   period: string;
 }
 
-const mockCarbonCredits: CarbonCredit[] = [
+const FALLBACK_CARBON_CREDITS: CarbonCredit[] = [
   { id: 'CC-001', projectName: 'Chobe Agroforestry Initiative', type: 'agroforestry', credits: 450, status: 'verified', verificationBody: 'Verra (VCS)', vintageYear: 2025, pricePerTonne: 18.50, totalValue: 8325, issuanceDate: '2025-03-15', expiryDate: '2035-03-15', buyerName: null, description: 'Carbon credits generated from the planting of over 12,000 indigenous and fruit trees across 300 hectares in the Chobe District. The project integrates agroforestry practices with smallholder farming, improving both carbon sequestration and farmer livelihoods.' },
   { id: 'CC-002', projectName: 'Makgadikgadi Soil Carbon Project', type: 'soil-carbon', credits: 280, status: 'verified', verificationBody: 'Gold Standard', vintageYear: 2025, pricePerTonne: 22.00, totalValue: 6160, issuanceDate: '2025-06-01', expiryDate: '2035-06-01', buyerName: null, description: 'Regenerative agriculture practices implemented across farms in the Makgadikgadi region have significantly increased soil organic carbon. Cover cropping, composting, and reduced tillage have been key interventions.' },
   { id: 'CC-003', projectName: 'Eastern Highlands Methane Capture', type: 'methane-reduction', credits: 620, status: 'listed', verificationBody: 'Verra (VCS)', vintageYear: 2024, pricePerTonne: 15.75, totalValue: 9765, issuanceDate: '2024-09-20', expiryDate: '2034-09-20', buyerName: null, description: 'Methane capture and biogas utilisation from dairy farming operations across the Eastern Highlands of Zimbabwe. Anaerobic digesters have been installed on 45 farms, converting methane emissions into clean cooking fuel.' },
@@ -105,7 +105,7 @@ const mockCarbonCredits: CarbonCredit[] = [
   { id: 'CC-012', projectName: 'Makgadikgadi Soil Carbon Project', type: 'soil-carbon', credits: 95, status: 'pending', verificationBody: 'Gold Standard', vintageYear: 2026, pricePerTonne: 23.50, totalValue: 2232.5, issuanceDate: '2026-01-15', expiryDate: '2036-01-15', buyerName: null, description: 'Expansion phase of the Makgadikgadi Soil Carbon Project. Additional farms have been onboarded, introducing advanced composting techniques and perennial cover crop systems to build soil organic carbon.' },
 ];
 
-const mockSustainabilityProjects: SustainabilityProject[] = [
+const FALLBACK_SUSTAINABILITY_PROJECTS: SustainabilityProject[] = [
   { id: 'SP-001', name: 'Chobe Agroforestry Initiative', type: 'agroforestry', country: 'Botswana', region: 'Chobe District', description: 'A flagship agroforestry project integrating indigenous and fruit tree planting with smallholder crop farming. The project aims to sequester carbon, improve soil health, and diversify farmer income through fruit sales and timber products. Over 200 farmers have participated since inception.', startDate: '2023-01-15', targetCredits: 1200, earnedCredits: 650, participatingFarmers: 215, hectaresCovered: 480, status: 'active', milestones: [{ date: '2023-01-15', title: 'Project launch & farmer registration', completed: true }, { date: '2023-06-01', title: 'First 5,000 trees planted', completed: true }, { date: '2024-01-20', title: 'Baseline carbon measurement completed', completed: true }, { date: '2024-09-15', title: 'First credit issuance (200 tonnes)', completed: true }, { date: '2025-03-15', title: 'Second credit issuance (450 tonnes)', completed: true }, { date: '2025-12-01', title: 'Reach 10,000 trees milestone', completed: false }, { date: '2026-06-01', title: 'Phase 2 expansion to new areas', completed: false }], image: '/images/projects/agroforestry-chobe.jpg' },
   { id: 'SP-002', name: 'Makgadikgadi Soil Carbon Project', type: 'soil-carbon', country: 'Botswana', region: 'Central District', description: 'Regenerative agriculture practices including cover cropping, composting, and reduced tillage are being implemented across farms near the Makgadikgadi salt pans. The project focuses on building soil organic carbon while improving water retention in this arid region.', startDate: '2024-03-01', targetCredits: 800, earnedCredits: 375, participatingFarmers: 128, hectaresCovered: 650, status: 'active', milestones: [{ date: '2024-03-01', title: 'Project initiation & soil baseline testing', completed: true }, { date: '2024-06-15', title: 'Cover crop seeds distributed to all farmers', completed: true }, { date: '2024-12-01', title: 'First soil carbon measurements', completed: true }, { date: '2025-06-01', title: 'Verification audit by Gold Standard', completed: true }, { date: '2026-01-15', title: 'Phase 2 farmer onboarding', completed: false }, { date: '2026-09-01', title: 'Target 600 tonnes verified', completed: false }], image: '/images/projects/soil-carbon-makgadikgadi.jpg' },
   { id: 'SP-003', name: 'Eastern Highlands Methane Capture', type: 'methane-reduction', country: 'Zimbabwe', region: 'Manicaland Province', description: 'Installation and operation of small-scale anaerobic digesters on dairy farms in the Eastern Highlands. The project captures methane from cattle manure and converts it to biogas for cooking and heating, replacing firewood and reducing deforestation pressure.', startDate: '2023-06-01', targetCredits: 1500, earnedCredits: 1000, participatingFarmers: 92, hectaresCovered: 320, status: 'active', milestones: [{ date: '2023-06-01', title: 'Feasibility study completed', completed: true }, { date: '2023-09-15', title: 'First 20 digesters installed', completed: true }, { date: '2024-03-01', title: 'Methane monitoring systems operational', completed: true }, { date: '2024-09-20', title: 'First credit issuance (620 tonnes)', completed: true }, { date: '2025-04-01', title: 'Expansion to 45 farms completed', completed: true }, { date: '2025-11-01', title: 'Second credit issuance (380 tonnes)', completed: true }, { date: '2026-06-01', title: 'Target 1,500 tonnes milestone', completed: false }], image: '/images/projects/methane-eastern-highlands.jpg' },
@@ -114,7 +114,7 @@ const mockSustainabilityProjects: SustainabilityProject[] = [
   { id: 'SP-006', name: 'Dodoma Water Conservation Initiative', type: 'water-conservation', country: 'Tanzania', region: 'Dodoma Region', description: 'Implementing water-smart farming techniques including rainwater harvesting, drip irrigation, and mulching in the semi-arid Dodoma region. The project reduces water waste by over 40% and improves crop resilience to drought conditions.', startDate: '2025-01-01', targetCredits: 400, earnedCredits: 0, participatingFarmers: 156, hectaresCovered: 280, status: 'planning', milestones: [{ date: '2025-01-01', title: 'Project design & community consultation', completed: true }, { date: '2025-04-01', title: 'Water audit of participating farms', completed: true }, { date: '2025-08-01', title: 'Rainwater harvesting systems installed', completed: false }, { date: '2026-01-01', title: 'Drip irrigation rollout', completed: false }, { date: '2026-06-01', title: 'First water savings measurement', completed: false }, { date: '2027-01-01', title: 'Verification and credit issuance', completed: false }], image: '/images/projects/water-dodoma.jpg' },
 ];
 
-const mockSustainabilityMetrics: SustainabilityMetric[] = [
+const FALLBACK_SUSTAINABILITY_METRICS: SustainabilityMetric[] = [
   { id: 'SM-001', category: 'carbon', name: 'Total Carbon Offset', value: 2885, unit: 'tonnes CO2e', trend: 'up', changePercent: 24.5, period: 'Last 12 months' },
   { id: 'SM-002', category: 'water', name: 'Water Saved', value: 1245000, unit: 'litres', trend: 'up', changePercent: 18.2, period: 'Last 12 months' },
   { id: 'SM-003', category: 'biodiversity', name: 'Trees Planted', value: 21400, unit: 'trees', trend: 'up', changePercent: 35.8, period: 'Last 12 months' },
@@ -637,8 +637,8 @@ export default function SustainabilityPage() {
   const { credits: liveCredits, loading: creditsLoading } = useCarbonCredits();
 
   // Use live Supabase data when available, fall back to mock data
-  const sustainabilityProjects = mockSustainabilityProjects;
-  const sustainabilityMetrics = mockSustainabilityMetrics;
+  const sustainabilityProjects = FALLBACK_SUSTAINABILITY_PROJECTS;
+  const sustainabilityMetrics = FALLBACK_SUSTAINABILITY_METRICS;
   const carbonCredits = liveCredits.length > 0
     ? liveCredits.map((c) => ({
         id: c.id,
@@ -655,7 +655,7 @@ export default function SustainabilityPage() {
         expiryDate: c.updated_at,
         buyerName: null,
       }))
-    : mockCarbonCredits;
+    : FALLBACK_CARBON_CREDITS;
 
   const [activeTab, setActiveTab] = useState<TabKey>('projects');
 

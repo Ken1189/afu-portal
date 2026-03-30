@@ -225,21 +225,21 @@ const aiTools: AITool[] = [
   },
 ];
 
-const mockDiagnosis: DiagnosisResult = {
+const FALLBACK_DIAGNOSIS: DiagnosisResult = {
   disease: 'Late Blight (Phytophthora infestans)',
   confidence: 94,
   severity: 'moderate',
   treatment: 'Apply Mancozeb 80WP at 2.5g/L. Remove infected leaves immediately. Improve air circulation. Avoid overhead irrigation. Re-inspect in 5-7 days.',
 };
 
-const mockYieldResult: YieldResult = {
+const FALLBACK_YIELD_RESULT: YieldResult = {
   estimatedYield: '4.8 tonnes/ha',
   confidenceRange: '4.2 - 5.4 tonnes/ha',
   regionalAvg: '3.9 tonnes/ha',
   comparison: 'above',
 };
 
-const mockPriceResult: PriceResult = {
+const FALLBACK_PRICE_RESULT: PriceResult = {
   commodity: 'Maize',
   currentPrice: '$285/tonne',
   forecast30d: '$312/tonne (+9.5%)',
@@ -247,26 +247,26 @@ const mockPriceResult: PriceResult = {
   confidence: 78,
 };
 
-const mockSoilResult: SoilResult = {
+const FALLBACK_SOIL_RESULT: SoilResult = {
   fertilizerType: 'NPK 15-15-15 + Zinc Sulphate',
   applicationRate: '250 kg/ha basal, 100 kg/ha top dress',
   limeRecommendation: 'Apply 2 tonnes/ha of agricultural lime to raise pH from 5.2 to 6.0',
   overallHealth: 'Moderate - Nitrogen and Zinc deficiency detected',
 };
 
-const mockIrrigationResult: IrrigationResult = {
+const FALLBACK_IRRIGATION_RESULT: IrrigationResult = {
   nextIrrigation: 'Tomorrow at 06:00',
   amount: '25mm',
   frequency: 'Every 3 days',
 };
 
-const mockPestAlerts: PestAlert[] = [
+const FALLBACK_PEST_ALERTS: PestAlert[] = [
   { pest: 'Fall Armyworm', affectedCrops: 'Maize, Sorghum', riskLevel: 'high', action: 'Apply Emamectin benzoate 5% SG at 0.4g/L. Scout fields every 2 days.' },
   { pest: 'Aphids (Rhopalosiphum maidis)', affectedCrops: 'Wheat, Barley', riskLevel: 'medium', action: 'Monitor populations. Apply Imidacloprid if threshold exceeded (50/plant).' },
   { pest: 'Red Spider Mite', affectedCrops: 'Tomatoes, Beans', riskLevel: 'low', action: 'Increase humidity around plants. Consider biological control with predatory mites.' },
 ];
 
-const mockCreditResult: CreditResult = {
+const FALLBACK_CREDIT_RESULT: CreditResult = {
   score: 742,
   eligibility: 'Eligible for Tier 2 agricultural loans up to BWP 500,000',
   recommendedProducts: [
@@ -276,7 +276,7 @@ const mockCreditResult: CreditResult = {
   ],
 };
 
-const mockPlannerResult: PlannerResult = {
+const FALLBACK_PLANNER_RESULT: PlannerResult = {
   crops: [
     { name: 'Maize', plant: 'Oct 15 - Nov 15', harvest: 'Mar 15 - Apr 15' },
     { name: 'Sorghum', plant: 'Nov 1 - Dec 1', harvest: 'Apr 1 - May 1' },
@@ -334,16 +334,16 @@ function CropDoctorContent() {
           <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
             <div className="flex items-center gap-2 mb-2">
               <AlertTriangle className="w-5 h-5 text-amber-600" />
-              <h4 className="font-semibold text-[#1B2A4A]">{mockDiagnosis.disease}</h4>
+              <h4 className="font-semibold text-[#1B2A4A]">{FALLBACK_DIAGNOSIS.disease}</h4>
             </div>
             <div className="grid grid-cols-2 gap-3 mt-3">
               <div className="bg-white rounded-lg p-3">
                 <p className="text-xs text-gray-400">Confidence</p>
-                <p className="text-lg font-bold text-[#8CB89C]">{mockDiagnosis.confidence}%</p>
+                <p className="text-lg font-bold text-[#8CB89C]">{FALLBACK_DIAGNOSIS.confidence}%</p>
               </div>
               <div className="bg-white rounded-lg p-3">
                 <p className="text-xs text-gray-400">Severity</p>
-                <p className="text-lg font-bold text-amber-600 capitalize">{mockDiagnosis.severity}</p>
+                <p className="text-lg font-bold text-amber-600 capitalize">{FALLBACK_DIAGNOSIS.severity}</p>
               </div>
             </div>
           </div>
@@ -352,7 +352,7 @@ function CropDoctorContent() {
               <Leaf className="w-4 h-4 text-green-600" />
               <h4 className="text-sm font-semibold text-green-800">Treatment Recommendation</h4>
             </div>
-            <p className="text-sm text-green-700">{mockDiagnosis.treatment}</p>
+            <p className="text-sm text-green-700">{FALLBACK_DIAGNOSIS.treatment}</p>
           </div>
           <button
             onClick={() => setShowResult(false)}
@@ -440,13 +440,13 @@ function YieldPredictorContent() {
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
           <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center">
             <p className="text-xs text-gray-400 mb-1">Estimated Yield for {crop}</p>
-            <p className="text-3xl font-bold text-[#1B2A4A]">{mockYieldResult.estimatedYield}</p>
-            <p className="text-sm text-gray-500 mt-1">Confidence: {mockYieldResult.confidenceRange}</p>
+            <p className="text-3xl font-bold text-[#1B2A4A]">{FALLBACK_YIELD_RESULT.estimatedYield}</p>
+            <p className="text-sm text-gray-500 mt-1">Confidence: {FALLBACK_YIELD_RESULT.confidenceRange}</p>
           </div>
           <div className="flex gap-3">
             <div className="flex-1 bg-gray-50 rounded-xl p-3 text-center">
               <p className="text-xs text-gray-400">Regional Avg</p>
-              <p className="text-sm font-bold text-[#1B2A4A]">{mockYieldResult.regionalAvg}</p>
+              <p className="text-sm font-bold text-[#1B2A4A]">{FALLBACK_YIELD_RESULT.regionalAvg}</p>
             </div>
             <div className="flex-1 bg-green-50 rounded-xl p-3 text-center">
               <p className="text-xs text-gray-400">vs Average</p>
@@ -502,11 +502,11 @@ function PriceForecasterContent() {
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-gray-50 rounded-xl p-3">
               <p className="text-xs text-gray-400">Current Price</p>
-              <p className="text-lg font-bold text-[#1B2A4A]">{mockPriceResult.currentPrice}</p>
+              <p className="text-lg font-bold text-[#1B2A4A]">{FALLBACK_PRICE_RESULT.currentPrice}</p>
             </div>
             <div className="bg-green-50 rounded-xl p-3">
               <p className="text-xs text-gray-400">30-Day Forecast</p>
-              <p className="text-lg font-bold text-green-600">{mockPriceResult.forecast30d}</p>
+              <p className="text-lg font-bold text-green-600">{FALLBACK_PRICE_RESULT.forecast30d}</p>
             </div>
           </div>
           <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center gap-3">
@@ -514,8 +514,8 @@ function PriceForecasterContent() {
               <Target className="w-5 h-5 text-amber-600" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-[#1B2A4A]">Recommendation: <span className="text-amber-600 uppercase">{mockPriceResult.recommendation}</span></p>
-              <p className="text-xs text-gray-500">Confidence: {mockPriceResult.confidence}%</p>
+              <p className="text-sm font-semibold text-[#1B2A4A]">Recommendation: <span className="text-amber-600 uppercase">{FALLBACK_PRICE_RESULT.recommendation}</span></p>
+              <p className="text-xs text-gray-500">Confidence: {FALLBACK_PRICE_RESULT.confidence}%</p>
             </div>
           </div>
           {/* Mini CSS sparkline */}
@@ -579,20 +579,20 @@ function SoilAnalyzerContent() {
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
           <div className="bg-orange-50 border border-orange-200 rounded-xl p-4">
             <p className="text-xs text-gray-400 mb-1">Overall Assessment</p>
-            <p className="text-sm font-semibold text-amber-800">{mockSoilResult.overallHealth}</p>
+            <p className="text-sm font-semibold text-amber-800">{FALLBACK_SOIL_RESULT.overallHealth}</p>
           </div>
           <div className="bg-gray-50 rounded-xl p-4 space-y-3">
             <div>
               <p className="text-xs text-gray-400">Recommended Fertilizer</p>
-              <p className="text-sm font-semibold text-[#1B2A4A]">{mockSoilResult.fertilizerType}</p>
+              <p className="text-sm font-semibold text-[#1B2A4A]">{FALLBACK_SOIL_RESULT.fertilizerType}</p>
             </div>
             <div>
               <p className="text-xs text-gray-400">Application Rate</p>
-              <p className="text-sm font-semibold text-[#1B2A4A]">{mockSoilResult.applicationRate}</p>
+              <p className="text-sm font-semibold text-[#1B2A4A]">{FALLBACK_SOIL_RESULT.applicationRate}</p>
             </div>
             <div>
               <p className="text-xs text-gray-400">Lime Recommendation</p>
-              <p className="text-sm font-semibold text-[#1B2A4A]">{mockSoilResult.limeRecommendation}</p>
+              <p className="text-sm font-semibold text-[#1B2A4A]">{FALLBACK_SOIL_RESULT.limeRecommendation}</p>
             </div>
           </div>
           <button onClick={() => setShowResult(false)} className="w-full py-2 text-sm text-gray-500 hover:text-[#1B2A4A] transition-colors">
@@ -655,17 +655,17 @@ function IrrigationSchedulerContent() {
             <div className="bg-cyan-50 rounded-xl p-3 text-center">
               <Droplets className="w-5 h-5 text-cyan-600 mx-auto mb-1" />
               <p className="text-xs text-gray-400">Next</p>
-              <p className="text-sm font-bold text-[#1B2A4A]">{mockIrrigationResult.nextIrrigation}</p>
+              <p className="text-sm font-bold text-[#1B2A4A]">{FALLBACK_IRRIGATION_RESULT.nextIrrigation}</p>
             </div>
             <div className="bg-cyan-50 rounded-xl p-3 text-center">
               <Activity className="w-5 h-5 text-cyan-600 mx-auto mb-1" />
               <p className="text-xs text-gray-400">Amount</p>
-              <p className="text-sm font-bold text-[#1B2A4A]">{mockIrrigationResult.amount}</p>
+              <p className="text-sm font-bold text-[#1B2A4A]">{FALLBACK_IRRIGATION_RESULT.amount}</p>
             </div>
             <div className="bg-cyan-50 rounded-xl p-3 text-center">
               <Clock className="w-5 h-5 text-cyan-600 mx-auto mb-1" />
               <p className="text-xs text-gray-400">Frequency</p>
-              <p className="text-sm font-bold text-[#1B2A4A]">{mockIrrigationResult.frequency}</p>
+              <p className="text-sm font-bold text-[#1B2A4A]">{FALLBACK_IRRIGATION_RESULT.frequency}</p>
             </div>
           </div>
           <button onClick={() => setShowResult(false)} className="w-full py-2 text-sm text-gray-500 hover:text-[#1B2A4A] transition-colors">
@@ -687,7 +687,7 @@ function PestAlertContent() {
   return (
     <div className="space-y-3">
       <p className="text-xs text-gray-400">Current pest alerts for your region</p>
-      {mockPestAlerts.map((alert, idx) => (
+      {FALLBACK_PEST_ALERTS.map((alert, idx) => (
         <div key={idx} className="bg-gray-50 rounded-xl p-4 border border-gray-100">
           <div className="flex items-center justify-between mb-2">
             <h4 className="text-sm font-semibold text-[#1B2A4A]">{alert.pest}</h4>
@@ -716,7 +716,7 @@ function CreditScoreContent() {
   const [revenue, setRevenue] = useState('250000');
   const [showResult, setShowResult] = useState(false);
 
-  const scoreColor = mockCreditResult.score >= 700 ? 'text-green-600' : mockCreditResult.score >= 500 ? 'text-amber-600' : 'text-red-600';
+  const scoreColor = FALLBACK_CREDIT_RESULT.score >= 700 ? 'text-green-600' : FALLBACK_CREDIT_RESULT.score >= 500 ? 'text-amber-600' : 'text-red-600';
 
   return (
     <div className="space-y-4">
@@ -749,21 +749,21 @@ function CreditScoreContent() {
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
           <div className="bg-gray-50 rounded-xl p-6 text-center">
             <p className="text-xs text-gray-400 mb-2">Your AI Credit Score</p>
-            <p className={`text-5xl font-bold ${scoreColor}`}>{mockCreditResult.score}</p>
+            <p className={`text-5xl font-bold ${scoreColor}`}>{FALLBACK_CREDIT_RESULT.score}</p>
             <p className="text-xs text-gray-400 mt-1">out of 1,000</p>
             <div className="w-full h-2 bg-gray-200 rounded-full mt-3 overflow-hidden">
               <div
                 className="h-full rounded-full bg-gradient-to-r from-red-500 via-amber-500 to-green-500"
-                style={{ width: `${(mockCreditResult.score / 1000) * 100}%` }}
+                style={{ width: `${(FALLBACK_CREDIT_RESULT.score / 1000) * 100}%` }}
               />
             </div>
           </div>
           <div className="bg-teal-50 border border-teal-200 rounded-xl p-3">
-            <p className="text-sm font-medium text-[#1B2A4A]">{mockCreditResult.eligibility}</p>
+            <p className="text-sm font-medium text-[#1B2A4A]">{FALLBACK_CREDIT_RESULT.eligibility}</p>
           </div>
           <div className="space-y-2">
             <p className="text-xs font-medium text-gray-500">Recommended Products</p>
-            {mockCreditResult.recommendedProducts.map((product, idx) => (
+            {FALLBACK_CREDIT_RESULT.recommendedProducts.map((product, idx) => (
               <div key={idx} className="flex items-center gap-2 bg-white rounded-lg p-2.5 border border-gray-100">
                 <CheckCircle className="w-4 h-4 text-[#8CB89C] flex-shrink-0" />
                 <p className="text-xs text-[#1B2A4A]">{product}</p>
@@ -822,7 +822,7 @@ function FarmPlannerContent() {
                   <div key={m} className="flex-1 text-center text-xs text-gray-400 font-medium">{m}</div>
                 ))}
               </div>
-              {mockPlannerResult.crops.map((crop, idx) => (
+              {FALLBACK_PLANNER_RESULT.crops.map((crop, idx) => (
                 <div key={idx} className="flex items-center mb-2">
                   <div className="w-24 flex-shrink-0 text-xs font-medium text-[#1B2A4A] truncate pr-2">{crop.name}</div>
                   <div className="flex-1 relative h-6 bg-gray-50 rounded-full overflow-hidden">
@@ -852,7 +852,7 @@ function FarmPlannerContent() {
             </div>
           </div>
           <div className="bg-purple-50 rounded-xl p-3 space-y-2">
-            {mockPlannerResult.crops.map((crop, idx) => (
+            {FALLBACK_PLANNER_RESULT.crops.map((crop, idx) => (
               <div key={idx} className="flex items-center justify-between text-xs">
                 <span className="font-medium text-[#1B2A4A]">{crop.name}</span>
                 <span className="text-gray-500">Plant: {crop.plant} | Harvest: {crop.harvest}</span>
@@ -893,7 +893,7 @@ function ToolContent({ toolId }: { toolId: string }) {
 export default function AIToolsPage() {
   const { user } = useAuth();
   const [expandedTool, setExpandedTool] = useState<string | null>(null);
-  const [liveDiagnosis, setLiveDiagnosis] = useState<DiagnosisResult>(mockDiagnosis);
+  const [liveDiagnosis, setLiveDiagnosis] = useState<DiagnosisResult>(FALLBACK_DIAGNOSIS);
   const [dataLoading, setDataLoading] = useState(true);
 
   useEffect(() => {

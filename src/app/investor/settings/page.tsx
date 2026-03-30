@@ -56,7 +56,7 @@ interface ActiveSession {
 
 // ── Demo Data ────────────────────────────────────────────────────────────────
 
-const demoSessions: ActiveSession[] = [
+const FALLBACK_SESSIONS: ActiveSession[] = [
   {
     id: '1',
     device: 'Chrome on Windows',
@@ -133,6 +133,12 @@ export default function InvestorSettingsPage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
+  // Investor profile fields
+  const [investorProfileId, setInvestorProfileId] = useState<string | null>(null);
+  const [accreditationStatus, setAccreditationStatus] = useState('verified');
+  const [investorType, setInvestorType] = useState('institutional');
+  const [accountOpened, setAccountOpened] = useState('15 January 2025');
+
   // Communication preferences
   const [commPrefs, setCommPrefs] = useState<CommPreferences>({
     quarterlyReports: 'both',
@@ -163,7 +169,35 @@ export default function InvestorSettingsPage() {
             }
           }
 
-          // Also try investor_settings for comm preferences
+          // Fetch investor_profiles for accreditation/type
+          const { data: investorProfile } = await supabase
+            .from('investor_profiles')
+            .select('*')
+            .eq('user_id', user.id)
+            .single();
+
+          if (investorProfile) {
+            setInvestorProfileId(investorProfile.id);
+            if (investorProfile.company_name) setEntityName(investorProfile.company_name);
+            if (investorProfile.accreditation_status) setAccreditationStatus(investorProfile.accreditation_status);
+            if (investorProfile.investor_type) setInvestorType(investorProfile.investor_type);
+            if (investorProfile.created_at) {
+              setAccountOpened(new Date(investorProfile.created_at).toLocaleDateString('en-GB', {
+                day: 'numeric', month: 'long', year: 'numeric',
+              }));
+            }
+            // Load notification_preferences from investor_profiles if available
+            if (investorProfile.notification_preferences) {
+              const prefs = typeof investorProfile.notification_preferences === 'string'
+                ? JSON.parse(investorProfile.notification_preferences)
+                : investorProfile.notification_preferences;
+              if (prefs.quarterlyReports || prefs.fundUpdates) {
+                setCommPrefs(prefs as CommPreferences);
+              }
+            }
+          }
+
+          // Also try investor_settings for comm preferences (fallback)
           const { data: settingsData } = await supabase
             .from('investor_settings')
             .select('*')
@@ -171,7 +205,9 @@ export default function InvestorSettingsPage() {
             .single();
 
           if (settingsData) {
-            if (settingsData.entity_name && !profileData?.company_name) setEntityName(settingsData.entity_name);
+            if (settingsData.entity_name && !investorProfile?.company_name && !profileData?.company_name) {
+              setEntityName(settingsData.entity_name);
+            }
             if (settingsData.phone && !profileData?.phone) setPhoneNumber(settingsData.phone);
             if (settingsData.comm_preferences) {
               setCommPrefs(settingsData.comm_preferences as CommPreferences);
@@ -202,7 +238,21 @@ export default function InvestorSettingsPage() {
         })
         .eq('id', user.id);
 
-      // Save comm preferences to investor_settings (upsert)
+      // Save to investor_profiles table (accreditation, company name, notification prefs)
+      if (investorProfileId) {
+        await supabase
+          .from('investor_profiles')
+          .update({
+            company_name: entityName,
+            accreditation_status: accreditationStatus,
+            investor_type: investorType,
+            notification_preferences: commPrefs,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', investorProfileId);
+      }
+
+      // Save comm preferences to investor_settings (upsert) as backup
       await supabase
         .from('investor_settings')
         .upsert({
@@ -414,7 +464,7 @@ export default function InvestorSettingsPage() {
           <div className="pt-2">
             <p className="text-sm font-medium text-[#1B2A4A] mb-3">Active Sessions</p>
             <div className="space-y-2">
-              {demoSessions.map((session) => (
+              {FALLBACK_SESSIONS.map((session) => (
                 <div
                   key={session.id}
                   className="flex items-center justify-between py-2.5 px-3 rounded-lg bg-gray-50"
@@ -450,18 +500,37 @@ export default function InvestorSettingsPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Investor Type */}
-          <div className="bg-gray-50 rounded-xl p-4">
-            <p className="text-xs text-gray-400 mb-1">Investor Type</p>
-            <p className="text-sm font-semibold text-[#1B2A4A]">Institutional</p>
+          <div className="bg-white rounded-xl p-4 border border-gray-200">
+            <label className="text-xs text-gray-400 mb-1.5 block">Investor Type</label>
+            <select
+              value={investorType}
+              onChange={(e) => setInvestorType(e.target.value)}
+              className="w-full text-sm font-semibold text-[#1B2A4A] bg-transparent outline-none cursor-pointer"
+            >
+              <option value="institutional">Institutional</option>
+              <option value="individual">Individual</option>
+              <option value="family_office">Family Office</option>
+              <option value="fund_of_funds">Fund of Funds</option>
+              <option value="corporate">Corporate</option>
+            </select>
           </div>
 
           {/* Accreditation Status */}
-          <div className="bg-gray-50 rounded-xl p-4">
-            <p className="text-xs text-gray-400 mb-1">Accreditation Status</p>
-            <div className="flex items-center gap-1.5">
-              <BadgeCheck className="w-4 h-4 text-[#5DB347]" />
-              <span className="text-sm font-semibold text-[#5DB347]">Verified</span>
-            </div>
+          <div className="bg-white rounded-xl p-4 border border-gray-200">
+            <label className="text-xs text-gray-400 mb-1.5 block">Accreditation Status</label>
+            <select
+              value={accreditationStatus}
+              onChange={(e) => setAccreditationStatus(e.target.value)}
+              className={`w-full text-sm font-semibold bg-transparent outline-none cursor-pointer ${
+                accreditationStatus === 'verified' ? 'text-[#5DB347]' :
+                accreditationStatus === 'pending' ? 'text-amber-600' : 'text-gray-600'
+              }`}
+            >
+              <option value="verified">Verified</option>
+              <option value="pending">Pending Verification</option>
+              <option value="unverified">Unverified</option>
+              <option value="expired">Expired</option>
+            </select>
           </div>
 
           {/* Account Opened */}
@@ -469,14 +538,14 @@ export default function InvestorSettingsPage() {
             <p className="text-xs text-gray-400 mb-1">Account Opened</p>
             <div className="flex items-center gap-1.5">
               <Calendar className="w-3.5 h-3.5 text-gray-400" />
-              <p className="text-sm font-semibold text-[#1B2A4A]">15 January 2025</p>
+              <p className="text-sm font-semibold text-[#1B2A4A]">{accountOpened}</p>
             </div>
           </div>
 
           {/* Relationship Manager */}
           <div className="bg-gray-50 rounded-xl p-4">
             <p className="text-xs text-gray-400 mb-1">Relationship Manager</p>
-            <p className="text-sm font-semibold text-[#1B2A4A]">Peter Watson, CEO</p>
+            <p className="text-sm font-semibold text-[#1B2A4A]">AFU Investor Relations</p>
           </div>
         </div>
       </motion.div>

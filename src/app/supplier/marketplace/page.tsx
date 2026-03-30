@@ -39,7 +39,7 @@ interface SupplierProduct {
   minOrder: number;
 }
 
-const supplierProducts: SupplierProduct[] = [
+const FALLBACK_PRODUCTS: SupplierProduct[] = [
   { id: 'SPROD-005', supplierId: 'SUP-001', supplierName: 'Zambezi Agri-Supplies', name: 'Groundnut Seed (Nyanda)', description: 'Virginia-type groundnut variety with large kernels. Resistant to rosette disease. Excellent for both oil extraction and confectionery markets. 25kg bag.', category: 'seeds', price: 78, memberPrice: 68.64, currency: 'USD', unit: 'per 25kg bag', image: 'https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=400&h=300&fit=crop', availability: 'in-stock', rating: 4.8, reviewCount: 98, soldCount: 1678, tags: ['groundnut', 'disease-resistant', 'export-quality', 'virginia-type'], featured: true, minOrder: 1 },
   { id: 'SPROD-014', supplierId: 'SUP-001', supplierName: 'Zambezi Agri-Supplies', name: 'Metalaxyl + Mancozeb Fungicide', description: 'Systemic and contact fungicide combination for control of downy mildew, late blight, and damping-off in vegetables and field crops. 1kg pack.', category: 'pesticides', price: 35, memberPrice: 30.80, currency: 'USD', unit: 'per kg', image: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400&h=300&fit=crop', availability: 'in-stock', rating: 4.5, reviewCount: 76, soldCount: 1345, tags: ['fungicide', 'systemic', 'blight', 'downy-mildew'], featured: false, minOrder: 2 },
   { id: 'SPROD-035', supplierId: 'SUP-001', supplierName: 'Zambezi Agri-Supplies', name: 'Knapsack Sprayer (16L Manual)', description: 'High-pressure manual knapsack sprayer with 16L tank. Brass lance and adjustable nozzle. Comfortable padded straps. Ideal for crop protection application.', category: 'tools', price: 35, memberPrice: 30.80, currency: 'USD', unit: 'per unit', image: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop', availability: 'in-stock', rating: 4.3, reviewCount: 123, soldCount: 3456, tags: ['sprayer', 'knapsack', 'manual', 'crop-protection'], featured: false, minOrder: 1 },
@@ -137,7 +137,7 @@ const availabilityConfig: Record<
 
 // -- Filter products for SUP-001 ----------------------------------------------
 
-const myProducts = supplierProducts.filter((p) => p.supplierId === 'SUP-001');
+const FALLBACK_MY_PRODUCTS = FALLBACK_PRODUCTS.filter((p) => p.supplierId === 'SUP-001');
 
 // =============================================================================
 //  MAIN COMPONENT
@@ -147,7 +147,7 @@ export default function SupplierMarketplacePage() {
   const { user } = useAuth();
   const [selectedTier, setSelectedTier] = useState<MemberTier>('Smallholder');
   const tiers: MemberTier[] = ['Smallholder', 'Commercial', 'Enterprise'];
-  const [liveProducts, setLiveProducts] = useState<SupplierProduct[]>(myProducts);
+  const [liveProducts, setLiveProducts] = useState<SupplierProduct[]>(FALLBACK_MY_PRODUCTS);
   const [loading, setLoading] = useState(true);
 
   // ── Fetch products from Supabase ────────────────────────────────────────
@@ -158,7 +158,7 @@ export default function SupplierMarketplacePage() {
         const { data: supplier } = await supabase
           .from('suppliers')
           .select('id, company_name')
-          .eq('email', user?.email ?? '')
+          .eq('profile_id', user?.id ?? '')
           .single();
 
         if (supplier) {
@@ -285,7 +285,7 @@ export default function SupplierMarketplacePage() {
         variants={containerVariants}
         className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5"
       >
-        {myProducts.map((product, index) => {
+        {liveProducts.map((product, index) => {
           const discountedPrice = getDiscountedPrice(product.memberPrice, selectedTier);
           const savingsPercent = getSavingsPercent(product.price, discountedPrice);
           const avail = availabilityConfig[product.availability];
@@ -455,7 +455,7 @@ export default function SupplierMarketplacePage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              {myProducts.map((product, i) => {
+              {liveProducts.map((product, i) => {
                 const smallholderPrice = getDiscountedPrice(product.memberPrice, 'Smallholder');
                 const commercialPrice = getDiscountedPrice(product.memberPrice, 'Commercial');
                 const enterprisePrice = getDiscountedPrice(product.memberPrice, 'Enterprise');

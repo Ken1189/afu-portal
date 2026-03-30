@@ -74,7 +74,7 @@ interface FarmPlot {
   location: string;
 }
 
-const mockFarmTransactions: FarmTransaction[] = [
+const FALLBACK_FARM_TRANSACTIONS: FarmTransaction[] = [
   { id: 'TXN-001', type: 'income', category: 'harvest-sale', amount: 960, currency: 'USD', date: '2026-03-07', description: 'Blueberries 120kg @ $8/kg — FreshPack Exports', plotId: 'PLT-001', plotName: 'Main Blueberry Field', buyer: 'FreshPack Exports', quantity: 120, unit: 'kg', pricePerUnit: 8 },
   { id: 'TXN-002', type: 'income', category: 'contract-payment', amount: 500, currency: 'USD', date: '2026-03-01', description: 'Advance payment — March sesame delivery contract', plotId: 'PLT-003', plotName: 'Sesame Strip', buyer: 'SesaMe Trading' },
   { id: 'TXN-003', type: 'expense', category: 'fertilizer', amount: 45, currency: 'USD', date: '2026-03-12', description: 'Sulfur-based soil acidifier — 25kg bag', plotId: 'PLT-001', plotName: 'Main Blueberry Field' },
@@ -89,7 +89,7 @@ const mockFarmTransactions: FarmTransaction[] = [
   { id: 'TXN-012', type: 'expense', category: 'labor', amount: 48, currency: 'USD', date: '2026-02-20', description: '4 laborers x 4 hours harvesting cassava @ $3/hr', plotId: 'PLT-002', plotName: 'Cassava Plot' },
 ];
 
-const mockFarmPlots: FarmPlot[] = [
+const FALLBACK_FARM_PLOTS: FarmPlot[] = [
   { id: 'PLT-001', name: 'Main Blueberry Field', size: 1.5, sizeUnit: 'hectares', crop: 'Blueberries', variety: 'Duke', stage: 'fruiting', plantingDate: '2025-09-15', expectedHarvest: '2026-04-10', daysToHarvest: 27, progressPercent: 78, healthScore: 92, lastActivity: '2026-03-12', activities: [], image: 'https://images.unsplash.com/photo-1498579809087-ef1e558fd1da?w=400&h=300&fit=crop', soilPH: 4.8, location: 'Plot A — North Field' },
   { id: 'PLT-002', name: 'Cassava Plot', size: 2.0, sizeUnit: 'hectares', crop: 'Cassava', variety: 'TMS 30572', stage: 'vegetative', plantingDate: '2025-12-01', expectedHarvest: '2026-09-30', daysToHarvest: 200, progressPercent: 35, healthScore: 78, lastActivity: '2026-03-10', activities: [], image: 'https://images.unsplash.com/photo-1590682680695-43b964a3ae17?w=400&h=300&fit=crop', soilPH: 6.2, location: 'Plot B — South Field' },
   { id: 'PLT-003', name: 'Sesame Strip', size: 0.8, sizeUnit: 'hectares', crop: 'Sesame', variety: 'S42 White', stage: 'flowering', plantingDate: '2025-11-20', expectedHarvest: '2026-04-25', daysToHarvest: 42, progressPercent: 65, healthScore: 85, lastActivity: '2026-03-11', activities: [], image: 'https://images.unsplash.com/photo-1595855759920-86582396756a?w=400&h=300&fit=crop', soilPH: 6.8, location: 'Plot C — East Strip' },
@@ -97,12 +97,12 @@ const mockFarmPlots: FarmPlot[] = [
 ];
 
 function getMockFarmSummary() {
-  const totalIncome = mockFarmTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
-  const totalExpenses = mockFarmTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+  const totalIncome = FALLBACK_FARM_TRANSACTIONS.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+  const totalExpenses = FALLBACK_FARM_TRANSACTIONS.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
   const profit = totalIncome - totalExpenses;
-  const totalHectares = mockFarmPlots.reduce((sum, p) => sum + p.size, 0);
-  const avgHealthScore = Math.round(mockFarmPlots.reduce((sum, p) => sum + p.healthScore, 0) / mockFarmPlots.length);
-  return { totalIncome, totalExpenses, profit, totalHectares, avgHealthScore, pendingTasks: 6, highPriorityTasks: 2, plotCount: mockFarmPlots.length };
+  const totalHectares = FALLBACK_FARM_PLOTS.reduce((sum, p) => sum + p.size, 0);
+  const avgHealthScore = Math.round(FALLBACK_FARM_PLOTS.reduce((sum, p) => sum + p.healthScore, 0) / FALLBACK_FARM_PLOTS.length);
+  return { totalIncome, totalExpenses, profit, totalHectares, avgHealthScore, pendingTasks: 6, highPriorityTasks: 2, plotCount: FALLBACK_FARM_PLOTS.length };
 }
 
 // ─── adaptFarmPlot (inlined from @/lib/data/adapters) ─────────────────────
@@ -337,7 +337,7 @@ export default function MoneyTrackerPage() {
   const { user } = useAuth();
   const { transactions: dbTransactions, createTransaction: createDbTransaction, fetchTransactions: refetchDbTransactions } = useFarmTransactions(user?.id);
   const { plots: livePlots } = useFarmPlots();
-  const farmPlots = livePlots.length > 0 ? livePlots.map(adaptFarmPlot) : mockFarmPlots;
+  const farmPlots = livePlots.length > 0 ? livePlots.map(adaptFarmPlot) : FALLBACK_FARM_PLOTS;
   const supabase = createClient();
 
   // ── Wallet balance state ──
@@ -414,7 +414,7 @@ export default function MoneyTrackerPage() {
       return [...onlyLocal, ...adaptedDbTxns];
     }
     if (localTxns.length > 0) return localTxns;
-    return mockFarmTransactions;
+    return FALLBACK_FARM_TRANSACTIONS;
   }, [adaptedDbTxns, localTxns]);
 
   // Compute real totals from whichever transactions are displayed

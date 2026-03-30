@@ -106,7 +106,7 @@ function adaptCooperative(row: CooperativeRow): Cooperative {
 // Inline fallback data (from @/lib/data/cooperatives)
 // ---------------------------------------------------------------------------
 
-const mockCooperatives: Cooperative[] = [
+const FALLBACK_COOPERATIVES: Cooperative[] = [
   {
     id: 'COOP-001', name: 'Gaborone Grain Collective', type: 'crop', region: 'South-East District', country: 'Botswana',
     description: 'Established cooperative of smallholder grain farmers in the greater Gaborone area focused on dryland sorghum and millet production. Members benefit from bulk input purchasing, shared storage facilities, and collective marketing agreements with the Botswana Agricultural Marketing Board. The collective has invested heavily in drought-resistant seed varieties suited to the semi-arid conditions of southern Botswana.',
@@ -393,7 +393,7 @@ const filterTabs = ['All', 'Crop', 'Livestock', 'Mixed', 'Processing', 'Marketin
 export default function CooperativesPage() {
   const { user } = useAuth();
   const { cooperatives: liveCoops, loading: coopsLoading } = useCooperatives();
-  const cooperatives: Cooperative[] = liveCoops.length > 0 ? liveCoops.map(adaptCooperative) : mockCooperatives;
+  const cooperatives: Cooperative[] = liveCoops.length > 0 ? liveCoops.map(adaptCooperative) : FALLBACK_COOPERATIVES;
 
   // The user's cooperative is the first one
   const myCooperative = cooperatives[0];

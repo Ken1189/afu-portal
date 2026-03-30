@@ -204,7 +204,7 @@ export default function CreateCampaign() {
         const { data: supplier } = await supabase
           .from('suppliers')
           .select('id')
-          .eq('email', user?.email ?? '')
+          .eq('profile_id', user?.id ?? '')
           .single();
         if (supplier) setSupplierId(supplier.id);
       } catch {

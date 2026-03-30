@@ -134,11 +134,24 @@ export default function SupplierSettingsPage() {
   const [notifSaved, setNotifSaved] = useState(false);
   const [payoutSaved, setPayoutSaved] = useState(false);
 
+  // Supplier ID for DB operations
+  const [supplierId, setSupplierId] = useState<string | null>(null);
+
   // ── Fetch settings from Supabase ────────────────────────────────────────
   useEffect(() => {
     async function fetchSettings() {
       try {
         const supabase = createClient();
+
+        // 1. Fetch supplier record via profile_id
+        const { data: supplierRow } = await supabase
+          .from('suppliers')
+          .select('id')
+          .eq('profile_id', user?.id ?? '')
+          .single();
+        if (supplierRow) setSupplierId(supplierRow.id);
+
+        // 2. Fetch profile for settings metadata
         const { data: profile } = await supabase
           .from('profiles')
           .select('*')
@@ -173,12 +186,32 @@ export default function SupplierSettingsPage() {
   const [showDeactivateConfirm, setShowDeactivateConfirm] = useState(false);
   const [deactivateText, setDeactivateText] = useState('');
 
-  const handleSaveNotifications = () => {
+  const handleSaveNotifications = async () => {
+    try {
+      const supabase = createClient();
+      await supabase.from('profiles').update({
+        metadata: {
+          notifNewOrders, notifPaymentReceived, notifReviews,
+          notifCommissions, notifAdvertising, notifSystem,
+          payoutMethod, payoutFrequency, payoutThreshold, twoFactorEnabled,
+        },
+      }).eq('id', user?.id ?? '');
+    } catch { /* silent */ }
     setNotifSaved(true);
     setTimeout(() => setNotifSaved(false), 2000);
   };
 
-  const handleSavePayoutSettings = () => {
+  const handleSavePayoutSettings = async () => {
+    try {
+      const supabase = createClient();
+      await supabase.from('profiles').update({
+        metadata: {
+          notifNewOrders, notifPaymentReceived, notifReviews,
+          notifCommissions, notifAdvertising, notifSystem,
+          payoutMethod, payoutFrequency, payoutThreshold, twoFactorEnabled,
+        },
+      }).eq('id', user?.id ?? '');
+    } catch { /* silent */ }
     setPayoutSaved(true);
     setTimeout(() => setPayoutSaved(false), 2000);
   };

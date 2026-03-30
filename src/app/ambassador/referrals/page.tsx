@@ -41,7 +41,7 @@ interface ReferralLink {
 
 // ── Demo Data ────────────────────────────────────────────────────────────────
 
-const demoReferrals: Referral[] = [
+const FALLBACK_REFERRALS: Referral[] = [
   { id: '1', referred_name: 'John Mwangi', referred_email: 'john@farm.co.ke', signed_up_date: '2026-03-20T00:00:00Z', status: 'active', lifetime_value: 2500, commission_earned: 250 },
   { id: '2', referred_name: 'Sarah Kimani', referred_email: 'sarah.k@gmail.com', signed_up_date: '2026-03-15T00:00:00Z', status: 'active', lifetime_value: 1200, commission_earned: 120 },
   { id: '3', referred_name: 'Peter Obi', referred_email: 'peter.obi@agri.ng', signed_up_date: '2026-03-10T00:00:00Z', status: 'active', lifetime_value: 800, commission_earned: 80 },
@@ -70,7 +70,7 @@ function randomString(len: number): string {
 export default function ReferralsPage() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
-  const [referrals, setReferrals] = useState<Referral[]>(demoReferrals);
+  const [referrals, setReferrals] = useState<Referral[]>(FALLBACK_REFERRALS);
   const [referralLinks, setReferralLinks] = useState<ReferralLink[]>([]);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');

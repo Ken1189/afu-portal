@@ -65,7 +65,7 @@ interface BreedingRecord {
   notes: string;
 }
 
-const animals: Animal[] = [
+const FALLBACK_ANIMALS: Animal[] = [
   { id: 'ANM-001', name: 'Mosi', type: 'cattle', breed: 'Brahman', tag: 'BW-C-0041', dateOfBirth: '2021-06-15', gender: 'male', weight: 620, status: 'healthy', parentSire: null, parentDam: null, acquisitionDate: '2022-01-10', acquisitionMethod: 'purchased', purchasePrice: 1200, currentValue: 1850, image: 'https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?w=400&h=300&fit=crop', notes: 'Herd bull. Excellent temperament and conformation. Purchased from Makalamabedi Ranch, Botswana.' },
   { id: 'ANM-002', name: 'Thandi', type: 'cattle', breed: 'Tuli', tag: 'BW-C-0042', dateOfBirth: '2020-09-22', gender: 'female', weight: 480, status: 'lactating', parentSire: null, parentDam: null, acquisitionDate: '2021-03-05', acquisitionMethod: 'purchased', purchasePrice: 950, currentValue: 1400, image: 'https://images.unsplash.com/photo-1596733430284-f7437764b1a9?w=400&h=300&fit=crop', notes: 'Strong milker. Third lactation. Calved January 2026 — calf Lesedi (ANM-009).' },
   { id: 'ANM-003', name: 'Bongani', type: 'cattle', breed: 'Bonsmara', tag: 'ZW-C-0118', dateOfBirth: '2022-02-10', gender: 'male', weight: 560, status: 'healthy', parentSire: null, parentDam: null, acquisitionDate: '2022-02-10', acquisitionMethod: 'born', purchasePrice: null, currentValue: 1650, image: 'https://images.unsplash.com/photo-1527153907836-6c575e1ce12b?w=400&h=300&fit=crop', notes: 'Born on farm in Masvingo, Zimbabwe. Growing well — potential breeding bull.' },
@@ -93,7 +93,7 @@ const animals: Animal[] = [
   { id: 'ANM-025', name: 'Ayana', type: 'pig', breed: 'Large White', tag: 'ZW-PG-0702', dateOfBirth: '2024-01-20', gender: 'female', weight: 145, status: 'pregnant', parentSire: null, parentDam: null, acquisitionDate: '2024-06-10', acquisitionMethod: 'purchased', purchasePrice: 350, currentValue: 600, image: 'https://images.unsplash.com/photo-1604848698030-c434ba08ece1?w=400&h=300&fit=crop', notes: 'First-time sow. Bred to Themba. Expected to farrow mid-April 2026. Good body condition score.' },
 ];
 
-const breedingRecords: BreedingRecord[] = [
+const FALLBACK_BREEDING_RECORDS: BreedingRecord[] = [
   { id: 'BRD-001', sireId: 'ANM-001', sireName: 'Mosi', damId: 'ANM-002', damName: 'Thandi', matingDate: '2025-04-10', expectedDueDate: '2026-01-15', actualBirthDate: '2026-01-12', method: 'natural', status: 'delivered', offspring: [{ id: 'ANM-009', name: 'Lesedi', gender: 'female' }], notes: 'Successful natural mating. Heifer calf born 3 days early. Easy calving, no assistance needed.' },
   { id: 'BRD-002', sireId: 'ANM-001', sireName: 'Mosi', damId: 'ANM-004', damName: 'Naledi', matingDate: '2025-07-05', expectedDueDate: '2026-04-10', actualBirthDate: null, method: 'natural', status: 'confirmed-pregnant', offspring: [], notes: 'Pregnancy confirmed at 90-day check via ultrasound. Single calf. First calving for Naledi.' },
   { id: 'BRD-003', sireId: 'ANM-003', sireName: 'Bongani', damId: 'ANM-008', damName: 'Tafara', matingDate: '2025-08-15', expectedDueDate: '2026-05-22', actualBirthDate: null, method: 'natural', status: 'confirmed-pregnant', offspring: [], notes: 'Bonsmara x Tuli cross. Expecting good hybrid vigour. Tafara in excellent condition.' },
@@ -163,13 +163,13 @@ function daysFromNow(dateStr: string): number {
   return Math.ceil((target.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
 }
 
-function getAnimal(id: string) {
-  return animals.find((a) => a.id === id);
+function getAnimal(id: string, animalsList: Animal[] = FALLBACK_ANIMALS) {
+  return animalsList.find((a) => a.id === id);
 }
 
-function getGestationDays(sireId: string): number {
+function getGestationDays(sireId: string, animalsList: Animal[] = FALLBACK_ANIMALS): number {
   // Approximate gestation periods
-  const sire = getAnimal(sireId);
+  const sire = getAnimal(sireId, animalsList);
   if (!sire) return 283; // default cattle
   switch (sire.type) {
     case 'cattle': return 283;
@@ -577,6 +577,30 @@ function OffspringGroupCard({
 export default function LivestockBreedingPage() {
   // --- Live Supabase data (available when real data is entered) ---
   const { livestock: liveLivestock } = useLivestock();
+
+  // --- Resolve data: prefer DB, fall back to mock ---
+  const animals: Animal[] = liveLivestock.length > 0
+    ? liveLivestock.map((row) => ({
+        id: row.id,
+        name: row.tag_id || row.type,
+        type: row.type as AnimalType,
+        breed: row.breed || 'Unknown',
+        tag: row.tag_id || '',
+        dateOfBirth: row.date_acquired || '',
+        gender: 'male' as const,
+        weight: 0,
+        status: (row.health_status || 'healthy') as AnimalStatus,
+        parentSire: null,
+        parentDam: null,
+        acquisitionDate: row.date_acquired || '',
+        acquisitionMethod: 'purchased' as const,
+        purchasePrice: null,
+        currentValue: row.value_estimate || 0,
+        image: '',
+        notes: row.notes || '',
+      }))
+    : FALLBACK_ANIMALS;
+  const breedingRecords: BreedingRecord[] = FALLBACK_BREEDING_RECORDS;
 
   // --- State ---
   const [activeTab, setActiveTab] = useState<TabKey>('active');

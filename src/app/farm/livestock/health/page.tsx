@@ -72,7 +72,7 @@ interface VetRecord {
   notes: string;
 }
 
-const animals: Animal[] = [
+const FALLBACK_ANIMALS: Animal[] = [
   { id: 'ANM-001', name: 'Mosi', type: 'cattle', breed: 'Brahman', tag: 'BW-C-0041', dateOfBirth: '2021-06-15', gender: 'male', weight: 620, status: 'healthy', parentSire: null, parentDam: null, acquisitionDate: '2022-01-10', acquisitionMethod: 'purchased', purchasePrice: 1200, currentValue: 1850, image: 'https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?w=400&h=300&fit=crop', notes: 'Herd bull. Excellent temperament and conformation. Purchased from Makalamabedi Ranch, Botswana.' },
   { id: 'ANM-002', name: 'Thandi', type: 'cattle', breed: 'Tuli', tag: 'BW-C-0042', dateOfBirth: '2020-09-22', gender: 'female', weight: 480, status: 'lactating', parentSire: null, parentDam: null, acquisitionDate: '2021-03-05', acquisitionMethod: 'purchased', purchasePrice: 950, currentValue: 1400, image: 'https://images.unsplash.com/photo-1596733430284-f7437764b1a9?w=400&h=300&fit=crop', notes: 'Strong milker. Third lactation. Calved January 2026 — calf Lesedi (ANM-009).' },
   { id: 'ANM-003', name: 'Bongani', type: 'cattle', breed: 'Bonsmara', tag: 'ZW-C-0118', dateOfBirth: '2022-02-10', gender: 'male', weight: 560, status: 'healthy', parentSire: null, parentDam: null, acquisitionDate: '2022-02-10', acquisitionMethod: 'born', purchasePrice: null, currentValue: 1650, image: 'https://images.unsplash.com/photo-1527153907836-6c575e1ce12b?w=400&h=300&fit=crop', notes: 'Born on farm in Masvingo, Zimbabwe. Growing well — potential breeding bull.' },
@@ -100,7 +100,7 @@ const animals: Animal[] = [
   { id: 'ANM-025', name: 'Ayana', type: 'pig', breed: 'Large White', tag: 'ZW-PG-0702', dateOfBirth: '2024-01-20', gender: 'female', weight: 145, status: 'pregnant', parentSire: null, parentDam: null, acquisitionDate: '2024-06-10', acquisitionMethod: 'purchased', purchasePrice: 350, currentValue: 600, image: 'https://images.unsplash.com/photo-1604848698030-c434ba08ece1?w=400&h=300&fit=crop', notes: 'First-time sow. Bred to Themba. Expected to farrow mid-April 2026. Good body condition score.' },
 ];
 
-const vetRecords: VetRecord[] = [
+const FALLBACK_VET_RECORDS: VetRecord[] = [
   { id: 'VET-001', animalId: 'ANM-001', animalName: 'Mosi', type: 'vaccination', description: 'Foot-and-Mouth Disease (FMD) vaccination — trivalent SAT1/SAT2/SAT3', date: '2025-03-15', veterinarian: 'Dr. Keabetswe Molefe', clinic: 'Maun Veterinary Services', cost: 18, nextDueDate: '2025-09-15', medications: ['FMD Trivalent Vaccine'], notes: 'Bi-annual FMD vaccination as per Botswana DVS protocol. No adverse reaction.' },
   { id: 'VET-002', animalId: 'ANM-002', animalName: 'Thandi', type: 'vaccination', description: 'Lumpy Skin Disease (LSD) vaccination', date: '2025-04-02', veterinarian: 'Dr. Keabetswe Molefe', clinic: 'Maun Veterinary Services', cost: 12, nextDueDate: '2026-04-02', medications: ['Lumpy Skin Disease Vaccine (Neethling strain)'], notes: 'Annual LSD vaccination. Mild swelling at injection site — resolved in 48 hours.' },
   { id: 'VET-003', animalId: 'ANM-003', animalName: 'Bongani', type: 'vaccination', description: 'Anthrax vaccination — annual booster', date: '2025-05-20', veterinarian: 'Dr. Tatenda Mhike', clinic: 'Masvingo Vet Clinic', cost: 8, nextDueDate: '2026-05-20', medications: ['Anthrax Spore Vaccine (Sterne 34F2)'], notes: 'Anthrax endemic area — annual vaccination mandatory in Masvingo district.' },
@@ -198,8 +198,8 @@ function daysFromNow(dateStr: string): number {
   return Math.ceil((target.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
 }
 
-function getAnimalTag(animalId: string): string {
-  const animal = animals.find((a) => a.id === animalId);
+function getAnimalTag(animalId: string, animalsList: Animal[] = FALLBACK_ANIMALS): string {
+  const animal = animalsList.find((a) => a.id === animalId);
   return animal?.tag || '';
 }
 
@@ -453,6 +453,30 @@ function ScheduleItem({ record, isOverdue }: { record: VetRecord; isOverdue: boo
 export default function LivestockHealthPage() {
   // --- Live Supabase data (available when real data is entered) ---
   const { livestock: liveLivestock } = useLivestock();
+
+  // --- Resolve data: prefer DB, fall back to mock ---
+  const animals: Animal[] = liveLivestock.length > 0
+    ? liveLivestock.map((row) => ({
+        id: row.id,
+        name: row.tag_id || row.type,
+        type: row.type as AnimalType,
+        breed: row.breed || 'Unknown',
+        tag: row.tag_id || '',
+        dateOfBirth: row.date_acquired || '',
+        gender: 'male' as const,
+        weight: 0,
+        status: (row.health_status || 'healthy') as AnimalStatus,
+        parentSire: null,
+        parentDam: null,
+        acquisitionDate: row.date_acquired || '',
+        acquisitionMethod: 'purchased' as const,
+        purchasePrice: null,
+        currentValue: row.value_estimate || 0,
+        image: '',
+        notes: row.notes || '',
+      }))
+    : FALLBACK_ANIMALS;
+  const vetRecords: VetRecord[] = FALLBACK_VET_RECORDS;
 
   // --- State ---
   const [activeTab, setActiveTab] = useState<TabKey>('all');

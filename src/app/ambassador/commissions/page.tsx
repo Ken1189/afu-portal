@@ -29,7 +29,7 @@ interface CommissionEntry {
 
 // ── Demo Data ────────────────────────────────────────────────────────────────
 
-const demoEntries: CommissionEntry[] = [
+const FALLBACK_ENTRIES: CommissionEntry[] = [
   { id: '1', commission_type: 'membership', source_amount: 250, rate: 0.10, commission_amount: 25, status: 'paid', created_at: '2026-03-25T10:00:00Z', description: 'John Mwangi membership signup' },
   { id: '2', commission_type: 'fundraising', source_amount: 5000, rate: 0.05, commission_amount: 250, status: 'paid', created_at: '2026-03-22T14:00:00Z', description: 'Community fundraiser - Kampala' },
   { id: '3', commission_type: 'advertising', source_amount: 1200, rate: 0.10, commission_amount: 120, status: 'pending', created_at: '2026-03-20T09:00:00Z', description: 'AgriTech Co. ad placement' },
@@ -52,7 +52,7 @@ const demoEntries: CommissionEntry[] = [
 export default function CommissionsPage() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
-  const [entries, setEntries] = useState<CommissionEntry[]>(demoEntries);
+  const [entries, setEntries] = useState<CommissionEntry[]>(FALLBACK_ENTRIES);
   const [typeFilter, setTypeFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
 
@@ -160,9 +160,18 @@ export default function CommissionsPage() {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-[#1B2A4A]">Commission History</h1>
-        <p className="text-gray-500 text-sm mt-1">View all your earned commissions and their statuses.</p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-[#1B2A4A]">Commission History</h1>
+          <p className="text-gray-500 text-sm mt-1">View all your earned commissions and their statuses.</p>
+        </div>
+        <a
+          href="/ambassador/payouts"
+          className="inline-flex items-center gap-2 bg-[#5DB347] hover:bg-[#4ea03c] text-white px-5 py-2.5 rounded-xl text-sm font-medium transition-colors whitespace-nowrap"
+        >
+          <DollarSign className="w-4 h-4" />
+          Request Payout
+        </a>
       </div>
 
       {/* Summary Cards */}

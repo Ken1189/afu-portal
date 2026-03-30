@@ -80,7 +80,7 @@ interface Review {
   response: string | null;
 }
 
-const mockReviews: Review[] = [
+const FALLBACK_REVIEWS: Review[] = [
   {
     id: 'REV-001',
     buyerName: 'Kgosi Mosweu',
@@ -241,7 +241,7 @@ const sentimentData = [
 
 export default function SupplierReviewsPage() {
   const { user } = useAuth();
-  const [reviews, setReviews] = useState<Review[]>(mockReviews);
+  const [reviews, setReviews] = useState<Review[]>(FALLBACK_REVIEWS);
   const [respondingTo, setRespondingTo] = useState<string | null>(null);
   const [responseText, setResponseText] = useState('');
   const [filterStars, setFilterStars] = useState<number | null>(null);
@@ -258,7 +258,7 @@ export default function SupplierReviewsPage() {
         const { data: supplier } = await supabase
           .from('suppliers')
           .select('id, rating, review_count')
-          .eq('email', user?.email ?? '')
+          .eq('profile_id', user?.id ?? '')
           .single();
 
         if (supplier) {

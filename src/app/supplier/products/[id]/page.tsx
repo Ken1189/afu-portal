@@ -56,7 +56,7 @@ interface SupplierProduct {
   minOrder: number;
 }
 
-const supplierProducts: SupplierProduct[] = [
+const FALLBACK_PRODUCTS: SupplierProduct[] = [
   { id: 'SPROD-001', supplierId: 'SUP-002', supplierName: 'Kalahari Seeds Co.', name: 'Drought-Resistant Sorghum (Macia)', description: 'Early-maturing white sorghum variety developed for semi-arid conditions. 90-100 day maturity cycle with excellent grain quality for milling. 25kg bag.', category: 'seeds', price: 65, memberPrice: 58.50, currency: 'USD', unit: 'per 25kg bag', image: 'https://images.unsplash.com/photo-1595855759920-86582396756a?w=400&h=300&fit=crop', availability: 'in-stock', rating: 4.7, reviewCount: 89, soldCount: 1245, tags: ['drought-resistant', 'early-maturing', 'sorghum', 'milling-grade'], featured: true, minOrder: 2 },
   { id: 'SPROD-002', supplierId: 'SUP-002', supplierName: 'Kalahari Seeds Co.', name: 'Hybrid Maize Seed (PAN 4M-21)', description: 'High-yielding hybrid maize variety with good drought tolerance. Expected yield 6-8 tonnes/hectare under optimal conditions. 10kg bag treats 1 hectare.', category: 'seeds', price: 48, memberPrice: 43.20, currency: 'USD', unit: 'per 10kg bag', image: 'https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=400&h=300&fit=crop', availability: 'in-stock', rating: 4.6, reviewCount: 134, soldCount: 2310, tags: ['hybrid', 'maize', 'high-yield', 'drought-tolerant'], featured: true, minOrder: 1 },
   { id: 'SPROD-003', supplierId: 'SUP-020', supplierName: 'Victoria Falls Seed Bank', name: 'Cowpea Seeds (IT18)', description: 'Improved cowpea variety with resistance to aphids and bruchids. Dual-purpose grain and fodder. Matures in 65-70 days. 5kg pack.', category: 'seeds', price: 22, memberPrice: 20.24, currency: 'USD', unit: 'per 5kg pack', image: 'https://images.unsplash.com/photo-1590682680695-43b964a3ae17?w=400&h=300&fit=crop', availability: 'in-stock', rating: 4.5, reviewCount: 67, soldCount: 890, tags: ['cowpea', 'dual-purpose', 'pest-resistant', 'legume'], featured: false, minOrder: 2 },
@@ -183,7 +183,7 @@ const salesData = [
 
 // ── Mock reviews ────────────────────────────────────────────────────────────
 
-const mockReviews = [
+const FALLBACK_REVIEWS = [
   {
     id: 'REV-001',
     author: 'Kgosi Mosweu',
@@ -342,7 +342,7 @@ export default function SupplierProductDetailPage() {
     fetchProduct();
   }, [productId]);
 
-  const product = dbProduct || supplierProducts.find((p) => p.id === productId);
+  const product = dbProduct || FALLBACK_PRODUCTS.find((p) => p.id === productId);
 
   const [selectedImage, setSelectedImage] = useState(0);
 
@@ -720,7 +720,7 @@ export default function SupplierProductDetailPage() {
             </div>
           </div>
           <div className="divide-y divide-gray-50">
-            {mockReviews.map((review, i) => (
+            {FALLBACK_REVIEWS.map((review, i) => (
               <motion.div
                 key={review.id}
                 initial={{ opacity: 0, y: 8 }}

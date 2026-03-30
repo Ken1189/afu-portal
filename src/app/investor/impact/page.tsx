@@ -23,6 +23,7 @@ import {
   Baby,
   Wheat,
   ArrowUpRight,
+  Download,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
@@ -263,74 +264,112 @@ export default function InvestorImpactPage() {
   const [loading, setLoading] = useState(true);
   const [carbonCreditsSold, setCarbonCreditsSold] = useState<number | null>(null);
   const [carbonCO2Offset, setCarbonCO2Offset] = useState<number | null>(null);
+  const [totalDeployed, setTotalDeployed] = useState<number | null>(null);
+  const [repaymentRate, setRepaymentRate] = useState<number | null>(null);
 
   useEffect(() => {
     async function fetchStats() {
       const supabase = createClient();
       try {
-        // Try members table first, then profiles table for farmer count
-        const { count: memberCount } = await supabase
-          .from('members')
-          .select('*', { count: 'exact', head: true });
+        // 1. Try site_config for curated impact_metrics first
+        const { data: configData } = await supabase
+          .from('site_config')
+          .select('value')
+          .eq('key', 'impact_metrics')
+          .single();
 
-        if (memberCount !== null && memberCount > 0) {
-          setFarmersCount(memberCount);
-        } else {
-          // Fall back to profiles table filtering for farmer role
-          const { count: profileCount } = await supabase
-            .from('profiles')
-            .select('*', { count: 'exact', head: true })
-            .eq('role', 'farmer');
-          if (profileCount !== null && profileCount > 0) {
-            setFarmersCount(profileCount);
+        if (configData?.value) {
+          const metrics = configData.value as Record<string, unknown>;
+          if (metrics.farmers_count) setFarmersCount(Number(metrics.farmers_count));
+          if (metrics.hectares) setHectares(Number(metrics.hectares));
+          if (metrics.countries_count) setCountriesCount(Number(metrics.countries_count));
+          if (metrics.carbon_credits_sold) setCarbonCreditsSold(Number(metrics.carbon_credits_sold));
+          if (metrics.carbon_co2_offset) setCarbonCO2Offset(Number(metrics.carbon_co2_offset));
+          if (metrics.total_deployed) setTotalDeployed(Number(metrics.total_deployed));
+          if (metrics.repayment_rate) setRepaymentRate(Number(metrics.repayment_rate));
+        }
+
+        // 2. Compute live stats from investments table
+        const { data: investmentsData } = await supabase
+          .from('investments')
+          .select('amount, status, returns');
+        if (investmentsData && investmentsData.length > 0) {
+          const deployed = investmentsData.reduce(
+            (sum: number, r: Record<string, unknown>) => sum + (Number(r.amount) || 0),
+            0
+          );
+          if (deployed > 0) setTotalDeployed(deployed);
+        }
+
+        // 3. Try members table first, then profiles table for farmer count
+        if (farmersCount === null) {
+          const { count: memberCount } = await supabase
+            .from('members')
+            .select('*', { count: 'exact', head: true });
+
+          if (memberCount !== null && memberCount > 0) {
+            setFarmersCount(memberCount);
           } else {
-            // Try all profiles as a general count
-            const { count: allProfiles } = await supabase
+            const { count: profileCount } = await supabase
               .from('profiles')
-              .select('*', { count: 'exact', head: true });
-            if (allProfiles !== null && allProfiles > 0) {
-              setFarmersCount(allProfiles);
+              .select('*', { count: 'exact', head: true })
+              .eq('role', 'farmer');
+            if (profileCount !== null && profileCount > 0) {
+              setFarmersCount(profileCount);
+            } else {
+              const { count: allProfiles } = await supabase
+                .from('profiles')
+                .select('*', { count: 'exact', head: true });
+              if (allProfiles !== null && allProfiles > 0) {
+                setFarmersCount(allProfiles);
+              }
             }
           }
         }
 
-        // Fetch hectares from farm_plots
-        const { data: plotData } = await supabase
-          .from('farm_plots')
-          .select('size_hectares');
+        // 4. Fetch hectares from farm_plots
+        if (hectares === null) {
+          const { data: plotData } = await supabase
+            .from('farm_plots')
+            .select('size_hectares');
 
-        if (plotData && plotData.length > 0) {
-          const total = plotData.reduce(
-            (sum: number, row: Record<string, unknown>) =>
-              sum + ((row.size_hectares as number) || 0),
-            0
-          );
-          if (total > 0) setHectares(Math.round(total));
+          if (plotData && plotData.length > 0) {
+            const total = plotData.reduce(
+              (sum: number, row: Record<string, unknown>) =>
+                sum + ((row.size_hectares as number) || 0),
+              0
+            );
+            if (total > 0) setHectares(Math.round(total));
+          }
         }
 
-        // Fetch distinct countries from profiles or members
-        const { data: countryData } = await supabase
-          .from('profiles')
-          .select('country')
-          .not('country', 'is', null);
-        if (countryData && countryData.length > 0) {
-          const uniqueCountries = new Set(
-            countryData.map((r: Record<string, unknown>) => String(r.country)).filter(Boolean)
-          );
-          if (uniqueCountries.size > 0) setCountriesCount(uniqueCountries.size);
+        // 5. Fetch distinct countries from profiles or members
+        if (countriesCount === null) {
+          const { data: countryData } = await supabase
+            .from('profiles')
+            .select('country')
+            .not('country', 'is', null);
+          if (countryData && countryData.length > 0) {
+            const uniqueCountries = new Set(
+              countryData.map((r: Record<string, unknown>) => String(r.country)).filter(Boolean)
+            );
+            if (uniqueCountries.size > 0) setCountriesCount(uniqueCountries.size);
+          }
         }
 
-        // Fetch carbon credits data
-        const { data: carbonData } = await supabase
-          .from('carbon_credits')
-          .select('quantity, status');
-        if (carbonData && carbonData.length > 0) {
-          const sold = carbonData
-            .filter((c: any) => c.status === 'sold' || c.status === 'retired')
-            .reduce((sum: number, c: any) => sum + (c.quantity || 0), 0);
-          const totalOffset = carbonData.reduce((sum: number, c: any) => sum + (c.quantity || 0), 0);
-          if (sold > 0) setCarbonCreditsSold(sold);
-          if (totalOffset > 0) setCarbonCO2Offset(totalOffset);
+        // 6. Fetch carbon credits data
+        if (carbonCreditsSold === null) {
+          const { data: carbonData } = await supabase
+            .from('carbon_credits')
+            .select('quantity, status');
+          if (carbonData && carbonData.length > 0) {
+            const sold = carbonData
+              .filter((c: any) => c.status === 'sold' || c.status === 'retired')
+              .reduce((sum: number, c: any) => sum + (c.quantity || 0), 0);
+            const totalOffset = carbonData.reduce((sum: number, c: any) => sum + (c.quantity || 0), 0);
+            if (sold > 0) setCarbonCreditsSold(sold);
+            if (totalOffset > 0) setCarbonCO2Offset(totalOffset);
+          }
         }
       } catch {
         // keep fallbacks
@@ -355,16 +394,25 @@ export default function InvestorImpactPage() {
     <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-8">
       {/* ─── Header ─── */}
       <motion.div variants={cardVariants}>
-        <div className="flex items-center gap-3 mb-1">
-          <div className="w-10 h-10 bg-[#5DB347]/10 rounded-xl flex items-center justify-center">
-            <Leaf className="w-5 h-5 text-[#5DB347]" />
+        <div className="flex items-center justify-between flex-wrap gap-4">
+          <div className="flex items-center gap-3 mb-1">
+            <div className="w-10 h-10 bg-[#5DB347]/10 rounded-xl flex items-center justify-center">
+              <Leaf className="w-5 h-5 text-[#5DB347]" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-[#1B2A4A]">ESG & Impact Dashboard</h1>
+              <p className="text-sm text-gray-500">
+                Real-time environmental, social, and governance metrics
+              </p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-2xl font-bold text-[#1B2A4A]">ESG & Impact Dashboard</h1>
-            <p className="text-sm text-gray-500">
-              Real-time environmental, social, and governance metrics
-            </p>
-          </div>
+          <a
+            href="/investor/documents"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#5DB347] text-white text-sm font-medium hover:bg-[#4ea03c] transition-colors shadow-sm"
+          >
+            <Download className="w-4 h-4" />
+            Download Impact Report
+          </a>
         </div>
       </motion.div>
 

@@ -62,7 +62,7 @@ interface InsuranceClaim {
   timeline: { date: string; status: string; note: string }[];
 }
 
-const mockInsurancePolicies: InsurancePolicy[] = [
+const FALLBACK_INSURANCE_POLICIES: InsurancePolicy[] = [
   {
     id: 'POL-001',
     productId: 'INS-PROD-001',
@@ -150,7 +150,7 @@ const mockInsurancePolicies: InsurancePolicy[] = [
   },
 ];
 
-const mockInsuranceClaims: InsuranceClaim[] = [
+const FALLBACK_INSURANCE_CLAIMS: InsuranceClaim[] = [
   {
     id: 'CLM-001',
     policyId: 'POL-001',
@@ -432,7 +432,7 @@ export default function InsuranceHomePage() {
       }));
     }
     if (policiesLoading) return [];
-    return mockInsurancePolicies;
+    return FALLBACK_INSURANCE_POLICIES;
   }, [dbPolicies, policiesLoading]);
 
   const insuranceClaims: InsuranceClaim[] = useMemo(() => {
@@ -454,7 +454,7 @@ export default function InsuranceHomePage() {
       }));
     }
     if (claimsLoading) return [];
-    return mockInsuranceClaims;
+    return FALLBACK_INSURANCE_CLAIMS;
   }, [dbClaims, claimsLoading]);
 
   // Compute stats from data

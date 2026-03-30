@@ -199,7 +199,7 @@ export default function AdvertisingDashboard() {
         const { data: supplier } = await supabase
           .from('suppliers')
           .select('id, company_name')
-          .eq('email', user?.email ?? '')
+          .eq('profile_id', user?.id ?? '')
           .single();
 
         if (supplier) {

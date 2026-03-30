@@ -47,7 +47,7 @@ interface FarmPlotMinimal {
   variety: string;
 }
 
-const cropScans: CropScan[] = [
+const FALLBACK_CROP_SCANS: CropScan[] = [
   {
     id: 'SCN-001', plotId: 'PLT-001', plotName: 'Main Blueberry Field', date: '2026-03-11',
     image: 'https://images.unsplash.com/photo-1498579809087-ef1e558fd1da?w=400&h=300&fit=crop',
@@ -71,7 +71,7 @@ const cropScans: CropScan[] = [
   },
 ];
 
-const farmPlots: FarmPlotMinimal[] = [
+const FALLBACK_FARM_PLOTS: FarmPlotMinimal[] = [
   { id: 'PLT-001', name: 'Main Blueberry Field', crop: 'Blueberries', variety: 'Duke' },
   { id: 'PLT-002', name: 'Cassava Plot', crop: 'Cassava', variety: 'TMS 30572' },
   { id: 'PLT-003', name: 'Sesame Strip', crop: 'Sesame', variety: 'S42 White' },
@@ -98,7 +98,7 @@ type PageState = 'capture' | 'analyzing' | 'results';
 // Mock Diagnoses
 // ---------------------------------------------------------------------------
 
-const mockDiagnoses: MockDiagnosis[] = [
+const FALLBACK_DIAGNOSES: MockDiagnosis[] = [
   {
     diagnosis: 'Healthy Crop - No Issues Detected',
     healthScore: 92,
@@ -417,7 +417,7 @@ function AnalysisStep({
 export default function CropDoctorPage() {
   const { t } = useLanguage();
   const [pageState, setPageState] = useState<PageState>('capture');
-  const [selectedPlotId, setSelectedPlotId] = useState<string>(farmPlots[0]?.id ?? '');
+  const [selectedPlotId, setSelectedPlotId] = useState<string>(FALLBACK_FARM_PLOTS[0]?.id ?? '');
   const [plotDropdownOpen, setPlotDropdownOpen] = useState(false);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [analysisStep, setAnalysisStep] = useState(0);
@@ -426,8 +426,8 @@ export default function CropDoctorPage() {
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
 
-  const selectedPlot = farmPlots.find((p) => p.id === selectedPlotId) ?? farmPlots[0];
-  const recentScans = cropScans.slice(0, 3);
+  const selectedPlot = FALLBACK_FARM_PLOTS.find((p) => p.id === selectedPlotId) ?? FALLBACK_FARM_PLOTS[0];
+  const recentScans = FALLBACK_CROP_SCANS.slice(0, 3);
 
   // ─── Handle photo selection ───
   const handlePhoto = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -563,7 +563,7 @@ export default function CropDoctorPage() {
         if (cancelled) return;
         // Fallback to a mock diagnosis on error
         const fallback =
-          mockDiagnoses[Math.floor(Math.random() * mockDiagnoses.length)];
+          FALLBACK_DIAGNOSES[Math.floor(Math.random() * FALLBACK_DIAGNOSES.length)];
         timers.push(
           setTimeout(() => {
             if (!cancelled) {
@@ -656,7 +656,7 @@ export default function CropDoctorPage() {
                       transition={{ type: 'spring' as const, stiffness: 400, damping: 25 }}
                       className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden z-20"
                     >
-                      {farmPlots.map((plot) => (
+                      {FALLBACK_FARM_PLOTS.map((plot) => (
                         <button
                           key={plot.id}
                           onClick={() => {

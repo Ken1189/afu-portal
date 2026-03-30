@@ -68,7 +68,7 @@ function adaptContract(row: { id: string; buyer_name?: string; commodity?: strin
   };
 }
 
-const mockContracts: OfftakeContract[] = [
+const FALLBACK_CONTRACTS: OfftakeContract[] = [
   { id: 'OFT-001', buyer: 'Berry Fresh UK', crop: 'Blueberries', volume: 50000, volumeUnit: 'kg', pricePerKg: 12.50, currency: 'USD', contractPeriod: { start: '2026-01-01', end: '2026-12-31' }, deliveredVolume: 12500, deliveredPercentage: 25, qualityGrade: 'A', status: 'active', country: 'Zimbabwe', memberId: 'AFU-2024-005', memberName: 'Grace Moyo', nextDeliveryDate: '2026-03-25', incoterm: 'FOB Harare' },
   { id: 'OFT-002', buyer: 'EuroFruit GmbH', crop: 'Blueberries', volume: 30000, volumeUnit: 'kg', pricePerKg: 11.80, currency: 'EUR', contractPeriod: { start: '2026-02-01', end: '2026-11-30' }, deliveredVolume: 5400, deliveredPercentage: 18, qualityGrade: 'A', status: 'active', country: 'Zimbabwe', memberId: 'AFU-2024-018', memberName: 'Amina Salim', nextDeliveryDate: '2026-04-01', incoterm: 'CIF Frankfurt' },
   { id: 'OFT-003', buyer: 'Dubai Fresh Markets', crop: 'Sesame', volume: 200000, volumeUnit: 'kg', pricePerKg: 2.80, currency: 'USD', contractPeriod: { start: '2025-10-01', end: '2026-09-30' }, deliveredVolume: 110000, deliveredPercentage: 55, qualityGrade: 'B', status: 'active', country: 'Tanzania', memberId: 'AFU-2024-041', memberName: 'Baraka Mushi', nextDeliveryDate: '2026-03-30', incoterm: 'FOB Dar es Salaam' },
@@ -95,7 +95,7 @@ function formatPeriod(period: { start: string; end: string }) {
 export default function OfftakePage() {
   const { contracts: liveContracts, loading: contractsLoading } = useContracts();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const contracts: OfftakeContract[] = liveContracts.length > 0 ? liveContracts.map((c: any) => adaptContract(c)) : mockContracts;
+  const contracts: OfftakeContract[] = liveContracts.length > 0 ? liveContracts.map((c: any) => adaptContract(c)) : FALLBACK_CONTRACTS;
 
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [expanded, setExpanded] = useState<string | null>(null);

@@ -156,7 +156,7 @@ const statusConfig: Record<TransactionStatus, { label: string; class: string }> 
 // ---------------------------------------------------------------------------
 // Mock Transactions (25+)
 // ---------------------------------------------------------------------------
-const mockTransactions: Transaction[] = [
+const FALLBACK_TRANSACTIONS: Transaction[] = [
   { id: 'TXN-001', date: '2026-03-15', description: 'Maize seeds — 50kg bag x3', amount: 245, type: 'debit', category: 'Input Purchase', paymentMethod: 'EcoCash', status: 'completed', reference: 'REF-EC-90312' },
   { id: 'TXN-002', date: '2026-03-14', description: 'Tomato harvest sold to Harare Fresh Market', amount: 1820, type: 'credit', category: 'Harvest Sale', paymentMethod: 'Bank Transfer', status: 'completed', reference: 'REF-BK-44201' },
   { id: 'TXN-003', date: '2026-03-13', description: 'Monthly crop insurance premium', amount: 68, type: 'debit', category: 'Insurance Premium', paymentMethod: 'EcoCash', status: 'completed', reference: 'REF-IN-55930' },
@@ -274,7 +274,7 @@ export default function PaymentHistoryPage() {
       }));
     }
     if (paymentsLoading) return [];
-    return mockTransactions;
+    return FALLBACK_TRANSACTIONS;
   }, [dbPayments, paymentsLoading]);
 
   // Filter transactions based on time, tab, and search

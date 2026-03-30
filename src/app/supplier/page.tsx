@@ -130,7 +130,7 @@ interface Advertisement {
 
 // ── Inline fallback data ────────────────────────────────────────────────────
 
-const staticSuppliers: Supplier[] = [
+const FALLBACK_SUPPLIERS: Supplier[] = [
   {
     id: 'SUP-001',
     companyName: 'Zambezi Agri-Supplies',
@@ -159,7 +159,7 @@ const staticSuppliers: Supplier[] = [
   },
 ];
 
-const supplierProducts: SupplierProduct[] = [
+const FALLBACK_SUPPLIER_PRODUCTS: SupplierProduct[] = [
   { id: 'SPROD-005', supplierId: 'SUP-001', supplierName: 'Zambezi Agri-Supplies', name: 'Groundnut Seed (Nyanda)', description: 'Virginia-type groundnut variety with large kernels.', category: 'seeds', price: 78, memberPrice: 68.64, currency: 'USD', unit: 'per 25kg bag', image: 'https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=400&h=300&fit=crop', availability: 'in-stock', rating: 4.8, reviewCount: 98, soldCount: 1678, tags: ['groundnut', 'disease-resistant', 'export-quality', 'virginia-type'], featured: true, minOrder: 1 },
   { id: 'SPROD-014', supplierId: 'SUP-001', supplierName: 'Zambezi Agri-Supplies', name: 'Metalaxyl + Mancozeb Fungicide', description: 'Systemic and contact fungicide combination.', category: 'pesticides', price: 35, memberPrice: 30.80, currency: 'USD', unit: 'per kg', image: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400&h=300&fit=crop', availability: 'in-stock', rating: 4.5, reviewCount: 76, soldCount: 1345, tags: ['fungicide', 'systemic', 'blight', 'downy-mildew'], featured: false, minOrder: 2 },
   { id: 'SPROD-035', supplierId: 'SUP-001', supplierName: 'Zambezi Agri-Supplies', name: 'Knapsack Sprayer (16L Manual)', description: 'High-pressure manual knapsack sprayer with 16L tank.', category: 'tools', price: 35, memberPrice: 30.80, currency: 'USD', unit: 'per unit', image: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop', availability: 'in-stock', rating: 4.3, reviewCount: 123, soldCount: 3456, tags: ['sprayer', 'knapsack', 'manual', 'crop-protection'], featured: false, minOrder: 1 },
@@ -167,7 +167,7 @@ const supplierProducts: SupplierProduct[] = [
   { id: 'SPROD-038', supplierId: 'SUP-001', supplierName: 'Zambezi Agri-Supplies', name: 'Pruning Shears (Bypass, Professional)', description: 'Professional bypass pruning shears with SK5 steel blades.', category: 'tools', price: 12, memberPrice: 10.56, currency: 'USD', unit: 'per unit', image: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop', availability: 'in-stock', rating: 4.5, reviewCount: 67, soldCount: 1234, tags: ['pruning', 'shears', 'professional', 'orchard'], featured: false, minOrder: 2 },
 ];
 
-const commissions: Commission[] = [
+const FALLBACK_ALL_COMMISSIONS: Commission[] = [
   { id: 'COM-001', supplierId: 'SUP-001', supplierName: 'Zambezi Agri-Supplies', orderId: 'ORD-2025-0412', productName: 'Groundnut Seed (Nyanda) x 50 bags', buyerName: 'Kgosi Mosweu', buyerType: 'smallholder', orderAmount: 3900, commissionRate: 8, commissionAmount: 312, status: 'paid', orderDate: '2025-09-15', paymentDate: '2025-10-15' },
   { id: 'COM-002', supplierId: 'SUP-002', supplierName: 'Kalahari Seeds Co.', orderId: 'ORD-2025-0489', productName: 'Hybrid Maize Seed (PAN 4M-21) x 20 bags', buyerName: 'Tendai Moyo', buyerType: 'smallholder', orderAmount: 960, commissionRate: 7, commissionAmount: 67.20, status: 'paid', orderDate: '2025-10-02', paymentDate: '2025-11-02' },
   { id: 'COM-003', supplierId: 'SUP-009', supplierName: 'Chobe Irrigation Systems', orderId: 'ORD-2025-0523', productName: 'Drip Irrigation Kit (1 Hectare) x 3', buyerName: 'Mosweu Cooperative', buyerType: 'cooperative', orderAmount: 5550, commissionRate: 11, commissionAmount: 610.50, status: 'paid', orderDate: '2025-10-18', paymentDate: '2025-11-18' },
@@ -200,7 +200,7 @@ const commissions: Commission[] = [
   { id: 'COM-030', supplierId: 'SUP-022', supplierName: 'Tuli Block Livestock Feeds', orderId: 'ORD-2026-0310', productName: 'Cattle Feed Concentrate x 200 bags', buyerName: 'Tuli Ranchers Assoc.', buyerType: 'cooperative', orderAmount: 5600, commissionRate: 8, commissionAmount: 448, status: 'pending', orderDate: '2026-03-14', paymentDate: null },
 ];
 
-const advertisements: Advertisement[] = [
+const FALLBACK_ALL_ADVERTISEMENTS: Advertisement[] = [
   { id: 'AD-001', supplierId: 'SUP-001', supplierName: 'Zambezi Agri-Supplies', type: 'banner', placement: 'dashboard', title: 'Season Opening Sale - 20% Off All Seeds', description: 'Start your planting season right with premium certified seeds from Zambezi Agri-Supplies.', image: 'https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=400&h=300&fit=crop', targetUrl: 'https://afu-portal.com/marketplace/supplier/SUP-001', startDate: '2026-02-15', endDate: '2026-04-15', impressions: 34500, clicks: 1725, ctr: 5.0, budget: 3500, spent: 2450, status: 'active' },
   { id: 'AD-002', supplierId: 'SUP-002', supplierName: 'Kalahari Seeds Co.', type: 'featured-product', placement: 'marketplace', title: 'New: Drought-Resistant Sorghum Macia Variety', description: 'Introducing the Macia sorghum variety - bred for Botswana conditions.', image: 'https://images.unsplash.com/photo-1595855759920-86582396756a?w=400&h=300&fit=crop', targetUrl: 'https://afu-portal.com/marketplace/product/SPROD-001', startDate: '2026-01-10', endDate: '2026-03-31', impressions: 28900, clicks: 1878, ctr: 6.5, budget: 2500, spent: 2125, status: 'active' },
   { id: 'AD-003', supplierId: 'SUP-003', supplierName: 'TechFarm Solutions', type: 'sponsored-content', placement: 'training', title: 'Smart Farming: How IoT Sensors Boost Yields by 30%', description: 'Learn how TechFarm IoT sensors are helping African farmers monitor soil conditions in real-time.', image: 'https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=400&h=300&fit=crop', targetUrl: 'https://afu-portal.com/training/webinar/smart-farming-iot', startDate: '2026-02-01', endDate: '2026-05-01', impressions: 12400, clicks: 868, ctr: 7.0, budget: 1800, spent: 1080, status: 'active' },
@@ -258,10 +258,10 @@ const fadeUp = {
 
 // ── Static fallback context ──────────────────────────────────────────────────
 
-const FALLBACK_SUPPLIER = staticSuppliers.find((s) => s.id === 'SUP-001')!;
-const FALLBACK_PRODUCTS = supplierProducts.filter((p) => p.supplierId === 'SUP-001');
-const FALLBACK_COMMISSIONS = commissions.filter((c) => c.supplierId === 'SUP-001');
-const FALLBACK_ADS = advertisements.filter((a) => a.supplierId === 'SUP-001');
+const FALLBACK_SUPPLIER = FALLBACK_SUPPLIERS.find((s) => s.id === 'SUP-001')!;
+const FALLBACK_PRODUCTS = FALLBACK_SUPPLIER_PRODUCTS.filter((p) => p.supplierId === 'SUP-001');
+const FALLBACK_COMMISSIONS = FALLBACK_ALL_COMMISSIONS.filter((c) => c.supplierId === 'SUP-001');
+const FALLBACK_ADS = FALLBACK_ALL_ADVERTISEMENTS.filter((a) => a.supplierId === 'SUP-001');
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -299,7 +299,7 @@ const orderStatusColors: Record<string, string> = {
 
 // ── Mock recent orders ──────────────────────────────────────────────────────
 
-const recentOrders = [
+const FALLBACK_RECENT_ORDERS = [
   { id: 'ORD-2026-0301', product: 'Groundnut Seed (Nyanda)', buyer: 'Kgosi Mosweu', amount: 3900, status: 'delivered', date: '2026-03-14' },
   { id: 'ORD-2026-0298', product: 'Knapsack Sprayer x12', buyer: 'Mashonaland Growers', amount: 420, status: 'shipped', date: '2026-03-13' },
   { id: 'ORD-2026-0285', product: 'Metalaxyl + Mancozeb x10', buyer: 'Tatenda Chikaura', amount: 350, status: 'processing', date: '2026-03-12' },
@@ -312,7 +312,7 @@ const recentOrders = [
 
 // ── Mock top products ───────────────────────────────────────────────────────
 
-const topProducts = [
+const FALLBACK_TOP_PRODUCTS = [
   { name: 'Groundnut Seed (Nyanda)', unitsSold: 1678, revenue: 115_000, rating: 4.8, trend: 'up' as const },
   { name: 'Knapsack Sprayer (16L)', unitsSold: 3456, revenue: 106_680, rating: 4.3, trend: 'up' as const },
   { name: 'Metalaxyl + Mancozeb', unitsSold: 1345, revenue: 47_075, rating: 4.5, trend: 'up' as const },
@@ -322,7 +322,7 @@ const topProducts = [
 
 // ── Monthly sales trend data ────────────────────────────────────────────────
 
-const salesTrendData = [
+const FALLBACK_SALES_TREND = [
   { month: 'Apr', sales: 98000 },
   { month: 'May', sales: 112000 },
   { month: 'Jun', sales: 134000 },
@@ -359,7 +359,7 @@ const FALLBACK_COMMISSION_TOTAL = FALLBACK_COMMISSION_PAID + FALLBACK_COMMISSION
 
 // ── Active ads (top 3) ──────────────────────────────────────────────────────
 
-const FALLBACK_ACTIVE_ADS = advertisements
+const FALLBACK_ACTIVE_ADS = FALLBACK_ALL_ADVERTISEMENTS
   .filter((a) => a.status === 'active')
   .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime())
   .slice(0, 3);
@@ -435,7 +435,7 @@ export default function SupplierDashboard() {
     totalOrders: number;
   } | null>(null);
   // Live recent orders
-  const [liveRecentOrders, setLiveRecentOrders] = useState<typeof recentOrders | null>(null);
+  const [liveRecentOrders, setLiveRecentOrders] = useState<typeof FALLBACK_RECENT_ORDERS | null>(null);
   const [dbLoading, setDbLoading] = useState(true);
 
   const fetchLiveDashboard = useCallback(async () => {
@@ -553,7 +553,7 @@ export default function SupplierDashboard() {
   const commissionBalance = FALLBACK_COMMISSION_BALANCE; // commissions not yet in DB — keep fallback
   const totalAdImpressions = FALLBACK_AD_IMPRESSIONS;    // ads not yet in DB — keep fallback
   const memberReach = FALLBACK_MEMBER_REACH;
-  const displayRecentOrders = liveRecentOrders || recentOrders;
+  const displayRecentOrders = liveRecentOrders || FALLBACK_RECENT_ORDERS;
   const commissionDonutData = FALLBACK_COMMISSION_DONUT;
   const commissionTotal = FALLBACK_COMMISSION_TOTAL;
   const activeAds = FALLBACK_ACTIVE_ADS;
@@ -725,7 +725,7 @@ export default function SupplierDashboard() {
         </div>
         <div className="h-72">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={salesTrendData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
+            <AreaChart data={FALLBACK_SALES_TREND} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="salesGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#8CB89C" stopOpacity={0.3} />
@@ -843,7 +843,7 @@ export default function SupplierDashboard() {
             <h3 className="font-semibold text-navy text-sm">Top Products</h3>
           </div>
           <div className="divide-y divide-gray-50">
-            {topProducts.map((product, i) => (
+            {FALLBACK_TOP_PRODUCTS.map((product, i) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, x: 10 }}
@@ -891,7 +891,7 @@ export default function SupplierDashboard() {
                     <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
                       <motion.div
                         initial={{ width: 0 }}
-                        animate={{ width: `${(product.revenue / topProducts[0].revenue) * 100}%` }}
+                        animate={{ width: `${(product.revenue / FALLBACK_TOP_PRODUCTS[0].revenue) * 100}%` }}
                         transition={{ duration: 0.4 }}
                         className="h-1.5 rounded-full bg-[#8CB89C]"
                       />

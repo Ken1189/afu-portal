@@ -75,7 +75,7 @@ interface ExportShipment {
   timeline: { date: string; event: string; location: string }[];
 }
 
-const exportDocuments: ExportDocument[] = [
+const FALLBACK_EXPORT_DOCUMENTS: ExportDocument[] = [
   { id: 'DOC-001', shipmentId: 'EXP-001', type: 'phytosanitary', title: 'Phytosanitary Certificate - Tobacco Leaf Export', status: 'approved', issuedBy: 'Zimbabwe Plant Quarantine Services', issuedDate: '2026-02-18', expiryDate: '2026-04-18', reference: 'ZW-PHYTO-2026-04218', notes: 'Inspected and certified free from pests and diseases. Compliant with EU Commission Regulation 2019/2072.' },
   { id: 'DOC-002', shipmentId: 'EXP-001', type: 'certificate-of-origin', title: 'Certificate of Origin - Zimbabwe Chamber of Commerce', status: 'approved', issuedBy: 'Zimbabwe National Chamber of Commerce', issuedDate: '2026-02-20', expiryDate: null, reference: 'ZNCC-COO-2026-1087', notes: 'Origin confirmed as Mashonaland East, Zimbabwe. Eligible for EPA preferential tariff rate.' },
   { id: 'DOC-003', shipmentId: 'EXP-001', type: 'bill-of-lading', title: 'Bill of Lading - Beira to Rotterdam', status: 'approved', issuedBy: 'Maersk Line', issuedDate: '2026-03-02', expiryDate: null, reference: 'MAEU-BL-264891', notes: 'Three original bills issued. Clean on board. Freight prepaid.' },
@@ -98,7 +98,7 @@ const exportDocuments: ExportDocument[] = [
   { id: 'DOC-020', shipmentId: 'EXP-006', type: 'bill-of-lading', title: 'Bill of Lading - Dar es Salaam to Hamburg', status: 'submitted', issuedBy: 'MSC Mediterranean Shipping', issuedDate: null, expiryDate: null, reference: 'MSCU-BL-PENDING', notes: 'Draft B/L submitted for shipper approval. Awaiting vessel confirmation for MSC Rosaria.' },
 ];
 
-const exportShipments: ExportShipment[] = [
+const FALLBACK_EXPORT_SHIPMENTS: ExportShipment[] = [
   { id: 'EXP-001', exporterId: 'AFU-2024-037', exporterName: 'Rudo Chidyamakono', product: 'Flue-Cured Virginia Tobacco', quantity: '36,000 kg (2 x 20ft containers)', destination: 'Netherlands', destinationPort: 'Rotterdam', originPort: 'Beira, Mozambique', vessel: 'MV Maersk Seletar', status: 'in-transit', estimatedDeparture: '2026-03-02', estimatedArrival: '2026-03-28', actualDeparture: '2026-03-02', value: 216000, currency: 'USD', documents: ['DOC-001', 'DOC-002', 'DOC-003', 'DOC-004'], timeline: [{ date: '2026-02-10', event: 'Export order confirmed with buyer', location: 'Harare, Zimbabwe' }, { date: '2026-02-18', event: 'Phytosanitary certificate issued', location: 'Harare, Zimbabwe' }, { date: '2026-02-25', event: 'Containers fumigated and sealed', location: 'Harare, Zimbabwe' }, { date: '2026-02-28', event: 'Trucked to Beira port via Machipanda', location: 'Mutare, Zimbabwe' }, { date: '2026-03-01', event: 'Arrived at Beira container terminal', location: 'Beira, Mozambique' }, { date: '2026-03-02', event: 'Loaded on vessel, departed Beira', location: 'Beira, Mozambique' }, { date: '2026-03-15', event: 'Vessel passed Suez Canal', location: 'Suez Canal, Egypt' }] },
   { id: 'EXP-002', exporterId: 'AFU-2024-041', exporterName: 'Grace Kilango', product: 'White Sesame Seeds (hulled)', quantity: '44,000 kg (2 x 20ft containers)', destination: 'United Arab Emirates', destinationPort: 'Jebel Ali, Dubai', originPort: 'Dar es Salaam, Tanzania', vessel: 'MSC Anzu', status: 'at-port', estimatedDeparture: '2026-03-18', estimatedArrival: '2026-04-02', actualDeparture: null, value: 123200, currency: 'USD', documents: ['DOC-005', 'DOC-006', 'DOC-007'], timeline: [{ date: '2026-02-20', event: 'Purchase order received from Dubai buyer', location: 'Iringa, Tanzania' }, { date: '2026-03-01', event: 'Phytosanitary inspection passed', location: 'Dar es Salaam, Tanzania' }, { date: '2026-03-03', event: 'SGS quality inspection completed', location: 'Dar es Salaam, Tanzania' }, { date: '2026-03-10', event: 'Containers stuffed at Dar port CFS', location: 'Dar es Salaam, Tanzania' }, { date: '2026-03-14', event: 'Customs declaration cleared', location: 'Dar es Salaam, Tanzania' }, { date: '2026-03-16', event: 'Containers placed at berth, awaiting vessel', location: 'Dar es Salaam, Tanzania' }] },
   { id: 'EXP-003', exporterId: 'AFU-2024-047', exporterName: 'Joseph Mwangosi', product: 'Fresh Cut Flowers (Roses & Chrysanthemums)', quantity: '420 cartons (approx. 6,300 kg)', destination: 'Netherlands', destinationPort: 'Amsterdam (Schiphol Airport)', originPort: 'Julius Nyerere International Airport, Dar es Salaam', vessel: null, status: 'customs-clearance', estimatedDeparture: '2026-03-17', estimatedArrival: '2026-03-18', actualDeparture: null, value: 94500, currency: 'USD', documents: ['DOC-008', 'DOC-009', 'DOC-010'], timeline: [{ date: '2026-03-08', event: 'Flower order confirmed for Dutch auction', location: 'Mbeya, Tanzania' }, { date: '2026-03-10', event: 'Harvesting and packing completed', location: 'Mbeya, Tanzania' }, { date: '2026-03-11', event: 'Cold chain truck departed for Dar airport', location: 'Mbeya, Tanzania' }, { date: '2026-03-12', event: 'Arrived at airport cold store', location: 'Dar es Salaam, Tanzania' }, { date: '2026-03-14', event: 'Pre-export phyto inspection passed', location: 'Dar es Salaam, Tanzania' }, { date: '2026-03-16', event: 'Customs processing underway', location: 'Dar es Salaam, Tanzania' }] },
@@ -305,7 +305,7 @@ function StatCard({
 }
 
 function DocumentCard({ doc }: { doc: ExportDocument }) {
-  const shipment = exportShipments.find((s) => s.id === doc.shipmentId);
+  const shipment = FALLBACK_EXPORT_SHIPMENTS.find((s) => s.id === doc.shipmentId);
   const typeColor = DOC_TYPE_COLORS[doc.type];
   const expiringSoon = isExpiringSoon(doc.expiryDate);
 
@@ -397,7 +397,7 @@ function DocumentCard({ doc }: { doc: ExportDocument }) {
 }
 
 function ShipmentDocGroup({ shipment }: { shipment: ExportShipment }) {
-  const docs = exportDocuments.filter((d) =>
+  const docs = FALLBACK_EXPORT_DOCUMENTS.filter((d) =>
     shipment.documents.includes(d.id)
   );
 
@@ -530,7 +530,7 @@ export default function ExportDocumentsPage() {
     'all'
   );
   const [searchQuery, setSearchQuery] = useState('');
-  const [liveDocs, setLiveDocs] = useState<ExportDocument[]>(exportDocuments);
+  const [liveDocs, setLiveDocs] = useState<ExportDocument[]>(FALLBACK_EXPORT_DOCUMENTS);
   const [dataLoading, setDataLoading] = useState(true);
 
   useEffect(() => {
@@ -806,7 +806,7 @@ export default function ExportDocumentsPage() {
               exit={{ opacity: 0, y: -10 }}
               className="space-y-4"
             >
-              {exportShipments.map((shipment) => (
+              {FALLBACK_EXPORT_SHIPMENTS.map((shipment) => (
                 <ShipmentDocGroup key={shipment.id} shipment={shipment} />
               ))}
             </motion.div>

@@ -46,11 +46,11 @@ interface SupplierProduct {
   featured: boolean; minOrder: number;
 }
 
-const suppliers: Supplier[] = [
+const FALLBACK_SUPPLIERS: Supplier[] = [
   { id: 'SUP-001', companyName: 'Zambezi Agri-Supplies', contactName: 'Farai Ndlovu', email: 'farai@zambezi-agri.co.zw', phone: '+263 77 200 1001', country: 'Zimbabwe', region: 'Harare', category: 'input-supplier', status: 'active', joinDate: '2024-06-15', logo: 'https://images.unsplash.com/photo-1560693225-b8507d6f3aa9?w=400&h=300&fit=crop', description: 'Leading agricultural input supplier across Southern Africa.', productsCount: 38, totalSales: 1847320, totalOrders: 4215, rating: 4.8, reviewCount: 312, memberDiscountPercent: 12, commissionRate: 8, isFounding: true, sponsorshipTier: 'platinum', verified: true, website: 'https://zambezi-agri.co.zw', certifications: ['ISO 9001', 'GlobalGAP Approved', 'SADC Trade Certified'] },
 ];
 
-const supplierProducts: SupplierProduct[] = [
+const FALLBACK_PRODUCTS: SupplierProduct[] = [
   { id: 'SPROD-005', supplierId: 'SUP-001', supplierName: 'Zambezi Agri-Supplies', name: 'Groundnut Seed (Nyanda)', description: 'Virginia-type groundnut variety.', category: 'seeds', price: 78, memberPrice: 68.64, currency: 'USD', unit: 'per 25kg bag', image: 'https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=400&h=300&fit=crop', availability: 'in-stock', rating: 4.8, reviewCount: 98, soldCount: 1678, tags: ['groundnut'], featured: true, minOrder: 1 },
   { id: 'SPROD-014', supplierId: 'SUP-001', supplierName: 'Zambezi Agri-Supplies', name: 'Metalaxyl + Mancozeb Fungicide', description: 'Systemic and contact fungicide.', category: 'pesticides', price: 35, memberPrice: 30.80, currency: 'USD', unit: 'per kg', image: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400&h=300&fit=crop', availability: 'in-stock', rating: 4.5, reviewCount: 76, soldCount: 1345, tags: ['fungicide'], featured: false, minOrder: 2 },
   { id: 'SPROD-035', supplierId: 'SUP-001', supplierName: 'Zambezi Agri-Supplies', name: 'Knapsack Sprayer (16L Manual)', description: 'High-pressure manual knapsack sprayer.', category: 'tools', price: 35, memberPrice: 30.80, currency: 'USD', unit: 'per unit', image: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop', availability: 'in-stock', rating: 4.3, reviewCount: 123, soldCount: 3456, tags: ['sprayer'], featured: false, minOrder: 1 },
@@ -98,8 +98,8 @@ const fadeUp = {
 
 // ── Supplier context ────────────────────────────────────────────────────────
 
-const currentSupplier = suppliers.find((s) => s.id === 'SUP-001')!;
-const myProducts = supplierProducts.filter((p) => p.supplierId === currentSupplier.id);
+const FALLBACK_SUPPLIER = FALLBACK_SUPPLIERS.find((s) => s.id === 'SUP-001')!;
+const FALLBACK_MY_PRODUCTS = FALLBACK_PRODUCTS.filter((p) => p.supplierId === FALLBACK_SUPPLIER.id);
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -133,8 +133,8 @@ interface VolumeRange {
 
 export default function MemberDiscounts() {
   const { user } = useAuth();
-  const [liveProducts, setLiveProducts] = useState<SupplierProduct[]>(myProducts);
-  const [liveSupplier, setLiveSupplier] = useState(currentSupplier);
+  const [liveProducts, setLiveProducts] = useState<SupplierProduct[]>(FALLBACK_MY_PRODUCTS);
+  const [liveSupplier, setLiveSupplier] = useState(FALLBACK_SUPPLIER);
   const [loading, setLoading] = useState(true);
 
   // ── Fetch products & supplier from Supabase ─────────────────────────────
@@ -145,16 +145,16 @@ export default function MemberDiscounts() {
         const { data: supplier } = await supabase
           .from('suppliers')
           .select('*')
-          .eq('email', user?.email ?? '')
+          .eq('profile_id', user?.id ?? '')
           .single();
 
         if (supplier) {
           setLiveSupplier({
-            ...currentSupplier,
+            ...FALLBACK_SUPPLIER,
             id: supplier.id,
             companyName: supplier.company_name,
-            memberDiscountPercent: supplier.member_discount_percent ?? currentSupplier.memberDiscountPercent,
-            commissionRate: supplier.commission_rate ?? currentSupplier.commissionRate,
+            memberDiscountPercent: supplier.member_discount_percent ?? FALLBACK_SUPPLIER.memberDiscountPercent,
+            commissionRate: supplier.commission_rate ?? FALLBACK_SUPPLIER.commissionRate,
           });
 
           const { data: products } = await supabase
@@ -197,8 +197,8 @@ export default function MemberDiscounts() {
   }, [user]);
 
   // ── Global discount state ─────────────────────────────────────────────
-  const [globalDiscount, setGlobalDiscount] = useState(currentSupplier.memberDiscountPercent);
-  const [savedGlobalDiscount, setSavedGlobalDiscount] = useState(currentSupplier.memberDiscountPercent);
+  const [globalDiscount, setGlobalDiscount] = useState(FALLBACK_SUPPLIER.memberDiscountPercent);
+  const [savedGlobalDiscount, setSavedGlobalDiscount] = useState(FALLBACK_SUPPLIER.memberDiscountPercent);
   const [globalSaved, setGlobalSaved] = useState(false);
 
   // Sync global discount when supplier loads from DB
@@ -396,7 +396,7 @@ export default function MemberDiscounts() {
         >
           <h3 className="font-semibold text-[#1B2A4A] text-sm flex items-center gap-2">
             <Package className="w-4 h-4 text-[#8CB89C]" />
-            Per-Product Discounts ({myProducts.length} products)
+            Per-Product Discounts ({liveProducts.length} products)
           </h3>
           {expandedSections.products ? (
             <ChevronUp className="w-4 h-4 text-gray-400" />
@@ -428,7 +428,7 @@ export default function MemberDiscounts() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
-                {myProducts.map((product, i) => {
+                {liveProducts.map((product, i) => {
                   const discountInfo = productDiscounts.find((p) => p.productId === product.id);
                   const discountPct = discountInfo?.discount || 0;
                   const memberPrice = product.price * (1 - discountPct / 100);

@@ -37,7 +37,7 @@ interface Document {
   statusNote?: string;
 }
 
-const defaultDocuments: Document[] = [
+const FALLBACK_DOCUMENTS: Document[] = [
   { id: 'DOC-001', name: 'Membership Agreement', type: 'PDF', size: '245 KB', date: 'Jan 15, 2026', category: 'Contracts', status: 'verified' },
   { id: 'DOC-002', name: 'Working Capital Loan Agreement - FIN-2026-012', type: 'PDF', size: '380 KB', date: 'Feb 1, 2026', category: 'Financing', status: 'verified' },
   { id: 'DOC-003', name: 'Invoice Finance Agreement - FIN-2026-018', type: 'PDF', size: '320 KB', date: 'Feb 20, 2026', category: 'Financing', status: 'verified' },
@@ -85,7 +85,7 @@ export default function DocumentsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showUpload, setShowUpload] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
-  const [documents, setDocuments] = useState<Document[]>(defaultDocuments);
+  const [documents, setDocuments] = useState<Document[]>(FALLBACK_DOCUMENTS);
   const [loading, setLoading] = useState(true);
 
   // Fetch documents from Supabase

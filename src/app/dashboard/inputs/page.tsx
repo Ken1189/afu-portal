@@ -44,7 +44,7 @@ interface Product {
   rating: number;
 }
 
-const defaultProducts: Product[] = [
+const FALLBACK_PRODUCTS: Product[] = [
   { id: 'PRD-001', name: 'Premium Blueberry Seedlings (Duke)', category: 'Seeds & Seedlings', description: 'High-yield Duke variety blueberry seedlings, adapted for sub-Saharan climate. 12-month tissue culture plants.', price: 3.50, unit: 'per plant', image: 'https://images.unsplash.com/photo-1498579809087-ef1e558fd1da?w=400&h=300&fit=crop', availability: 'in-stock', recommendedCrops: ['Blueberries'], supplier: 'AgriPlant Zimbabwe', rating: 4.8 },
   { id: 'PRD-002', name: 'Blueberry Starter Bundle', category: 'Seeds & Seedlings', description: 'Complete starter kit: 500 seedlings, mycorrhizal inoculant, pH test kit, and planting guide.', price: 2200, unit: 'per bundle', image: 'https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=400&h=300&fit=crop', availability: 'in-stock', recommendedCrops: ['Blueberries'], supplier: 'AgriPlant Zimbabwe', rating: 4.9 },
   { id: 'PRD-003', name: 'Cassava Stem Cuttings (TMS 30572)', category: 'Seeds & Seedlings', description: 'Disease-resistant cassava variety with high starch content. Suitable for both food and industrial processing.', price: 0.15, unit: 'per cutting', image: 'https://images.unsplash.com/photo-1590682680695-43b964a3ae17?w=400&h=300&fit=crop', availability: 'in-stock', recommendedCrops: ['Cassava'], supplier: 'Tanzania Seed Agency', rating: 4.5 },
@@ -275,7 +275,7 @@ export default function InputsMarketplacePage() {
   const [cartOpen, setCartOpen] = useState(false);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
-  const [products, setProducts] = useState<Product[]>(defaultProducts);
+  const [products, setProducts] = useState<Product[]>(FALLBACK_PRODUCTS);
   const [loading, setLoading] = useState(true);
 
   // Fetch products from Supabase
