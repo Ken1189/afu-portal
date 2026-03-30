@@ -59,7 +59,35 @@ export async function PATCH(
 ) {
   try {
     const { id } = await params;
+
+    // Auth: verify user is authenticated
+    const authHeader = req.headers.get('authorization');
+    const supabaseAuth = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      { global: { headers: { Authorization: authHeader || '' } } }
+    );
+    const { data: { user } } = await supabaseAuth.auth.getUser();
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+    // Verify user is admin or cooperative leader
     const supabase = getSupabase();
+    const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+    const isAdmin = profile?.role === 'admin' || profile?.role === 'super_admin';
+
+    if (!isAdmin) {
+      // Check if user is the cooperative leader
+      const { data: membership } = await supabase
+        .from('cooperative_members')
+        .select('role')
+        .eq('cooperative_id', id)
+        .eq('member_id', user.id)
+        .single();
+      if (!membership || membership.role !== 'leader') {
+        return NextResponse.json({ error: 'Forbidden: admin or cooperative leader required' }, { status: 403 });
+      }
+    }
+
     const body = await req.json();
 
     const updates: Record<string, unknown> = {};
@@ -95,6 +123,17 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
+
+    // Auth: verify user is authenticated
+    const authHeader = req.headers.get('authorization');
+    const supabaseAuth = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      { global: { headers: { Authorization: authHeader || '' } } }
+    );
+    const { data: { user } } = await supabaseAuth.auth.getUser();
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
     const supabase = getSupabase();
     const body = await req.json();
 

@@ -14,58 +14,36 @@ const sendEmailSchema = z.object({
 });
 
 // ---------------------------------------------------------------------------
-// Auth helpers
-// ---------------------------------------------------------------------------
-
-/** Returns true when the request carries a valid service-role key. */
-function hasServiceRoleKey(req: NextRequest): boolean {
-  const auth = req.headers.get('authorization');
-  if (!auth?.startsWith('Bearer ')) return false;
-  return auth.slice(7) === process.env.SUPABASE_SERVICE_ROLE_KEY;
-}
-
-/** Returns true when the authenticated Supabase user has role = 'admin'. */
-async function isAdminUser(req: NextRequest): Promise<boolean> {
-  const auth = req.headers.get('authorization');
-  if (!auth?.startsWith('Bearer ')) return false;
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  );
-
-  // Verify the JWT and get the user
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser(auth.slice(7));
-  if (error || !user) return false;
-
-  // Check the profiles table for admin role
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single();
-
-  return profile?.role === 'admin';
-}
-
-// ---------------------------------------------------------------------------
 // POST /api/email/send
 // ---------------------------------------------------------------------------
 
 export async function POST(req: NextRequest) {
   try {
-    // --- Auth gate -------------------------------------------------------
-    const isService = hasServiceRoleKey(req);
-    const isAdmin = !isService ? await isAdminUser(req) : false;
+    // --- Auth gate: require authenticated admin user ---------------------
+    const auth = req.headers.get('authorization');
+    if (!auth?.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
-    if (!isService && !isAdmin) {
-      return NextResponse.json(
-        { error: 'Unauthorized — admin or service role required' },
-        { status: 401 },
-      );
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    );
+
+    const { data: { user }, error: userError } = await supabase.auth.getUser(auth.slice(7));
+    if (userError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Check admin role
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     // --- Validate body ---------------------------------------------------

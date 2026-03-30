@@ -511,14 +511,14 @@ registerHandler('INSURANCE_PAYOUT', async (event: AFUEvent) => {
 
 registerHandler('APPLICATION_APPROVED', async (event: AFUEvent) => {
   if (event.type !== 'APPLICATION_APPROVED') return;
-  const { userId, tempPassword, email, fullName } = event.data;
+  const { userId, email, fullName } = event.data;
 
-  // Send welcome email with temp password
+  // Send welcome email (temp password is delivered separately via the approval endpoint)
   if (email) {
     await notifyUser(
       userId,
       'Welcome to African Farming Union!',
-      `Welcome${fullName ? `, ${fullName}` : ''}! Your account is ready. Login at africanfarmingunion.org/login with your email and temporary password: ${tempPassword}`,
+      `Welcome${fullName ? `, ${fullName}` : ''}! Your account is ready. Check your email for login credentials at africanfarmingunion.org/login`,
       'email',
     );
   }

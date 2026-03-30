@@ -178,12 +178,12 @@ export async function POST(request: Request) {
     }
 
     // Emit cross-system event (fire-and-forget)
+    // Note: tempPassword intentionally excluded from event data for security
     emitEventAsync({
       type: 'APPLICATION_APPROVED',
       data: {
         applicationId,
         userId,
-        tempPassword,
         email: application.email,
         fullName: application.full_name,
       },

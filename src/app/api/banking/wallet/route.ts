@@ -248,6 +248,12 @@ export async function POST(req: NextRequest) {
           return NextResponse.json({ error: 'from_wallet_id and to_wallet_id (or recipient) required' }, { status: 400 });
         }
 
+        // Verify the source wallet belongs to the authenticated user
+        const { data: fromWallet } = await db.from('wallet_accounts').select('user_id').eq('id', fromWalletId).single();
+        if (!fromWallet || fromWallet.user_id !== user.id) {
+          return NextResponse.json({ error: 'Not your wallet' }, { status: 403 });
+        }
+
         const result = await walletService.transfer({
           from_wallet_id: fromWalletId,
           to_wallet_id: toWalletId,

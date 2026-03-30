@@ -79,6 +79,14 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // Input validation
+  if (typeof amount !== 'number' || amount <= 0 || amount > 10000000) {
+    return NextResponse.json({ error: 'Invalid amount' }, { status: 400 });
+  }
+  if (typeof currency !== 'string' || currency.length !== 3) {
+    return NextResponse.json({ error: 'Invalid currency' }, { status: 400 });
+  }
+
   const adminClient = await createAdminClient();
 
   // Get member's country for payment routing

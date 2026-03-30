@@ -40,6 +40,17 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
+
+    // Auth: verify user is authenticated
+    const authHeader = req.headers.get('authorization');
+    const supabaseAuth = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      { global: { headers: { Authorization: authHeader || '' } } }
+    );
+    const { data: { user } } = await supabaseAuth.auth.getUser();
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
     const supabase = getSupabase();
     const body = await req.json();
 

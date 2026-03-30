@@ -63,7 +63,7 @@ export type AFUEvent =
   | { type: 'INSURANCE_PAYOUT'; data: { policyId: string; userId: string; amount: number; triggerType: string } }
   // Membership events
   | { type: 'MEMBER_JOINED'; data: { userId: string; referralCode?: string } }
-  | { type: 'APPLICATION_APPROVED'; data: { applicationId: string; userId: string; tempPassword: string; email?: string; fullName?: string } }
+  | { type: 'APPLICATION_APPROVED'; data: { applicationId: string; userId: string; tempPassword?: string; email?: string; fullName?: string } }
   | { type: 'KYC_APPROVED'; data: { userId: string } }
   | { type: 'MEMBERSHIP_PAYMENT'; data: { userId: string; tier: string; amount: number } }
   // Cooperative events
