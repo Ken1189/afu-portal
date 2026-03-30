@@ -21,6 +21,8 @@ import {
   X,
   ChevronLeft,
   ArrowLeftRight,
+  Home,
+  ExternalLink,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -209,13 +211,20 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
         </nav>
 
         {/* Sidebar Footer */}
-        <div className="p-3 border-t border-white/10">
+        <div className="p-3 border-t border-white/10 space-y-0.5">
           <Link
             href="/dashboard"
             className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-white/70 hover:bg-white/10 hover:text-white transition-colors"
           >
-            <ChevronLeft className="w-5 h-5" />
-            Back to Portal
+            <Home className="w-5 h-5" />
+            Back to Dashboard
+          </Link>
+          <Link
+            href="/"
+            className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-white/70 hover:bg-white/10 hover:text-white transition-colors"
+          >
+            <ExternalLink className="w-5 h-5" />
+            AFU Home
           </Link>
         </div>
       </aside>
@@ -334,14 +343,22 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
                 </nav>
 
                 {/* Drawer Footer */}
-                <div className="p-3 border-t border-white/10">
+                <div className="p-3 border-t border-white/10 space-y-0.5">
                   <Link
                     href="/dashboard"
                     onClick={() => setDrawerOpen(false)}
                     className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-white/70 active:bg-white/10"
                   >
-                    <ChevronLeft className="w-5 h-5" />
-                    Back to Portal
+                    <Home className="w-5 h-5" />
+                    Back to Dashboard
+                  </Link>
+                  <Link
+                    href="/"
+                    onClick={() => setDrawerOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-white/70 active:bg-white/10"
+                  >
+                    <ExternalLink className="w-5 h-5" />
+                    AFU Home
                   </Link>
                 </div>
               </motion.aside>

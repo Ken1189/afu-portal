@@ -36,6 +36,7 @@ import {
   ArrowLeftRight,
   Zap,
   Warehouse,
+  ExternalLink,
 } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
@@ -395,13 +396,20 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Sidebar Footer */}
-        <div className="p-3 border-t border-gray-100">
+        <div className="p-3 border-t border-gray-100 space-y-0.5">
           <Link
             href="/dashboard"
             className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors"
           >
             <ChevronLeft className="w-5 h-5" />
             {t.common.backToPortal}
+          </Link>
+          <Link
+            href="/"
+            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors"
+          >
+            <ExternalLink className="w-5 h-5" />
+            AFU Home
           </Link>
         </div>
       </aside>
@@ -625,7 +633,7 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
                   </div>
                 </div>
 
-                <div className="p-3 border-t border-gray-100">
+                <div className="p-3 border-t border-gray-100 space-y-0.5">
                   <Link
                     href="/dashboard"
                     onClick={() => setDrawerOpen(false)}
@@ -633,6 +641,14 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
                   >
                     <ChevronLeft className="w-5 h-5" />
                     {t.common.backToPortal}
+                  </Link>
+                  <Link
+                    href="/"
+                    onClick={() => setDrawerOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-500 active:bg-gray-50"
+                  >
+                    <ExternalLink className="w-5 h-5" />
+                    AFU Home
                   </Link>
                 </div>
               </motion.aside>
