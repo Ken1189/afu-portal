@@ -131,8 +131,8 @@ function CountStat({
   );
 }
 
-/* ─── Service cards data ─── */
-const services = [
+/* ─── Service cards data (FALLBACK) ─── */
+const FALLBACK_SERVICES = [
   {
     icon: Banknote,
     title: 'Financing',
@@ -247,10 +247,57 @@ const HERO_DEFAULTS = {
   hero_bg_image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1920&h=1080&fit=crop',
 };
 
+/* ─── Programs fallback ─── */
+const FALLBACK_PROGRAMS = [
+  {
+    name: 'Blueberry Export Program',
+    countries: 'Zimbabwe',
+    crop: 'Blueberries',
+    desc: '25ha commercial blueberry operation targeting EU markets. Counter-seasonal advantage delivers premium pricing when Northern Hemisphere supply is low.',
+    icon: Sprout,
+  },
+  {
+    name: 'Maize & Soya Staples Program',
+    countries: 'Multi-country',
+    crop: 'Maize & Soya',
+    desc: 'Food security crops cultivated across all 20 AFU countries. Building reliable staple supply chains from smallholder to market.',
+    icon: Leaf,
+  },
+  {
+    name: 'Sesame Export Program',
+    countries: 'Zimbabwe, Tanzania',
+    crop: 'Sesame',
+    desc: 'High-demand oilseed for export markets. Contract farming model connecting smallholders to international commodity buyers.',
+    icon: TrendingUp,
+  },
+  {
+    name: 'Castor Oil Program',
+    countries: 'Multi-country',
+    crop: 'Castor',
+    desc: 'ENI-approved off-take agreement for biofuel feedstock. Industrial-grade castor oil production with guaranteed buyer.',
+    icon: Factory,
+  },
+  {
+    name: 'Macadamia Development',
+    countries: 'Zimbabwe, Mozambique',
+    crop: 'Macadamia',
+    desc: 'Premium nut export program. Long-term orchard development delivering high-margin returns in global snack and confectionery markets.',
+    icon: Target,
+  },
+];
+
+/* ─── Icon lookup for programs from DB ─── */
+const PROGRAM_ICON_MAP: Record<string, typeof Sprout> = {
+  Sprout, Leaf, TrendingUp, Factory, Target, Tractor, Droplets, BarChart3, Star,
+};
+
 export default function Home() {
   const [testimonials, setTestimonials] = useState(fallbackTestimonials);
   const [partners, setPartners] = useState(FALLBACK_PARTNERS);
   const [hero, setHero] = useState(HERO_DEFAULTS);
+  const [services, setServices] = useState(FALLBACK_SERVICES);
+  const [programs, setPrograms] = useState(FALLBACK_PROGRAMS);
+  const [memberCount, setMemberCount] = useState(247);
 
   useEffect(() => {
     async function fetchHero() {
@@ -325,6 +372,84 @@ export default function Home() {
       }
     }
     fetchPartners();
+  }, []);
+
+  /* ─── Live member count from profiles ─── */
+  useEffect(() => {
+    async function fetchMemberCount() {
+      try {
+        const supabase = createClient();
+        const { count } = await supabase
+          .from('profiles')
+          .select('*', { count: 'exact', head: true });
+        if (count && count > 0) {
+          setMemberCount(count);
+        }
+      } catch {
+        // keep fallback 247
+      }
+    }
+    fetchMemberCount();
+  }, []);
+
+  /* ─── Services from site_content ─── */
+  useEffect(() => {
+    async function fetchServices() {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from('site_content')
+          .select('*')
+          .eq('section', 'homepage_services')
+          .order('display_order', { ascending: true });
+        if (data && data.length > 0) {
+          const iconMap: Record<string, typeof Banknote> = {
+            Banknote, Cog, Factory, ShieldCheck, CircleDollarSign, GraduationCap,
+          };
+          setServices(
+            data.map((s: Record<string, unknown>) => ({
+              icon: iconMap[(s.icon as string) || ''] || Banknote,
+              title: (s.title as string) || '',
+              desc: (s.description as string) || (s.content as string) || '',
+              link: (s.link as string) || (s.url as string) || '/services',
+              img: (s.image_url as string) || (s.img as string) || 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&h=500&fit=crop',
+            }))
+          );
+        }
+      } catch {
+        // keep fallback
+      }
+    }
+    fetchServices();
+  }, []);
+
+  /* ─── Programs from DB ─── */
+  useEffect(() => {
+    async function fetchPrograms() {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from('programs')
+          .select('*')
+          .eq('status', 'active')
+          .order('created_at', { ascending: false })
+          .limit(6);
+        if (data && data.length > 0) {
+          setPrograms(
+            data.map((p: Record<string, unknown>) => ({
+              name: (p.title as string) || '',
+              countries: (p.country as string) || 'Multi-country',
+              crop: (p.crop as string) || '',
+              desc: (p.description as string) || '',
+              icon: PROGRAM_ICON_MAP[(p.icon as string) || ''] || Sprout,
+            }))
+          );
+        }
+      } catch {
+        // keep fallback
+      }
+    }
+    fetchPrograms();
   }, []);
 
   return (
@@ -477,7 +602,7 @@ export default function Home() {
             </FadeInWhenVisible>
             <FadeInWhenVisible delay={0.3}>
               <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border-l-4 border-[#5DB347] shadow-lg shadow-[#5DB347]/5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                <CountStat target={247} suffix="+" label="active AFU members across 20 countries" />
+                <CountStat target={memberCount} suffix="+" label="active AFU members across 20 countries" />
               </div>
             </FadeInWhenVisible>
           </div>
@@ -560,43 +685,7 @@ export default function Home() {
           </FadeInWhenVisible>
 
           <StaggerChildren className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              {
-                name: 'Blueberry Export Program',
-                countries: 'Zimbabwe',
-                crop: 'Blueberries',
-                desc: '25ha commercial blueberry operation targeting EU markets. Counter-seasonal advantage delivers premium pricing when Northern Hemisphere supply is low.',
-                icon: Sprout,
-              },
-              {
-                name: 'Maize & Soya Staples Program',
-                countries: 'Multi-country',
-                crop: 'Maize & Soya',
-                desc: 'Food security crops cultivated across all 20 AFU countries. Building reliable staple supply chains from smallholder to market.',
-                icon: Leaf,
-              },
-              {
-                name: 'Sesame Export Program',
-                countries: 'Zimbabwe, Tanzania',
-                crop: 'Sesame',
-                desc: 'High-demand oilseed for export markets. Contract farming model connecting smallholders to international commodity buyers.',
-                icon: TrendingUp,
-              },
-              {
-                name: 'Castor Oil Program',
-                countries: 'Multi-country',
-                crop: 'Castor',
-                desc: 'ENI-approved off-take agreement for biofuel feedstock. Industrial-grade castor oil production with guaranteed buyer.',
-                icon: Factory,
-              },
-              {
-                name: 'Macadamia Development',
-                countries: 'Zimbabwe, Mozambique',
-                crop: 'Macadamia',
-                desc: 'Premium nut export program. Long-term orchard development delivering high-margin returns in global snack and confectionery markets.',
-                icon: Target,
-              },
-            ].map((program) => {
+            {programs.map((program) => {
               const Icon = program.icon;
               return (
                 <motion.div key={program.name} variants={fadeUpChild}>

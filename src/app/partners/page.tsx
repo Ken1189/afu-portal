@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Wheat,
@@ -12,6 +12,7 @@ import {
   MapPin,
   Target,
 } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
 type PartnerTab = "unions" | "business" | "governments" | "universities";
 
@@ -32,7 +33,7 @@ const tabs: { key: PartnerTab; label: string; icon: typeof Wheat }[] = [
   { key: "universities", label: "Universities", icon: GraduationCap },
 ];
 
-const partners: Record<PartnerTab, Partner[]> = {
+const FALLBACK_PARTNERS: Record<PartnerTab, Partner[]> = {
   unions: [
     {
       name: "Zimbabwe National Farmers Union",
@@ -313,8 +314,72 @@ const partners: Record<PartnerTab, Partner[]> = {
   ],
 };
 
+/* Map managed_partners categories to tab keys */
+const CATEGORY_TO_TAB: Record<string, PartnerTab> = {
+  unions: "unions",
+  farming_unions: "unions",
+  business: "business",
+  business_networks: "business",
+  governments: "governments",
+  government: "governments",
+  universities: "universities",
+  university: "universities",
+  technology: "business",
+  finance: "business",
+};
+
 export default function PartnersPage() {
   const [activeTab, setActiveTab] = useState<PartnerTab>("unions");
+  const [partners, setPartners] = useState<Record<PartnerTab, Partner[]>>(FALLBACK_PARTNERS);
+
+  useEffect(() => {
+    async function fetchPartners() {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from("managed_partners")
+          .select("*")
+          .eq("is_published", true)
+          .order("display_order", { ascending: true });
+        if (data && data.length > 0) {
+          const grouped: Record<PartnerTab, Partner[]> = {
+            unions: [],
+            business: [],
+            governments: [],
+            universities: [],
+          };
+          data.forEach((p: Record<string, unknown>) => {
+            const rawCategory = ((p.category as string) || "business").toLowerCase().replace(/\s+/g, "_");
+            const tab = CATEGORY_TO_TAB[rawCategory] || "business";
+            grouped[tab].push({
+              name: (p.name as string) || (p.company_name as string) || "",
+              initials: (p.initials as string) || ((p.name as string) || "").slice(0, 2).toUpperCase(),
+              color: (p.brand_color as string) || (p.color as string) || "bg-green-600",
+              type: (p.type as string) || (p.partner_type as string) || "",
+              country: (p.country as string) || "Pan-African",
+              description: (p.description as string) || "",
+              focus: (p.focus as string) || (p.specialty as string) || "",
+            });
+          });
+          // Only use DB data if at least one tab has entries
+          const hasData = Object.values(grouped).some((arr) => arr.length > 0);
+          if (hasData) {
+            // For tabs with no DB entries, keep fallback
+            const merged = { ...FALLBACK_PARTNERS };
+            for (const key of Object.keys(grouped) as PartnerTab[]) {
+              if (grouped[key].length > 0) {
+                merged[key] = grouped[key];
+              }
+            }
+            setPartners(merged);
+          }
+        }
+      } catch {
+        // keep fallback
+      }
+    }
+    fetchPartners();
+  }, []);
 
   return (
     <>

@@ -18,6 +18,9 @@ import {
 import { useAuth } from '@/lib/supabase/auth-context';
 
 // ── Demo Data ────────────────────────────────────────────────────────────────
+// NOTE: Asset metadata below is demo/hardcoded. Downloads attempt Supabase
+// Storage (`public-assets` bucket, `ambassador-materials/` prefix) first.
+// When files are uploaded to that bucket the download links work automatically.
 
 const marketingAssets = [
   { id: '1', name: 'AFU Ambassador Banner (1200x628)', type: 'image', format: 'PNG', size: '245 KB', category: 'Social Media', icon: Image },

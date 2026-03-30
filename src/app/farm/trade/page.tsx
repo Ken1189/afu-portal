@@ -96,7 +96,7 @@ const STATUS_LABELS: Record<string, string> = {
   cancelled: 'Cancelled',
 };
 
-const COMMODITIES = [
+const FALLBACK_COMMODITIES = [
   'Maize', 'Wheat', 'Rice', 'Sorghum', 'Millet', 'Soybeans', 'Sunflower',
   'Coffee', 'Tea', 'Cocoa', 'Cotton', 'Sugar Cane', 'Cassava', 'Groundnuts',
   'Sesame', 'Beans', 'Cowpeas', 'Pigeon Peas', 'Chickpeas', 'Lentils',
@@ -155,10 +155,33 @@ export default function FarmTradePage() {
     recurring_interval: 'monthly',
   });
 
+  // Commodity list (fetched from DB, fallback to hardcoded)
+  const [commodities, setCommodities] = useState<string[]>(FALLBACK_COMMODITIES);
+
+  useEffect(() => {
+    async function fetchCommodityList() {
+      try {
+        const { data } = await supabase
+          .from('commodity_prices')
+          .select('commodity')
+          .order('commodity');
+        if (data && data.length > 0) {
+          const unique = [...new Set(data.map((r: { commodity: string }) => r.commodity))].filter(Boolean) as string[];
+          if (unique.length > 0) {
+            // Merge DB commodities with fallback to ensure complete list
+            const merged = [...new Set([...unique, ...FALLBACK_COMMODITIES])].sort();
+            setCommodities(merged);
+          }
+        }
+      } catch { /* keep fallback */ }
+    }
+    fetchCommodityList();
+  }, [supabase]);
+
   // Commodity search
   const [commoditySearch, setCommoditySearch] = useState('');
   const [showCommodityDropdown, setShowCommodityDropdown] = useState(false);
-  const filteredCommodities = COMMODITIES.filter(c => c.toLowerCase().includes(commoditySearch.toLowerCase()));
+  const filteredCommodities = commodities.filter(c => c.toLowerCase().includes(commoditySearch.toLowerCase()));
 
   // Orders state
   const [orders, setOrders] = useState<TradeOrder[]>([]);
@@ -307,7 +330,7 @@ export default function FarmTradePage() {
             onChange={e => {
               setCommoditySearch(e.target.value);
               setShowCommodityDropdown(true);
-              if (COMMODITIES.includes(e.target.value)) {
+              if (commodities.includes(e.target.value)) {
                 setForm(f => ({ ...f, commodity: e.target.value }));
               }
             }}

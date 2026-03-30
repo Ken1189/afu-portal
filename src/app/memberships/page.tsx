@@ -1,12 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
 
-const tiers = [
+const FALLBACK_TIERS = [
   {
     name: 'Smallholder',
     slug: 'smallholder',
@@ -210,6 +211,36 @@ export default function MembershipsPage() {
   const [isAnnual, setIsAnnual] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
   const [checkoutError, setCheckoutError] = useState('');
+  const [tiers, setTiers] = useState(FALLBACK_TIERS);
+
+  useEffect(() => {
+    async function fetchTiers() {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from('site_config')
+          .select('key, value')
+          .like('key', 'membership_%');
+        if (data && data.length > 0) {
+          // If site_config has membership data in JSON format, parse and use it
+          const tiersConfig = data.find((d: { key: string; value: string }) => d.key === 'membership_tiers');
+          if (tiersConfig && tiersConfig.value) {
+            try {
+              const parsed = JSON.parse(tiersConfig.value);
+              if (Array.isArray(parsed) && parsed.length > 0) {
+                setTiers(parsed);
+              }
+            } catch {
+              // keep fallback if JSON parse fails
+            }
+          }
+        }
+      } catch {
+        // keep fallback
+      }
+    }
+    fetchTiers();
+  }, []);
 
   const handleCheckout = async (tierSlug: string) => {
     if (tierSlug === 'partner') {

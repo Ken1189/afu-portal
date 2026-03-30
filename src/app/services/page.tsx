@@ -2,6 +2,7 @@ import Link from "next/link";
 import { DollarSign, Sprout, Factory, Handshake, Globe, GraduationCap, Scale, Stethoscope } from "lucide-react";
 import { type LucideIcon } from "lucide-react";
 import { createPageMetadata } from '@/lib/seo/metadata';
+import { createServerSupabaseClient } from '@/lib/supabase/server';
 
 export const metadata = createPageMetadata({
   title: 'Services',
@@ -9,7 +10,11 @@ export const metadata = createPageMetadata({
   path: '/services',
 });
 
-const services: { title: string; desc: string; features: string[]; link: string; icon: LucideIcon }[] = [
+const ICON_MAP: Record<string, LucideIcon> = {
+  DollarSign, Sprout, Factory, Handshake, Globe, GraduationCap, Scale, Stethoscope,
+};
+
+const FALLBACK_SERVICES: { title: string; desc: string; features: string[]; link: string; icon: LucideIcon }[] = [
   {
     title: "Financing",
     desc: "Pre-export working capital (90-180 days, 12-18% APR) and export invoice finance (30-60 days, 8-10% APR). Repayment controlled through offtake + escrow.",
@@ -68,7 +73,31 @@ const services: { title: string; desc: string; features: string[]; link: string;
   },
 ];
 
-export default function ServicesPage() {
+async function getServices() {
+  try {
+    const supabase = await createServerSupabaseClient();
+    const { data } = await supabase
+      .from('site_content')
+      .select('*')
+      .eq('section', 'services')
+      .order('display_order', { ascending: true });
+    if (data && data.length > 0) {
+      return data.map((s: Record<string, unknown>) => ({
+        title: (s.title as string) || '',
+        desc: (s.description as string) || (s.content as string) || '',
+        features: (s.features as string[]) || [],
+        link: (s.link as string) || (s.url as string) || '/services',
+        icon: ICON_MAP[(s.icon as string) || ''] || DollarSign,
+      }));
+    }
+  } catch {
+    // keep fallback
+  }
+  return FALLBACK_SERVICES;
+}
+
+export default async function ServicesPage() {
+  const services = await getServices();
   return (
     <>
       <section className="gradient-navy text-white py-16">

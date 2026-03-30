@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { createClient } from '@/lib/supabase/client';
 import {
   Settings,
   Globe,
@@ -24,6 +25,7 @@ import {
   AlertCircle,
   CheckCircle2,
   Info,
+  Percent,
 } from 'lucide-react';
 
 // ── Animation variants ──────────────────────────────────────────────────────
@@ -66,7 +68,19 @@ const fadeUp = {
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
-type TabId = 'general' | 'roles' | 'notifications' | 'system';
+type TabId = 'general' | 'roles' | 'notifications' | 'system' | 'commissions';
+
+interface CommissionRate {
+  id: string;
+  commission_type: string;
+  tier: string | null;
+  description: string;
+  rate_percent: number;
+  min_amount: number | null;
+  max_amount: number | null;
+  is_recurring: boolean;
+  is_active: boolean;
+}
 
 interface SettingField {
   key: string;
@@ -370,6 +384,56 @@ export default function SettingsPage() {
   const [liveSettings, setLiveSettings] = useState<Record<string, Record<string, unknown>> | null>(null);
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
 
+  // Commission rates state
+  const [commissionRates, setCommissionRates] = useState<CommissionRate[]>([]);
+  const [commissionLoading, setCommissionLoading] = useState(false);
+  const [editingRate, setEditingRate] = useState<string | null>(null);
+  const [editValues, setEditValues] = useState<Record<string, { rate_percent: string; is_active: boolean }>>({});
+
+  const fetchCommissionRates = useCallback(async () => {
+    setCommissionLoading(true);
+    try {
+      const supabase = createClient();
+      const { data } = await supabase
+        .from('commission_rates')
+        .select('*')
+        .order('commission_type')
+        .order('rate_percent', { ascending: true });
+      if (data) setCommissionRates(data as CommissionRate[]);
+    } catch { /* silent */ }
+    setCommissionLoading(false);
+  }, []);
+
+  useEffect(() => {
+    if (activeTab === 'commissions') fetchCommissionRates();
+  }, [activeTab, fetchCommissionRates]);
+
+  const saveCommissionRate = useCallback(async (id: string) => {
+    const vals = editValues[id];
+    if (!vals) return;
+    setSaveStatus('Saving...');
+    try {
+      const supabase = createClient();
+      const { error } = await supabase
+        .from('commission_rates')
+        .update({
+          rate_percent: parseFloat(vals.rate_percent),
+          is_active: vals.is_active,
+        })
+        .eq('id', id);
+      if (!error) {
+        setSaveStatus('Saved!');
+        setEditingRate(null);
+        await fetchCommissionRates();
+      } else {
+        setSaveStatus('Error: ' + error.message);
+      }
+    } catch {
+      setSaveStatus('Failed to save');
+    }
+    setTimeout(() => setSaveStatus(null), 3000);
+  }, [editValues, fetchCommissionRates]);
+
   // Fetch live settings from API
   useEffect(() => {
     fetch('/api/admin/settings')
@@ -405,6 +469,7 @@ export default function SettingsPage() {
     { id: 'roles', label: 'Roles & Permissions', icon: <Shield className="w-4 h-4" /> },
     { id: 'notifications', label: 'Notifications', icon: <Bell className="w-4 h-4" /> },
     { id: 'system', label: 'System', icon: <Server className="w-4 h-4" /> },
+    { id: 'commissions', label: 'Commission Rates', icon: <Percent className="w-4 h-4" /> },
   ];
 
   const toggleTemplate = (id: string) => {
@@ -774,6 +839,136 @@ export default function SettingsPage() {
                   </div>
                 </div>
               </div>
+            </motion.div>
+          </motion.div>
+        )}
+        {/* ════════════════════════════════════════════════════════════
+            COMMISSION RATES TAB
+        ════════════════════════════════════════════════════════════ */}
+        {activeTab === 'commissions' && (
+          <motion.div
+            key="commissions"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            exit={{ opacity: 0, y: -10 }}
+            className="space-y-6"
+          >
+            <motion.div
+              variants={cardVariants}
+              className="bg-white rounded-xl border border-gray-100 overflow-hidden"
+            >
+              <div className="p-5 border-b border-gray-100">
+                <h3 className="font-semibold text-navy text-sm flex items-center gap-2">
+                  <Percent className="w-4 h-4 text-teal" />
+                  Commission Rate Schedule
+                </h3>
+                <p className="text-xs text-gray-400 mt-1">
+                  Manage ambassador and supplier commission rates from the database.
+                </p>
+              </div>
+
+              {commissionLoading ? (
+                <div className="p-8 text-center">
+                  <div className="inline-flex items-center gap-2 text-gray-400 text-sm">
+                    <div className="w-4 h-4 border-2 border-gray-300 border-t-teal rounded-full animate-spin" />
+                    Loading commission rates...
+                  </div>
+                </div>
+              ) : commissionRates.length === 0 ? (
+                <div className="p-8 text-center text-gray-400 text-sm">
+                  No commission rates found. Run migration 023 to seed default rates.
+                </div>
+              ) : (
+                <div className="divide-y divide-gray-50">
+                  {commissionRates.map((rate) => {
+                    const isEditing = editingRate === rate.id;
+                    const vals = editValues[rate.id] || { rate_percent: String(rate.rate_percent), is_active: rate.is_active };
+                    return (
+                      <div key={rate.id} className="p-4 flex items-center gap-4 hover:bg-gray-50/50">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-0.5">
+                            <span className="text-sm font-medium text-navy">{rate.description}</span>
+                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                              rate.is_active ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-500'
+                            }`}>
+                              {rate.is_active ? 'Active' : 'Inactive'}
+                            </span>
+                            {rate.is_recurring && (
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700">
+                                Recurring
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-3 text-xs text-gray-400">
+                            <span>Type: {rate.commission_type}</span>
+                            {rate.tier && <span>Tier: {rate.tier}</span>}
+                            {rate.min_amount != null && <span>Min: ${Number(rate.min_amount).toLocaleString()}</span>}
+                            {rate.max_amount != null && <span>Max: ${Number(rate.max_amount).toLocaleString()}</span>}
+                          </div>
+                        </div>
+
+                        {isEditing ? (
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="number"
+                              step="0.1"
+                              value={vals.rate_percent}
+                              onChange={(e) => setEditValues(prev => ({
+                                ...prev,
+                                [rate.id]: { ...vals, rate_percent: e.target.value },
+                              }))}
+                              className="w-20 px-2 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal/30 text-navy font-mono"
+                            />
+                            <span className="text-xs text-gray-400">%</span>
+                            <button
+                              onClick={() => setEditValues(prev => ({
+                                ...prev,
+                                [rate.id]: { ...vals, is_active: !vals.is_active },
+                              }))}
+                              className={`text-[11px] px-2 py-1 rounded-lg font-medium ${
+                                vals.is_active ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-500'
+                              }`}
+                            >
+                              {vals.is_active ? 'On' : 'Off'}
+                            </button>
+                            <button
+                              onClick={() => saveCommissionRate(rate.id)}
+                              className="p-1.5 rounded-lg bg-teal text-white hover:bg-teal-dark"
+                            >
+                              <Check className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              onClick={() => setEditingRate(null)}
+                              className="p-1.5 rounded-lg bg-gray-100 text-gray-500 hover:bg-gray-200"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-3">
+                            <span className="text-sm font-bold font-mono text-navy">
+                              {Number(rate.rate_percent).toFixed(1)}%
+                            </span>
+                            <button
+                              onClick={() => {
+                                setEditingRate(rate.id);
+                                setEditValues(prev => ({
+                                  ...prev,
+                                  [rate.id]: { rate_percent: String(rate.rate_percent), is_active: rate.is_active },
+                                }));
+                              }}
+                              className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-navy transition-colors"
+                            >
+                              <Pencil className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </motion.div>
           </motion.div>
         )}

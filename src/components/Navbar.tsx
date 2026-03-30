@@ -37,6 +37,8 @@ import {
   Stethoscope,
   Megaphone,
   Leaf,
+  HelpCircle,
+  Newspaper,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useAuth } from "@/lib/supabase/auth-context";
@@ -102,6 +104,8 @@ const exploreLinks: { label: string; href: string; desc: string; icon: LucideIco
   { label: "Podcasts", href: "/podcasts", desc: "Listen & learn", icon: Headphones },
   { label: "Newsletter", href: "/newsletter", desc: "Weekly intelligence", icon: Mail },
   { label: "Carbon Credits", href: "/carbon", desc: "Offset your footprint", icon: Leaf },
+  { label: "Blog", href: "/blog", desc: "News & insights", icon: Newspaper },
+  { label: "FAQ", href: "/faq", desc: "Common questions", icon: HelpCircle },
 ];
 
 type OpenDropdown = null | "services" | "education" | "community" | "explore";

@@ -40,7 +40,7 @@ const categories = [
   { key: 'impact', label: 'Impact Reports', icon: Leaf, count: 2 },
 ];
 
-const demoDocuments: InvestorDocument[] = [
+const FALLBACK_DOCUMENTS: InvestorDocument[] = [
   {
     id: '1',
     name: 'AFU Fund I - Subscription Agreement',
@@ -180,7 +180,7 @@ type SortDirection = 'asc' | 'desc';
 
 export default function DocumentsPage() {
   const { user } = useAuth();
-  const [documents, setDocuments] = useState<InvestorDocument[]>(demoDocuments);
+  const [documents, setDocuments] = useState<InvestorDocument[]>(FALLBACK_DOCUMENTS);
   const [activeCategory, setActiveCategory] = useState('all');
   const [search, setSearch] = useState('');
   const [sortField, setSortField] = useState<SortField>('date');

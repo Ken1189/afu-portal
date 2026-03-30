@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { Search, CreditCard, Sprout, Building2 } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
 
 /* ─── Types ─── */
 
@@ -515,12 +516,66 @@ function ImpactStat({ value, label }: { value: string; label: string }) {
   );
 }
 
+/* ─── Sponsor tier fallback data ─── */
+interface SponsorTier {
+  emoji: string;
+  name: string;
+  label: string;
+  monthlyPrice: number | null;
+  description: string;
+  features: string[];
+  isPopular?: boolean;
+  isCorporate?: boolean;
+  annualSaving?: number;
+}
+
+const FALLBACK_TIERS: SponsorTier[] = [
+  {
+    emoji: "\u{1F949}",
+    name: "Bronze",
+    label: "Bronze",
+    monthlyPrice: 5,
+    description: "Cover their AFU membership. Give them access to training, market prices, and the AFU network.",
+    features: ["AFU Membership", "Training Access", "Market Data"],
+    annualSaving: 10,
+  },
+  {
+    emoji: "\u{1F948}",
+    name: "Silver",
+    label: "Silver",
+    monthlyPrice: 100,
+    description: "Fund a full season of crop inputs \u2014 seeds, fertiliser, pest management.",
+    features: ["Everything in Bronze", "Crop Inputs", "Crop Insurance", "Monthly Update"],
+    isPopular: true,
+    annualSaving: 200,
+  },
+  {
+    emoji: "\u{1F947}",
+    name: "Gold",
+    label: "Gold",
+    monthlyPrice: 500,
+    description: "Full program sponsorship. Inputs + insurance + working capital for the season.",
+    features: ["Everything in Silver", "Working Capital", "Offtake Support", "Quarterly Report", "Named Recognition"],
+    annualSaving: 1000,
+  },
+  {
+    emoji: "\u{1F3E2}",
+    name: "Corporate",
+    label: "Corporate",
+    monthlyPrice: null,
+    description: "Sponsor a cohort of 10\u201350 farmers. Get a CSR impact report and brand recognition.",
+    features: ["Cohort Selection", "Branded Impact Report", "Logo on AFU Website", "Naming Rights"],
+    isCorporate: true,
+  },
+];
+
 /* ─── Main Page ─── */
 export default function SponsorPage() {
   const [farmers, setFarmers] = useState<FarmerProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCountry, setSelectedCountry] = useState<string>('All');
   const [showAnnual, setShowAnnual] = useState(false);
+  const [sponsorTiers, setSponsorTiers] = useState<SponsorTier[]>(FALLBACK_TIERS);
 
   const farmersRef = useRef<HTMLDivElement>(null);
   const tiersRef = useRef<HTMLDivElement>(null);
@@ -544,6 +599,37 @@ export default function SponsorPage() {
       }
     }
     loadFarmers();
+  }, []);
+
+  useEffect(() => {
+    async function fetchSponsorTiers() {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from('sponsor_tiers')
+          .select('*')
+          .eq('is_published', true)
+          .order('display_order', { ascending: true });
+        if (data && data.length > 0) {
+          setSponsorTiers(
+            data.map((t: Record<string, unknown>) => ({
+              emoji: (t.icon as string) || "\u{1F949}",
+              name: (t.name as string) || '',
+              label: (t.name as string) || '',
+              monthlyPrice: t.price_usd != null ? Number(t.price_usd) : null,
+              description: (t.description as string) || '',
+              features: (t.features as string[]) || [],
+              isPopular: (t.is_popular as boolean) || false,
+              isCorporate: ((t.name as string) || '').toLowerCase() === 'corporate' || t.price_usd == null,
+              annualSaving: t.price_usd != null ? Math.round(Number(t.price_usd) * 2) : undefined,
+            }))
+          );
+        }
+      } catch {
+        // keep fallback
+      }
+    }
+    fetchSponsorTiers();
   }, []);
 
   const countries = ['All', ...Array.from(new Set(farmers.map((f) => f.country))).sort()];
@@ -697,63 +783,21 @@ export default function SponsorPage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
-            <TierCard
-              emoji="🥉"
-              name="Bronze"
-              label="Bronze"
-              monthlyPrice={5}
-              description="Cover their AFU membership. Give them access to training, market prices, and the AFU network."
-              features={['AFU Membership', 'Training Access', 'Market Data']}
-              showAnnual={showAnnual}
-              annualSaving={10}
-            />
-            <TierCard
-              emoji="🥈"
-              name="Silver"
-              label="Silver"
-              monthlyPrice={100}
-              description="Fund a full season of crop inputs — seeds, fertiliser, pest management."
-              features={[
-                'Everything in Bronze',
-                'Crop Inputs',
-                'Crop Insurance',
-                'Monthly Update',
-              ]}
-              isPopular
-              showAnnual={showAnnual}
-              annualSaving={200}
-            />
-            <TierCard
-              emoji="🥇"
-              name="Gold"
-              label="Gold"
-              monthlyPrice={500}
-              description="Full program sponsorship. Inputs + insurance + working capital for the season."
-              features={[
-                'Everything in Silver',
-                'Working Capital',
-                'Offtake Support',
-                'Quarterly Report',
-                'Named Recognition',
-              ]}
-              showAnnual={showAnnual}
-              annualSaving={1000}
-            />
-            <TierCard
-              emoji="🏢"
-              name="Corporate"
-              label="Corporate"
-              monthlyPrice={null}
-              description="Sponsor a cohort of 10–50 farmers. Get a CSR impact report and brand recognition."
-              features={[
-                'Cohort Selection',
-                'Branded Impact Report',
-                'Logo on AFU Website',
-                'Naming Rights',
-              ]}
-              isCorporate
-              showAnnual={showAnnual}
-            />
+            {sponsorTiers.map((tier) => (
+              <TierCard
+                key={tier.name}
+                emoji={tier.emoji}
+                name={tier.name}
+                label={tier.label}
+                monthlyPrice={tier.monthlyPrice}
+                description={tier.description}
+                features={tier.features}
+                isPopular={tier.isPopular}
+                isCorporate={tier.isCorporate}
+                showAnnual={showAnnual}
+                annualSaving={tier.annualSaving}
+              />
+            ))}
           </div>
         </div>
       </section>

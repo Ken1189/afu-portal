@@ -40,7 +40,7 @@ interface InsuranceProduct {
   icon: string;
 }
 
-const mockInsuranceProducts: InsuranceProduct[] = [
+const FALLBACK_INSURANCE_PRODUCTS: InsuranceProduct[] = [
   {
     id: 'INS-PROD-001',
     name: 'Crop Shield Basic',
@@ -232,7 +232,7 @@ export default function ProductsPage() {
   const { user } = useAuth();
   const ti = t.insurance;
 
-  const [insuranceProducts, setInsuranceProducts] = useState<InsuranceProduct[]>(mockInsuranceProducts);
+  const [insuranceProducts, setInsuranceProducts] = useState<InsuranceProduct[]>(FALLBACK_INSURANCE_PRODUCTS);
   const [dataLoading, setDataLoading] = useState(true);
 
   useEffect(() => {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   TrendingUp,
@@ -18,6 +18,7 @@ import {
   X,
 } from 'lucide-react';
 import { useAuth } from '@/lib/supabase/auth-context';
+import { createClient } from '@/lib/supabase/client';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -46,9 +47,9 @@ interface EOIFormData {
   notes: string;
 }
 
-// ── Data ──────────────────────────────────────────────────────────────────────
+// ── Fallback Data ─────────────────────────────────────────────────────────────
 
-const opportunities: Opportunity[] = [
+const FALLBACK_OPPORTUNITIES: Opportunity[] = [
   {
     id: 'afu-debt-fund-ii',
     name: 'AFU Agricultural Debt Fund II',
@@ -177,12 +178,58 @@ const fadeIn = {
 
 export default function InvestorOpportunities() {
   const { user, profile } = useAuth();
+  const [opportunities, setOpportunities] = useState<Opportunity[]>(FALLBACK_OPPORTUNITIES);
   const [filter, setFilter] = useState<'open' | 'subscribed'>('open');
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [submittedIds, setSubmittedIds] = useState<Set<string>>(new Set());
   const [formData, setFormData] = useState<Record<string, EOIFormData>>({});
 
   const displayEmail = user?.email || '';
+
+  // Fetch opportunities from DB, fall back to hardcoded
+  useEffect(() => {
+    const supabase = createClient();
+    async function load() {
+      try {
+        const { data } = await supabase
+          .from('site_content')
+          .select('*')
+          .eq('section', 'investment_opportunities')
+          .single();
+        if (data?.content && Array.isArray(data.content)) {
+          setOpportunities(data.content as Opportunity[]);
+          return;
+        }
+      } catch { /* try investor_interests next */ }
+      try {
+        const { data } = await supabase
+          .from('investor_interests')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (data && data.length > 0) {
+          const mapped: Opportunity[] = data.map((row: Record<string, unknown>) => ({
+            id: String(row.id),
+            name: String(row.opportunity_name || row.name || 'Investment Opportunity'),
+            type: (String(row.type || 'Debt')) as OpportunityType,
+            target: Number(row.target || 0),
+            minInvestment: Number(row.min_investment || row.amount || 100000),
+            targetIRR: String(row.target_irr || '18-22%'),
+            term: String(row.term || '3 years'),
+            subscribed: Number(row.subscribed_percent || 0),
+            subscribedAmount: Number(row.subscribed_amount || 0),
+            status: (String(row.status || 'Open')) as OpportunityStatus,
+            description: String(row.description || ''),
+          }));
+          if (mapped.length > 0) {
+            setOpportunities(mapped);
+            return;
+          }
+        }
+      } catch { /* use fallback */ }
+      // Keep FALLBACK_OPPORTUNITIES (already set as initial state)
+    }
+    load();
+  }, []);
 
   const filtered = opportunities.filter((o) =>
     filter === 'open' ? o.status === 'Open' : o.status === 'Fully Subscribed'

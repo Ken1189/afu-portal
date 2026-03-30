@@ -66,7 +66,7 @@ const typeConfig: Record<
   },
 };
 
-const demoUpdates: InvestorUpdate[] = [
+const FALLBACK_UPDATES: InvestorUpdate[] = [
   {
     id: '1',
     title: 'Q1 2026 Quarterly Report Published',
@@ -135,7 +135,7 @@ const demoUpdates: InvestorUpdate[] = [
 
 export default function UpdatesPage() {
   const { user } = useAuth();
-  const [updates, setUpdates] = useState<InvestorUpdate[]>(demoUpdates);
+  const [updates, setUpdates] = useState<InvestorUpdate[]>(FALLBACK_UPDATES);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState<string>('all');
@@ -145,14 +145,23 @@ export default function UpdatesPage() {
     async function load() {
       if (!user) { setLoading(false); return; }
       try {
-        // Try investor_updates table first
+        // Try investor_updates table first (column is is_published boolean, not status)
         const { data } = await supabase
           .from('investor_updates')
           .select('*')
-          .eq('status', 'published')
+          .eq('is_published', true)
           .order('published_at', { ascending: false });
         if (data && data.length > 0) {
-          setUpdates(data);
+          // Map DB columns to component interface (metrics vs metrics_snapshot)
+          const mapped: InvestorUpdate[] = data.map((row: Record<string, unknown>) => ({
+            id: String(row.id),
+            title: String(row.title || ''),
+            body: String(row.body || ''),
+            update_type: String(row.update_type || 'fund_update'),
+            published_at: String(row.published_at || row.created_at || new Date().toISOString()),
+            metrics_snapshot: (row.metrics_snapshot || row.metrics || null) as Record<string, string | number> | null,
+          }));
+          setUpdates(mapped);
         } else {
           // Fall back to notifications table
           const { data: notifs } = await supabase
