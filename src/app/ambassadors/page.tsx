@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import {
   Award,
@@ -15,6 +15,19 @@ import {
   Beef,
   Quote,
   ArrowRight,
+  UserPlus,
+  Share2,
+  Users,
+  DollarSign,
+  Globe,
+  TrendingUp,
+  Star,
+  Crown,
+  Gem,
+  Shield,
+  CheckCircle2,
+  Send,
+  Loader2,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
@@ -33,6 +46,12 @@ interface Ambassador {
   pull_quote: string | null;
   bio: string | null;
   achievements: string[] | null;
+}
+
+interface CommissionRate {
+  label: string;
+  amount: string;
+  description: string;
 }
 
 /* ─── Fallback data ─── */
@@ -144,6 +163,43 @@ const SECTOR_ICONS: Record<string, React.ReactNode> = {
   Poultry: <Egg className="w-3.5 h-3.5" />,
 };
 
+const AFU_COUNTRIES = [
+  'Botswana',
+  'Ghana',
+  'Kenya',
+  'Mozambique',
+  'Nigeria',
+  'Sierra Leone',
+  'South Africa',
+  'Tanzania',
+  'Uganda',
+  'Zambia',
+  'Zimbabwe',
+];
+
+const DEFAULT_COMMISSION_RATES: CommissionRate[] = [
+  { label: 'New Farmer Signup', amount: '$25 per referral', description: 'Earn for every farmer who joins through your link' },
+  { label: 'Supplier Onboarding', amount: '$100 per supplier', description: 'Bring suppliers onto the platform' },
+  { label: 'Loan Facilitation', amount: '2% of loan value', description: 'Commission on facilitated agricultural loans' },
+  { label: 'Insurance Sale', amount: '5% of first premium', description: 'Earn on crop and livestock insurance sales' },
+  { label: 'Trading Commission', amount: '1% of trade value', description: 'Commission on marketplace transactions' },
+];
+
+const TIERS = [
+  { name: 'Bronze', icon: Shield, color: '#CD7F32', minReferrals: 0, commission: '5%', perks: ['Base commission rate', 'Ambassador dashboard', 'Referral link'] },
+  { name: 'Silver', icon: Star, color: '#C0C0C0', minReferrals: 10, commission: '8%', perks: ['Increased commission', 'Monthly bonus', 'Priority email support'] },
+  { name: 'Gold', icon: Award, color: '#FFD700', minReferrals: 25, commission: '12%', perks: ['Premium commission', 'Quarterly bonus', 'Priority support'] },
+  { name: 'Platinum', icon: Crown, color: '#E5E4E2', minReferrals: 50, commission: '15%', perks: ['Top commission rate', 'Exclusive events', 'Dedicated manager'] },
+  { name: 'Diamond', icon: Gem, color: '#B9F2FF', minReferrals: 100, commission: 'Custom', perks: ['Custom rates', 'Advisory role', 'Revenue sharing'] },
+];
+
+const HOW_IT_WORKS_STEPS = [
+  { icon: UserPlus, title: 'Sign Up', description: 'Apply to join the ambassador program and get approved within 48 hours' },
+  { icon: Share2, title: 'Share Your Link', description: 'Get a unique referral link and share it with farmers, suppliers, and investors' },
+  { icon: Users, title: 'Farmers Join', description: 'When people sign up through your link, they are tracked to your account' },
+  { icon: DollarSign, title: 'Earn Commissions', description: 'Get paid for every signup, transaction, and milestone your referrals achieve' },
+];
+
 /* ─── Component ─── */
 
 export default function AmbassadorsPage() {
@@ -152,10 +208,55 @@ export default function AmbassadorsPage() {
   const [activeSector, setActiveSector] = useState('All');
   const [expandedBio, setExpandedBio] = useState<string | null>(null);
 
+  // Commission rates from site_config
+  const [commissionRates, setCommissionRates] = useState<CommissionRate[]>(DEFAULT_COMMISSION_RATES);
+
+  // Apply form state
+  const applyFormRef = useRef<HTMLDivElement>(null);
+  const [formData, setFormData] = useState({
+    full_name: '',
+    email: '',
+    phone: '',
+    country: '',
+    whatsapp: '',
+    motivation: '',
+    promotion_plan: '',
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+
+  // Auth state for pre-fill
+  const [authUser, setAuthUser] = useState<{ id: string; full_name: string; email: string; phone: string | null } | null>(null);
+
   useEffect(() => {
-    async function fetchAmbassadors() {
+    async function init() {
+      const supabase = createClient();
+
+      // Fetch user session for pre-fill
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('full_name, phone')
+          .eq('id', user.id)
+          .single();
+        setAuthUser({
+          id: user.id,
+          full_name: profile?.full_name || '',
+          email: user.email || '',
+          phone: profile?.phone || null,
+        });
+        setFormData((prev) => ({
+          ...prev,
+          full_name: profile?.full_name || '',
+          email: user.email || '',
+          phone: profile?.phone || '',
+        }));
+      }
+
+      // Fetch ambassadors
       try {
-        const supabase = createClient();
         const { data, error } = await supabase
           .from('ambassadors')
           .select('*')
@@ -168,11 +269,28 @@ export default function AmbassadorsPage() {
         }
       } catch {
         setAmbassadors(FALLBACK_AMBASSADORS);
-      } finally {
-        setLoading(false);
       }
+
+      // Fetch commission rates from site_config
+      try {
+        const { data: configData } = await supabase
+          .from('site_config')
+          .select('value')
+          .eq('key', 'commission_rates')
+          .single();
+        if (configData?.value) {
+          const parsed = typeof configData.value === 'string' ? JSON.parse(configData.value) : configData.value;
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setCommissionRates(parsed);
+          }
+        }
+      } catch {
+        // keep defaults
+      }
+
+      setLoading(false);
     }
-    fetchAmbassadors();
+    init();
   }, []);
 
   const filtered = useMemo(() => {
@@ -180,11 +298,286 @@ export default function AmbassadorsPage() {
     return ambassadors.filter((a) => a.sector === activeSector);
   }, [ambassadors, activeSector]);
 
+  function scrollToApply() {
+    applyFormRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function handleFormChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    setFormError(null);
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setFormError(null);
+
+    // Validation
+    if (!formData.full_name.trim() || !formData.email.trim() || !formData.phone.trim() || !formData.country) {
+      setFormError('Please fill in all required fields.');
+      return;
+    }
+    if (!formData.motivation.trim()) {
+      setFormError('Please tell us why you want to be an ambassador.');
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const supabase = createClient();
+
+      // Insert into ambassadors with pending status
+      const ambassadorInsert: Record<string, unknown> = {
+        full_name: formData.full_name.trim(),
+        email: formData.email.trim(),
+        phone: formData.phone.trim(),
+        country: formData.country,
+        whatsapp: formData.whatsapp.trim() || null,
+        motivation: formData.motivation.trim(),
+        promotion_plan: formData.promotion_plan.trim() || null,
+        status: 'pending',
+      };
+
+      if (authUser?.id) {
+        ambassadorInsert.user_id = authUser.id;
+      }
+
+      const { error: ambError } = await supabase
+        .from('ambassadors')
+        .insert(ambassadorInsert);
+
+      // Also insert into membership_applications for admin review
+      const { error: appError } = await supabase
+        .from('membership_applications')
+        .insert({
+          full_name: formData.full_name.trim(),
+          email: formData.email.trim(),
+          phone: formData.phone.trim(),
+          country: formData.country,
+          requested_tier: 'ambassador',
+          notes: `Ambassador application. Motivation: ${formData.motivation.trim()}. Promotion plan: ${formData.promotion_plan.trim() || 'N/A'}. WhatsApp: ${formData.whatsapp.trim() || 'N/A'}`,
+          status: 'pending',
+          profile_id: authUser?.id || null,
+        });
+
+      if (ambError && appError) {
+        setFormError('Something went wrong. Please try again.');
+      } else {
+        setSubmitted(true);
+      }
+    } catch {
+      setFormError('Something went wrong. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* ── Hero ── */}
+      {/* ═══════════════════════════════════════════════════════════════════
+          SECTION 1: HERO
+      ═══════════════════════════════════════════════════════════════════ */}
       <section
-        className="relative py-20 px-4"
+        className="relative py-24 px-4 overflow-hidden"
+        style={{ background: 'linear-gradient(135deg, #1B2A4A 0%, #2A3F6A 50%, #1B2A4A 100%)' }}
+      >
+        {/* Decorative background elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full opacity-5 bg-white" />
+          <div className="absolute -bottom-32 -left-32 w-[500px] h-[500px] rounded-full opacity-5 bg-[#5DB347]" />
+        </div>
+
+        <div className="max-w-7xl mx-auto text-center relative z-10">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#5DB347]/20 text-[#5DB347] text-sm font-semibold mb-6 border border-[#5DB347]/30">
+            <Award className="w-4 h-4" />
+            Ambassador Program
+          </div>
+
+          <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-6 tracking-tight leading-tight">
+            Become an AFU<br />Ambassador
+          </h1>
+
+          <p className="text-lg md:text-xl text-white/70 max-w-3xl mx-auto mb-10 leading-relaxed">
+            Earn commissions by connecting farmers, suppliers, and investors to
+            Africa&apos;s largest agricultural platform
+          </p>
+
+          <button
+            onClick={scrollToApply}
+            className="inline-flex items-center gap-2 px-8 py-4 rounded-xl text-white font-bold text-lg transition-all hover:shadow-xl hover:shadow-[#5DB347]/30 hover:-translate-y-0.5 active:translate-y-0"
+            style={{ background: 'linear-gradient(135deg, #5DB347, #449933)' }}
+          >
+            Apply Now
+            <ArrowRight className="w-5 h-5" />
+          </button>
+
+          {/* Trust badges */}
+          <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10 mt-14">
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-2 text-white font-bold text-2xl md:text-3xl">
+                <Users className="w-6 h-6 text-[#5DB347]" />
+                500+
+              </div>
+              <p className="text-white/50 text-sm mt-1">Ambassadors</p>
+            </div>
+            <div className="w-px h-10 bg-white/10 hidden md:block" />
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-2 text-white font-bold text-2xl md:text-3xl">
+                <Globe className="w-6 h-6 text-[#5DB347]" />
+                20
+              </div>
+              <p className="text-white/50 text-sm mt-1">Countries</p>
+            </div>
+            <div className="w-px h-10 bg-white/10 hidden md:block" />
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-2 text-white font-bold text-2xl md:text-3xl">
+                <TrendingUp className="w-6 h-6 text-[#5DB347]" />
+                15%
+              </div>
+              <p className="text-white/50 text-sm mt-1">Earn Up To</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════════════
+          SECTION 2: HOW IT WORKS
+      ═══════════════════════════════════════════════════════════════════ */}
+      <section className="py-20 px-4 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-14">
+            <h2 className="text-3xl md:text-4xl font-extrabold text-[#1B2A4A] mb-4">
+              How It Works
+            </h2>
+            <p className="text-gray-500 max-w-2xl mx-auto">
+              Start earning in four simple steps. No experience required.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {HOW_IT_WORKS_STEPS.map((step, idx) => (
+              <div key={step.title} className="relative text-center group">
+                {/* Connector line */}
+                {idx < HOW_IT_WORKS_STEPS.length - 1 && (
+                  <div className="hidden lg:block absolute top-12 left-[60%] w-[80%] h-px bg-[#5DB347]/20" />
+                )}
+                <div
+                  className="inline-flex items-center justify-center w-20 h-20 rounded-2xl mb-5 transition-transform group-hover:scale-110"
+                  style={{ background: 'linear-gradient(135deg, #5DB347, #449933)' }}
+                >
+                  <step.icon className="w-9 h-9 text-white" />
+                </div>
+                <div className="text-xs font-bold text-[#5DB347] mb-2">STEP {idx + 1}</div>
+                <h3 className="text-lg font-bold text-[#1B2A4A] mb-2">{step.title}</h3>
+                <p className="text-sm text-gray-500 leading-relaxed">{step.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════════════
+          SECTION 3: COMMISSION STRUCTURE
+      ═══════════════════════════════════════════════════════════════════ */}
+      <section className="py-20 px-4 bg-gray-50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-14">
+            <h2 className="text-3xl md:text-4xl font-extrabold text-[#1B2A4A] mb-4">
+              Commission Structure
+            </h2>
+            <p className="text-gray-500 max-w-2xl mx-auto">
+              Multiple revenue streams to maximize your earnings
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            {commissionRates.map((rate) => (
+              <div
+                key={rate.label}
+                className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm hover:shadow-md hover:border-[#5DB347]/30 transition-all"
+              >
+                <div className="flex items-start gap-4">
+                  <div
+                    className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center"
+                    style={{ background: 'linear-gradient(135deg, #5DB347/15, #5DB347/5)' }}
+                  >
+                    <DollarSign className="w-6 h-6 text-[#5DB347]" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-[#1B2A4A] mb-1">{rate.label}</h3>
+                    <p className="text-xl font-extrabold text-[#5DB347] mb-1">{rate.amount}</p>
+                    <p className="text-xs text-gray-400">{rate.description}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <p className="text-center text-xs text-gray-400 mt-8">
+            Rates are configurable by admin and may vary by region and tier level.
+          </p>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════════════
+          SECTION 4: TIER SYSTEM
+      ═══════════════════════════════════════════════════════════════════ */}
+      <section className="py-20 px-4 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-14">
+            <h2 className="text-3xl md:text-4xl font-extrabold text-[#1B2A4A] mb-4">
+              Ambassador Tiers
+            </h2>
+            <p className="text-gray-500 max-w-2xl mx-auto">
+              The more you grow, the more you earn. Advance through tiers as you bring new members to AFU.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
+            {TIERS.map((tier) => (
+              <div
+                key={tier.name}
+                className="relative bg-white rounded-xl border-2 p-6 text-center transition-all hover:shadow-lg hover:-translate-y-1"
+                style={{ borderColor: tier.color + '60' }}
+              >
+                {/* Tier icon */}
+                <div
+                  className="inline-flex items-center justify-center w-14 h-14 rounded-full mb-4"
+                  style={{ backgroundColor: tier.color + '20' }}
+                >
+                  <tier.icon className="w-7 h-7" style={{ color: tier.color === '#C0C0C0' ? '#888' : tier.color }} />
+                </div>
+
+                <h3 className="text-lg font-extrabold text-[#1B2A4A] mb-1">{tier.name}</h3>
+                <p className="text-xs text-gray-400 mb-3">{tier.minReferrals}+ referrals</p>
+
+                <div
+                  className="text-2xl font-extrabold mb-4"
+                  style={{ color: '#5DB347' }}
+                >
+                  {tier.commission}
+                </div>
+
+                <ul className="space-y-2 text-left">
+                  {tier.perks.map((perk) => (
+                    <li key={perk} className="flex items-start gap-2 text-sm text-gray-600">
+                      <CheckCircle2 className="w-4 h-4 text-[#5DB347] flex-shrink-0 mt-0.5" />
+                      {perk}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════════════
+          SECTION 5: EXISTING AMBASSADOR PROFILES (KEPT AS-IS)
+      ═══════════════════════════════════════════════════════════════════ */}
+
+      {/* ── Section header ── */}
+      <section
+        className="relative py-16 px-4"
         style={{ background: 'linear-gradient(135deg, #1B2A4A 0%, #2A3F6A 100%)' }}
       >
         <div className="max-w-7xl mx-auto text-center relative z-10">
@@ -192,20 +585,12 @@ export default function AmbassadorsPage() {
             <Award className="w-4 h-4" />
             Our Ambassadors
           </div>
-          <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-4 tracking-tight">
+          <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4 tracking-tight">
             Meet Our Ambassadors
-          </h1>
-          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8">
+          </h2>
+          <p className="text-lg text-white/70 max-w-2xl mx-auto">
             The farmers leading Africa&apos;s agricultural transformation
           </p>
-          <Link
-            href="/ambassador/apply"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-white font-semibold text-sm transition-all hover:shadow-lg hover:shadow-[#5DB347]/30 hover:-translate-y-0.5"
-            style={{ background: 'linear-gradient(135deg, #5DB347, #449933)' }}
-          >
-            Become an Ambassador
-            <ArrowRight className="w-4 h-4" />
-          </Link>
         </div>
       </section>
 
@@ -355,6 +740,204 @@ export default function AmbassadorsPage() {
             ))}
           </div>
         )}
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════════════
+          SECTION 6: APPLY FORM
+      ═══════════════════════════════════════════════════════════════════ */}
+      <section
+        ref={applyFormRef}
+        className="py-20 px-4"
+        style={{ background: 'linear-gradient(135deg, #1B2A4A 0%, #2A3F6A 100%)' }}
+      >
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4">
+              Apply to Become an Ambassador
+            </h2>
+            <p className="text-white/60 max-w-xl mx-auto">
+              Join our network of ambassadors across Africa and start earning commissions today.
+            </p>
+          </div>
+
+          {submitted ? (
+            <div className="bg-white rounded-2xl p-10 text-center shadow-xl">
+              <div
+                className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-6"
+                style={{ backgroundColor: '#5DB347' + '20' }}
+              >
+                <CheckCircle2 className="w-10 h-10 text-[#5DB347]" />
+              </div>
+              <h3 className="text-2xl font-bold text-[#1B2A4A] mb-3">Application Submitted!</h3>
+              <p className="text-gray-500 mb-6">
+                Thank you for your interest in becoming an AFU Ambassador.
+                We review applications within 48 hours. You&apos;ll receive a confirmation email shortly.
+              </p>
+              <Link
+                href="/"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-white font-semibold text-sm transition-all hover:shadow-lg"
+                style={{ background: 'linear-gradient(135deg, #5DB347, #449933)' }}
+              >
+                Return Home
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          ) : (
+            <form
+              onSubmit={handleSubmit}
+              className="bg-white rounded-2xl p-8 md:p-10 shadow-xl space-y-6"
+            >
+              {/* Row: Name + Email */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                  <label className="block text-sm font-semibold text-[#1B2A4A] mb-1.5">
+                    Full Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="full_name"
+                    value={formData.full_name}
+                    onChange={handleFormChange}
+                    placeholder="e.g. Grace Moyo"
+                    required
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm text-gray-800 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#5DB347]/40 focus:border-[#5DB347] transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-[#1B2A4A] mb-1.5">
+                    Email Address <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleFormChange}
+                    placeholder="grace@example.com"
+                    required
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm text-gray-800 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#5DB347]/40 focus:border-[#5DB347] transition-all"
+                  />
+                </div>
+              </div>
+
+              {/* Row: Phone + WhatsApp */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                  <label className="block text-sm font-semibold text-[#1B2A4A] mb-1.5">
+                    Phone Number <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleFormChange}
+                    placeholder="+263 77 123 4567"
+                    required
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm text-gray-800 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#5DB347]/40 focus:border-[#5DB347] transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-[#1B2A4A] mb-1.5">
+                    WhatsApp Number
+                  </label>
+                  <input
+                    type="tel"
+                    name="whatsapp"
+                    value={formData.whatsapp}
+                    onChange={handleFormChange}
+                    placeholder="+263 77 123 4567"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm text-gray-800 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#5DB347]/40 focus:border-[#5DB347] transition-all"
+                  />
+                </div>
+              </div>
+
+              {/* Country */}
+              <div>
+                <label className="block text-sm font-semibold text-[#1B2A4A] mb-1.5">
+                  Country <span className="text-red-500">*</span>
+                </label>
+                <select
+                  name="country"
+                  value={formData.country}
+                  onChange={handleFormChange}
+                  required
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#5DB347]/40 focus:border-[#5DB347] transition-all bg-white"
+                >
+                  <option value="">Select your country</option>
+                  {AFU_COUNTRIES.map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Motivation */}
+              <div>
+                <label className="block text-sm font-semibold text-[#1B2A4A] mb-1.5">
+                  Why do you want to be an ambassador? <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  name="motivation"
+                  value={formData.motivation}
+                  onChange={handleFormChange}
+                  placeholder="Tell us about your experience, your network, and why you're passionate about African agriculture..."
+                  required
+                  rows={4}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm text-gray-800 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#5DB347]/40 focus:border-[#5DB347] transition-all resize-none"
+                />
+              </div>
+
+              {/* Promotion plan */}
+              <div>
+                <label className="block text-sm font-semibold text-[#1B2A4A] mb-1.5">
+                  How will you promote AFU?
+                </label>
+                <textarea
+                  name="promotion_plan"
+                  value={formData.promotion_plan}
+                  onChange={handleFormChange}
+                  placeholder="e.g. Social media, community meetings, farmer cooperatives, church groups, WhatsApp groups..."
+                  rows={3}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm text-gray-800 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#5DB347]/40 focus:border-[#5DB347] transition-all resize-none"
+                />
+              </div>
+
+              {/* Error */}
+              {formError && (
+                <div className="bg-red-50 text-red-700 text-sm px-4 py-3 rounded-xl border border-red-100">
+                  {formError}
+                </div>
+              )}
+
+              {/* Submit */}
+              <button
+                type="submit"
+                disabled={submitting}
+                className="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-xl text-white font-bold text-base transition-all hover:shadow-lg hover:shadow-[#5DB347]/30 disabled:opacity-60 disabled:cursor-not-allowed"
+                style={{ background: 'linear-gradient(135deg, #5DB347, #449933)' }}
+              >
+                {submitting ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Submitting...
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-5 h-5" />
+                    Submit Application
+                  </>
+                )}
+              </button>
+
+              <p className="text-xs text-gray-400 text-center">
+                By applying, you agree to our ambassador terms and conditions.
+                {authUser && (
+                  <span className="block mt-1 text-[#5DB347]">
+                    Signed in as {authUser.email} -- your profile will be linked automatically.
+                  </span>
+                )}
+              </p>
+            </form>
+          )}
+        </div>
       </section>
     </div>
   );
