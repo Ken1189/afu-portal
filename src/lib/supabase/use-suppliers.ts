@@ -127,6 +127,10 @@ export function useSuppliers() {
     return updateSupplier(id, { status: 'active' as SupplierStatus });
   };
 
+  const rejectSupplier = async (id: string) => {
+    return updateSupplier(id, { status: 'rejected' as SupplierStatus });
+  };
+
   // ── Summary stats ──────────────────────────────────────────────────────
 
   const stats = {
@@ -134,6 +138,7 @@ export function useSuppliers() {
     active: suppliers.filter((s) => s.status === 'active').length,
     pending: suppliers.filter((s) => s.status === 'pending').length,
     suspended: suppliers.filter((s) => s.status === 'suspended').length,
+    rejected: suppliers.filter((s) => s.status === 'rejected').length,
   };
 
   return {
@@ -147,5 +152,6 @@ export function useSuppliers() {
     approveSupplier,
     suspendSupplier,
     activateSupplier,
+    rejectSupplier,
   };
 }
