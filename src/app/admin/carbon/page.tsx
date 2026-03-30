@@ -212,7 +212,7 @@ export default function AdminCarbonDashboard() {
       <div className="grid lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
           <h3 className="font-semibold text-[#1B2A4A] mb-4">Monthly Enrollments</h3>
-          <ResponsiveContainer width="100%" height={250}>
+          <ResponsiveContainer width="100%" height={250} minWidth={0}>
             <BarChart data={enrollmentTrend}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
               <XAxis dataKey="month" tick={{ fontSize: 12 }} />
@@ -224,7 +224,7 @@ export default function AdminCarbonDashboard() {
         </div>
         <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
           <h3 className="font-semibold text-[#1B2A4A] mb-4">Monthly Carbon Revenue ($)</h3>
-          <ResponsiveContainer width="100%" height={250}>
+          <ResponsiveContainer width="100%" height={250} minWidth={0}>
             <AreaChart data={revenueTrend}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
               <XAxis dataKey="month" tick={{ fontSize: 12 }} />

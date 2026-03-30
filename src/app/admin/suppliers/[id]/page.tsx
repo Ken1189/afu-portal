@@ -703,7 +703,7 @@ export default function SupplierDetailPage() {
                 <motion.div variants={cardVariants}>
                   <h3 className="font-semibold text-navy text-sm mb-4">Monthly Sales Performance</h3>
                   <div className="h-72">
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                       <AreaChart data={monthlySales} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
                         <defs>
                           <linearGradient id="salesGradient" x1="0" y1="0" x2="0" y2="1">
@@ -735,7 +735,7 @@ export default function SupplierDetailPage() {
                   <motion.div variants={cardVariants}>
                     <h3 className="font-semibold text-navy text-sm mb-4">Top Selling Products</h3>
                     <div className="h-64">
-                      <ResponsiveContainer width="100%" height="100%">
+                      <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                         <BarChart data={topSellingData} layout="vertical" margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
                           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" horizontal={false} />
                           <XAxis type="number" tick={{ fontSize: 11, fill: '#9CA3AF' }} axisLine={false} tickLine={false} />
@@ -758,7 +758,7 @@ export default function SupplierDetailPage() {
                   <motion.div variants={cardVariants}>
                     <h3 className="font-semibold text-navy text-sm mb-4">Customer Demographics</h3>
                     <div className="h-64 flex items-center">
-                      <ResponsiveContainer width="100%" height="100%">
+                      <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                         <PieChart>
                           <Pie
                             data={demographicsData}

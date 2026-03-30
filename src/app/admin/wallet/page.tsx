@@ -416,7 +416,7 @@ export default function AdminWalletPage() {
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
         <h2 className="text-lg font-semibold text-[#1B2A4A] mb-4">Transaction Volume (30 Days)</h2>
         <div className="h-72">
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%" minWidth={0}>
             <BarChart data={volumeData} barGap={2}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
               <XAxis dataKey="date" fontSize={10} tickLine={false} stroke="#999" interval={4} />

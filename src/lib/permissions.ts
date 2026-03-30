@@ -233,18 +233,25 @@ export function usePermissions(userId: string | undefined) {
     fetchedRef.current = true;
 
     const supabase = createClient();
-    supabase
-      .from('admin_permissions')
-      .select('permission')
-      .eq('user_id', userId)
-      .then(({ data, error }) => {
-        if (!error && data) {
+    (async () => {
+      try {
+        const { data, error } = await supabase
+          .from('admin_permissions')
+          .select('permission')
+          .eq('user_id', userId);
+        if (!error && data && data.length > 0) {
           const perms = data.map((row: { permission: string }) => row.permission);
           setPermissions(perms);
           permissionsCache.set(userId, { permissions: perms, timestamp: Date.now() });
+        } else {
+          setPermissions([]);
         }
+      } catch {
+        setPermissions([]);
+      } finally {
         setLoading(false);
-      });
+      }
+    })();
 
     return () => {
       fetchedRef.current = false;

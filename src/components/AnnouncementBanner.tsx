@@ -8,14 +8,13 @@ import { usePathname } from 'next/navigation';
 
 interface Announcement {
   id: string;
-  title: string | null;
   message: string;
   link_url: string | null;
   link_text: string | null;
   bg_color: string;
   text_color: string;
-  start_date: string | null;
-  end_date: string | null;
+  starts_at: string | null;
+  ends_at: string | null;
 }
 
 export default function AnnouncementBanner() {
@@ -35,7 +34,7 @@ export default function AnnouncementBanner() {
     const supabase = createClient();
     supabase
       .from('announcements')
-      .select('id, title, message, link_url, link_text, bg_color, text_color, start_date, end_date')
+      .select('id, message, link_url, link_text, bg_color, text_color, starts_at, ends_at')
       .eq('is_active', true)
       .order('display_order', { ascending: false })
       .limit(5)
@@ -46,8 +45,8 @@ export default function AnnouncementBanner() {
         // Find the first active announcement that's within date range
         const active = data.find((a) => {
           if (a.id === dismissedId) return false;
-          if (a.start_date && new Date(a.start_date) > now) return false;
-          if (a.end_date && new Date(a.end_date) < now) return false;
+          if (a.starts_at && new Date(a.starts_at) > now) return false;
+          if (a.ends_at && new Date(a.ends_at) < now) return false;
           return true;
         });
 

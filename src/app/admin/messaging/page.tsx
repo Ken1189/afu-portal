@@ -341,7 +341,7 @@ export default function MessagingDashboard() {
         <motion.div variants={cardVariants} className="lg:col-span-2 bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
           <h3 className="text-sm font-semibold text-[#1B2A4A] mb-4">Daily Message Volume (Last 30 Days)</h3>
           <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
               <BarChart data={volumeData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                 <XAxis dataKey="date" tick={{ fontSize: 10 }} interval={4} />
@@ -360,7 +360,7 @@ export default function MessagingDashboard() {
         <motion.div variants={cardVariants} className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
           <h3 className="text-sm font-semibold text-[#1B2A4A] mb-4">Delivery Rate</h3>
           <div className="h-64 flex items-center justify-center">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
               <PieChart>
                 <Pie
                   data={deliveryData}

@@ -627,7 +627,7 @@ export default function SponsorshipsPage() {
         >
           <h3 className="font-semibold text-navy text-sm mb-4">Sponsors by Tier</h3>
           <div className="h-72 flex items-center">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
               <PieChart>
                 <Pie
                   data={donutData}
