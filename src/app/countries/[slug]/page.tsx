@@ -28,7 +28,7 @@ interface CountryData {
   highlights: string[];
 }
 
-const countries: CountryData[] = [
+const FALLBACK_COUNTRIES: CountryData[] = [
   {
     name: "Botswana",
     slug: "botswana",
@@ -697,13 +697,13 @@ const countries: CountryData[] = [
 /* ─── Static params for all country slugs ─── */
 
 export function generateStaticParams() {
-  return countries.map((c) => ({ slug: c.slug }));
+  return FALLBACK_COUNTRIES.map((c) => ({ slug: c.slug }));
 }
 
 /* ─── Dynamic metadata ─── */
 
 export function generateMetadata({ params }: { params: { slug: string } }) {
-  const country = countries.find((c) => c.slug === params.slug);
+  const country = FALLBACK_COUNTRIES.find((c) => c.slug === params.slug);
   if (!country) return { title: "Country Not Found - AFU" };
 
   return {
@@ -719,19 +719,39 @@ export function generateMetadata({ params }: { params: { slug: string } }) {
 /* ─── Page Component ─── */
 
 export default async function CountryPage({ params }: { params: { slug: string } }) {
-  const fallback = countries.find((c) => c.slug === params.slug);
+  const fallback = FALLBACK_COUNTRIES.find((c) => c.slug === params.slug);
 
   if (!fallback) {
     notFound();
   }
 
   // Attempt to enrich with DB data; fallback to hardcoded if unavailable
-  let country = { ...fallback };
+  const country = { ...fallback };
   try {
     const svc = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
+      process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
+    // Try site_config countries_data first (admin-editable)
+    const { data: configData } = await svc
+      .from('site_config')
+      .select('value')
+      .eq('key', 'countries_data')
+      .single();
+    if (configData?.value && Array.isArray(configData.value)) {
+      const match = configData.value.find((c: Record<string, unknown>) =>
+        String(c.slug || c.name || '').toLowerCase().replace(/\s+/g, '-') === params.slug
+      );
+      if (match) {
+        if (match.description) country.description = String(match.description);
+        if (match.role) country.role = String(match.role);
+        if (match.highlights && Array.isArray(match.highlights)) country.highlights = match.highlights as string[];
+        if (match.crops && Array.isArray(match.crops)) {
+          country.crops = (match.crops as Array<Record<string, string>>).map((c) => ({ name: c.name || String(c), icon: c.icon || '' }));
+        }
+      }
+    }
+    // Also try country_settings table as secondary source
     const { data } = await svc
       .from('country_settings')
       .select('*')

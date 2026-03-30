@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { createClient } from "@supabase/supabase-js";
 
 export const metadata = {
   title: "Our Countries - AFU",
@@ -26,7 +27,7 @@ export const metadata = {
   },
 };
 
-const countries = [
+const FALLBACK_COUNTRIES = [
   {
     flag: "🇧🇼",
     country: "Botswana",
@@ -191,7 +192,26 @@ const countries = [
   },
 ];
 
-export default function CountriesPage() {
+async function getCountries() {
+  try {
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+    const { data } = await supabase
+      .from('site_config')
+      .select('value')
+      .eq('key', 'countries_data')
+      .single();
+    if (data?.value && Array.isArray(data.value) && data.value.length > 0) {
+      return data.value as typeof FALLBACK_COUNTRIES;
+    }
+  } catch { /* use fallback */ }
+  return FALLBACK_COUNTRIES;
+}
+
+export default async function CountriesPage() {
+  const countries = await getCountries();
   return (
     <>
       {/* ─── HERO ─── */}
