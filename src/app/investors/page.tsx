@@ -311,7 +311,7 @@ export default function InvestorsPage() {
                   {[
                     { value: "10", label: "Countries" },
                     { value: "37+", label: "Database Tables" },
-                    { value: "247+", label: "Active Members" },
+                    { value: "19,000+", label: "Farmers" },
                     { value: "$500M", label: "Target Raise" },
                     { value: "6", label: "Service Pillars" },
                     { value: "12", label: "Languages" },

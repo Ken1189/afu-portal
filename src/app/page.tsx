@@ -297,7 +297,7 @@ export default function Home() {
   const [hero, setHero] = useState(HERO_DEFAULTS);
   const [services, setServices] = useState(FALLBACK_SERVICES);
   const [programs, setPrograms] = useState(FALLBACK_PROGRAMS);
-  const [memberCount, setMemberCount] = useState(247);
+  const [memberCount, setMemberCount] = useState(19000);
 
   // Section visibility from site_config key "homepage_sections"
   const [sectionVisibility, setSectionVisibility] = useState<Record<string, boolean>>({});
@@ -422,7 +422,7 @@ export default function Home() {
           setMemberCount(count);
         }
       } catch {
-        // keep fallback 247
+        // keep fallback 19000
       }
     }
     fetchMemberCount();
@@ -586,7 +586,7 @@ export default function Home() {
               </div>
               <div className="flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/10 px-4 py-2 rounded-full text-white/70">
                 <Users className="w-4 h-4 text-[#5DB347]" />
-                <span>247+ Active Members</span>
+                <span>19,000+ Farmers</span>
               </div>
             </motion.div>
           </div>
@@ -638,7 +638,7 @@ export default function Home() {
             </FadeInWhenVisible>
             <FadeInWhenVisible delay={0.3}>
               <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border-l-4 border-[#5DB347] shadow-lg shadow-[#5DB347]/5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                <CountStat target={memberCount} suffix="+" label="active AFU members across 20 countries" />
+                <CountStat target={memberCount} suffix="+" label="farmers across 20 African countries" />
               </div>
             </FadeInWhenVisible>
           </div>
@@ -1494,7 +1494,7 @@ export default function Home() {
             <FadeInWhenVisible direction="left">
               <div className="relative rounded-3xl overflow-hidden shadow-2xl">
                 <Image
-                  src="https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=800&h=600&fit=crop"
+                  src="https://images.unsplash.com/photo-1589923188651-268a9765e432?w=800&h=600&fit=crop"
                   alt="African farmer in field"
                   width={800}
                   height={600}

@@ -696,7 +696,7 @@ export default function CreditScoresPage() {
           </button>
           <p className="text-[11px] text-gray-400">
             This will trigger a full score recalculation for all{' '}
-            <span className="font-semibold text-[#1B2A4A]">247 active members</span> using the
+            <span className="font-semibold text-[#1B2A4A]">19,000+ farmers</span> using the
             latest data. Estimated time: ~4 minutes.
           </p>
         </div>
