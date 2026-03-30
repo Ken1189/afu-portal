@@ -4,6 +4,7 @@ import { Sprout, Tractor, Building2, ShieldCheck, Settings, Globe, BarChart3, Lo
 import LeadershipSection from "@/components/LeadershipSection";
 // CountryTeams removed — will be added when real team members are confirmed
 import VideoCard from "@/components/VideoCard";
+import { createClient } from "@supabase/supabase-js";
 
 export const metadata = {
   title: "About AFU - African Farming Union",
@@ -31,7 +32,149 @@ export const metadata = {
   },
 };
 
-export default function AboutPage() {
+/* ─── FALLBACK DATA ─── */
+
+const FALLBACK_HERO_STATS = [
+  { value: '20', label: 'Countries' },
+  { value: '247+', label: 'Active Members' },
+  { value: '$50B+', label: 'Market Opportunity' },
+];
+
+const FALLBACK_OPERATING_MODEL = [
+  {
+    tier: "Tier A",
+    name: "Smallholder & SME",
+    iconName: "Sprout",
+    items: [
+      "Input bundles + seasonal working capital",
+      "Training + compliance onboarding",
+      "Guaranteed buy-back routes",
+    ],
+  },
+  {
+    tier: "Tier B",
+    name: "Commercial Farms",
+    iconName: "Tractor",
+    items: [
+      "Equipment finance, irrigation, high-value crop financing",
+      "Structured contracts + processing access",
+      "Trade finance (SBLCs, LCs) + export packaging",
+    ],
+  },
+  {
+    tier: "Tier C",
+    name: "Large Projects",
+    iconName: "Building2",
+    items: [
+      "Project finance + infrastructure",
+      "Anchor processing hubs",
+      "Full corridor offtake contracts",
+    ],
+  },
+];
+
+const FALLBACK_RISK_STRATEGIES = [
+  { risk: "Credit Risk", mitigation: "Offtake contracts, tranche releases, input-in-kind financing, aggregation control", iconName: "ShieldCheck" },
+  { risk: "Execution Risk", mitigation: "Commercial farmer operators + phased rollout", iconName: "Settings" },
+  { risk: "FX / Regulatory Risk", mitigation: "Structured trade routes + multi-country diversification", iconName: "Globe" },
+  { risk: "Commodity Price Risk", mitigation: "Processing/value-add + contract pricing mechanisms", iconName: "BarChart3" },
+  { risk: "Fraud / Leakage", mitigation: "Controlled procurement + field verification + audit trail", iconName: "Lock" },
+];
+
+const FALLBACK_COMMUNITY_PROGRAMS = [
+  {
+    iconName: 'HeartHandshake',
+    title: 'Women in Agriculture',
+    slug: 'women-in-agriculture',
+    desc: 'Supporting women farmers with training, financing, and mentorship. Across Africa, women produce most of the food but receive a fraction of the support. We\'re changing that — one farmer, one loan, one season at a time.',
+  },
+  {
+    iconName: 'UtensilsCrossed',
+    title: 'Feed a Child',
+    slug: 'feed-a-child',
+    desc: 'Ensuring food reaches those who need it most. When our farmers harvest, a portion goes directly to feeding programs in local communities. No child should go hungry in a continent that can feed the world.',
+  },
+  {
+    iconName: 'Sprout',
+    title: 'Young Farmers',
+    slug: 'young-farmers',
+    desc: 'Incubators, education, and entrepreneurship for the next generation. Africa\'s future belongs to its young people — we\'re giving them the tools, the training, and the capital to build farming businesses of their own.',
+  },
+];
+
+/* ─── ICON MAP ─── */
+
+const iconMap: Record<string, LucideIcon> = {
+  Sprout,
+  Tractor,
+  Building2,
+  ShieldCheck,
+  Settings,
+  Globe,
+  BarChart3,
+  Lock,
+  HeartHandshake,
+  UtensilsCrossed,
+};
+
+function getIcon(name: string) {
+  return iconMap[name] || Sprout;
+}
+
+/* ─── FETCH SITE CONFIG ─── */
+
+async function fetchAboutContent() {
+  let heroStats = FALLBACK_HERO_STATS;
+  let operatingModel = FALLBACK_OPERATING_MODEL;
+  let riskStrategies = FALLBACK_RISK_STRATEGIES;
+  let communityPrograms = FALLBACK_COMMUNITY_PROGRAMS;
+
+  try {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (supabaseUrl && supabaseKey) {
+      const supabase = createClient(supabaseUrl, supabaseKey);
+
+      const { data, error } = await supabase
+        .from('site_config')
+        .select('key, value')
+        .in('key', [
+          'about_hero_stats',
+          'about_operating_model',
+          'about_risk_strategies',
+          'about_community_programs',
+        ]);
+
+      if (!error && data) {
+        for (const row of data) {
+          switch (row.key) {
+            case 'about_hero_stats':
+              heroStats = row.value as typeof FALLBACK_HERO_STATS;
+              break;
+            case 'about_operating_model':
+              operatingModel = row.value as typeof FALLBACK_OPERATING_MODEL;
+              break;
+            case 'about_risk_strategies':
+              riskStrategies = row.value as typeof FALLBACK_RISK_STRATEGIES;
+              break;
+            case 'about_community_programs':
+              communityPrograms = row.value as typeof FALLBACK_COMMUNITY_PROGRAMS;
+              break;
+          }
+        }
+      }
+    }
+  } catch {
+    // Silently fall back to hardcoded data
+  }
+
+  return { heroStats, operatingModel, riskStrategies, communityPrograms };
+}
+
+export default async function AboutPage() {
+  const { heroStats, operatingModel, riskStrategies, communityPrograms } = await fetchAboutContent();
+
   return (
     <>
       {/* ─── HERO ─── */}
@@ -71,11 +214,7 @@ export default function AboutPage() {
             </p>
             {/* 3 stat pills — glassmorphism */}
             <div className="flex flex-wrap gap-4">
-              {[
-                { value: '20', label: 'Countries' },
-                { value: '247+', label: 'Active Members' },
-                { value: '$50B+', label: 'Market Opportunity' },
-              ].map((s) => (
+              {heroStats.map((s) => (
                 <div
                   key={s.label}
                   className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl px-6 py-4 text-center hover:-translate-y-1 hover:bg-white/15 transition-all duration-300 shadow-lg shadow-black/10"
@@ -163,68 +302,40 @@ export default function AboutPage() {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                tier: "Tier A",
-                name: "Smallholder & SME",
-                icon: <Sprout className="w-6 h-6 text-white" />,
-                items: [
-                  "Input bundles + seasonal working capital",
-                  "Training + compliance onboarding",
-                  "Guaranteed buy-back routes",
-                ],
-              },
-              {
-                tier: "Tier B",
-                name: "Commercial Farms",
-                icon: <Tractor className="w-6 h-6 text-white" />,
-                items: [
-                  "Equipment finance, irrigation, high-value crop financing",
-                  "Structured contracts + processing access",
-                  "Trade finance (SBLCs, LCs) + export packaging",
-                ],
-              },
-              {
-                tier: "Tier C",
-                name: "Large Projects",
-                icon: <Building2 className="w-6 h-6 text-white" />,
-                items: [
-                  "Project finance + infrastructure",
-                  "Anchor processing hubs",
-                  "Full corridor offtake contracts",
-                ],
-              },
-            ].map((item, i) => (
-              <div
-                key={i}
-                className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-lg shadow-[#5DB347]/5 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 border-l-4 border-[#5DB347]"
-              >
+            {operatingModel.map((item, i) => {
+              const Icon = getIcon(item.iconName);
+              return (
                 <div
-                  className="w-14 h-14 rounded-full flex items-center justify-center mb-4 shadow-lg shadow-[#5DB347]/30 hover:scale-110 transition-transform duration-300 gradient-green"
+                  key={i}
+                  className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-lg shadow-[#5DB347]/5 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 border-l-4 border-[#5DB347]"
                 >
-                  {item.icon}
+                  <div
+                    className="w-14 h-14 rounded-full flex items-center justify-center mb-4 shadow-lg shadow-[#5DB347]/30 hover:scale-110 transition-transform duration-300 gradient-green"
+                  >
+                    <Icon className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="text-sm font-semibold uppercase tracking-wider mb-1 text-green">
+                    {item.tier}
+                  </div>
+                  <h3 className="text-xl font-bold text-[#1B2A4A] mb-4">{item.name}</h3>
+                  <ul className="space-y-3">
+                    {item.items.map((li, j) => (
+                      <li key={j} className="flex items-start gap-2 text-gray-600 text-sm">
+                        <svg
+                          className="w-4 h-4 mt-0.5 shrink-0 text-green"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        {li}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <div className="text-sm font-semibold uppercase tracking-wider mb-1 text-green">
-                  {item.tier}
-                </div>
-                <h3 className="text-xl font-bold text-[#1B2A4A] mb-4">{item.name}</h3>
-                <ul className="space-y-3">
-                  {item.items.map((li, j) => (
-                    <li key={j} className="flex items-start gap-2 text-gray-600 text-sm">
-                      <svg
-                        className="w-4 h-4 mt-0.5 shrink-0 text-green"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      {li}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -241,26 +352,23 @@ export default function AboutPage() {
             </h2>
           </div>
           <div className="space-y-4">
-            {[
-              { risk: "Credit Risk", mitigation: "Offtake contracts, tranche releases, input-in-kind financing, aggregation control", icon: <ShieldCheck className="w-6 h-6 text-white" /> },
-              { risk: "Execution Risk", mitigation: "Commercial farmer operators + phased rollout", icon: <Settings className="w-6 h-6 text-white" /> },
-              { risk: "FX / Regulatory Risk", mitigation: "Structured trade routes + multi-country diversification", icon: <Globe className="w-6 h-6 text-white" /> },
-              { risk: "Commodity Price Risk", mitigation: "Processing/value-add + contract pricing mechanisms", icon: <BarChart3 className="w-6 h-6 text-white" /> },
-              { risk: "Fraud / Leakage", mitigation: "Controlled procurement + field verification + audit trail", icon: <Lock className="w-6 h-6 text-white" /> },
-            ].map((item, i) => (
-              <div
-                key={i}
-                className="flex flex-col md:flex-row md:items-center gap-4 md:gap-8 bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-lg shadow-[#5DB347]/5 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 border-l-4 border-[#5DB347]"
-              >
+            {riskStrategies.map((item, i) => {
+              const Icon = getIcon(item.iconName);
+              return (
                 <div
-                  className="w-14 h-14 rounded-full flex items-center justify-center shrink-0 shadow-lg shadow-[#5DB347]/30 hover:scale-110 transition-transform duration-300 gradient-green"
+                  key={i}
+                  className="flex flex-col md:flex-row md:items-center gap-4 md:gap-8 bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-lg shadow-[#5DB347]/5 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 border-l-4 border-[#5DB347]"
                 >
-                  {item.icon}
+                  <div
+                    className="w-14 h-14 rounded-full flex items-center justify-center shrink-0 shadow-lg shadow-[#5DB347]/30 hover:scale-110 transition-transform duration-300 gradient-green"
+                  >
+                    <Icon className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="font-bold text-[#1B2A4A] md:min-w-[200px]">{item.risk}</div>
+                  <div className="text-gray-600 text-sm">{item.mitigation}</div>
                 </div>
-                <div className="font-bold text-[#1B2A4A] md:min-w-[200px]">{item.risk}</div>
-                <div className="text-gray-600 text-sm">{item.mitigation}</div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -282,44 +390,28 @@ export default function AboutPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {([
-              {
-                Icon: HeartHandshake,
-                title: 'Women in Agriculture',
-                slug: 'women-in-agriculture',
-                desc: 'Supporting women farmers with training, financing, and mentorship. Across Africa, women produce most of the food but receive a fraction of the support. We\'re changing that — one farmer, one loan, one season at a time.',
-              },
-              {
-                Icon: UtensilsCrossed,
-                title: 'Feed a Child',
-                slug: 'feed-a-child',
-                desc: 'Ensuring food reaches those who need it most. When our farmers harvest, a portion goes directly to feeding programs in local communities. No child should go hungry in a continent that can feed the world.',
-              },
-              {
-                Icon: Sprout,
-                title: 'Young Farmers',
-                slug: 'young-farmers',
-                desc: 'Incubators, education, and entrepreneurship for the next generation. Africa\'s future belongs to its young people — we\'re giving them the tools, the training, and the capital to build farming businesses of their own.',
-              },
-            ] as { Icon: LucideIcon; title: string; slug: string; desc: string }[]).map((item) => (
-              <div
-                key={item.title}
-                className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl p-8 hover:-translate-y-1 hover:bg-white/10 transition-all duration-300 flex flex-col"
-              >
-                <div className="w-12 h-12 rounded-xl bg-[#5DB347]/10 flex items-center justify-center mb-4">
-                  <item.Icon className="w-6 h-6 text-[#5DB347]" />
-                </div>
-                <h3 className="text-xl font-bold text-white mb-3">{item.title}</h3>
-                <p className="text-white/60 text-sm leading-relaxed mb-6 flex-1">{item.desc}</p>
-                <Link
-                  href={`/donate?program=${item.slug}`}
-                  className="inline-flex items-center justify-center gap-2 bg-[#5DB347] hover:bg-[#449933] text-white text-sm font-semibold px-6 py-3 rounded-full transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[#5DB347]/25"
+            {communityPrograms.map((item) => {
+              const Icon = getIcon(item.iconName);
+              return (
+                <div
+                  key={item.title}
+                  className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl p-8 hover:-translate-y-1 hover:bg-white/10 transition-all duration-300 flex flex-col"
                 >
-                  <Heart className="w-4 h-4" />
-                  Donate to This Program
-                </Link>
-              </div>
-            ))}
+                  <div className="w-12 h-12 rounded-xl bg-[#5DB347]/10 flex items-center justify-center mb-4">
+                    <Icon className="w-6 h-6 text-[#5DB347]" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-3">{item.title}</h3>
+                  <p className="text-white/60 text-sm leading-relaxed mb-6 flex-1">{item.desc}</p>
+                  <Link
+                    href={`/donate?program=${item.slug}`}
+                    className="inline-flex items-center justify-center gap-2 bg-[#5DB347] hover:bg-[#449933] text-white text-sm font-semibold px-6 py-3 rounded-full transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[#5DB347]/25"
+                  >
+                    <Heart className="w-4 h-4" />
+                    Donate to This Program
+                  </Link>
+                </div>
+              );
+            })}
           </div>
 
           <div className="mt-12 text-center">

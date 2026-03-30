@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Rocket, Sprout, School, Trophy, Handshake, type LucideIcon } from "lucide-react";
 import { createPageMetadata } from '@/lib/seo/metadata';
+import { createClient } from "@supabase/supabase-js";
 
 export const metadata = createPageMetadata({
   title: 'Young Farmers Program',
@@ -8,37 +9,39 @@ export const metadata = createPageMetadata({
   path: '/young-farmers',
 });
 
-const programs: { icon: LucideIcon; title: string; description: string; highlight: string }[] = [
+/* ─── FALLBACK DATA ─── */
+
+const FALLBACK_PROGRAMS: { iconName: string; title: string; description: string; highlight: string }[] = [
   {
-    icon: Rocket,
+    iconName: "Rocket",
     title: "Young Farmer Incubator",
     description:
       "Our Shark Tank-style pitch program where young entrepreneurs present their agricultural business ideas to a panel of AFU mentors and investors. The best ideas receive seed funding, operational support, and access to AFU's full network to turn their vision into reality.",
     highlight: "Seed funding for winning ideas",
   },
   {
-    icon: Sprout,
+    iconName: "Sprout",
     title: "Junior Training Program",
     description:
       "Age-appropriate farming education modules covering soil science, crop management, livestock care, basic business skills, and sustainable practices. Designed for ages 10 to 18 with hands-on learning experiences.",
     highlight: "Ages 10-18",
   },
   {
-    icon: School,
+    iconName: "School",
     title: "School Farm Partnerships",
     description:
       "AFU partners with schools across our member countries to create learning gardens and mini-farms on school grounds. Students learn agriculture from planting to harvest while contributing fresh produce to their school communities.",
     highlight: "Active in 20 countries",
   },
   {
-    icon: Trophy,
+    iconName: "Trophy",
     title: "Youth Entrepreneurship Awards",
     description:
       "Annual awards recognizing outstanding young agricultural innovators across Africa. Categories include Best Young Farmer, Most Innovative Agritech Idea, Community Impact, and Sustainability Champion.",
     highlight: "Annual awards ceremony",
   },
   {
-    icon: Handshake,
+    iconName: "Handshake",
     title: "Mentorship Program",
     description:
       "Connecting young farmers with experienced AFU ambassadors and commercial farmers. One-on-one mentorship covering everything from crop planning to business management, with regular farm visits and quarterly reviews.",
@@ -46,7 +49,68 @@ const programs: { icon: LucideIcon; title: string; description: string; highligh
   },
 ];
 
-export default function YoungFarmersPage() {
+const FALLBACK_STATS = [
+  { value: "500+", label: "Young farmers enrolled" },
+  { value: "45", label: "Partner schools" },
+  { value: "9", label: "Countries active" },
+  { value: "$120K", label: "Seed funding awarded" },
+];
+
+/* ─── ICON MAP ─── */
+
+const iconMap: Record<string, LucideIcon> = {
+  Rocket,
+  Sprout,
+  School,
+  Trophy,
+  Handshake,
+};
+
+function getIcon(name: string) {
+  return iconMap[name] || Sprout;
+}
+
+/* ─── FETCH SITE CONFIG ─── */
+
+async function fetchYoungFarmersContent() {
+  let programs = FALLBACK_PROGRAMS;
+  let stats = FALLBACK_STATS;
+
+  try {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (supabaseUrl && supabaseKey) {
+      const supabase = createClient(supabaseUrl, supabaseKey);
+
+      const { data, error } = await supabase
+        .from('site_config')
+        .select('key, value')
+        .in('key', ['young_farmers_programs', 'young_farmers_stats']);
+
+      if (!error && data) {
+        for (const row of data) {
+          switch (row.key) {
+            case 'young_farmers_programs':
+              programs = row.value as typeof FALLBACK_PROGRAMS;
+              break;
+            case 'young_farmers_stats':
+              stats = row.value as typeof FALLBACK_STATS;
+              break;
+          }
+        }
+      }
+    }
+  } catch {
+    // Silently fall back to hardcoded data
+  }
+
+  return { programs, stats };
+}
+
+export default async function YoungFarmersPage() {
+  const { programs, stats } = await fetchYoungFarmersContent();
+
   return (
     <>
       {/* Hero */}
@@ -95,31 +159,34 @@ export default function YoungFarmersPage() {
           </div>
 
           <div className="space-y-8">
-            {programs.map((program, i) => (
-              <div
-                key={i}
-                className="bg-cream rounded-2xl p-8 md:p-10 border border-gray-100 hover:border-[#5DB347]/20 hover:shadow-lg transition-all duration-300"
-              >
-                <div className="flex flex-col md:flex-row gap-6">
-                  <div className="w-14 h-14 rounded-xl bg-[#5DB347]/10 flex items-center justify-center shrink-0">
-                    <program.icon className="w-7 h-7 text-[#5DB347]" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex flex-wrap items-center gap-3 mb-3">
-                      <h3 className="text-xl font-bold text-navy">
-                        {program.title}
-                      </h3>
-                      <span className="bg-[#5DB347]/10 text-[#5DB347] text-xs font-semibold px-3 py-1 rounded-full">
-                        {program.highlight}
-                      </span>
+            {programs.map((program, i) => {
+              const Icon = getIcon(program.iconName);
+              return (
+                <div
+                  key={i}
+                  className="bg-cream rounded-2xl p-8 md:p-10 border border-gray-100 hover:border-[#5DB347]/20 hover:shadow-lg transition-all duration-300"
+                >
+                  <div className="flex flex-col md:flex-row gap-6">
+                    <div className="w-14 h-14 rounded-xl bg-[#5DB347]/10 flex items-center justify-center shrink-0">
+                      <Icon className="w-7 h-7 text-[#5DB347]" />
                     </div>
-                    <p className="text-gray-500 leading-relaxed">
-                      {program.description}
-                    </p>
+                    <div className="flex-1">
+                      <div className="flex flex-wrap items-center gap-3 mb-3">
+                        <h3 className="text-xl font-bold text-navy">
+                          {program.title}
+                        </h3>
+                        <span className="bg-[#5DB347]/10 text-[#5DB347] text-xs font-semibold px-3 py-1 rounded-full">
+                          {program.highlight}
+                        </span>
+                      </div>
+                      <p className="text-gray-500 leading-relaxed">
+                        {program.description}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -128,12 +195,7 @@ export default function YoungFarmersPage() {
       <section className="py-16 bg-cream">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            {[
-              { value: "500+", label: "Young farmers enrolled" },
-              { value: "45", label: "Partner schools" },
-              { value: "9", label: "Countries active" },
-              { value: "$120K", label: "Seed funding awarded" },
-            ].map((stat, i) => (
+            {stats.map((stat, i) => (
               <div key={i}>
                 <div className="text-3xl md:text-4xl font-bold text-[#5DB347] mb-1">
                   {stat.value}

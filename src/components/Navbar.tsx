@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ChevronDown,
@@ -108,6 +109,21 @@ const exploreLinks: { label: string; href: string; desc: string; icon: LucideIco
   { label: "FAQ", href: "/faq", desc: "Common questions", icon: HelpCircle },
 ];
 
+/* ─── Navbar config types (from site_config DB) ─── */
+
+interface NavConfigChild {
+  label: string;
+  href: string;
+}
+
+interface NavConfigItem {
+  label: string;
+  href: string;
+  visible?: boolean;
+  order?: number;
+  children?: NavConfigChild[];
+}
+
 type OpenDropdown = null | "services" | "education" | "community" | "explore";
 
 /* ─── Dropdown animation variants ─── */
@@ -124,12 +140,354 @@ const mobileMenuVariants = {
   exit: { opacity: 0, y: -10 },
 };
 
+/* ─── Extracted desktop dropdown sub-components for DB-driven nav ─── */
+
+interface DropdownProps {
+  openDropdown: OpenDropdown;
+  setOpenDropdown: (v: OpenDropdown) => void;
+  handleMouseEnter?: (v: OpenDropdown) => void;
+  handleMouseLeave?: () => void;
+}
+
+function DesktopEducationDropdown({ openDropdown, handleMouseEnter, handleMouseLeave, setOpenDropdown }: DropdownProps) {
+  return (
+    <div
+      className="relative"
+      onMouseEnter={() => handleMouseEnter?.("education")}
+      onMouseLeave={handleMouseLeave}
+    >
+      <button
+        className={`flex items-center gap-1 text-sm font-medium px-3 py-2 rounded-lg transition-colors ${
+          openDropdown === "education" ? "text-[#5DB347] bg-[#EBF7E5]/50" : "text-navy hover:text-[#5DB347] hover:bg-[#EBF7E5]/50"
+        }`}
+        onClick={() => setOpenDropdown(openDropdown === "education" ? null : "education")}
+      >
+        Education
+        <ChevronDown className={`w-4 h-4 transition-transform ${openDropdown === "education" ? "rotate-180" : ""}`} />
+      </button>
+      <AnimatePresence>
+        {openDropdown === "education" && (
+          <motion.div
+            variants={dropdownVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            transition={{ duration: 0.15 }}
+            className="absolute top-full left-0 mt-1 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+            onMouseEnter={() => handleMouseEnter?.("education")}
+            onMouseLeave={handleMouseLeave}
+          >
+            {educationLinks.map((link) => {
+              const Icon = link.icon;
+              return (
+                <Link key={link.href} href={link.href} className="flex items-center gap-3 px-4 py-2.5 text-sm text-navy hover:bg-[#EBF7E5] hover:text-[#5DB347] transition-colors" onClick={() => setOpenDropdown(null)}>
+                  <Icon className="w-4 h-4 text-gray-400" />
+                  {link.label}
+                </Link>
+              );
+            })}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function DesktopServicesDropdown({ openDropdown, handleMouseEnter, handleMouseLeave, setOpenDropdown }: DropdownProps) {
+  return (
+    <div
+      className="relative"
+      onMouseEnter={() => handleMouseEnter?.("services")}
+      onMouseLeave={handleMouseLeave}
+    >
+      <button
+        className={`flex items-center gap-1 text-sm font-medium px-3 py-2 rounded-lg transition-colors ${
+          openDropdown === "services" ? "text-[#5DB347] bg-[#EBF7E5]/50" : "text-navy hover:text-[#5DB347] hover:bg-[#EBF7E5]/50"
+        }`}
+        onClick={() => setOpenDropdown(openDropdown === "services" ? null : "services")}
+      >
+        Services
+        <ChevronDown className={`w-4 h-4 transition-transform ${openDropdown === "services" ? "rotate-180" : ""}`} />
+      </button>
+      <AnimatePresence>
+        {openDropdown === "services" && (
+          <motion.div
+            variants={dropdownVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            transition={{ duration: 0.15 }}
+            className="absolute top-full -left-40 mt-1 bg-white rounded-xl shadow-xl border border-gray-100 z-50 w-[700px] max-w-[calc(100vw-2rem)]"
+            onMouseEnter={() => handleMouseEnter?.("services")}
+            onMouseLeave={handleMouseLeave}
+          >
+            <div className="p-6">
+              <div className="grid grid-cols-3 gap-8">
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <Landmark className="w-4 h-4 text-[#5DB347]" />
+                    <span className="text-xs font-semibold text-[#5DB347] uppercase tracking-wider">Finance</span>
+                  </div>
+                  <div className="space-y-0.5">
+                    {financeLinks.map((link) => (
+                      <Link key={link.href} href={link.href} className="block px-3 py-2 text-sm text-navy hover:bg-[#EBF7E5] hover:text-[#5DB347] rounded-lg transition-all hover:translate-x-0.5 border-l-2 border-transparent hover:border-[#5DB347]" onClick={() => setOpenDropdown(null)}>
+                        {link.label}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <ShieldCheck className="w-4 h-4 text-[#5DB347]" />
+                    <span className="text-xs font-semibold text-[#5DB347] uppercase tracking-wider">Insurance</span>
+                  </div>
+                  <div className="space-y-0.5">
+                    {insuranceLinks.map((link) => (
+                      <Link key={link.href} href={link.href} className="block px-3 py-2 text-sm text-navy hover:bg-[#EBF7E5] hover:text-[#5DB347] rounded-lg transition-all hover:translate-x-0.5 border-l-2 border-transparent hover:border-[#5DB347]" onClick={() => setOpenDropdown(null)}>
+                        {link.label}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-xs font-semibold text-[#5DB347] uppercase tracking-wider">More</span>
+                  </div>
+                  <div className="space-y-0.5">
+                    {moreServicesLinks.map((link) => {
+                      const Icon = link.icon;
+                      return (
+                        <Link key={link.href} href={link.href} className="flex items-center gap-3 px-3 py-2 text-sm text-navy hover:bg-[#EBF7E5] hover:text-[#5DB347] rounded-lg transition-all hover:translate-x-0.5 border-l-2 border-transparent hover:border-[#5DB347]" onClick={() => setOpenDropdown(null)}>
+                          <Icon className="w-4 h-4 text-gray-400" />
+                          {link.label}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function DesktopCommunityDropdown({ openDropdown, setOpenDropdown }: DropdownProps) {
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setOpenDropdown(openDropdown === "community" ? null : "community")}
+        className={`flex items-center gap-1 text-sm font-medium px-3 py-2 rounded-lg transition-colors ${
+          openDropdown === "community" ? "text-[#5DB347] bg-[#EBF7E5]/50" : "text-navy hover:text-[#5DB347] hover:bg-[#EBF7E5]/50"
+        }`}
+      >
+        Community
+        <ChevronDown className={`w-3.5 h-3.5 transition-transform ${openDropdown === "community" ? "rotate-180" : ""}`} />
+      </button>
+      <AnimatePresence>
+        {openDropdown === "community" && (
+          <motion.div
+            variants={dropdownVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            transition={{ duration: 0.15 }}
+            className="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50"
+          >
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-4 pt-1 pb-2">Community</p>
+            {communityLinks.map((link) => {
+              const Icon = link.icon;
+              return (
+                <Link key={link.href} href={link.href} onClick={() => setOpenDropdown(null)} className="flex items-center gap-3 px-4 py-2.5 hover:bg-[#EBF7E5] hover:translate-x-0.5 transition-all border-l-2 border-transparent hover:border-[#5DB347]">
+                  <Icon className="w-4 h-4 text-[#8CB89C] shrink-0" />
+                  <div>
+                    <span className="text-sm font-medium text-navy block">{link.label}</span>
+                    <span className="text-[10px] text-gray-400 block">{link.desc}</span>
+                  </div>
+                </Link>
+              );
+            })}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function DesktopExploreDropdown({ openDropdown, setOpenDropdown }: DropdownProps) {
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setOpenDropdown(openDropdown === "explore" ? null : "explore")}
+        className={`flex items-center gap-1 text-sm font-medium px-3 py-2 rounded-lg transition-colors ${
+          openDropdown === "explore" ? "text-[#5DB347] bg-[#EBF7E5]/50" : "text-navy hover:text-[#5DB347] hover:bg-[#EBF7E5]/50"
+        }`}
+      >
+        Explore
+        <ChevronDown className={`w-3.5 h-3.5 transition-transform ${openDropdown === "explore" ? "rotate-180" : ""}`} />
+      </button>
+      <AnimatePresence>
+        {openDropdown === "explore" && (
+          <motion.div
+            variants={dropdownVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            transition={{ duration: 0.15 }}
+            className="absolute top-full right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50"
+          >
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-4 pt-1 pb-2">Explore</p>
+            {exploreLinks.map((link) => {
+              const Icon = link.icon;
+              return (
+                <Link key={link.href} href={link.href} onClick={() => setOpenDropdown(null)} className="flex items-center gap-3 px-4 py-2.5 hover:bg-[#EBF7E5] hover:translate-x-0.5 transition-all border-l-2 border-transparent hover:border-[#5DB347]">
+                  <Icon className="w-4 h-4 text-[#8CB89C] shrink-0" />
+                  <div>
+                    <span className="text-sm font-medium text-navy block">{link.label}</span>
+                    <span className="text-[10px] text-gray-400 block">{link.desc}</span>
+                  </div>
+                </Link>
+              );
+            })}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+/* ─── Extracted mobile accordion sub-components for DB-driven nav ─── */
+
+function MobileEducationSection({ mobileEducationOpen, setMobileEducationOpen, closeMobile }: { mobileEducationOpen: boolean; setMobileEducationOpen: (v: boolean) => void; closeMobile: () => void }) {
+  return (
+    <div>
+      <button className="flex items-center justify-between w-full text-navy text-base font-medium py-3 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors" onClick={() => setMobileEducationOpen(!mobileEducationOpen)}>
+        Education
+        <ChevronDown className={`w-5 h-5 transition-transform ${mobileEducationOpen ? "rotate-180" : ""}`} />
+      </button>
+      <AnimatePresence>
+        {mobileEducationOpen && (
+          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }} className="overflow-hidden">
+            <div className="pl-4 py-1 space-y-0.5">
+              {educationLinks.map((link) => {
+                const Icon = link.icon;
+                return (
+                  <Link key={link.href} href={link.href} className="flex items-center gap-3 text-navy/70 hover:text-[#5DB347] text-sm py-2.5 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors" onClick={closeMobile}>
+                    <Icon className="w-4 h-4" />
+                    {link.label}
+                  </Link>
+                );
+              })}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function MobileServicesSection({ mobileServicesOpen, setMobileServicesOpen, mobileFinanceOpen, setMobileFinanceOpen, mobileInsuranceOpen, setMobileInsuranceOpen, mobileMoreOpen, setMobileMoreOpen, closeMobile }: { mobileServicesOpen: boolean; setMobileServicesOpen: (v: boolean) => void; mobileFinanceOpen: boolean; setMobileFinanceOpen: (v: boolean) => void; mobileInsuranceOpen: boolean; setMobileInsuranceOpen: (v: boolean) => void; mobileMoreOpen: boolean; setMobileMoreOpen: (v: boolean) => void; closeMobile: () => void }) {
+  return (
+    <div>
+      <button className="flex items-center justify-between w-full text-navy text-base font-medium py-3 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors" onClick={() => setMobileServicesOpen(!mobileServicesOpen)}>
+        Services
+        <ChevronDown className={`w-5 h-5 transition-transform ${mobileServicesOpen ? "rotate-180" : ""}`} />
+      </button>
+      <AnimatePresence>
+        {mobileServicesOpen && (
+          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }} className="overflow-hidden">
+            <div className="pl-4 py-1 space-y-1">
+              {/* Finance sub-accordion */}
+              <button className="flex items-center justify-between w-full text-navy/80 text-sm font-semibold py-2.5 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors" onClick={() => setMobileFinanceOpen(!mobileFinanceOpen)}>
+                <span className="flex items-center gap-2"><Landmark className="w-4 h-4 text-[#5DB347]" />Finance</span>
+                <ChevronDown className={`w-4 h-4 transition-transform ${mobileFinanceOpen ? "rotate-180" : ""}`} />
+              </button>
+              <AnimatePresence>
+                {mobileFinanceOpen && (
+                  <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.15 }} className="overflow-hidden">
+                    <div className="pl-4 space-y-0.5">
+                      {financeLinks.map((link) => (
+                        <Link key={link.href} href={link.href} className="block text-navy/60 hover:text-[#5DB347] text-sm py-2 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors" onClick={closeMobile}>{link.label}</Link>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              {/* Insurance sub-accordion */}
+              <button className="flex items-center justify-between w-full text-navy/80 text-sm font-semibold py-2.5 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors" onClick={() => setMobileInsuranceOpen(!mobileInsuranceOpen)}>
+                <span className="flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-[#5DB347]" />Insurance</span>
+                <ChevronDown className={`w-4 h-4 transition-transform ${mobileInsuranceOpen ? "rotate-180" : ""}`} />
+              </button>
+              <AnimatePresence>
+                {mobileInsuranceOpen && (
+                  <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.15 }} className="overflow-hidden">
+                    <div className="pl-4 space-y-0.5">
+                      {insuranceLinks.map((link) => (
+                        <Link key={link.href} href={link.href} className="block text-navy/60 hover:text-[#5DB347] text-sm py-2 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors" onClick={closeMobile}>{link.label}</Link>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              {/* More sub-accordion */}
+              <button className="flex items-center justify-between w-full text-navy/80 text-sm font-semibold py-2.5 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors" onClick={() => setMobileMoreOpen(!mobileMoreOpen)}>
+                <span>More Services</span>
+                <ChevronDown className={`w-4 h-4 transition-transform ${mobileMoreOpen ? "rotate-180" : ""}`} />
+              </button>
+              <AnimatePresence>
+                {mobileMoreOpen && (
+                  <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.15 }} className="overflow-hidden">
+                    <div className="pl-4 space-y-0.5">
+                      {moreServicesLinks.map((link) => {
+                        const Icon = link.icon;
+                        return (
+                          <Link key={link.href} href={link.href} className="flex items-center gap-3 text-navy/60 hover:text-[#5DB347] text-sm py-2 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors" onClick={closeMobile}>
+                            <Icon className="w-4 h-4" />{link.label}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 /* ─── Component ─── */
 
 export default function Navbar() {
   const { user, profile, isAdmin, signOut, isLoading: authLoading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+
+  /* ─── DB-driven nav config ─── */
+  const [dbNavItems, setDbNavItems] = useState<NavConfigItem[] | null>(null);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase
+      .from("site_config")
+      .select("value")
+      .eq("key", "navbar_config")
+      .single()
+      .then(({ data, error }) => {
+        if (!error && data?.value && Array.isArray(data.value) && data.value.length > 0) {
+          const items = (data.value as NavConfigItem[])
+            .filter((item) => item.visible !== false)
+            .sort((a, b) => (a.order ?? 99) - (b.order ?? 99));
+          setDbNavItems(items);
+        }
+        // On error or empty, dbNavItems stays null -> use hardcoded fallback
+      });
+  }, []);
+
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<OpenDropdown>(null);
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
@@ -250,7 +608,61 @@ export default function Navbar() {
 
           {/* ── Desktop Nav ── */}
           <div className="hidden lg:flex items-center gap-1">
-            {/* About Us */}
+            {/* --- DB-driven nav items (when available) --- */}
+            {dbNavItems ? (
+              <>
+                {dbNavItems.map((item) => {
+                  const key = item.label.toLowerCase();
+                  // Known dropdown keys: render the hardcoded mega-dropdowns
+                  if (key === "education") return <DesktopEducationDropdown key="education" openDropdown={openDropdown} handleMouseEnter={handleMouseEnter} handleMouseLeave={handleMouseLeave} setOpenDropdown={setOpenDropdown} />;
+                  if (key === "services") return <DesktopServicesDropdown key="services" openDropdown={openDropdown} handleMouseEnter={handleMouseEnter} handleMouseLeave={handleMouseLeave} setOpenDropdown={setOpenDropdown} />;
+                  if (key === "community") return <DesktopCommunityDropdown key="community" openDropdown={openDropdown} setOpenDropdown={setOpenDropdown} />;
+                  if (key === "explore") return <DesktopExploreDropdown key="explore" openDropdown={openDropdown} setOpenDropdown={setOpenDropdown} />;
+                  // Items with children from DB: render a simple dropdown
+                  if (item.children && item.children.length > 0) {
+                    return (
+                      <div key={item.label} className="relative group">
+                        <Link href={item.href || "#"} className="text-navy hover:text-[#5DB347] transition-colors text-sm font-medium px-3 py-2 rounded-lg hover:bg-[#EBF7E5]/50 flex items-center gap-1">
+                          {item.label}
+                          <ChevronDown className="w-3.5 h-3.5" />
+                        </Link>
+                        <div className="absolute top-full left-0 mt-1 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50 hidden group-hover:block">
+                          {item.children.map((child) => (
+                            <Link key={child.href} href={child.href} className="block px-4 py-2.5 text-sm text-navy hover:bg-[#EBF7E5] hover:text-[#5DB347] transition-colors">
+                              {child.label}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  }
+                  // Special CTA buttons
+                  if (key === "sponsor") {
+                    return (
+                      <Link key="sponsor" href={item.href || "/sponsor"} className="text-white font-semibold text-xs px-4 py-2 rounded-lg transition-colors flex items-center gap-1.5 whitespace-nowrap" style={{ background: '#5DB347' }} onMouseEnter={(e) => (e.currentTarget.style.background = '#449933')} onMouseLeave={(e) => (e.currentTarget.style.background = '#5DB347')}>
+                        <span className="text-sm">&#10084;&#65039;</span>
+                        {item.label}
+                      </Link>
+                    );
+                  }
+                  if (key === "donate") {
+                    return (
+                      <Link key="donate" href={item.href || "/donate"} className="text-white font-semibold text-xs px-4 py-2 rounded-lg transition-colors flex items-center gap-1.5 whitespace-nowrap border border-white/20 hover:bg-white/10">
+                        {item.label}
+                      </Link>
+                    );
+                  }
+                  // Simple link
+                  return (
+                    <Link key={item.label} href={item.href} className="text-navy hover:text-[#5DB347] transition-colors text-sm font-medium px-3 py-2 rounded-lg hover:bg-[#EBF7E5]/50">
+                      {item.label}
+                    </Link>
+                  );
+                })}
+              </>
+            ) : (
+              <>
+            {/* FALLBACK: hardcoded About Us link */}
             <Link
               href="/about"
               className="text-navy hover:text-[#5DB347] transition-colors text-sm font-medium px-3 py-2 rounded-lg hover:bg-[#EBF7E5]/50"
@@ -557,6 +969,8 @@ export default function Navbar() {
             >
               Donate
             </Link>
+              </>
+            )}
           </div>
 
           {/* ── Desktop CTA ── */}
@@ -684,7 +1098,87 @@ export default function Navbar() {
       >
         <div className="px-4 py-6 pb-32">
               <div className="flex flex-col gap-1">
-                {/* About */}
+                {/* --- DB-driven mobile nav items (when available) --- */}
+                {dbNavItems ? (
+                  <>
+                    {dbNavItems.map((item) => {
+                      const key = item.label.toLowerCase();
+                      // Known accordion sections rendered below with hardcoded content
+                      if (["education", "services", "community", "explore"].includes(key)) return null;
+                      // Sponsor CTA
+                      if (key === "sponsor") {
+                        return (
+                          <Link key="sponsor" href={item.href || "/sponsor"} className="text-white font-semibold text-base py-3 px-3 rounded-lg transition-colors flex items-center gap-2" style={{ background: '#5DB347' }} onClick={closeMobile}>
+                            <span>&#10084;&#65039;</span>
+                            {item.label}
+                          </Link>
+                        );
+                      }
+                      if (key === "donate") return null; // Donate is in CTA section
+                      // Items with children from DB
+                      if (item.children && item.children.length > 0) {
+                        return (
+                          <details key={item.label} className="group">
+                            <summary className="flex items-center justify-between w-full text-navy text-base font-medium py-3 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors cursor-pointer list-none">
+                              {item.label}
+                              <ChevronDown className="w-5 h-5 transition-transform group-open:rotate-180" />
+                            </summary>
+                            <div className="pl-4 py-1 space-y-0.5">
+                              {item.children.map((child) => (
+                                <Link key={child.href} href={child.href} className="block text-navy/70 hover:text-[#5DB347] text-sm py-2.5 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors" onClick={closeMobile}>
+                                  {child.label}
+                                </Link>
+                              ))}
+                            </div>
+                          </details>
+                        );
+                      }
+                      // Simple link
+                      return (
+                        <Link key={item.label} href={item.href} className="text-navy hover:text-[#5DB347] text-base font-medium py-3 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors" onClick={closeMobile}>
+                          {item.label}
+                        </Link>
+                      );
+                    })}
+                    {/* Known dropdown sections from DB that need hardcoded rendering */}
+                    {dbNavItems.some((i) => i.label.toLowerCase() === "education") && (
+                      <MobileEducationSection mobileEducationOpen={mobileEducationOpen} setMobileEducationOpen={setMobileEducationOpen} closeMobile={closeMobile} />
+                    )}
+                    {dbNavItems.some((i) => i.label.toLowerCase() === "services") && (
+                      <MobileServicesSection mobileServicesOpen={mobileServicesOpen} setMobileServicesOpen={setMobileServicesOpen} mobileFinanceOpen={mobileFinanceOpen} setMobileFinanceOpen={setMobileFinanceOpen} mobileInsuranceOpen={mobileInsuranceOpen} setMobileInsuranceOpen={setMobileInsuranceOpen} mobileMoreOpen={mobileMoreOpen} setMobileMoreOpen={setMobileMoreOpen} closeMobile={closeMobile} />
+                    )}
+                    {dbNavItems.some((i) => i.label.toLowerCase() === "community") && (
+                      <div className="pt-2 mt-2 border-t border-gray-100">
+                        <p className="text-xs font-bold text-gray-400 uppercase tracking-wider px-3 mb-2">Community</p>
+                        {communityLinks.map((link) => {
+                          const Icon = link.icon;
+                          return (
+                            <Link key={link.href} href={link.href} className="flex items-center gap-3 text-navy/80 hover:text-[#5DB347] text-sm font-medium py-2.5 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors" onClick={closeMobile}>
+                              <Icon className="w-4 h-4 text-[#8CB89C]" />
+                              {link.label}
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    )}
+                    {dbNavItems.some((i) => i.label.toLowerCase() === "explore") && (
+                      <div className="pt-2 mt-2 border-t border-gray-100">
+                        <p className="text-xs font-bold text-gray-400 uppercase tracking-wider px-3 mb-2">Explore</p>
+                        {exploreLinks.map((link) => {
+                          const Icon = link.icon;
+                          return (
+                            <Link key={link.href} href={link.href} className="flex items-center gap-3 text-navy/80 hover:text-[#5DB347] text-sm font-medium py-2.5 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors" onClick={closeMobile}>
+                              <Icon className="w-4 h-4 text-[#8CB89C]" />
+                              {link.label}
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                <>
+                {/* FALLBACK: hardcoded About Us link */}
                 <Link
                   href="/about"
                   className="text-navy hover:text-[#5DB347] text-base font-medium py-3 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors"
@@ -959,6 +1453,8 @@ export default function Navbar() {
                   <span>&#10084;&#65039;</span>
                   Sponsor a Farmer
                 </Link>
+                </>
+                )}
 
                 {/* CTA Section */}
                 <hr className="border-gray-200 my-4" />

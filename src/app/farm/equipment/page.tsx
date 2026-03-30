@@ -1177,12 +1177,60 @@ export default function EquipmentHirePage() {
     error: dbError,
   } = useEquipment();
 
-  // Map DB rows to local shape; fall back to mock when DB returns nothing
+  // --- site_config override for equipment catalog ---
+  const [configEquipment, setConfigEquipment] = useState<Equipment[] | null>(null);
+
+  useEffect(() => {
+    async function fetchEquipmentConfig() {
+      try {
+        const sb = createClient();
+        const { data } = await sb
+          .from('site_config')
+          .select('value')
+          .eq('key', 'equipment_catalog')
+          .single();
+        if (data?.value) {
+          const parsed = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            const mapped: Equipment[] = parsed.map((e: Record<string, unknown>, idx: number) => ({
+              id: (e.id as string) || `cfg-${idx}`,
+              name: (e.name as string) || '',
+              category: ((e.category as string) || 'tractor') as EquipmentCategory,
+              description: (e.description as string) || '',
+              specs: (e.specs as Record<string, string>) || {},
+              dailyRate: Number(e.dailyRate ?? e.daily_rate ?? 0),
+              weeklyRate: Number(e.weeklyRate ?? e.weekly_rate ?? 0),
+              monthlyRate: Number(e.monthlyRate ?? e.monthly_rate ?? 0),
+              availability: ((e.availability as string) || 'available') as Equipment['availability'],
+              location: (e.location as string) || '',
+              country: (e.country as string) || '',
+              owner: (e.owner as string) || '',
+              condition: ((e.condition as string) || 'good') as Equipment['condition'],
+              image: (e.image as string) || (e.image_url as string) || '',
+              rating: Number(e.rating ?? 4),
+              reviewCount: Number(e.reviewCount ?? e.review_count ?? 0),
+              minBookingDays: Number(e.minBookingDays ?? e.min_booking_days ?? 1),
+              deliveryAvailable: Boolean(e.deliveryAvailable ?? e.delivery_available ?? false),
+              deliveryFee: Number(e.deliveryFee ?? e.delivery_fee ?? 0),
+              insuranceIncluded: Boolean(e.insuranceIncluded ?? e.insurance_included ?? false),
+            }));
+            setConfigEquipment(mapped);
+          }
+        }
+      } catch {
+        // site_config fetch failed — fall through to normal sources
+      }
+    }
+    fetchEquipmentConfig();
+  }, []);
+
+  // Map DB rows to local shape; prefer config > DB > fallback
   const equipment: Equipment[] = useMemo(() => {
+    if (configEquipment && configEquipment.length > 0) return configEquipment;
     if (dbEquipment.length > 0) return dbEquipment.map(mapRowToEquipment);
     if (dbLoading) return []; // will show skeleton
     return FALLBACK_EQUIPMENT; // fallback when DB is empty / errored
-  }, [dbEquipment, dbLoading]);
+  }, [configEquipment, dbEquipment, dbLoading]);
 
   // --- State ---
   const [activeTab, setActiveTab] = useState<TabKey>('browse');

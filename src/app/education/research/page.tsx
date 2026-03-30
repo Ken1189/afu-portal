@@ -19,8 +19,8 @@ interface ResearchCentre {
   partner_institutions: string[];
 }
 
-// Hardcoded fallback data
-const fallbackCentres: ResearchCentre[] = [
+// Fallback data — used when DB is empty or unreachable
+const FALLBACK_CENTRES: ResearchCentre[] = [
   {
     id: '1',
     name: 'Harare Crop Science Lab',
@@ -132,7 +132,7 @@ const fallbackCentres: ResearchCentre[] = [
 ];
 
 export default function ResearchCentresPage() {
-  const [centres, setCentres] = useState<ResearchCentre[]>(fallbackCentres);
+  const [centres, setCentres] = useState<ResearchCentre[]>(FALLBACK_CENTRES);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -142,9 +142,27 @@ export default function ResearchCentresPage() {
         const { data } = await supabase
           .from('research_centres')
           .select('*')
+          .eq('is_active', true)
+          .order('sort_order', { ascending: true })
           .order('established_year', { ascending: true });
         if (data && data.length > 0) {
-          setCentres(data);
+          // Map DB column `website_url` to interface field `website`
+          setCentres(
+            data.map((row: Record<string, unknown>) => ({
+              id: row.id as string,
+              name: row.name as string,
+              description: row.description as string,
+              focus_areas: (row.focus_areas as string[]) || [],
+              country: row.country as string,
+              region: (row.region as string) || null,
+              photo_url: (row.photo_url as string) || null,
+              website: (row.website_url as string) || null,
+              established_year: (row.established_year as number) || null,
+              team_size: (row.team_size as number) || null,
+              key_projects: (row.key_projects as string[]) || [],
+              partner_institutions: (row.partner_institutions as string[]) || [],
+            }))
+          );
         }
       } catch {
         // keep fallback

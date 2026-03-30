@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 
 /* ------------------------------------------------------------------ */
-/*  Demo Data                                                          */
+/*  Fallback Data — used when DB is empty or unreachable               */
 /* ------------------------------------------------------------------ */
 
 interface FundProduct {
@@ -45,7 +45,44 @@ interface QuarterlyData {
   newInvestors: number;
 }
 
-const fundProducts: FundProduct[] = [
+interface TopInvestment {
+  name: string;
+  type: string;
+  totalCommitted: number;
+  investors: number;
+  irr: number;
+  status: string;
+}
+
+const PRODUCT_COLORS = ['#1B2A4A', '#5DB347', '#3B82F6', '#8B5CF6', '#F59E0B', '#EC4899', '#14B8A6', '#EF4444'];
+
+const COUNTRY_FLAGS: Record<string, string> = {
+  Zimbabwe: '\uD83C\uDDFF\uD83C\uDDFC',
+  Uganda: '\uD83C\uDDFA\uD83C\uDDEC',
+  Kenya: '\uD83C\uDDF0\uD83C\uDDEA',
+  Tanzania: '\uD83C\uDDF9\uD83C\uDDFF',
+  Botswana: '\uD83C\uDDE7\uD83C\uDDFC',
+  Mozambique: '\uD83C\uDDF2\uD83C\uDDFF',
+  Zambia: '\uD83C\uDDFF\uD83C\uDDF2',
+  Ghana: '\uD83C\uDDEC\uD83C\uDDED',
+  Nigeria: '\uD83C\uDDF3\uD83C\uDDEC',
+  Ethiopia: '\uD83C\uDDEA\uD83C\uDDF9',
+};
+
+const COUNTRY_COLORS: Record<string, string> = {
+  Zimbabwe: '#1B2A4A',
+  Uganda: '#5DB347',
+  Kenya: '#3B82F6',
+  Tanzania: '#8B5CF6',
+  Botswana: '#F59E0B',
+  Mozambique: '#EC4899',
+  Zambia: '#14B8A6',
+  Ghana: '#EF4444',
+  Nigeria: '#F97316',
+  Ethiopia: '#6366F1',
+};
+
+const FALLBACK_FUND_PRODUCTS: FundProduct[] = [
   { name: 'AFU Agricultural Debt Fund', aum: 2375000, deployed: 1680000, investors: 5, irr: 20.1, color: '#1B2A4A' },
   { name: 'AFU Insurance Premium Pool', aum: 950000, deployed: 580000, investors: 3, irr: 16.8, color: '#5DB347' },
   { name: 'AFU Trade Finance Facility', aum: 675000, deployed: 540000, investors: 3, irr: 18.5, color: '#3B82F6' },
@@ -53,7 +90,7 @@ const fundProducts: FundProduct[] = [
   { name: 'AFU Blended Finance Vehicle', aum: 375000, deployed: 275000, investors: 2, irr: 21.2, color: '#F59E0B' },
 ];
 
-const countryAllocations: CountryAllocation[] = [
+const FALLBACK_COUNTRY_ALLOCATIONS: CountryAllocation[] = [
   { country: 'Zimbabwe', flag: '\uD83C\uDDFF\uD83C\uDDFC', invested: 1625000, pct: 34, color: '#1B2A4A' },
   { country: 'Uganda', flag: '\uD83C\uDDFA\uD83C\uDDEC', invested: 1000000, pct: 21, color: '#5DB347' },
   { country: 'Kenya', flag: '\uD83C\uDDF0\uD83C\uDDEA', invested: 925000, pct: 20, color: '#3B82F6' },
@@ -62,7 +99,7 @@ const countryAllocations: CountryAllocation[] = [
   { country: 'Mozambique', flag: '\uD83C\uDDF2\uD83C\uDDFF', invested: 325000, pct: 6, color: '#EC4899' },
 ];
 
-const quarterlyData: QuarterlyData[] = [
+const FALLBACK_QUARTERLY_DATA: QuarterlyData[] = [
   { quarter: 'Q1 2025', invested: 500000, returned: 21000, newInvestors: 1 },
   { quarter: 'Q2 2025', invested: 1250000, returned: 63750, newInvestors: 2 },
   { quarter: 'Q3 2025', invested: 750000, returned: 42000, newInvestors: 1 },
@@ -70,7 +107,7 @@ const quarterlyData: QuarterlyData[] = [
   { quarter: 'Q1 2026', invested: 1250000, returned: 61250, newInvestors: 1 },
 ];
 
-const topInvestments = [
+const FALLBACK_TOP_INVESTMENTS: TopInvestment[] = [
   { name: 'Zimbabwe Maize Lending', type: 'Debt', totalCommitted: 900000, investors: 3, irr: 22.1, status: 'Active' },
   { name: 'Uganda Smallholder Lending Pool', type: 'Debt', totalCommitted: 750000, investors: 2, irr: 19.2, status: 'Active' },
   { name: 'East Africa Crop Insurance Fund', type: 'Insurance', totalCommitted: 950000, investors: 3, irr: 16.8, status: 'Active' },
@@ -82,6 +119,10 @@ const topInvestments = [
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                            */
 /* ------------------------------------------------------------------ */
+
+function capitalise(s: string) {
+  return s.charAt(0).toUpperCase() + s.slice(1).replace(/_/g, ' ');
+}
 
 function fmtCurrency(val: number) {
   if (val >= 1000000) return `$${(val / 1000000).toFixed(1)}M`;
@@ -119,31 +160,97 @@ const item = {
 
 export default function TotalInvestmentsPage() {
   const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'geography'>('overview');
-  const [dbStats, setDbStats] = useState<{ totalAUM: number; totalInvestors: number; totalInterests: number } | null>(null);
-  const [dbLoading, setDbLoading] = useState(true);
+  const [fundProducts, setFundProducts] = useState<FundProduct[]>(FALLBACK_FUND_PRODUCTS);
+  const [countryAllocations, setCountryAllocations] = useState<CountryAllocation[]>(FALLBACK_COUNTRY_ALLOCATIONS);
+  const [quarterlyData] = useState<QuarterlyData[]>(FALLBACK_QUARTERLY_DATA);
+  const [topInvestments, setTopInvestments] = useState<TopInvestment[]>(FALLBACK_TOP_INVESTMENTS);
+  const [dbStats, setDbStats] = useState<{ totalAUM: number; totalDeployed: number; totalReturns: number; totalInvestors: number; activeDeals: number; weightedIRR: number } | null>(null);
 
   useEffect(() => {
     const supabase = createClient();
     async function fetchInvestmentData() {
       try {
-        const [{ data: interests }, { data: ledger }] = await Promise.all([
-          supabase.from('investor_interests').select('*'),
-          supabase.from('ledger_accounts').select('*'),
+        const [{ data: opportunities }, { data: investments }] = await Promise.all([
+          supabase.from('investment_opportunities').select('*').order('created_at', { ascending: false }),
+          supabase.from('investments').select('*').order('amount', { ascending: false }),
         ]);
-        if ((interests && interests.length > 0) || (ledger && ledger.length > 0)) {
-          const totalFromInterests = (interests || []).reduce((s: number, i: Record<string, unknown>) => s + ((i.amount as number) || 0), 0);
-          const totalFromLedger = (ledger || []).reduce((s: number, l: Record<string, unknown>) => s + ((l.balance as number) || 0), 0);
-          const uniqueInvestors = new Set((interests || []).map((i: Record<string, unknown>) => i.investor_id || i.profile_id)).size;
+
+        const hasOpportunities = opportunities && opportunities.length > 0;
+        const hasInvestments = investments && investments.length > 0;
+
+        // --- Fund Products from investment_opportunities ---
+        if (hasOpportunities) {
+          setFundProducts(
+            opportunities.map((opp: Record<string, unknown>, idx: number) => ({
+              name: (opp.name as string) || 'Unknown',
+              aum: Number(opp.target) || 0,
+              deployed: Number(opp.subscribed_amount) || 0,
+              investors: 0, // not tracked per-opportunity in this table
+              irr: opp.target_irr ? parseFloat((opp.target_irr as string).replace(/[^0-9.]/g, '')) || 0 : 0,
+              color: PRODUCT_COLORS[idx % PRODUCT_COLORS.length],
+            }))
+          );
+        }
+
+        // --- Top Investments from investments table ---
+        if (hasInvestments) {
+          setTopInvestments(
+            investments.slice(0, 10).map((inv: Record<string, unknown>) => ({
+              name: (inv.investment_name as string) || (inv.project_name as string) || 'Unknown',
+              type: capitalise((inv.investment_type as string) || 'Debt'),
+              totalCommitted: Number(inv.amount) || 0,
+              investors: 1,
+              irr: Number(inv.irr) || 0,
+              status: capitalise((inv.status as string) || 'Active'),
+            }))
+          );
+        }
+
+        // --- Country allocations from investments grouped by project_country ---
+        if (hasInvestments) {
+          const countryMap: Record<string, number> = {};
+          for (const inv of investments) {
+            const country = (inv.project_country as string) || 'Other';
+            countryMap[country] = (countryMap[country] || 0) + (Number(inv.amount) || 0);
+          }
+          const totalInvested = Object.values(countryMap).reduce((a, b) => a + b, 0);
+          const sorted = Object.entries(countryMap).sort((a, b) => b[1] - a[1]);
+          if (sorted.length > 0 && totalInvested > 0) {
+            setCountryAllocations(
+              sorted.map(([country, invested], idx) => ({
+                country,
+                flag: COUNTRY_FLAGS[country] || '\uD83C\uDF0D',
+                invested,
+                pct: Math.round((invested / totalInvested) * 100),
+                color: COUNTRY_COLORS[country] || PRODUCT_COLORS[idx % PRODUCT_COLORS.length],
+              }))
+            );
+          }
+        }
+
+        // --- Aggregate stats ---
+        if (hasOpportunities || hasInvestments) {
+          const oppTotalAUM = (opportunities || []).reduce((s: number, o: Record<string, unknown>) => s + (Number(o.target) || 0), 0);
+          const oppTotalDeployed = (opportunities || []).reduce((s: number, o: Record<string, unknown>) => s + (Number(o.subscribed_amount) || 0), 0);
+          const invTotalAmount = (investments || []).reduce((s: number, i: Record<string, unknown>) => s + (Number(i.amount) || 0), 0);
+          const invTotalReturns = (investments || []).reduce((s: number, i: Record<string, unknown>) => s + (Number(i.returns_to_date) || 0), 0);
+          const uniqueInvestors = new Set((investments || []).map((i: Record<string, unknown>) => i.investor_id)).size;
+          const irrs = (investments || []).filter((i: Record<string, unknown>) => Number(i.irr) > 0).map((i: Record<string, unknown>) => Number(i.irr));
+          const avgIRR = irrs.length > 0 ? irrs.reduce((a: number, b: number) => a + b, 0) / irrs.length : 0;
+
           setDbStats({
-            totalAUM: totalFromInterests > 0 ? totalFromInterests : totalFromLedger > 0 ? totalFromLedger : 0,
+            totalAUM: oppTotalAUM > 0 ? oppTotalAUM : invTotalAmount,
+            totalDeployed: oppTotalDeployed > 0 ? oppTotalDeployed : Math.round(invTotalAmount * 0.73),
+            totalReturns: invTotalReturns,
             totalInvestors: uniqueInvestors || 0,
-            totalInterests: (interests || []).length,
+            activeDeals: hasInvestments ? investments.length : hasOpportunities ? opportunities.length : 0,
+            weightedIRR: avgIRR > 0 ? Math.round(avgIRR * 10) / 10 : 0,
           });
         }
       } catch {
         // keep fallback
       } finally {
-        setDbLoading(false);
+        // loading complete
       }
     }
     fetchInvestmentData();
@@ -151,11 +258,11 @@ export default function TotalInvestmentsPage() {
 
   // Use DB data if available, otherwise fallback to demo
   const totalAUM = dbStats && dbStats.totalAUM > 0 ? dbStats.totalAUM : 4750000;
-  const totalDeployed = dbStats && dbStats.totalAUM > 0 ? Math.round(dbStats.totalAUM * 0.73) : 3450000;
-  const totalReturns = 236000;
-  const weightedIRR = 19.8;
+  const totalDeployed = dbStats && dbStats.totalDeployed > 0 ? dbStats.totalDeployed : 3450000;
+  const totalReturns = dbStats && dbStats.totalReturns > 0 ? dbStats.totalReturns : 236000;
+  const weightedIRR = dbStats && dbStats.weightedIRR > 0 ? dbStats.weightedIRR : 19.8;
   const totalInvestors = dbStats && dbStats.totalInvestors > 0 ? dbStats.totalInvestors : 6;
-  const activeDeals = dbStats && dbStats.totalInterests > 0 ? dbStats.totalInterests : 6;
+  const activeDeals = dbStats && dbStats.activeDeals > 0 ? dbStats.activeDeals : 6;
   const deploymentRatio = Math.round((totalDeployed / totalAUM) * 100);
 
   const maxQuarterly = Math.max(...quarterlyData.map((q) => q.invested));

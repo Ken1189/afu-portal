@@ -299,6 +299,42 @@ export default function Home() {
   const [programs, setPrograms] = useState(FALLBACK_PROGRAMS);
   const [memberCount, setMemberCount] = useState(247);
 
+  // Section visibility from site_config key "homepage_sections"
+  const [sectionVisibility, setSectionVisibility] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    async function fetchSectionVisibility() {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from('site_config')
+          .select('value')
+          .eq('key', 'homepage_sections')
+          .single();
+        if (data?.value) {
+          const parsed = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
+          if (Array.isArray(parsed)) {
+            const vis: Record<string, boolean> = {};
+            parsed.forEach((item: { section?: string; visible?: boolean }) => {
+              if (item.section) vis[item.section] = item.visible !== false;
+            });
+            setSectionVisibility(vis);
+          }
+        }
+      } catch {
+        // On failure, sectionVisibility stays empty → all sections shown
+      }
+    }
+    fetchSectionVisibility();
+  }, []);
+
+  // Helper: returns true if a section should be shown.
+  // If config was never loaded (empty object), default to visible.
+  const showSection = (key: string) => {
+    if (Object.keys(sectionVisibility).length === 0) return true;
+    return sectionVisibility[key] !== false;
+  };
+
   useEffect(() => {
     async function fetchHero() {
       try {
@@ -455,7 +491,7 @@ export default function Home() {
   return (
     <>
       {/* ─── HERO ─── */}
-      <section className="relative min-h-[92vh] flex items-center overflow-hidden">
+      {showSection('hero') && <section className="relative min-h-[92vh] flex items-center overflow-hidden">
         {/* Background image */}
         <div className="absolute inset-0">
           <Image
@@ -565,10 +601,10 @@ export default function Home() {
         >
           <ChevronDown className="w-6 h-6 text-white/50 animate-bounce-slow" />
         </motion.div>
-      </section>
+      </section>}
 
       {/* ─── IMPACT STATS (Animated counters) ─── */}
-      <section className="py-16 bg-gradient-to-b from-white via-[#f8fdf6] to-white relative overflow-hidden">
+      {showSection('stats') && <section className="py-16 bg-gradient-to-b from-white via-[#f8fdf6] to-white relative overflow-hidden">
         <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#5DB347]/30 to-transparent" />
         <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, #5DB347 1px, transparent 0)', backgroundSize: '40px 40px' }} />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -607,10 +643,10 @@ export default function Home() {
             </FadeInWhenVisible>
           </div>
         </div>
-      </section>
+      </section>}
 
       {/* ─── WHAT AFU PROVIDES (Services Grid) ─── */}
-      <section className="py-16 bg-cream">
+      {showSection('services') && <section className="py-16 bg-cream">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeInWhenVisible>
             <div className="text-center mb-14">
@@ -666,10 +702,10 @@ export default function Home() {
             })}
           </StaggerChildren>
         </div>
-      </section>
+      </section>}
 
       {/* ─── OUR PROGRAMS ─── */}
-      <section className="py-16 bg-white relative overflow-hidden">
+      {showSection('programs') && <section className="py-16 bg-white relative overflow-hidden">
         <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, #5DB347 1px, transparent 0)', backgroundSize: '40px 40px' }} />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <FadeInWhenVisible>
@@ -718,7 +754,7 @@ export default function Home() {
             })}
           </StaggerChildren>
         </div>
-      </section>
+      </section>}
 
       {/* ─── THE AFU FLYWHEEL ─── */}
       <section className="py-16 bg-navy text-white overflow-hidden">
@@ -949,7 +985,7 @@ export default function Home() {
       </section>
 
       {/* ─── TESTIMONIALS ─── */}
-      <section className="py-16 bg-white relative">
+      {showSection('testimonials') && <section className="py-16 bg-white relative">
         <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#5DB347]/20 to-transparent" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeInWhenVisible>
@@ -1000,10 +1036,10 @@ export default function Home() {
             ))}
           </StaggerChildren>
         </div>
-      </section>
+      </section>}
 
       {/* ─── PARTNER LOGOS MARQUEE ─── */}
-      <section className="py-16 bg-cream border-y border-gray-100">
+      {showSection('partners') && <section className="py-16 bg-cream border-y border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeInWhenVisible>
             <p className="text-center text-sm font-semibold text-gray-400 uppercase tracking-wider mb-10">
@@ -1033,10 +1069,10 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </section>
+      </section>}
 
       {/* ─── MEMBERSHIP TIERS ─── */}
-      <section className="py-16 bg-gradient-to-b from-white to-[#f8fdf6]">
+      {showSection('membership_preview') && <section className="py-16 bg-gradient-to-b from-white to-[#f8fdf6]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeInWhenVisible>
             <div className="text-center mb-16">
@@ -1204,7 +1240,7 @@ export default function Home() {
             ))}
           </StaggerChildren>
         </div>
-      </section>
+      </section>}
 
       {/* ─── INVESTOR SECTION ─── */}
       <section className="py-16 bg-gradient-to-br from-navy-dark via-navy to-[#1e3a5f] text-white overflow-hidden relative">
@@ -1623,7 +1659,7 @@ export default function Home() {
       </section>
 
       {/* ─── FINAL CTA ─── */}
-      <section className="relative py-32 overflow-hidden">
+      {showSection('cta') && <section className="relative py-32 overflow-hidden">
         <div className="absolute inset-0">
           <Image
             src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=1920&q=80"
@@ -1665,7 +1701,7 @@ export default function Home() {
             </div>
           </FadeInWhenVisible>
         </div>
-      </section>
+      </section>}
     </>
   );
 }

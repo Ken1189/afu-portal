@@ -1,12 +1,115 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createClient } from "@/lib/supabase/client";
+
+/* ─── Footer config types (from site_config DB) ─── */
+
+interface FooterLink {
+  label: string;
+  href: string;
+  highlight?: boolean; // for green CTA-style links
+}
+
+interface FooterColumn {
+  title: string;
+  links: FooterLink[];
+}
+
+interface FooterSocialLink {
+  platform: string;
+  url: string;
+  icon: string; // SVG path data
+  viewBox?: string;
+}
+
+interface FooterConfig {
+  columns?: FooterColumn[];
+  social_links?: FooterSocialLink[];
+}
+
+/* ─── Hardcoded fallback data ─── */
+
+const FALLBACK_FOOTER_COLUMNS: FooterColumn[] = [
+  {
+    title: "Services",
+    links: [
+      { label: "Financing", href: "/services/financing" },
+      { label: "Inputs & Equipment", href: "/services/inputs" },
+      { label: "Processing Hubs", href: "/services/processing" },
+      { label: "Guaranteed Offtake", href: "/services/offtake" },
+      { label: "Trade Finance", href: "/services/trade-finance" },
+      { label: "Training", href: "/services/training" },
+      { label: "Legal Assistance", href: "/services/legal-assistance" },
+      { label: "Veterinary Services", href: "/services/veterinary" },
+      { label: "Advertise with Us", href: "/services/advertising" },
+      { label: "Carbon Credits", href: "/carbon" },
+      { label: "Become a Supplier", href: "/supplier/apply", highlight: true },
+    ],
+  },
+  {
+    title: "Company",
+    links: [
+      { label: "About AFU", href: "/about" },
+      { label: "Countries", href: "/countries" },
+      { label: "Partners", href: "/partners" },
+      { label: "Jobs", href: "/jobs" },
+      { label: "Ambassadors", href: "/ambassadors" },
+      { label: "Become an Ambassador", href: "/ambassador/apply", highlight: true },
+      { label: "Farms", href: "/farms" },
+      { label: "Sponsor a Farmer", href: "/sponsor" },
+      { label: "Donate", href: "/donate" },
+      { label: "Blog", href: "/blog" },
+      { label: "FAQ", href: "/faq" },
+      { label: "Contact", href: "/contact" },
+      { label: "Become a Member", href: "/apply" },
+    ],
+  },
+];
+
+const FALLBACK_SOCIAL_LINKS = [
+  { label: "LinkedIn", href: "https://linkedin.com/company/african-farming-union", icon: "M4.98 3.5c0 1.381-1.11 2.5-2.48 2.5s-2.48-1.119-2.48-2.5c0-1.38 1.11-2.5 2.48-2.5s2.48 1.12 2.48 2.5zM.02 23h4.96V7.5H.02V23zM17.27 7.17c-2.68 0-3.88 1.47-4.55 2.5V7.5H7.76V23h4.96v-8.63c0-2.28 1.05-3.64 3.07-3.64s2.68 1.64 2.68 3.77V23H23.5v-9.5c0-4.64-2.63-6.33-6.23-6.33z", viewBox: "0 0 24 24" },
+  { label: "Twitter", href: "https://x.com/africanfarming", icon: "M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z", viewBox: "0 0 24 24" },
+  { label: "Facebook", href: "https://facebook.com/africanfarmingunion", icon: "M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z", viewBox: "0 0 24 24" },
+];
 
 export default function Footer() {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
+
+  /* ─── DB-driven footer config ─── */
+  const [footerColumns, setFooterColumns] = useState<FooterColumn[]>(FALLBACK_FOOTER_COLUMNS);
+  const [socialLinks, setSocialLinks] = useState(FALLBACK_SOCIAL_LINKS);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase
+      .from("site_config")
+      .select("value")
+      .eq("key", "footer_config")
+      .single()
+      .then(({ data, error }) => {
+        if (!error && data?.value) {
+          const config = data.value as FooterConfig;
+          if (config.columns && Array.isArray(config.columns) && config.columns.length > 0) {
+            setFooterColumns(config.columns);
+          }
+          if (config.social_links && Array.isArray(config.social_links) && config.social_links.length > 0) {
+            setSocialLinks(
+              config.social_links.map((s) => ({
+                label: s.platform,
+                href: s.url,
+                icon: s.icon,
+                viewBox: s.viewBox || "0 0 24 24",
+              }))
+            );
+          }
+        }
+        // On error or empty, keep fallback values
+      });
+  }, []);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -75,13 +178,9 @@ export default function Footer() {
               Africa&apos;s Agriculture Development Bank + Operating Platform.
               Financing, Inputs, Processing, Offtake, Trade Finance &amp; Training.
             </p>
-            {/* Social icons */}
+            {/* Social icons — DB-driven with fallback */}
             <div className="flex gap-3">
-              {[
-                { label: "LinkedIn", href: "https://linkedin.com/company/african-farming-union", icon: "M4.98 3.5c0 1.381-1.11 2.5-2.48 2.5s-2.48-1.119-2.48-2.5c0-1.38 1.11-2.5 2.48-2.5s2.48 1.12 2.48 2.5zM.02 23h4.96V7.5H.02V23zM17.27 7.17c-2.68 0-3.88 1.47-4.55 2.5V7.5H7.76V23h4.96v-8.63c0-2.28 1.05-3.64 3.07-3.64s2.68 1.64 2.68 3.77V23H23.5v-9.5c0-4.64-2.63-6.33-6.23-6.33z", viewBox: "0 0 24 24" },
-                { label: "Twitter", href: "https://x.com/africanfarming", icon: "M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z", viewBox: "0 0 24 24" },
-                { label: "Facebook", href: "https://facebook.com/africanfarmingunion", icon: "M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z", viewBox: "0 0 24 24" },
-              ].map((social) => (
+              {socialLinks.map((social) => (
                 <a
                   key={social.label}
                   href={social.href}
@@ -98,47 +197,29 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Services */}
-          <div>
-            <h4 className="font-semibold text-sm uppercase tracking-wider text-white mb-5">
-              Services
-            </h4>
-            <div className="flex flex-col gap-2.5">
-              <Link href="/services/financing" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">Financing</Link>
-              <Link href="/services/inputs" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">Inputs & Equipment</Link>
-              <Link href="/services/processing" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">Processing Hubs</Link>
-              <Link href="/services/offtake" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">Guaranteed Offtake</Link>
-              <Link href="/services/trade-finance" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">Trade Finance</Link>
-              <Link href="/services/training" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">Training</Link>
-              <Link href="/services/legal-assistance" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">Legal Assistance</Link>
-              <Link href="/services/veterinary" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">Veterinary Services</Link>
-              <Link href="/services/advertising" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">Advertise with Us</Link>
-              <Link href="/carbon" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">Carbon Credits</Link>
-              <Link href="/supplier/apply" className="text-[#5DB347] hover:text-[#449933] text-sm font-medium transition-colors duration-300">Become a Supplier</Link>
+          {/* Footer link columns — DB-driven with fallback */}
+          {footerColumns.map((column) => (
+            <div key={column.title}>
+              <h4 className="font-semibold text-sm uppercase tracking-wider text-white mb-5">
+                {column.title}
+              </h4>
+              <div className="flex flex-col gap-2.5">
+                {column.links.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={
+                      link.highlight
+                        ? "text-[#5DB347] hover:text-[#449933] text-sm font-medium transition-colors duration-300"
+                        : "text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300"
+                    }
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
             </div>
-          </div>
-
-          {/* Company */}
-          <div>
-            <h4 className="font-semibold text-sm uppercase tracking-wider text-white mb-5">
-              Company
-            </h4>
-            <div className="flex flex-col gap-2.5">
-              <Link href="/about" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">About AFU</Link>
-              <Link href="/countries" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">Countries</Link>
-              <Link href="/partners" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">Partners</Link>
-              <Link href="/jobs" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">Jobs</Link>
-              <Link href="/ambassadors" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">Ambassadors</Link>
-              <Link href="/ambassador/apply" className="text-[#5DB347] hover:text-[#449933] text-sm font-medium transition-colors duration-300">Become an Ambassador</Link>
-              <Link href="/farms" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">Farms</Link>
-              <Link href="/sponsor" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">Sponsor a Farmer</Link>
-              <Link href="/donate" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">Donate</Link>
-              <Link href="/blog" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">Blog</Link>
-              <Link href="/faq" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">FAQ</Link>
-              <Link href="/contact" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">Contact</Link>
-              <Link href="/apply" className="text-gray-400 hover:text-[#5DB347] text-sm transition-colors duration-300">Become a Member</Link>
-            </div>
-          </div>
+          ))}
 
           {/* Newsletter + Phase 1 */}
           <div>

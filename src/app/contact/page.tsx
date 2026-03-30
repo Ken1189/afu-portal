@@ -4,8 +4,43 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
+const FALLBACK_CONTACT = {
+  primary_email: "info@africanfarmunion.com",
+  support_email: "info@africanfarmunion.com",
+  phone: "",
+  hq_address: "",
+  hq_city: "Gaborone",
+  hq_country: "Botswana",
+  operations: "Botswana, Zimbabwe, Tanzania",
+};
+
 export default function ContactPage() {
   const searchParams = useSearchParams();
+  const [contactInfo, setContactInfo] = useState(FALLBACK_CONTACT);
+
+  // Fetch contact info from site_config
+  useEffect(() => {
+    async function fetchContactInfo() {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from('site_config')
+          .select('value')
+          .eq('key', 'contact_info')
+          .single();
+        if (data?.value) {
+          const parsed = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
+          if (parsed && typeof parsed === 'object') {
+            setContactInfo({ ...FALLBACK_CONTACT, ...parsed });
+          }
+        }
+      } catch {
+        // keep fallback
+      }
+    }
+    fetchContactInfo();
+  }, []);
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -96,7 +131,7 @@ export default function ContactPage() {
     } catch (err) {
       console.error("Contact form submission error:", err);
       setError(
-        "Something went wrong submitting your message. Please try again or email us directly at info@africanfarmunion.com."
+        `Something went wrong submitting your message. Please try again or email us directly at ${contactInfo.primary_email}.`
       );
     } finally {
       setSubmitting(false);
@@ -132,7 +167,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-[#1B2A4A]">Headquarters</h3>
-                    <p className="text-gray-500 text-sm">Gaborone, Botswana</p>
+                    <p className="text-gray-500 text-sm">{contactInfo.hq_city}, {contactInfo.hq_country}</p>
                   </div>
                 </div>
               </div>
@@ -147,7 +182,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-[#1B2A4A]">Email</h3>
-                    <p className="text-gray-500 text-sm">info@africanfarmunion.com</p>
+                    <p className="text-gray-500 text-sm">{contactInfo.primary_email}</p>
                   </div>
                 </div>
               </div>
@@ -162,7 +197,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-[#1B2A4A]">Operations</h3>
-                    <p className="text-gray-500 text-sm">Botswana, Zimbabwe, Tanzania</p>
+                    <p className="text-gray-500 text-sm">{contactInfo.operations}</p>
                   </div>
                 </div>
               </div>

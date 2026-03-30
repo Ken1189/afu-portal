@@ -32,6 +32,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
+import { createClient } from '@/lib/supabase/client';
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -82,7 +83,7 @@ const initialData: OnboardingData = {
 /* ------------------------------------------------------------------ */
 /*  Constants                                                          */
 /* ------------------------------------------------------------------ */
-const COUNTRIES = [
+const FALLBACK_COUNTRIES = [
   { name: 'Botswana', currency: 'BWP' },
   { name: 'Zimbabwe', currency: 'ZWL' },
   { name: 'Tanzania', currency: 'TZS' },
@@ -95,9 +96,9 @@ const COUNTRIES = [
   { name: 'Sierra Leone', currency: 'SLL' },
 ];
 
-const CROPS = ['Maize', 'Wheat', 'Sorghum', 'Coffee', 'Cotton', 'Tobacco', 'Sugarcane', 'Tea'];
+const FALLBACK_CROPS = ['Maize', 'Wheat', 'Sorghum', 'Coffee', 'Cotton', 'Tobacco', 'Sugarcane', 'Tea'];
 
-const SUPPLIER_CATEGORIES = [
+const FALLBACK_SUPPLIER_CATEGORIES = [
   'Seeds',
   'Fertilizer',
   'Pesticides',
@@ -107,7 +108,7 @@ const SUPPLIER_CATEGORIES = [
   'Logistics',
 ];
 
-const LANGUAGES = ['English', 'Shona', 'Ndebele', 'Swahili', 'Setswana', 'Portuguese', 'Hausa', 'Luganda'];
+const FALLBACK_LANGUAGES = ['English', 'Shona', 'Ndebele', 'Swahili', 'Setswana', 'Portuguese', 'Hausa', 'Luganda'];
 
 const NOTIFICATION_CHANNELS = [
   { key: 'SMS', icon: Phone },
@@ -116,7 +117,7 @@ const NOTIFICATION_CHANNELS = [
   { key: 'Push', icon: Smartphone },
 ];
 
-const PARTNERSHIP_TYPES = ['NGO', 'Government', 'Research', 'Financial Institution', 'Other'];
+const FALLBACK_PARTNERSHIP_TYPES = ['NGO', 'Government', 'Research', 'Financial Institution', 'Other'];
 
 const STEP_LABELS = ['Role', 'Profile', 'Preferences', 'Get Started'];
 
@@ -200,6 +201,53 @@ export default function OnboardingPage() {
   const [submitting, setSubmitting] = useState(false);
   const [resumed, setResumed] = useState(false);
 
+  // Dynamic lists from site_config (fallback to hardcoded)
+  const [countries, setCountries] = useState(FALLBACK_COUNTRIES);
+  const [crops, setCrops] = useState(FALLBACK_CROPS);
+  const [supplierCategories, setSupplierCategories] = useState(FALLBACK_SUPPLIER_CATEGORIES);
+  const [languages, setLanguages] = useState(FALLBACK_LANGUAGES);
+  const [partnershipTypes, setPartnershipTypes] = useState(FALLBACK_PARTNERSHIP_TYPES);
+
+  // Fetch onboarding options from site_config
+  useEffect(() => {
+    const supabase = createClient();
+    const keys = [
+      'onboarding_countries',
+      'onboarding_crops',
+      'onboarding_supplier_categories',
+      'onboarding_languages',
+      'onboarding_partnership_types',
+    ];
+    supabase
+      .from('site_config')
+      .select('key, value')
+      .in('key', keys)
+      .then(({ data: rows }) => {
+        if (!rows) return;
+        for (const row of rows) {
+          const val = row.value;
+          if (!val) continue;
+          switch (row.key) {
+            case 'onboarding_countries':
+              if (Array.isArray(val) && val.length > 0) setCountries(val);
+              break;
+            case 'onboarding_crops':
+              if (Array.isArray(val) && val.length > 0) setCrops(val);
+              break;
+            case 'onboarding_supplier_categories':
+              if (Array.isArray(val) && val.length > 0) setSupplierCategories(val);
+              break;
+            case 'onboarding_languages':
+              if (Array.isArray(val) && val.length > 0) setLanguages(val);
+              break;
+            case 'onboarding_partnership_types':
+              if (Array.isArray(val) && val.length > 0) setPartnershipTypes(val);
+              break;
+          }
+        }
+      });
+  }, []);
+
   // S5.1: Restore from localStorage on mount
   useEffect(() => {
     // S8.12: Geo-IP country detection (before localStorage restore)
@@ -207,7 +255,7 @@ export default function OnboardingPage() {
       .then((res) => res.json())
       .then((geo: Record<string, string>) => {
         if (geo?.country_name) {
-          const match = COUNTRIES.find((c) => c.name.toLowerCase() === geo.country_name.toLowerCase());
+          const match = countries.find((c) => c.name.toLowerCase() === geo.country_name.toLowerCase());
           if (match) {
             setData((prev) => prev.country ? prev : { ...prev, country: match.name, currency: match.currency });
           }
@@ -312,7 +360,7 @@ export default function OnboardingPage() {
   /* Auto-detect currency when country changes */
   const handleCountryChange = (country: string) => {
     update('country', country);
-    const match = COUNTRIES.find((c) => c.name === country);
+    const match = countries.find((c) => c.name === country);
     if (match) update('currency', match.currency);
   };
 
@@ -433,7 +481,7 @@ export default function OnboardingPage() {
             className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C] focus:border-transparent bg-white"
           >
             <option value="">Select your country</option>
-            {COUNTRIES.map((c) => (
+            {countries.map((c) => (
               <option key={c.name} value={c.name}>
                 {c.name}
               </option>
@@ -516,7 +564,7 @@ export default function OnboardingPage() {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Primary Crops</label>
             <div className="flex flex-wrap gap-2">
-              {CROPS.map((crop) => (
+              {crops.map((crop) => (
                 <Chip
                   key={crop}
                   label={crop}
@@ -570,7 +618,7 @@ export default function OnboardingPage() {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Product Categories</label>
             <div className="flex flex-wrap gap-2">
-              {SUPPLIER_CATEGORIES.map((cat) => (
+              {supplierCategories.map((cat) => (
                 <Chip
                   key={cat}
                   label={cat}
@@ -611,7 +659,7 @@ export default function OnboardingPage() {
               className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C] focus:border-transparent bg-white"
             >
               <option value="">Select type</option>
-              {PARTNERSHIP_TYPES.map((pt) => (
+              {partnershipTypes.map((pt) => (
                 <option key={pt} value={pt}>
                   {pt}
                 </option>
@@ -644,7 +692,7 @@ export default function OnboardingPage() {
           onChange={(e) => update('preferredLanguage', e.target.value)}
           className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C] focus:border-transparent bg-white"
         >
-          {LANGUAGES.map((lang) => (
+          {languages.map((lang) => (
             <option key={lang} value={lang}>
               {lang}
             </option>

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Wheat, ShoppingCart, Truck, type LucideIcon } from "lucide-react";
+import { createServerSupabaseClient } from '@/lib/supabase/server';
 
 export const metadata = {
   title: "AFU Fresh — Farm to Fork | African Farming Union",
@@ -28,7 +29,10 @@ const howItWorks: { step: string; icon: LucideIcon; title: string; desc: string 
   },
 ];
 
-const tiers = [
+/* ------------------------------------------------------------------ */
+/*  Fallback data (used when site_config is empty)                     */
+/* ------------------------------------------------------------------ */
+const FALLBACK_TIERS = [
   {
     name: "AFU Fresh",
     type: "B2C",
@@ -44,6 +48,7 @@ const tiers = [
     ],
     color: "from-[#5DB347] to-[#449933]",
     borderColor: "border-[#5DB347]/30",
+    featured: false,
   },
   {
     name: "AFU Trade",
@@ -77,10 +82,37 @@ const tiers = [
     ],
     color: "from-[#D4A843] to-[#E8C547]",
     borderColor: "border-gold/30",
+    featured: false,
   },
 ];
 
-export default function FreshPage() {
+/* ------------------------------------------------------------------ */
+/*  Data fetch                                                         */
+/* ------------------------------------------------------------------ */
+async function getFreshTiers(): Promise<typeof FALLBACK_TIERS> {
+  try {
+    const supabase = await createServerSupabaseClient();
+    const { data } = await supabase
+      .from('site_config')
+      .select('value')
+      .eq('key', 'fresh_tiers')
+      .single();
+
+    if (data?.value && Array.isArray(data.value)) {
+      return data.value as typeof FALLBACK_TIERS;
+    }
+  } catch {
+    // Fall through to defaults
+  }
+  return FALLBACK_TIERS;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Page                                                               */
+/* ------------------------------------------------------------------ */
+export default async function FreshPage() {
+  const tiers = await getFreshTiers();
+
   return (
     <>
       {/* Hero */}

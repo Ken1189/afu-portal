@@ -77,6 +77,9 @@ import {
   Percent,
   Target,
   Wheat,
+  Crown,
+  Banknote,
+  Mail,
 } from 'lucide-react';
 
 // ── Navigation structure with collapsible groups ──
@@ -242,6 +245,9 @@ const navGroups: NavGroup[] = [
     defaultOpen: false,
     superAdminOnly: true,
     links: [
+      { href: '/admin/settings/membership-tiers', label: 'Membership Tiers', icon: <Crown className={ICON_CLS} /> },
+      { href: '/admin/settings/loan-products', label: 'Loan Products', icon: <Banknote className={ICON_CLS} /> },
+      { href: '/admin/settings/contact-info', label: 'Contact Info', icon: <Mail className={ICON_CLS} /> },
       { href: '/admin/settings/branding', label: 'Branding', icon: <Palette className={ICON_CLS} /> },
       { href: '/admin/settings/navigation', label: 'Navigation', icon: <LayoutDashboard className={ICON_CLS} /> },
       { href: '/admin/settings/homepage-sections', label: 'Homepage Sections', icon: <Layers className={ICON_CLS} /> },
@@ -266,6 +272,9 @@ const navGroups: NavGroup[] = [
       { href: '/admin/settings/storage-fees', label: 'Storage Fees', icon: <Warehouse className={ICON_CLS} /> },
       { href: '/admin/settings/trading-commissions', label: 'Trading Commissions', icon: <Percent className={ICON_CLS} /> },
       { href: '/admin/settings/trading-rules', label: 'Trading Rules', icon: <Globe className={ICON_CLS} /> },
+      { href: '/admin/settings/insurance-pricing', label: 'Insurance Pricing', icon: <ShieldCheck className={ICON_CLS} /> },
+      { href: '/admin/settings/fresh-tiers', label: 'Fresh Tiers', icon: <Store className={ICON_CLS} /> },
+      { href: '/admin/settings/onboarding-options', label: 'Onboarding Options', icon: <Settings className={ICON_CLS} /> },
     ],
   },
   {

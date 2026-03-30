@@ -4,10 +4,11 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useApplications } from "@/lib/supabase/use-applications";
+import { createClient } from "@/lib/supabase/client";
 
 type Tier = "smallholder" | "commercial" | "enterprise" | "partner";
 
-const tiers = {
+const FALLBACK_TIERS: Record<Tier, { name: string; price: string; priceNote: string; desc: string }> = {
   smallholder: { name: "Smallholder", price: "$48/year", priceNote: "or $5/mo", desc: "For farms under 10 hectares" },
   commercial: { name: "Commercial", price: "$240/year", priceNote: "or $25/mo", desc: "For farms 10-500 hectares" },
   enterprise: { name: "Enterprise", price: "$950/year", priceNote: "or $99/mo", desc: "For large-scale operations + cooperatives" },
@@ -36,6 +37,50 @@ export default function ApplyPage() {
 
   const { submitApplication } = useApplications();
   const [submitting, setSubmitting] = useState(false);
+  const [tiers, setTiers] = useState<Record<Tier, { name: string; price: string; priceNote: string; desc: string }>>(FALLBACK_TIERS);
+
+  // Fetch tier pricing from site_config
+  useEffect(() => {
+    async function fetchTiers() {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from('site_config')
+          .select('value')
+          .eq('key', 'membership_tiers')
+          .single();
+        if (data?.value) {
+          const parsed = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            // Map the array format to the record format used on this page
+            const mapped: Record<string, { name: string; price: string; priceNote: string; desc: string }> = {};
+            for (const t of parsed) {
+              const slug = (t.slug || t.name?.toLowerCase().replace(/\s+/g, '-')) as string;
+              const tierKey = slug === 'smallholder' ? 'smallholder'
+                : slug === 'commercial' || slug === 'bronze' ? 'commercial'
+                : slug === 'enterprise' || slug === 'gold' || slug === 'platinum' ? 'enterprise'
+                : 'partner';
+              if (!mapped[tierKey]) {
+                mapped[tierKey] = {
+                  name: t.name || FALLBACK_TIERS[tierKey as Tier].name,
+                  price: t.priceAnnual ? `${t.priceAnnual}/year` : FALLBACK_TIERS[tierKey as Tier].price,
+                  priceNote: t.priceMonthly ? `or ${t.priceMonthly}/mo` : FALLBACK_TIERS[tierKey as Tier].priceNote,
+                  desc: t.audience || FALLBACK_TIERS[tierKey as Tier].desc,
+                };
+              }
+            }
+            // Only apply if we got all four keys
+            if (mapped.smallholder && mapped.commercial && mapped.enterprise && mapped.partner) {
+              setTiers(mapped as Record<Tier, { name: string; price: string; priceNote: string; desc: string }>);
+            }
+          }
+        }
+      } catch {
+        // keep fallback
+      }
+    }
+    fetchTiers();
+  }, []);
 
   // Capture referral code from URL
   useEffect(() => {

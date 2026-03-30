@@ -118,10 +118,43 @@ export default function TrainingPage() {
   const [currentTier, setCurrentTier] = useState<FarmerTier>('seedling');
   const [celebrateCourse, setCelebrateCourse] = useState<string | null>(null);
 
-  // ── Fetch courses from Supabase, fallback to hardcoded ────────────────
+  // ── Fetch courses: site_config → courses table → hardcoded fallback ───
 
   const fetchCourses = useCallback(async () => {
     try {
+      // 1. Check site_config for admin-managed training catalog
+      const { data: configRow } = await supabase
+        .from('site_config')
+        .select('value')
+        .eq('key', 'training_catalog')
+        .single();
+
+      if (configRow?.value) {
+        const parsed = typeof configRow.value === 'string'
+          ? JSON.parse(configRow.value)
+          : configRow.value;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          const mapped: Course[] = parsed.map((c: Record<string, unknown>, idx: number) => ({
+            id: (c.id as string) || `config-${idx}`,
+            title: (c.title as string) || '',
+            description: (c.description as string) || '',
+            duration_hours: Number(c.duration_hours) || Math.round((Number(c.duration_minutes) || 120) / 60),
+            difficulty: (c.difficulty as string) || 'Beginner',
+            lesson_count: Number(c.lesson_count) || Number(c.modules_count) || 5,
+            tier_unlock: (c.tier_unlock as string) || TIER_COURSE_MAP[((c.category as string) || '').toLowerCase().replace(/\s+/g, '-')] || 'sprout',
+            slug: (c.slug as string) || ((c.category as string) || '').toLowerCase().replace(/\s+/g, '-') || `course-${idx}`,
+            category: (c.category as string) || 'General',
+          }));
+          setCourses(mapped);
+          return;
+        }
+      }
+    } catch {
+      // site_config fetch failed — fall through to courses table
+    }
+
+    try {
+      // 2. Fetch from courses table
       const { data, error } = await supabase
         .from('courses')
         .select('*')

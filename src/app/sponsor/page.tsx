@@ -33,8 +33,8 @@ interface FarmerProfile {
   } | null;
 }
 
-/* ─── Dummy farmer data (shown until DB is seeded) ─── */
-const DUMMY_FARMERS: FarmerProfile[] = [
+/* ─── Fallback farmer data (shown until DB is seeded) ─── */
+const FALLBACK_FARMERS: FarmerProfile[] = [
   {
     id: 'dummy-1',
     slug: 'grace-moyo',
@@ -588,12 +588,12 @@ export default function SponsorPage() {
           const data = await res.json();
           const live = data.farmers ?? [];
           // Use live data if available, otherwise fall back to dummy data
-          setFarmers(live.length > 0 ? live : DUMMY_FARMERS);
+          setFarmers(live.length > 0 ? live : FALLBACK_FARMERS);
         } else {
-          setFarmers(DUMMY_FARMERS);
+          setFarmers(FALLBACK_FARMERS);
         }
       } catch {
-        setFarmers(DUMMY_FARMERS);
+        setFarmers(FALLBACK_FARMERS);
       } finally {
         setLoading(false);
       }

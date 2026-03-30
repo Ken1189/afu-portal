@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { createClient } from "@supabase/supabase-js";
 
 export const metadata = {
   title: "Crop Development Loans - AFU",
@@ -6,7 +7,7 @@ export const metadata = {
     "Finance your entire growing season with AFU Crop Development Loans. From smallholder to commercial, with repayment tied to your harvest cycle.",
 };
 
-const stages = [
+const FALLBACK_STAGES = [
   {
     stage: "Pre-Plant",
     period: "6-8 weeks before",
@@ -44,7 +45,7 @@ const stages = [
   },
 ];
 
-const tiers = [
+const FALLBACK_TIERS = [
   {
     name: "Smallholder",
     range: "$500 - $5,000",
@@ -84,7 +85,7 @@ const tiers = [
   },
 ];
 
-const crops = [
+const FALLBACK_CROPS = [
   { name: "Maize", season: "Oct - Apr" },
   { name: "Soya Beans", season: "Nov - Apr" },
   { name: "Groundnuts", season: "Nov - Mar" },
@@ -95,7 +96,7 @@ const crops = [
   { name: "Wheat", season: "May - Oct" },
 ];
 
-const requirements = [
+const FALLBACK_REQUIREMENTS = [
   "Active AFU membership (any tier)",
   "KYC verification complete",
   "Crop plan submitted and approved",
@@ -104,7 +105,34 @@ const requirements = [
   "Offtake agreement or market plan",
 ];
 
-export default function CropDevLoanPage() {
+export default async function CropDevLoanPage() {
+  // Fetch loan products config from site_config
+  let stages = FALLBACK_STAGES;
+  let tiers = FALLBACK_TIERS;
+  let crops = FALLBACK_CROPS;
+  let requirements = FALLBACK_REQUIREMENTS;
+
+  try {
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+    const { data } = await supabase
+      .from('site_config')
+      .select('value')
+      .eq('key', 'loan_products')
+      .single();
+    if (data?.value) {
+      const parsed = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
+      if (parsed.stages && Array.isArray(parsed.stages) && parsed.stages.length > 0) stages = parsed.stages;
+      if (parsed.tiers && Array.isArray(parsed.tiers) && parsed.tiers.length > 0) tiers = parsed.tiers;
+      if (parsed.crops && Array.isArray(parsed.crops) && parsed.crops.length > 0) crops = parsed.crops;
+      if (parsed.requirements && Array.isArray(parsed.requirements) && parsed.requirements.length > 0) requirements = parsed.requirements;
+    }
+  } catch {
+    // keep fallbacks
+  }
+
   return (
     <>
       {/* Hero */}

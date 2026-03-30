@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Tractor, Wheat, Hospital, Home, Ship, Beef, ShieldCheck, Cog, Landmark, Truck, type LucideIcon } from "lucide-react";
 import { createPageMetadata } from '@/lib/seo/metadata';
+import { createServerSupabaseClient } from '@/lib/supabase/server';
 
 export const metadata = createPageMetadata({
   title: 'Insurance Products',
@@ -8,9 +9,19 @@ export const metadata = createPageMetadata({
   path: '/services/insurance',
 });
 
-const products: { icon: LucideIcon; name: string; description: string; premium: string; link: string }[] = [
+/* ------------------------------------------------------------------ */
+/*  Icon lookup                                                        */
+/* ------------------------------------------------------------------ */
+const ICON_MAP: Record<string, LucideIcon> = {
+  Tractor, Wheat, Hospital, Home, Ship, Beef, ShieldCheck, Cog, Landmark, Truck,
+};
+
+/* ------------------------------------------------------------------ */
+/*  Fallback data (used when site_config is empty)                     */
+/* ------------------------------------------------------------------ */
+const FALLBACK_PRODUCTS: { icon: string; name: string; description: string; premium: string; link: string }[] = [
   {
-    icon: Tractor,
+    icon: "Tractor",
     name: "Asset Insurance",
     description:
       "Protect your farming equipment, machinery, vehicles, and buildings against breakdown, theft, fire, and natural disasters.",
@@ -18,7 +29,7 @@ const products: { icon: LucideIcon; name: string; description: string; premium: 
     link: "/services/insurance/asset",
   },
   {
-    icon: Wheat,
+    icon: "Wheat",
     name: "Crop Insurance",
     description:
       "Guard against crop loss from drought, flood, pests, disease, and hail with weather-index and traditional indemnity coverage.",
@@ -26,7 +37,7 @@ const products: { icon: LucideIcon; name: string; description: string; premium: 
     link: "/services/insurance/crop",
   },
   {
-    icon: Hospital,
+    icon: "Hospital",
     name: "Medical Insurance",
     description:
       "Health coverage for farming families including outpatient care, hospitalization, dental, and optical across our clinic network.",
@@ -34,7 +45,7 @@ const products: { icon: LucideIcon; name: string; description: string; premium: 
     link: "/services/insurance/medical",
   },
   {
-    icon: Home,
+    icon: "Home",
     name: "Farm Insurance",
     description:
       "Comprehensive all-in-one protection for your entire farm: buildings, fencing, irrigation, stored produce, and liability coverage.",
@@ -42,7 +53,7 @@ const products: { icon: LucideIcon; name: string; description: string; premium: 
     link: "/services/insurance/farm",
   },
   {
-    icon: Ship,
+    icon: "Ship",
     name: "Trade Insurance",
     description:
       "Coverage for export shipments including marine transit, buyer default, letters of credit, and political risk for cross-border trade.",
@@ -50,7 +61,7 @@ const products: { icon: LucideIcon; name: string; description: string; premium: 
     link: "/services/insurance/trade",
   },
   {
-    icon: Beef,
+    icon: "Beef",
     name: "Livestock Insurance",
     description:
       "Protect your cattle, goats, sheep, and poultry against disease, theft, predators, and natural disasters.",
@@ -58,7 +69,7 @@ const products: { icon: LucideIcon; name: string; description: string; premium: 
     link: "/services/insurance/livestock",
   },
   {
-    icon: ShieldCheck,
+    icon: "ShieldCheck",
     name: "Life & Personal Insurance",
     description:
       "Life cover, funeral plans, and personal accident insurance to protect farming families and their futures.",
@@ -66,7 +77,7 @@ const products: { icon: LucideIcon; name: string; description: string; premium: 
     link: "/services/insurance/life",
   },
   {
-    icon: Cog,
+    icon: "Cog",
     name: "Equipment Insurance",
     description:
       "Cover tractors, irrigation systems, and implements against theft, damage, and mechanical breakdown.",
@@ -74,7 +85,7 @@ const products: { icon: LucideIcon; name: string; description: string; premium: 
     link: "/services/insurance/equipment",
   },
   {
-    icon: Landmark,
+    icon: "Landmark",
     name: "Pension & Retirement",
     description:
       "Farmer retirement savings plans with leveraged growth through AFU's capital program. Start from $10/month.",
@@ -82,7 +93,7 @@ const products: { icon: LucideIcon; name: string; description: string; premium: 
     link: "/services/insurance/pension",
   },
   {
-    icon: Truck,
+    icon: "Truck",
     name: "Vehicle & Transport Insurance",
     description:
       "Third party, fire and theft, or comprehensive cover for farm bakkies, trucks, and fleet vehicles.",
@@ -91,7 +102,7 @@ const products: { icon: LucideIcon; name: string; description: string; premium: 
   },
 ];
 
-const stats = [
+const FALLBACK_STATS = [
   { value: "1,200+", label: "Policies Active" },
   { value: "$5.2M", label: "Total Coverage" },
   { value: "94%", label: "Claims Paid" },
@@ -119,7 +130,42 @@ const steps = [
   },
 ];
 
-export default function InsuranceHubPage() {
+/* ------------------------------------------------------------------ */
+/*  Data fetch                                                         */
+/* ------------------------------------------------------------------ */
+interface InsurancePageConfig {
+  products: typeof FALLBACK_PRODUCTS;
+  stats: typeof FALLBACK_STATS;
+}
+
+async function getInsuranceConfig(): Promise<InsurancePageConfig> {
+  try {
+    const supabase = await createServerSupabaseClient();
+    const { data } = await supabase
+      .from('site_config')
+      .select('value')
+      .eq('key', 'insurance_page_products')
+      .single();
+
+    if (data?.value) {
+      const cfg = data.value as InsurancePageConfig;
+      return {
+        products: cfg.products ?? FALLBACK_PRODUCTS,
+        stats: cfg.stats ?? FALLBACK_STATS,
+      };
+    }
+  } catch {
+    // Fall through to defaults
+  }
+  return { products: FALLBACK_PRODUCTS, stats: FALLBACK_STATS };
+}
+
+/* ------------------------------------------------------------------ */
+/*  Page                                                               */
+/* ------------------------------------------------------------------ */
+export default async function InsuranceHubPage() {
+  const { products, stats } = await getInsuranceConfig();
+
   return (
     <>
       {/* Hero */}
@@ -168,31 +214,34 @@ export default function InsuranceHubPage() {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {products.map((product, i) => (
-              <Link
-                key={i}
-                href={product.link}
-                className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-lg shadow-[#5DB347]/5 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 group"
-              >
-                <div className="w-12 h-12 rounded-xl bg-[#5DB347]/10 flex items-center justify-center mb-4">
-                  <product.icon className="w-6 h-6 text-[#5DB347]" />
-                </div>
-                <h3 className="text-xl font-bold text-navy mb-3 group-hover:text-[#5DB347] transition-colors">
-                  {product.name}
-                </h3>
-                <p className="text-gray-500 text-sm mb-5 leading-relaxed">
-                  {product.description}
-                </p>
-                <div className="flex items-center justify-between">
-                  <span className="bg-[#EBF7E5] text-[#5DB347] text-xs font-semibold px-3 py-1 rounded-full">
-                    {product.premium}
-                  </span>
-                  <span className="text-[#5DB347] text-sm font-medium group-hover:translate-x-1 transition-transform inline-block">
-                    Learn More &rarr;
-                  </span>
-                </div>
-              </Link>
-            ))}
+            {products.map((product, i) => {
+              const IconComponent = ICON_MAP[product.icon] ?? ShieldCheck;
+              return (
+                <Link
+                  key={i}
+                  href={product.link}
+                  className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-lg shadow-[#5DB347]/5 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 group"
+                >
+                  <div className="w-12 h-12 rounded-xl bg-[#5DB347]/10 flex items-center justify-center mb-4">
+                    <IconComponent className="w-6 h-6 text-[#5DB347]" />
+                  </div>
+                  <h3 className="text-xl font-bold text-navy mb-3 group-hover:text-[#5DB347] transition-colors">
+                    {product.name}
+                  </h3>
+                  <p className="text-gray-500 text-sm mb-5 leading-relaxed">
+                    {product.description}
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <span className="bg-[#EBF7E5] text-[#5DB347] text-xs font-semibold px-3 py-1 rounded-full">
+                      {product.premium}
+                    </span>
+                    <span className="text-[#5DB347] text-sm font-medium group-hover:translate-x-1 transition-transform inline-block">
+                      Learn More &rarr;
+                    </span>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
