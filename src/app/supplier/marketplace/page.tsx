@@ -7,7 +7,6 @@ import { useAuth } from '@/lib/supabase/auth-context';
 import {
   Eye,
   Star,
-  ShoppingCart,
   Tag,
   CheckCircle2,
   AlertCircle,
@@ -15,6 +14,8 @@ import {
   Package,
   Users,
   Percent,
+  BarChart3,
+  Plus,
 } from 'lucide-react';
 // ── Inline supplier-product type & fallback data (replaces @/lib/data/supplierProducts import) ──
 
@@ -391,16 +392,25 @@ export default function SupplierMarketplacePage() {
                   <span>Min order: {product.minOrder}</span>
                 </div>
 
-                {/* Add to cart button (disabled mock) */}
-                <button
-                  disabled
-                  className="w-full flex items-center justify-center gap-2 bg-gray-100 text-gray-400 py-2.5 rounded-lg text-sm font-semibold cursor-not-allowed"
-                >
-                  <ShoppingCart className="w-4 h-4" />
-                  Add to Cart
-                </button>
-                <p className="text-[9px] text-gray-300 text-center mt-1.5">
-                  Preview only &mdash; members purchase from the marketplace
+                {/* Supplier actions */}
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => window.open(`/supplier/products?compare=${encodeURIComponent(product.name)}`, '_self')}
+                    className="flex-1 flex items-center justify-center gap-2 bg-[#1B2A4A] text-white py-2.5 rounded-lg text-sm font-semibold hover:bg-[#1B2A4A]/90 transition-colors"
+                  >
+                    <BarChart3 className="w-4 h-4" />
+                    Compare Pricing
+                  </button>
+                  <button
+                    onClick={() => window.open('/supplier/products', '_self')}
+                    className="flex-1 flex items-center justify-center gap-2 bg-[#5DB347] text-white py-2.5 rounded-lg text-sm font-semibold hover:bg-[#5DB347]/90 transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                    List Similar
+                  </button>
+                </div>
+                <p className="text-[9px] text-gray-400 text-center mt-1.5">
+                  See how your pricing compares or list a similar product
                 </p>
               </div>
             </motion.div>
