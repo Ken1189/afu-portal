@@ -58,7 +58,7 @@ interface Template {
 
 // ── Demo data ──
 
-const DEMO_CAMPAIGNS: Campaign[] = [
+const FALLBACK_CAMPAIGNS: Campaign[] = [
   { id: '1', name: 'March Price Update', channel: 'sms', template_id: '4', template_name: 'price_alert', target_audience: { country_code: ['ZW', 'MZ'] }, body: null, status: 'completed', total_recipients: 342, sent_count: 340, delivered_count: 328, failed_count: 14, scheduled_at: null, started_at: '2026-03-15T08:00:00Z', completed_at: '2026-03-15T08:15:00Z', created_at: '2026-03-14T10:00:00Z' },
   { id: '2', name: 'New Member Welcome', channel: 'whatsapp', template_id: '3', template_name: 'welcome_member', target_audience: { membership_tier: ['A', 'B'] }, body: null, status: 'completed', total_recipients: 28, sent_count: 28, delivered_count: 26, failed_count: 2, scheduled_at: null, started_at: '2026-03-20T10:00:00Z', completed_at: '2026-03-20T10:05:00Z', created_at: '2026-03-19T14:00:00Z' },
   { id: '3', name: 'April Loan Promo', channel: 'sms', template_id: '8', template_name: 'campaign_promo', target_audience: { country_code: ['ZW', 'TZ', 'MZ'] }, body: null, status: 'scheduled', total_recipients: 0, sent_count: 0, delivered_count: 0, failed_count: 0, scheduled_at: '2026-04-01T08:00:00Z', started_at: null, completed_at: null, created_at: '2026-03-25T11:00:00Z' },
@@ -69,7 +69,7 @@ const DEMO_CAMPAIGNS: Campaign[] = [
 
 export default function CampaignsPage() {
   const { user } = useAuth();
-  const [campaigns, setCampaigns] = useState<Campaign[]>(DEMO_CAMPAIGNS);
+  const [campaigns, setCampaigns] = useState<Campaign[]>(FALLBACK_CAMPAIGNS);
   const [templates, setTemplates] = useState<Template[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -101,17 +101,91 @@ export default function CampaignsPage() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     const supabase = createClient();
+    let campaignsLoaded = false;
 
     try {
-      const { data: campaignsData } = await supabase
+      // Attempt 1: message_campaigns table
+      const { data: campaignsData, error: mcErr } = await supabase
         .from('message_campaigns')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (campaignsData && campaignsData.length > 0) {
+      if (!mcErr && campaignsData && campaignsData.length > 0) {
         setCampaigns(campaignsData);
+        campaignsLoaded = true;
       }
 
+      if (!campaignsLoaded) {
+        // Attempt 2: broadcasts table
+        try {
+          const { data: broadcastsData, error: bErr } = await supabase
+            .from('broadcasts')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+          if (!bErr && broadcastsData && broadcastsData.length > 0) {
+            const mapped: Campaign[] = broadcastsData.map((b: Record<string, unknown>) => ({
+              id: String(b.id),
+              name: String(b.name || b.title || 'Broadcast'),
+              channel: String(b.channel || 'sms'),
+              template_id: b.template_id ? String(b.template_id) : null,
+              target_audience: (b.target_audience as Campaign['target_audience']) || {},
+              body: b.body ? String(b.body) : null,
+              status: String(b.status || 'draft'),
+              total_recipients: Number(b.total_recipients || 0),
+              sent_count: Number(b.sent_count || 0),
+              delivered_count: Number(b.delivered_count || 0),
+              failed_count: Number(b.failed_count || 0),
+              scheduled_at: b.scheduled_at ? String(b.scheduled_at) : null,
+              started_at: b.started_at ? String(b.started_at) : null,
+              completed_at: b.completed_at ? String(b.completed_at) : null,
+              created_at: String(b.created_at || new Date().toISOString()),
+            }));
+            setCampaigns(mapped);
+            campaignsLoaded = true;
+          }
+        } catch {
+          // broadcasts table may not exist
+        }
+      }
+
+      if (!campaignsLoaded) {
+        // Attempt 3: notification_queue table
+        try {
+          const { data: nqData, error: nqErr } = await supabase
+            .from('notification_queue')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+          if (!nqErr && nqData && nqData.length > 0) {
+            const mapped: Campaign[] = nqData.map((n: Record<string, unknown>) => ({
+              id: String(n.id),
+              name: String(n.title || n.subject || 'Notification'),
+              channel: String(n.channel || 'sms'),
+              template_id: n.template_id ? String(n.template_id) : null,
+              target_audience: (n.target_audience as Campaign['target_audience']) || {},
+              body: n.body ? String(n.body) : null,
+              status: String(n.status || 'draft'),
+              total_recipients: Number(n.total_recipients || 0),
+              sent_count: Number(n.sent_count || 0),
+              delivered_count: Number(n.delivered_count || 0),
+              failed_count: Number(n.failed_count || 0),
+              scheduled_at: n.scheduled_at ? String(n.scheduled_at) : null,
+              started_at: n.started_at ? String(n.started_at) : null,
+              completed_at: n.completed_at ? String(n.completed_at) : null,
+              created_at: String(n.created_at || new Date().toISOString()),
+            }));
+            setCampaigns(mapped);
+            campaignsLoaded = true;
+          }
+        } catch {
+          // notification_queue table may not exist
+        }
+      }
+
+      // If nothing loaded, FALLBACK_CAMPAIGNS remain as initial state
+
+      // Fetch templates
       const { data: templatesData } = await supabase
         .from('message_templates')
         .select('id, name, channel, body')
@@ -122,7 +196,7 @@ export default function CampaignsPage() {
         setTemplates(templatesData);
       }
     } catch {
-      // keep demo data
+      // keep fallback data
     } finally {
       setLoading(false);
     }

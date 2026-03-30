@@ -73,8 +73,10 @@ interface NotificationTemplate {
   preview: string;
 }
 
-// ── Mock Data ──
-const notifications: Notification[] = [
+import { createClient } from '@/lib/supabase/client';
+
+// ── Fallback Data ──
+const FALLBACK_NOTIFICATIONS: Notification[] = [
   { id: 1, type: 'critical', title: 'Loan Default Alert', message: 'Member AFU-2024-032 has missed 3 consecutive payments on Working Capital loan WC-0145.', timestamp: '5 min ago', read: false, priority: 'high', source: 'Financial System' },
   { id: 2, type: 'system', title: 'System Maintenance Scheduled', message: 'Platform maintenance window scheduled for Saturday 22:00-02:00 UTC. All services will be affected.', timestamp: '15 min ago', read: false, priority: 'medium', source: 'DevOps' },
   { id: 3, type: 'member', title: 'New Membership Application', message: 'Grace Nyathi from Zimbabwe has submitted a Tier A membership application with all required documents.', timestamp: '32 min ago', read: false, priority: 'medium', source: 'Applications' },
@@ -92,7 +94,7 @@ const notifications: Notification[] = [
   { id: 15, type: 'info', title: 'Weekly Digest Ready', message: 'Your weekly platform activity summary for March 3-9 is ready for review.', timestamp: '1 day ago', read: true, priority: 'low', source: 'Reports' },
 ];
 
-const sentNotifications: SentNotification[] = [
+const FALLBACK_SENT_NOTIFICATIONS: SentNotification[] = [
   { id: 1, recipients: 'All Members (342)', subject: 'Q1 2026 Platform Updates & New Features', sentDate: 'Mar 14, 2026', status: 'delivered', openRate: '68%' },
   { id: 2, recipients: 'Tier A Members (89)', subject: 'Exclusive Export Opportunity - European Buyer', sentDate: 'Mar 13, 2026', status: 'delivered', openRate: '82%' },
   { id: 3, recipients: 'Training Batch 12 (18)', subject: 'GlobalGAP Certificate Available for Download', sentDate: 'Mar 12, 2026', status: 'delivered', openRate: '94%' },
@@ -105,7 +107,7 @@ const sentNotifications: SentNotification[] = [
   { id: 10, recipients: 'Botswana Region (78)', subject: 'Regional Meeting Invitation - March 20', sentDate: 'Mar 4, 2026', status: 'pending', openRate: '-' },
 ];
 
-const templates: NotificationTemplate[] = [
+const FALLBACK_TEMPLATES: NotificationTemplate[] = [
   { id: 1, name: 'Welcome Message', category: 'Onboarding', preview: 'Welcome to AFU! Your membership application has been approved. Here is how to get started with your account...' },
   { id: 2, name: 'Payment Reminder', category: 'Financial', preview: 'This is a reminder that your loan payment of {amount} is due on {date}. Please ensure timely payment to maintain...' },
   { id: 3, name: 'Loan Approval', category: 'Financial', preview: 'Congratulations! Your {loan_type} application for {amount} has been approved. Funds will be disbursed within...' },
@@ -142,6 +144,30 @@ function priorityBadge(priority: 'high' | 'medium' | 'low') {
   }
 }
 
+// ── DB helpers ──
+
+function mapNotifType(raw: string): NotificationType {
+  const s = raw.toLowerCase();
+  if (['critical', 'system', 'member', 'financial', 'info'].includes(s))
+    return s as NotificationType;
+  if (s.includes('alert') || s.includes('urgent')) return 'critical';
+  if (s.includes('finance') || s.includes('payment')) return 'financial';
+  if (s.includes('user') || s.includes('member')) return 'member';
+  return 'info';
+}
+
+function formatRelativeTime(isoStr: string): string {
+  if (!isoStr) return '';
+  const diff = Date.now() - new Date(isoStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'Just now';
+  if (mins < 60) return `${mins} min ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs} hr ago`;
+  const days = Math.floor(hrs / 24);
+  return `${days} day${days > 1 ? 's' : ''} ago`;
+}
+
 // ═══════════════════════════════════════════════════════
 //  MAIN PAGE COMPONENT
 // ═══════════════════════════════════════════════════════
@@ -149,19 +175,72 @@ function priorityBadge(priority: 'high' | 'medium' | 'low') {
 export default function AdminNotificationsPage() {
   const [activeTab, setActiveTab] = useState<TabKey>('inbox');
   const [inboxFilter, setInboxFilter] = useState<InboxFilter>('all');
-  const [notifState, setNotifState] = useState(notifications);
+  const [notifState, setNotifState] = useState<Notification[]>(FALLBACK_NOTIFICATIONS);
+  const [sentNotifs, setSentNotifs] = useState<SentNotification[]>(FALLBACK_SENT_NOTIFICATIONS);
+  const [templatesList, setTemplatesList] = useState<NotificationTemplate[]>(FALLBACK_TEMPLATES);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Fetch live notification preferences from settings API
+  // Fetch live notifications from Supabase
   useEffect(() => {
-    fetch('/api/admin/settings')
-      .then(r => r.json())
-      .then(d => {
-        if (d?.notifications) {
-          // Could merge live notification prefs here in future
+    const supabase = createClient();
+    (async () => {
+      try {
+        // Fetch inbox notifications
+        const { data: notifData } = await supabase
+          .from('notifications')
+          .select('id, user_id, title, body, type, is_read, created_at')
+          .order('created_at', { ascending: false })
+          .limit(50);
+
+        if (notifData && notifData.length > 0) {
+          setNotifState(notifData.map((n: Record<string, unknown>) => ({
+            id: typeof n.id === 'number' ? n.id : Number(n.id),
+            type: mapNotifType(String(n.type ?? 'info')),
+            title: String(n.title ?? ''),
+            message: String(n.body ?? ''),
+            timestamp: formatRelativeTime(String(n.created_at ?? '')),
+            read: Boolean(n.is_read),
+            priority: (String(n.type) === 'critical' ? 'high' : 'medium') as Notification['priority'],
+            source: String(n.type ?? 'System'),
+          })));
         }
-      })
-      .catch(() => {});
+
+        // Fetch sent notifications (broadcasts)
+        const { data: broadcastData } = await supabase
+          .from('broadcasts')
+          .select('id, title, body, type, target_roles, is_active, created_at')
+          .order('created_at', { ascending: false })
+          .limit(50);
+
+        if (broadcastData && broadcastData.length > 0) {
+          setSentNotifs(broadcastData.map((b: Record<string, unknown>, idx: number) => ({
+            id: typeof b.id === 'number' ? b.id : idx + 1,
+            recipients: String(b.target_roles ?? 'All'),
+            subject: String(b.title ?? ''),
+            sentDate: b.created_at ? new Date(String(b.created_at)).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '',
+            status: (b.is_active ? 'delivered' : 'pending') as SentNotification['status'],
+            openRate: '-',
+          })));
+        }
+
+        // Fetch notification templates if table exists
+        const { data: tplData } = await supabase
+          .from('notification_templates')
+          .select('id, name, category, preview')
+          .order('created_at', { ascending: false });
+
+        if (tplData && tplData.length > 0) {
+          setTemplatesList(tplData.map((t: Record<string, unknown>) => ({
+            id: typeof t.id === 'number' ? t.id : Number(t.id),
+            name: String(t.name ?? ''),
+            category: String(t.category ?? ''),
+            preview: String(t.preview ?? ''),
+          })));
+        }
+      } catch {
+        // Keep fallback data on error
+      }
+    })();
   }, []);
 
   // Notification preferences (settings tab)
@@ -200,7 +279,8 @@ export default function AdminNotificationsPage() {
   const totalNotifications = notifState.length;
   const unreadCount = notifState.filter((n) => !n.read).length;
   const criticalCount = notifState.filter((n) => n.type === 'critical' && !n.read).length;
-  const sentToday = sentNotifications.filter((s) => s.sentDate.includes('Mar 14')).length;
+  const todayStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  const sentToday = sentNotifs.filter((s) => s.sentDate.includes(todayStr)).length;
 
   // ── Filtered inbox ──
   const filteredNotifications = notifState.filter((n) => {
@@ -216,17 +296,57 @@ export default function AdminNotificationsPage() {
            n.message.toLowerCase().includes(searchQuery.toLowerCase());
   });
 
-  const markAsRead = (id: number) => {
+  const markAsRead = async (id: number) => {
     setNotifState((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
+    const supabase = createClient();
+    await supabase.from('notifications').update({ is_read: true }).eq('id', id);
   };
 
-  const archiveNotification = (id: number) => {
+  const archiveNotification = async (id: number) => {
     setNotifState((prev) => prev.filter((n) => n.id !== id));
+    const supabase = createClient();
+    await supabase.from('notifications').delete().eq('id', id);
   };
 
-  const markAllRead = () => {
+  const markAllRead = async () => {
     setNotifState((prev) => prev.map((n) => ({ ...n, read: true })));
+    const supabase = createClient();
+    const unreadIds = notifState.filter((n) => !n.read).map((n) => n.id);
+    if (unreadIds.length > 0) {
+      await supabase.from('notifications').update({ is_read: true }).in('id', unreadIds);
+    }
   };
+
+  // Send a notification to a specific user
+  const sendNotification = async (userId: string, title: string, body: string, type: string) => {
+    const supabase = createClient();
+    const { error } = await supabase.from('notifications').insert({
+      user_id: userId,
+      title,
+      body,
+      type,
+      created_at: new Date().toISOString(),
+    });
+    return !error;
+  };
+
+  // Create a broadcast notification
+  const createBroadcast = async (title: string, body: string, type: string, targetRoles: string[]) => {
+    const supabase = createClient();
+    const { error } = await supabase.from('broadcasts').insert({
+      title,
+      body,
+      type,
+      target_roles: targetRoles,
+      is_active: true,
+      created_at: new Date().toISOString(),
+    });
+    return !error;
+  };
+
+  // Keep lint-happy references for future UI wiring
+  void sendNotification;
+  void createBroadcast;
 
   return (
     <motion.div variants={containerVariants} initial="hidden" animate="show" className="space-y-6">
@@ -407,7 +527,7 @@ export default function AdminNotificationsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
-                  {sentNotifications.map((sent) => (
+                  {sentNotifs.map((sent) => (
                     <tr key={sent.id} className="hover:bg-gray-50/50 transition-colors">
                       <td className="px-6 py-4 text-sm font-medium text-[#1B2A4A]">{sent.recipients}</td>
                       <td className="px-6 py-4 text-sm text-gray-600 max-w-xs truncate">{sent.subject}</td>
@@ -434,7 +554,7 @@ export default function AdminNotificationsPage() {
       {/* ===== TEMPLATES TAB ===== */}
       {activeTab === 'templates' && (
         <motion.div variants={containerVariants} initial="hidden" animate="show" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {templates.map((tpl) => (
+          {templatesList.map((tpl) => (
             <motion.div key={tpl.id} variants={cardVariants} className="bg-white rounded-xl border border-gray-100 p-5">
               <div className="flex items-start justify-between mb-3">
                 <div>

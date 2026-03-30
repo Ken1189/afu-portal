@@ -103,7 +103,7 @@ interface RecentActivity {
 
 // ── Mock data ──────────────────────────────────────────────────────────────
 
-const mockApplications: LoanApplication[] = [
+const FALLBACK_APPLICATIONS: LoanApplication[] = [
   {
     id: 'APP-2026-001',
     memberName: 'Amara Diallo',
@@ -186,7 +186,7 @@ const mockApplications: LoanApplication[] = [
   },
 ];
 
-const disbursementQueue: DisbursementEntry[] = [
+const FALLBACK_DISBURSEMENT_QUEUE: DisbursementEntry[] = [
   {
     loanId: 'LN-2026-043',
     member: 'Ngozi Okonkwo',
@@ -213,7 +213,7 @@ const disbursementQueue: DisbursementEntry[] = [
   },
 ];
 
-const recentActivity: RecentActivity[] = [
+const FALLBACK_RECENT_ACTIVITY: RecentActivity[] = [
   {
     id: '1',
     description: 'Loan LN-2026-045 disbursed to Grace Moyo — $15,000 via M-Pesa',
@@ -254,7 +254,7 @@ const recentActivity: RecentActivity[] = [
 
 // ── Pipeline data ──────────────────────────────────────────────────────────
 
-const pipelineColumns = [
+const FALLBACK_PIPELINE = [
   { label: 'Applied', count: 12, color: 'bg-blue-500', lightColor: 'bg-blue-50', textColor: 'text-blue-700' },
   { label: 'Under Review', count: 5, color: 'bg-amber-500', lightColor: 'bg-amber-50', textColor: 'text-amber-700' },
   { label: 'Approved', count: 3, color: 'bg-[#8CB89C]', lightColor: 'bg-[#EDF4EF]', textColor: 'text-teal-700' },
@@ -381,7 +381,34 @@ export default function LoansPage() {
   useEffect(() => { fetchLoans(); }, [fetchLoans]);
 
   // Use real data if available, fall back to mock for demo
-  const applications = realLoans.length > 0 ? realLoans : mockApplications;
+  const applications = realLoans.length > 0 ? realLoans : FALLBACK_APPLICATIONS;
+
+  // ── Computed Stats ─────────────────────────────────────────────────────
+  const totalPortfolio = applications
+    .filter((a) => a.status === 'disbursed' || a.status === 'repaying')
+    .reduce((sum, a) => sum + a.amountRequested, 0);
+  const activeLoansCount = applications.filter(
+    (a) => a.status === 'disbursed' || a.status === 'repaying'
+  ).length;
+  const pendingCount = applications.filter(
+    (a) => a.status === 'pending' || a.status === 'submitted'
+  ).length;
+  const completedCount = applications.filter((a) => a.status === 'completed').length;
+  const rejectedCount = applications.filter((a) => a.status === 'rejected').length;
+  const totalFinished = completedCount + rejectedCount + activeLoansCount;
+  const repaymentRate = totalFinished > 0 ? ((completedCount + activeLoansCount) / totalFinished * 100) : 96.2;
+  const approvedNotDisbursed = applications.filter((a) => a.status === 'approved').length;
+  const underReviewCount = applications.filter((a) => a.status === 'under_review').length;
+  const appliedCount = applications.filter((a) => a.status === 'pending' || a.status === 'submitted').length;
+
+  const pipelineColumns = realLoans.length > 0
+    ? [
+        { label: 'Applied', count: appliedCount, color: 'bg-blue-500', lightColor: 'bg-blue-50', textColor: 'text-blue-700' },
+        { label: 'Under Review', count: underReviewCount, color: 'bg-amber-500', lightColor: 'bg-amber-50', textColor: 'text-amber-700' },
+        { label: 'Approved', count: approvedNotDisbursed, color: 'bg-[#8CB89C]', lightColor: 'bg-[#EDF4EF]', textColor: 'text-teal-700' },
+        { label: 'Disbursed', count: activeLoansCount, color: 'bg-navy', lightColor: 'bg-navy/5', textColor: 'text-navy' },
+      ]
+    : FALLBACK_PIPELINE;
 
   const tabs: { key: 'all' | ApplicationStatus; label: string }[] = [
     { key: 'all', label: 'All' },
@@ -517,7 +544,7 @@ export default function LoansPage() {
           <div className="w-9 h-9 rounded-lg bg-navy/10 flex items-center justify-center text-navy mb-3">
             <DollarSign className="w-5 h-5" />
           </div>
-          <p className="text-2xl font-bold text-navy">$2.4M</p>
+          <p className="text-2xl font-bold text-navy">{formatCurrency(totalPortfolio)}</p>
           <p className="text-xs text-gray-500 mt-0.5">Portfolio Outstanding</p>
           <p className="text-[10px] text-gray-400 mt-0.5">Active loan book</p>
         </motion.div>
@@ -531,9 +558,9 @@ export default function LoansPage() {
           <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 mb-3">
             <Users className="w-5 h-5" />
           </div>
-          <p className="text-2xl font-bold text-navy">187</p>
+          <p className="text-2xl font-bold text-navy">{activeLoansCount}</p>
           <p className="text-xs text-gray-500 mt-0.5">Active Loans</p>
-          <p className="text-[10px] text-gray-400 mt-0.5">Across 20 countries</p>
+          <p className="text-[10px] text-gray-400 mt-0.5">Currently disbursed / repaying</p>
         </motion.div>
 
         {/* Repayment Rate */}
@@ -546,7 +573,7 @@ export default function LoansPage() {
             <TrendingUp className="w-5 h-5" />
           </div>
           <div className="flex items-center gap-2">
-            <p className="text-2xl font-bold text-navy">96.2%</p>
+            <p className="text-2xl font-bold text-navy">{repaymentRate.toFixed(1)}%</p>
             <span className="text-xs font-medium text-green-600 bg-green-100 px-2 py-0.5 rounded-full">
               Good
             </span>
@@ -583,7 +610,7 @@ export default function LoansPage() {
           <div className="w-9 h-9 rounded-lg bg-purple-50 flex items-center justify-center text-purple-600 mb-3">
             <Clock className="w-5 h-5" />
           </div>
-          <p className="text-2xl font-bold text-navy">12</p>
+          <p className="text-2xl font-bold text-navy">{pendingCount}</p>
           <p className="text-xs text-gray-500 mt-0.5">Pending Applications</p>
           <p className="text-[10px] text-gray-400 mt-0.5">Awaiting review</p>
         </motion.div>
@@ -877,7 +904,7 @@ export default function LoansPage() {
             <Send className="w-4 h-4 text-navy" />
             <h3 className="font-semibold text-navy text-sm">Disbursement Queue</h3>
             <span className="ml-auto text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full font-medium">
-              {disbursementQueue.filter((d) => !disbursedIds.has(d.loanId)).length} pending
+              {FALLBACK_DISBURSEMENT_QUEUE.filter((d) => !disbursedIds.has(d.loanId)).length} pending
             </span>
           </div>
           <div className="overflow-x-auto">
@@ -902,7 +929,7 @@ export default function LoansPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
-                {disbursementQueue.map((entry) => {
+                {FALLBACK_DISBURSEMENT_QUEUE.map((entry) => {
                   const isDisbursed = disbursedIds.has(entry.loanId);
                   return (
                     <tr key={entry.loanId} className="hover:bg-gray-50/50 transition-colors">
@@ -1013,7 +1040,7 @@ export default function LoansPage() {
             <h3 className="font-semibold text-navy text-sm">Recent Loan Activity</h3>
           </div>
           <div className="space-y-3">
-            {recentActivity.map((event, i) => {
+            {FALLBACK_RECENT_ACTIVITY.map((event, i) => {
               const config = activityTypeConfig[event.type];
               return (
                 <motion.div

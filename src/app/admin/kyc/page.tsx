@@ -82,7 +82,7 @@ interface CountryCompliance {
 
 // ── Mock data ────────────────────────────────────────────────────────────────
 
-const INITIAL_RECORDS: KycRecord[] = [
+const FALLBACK_KYC_RECORDS: KycRecord[] = [
   { id: '1', name: 'Amara Diallo', email: 'amara.diallo@example.com', country: 'Sierra Leone', docType: 'national_id', submittedDate: '2026-03-17', tier: 2, status: 'pending' },
   { id: '2', name: 'Chidi Okonkwo', email: 'chidi.okonkwo@example.com', country: 'Nigeria', docType: 'passport', submittedDate: '2026-03-16', tier: 2, status: 'pending' },
   { id: '3', name: 'Fatima Nkosi', email: 'fatima.nkosi@example.com', country: 'South Africa', docType: 'drivers_license', submittedDate: '2026-03-15', tier: 1, status: 'verified' },
@@ -152,7 +152,7 @@ function TierBadge({ tier }: { tier: KycTier }) {
 // ── Main component ───────────────────────────────────────────────────────────
 
 export default function KycManagementPage() {
-  const [records, setRecords] = useState<KycRecord[]>(INITIAL_RECORDS);
+  const [records, setRecords] = useState<KycRecord[]>(FALLBACK_KYC_RECORDS);
   const [filterTab, setFilterTab] = useState<'all' | KycStatus>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRecord, setSelectedRecord] = useState<KycRecord | null>(null);
@@ -164,30 +164,73 @@ export default function KycManagementPage() {
   const showSuccess = (msg: string) => { setSuccessMsg(msg); setTimeout(() => setSuccessMsg(null), 3000); };
   const showError = (msg: string) => { setErrorMsg(msg); setTimeout(() => setErrorMsg(null), 5000); };
 
-  // Fetch real KYC documents from Supabase
+  // Fetch real KYC data from Supabase — try kyc_verifications first, then kyc_documents, fallback to hardcoded
   const fetchKycRecords = useCallback(async () => {
     const supabase = createClient();
-    const { data, error } = await supabase
-      .from('kyc_documents')
-      .select('*, profiles!inner(full_name, email)')
-      .order('created_at', { ascending: false });
 
-    if (!error && data && data.length > 0) {
-      const mapped: KycRecord[] = data.map((doc: Record<string, unknown>) => {
-        const profiles = doc.profiles as Record<string, unknown> | null;
-        return {
-          id: String(doc.id),
-          name: String(profiles?.full_name || 'Unknown'),
-          email: String(profiles?.email || ''),
-          country: '-',
-          docType: (String(doc.document_type || 'national_id')) as DocType,
-          submittedDate: String(doc.created_at),
-          tier: (Number(doc.kyc_tier) || 1) as KycTier,
-          status: (String(doc.status) === 'verified' ? 'verified' : String(doc.status) === 'rejected' ? 'rejected' : 'pending') as KycStatus,
-        };
-      });
-      setRecords(mapped);
+    // Attempt 1: kyc_verifications joined with profiles
+    try {
+      const { data: verifications, error: vErr } = await supabase
+        .from('kyc_verifications')
+        .select('id, profile_id, status, verification_type, submitted_at, reviewed_at, reviewer_id, notes, profiles!inner(full_name, email, country)')
+        .order('submitted_at', { ascending: false });
+
+      if (!vErr && verifications && verifications.length > 0) {
+        const mapped: KycRecord[] = verifications.map((v: Record<string, unknown>) => {
+          const profile = v.profiles as Record<string, unknown> | null;
+          const rawStatus = String(v.status || 'pending');
+          const status: KycStatus = rawStatus === 'approved' || rawStatus === 'verified' ? 'verified' : rawStatus === 'rejected' ? 'rejected' : 'pending';
+          const vType = String(v.verification_type || 'national_id');
+          const docType: DocType = (['national_id', 'passport', 'drivers_license', 'proof_of_address'].includes(vType) ? vType : 'national_id') as DocType;
+          return {
+            id: String(v.id),
+            name: String(profile?.full_name || 'Unknown'),
+            email: String(profile?.email || ''),
+            country: String(profile?.country || '-'),
+            docType,
+            submittedDate: v.submitted_at ? new Date(String(v.submitted_at)).toISOString().split('T')[0] : '-',
+            tier: 1 as KycTier,
+            status,
+          };
+        });
+        setRecords(mapped);
+        return;
+      }
+    } catch {
+      // kyc_verifications table may not exist — continue to fallback
     }
+
+    // Attempt 2: kyc_documents joined with profiles
+    try {
+      const { data, error } = await supabase
+        .from('kyc_documents')
+        .select('*, profiles!inner(full_name, email, country)')
+        .order('created_at', { ascending: false });
+
+      if (!error && data && data.length > 0) {
+        const mapped: KycRecord[] = data.map((doc: Record<string, unknown>) => {
+          const profiles = doc.profiles as Record<string, unknown> | null;
+          const rawStatus = String(doc.status || 'pending');
+          const status: KycStatus = rawStatus === 'approved' || rawStatus === 'verified' ? 'verified' : rawStatus === 'rejected' ? 'rejected' : 'pending';
+          return {
+            id: String(doc.id),
+            name: String(profiles?.full_name || 'Unknown'),
+            email: String(profiles?.email || ''),
+            country: String(profiles?.country || '-'),
+            docType: (String(doc.document_type || 'national_id')) as DocType,
+            submittedDate: doc.created_at ? new Date(String(doc.created_at)).toISOString().split('T')[0] : '-',
+            tier: (Number(doc.kyc_tier) || 1) as KycTier,
+            status,
+          };
+        });
+        setRecords(mapped);
+        return;
+      }
+    } catch {
+      // kyc_documents table may not exist — keep fallback
+    }
+
+    // Attempt 3: keep FALLBACK_KYC_RECORDS (already set as initial state)
   }, []);
 
   useEffect(() => { fetchKycRecords(); }, [fetchKycRecords]);
@@ -216,15 +259,31 @@ export default function KycManagementPage() {
         if (selectedRecord?.id === id) setSelectedRecord((r) => r ? { ...r, status: 'verified' as KycStatus } : r);
         showSuccess('Document verified successfully.');
       } else {
-        // Fallback: update directly via Supabase
+        // Fallback: update directly via Supabase — try kyc_verifications first, then kyc_documents
         const supabase = createClient();
-        const { error } = await supabase.from('kyc_documents').update({ status: 'verified' }).eq('id', id);
-        if (!error) {
+        const { data: { user: authUser } } = await supabase.auth.getUser();
+        const reviewerId = authUser?.id || null;
+
+        // Try kyc_verifications
+        const { error: vErr } = await supabase
+          .from('kyc_verifications')
+          .update({ status: 'approved', reviewed_at: new Date().toISOString(), reviewer_id: reviewerId })
+          .eq('id', id);
+
+        if (!vErr) {
           setRecords((prev) => prev.map((r) => (r.id === id ? { ...r, status: 'verified' as KycStatus } : r)));
           if (selectedRecord?.id === id) setSelectedRecord((r) => r ? { ...r, status: 'verified' as KycStatus } : r);
           showSuccess('Document verified successfully.');
         } else {
-          showError(`Failed to verify: ${error.message}`);
+          // Fallback to kyc_documents
+          const { error } = await supabase.from('kyc_documents').update({ status: 'verified' }).eq('id', id);
+          if (!error) {
+            setRecords((prev) => prev.map((r) => (r.id === id ? { ...r, status: 'verified' as KycStatus } : r)));
+            if (selectedRecord?.id === id) setSelectedRecord((r) => r ? { ...r, status: 'verified' as KycStatus } : r);
+            showSuccess('Document verified successfully.');
+          } else {
+            showError(`Failed to verify: ${error.message}`);
+          }
         }
       }
     } catch {
@@ -248,14 +307,31 @@ export default function KycManagementPage() {
         if (selectedRecord?.id === id) setSelectedRecord((r) => r ? { ...r, status: 'rejected' as KycStatus } : r);
         showSuccess('Document rejected.');
       } else {
+        // Fallback: update directly via Supabase — try kyc_verifications first, then kyc_documents
         const supabase = createClient();
-        const { error } = await supabase.from('kyc_documents').update({ status: 'rejected', rejection_reason: reason }).eq('id', id);
-        if (!error) {
+        const { data: { user: authUser } } = await supabase.auth.getUser();
+        const reviewerId = authUser?.id || null;
+
+        // Try kyc_verifications
+        const { error: vErr } = await supabase
+          .from('kyc_verifications')
+          .update({ status: 'rejected', reviewed_at: new Date().toISOString(), reviewer_id: reviewerId, notes: reason })
+          .eq('id', id);
+
+        if (!vErr) {
           setRecords((prev) => prev.map((r) => (r.id === id ? { ...r, status: 'rejected' as KycStatus } : r)));
           if (selectedRecord?.id === id) setSelectedRecord((r) => r ? { ...r, status: 'rejected' as KycStatus } : r);
           showSuccess('Document rejected.');
         } else {
-          showError(`Failed to reject: ${error.message}`);
+          // Fallback to kyc_documents
+          const { error } = await supabase.from('kyc_documents').update({ status: 'rejected', rejection_reason: reason }).eq('id', id);
+          if (!error) {
+            setRecords((prev) => prev.map((r) => (r.id === id ? { ...r, status: 'rejected' as KycStatus } : r)));
+            if (selectedRecord?.id === id) setSelectedRecord((r) => r ? { ...r, status: 'rejected' as KycStatus } : r);
+            showSuccess('Document rejected.');
+          } else {
+            showError(`Failed to reject: ${error.message}`);
+          }
         }
       }
     } catch {

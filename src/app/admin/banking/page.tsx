@@ -116,18 +116,69 @@ export default function AdminBankingPage() {
     const supabase = createClient();
     async function fetchData() {
       try {
-        // Fetch wallet transactions as recent transactions
+        // ── KPIs: compute from wallet_accounts + wallet_transactions + transaction_flags ──
+        const [
+          { count: walletCount },
+          { data: walletBalances },
+          { data: todayTxns },
+          { count: pendingFlagCount },
+          { data: highSeverityFlags },
+        ] = await Promise.all([
+          supabase.from('wallet_accounts').select('*', { count: 'exact', head: true }),
+          supabase.from('wallet_accounts').select('balance'),
+          supabase.from('wallet_transactions').select('amount').gte('created_at', new Date().toISOString().slice(0, 10)),
+          supabase.from('transaction_flags').select('*', { count: 'exact', head: true }).eq('resolved', false),
+          supabase.from('transaction_flags').select('severity').eq('resolved', false).eq('severity', 'high'),
+        ]);
+
+        const totalAum = walletBalances?.reduce((s, w) => s + Number(w.balance || 0), 0) ?? 0;
+        const txnVolume = todayTxns?.reduce((s, t) => s + Math.abs(Number(t.amount || 0)), 0) ?? 0;
+
+        if (walletCount !== null || todayTxns || pendingFlagCount !== null) {
+          setKpis([
+            {
+              label: 'Total AUM',
+              value: totalAum >= 1_000_000 ? `$${(totalAum / 1_000_000).toFixed(2)}M` : `$${totalAum.toLocaleString()}`,
+              change: '',
+              icon: DollarSign,
+              color: 'text-green-600 bg-green-50',
+            },
+            {
+              label: 'Active Wallets',
+              value: (walletCount ?? 0).toLocaleString(),
+              change: '',
+              icon: Wallet,
+              color: 'text-blue-600 bg-blue-50',
+            },
+            {
+              label: 'Transactions Today',
+              value: (todayTxns?.length ?? 0).toLocaleString(),
+              change: `$${txnVolume >= 1000 ? (txnVolume / 1000).toFixed(0) + 'K' : txnVolume.toLocaleString()} volume`,
+              icon: ArrowUpDown,
+              color: 'text-purple-600 bg-purple-50',
+            },
+            {
+              label: 'Pending Flags',
+              value: (pendingFlagCount ?? 0).toString(),
+              change: `${highSeverityFlags?.length ?? 0} high severity`,
+              icon: AlertTriangle,
+              color: 'text-amber-600 bg-amber-50',
+            },
+          ]);
+        }
+
+        // ── Recent Transactions (limit 20) ──
         const { data: txData } = await supabase
           .from('wallet_transactions')
           .select('*')
           .order('created_at', { ascending: false })
-          .limit(10);
+          .limit(20);
         if (txData && txData.length > 0) {
           setRecentTransactions(
             txData.map((t: Record<string, unknown>) => ({
               id: (t.id as string)?.slice(0, 8) || 'TXN',
-              type: (t.transaction_type as string) || 'Transaction',
-              user: (t.description as string) || 'Unknown',
+              type: (t.type as string) || (t.transaction_type as string) || 'Transaction',
+              user: (t.reference as string) || (t.description as string) || 'Unknown',
               amount: `${(t.amount as number) >= 0 ? '+' : ''}$${Math.abs((t.amount as number) || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
               currency: (t.currency as string) || 'USD',
               time: (t.created_at as string) || '',
@@ -136,7 +187,7 @@ export default function AdminBankingPage() {
           );
         }
 
-        // Fetch ledger accounts as system accounts
+        // ── System Accounts from ledger_accounts ──
         const { data: ledgerData } = await supabase
           .from('ledger_accounts')
           .select('*')
@@ -145,19 +196,19 @@ export default function AdminBankingPage() {
           setSystemAccounts(
             ledgerData.map((a: Record<string, unknown>) => ({
               name: (a.name as string) || 'Account',
-              type: (a.account_type as string) || 'general',
+              type: (a.type as string) || (a.account_type as string) || 'general',
               currency: (a.currency as string) || 'USD',
-              balance: (a.balance as number) || 0,
+              balance: Number(a.balance) || 0,
             }))
           );
         }
 
-        // Fetch transaction flags
+        // ── Compliance Flags (unresolved) ──
         const { data: flagData } = await supabase
           .from('transaction_flags')
           .select('*')
-          .order('created_at', { ascending: false })
-          .limit(10);
+          .eq('resolved', false)
+          .order('created_at', { ascending: false });
         if (flagData && flagData.length > 0) {
           setFlags(
             flagData.map((f: Record<string, unknown>) => ({
@@ -167,12 +218,12 @@ export default function AdminBankingPage() {
               severity: (f.severity as string) || 'medium',
               detail: (f.detail as string) || '',
               time: (f.created_at as string) || '',
-              status: (f.status as string) || 'pending',
+              status: (f.resolved as boolean) ? 'cleared' : 'pending',
             }))
           );
         }
 
-        // Fetch reconciliation runs
+        // ── Reconciliation Runs (latest 10) ──
         const { data: reconData } = await supabase
           .from('reconciliation_runs')
           .select('*')
@@ -181,14 +232,14 @@ export default function AdminBankingPage() {
         if (reconData && reconData.length > 0) {
           setReconRuns(
             reconData.map((r: Record<string, unknown>) => ({
-              date: ((r.run_date as string) || (r.created_at as string))?.split('T')[0] || '',
+              date: ((r.started_at as string) || (r.created_at as string))?.split('T')[0] || '',
               provider: (r.provider as string) || 'Unknown',
               currency: (r.currency as string) || 'USD',
-              our: (r.our_balance as number) || 0,
-              theirs: (r.provider_balance as number) || 0,
-              disc: (r.discrepancy as number) || 0,
-              matched: (r.matched_count as number) || 0,
-              unmatched: (r.unmatched_count as number) || 0,
+              our: Number(r.our_balance) || 0,
+              theirs: Number(r.provider_balance) || 0,
+              disc: Number(r.unmatched_count) || 0,
+              matched: Number(r.matched_count) || 0,
+              unmatched: Number(r.unmatched_count) || 0,
               status: (r.status as string) || 'matched',
             }))
           );

@@ -50,7 +50,7 @@ interface PaymentRecord {
   description: string;
 }
 
-const mockPayments: PaymentRecord[] = [
+const FALLBACK_PAYMENTS: PaymentRecord[] = [
   { id: 'PAY-001', memberId: 'AFU-2024-001', memberName: 'Kgosi Mosweu', type: 'loan-repayment', method: 'mobile-money', provider: 'Orange Money', amount: 2200, currency: 'USD', reference: 'OM-BW-20250915-7823', status: 'completed', date: '2025-09-15', relatedId: 'FIN-2024-003', description: 'Monthly loan repayment for input bundle financing - maize season 2025' },
   { id: 'PAY-002', memberId: 'AFU-2024-003', memberName: 'Tendai Moyo', type: 'input-purchase', method: 'mobile-money', provider: 'EcoCash', amount: 960, currency: 'USD', reference: 'EC-ZW-20251002-4512', status: 'completed', date: '2025-10-02', relatedId: 'ORD-2025-0489', description: 'Purchase of Hybrid Maize Seed (PAN 4M-21) x 20 bags from Kalahari Seeds' },
   { id: 'PAY-003', memberId: 'AFU-2024-036', memberName: 'Thabo Molefe', type: 'loan-repayment', method: 'bank-transfer', provider: 'FNB', amount: 14800, currency: 'USD', reference: 'FNB-BW-20251015-9034', status: 'completed', date: '2025-10-15', relatedId: 'FIN-2024-001', description: 'Working capital loan monthly instalment - blueberry farming operations' },
@@ -72,12 +72,7 @@ const mockPayments: PaymentRecord[] = [
   { id: 'PAY-040', memberId: 'SUP-019', memberName: 'Mmegi Digital Agriculture', type: 'commission-payout', method: 'bank-transfer', provider: 'FNB', amount: 840, currency: 'USD', reference: 'FNB-BW-20260315-CP26', status: 'pending', date: '2026-03-15', relatedId: 'COM-026', description: 'Commission payout for FarmTrack Pro bulk license order - AFU Botswana Chapter' },
 ];
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { createClient } from '@/lib/supabase/client';
-
-interface FinancialApiData {
-  payments: { records: PaymentRecord[]; stats: { total: number; totalCollected: number; totalPending: number; totalFailed: number; completedCount: number; pendingCount: number; failedCount: number } };
-}
 
 // ── Animation variants ──────────────────────────────────────────────────────
 
@@ -241,6 +236,27 @@ function CustomTooltip({
 
 const ITEMS_PER_PAGE = 10;
 
+// ── DB → UI mappers ───────────────────────────────────────────────────────
+
+function mapMethod(raw: string): PaymentRecord['method'] {
+  const m = raw.toLowerCase().replace(/[\s_]+/g, '-');
+  if (['mobile-money', 'bank-transfer', 'cash', 'card', 'ussd'].includes(m))
+    return m as PaymentRecord['method'];
+  if (m.includes('mobile') || m.includes('mpesa') || m.includes('ecocash') || m.includes('orange'))
+    return 'mobile-money';
+  if (m.includes('bank')) return 'bank-transfer';
+  return 'mobile-money';
+}
+
+function mapStatus(raw: string): PaymentRecord['status'] {
+  const s = raw.toLowerCase();
+  if (['completed', 'pending', 'failed', 'reversed'].includes(s))
+    return s as PaymentRecord['status'];
+  if (s === 'success' || s === 'paid') return 'completed';
+  if (s === 'refunded') return 'reversed';
+  return 'pending';
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 //  MAIN COMPONENT
 // ═══════════════════════════════════════════════════════════════════════════
@@ -253,34 +269,83 @@ export default function PaymentsPage() {
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [liveData, setLiveData] = useState<FinancialApiData | null>(null);
+  const [payments, setPayments] = useState<PaymentRecord[]>(FALLBACK_PAYMENTS);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch live financial data
+  // Fetch live payments from Supabase
   useEffect(() => {
-    fetch('/api/admin/financial')
-      .then(res => res.json())
-      .then(data => { if (!data.error) setLiveData(data); })
-      .catch(() => { /* fallback to mock */ });
+    const supabase = createClient();
+    (async () => {
+      try {
+        const { data, error } = await supabase
+          .from('payments')
+          .select('id, order_id, member_id, amount, currency, method, status, reference, created_at, profiles:member_id(full_name)')
+          .order('created_at', { ascending: false });
+
+        if (error || !data || data.length === 0) {
+          setPayments(FALLBACK_PAYMENTS);
+        } else {
+          const mapped: PaymentRecord[] = data.map((row: Record<string, unknown>) => {
+            const profile = row.profiles as Record<string, unknown> | null;
+            return {
+              id: String(row.id ?? ''),
+              memberId: String(row.member_id ?? ''),
+              memberName: String(profile?.full_name ?? 'Unknown'),
+              type: (String(row.method ?? 'subscription')) as PaymentRecord['type'],
+              method: mapMethod(String(row.method ?? '')),
+              provider: String(row.method ?? ''),
+              amount: Number(row.amount ?? 0),
+              currency: String(row.currency ?? 'USD'),
+              reference: String(row.reference ?? ''),
+              status: mapStatus(String(row.status ?? '')),
+              date: row.created_at ? new Date(String(row.created_at)).toISOString().slice(0, 10) : '',
+              relatedId: String(row.order_id ?? ''),
+              description: '',
+            };
+          });
+          setPayments(mapped);
+        }
+      } catch {
+        setPayments(FALLBACK_PAYMENTS);
+      } finally {
+        setIsLoading(false);
+      }
+    })();
   }, []);
 
-  // Use live payments or fallback to mock
-  const payments = liveData?.payments?.records?.length ? liveData.payments.records : mockPayments;
+  // Update payment status in Supabase (approve / refund)
+  const updatePaymentStatus = async (paymentId: string, newStatus: string) => {
+    const supabase = createClient();
+    const { error } = await supabase
+      .from('payments')
+      .update({ status: newStatus })
+      .eq('id', paymentId);
+    if (!error) {
+      setPayments((prev) =>
+        prev.map((p) => (p.id === paymentId ? { ...p, status: newStatus as PaymentRecord['status'] } : p))
+      );
+    }
+  };
+
+  // Keep lint-happy reference for approve/refund (used in future UI actions)
+  void updatePaymentStatus;
+  void isLoading;
 
   // ── Computed stats ────────────────────────────────────────────────────
 
   const totalRevenue = useMemo(
-    () => liveData?.payments?.stats?.totalCollected ?? payments.filter((p) => p.status === 'completed').reduce((sum, p) => sum + p.amount, 0),
-    [payments, liveData]
+    () => payments.filter((p) => p.status === 'completed').reduce((sum, p) => sum + p.amount, 0),
+    [payments]
   );
 
   const pendingTotal = useMemo(
-    () => liveData?.payments?.stats?.totalPending ?? payments.filter((p) => p.status === 'pending').reduce((sum, p) => sum + p.amount, 0),
-    [payments, liveData]
+    () => payments.filter((p) => p.status === 'pending').reduce((sum, p) => sum + p.amount, 0),
+    [payments]
   );
 
   const failedTotal = useMemo(
-    () => liveData?.payments?.stats?.totalFailed ?? payments.filter((p) => p.status === 'failed').reduce((sum, p) => sum + p.amount, 0),
-    [payments, liveData]
+    () => payments.filter((p) => p.status === 'failed').reduce((sum, p) => sum + p.amount, 0),
+    [payments]
   );
 
   const reversedTotal = useMemo(
@@ -306,7 +371,7 @@ export default function PaymentsPage() {
       value: amount,
       color: methodChartColors[method] || '#9CA3AF',
     }));
-  }, []);
+  }, [payments]);
 
   // ── Filtered payments ─────────────────────────────────────────────────
 

@@ -37,7 +37,7 @@ interface AdminUser {
   avatar: string | null;
 }
 
-const mockAdminUsers: AdminUser[] = [
+const FALLBACK_USERS: AdminUser[] = [
   { id: 'ADM-001', name: 'Tendai Chikwava', email: 'tendai@afu-portal.org', role: 'super-admin', department: 'Executive', status: 'active', lastLogin: '2026-03-16T07:15:00Z', createdAt: '2024-06-01', permissions: ['all'], twoFactorEnabled: true, avatar: null },
   { id: 'ADM-002', name: 'Sarah Moatlhodi', email: 'sarah@afu-portal.org', role: 'admin', department: 'Operations', status: 'active', lastLogin: '2026-03-15T08:00:00Z', createdAt: '2024-07-15', permissions: ['member_manage', 'supplier_manage', 'document_verify', 'report_generate'], twoFactorEnabled: true, avatar: null },
   { id: 'ADM-003', name: 'Grace Nkomo', email: 'grace@afu-portal.org', role: 'finance-officer', department: 'Finance', status: 'active', lastLogin: '2026-03-13T09:30:00Z', createdAt: '2024-08-20', permissions: ['loan_approve', 'disbursement_approve', 'payment_view', 'report_generate'], twoFactorEnabled: true, avatar: null },
@@ -102,7 +102,7 @@ function getInitials(name: string): string {
 }
 
 function relativeTime(timestamp: string): string {
-  const now = new Date('2026-03-16T12:00:00Z');
+  const now = new Date();
   const date = new Date(timestamp);
   const diffMs = now.getTime() - date.getTime();
   const diffMins = Math.floor(diffMs / 60000);
@@ -361,8 +361,7 @@ export default function UsersPage() {
         const supabase = createClient();
         const { data, error } = await supabase
           .from('profiles')
-          .select('id, full_name, email, role, country, status, updated_at')
-          .in('role', ['super_admin', 'admin', 'finance_officer', 'loan_officer', 'support_agent', 'auditor', 'read_only'])
+          .select('id, full_name, email, role, avatar_url, created_at, last_sign_in_at, country, status, updated_at')
           .order('full_name');
 
         if (!error && data && data.length > 0) {
@@ -373,11 +372,11 @@ export default function UsersPage() {
             role: ((u.role as string) || 'read-only').replace(/_/g, '-') as AdminUser['role'],
             department: '',
             status: ((u.status as string) || 'active') as AdminUser['status'],
-            lastLogin: (u.updated_at as string) || '',
-            createdAt: '',
+            lastLogin: (u.last_sign_in_at as string) || (u.updated_at as string) || '',
+            createdAt: (u.created_at as string) || '',
             permissions: [],
             twoFactorEnabled: false,
-            avatar: null,
+            avatar: (u.avatar_url as string) || null,
           })));
         }
       } catch { /* fallback to mock */ }
@@ -439,7 +438,7 @@ export default function UsersPage() {
     setNewUserEmail('');
   };
 
-  const adminUsers = liveUsers || mockAdminUsers;
+  const adminUsers = liveUsers || FALLBACK_USERS;
 
   // ── Stats ─────────────────────────────────────────────────────────────
 
@@ -469,7 +468,7 @@ export default function UsersPage() {
       if (statusFilter !== 'all' && user.status !== statusFilter) return false;
       return true;
     });
-  }, [searchQuery, roleFilter, statusFilter]);
+  }, [adminUsers, searchQuery, roleFilter, statusFilter]);
 
   // ── Stat cards ────────────────────────────────────────────────────────
 

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { createClient } from '@/lib/supabase/client';
 import {
   BarChart3,
   Users,
@@ -41,10 +42,10 @@ const cardVariants = {
 // ── Types ──
 type TabKey = 'overview' | 'members' | 'financial' | 'operations';
 
-// ── Mock Data ──
+// ── Fallback Data (used when DB fetch fails or returns empty) ──
 
 // KPI data
-const kpis = [
+const FALLBACK_KPIS = [
   { label: 'Total Members', value: '342', change: '+12%', up: true, icon: <Users className="w-5 h-5" />, color: 'text-[#1B2A4A]', iconBg: 'bg-[#1B2A4A]/10' },
   { label: 'Revenue (MTD)', value: '$487K', change: '+8.3%', up: true, icon: <DollarSign className="w-5 h-5" />, color: 'text-[#8CB89C]', iconBg: 'bg-[#8CB89C]/10' },
   { label: 'Active Loans', value: '89', change: '+5', up: true, icon: <CreditCard className="w-5 h-5" />, color: 'text-blue-600', iconBg: 'bg-blue-50' },
@@ -54,7 +55,7 @@ const kpis = [
 ];
 
 // Member growth (12 months)
-const memberGrowth = [
+const FALLBACK_MEMBER_GROWTH = [
   { month: 'Apr', count: 180 }, { month: 'May', count: 195 }, { month: 'Jun', count: 210 },
   { month: 'Jul', count: 228 }, { month: 'Aug', count: 245 }, { month: 'Sep', count: 258 },
   { month: 'Oct', count: 275 }, { month: 'Nov', count: 290 }, { month: 'Dec', count: 298 },
@@ -62,7 +63,7 @@ const memberGrowth = [
 ];
 
 // Revenue trend (12 months)
-const revenueTrend = [
+const FALLBACK_REVENUE_TREND = [
   { month: 'Apr', value: 320 }, { month: 'May', value: 345 }, { month: 'Jun', value: 380 },
   { month: 'Jul', value: 365 }, { month: 'Aug', value: 410 }, { month: 'Sep', value: 398 },
   { month: 'Oct', value: 425 }, { month: 'Nov', value: 450 }, { month: 'Dec', value: 432 },
@@ -70,24 +71,24 @@ const revenueTrend = [
 ];
 
 // Active users
-const activeUsers = { daily: 186, weekly: 298, monthly: 342 };
+const FALLBACK_ACTIVE_USERS = { daily: 186, weekly: 298, monthly: 342 };
 
 // Top features
-const topFeatures = [
+const FALLBACK_TOP_FEATURES = [
   { name: 'Marketplace', usage: 89 }, { name: 'Loan Applications', usage: 76 },
   { name: 'Training Portal', usage: 68 }, { name: 'Export Tracking', usage: 52 },
   { name: 'Financial Dashboard', usage: 45 }, { name: 'Document Library', usage: 38 },
 ];
 
 // Member distribution by country
-const membersByCountry = [
+const FALLBACK_MEMBERS_BY_COUNTRY = [
   { country: 'Zimbabwe', count: 128 }, { country: 'Tanzania', count: 85 },
   { country: 'Kenya', count: 62 }, { country: 'Botswana', count: 42 },
   { country: 'Uganda', count: 15 }, { country: 'Mozambique', count: 10 },
 ];
 
 // Tier distribution
-const tierDistribution = [
+const FALLBACK_TIER_DISTRIBUTION = [
   { tier: 'Tier A - Commercial', count: 145, percent: 42, color: 'bg-[#1B2A4A]' },
   { tier: 'Tier B - Smallholder', count: 128, percent: 38, color: 'bg-[#8CB89C]' },
   { tier: 'Tier C - Enterprise', count: 45, percent: 13, color: 'bg-[#D4A843]' },
@@ -95,23 +96,23 @@ const tierDistribution = [
 ];
 
 // Growth rate by month
-const growthRates = [
+const FALLBACK_GROWTH_RATES = [
   { month: 'Oct', rate: 6.2 }, { month: 'Nov', rate: 5.5 }, { month: 'Dec', rate: 2.8 },
   { month: 'Jan', rate: 5.7 }, { month: 'Feb', rate: 4.8 }, { month: 'Mar', rate: 3.6 },
 ];
 
 // Churn analysis
-const churnData = { rate: 2.1, atRisk: 12, churned: 7, recovered: 3 };
+const FALLBACK_CHURN_DATA = { rate: 2.1, atRisk: 12, churned: 7, recovered: 3 };
 
 // Engagement scores
-const engagementScores = [
+const FALLBACK_ENGAGEMENT_SCORES = [
   { metric: 'Login Frequency', score: 78 }, { metric: 'Feature Adoption', score: 65 },
   { metric: 'Transaction Activity', score: 82 }, { metric: 'Training Participation', score: 58 },
   { metric: 'Support Interaction', score: 44 },
 ];
 
 // Loan portfolio
-const loanPortfolio = [
+const FALLBACK_LOAN_PORTFOLIO = [
   { type: 'Working Capital', amount: 2500000, count: 45, rate: 95.2 },
   { type: 'Invoice Finance', amount: 1200000, count: 32, rate: 93.8 },
   { type: 'Equipment Finance', amount: 350000, count: 8, rate: 97.1 },
@@ -119,7 +120,7 @@ const loanPortfolio = [
 ];
 
 // Revenue by service line
-const revenueByService = [
+const FALLBACK_REVENUE_BY_SERVICE = [
   { service: 'Interest Income', amount: 312000, percent: 64 },
   { service: 'Origination Fees', amount: 78000, percent: 16 },
   { service: 'Membership Fees', amount: 47000, percent: 10 },
@@ -128,63 +129,138 @@ const revenueByService = [
 ];
 
 // Collection rate trends
-const collectionRates = [
+const FALLBACK_COLLECTION_RATES = [
   { month: 'Oct', rate: 92.1 }, { month: 'Nov', rate: 93.4 }, { month: 'Dec', rate: 91.8 },
   { month: 'Jan', rate: 94.0 }, { month: 'Feb', rate: 94.2 }, { month: 'Mar', rate: 94.8 },
 ];
 
 // Operations data
-const marketplaceMetrics = { totalOrders: 1245, gmv: 1200000, avgOrderValue: 964, activeListings: 342 };
-const logisticsMetrics = { totalShipments: 89, avgDeliveryDays: 4.2, onTimeRate: 91, inTransit: 12 };
-const supportMetrics = { openTickets: 23, resolvedMtd: 145, avgResolutionHrs: 6.4, satisfaction: 4.6 };
-const systemMetrics = { uptime: 99.97, responseTime: 142, errorRate: 0.03, activeConnections: 86 };
+const FALLBACK_MARKETPLACE_METRICS = { totalOrders: 1245, gmv: 1200000, avgOrderValue: 964, activeListings: 342 };
+const FALLBACK_LOGISTICS_METRICS = { totalShipments: 89, avgDeliveryDays: 4.2, onTimeRate: 91, inTransit: 12 };
+const FALLBACK_SUPPORT_METRICS = { openTickets: 23, resolvedMtd: 145, avgResolutionHrs: 6.4, satisfaction: 4.6 };
+const FALLBACK_SYSTEM_METRICS = { uptime: 99.97, responseTime: 142, errorRate: 0.03, activeConnections: 86 };
 
 // ═══════════════════════════════════════════════════════
 //  MAIN PAGE COMPONENT
 // ═══════════════════════════════════════════════════════
 
+// ── Live analytics state shape ──
+interface LiveAnalytics {
+  totalMembers: number;
+  totalFarmers: number;
+  totalSuppliers: number;
+  totalInvestors: number;
+  activeLoans: number;
+  totalRevenue: number;
+  membersByCountry: { country: string; count: number }[];
+  membersByRole: { role: string; count: number }[];
+}
+
 export default function AdminAnalyticsPage() {
   const [activeTab, setActiveTab] = useState<TabKey>('overview');
-  const [liveStats, setLiveStats] = useState<Record<string, unknown> | null>(null);
+  const [live, setLive] = useState<LiveAnalytics | null>(null);
 
-  // Fetch live platform stats
+  // Fetch live analytics directly from Supabase in parallel
   useEffect(() => {
-    fetch('/api/admin/stats')
-      .then(r => r.json())
-      .then(d => { if (!d.error) setLiveStats(d); })
-      .catch(() => {});
+    const supabase = createClient();
+    (async () => {
+      try {
+        const [
+          membersRes,
+          farmersRes,
+          suppliersRes,
+          investorsRes,
+          activeLoansRes,
+          revenueRes,
+          countriesRes,
+          rolesRes,
+        ] = await Promise.all([
+          // totalMembers: COUNT from profiles
+          supabase.from('profiles').select('id', { count: 'exact', head: true }),
+          // totalFarmers: COUNT from profiles WHERE role = 'farmer'
+          supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'farmer'),
+          // totalSuppliers: COUNT from profiles WHERE role = 'supplier'
+          supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'supplier'),
+          // totalInvestors: COUNT from profiles WHERE role = 'investor'
+          supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'investor'),
+          // activeLoans: COUNT from loans WHERE status IN ('active','disbursed')
+          supabase.from('loans').select('id', { count: 'exact', head: true }).in('status', ['active', 'disbursed']),
+          // totalRevenue: SUM from payments WHERE status = 'completed'
+          supabase.from('payments').select('amount').eq('status', 'completed'),
+          // membersByCountry: SELECT country, COUNT(*) from profiles GROUP BY country
+          supabase.from('profiles').select('country'),
+          // membersByRole: SELECT role, COUNT(*) from profiles GROUP BY role
+          supabase.from('profiles').select('role'),
+        ]);
+
+        // Compute totalRevenue from payments
+        const totalRevenue = revenueRes.data
+          ? revenueRes.data.reduce((sum: number, p: { amount: number }) => sum + (p.amount || 0), 0)
+          : 0;
+
+        // Group members by country
+        const countryMap: Record<string, number> = {};
+        if (countriesRes.data) {
+          countriesRes.data.forEach((p: { country: string | null }) => {
+            const c = p.country || 'Unknown';
+            countryMap[c] = (countryMap[c] || 0) + 1;
+          });
+        }
+        const membersByCountry = Object.entries(countryMap)
+          .sort((a, b) => b[1] - a[1])
+          .map(([country, count]) => ({ country, count }));
+
+        // Group members by role
+        const roleMap: Record<string, number> = {};
+        if (rolesRes.data) {
+          rolesRes.data.forEach((p: { role: string | null }) => {
+            const r = p.role || 'unknown';
+            roleMap[r] = (roleMap[r] || 0) + 1;
+          });
+        }
+        const membersByRole = Object.entries(roleMap)
+          .sort((a, b) => b[1] - a[1])
+          .map(([role, count]) => ({ role, count }));
+
+        setLive({
+          totalMembers: membersRes.count ?? 0,
+          totalFarmers: farmersRes.count ?? 0,
+          totalSuppliers: suppliersRes.count ?? 0,
+          totalInvestors: investorsRes.count ?? 0,
+          activeLoans: activeLoansRes.count ?? 0,
+          totalRevenue,
+          membersByCountry,
+          membersByRole,
+        });
+      } catch {
+        // On failure, live stays null and fallback data is used
+      }
+    })();
   }, []);
 
-  // Override static KPI cards with live data when available
-  const liveMembers = (liveStats?.members as Record<string, number>)?.total;
-  const liveSuppliers = (liveStats?.suppliers as Record<string, number>)?.total;
-  const liveProducts = (liveStats?.products as Record<string, number>)?.total;
-  const liveOrders = (liveStats?.orders as Record<string, number>)?.total;
-  const liveLoansActive = (liveStats?.loans as Record<string, number>)?.active;
-  const liveRevenue = (liveStats?.orders as Record<string, number>)?.revenue;
+  // Format currency helper
+  const fmtCurrency = (v: number) =>
+    v >= 1_000_000 ? `$${(v / 1_000_000).toFixed(1)}M`
+      : v >= 1_000 ? `$${(v / 1_000).toFixed(0)}K`
+      : `$${v}`;
 
   // Build KPI list with live overrides
-  const liveKpis = kpis.map((kpi) => {
-    if (kpi.label === 'Total Members' && liveMembers != null) {
-      return { ...kpi, value: liveMembers.toLocaleString() };
+  const liveKpis = FALLBACK_KPIS.map((kpi) => {
+    if (!live) return kpi;
+    if (kpi.label === 'Total Members') {
+      return { ...kpi, value: live.totalMembers.toLocaleString() };
     }
-    if (kpi.label === 'Active Loans' && liveLoansActive != null) {
-      return { ...kpi, value: liveLoansActive.toString() };
+    if (kpi.label === 'Active Loans') {
+      return { ...kpi, value: live.activeLoans.toString() };
     }
-    if (kpi.label === 'Marketplace GMV' && liveOrders != null) {
-      return { ...kpi, value: `${liveOrders} orders` };
+    if (kpi.label === 'Revenue (MTD)') {
+      return { ...kpi, value: fmtCurrency(live.totalRevenue) };
     }
-    if (kpi.label === 'NPS Score' && liveProducts != null) {
-      return { ...kpi, value: liveProducts.toString(), label: 'Products' };
+    if (kpi.label === 'Export Value') {
+      return { ...kpi, value: live.totalSuppliers.toString(), label: 'Total Suppliers' };
     }
-    if (kpi.label === 'Revenue (MTD)' && liveRevenue != null) {
-      const formatted = liveRevenue >= 1_000_000 ? `$${(liveRevenue / 1_000_000).toFixed(1)}M`
-        : liveRevenue >= 1_000 ? `$${(liveRevenue / 1_000).toFixed(0)}K`
-        : `$${liveRevenue}`;
-      return { ...kpi, value: formatted };
-    }
-    if (kpi.label === 'Export Value' && liveSuppliers != null) {
-      return { ...kpi, value: liveSuppliers.toString(), label: 'Total Suppliers' };
+    if (kpi.label === 'NPS Score') {
+      return { ...kpi, value: live.totalInvestors.toString(), label: 'Investors' };
     }
     return kpi;
   });
@@ -195,6 +271,40 @@ export default function AdminAnalyticsPage() {
     { key: 'financial', label: 'Financial' },
     { key: 'operations', label: 'Operations' },
   ];
+
+  // Use live membersByCountry if available, otherwise fallback
+  const membersByCountry = (live?.membersByCountry && live.membersByCountry.length > 0)
+    ? live.membersByCountry
+    : FALLBACK_MEMBERS_BY_COUNTRY;
+
+  // Use live membersByRole to build tier distribution if available
+  const tierDistribution = (live?.membersByRole && live.membersByRole.length > 0)
+    ? (() => {
+        const total = live.membersByRole.reduce((s, r) => s + r.count, 0) || 1;
+        const colors = ['bg-[#1B2A4A]', 'bg-[#8CB89C]', 'bg-[#D4A843]', 'bg-gray-400', 'bg-blue-400', 'bg-purple-400'];
+        return live.membersByRole.map((r, i) => ({
+          tier: r.role.charAt(0).toUpperCase() + r.role.slice(1),
+          count: r.count,
+          percent: Math.round((r.count / total) * 100),
+          color: colors[i % colors.length],
+        }));
+      })()
+    : FALLBACK_TIER_DISTRIBUTION;
+
+  const memberGrowth = FALLBACK_MEMBER_GROWTH;
+  const revenueTrend = FALLBACK_REVENUE_TREND;
+  const activeUsers = FALLBACK_ACTIVE_USERS;
+  const topFeatures = FALLBACK_TOP_FEATURES;
+  const growthRates = FALLBACK_GROWTH_RATES;
+  const churnData = FALLBACK_CHURN_DATA;
+  const engagementScores = FALLBACK_ENGAGEMENT_SCORES;
+  const loanPortfolio = FALLBACK_LOAN_PORTFOLIO;
+  const revenueByService = FALLBACK_REVENUE_BY_SERVICE;
+  const collectionRates = FALLBACK_COLLECTION_RATES;
+  const marketplaceMetrics = FALLBACK_MARKETPLACE_METRICS;
+  const logisticsMetrics = FALLBACK_LOGISTICS_METRICS;
+  const supportMetrics = FALLBACK_SUPPORT_METRICS;
+  const systemMetrics = FALLBACK_SYSTEM_METRICS;
 
   const maxMemberCount = Math.max(...memberGrowth.map((m) => m.count));
   const maxRevenue = Math.max(...revenueTrend.map((r) => r.value));
@@ -301,9 +411,9 @@ export default function AdminAnalyticsPage() {
               </h3>
               <div className="grid grid-cols-3 gap-4">
                 {[
-                  { label: 'Daily', value: activeUsers.daily, percent: Math.round((activeUsers.daily / 342) * 100), color: 'bg-[#8CB89C]' },
-                  { label: 'Weekly', value: activeUsers.weekly, percent: Math.round((activeUsers.weekly / 342) * 100), color: 'bg-[#1B2A4A]' },
-                  { label: 'Monthly', value: activeUsers.monthly, percent: Math.round((activeUsers.monthly / 342) * 100), color: 'bg-[#D4A843]' },
+                  { label: 'Daily', value: activeUsers.daily, percent: Math.round((activeUsers.daily / (live?.totalMembers || 342)) * 100), color: 'bg-[#8CB89C]' },
+                  { label: 'Weekly', value: activeUsers.weekly, percent: Math.round((activeUsers.weekly / (live?.totalMembers || 342)) * 100), color: 'bg-[#1B2A4A]' },
+                  { label: 'Monthly', value: activeUsers.monthly, percent: Math.round((activeUsers.monthly / (live?.totalMembers || 342)) * 100), color: 'bg-[#D4A843]' },
                 ].map((u, i) => (
                   <div key={i} className="text-center">
                     <div className="relative w-20 h-20 mx-auto mb-2">
@@ -401,7 +511,7 @@ export default function AdminAnalyticsPage() {
                   </svg>
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="text-center">
-                      <p className="text-lg font-bold text-[#1B2A4A]">342</p>
+                      <p className="text-lg font-bold text-[#1B2A4A]">{live?.totalMembers ?? 342}</p>
                       <p className="text-[9px] text-gray-400">Total</p>
                     </div>
                   </div>

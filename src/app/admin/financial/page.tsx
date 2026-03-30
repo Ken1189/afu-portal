@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { createClient } from '@/lib/supabase/client';
 import {
   PieChart,
   Pie,
@@ -259,22 +260,105 @@ function CustomTooltip({
 export default function FinancialManagementPage() {
   const [selectedQuality, setSelectedQuality] = useState<string | null>(null);
   const [liveFinancial, setLiveFinancial] = useState<FinancialLiveData | null>(null);
+  const [liveLoans, setLiveLoans] = useState<Loan[] | null>(null);
+  const [liveMemberCount, setLiveMemberCount] = useState<number | null>(null);
+  const [livePaymentTotal, setLivePaymentTotal] = useState<number | null>(null);
 
-  // Fetch live financial data
+  // Fetch live financial data from API + direct Supabase queries
   useEffect(() => {
+    // API route fetch (for aggregated stats)
     fetch('/api/admin/financial')
       .then(r => r.json())
       .then(d => { if (!d.error) setLiveFinancial(d); })
       .catch(() => {});
+
+    // Direct Supabase queries for live data
+    const supabase = createClient();
+
+    async function fetchLiveData() {
+      try {
+        // Recent loans joined with profiles for member names
+        const { data: loanRows } = await supabase
+          .from('loans')
+          .select('id, borrower_id, loan_type, amount, amount_repaid, interest_rate, tenor_days, status, disbursement_date, maturity_date, next_payment_date, next_payment_amount, crop, buyer, country, created_at, profiles!loans_borrower_id_fkey(full_name)')
+          .order('created_at', { ascending: false })
+          .limit(20);
+
+        if (loanRows && loanRows.length > 0) {
+          setLiveLoans(
+            loanRows.map((l: Record<string, unknown>) => {
+              const profile = l.profiles as Record<string, unknown> | null;
+              const amount = Number(l.amount) || 0;
+              const repaid = Number(l.amount_repaid) || 0;
+              const outstanding = Math.max(0, amount - repaid);
+              return {
+                id: (l.id as string) || '',
+                memberId: (l.borrower_id as string) || '',
+                memberName: (profile?.full_name as string) || 'Unknown Member',
+                type: ((l.loan_type as string) || 'working-capital') as Loan['type'],
+                amount,
+                outstanding,
+                interestRate: Number(l.interest_rate) || 0,
+                tenor: Number(l.tenor_days) || 0,
+                status: ((l.status as string) || 'active') as Loan['status'],
+                disbursementDate: (l.disbursement_date as string) || '',
+                maturityDate: (l.maturity_date as string) || '',
+                nextPaymentDate: (l.next_payment_date as string) || '',
+                nextPaymentAmount: Number(l.next_payment_amount) || 0,
+                repaidPercentage: amount > 0 ? Math.round((repaid / amount) * 100) : 0,
+                crop: (l.crop as string) || '',
+                buyer: (l.buyer as string) || null,
+                country: (l.country as string) || '',
+              };
+            })
+          );
+        }
+
+        // Member count from profiles
+        const { count: memberCount } = await supabase
+          .from('profiles')
+          .select('*', { count: 'exact', head: true });
+        if (memberCount !== null) setLiveMemberCount(memberCount);
+
+        // Payment totals (completed)
+        const { data: paymentRows } = await supabase
+          .from('payments')
+          .select('amount')
+          .eq('status', 'completed');
+        if (paymentRows && paymentRows.length > 0) {
+          setLivePaymentTotal(paymentRows.reduce((s, p) => s + Number(p.amount), 0));
+        }
+      } catch {
+        // Fallback data already set via defaults
+      }
+    }
+    fetchLiveData();
   }, []);
 
-  // Use live loan data or mock
-  const loans = liveFinancial?.loans?.stats ? mockLoans : mockLoans; // Data structure mismatch — keep mock for table, use live for stats
+  // Use live loans or mock fallback
+  const loans = liveLoans && liveLoans.length > 0 ? liveLoans : mockLoans;
+
+  // Compute stats from live data if available, otherwise use mock-derived values
+  const computedStats = useMemo(() => {
+    const liveStats = liveFinancial?.loans?.stats;
+    const portfolioValue = liveStats
+      ? liveStats.totalDeployed - liveStats.totalRepaid
+      : totalPortfolioValue;
+    const activeLoansCnt = liveStats ? liveStats.activeCount : activeLoansCount;
+    const defRate = liveStats ? parseFloat(liveStats.defaultRate) : defaultRate;
+    const avgSize = activeLoansCnt > 0 ? Math.round(portfolioValue / activeLoansCnt) : avgLoanSize;
+    const disbursed = liveStats ? liveStats.totalDeployed : disbursedThisMonth;
+    const collections = livePaymentTotal !== null && liveStats
+      ? Math.min(100, Math.round((livePaymentTotal / Math.max(1, liveStats.totalDeployed)) * 1000) / 10)
+      : collectionsRate;
+
+    return { portfolioValue, activeLoansCnt, defRate, avgSize, disbursed, collections };
+  }, [liveFinancial, livePaymentTotal]);
 
   const statCards = [
     {
       label: 'Total Portfolio Value',
-      value: formatCurrency(totalPortfolioValue),
+      value: formatCurrency(computedStats.portfolioValue),
       change: '+12.4%',
       changeType: 'up' as const,
       icon: <Landmark className="w-5 h-5" />,
@@ -283,7 +367,7 @@ export default function FinancialManagementPage() {
     },
     {
       label: 'Active Loans',
-      value: activeLoansCount.toString(),
+      value: computedStats.activeLoansCnt.toString(),
       change: '+8',
       changeType: 'up' as const,
       icon: <FileText className="w-5 h-5" />,
@@ -292,7 +376,7 @@ export default function FinancialManagementPage() {
     },
     {
       label: 'Disbursed This Month',
-      value: formatCurrency(disbursedThisMonth),
+      value: formatCurrency(computedStats.disbursed),
       change: '+22.5%',
       changeType: 'up' as const,
       icon: <ArrowDownToLine className="w-5 h-5" />,
@@ -301,7 +385,7 @@ export default function FinancialManagementPage() {
     },
     {
       label: 'Collections Rate',
-      value: `${collectionsRate}%`,
+      value: `${computedStats.collections}%`,
       change: '+1.8%',
       changeType: 'up' as const,
       icon: <Target className="w-5 h-5" />,
@@ -310,7 +394,7 @@ export default function FinancialManagementPage() {
     },
     {
       label: 'Default Rate',
-      value: `${defaultRate}%`,
+      value: `${computedStats.defRate}%`,
       change: '-0.5%',
       changeType: 'down' as const,
       icon: <AlertTriangle className="w-5 h-5" />,
@@ -319,7 +403,7 @@ export default function FinancialManagementPage() {
     },
     {
       label: 'Avg Loan Size',
-      value: formatCurrency(avgLoanSize),
+      value: formatCurrency(computedStats.avgSize),
       change: null,
       changeType: 'neutral' as const,
       icon: <DollarSign className="w-5 h-5" />,

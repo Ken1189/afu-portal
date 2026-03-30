@@ -272,44 +272,113 @@ export default function AdminDashboard() {
   const [live, setLive] = useState<LiveStats | null>(null);
   const [realApplications, setRealApplications] = useState<FallbackApplication[] | null>(null);
   const [liveRevenue, setLiveRevenue] = useState<{ name: string; value: number }[] | null>(null);
-  const [liveKpis, setLiveKpis] = useState<Record<string, unknown> | null>(null);
+  // liveKpis removed — stats now fetched directly from Supabase above
   const [livePortfolio, setLivePortfolio] = useState<{ month: string; disbursed: number; repaid: number }[] | null>(null);
 
-  // Fetch live stats from API
+  // Fetch live stats directly from Supabase in parallel
   useEffect(() => {
-    fetch('/api/admin/stats')
-      .then(res => res.json())
-      .then(data => { if (!data.error) setLive(data); })
-      .catch(() => { /* fallback to mock */ });
-  }, []);
+    const supabase = createClient();
+    (async () => {
+      try {
+        const [
+          membersRes,
+          farmersRes,
+          loansRes,
+          loansDeployedRes,
+          pendingAppsRes,
+          totalAppsRes,
+          approvedAppsRes,
+          rejectedAppsRes,
+          suppliersRes,
+          ordersRes,
+          productsRes,
+          auditRes,
+        ] = await Promise.all([
+          // totalMembers: COUNT from profiles WHERE role != 'pending'
+          supabase.from('profiles').select('id', { count: 'exact', head: true }).neq('role', 'pending'),
+          // totalFarmers: COUNT from profiles WHERE role = 'farmer'
+          supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'farmer'),
+          // totalLoans: COUNT from loans
+          supabase.from('loans').select('id', { count: 'exact', head: true }),
+          // totalLoansDeployed: SUM of amount from loans WHERE status IN ('active','disbursed')
+          supabase.from('loans').select('amount').in('status', ['active', 'disbursed']),
+          // pendingApplications: COUNT from membership_applications WHERE status = 'pending'
+          supabase.from('membership_applications').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+          // total applications
+          supabase.from('membership_applications').select('id', { count: 'exact', head: true }),
+          // approved applications
+          supabase.from('membership_applications').select('id', { count: 'exact', head: true }).eq('status', 'approved'),
+          // rejected applications
+          supabase.from('membership_applications').select('id', { count: 'exact', head: true }).eq('status', 'rejected'),
+          // suppliers
+          supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'supplier'),
+          // orders
+          supabase.from('orders').select('id, total_amount', { count: 'exact' }),
+          // products
+          supabase.from('products').select('id, status', { count: 'exact' }),
+          // recentActivities: SELECT from audit_log ORDER BY created_at DESC LIMIT 10
+          supabase.from('audit_log').select('id, action, entity_type, details, created_at').order('created_at', { ascending: false }).limit(10),
+        ]);
 
-  // Fetch analytics data for charts
-  useEffect(() => {
-    // Revenue breakdown
-    fetch('/api/admin/analytics/revenue')
-      .then(res => res.ok ? res.json() : null)
-      .then(data => {
-        if (data?.byPurpose) {
-          setLiveRevenue(data.byPurpose.map((p: { purpose: string; total: number }) => ({
-            name: p.purpose || 'Other',
-            value: p.total,
-          })));
-        }
-        if (data?.byMonth) {
-          setLivePortfolio(data.byMonth.map((m: { month: string; total: number }) => ({
-            month: m.month,
-            disbursed: m.total,
-            repaid: Math.round(m.total * 0.6),
-          })));
-        }
-      })
-      .catch(() => {});
+        const totalLoansDeployed = loansDeployedRes.data
+          ? loansDeployedRes.data.reduce((sum: number, l: { amount: number }) => sum + (l.amount || 0), 0)
+          : FALLBACK_STATS.totalLoansDeployed;
 
-    // KPIs
-    fetch('/api/admin/analytics/kpis')
-      .then(res => res.ok ? res.json() : null)
-      .then(data => { if (data) setLiveKpis(data); })
-      .catch(() => {});
+        const activeLoansCount = loansDeployedRes.data ? loansDeployedRes.data.length : FALLBACK_STATS.activeLoans;
+
+        const ordersRevenue = ordersRes.data
+          ? ordersRes.data.reduce((sum: number, o: { total_amount: number }) => sum + (o.total_amount || 0), 0)
+          : FALLBACK_STATS.monthlyRevenue;
+
+        const productsTotal = productsRes.count ?? 0;
+        const productsInStock = productsRes.data
+          ? productsRes.data.filter((p: { status: string }) => p.status === 'active' || p.status === 'in_stock').length
+          : 0;
+
+        setLive({
+          members: {
+            total: membersRes.count ?? FALLBACK_STATS.totalMembers,
+            active: farmersRes.count ?? 0,
+            pending: 0,
+            suspended: 0,
+            byTier: {},
+          },
+          suppliers: {
+            total: suppliersRes.count ?? 0,
+            active: suppliersRes.count ?? 0,
+            pending: 0,
+            suspended: 0,
+            totalSales: 0,
+          },
+          orders: {
+            total: ordersRes.count ?? 0,
+            revenue: ordersRevenue,
+            pending: 0,
+            completed: 0,
+          },
+          payments: { total: 0, collected: 0, pending: 0 },
+          applications: {
+            total: totalAppsRes.count ?? FALLBACK_STATS.pendingApplications,
+            pending: pendingAppsRes.count ?? FALLBACK_STATS.pendingApplications,
+            approved: approvedAppsRes.count ?? 0,
+            rejected: rejectedAppsRes.count ?? 0,
+          },
+          loans: {
+            total: loansRes.count ?? 0,
+            totalAmount: totalLoansDeployed,
+            active: activeLoansCount,
+            pending: 0,
+          },
+          products: {
+            total: productsTotal,
+            inStock: productsInStock,
+          },
+          recentActivity: (auditRes.data || []) as LiveStats['recentActivity'],
+        });
+      } catch {
+        // On any failure, live stays null and fallback data is used
+      }
+    })();
   }, []);
 
   // Fetch recent applications directly from Supabase
