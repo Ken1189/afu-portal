@@ -943,9 +943,9 @@ export default function InvestorsPage() {
 
           {/* Contact info */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 text-gray-400 text-sm">
-            <a href="mailto:investors@africanfarmers.org" className="flex items-center gap-2 hover:text-white transition-colors">
+            <a href="mailto:peterw@africanfarmingunion.org" className="flex items-center gap-2 hover:text-white transition-colors">
               <Mail className="w-4 h-4" />
-              investors@africanfarmers.org
+              peterw@africanfarmingunion.org
             </a>
             <span className="hidden sm:block text-white/20">|</span>
             <a href="tel:+27000000000" className="flex items-center gap-2 hover:text-white transition-colors">

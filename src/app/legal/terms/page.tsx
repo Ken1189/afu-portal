@@ -248,7 +248,7 @@ export default async function TermsOfServicePage() {
                 For questions regarding these Terms of Service, please
                 contact us at{" "}
                 <span style={{ color: "#5DB347" }} className="font-medium">
-                  legal@africanfarmers.org
+                  legal@africanfarmingunion.org
                 </span>{" "}
                 or visit our{" "}
                 <Link

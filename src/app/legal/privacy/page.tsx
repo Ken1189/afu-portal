@@ -187,7 +187,7 @@ export default async function PrivacyPolicyPage() {
                 the relevant data protection authority in your jurisdiction. To
                 exercise these rights, contact us at{" "}
                 <span style={{ color: "#5DB347" }} className="font-medium">
-                  privacy@africanfarmers.org
+                  privacy@africanfarmingunion.org
                 </span>
                 .
               </p>
@@ -227,7 +227,7 @@ export default async function PrivacyPolicyPage() {
                 If you have questions about this Privacy Policy or our data
                 practices, please contact us at{" "}
                 <span style={{ color: "#5DB347" }} className="font-medium">
-                  privacy@africanfarmers.org
+                  privacy@africanfarmingunion.org
                 </span>{" "}
                 or visit our{" "}
                 <Link

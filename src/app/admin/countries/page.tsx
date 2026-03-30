@@ -212,7 +212,7 @@ function CountryModal({
 
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-1">Contact Email</label>
-            <input type="email" value={form.contact_email} onChange={(e) => onChange({ ...form, contact_email: e.target.value })} placeholder="admin@afu-country.org"
+            <input type="email" value={form.contact_email} onChange={(e) => onChange({ ...form, contact_email: e.target.value })} placeholder="admin@africanfarmingunion.org"
               className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm placeholder:text-slate-500 focus:border-[#8CB89C]/50 focus:outline-none" />
           </div>
         </div>

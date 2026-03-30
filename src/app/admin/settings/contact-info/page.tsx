@@ -37,8 +37,8 @@ interface ContactConfig {
 }
 
 const defaultConfig: ContactConfig = {
-  primary_email: 'info@africanfarmunion.com',
-  support_email: 'info@africanfarmunion.com',
+  primary_email: 'peterw@africanfarmingunion.org',
+  support_email: 'devonk@africanfarmingunion.org',
   phone: '',
   hq_address: '',
   hq_city: 'Gaborone',
@@ -128,7 +128,7 @@ export default function ContactInfoAdminPage() {
               className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#5DB347]/50 focus:border-[#5DB347] outline-none"
               value={form.primary_email}
               onChange={e => update('primary_email', e.target.value)}
-              placeholder="info@africanfarmunion.com"
+              placeholder="info@africanfarmingunion.org"
             />
           </div>
           <div>
@@ -138,7 +138,7 @@ export default function ContactInfoAdminPage() {
               className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#5DB347]/50 focus:border-[#5DB347] outline-none"
               value={form.support_email}
               onChange={e => update('support_email', e.target.value)}
-              placeholder="support@africanfarmunion.com"
+              placeholder="support@africanfarmingunion.org"
             />
           </div>
         </div>

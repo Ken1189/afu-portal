@@ -42,7 +42,7 @@ export async function GET() {
     if (error?.message?.includes('does not exist')) {
       // Table doesn't exist yet — return defaults
       return NextResponse.json({
-        general: { platformName: 'African Farming Union', supportEmail: 'support@afu.org', defaultCurrency: 'USD', maintenanceMode: false },
+        general: { platformName: 'African Farming Union', supportEmail: 'support@africanfarmingunion.org', defaultCurrency: 'USD', maintenanceMode: false },
         membership: { autoApprove: false, trialDays: 14, requireKyc: true },
         notifications: { emailEnabled: true, smsEnabled: false, pushEnabled: false },
         security: { maxLoginAttempts: 5, sessionTimeoutMinutes: 60, require2FA: false },
@@ -51,7 +51,7 @@ export async function GET() {
 
     if (!data || data.length === 0) {
       return NextResponse.json({
-        general: { platformName: 'African Farming Union', supportEmail: 'support@afu.org', defaultCurrency: 'USD', maintenanceMode: false },
+        general: { platformName: 'African Farming Union', supportEmail: 'support@africanfarmingunion.org', defaultCurrency: 'USD', maintenanceMode: false },
         membership: { autoApprove: false, trialDays: 14, requireKyc: true },
         notifications: { emailEnabled: true, smsEnabled: false, pushEnabled: false },
         security: { maxLoginAttempts: 5, sessionTimeoutMinutes: 60, require2FA: false },

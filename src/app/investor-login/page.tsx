@@ -94,7 +94,7 @@ export default function InvestorLoginPage() {
       if (role === 'investor' || role === 'admin' || role === 'super_admin') {
         router.push('/investor');
       } else {
-        setError('Your account does not have investor access. Contact investor-relations@africanfarmersunion.com');
+        setError('Your account does not have investor access. Contact peterw@africanfarmingunion.org');
       }
     } catch {
       setError('Unable to verify access. Please try again.');

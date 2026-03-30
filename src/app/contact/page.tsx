@@ -5,8 +5,8 @@ import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 const FALLBACK_CONTACT = {
-  primary_email: "info@africanfarmunion.com",
-  support_email: "info@africanfarmunion.com",
+  primary_email: "peterw@africanfarmingunion.org",
+  support_email: "devonk@africanfarmingunion.org",
   phone: "",
   hq_address: "",
   hq_city: "Gaborone",

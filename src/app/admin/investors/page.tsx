@@ -54,7 +54,7 @@ const demoInvestors: Investor[] = [
     id: '1',
     name: 'Devon Kennaird',
     entity: 'AFU Capital (Founder)',
-    email: 'devonk@africanfarmersunion.org',
+    email: 'devonk@africanfarmingunion.org',
     phone: '+27 82 555 0101',
     type: 'Individual',
     status: 'Active',

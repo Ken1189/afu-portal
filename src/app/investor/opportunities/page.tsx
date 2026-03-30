@@ -688,10 +688,10 @@ export default function InvestorOpportunities() {
           <div className="flex items-center gap-2 text-gray-300">
             <Mail className="w-4 h-4 text-[#5DB347]" />
             <a
-              href="mailto:peter@africanfarmersunion.org"
+              href="mailto:peterw@africanfarmingunion.org"
               className="text-sm hover:text-white transition-colors"
             >
-              peter@africanfarmersunion.org
+              peterw@africanfarmingunion.org
             </a>
           </div>
           <div className="flex items-center gap-2 text-gray-300">
@@ -702,7 +702,7 @@ export default function InvestorOpportunities() {
           </div>
         </div>
         <a
-          href="mailto:peter@africanfarmersunion.org?subject=Meeting%20Request%20-%20Custom%20Allocation"
+          href="mailto:peterw@africanfarmingunion.org?subject=Meeting%20Request%20-%20Custom%20Allocation"
           className="inline-flex items-center gap-2 px-6 py-3 bg-[#5DB347] text-white rounded-xl text-sm font-semibold hover:bg-[#4A9A38] transition-colors shadow-sm"
         >
           <Calendar className="w-4 h-4" />
