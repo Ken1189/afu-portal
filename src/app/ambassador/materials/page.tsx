@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   Megaphone,
@@ -14,28 +14,41 @@ import {
   Globe,
   MessageSquare,
   Smartphone,
+  Loader2,
+  FolderOpen,
 } from 'lucide-react';
 import { useAuth } from '@/lib/supabase/auth-context';
+import { createClient } from '@/lib/supabase/client';
 
-// ── Demo Data ────────────────────────────────────────────────────────────────
-// NOTE: Asset metadata below is demo/hardcoded. Downloads attempt Supabase
-// Storage (`public-assets` bucket, `ambassador-materials/` prefix) first.
-// When files are uploaded to that bucket the download links work automatically.
+// ── Types ────────────────────────────────────────────────────────────────────
 
-const marketingAssets = [
-  { id: '1', name: 'AFU Ambassador Banner (1200x628)', type: 'image', format: 'PNG', size: '245 KB', category: 'Social Media', icon: Image },
-  { id: '2', name: 'AFU Referral Flyer - English', type: 'pdf', format: 'PDF', size: '1.2 MB', category: 'Print', icon: FileText },
-  { id: '3', name: 'AFU Referral Flyer - French', type: 'pdf', format: 'PDF', size: '1.3 MB', category: 'Print', icon: FileText },
-  { id: '4', name: 'Instagram Story Template', type: 'image', format: 'PNG', size: '180 KB', category: 'Social Media', icon: Smartphone },
-  { id: '5', name: 'Facebook Post Template', type: 'image', format: 'PNG', size: '320 KB', category: 'Social Media', icon: Share2 },
-  { id: '6', name: 'WhatsApp Share Card', type: 'image', format: 'JPG', size: '95 KB', category: 'Messaging', icon: MessageSquare },
-  { id: '7', name: 'AFU Membership Benefits Guide', type: 'pdf', format: 'PDF', size: '2.1 MB', category: 'Educational', icon: FileText },
-  { id: '8', name: 'Ambassador Program Overview', type: 'pdf', format: 'PDF', size: '890 KB', category: 'Educational', icon: FileText },
-  { id: '9', name: 'Twitter/X Header Image', type: 'image', format: 'PNG', size: '150 KB', category: 'Social Media', icon: Globe },
-  { id: '10', name: 'Email Signature Badge', type: 'image', format: 'PNG', size: '45 KB', category: 'Email', icon: Mail },
+interface MaterialAsset {
+  id: string;
+  name: string;
+  type: string;
+  format: string;
+  size: string;
+  category: string;
+  url?: string;
+}
+
+// ── Fallback Data ────────────────────────────────────────────────────────────
+// Used when site_config key `ambassador_materials` is empty or not set.
+
+const FALLBACK_ASSETS: MaterialAsset[] = [
+  { id: '1', name: 'AFU Ambassador Banner (1200x628)', type: 'image', format: 'PNG', size: '245 KB', category: 'Social Media' },
+  { id: '2', name: 'AFU Referral Flyer - English', type: 'pdf', format: 'PDF', size: '1.2 MB', category: 'Print' },
+  { id: '3', name: 'AFU Referral Flyer - French', type: 'pdf', format: 'PDF', size: '1.3 MB', category: 'Print' },
+  { id: '4', name: 'Instagram Story Template', type: 'image', format: 'PNG', size: '180 KB', category: 'Social Media' },
+  { id: '5', name: 'Facebook Post Template', type: 'image', format: 'PNG', size: '320 KB', category: 'Social Media' },
+  { id: '6', name: 'WhatsApp Share Card', type: 'image', format: 'JPG', size: '95 KB', category: 'Messaging' },
+  { id: '7', name: 'AFU Membership Benefits Guide', type: 'pdf', format: 'PDF', size: '2.1 MB', category: 'Educational' },
+  { id: '8', name: 'Ambassador Program Overview', type: 'pdf', format: 'PDF', size: '890 KB', category: 'Educational' },
+  { id: '9', name: 'Twitter/X Header Image', type: 'image', format: 'PNG', size: '150 KB', category: 'Social Media' },
+  { id: '10', name: 'Email Signature Badge', type: 'image', format: 'PNG', size: '45 KB', category: 'Email' },
 ];
 
-const emailTemplates = [
+const FALLBACK_EMAIL_TEMPLATES = [
   {
     id: '1',
     name: 'Farmer Invitation Email',
@@ -80,7 +93,7 @@ AFU Ambassador`,
   },
 ];
 
-const socialTemplates = [
+const FALLBACK_SOCIAL_TEMPLATES = [
   {
     id: '1',
     platform: 'Facebook / LinkedIn',
@@ -98,6 +111,19 @@ const socialTemplates = [
   },
 ];
 
+// ── Icon Mapping ─────────────────────────────────────────────────────────────
+
+function getAssetIcon(category: string) {
+  switch (category.toLowerCase()) {
+    case 'social media': return Image;
+    case 'messaging': return MessageSquare;
+    case 'email': return Mail;
+    case 'print': return FileText;
+    case 'educational': return FileText;
+    default: return FolderOpen;
+  }
+}
+
 // ── Component ────────────────────────────────────────────────────────────────
 
 export default function MaterialsPage() {
@@ -105,10 +131,51 @@ export default function MaterialsPage() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [downloadToast, setDownloadToast] = useState<{ type: 'success' | 'info' | 'error'; text: string } | null>(null);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [assets, setAssets] = useState<MaterialAsset[]>(FALLBACK_ASSETS);
+  const [emailTemplates, setEmailTemplates] = useState(FALLBACK_EMAIL_TEMPLATES);
+  const [socialTemplates, setSocialTemplates] = useState(FALLBACK_SOCIAL_TEMPLATES);
+  const [loadingMaterials, setLoadingMaterials] = useState(true);
 
   const referralCode = user?.id?.slice(0, 8).toUpperCase() || 'DEMO1234';
   const referralLink = `https://africanfarmingunion.org/apply?ref=${referralCode}`;
   const utmLink = `${referralLink}&utm_source=ambassador&utm_medium=referral&utm_campaign=ambassador_program`;
+
+  // Fetch materials from site_config
+  useEffect(() => {
+    async function fetchMaterials() {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from('site_config')
+          .select('value')
+          .eq('key', 'ambassador_materials')
+          .single();
+
+        if (data?.value) {
+          const config = data.value as {
+            assets?: MaterialAsset[];
+            email_templates?: typeof FALLBACK_EMAIL_TEMPLATES;
+            social_templates?: typeof FALLBACK_SOCIAL_TEMPLATES;
+          };
+          if (config.assets && Array.isArray(config.assets) && config.assets.length > 0) {
+            setAssets(config.assets);
+          }
+          if (config.email_templates && Array.isArray(config.email_templates) && config.email_templates.length > 0) {
+            setEmailTemplates(config.email_templates);
+          }
+          if (config.social_templates && Array.isArray(config.social_templates) && config.social_templates.length > 0) {
+            setSocialTemplates(config.social_templates);
+          }
+        }
+      } catch {
+        // Use fallback data
+      } finally {
+        setLoadingMaterials(false);
+      }
+    }
+
+    fetchMaterials();
+  }, []);
 
   const handleCopy = async (text: string, id: string) => {
     const processed = text.replace(/\[REFERRAL_LINK\]/g, utmLink);
@@ -117,13 +184,19 @@ export default function MaterialsPage() {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const handleDownload = async (asset: typeof marketingAssets[0]) => {
+  const handleDownload = async (asset: MaterialAsset) => {
     setDownloadingId(asset.id);
     setDownloadToast(null);
 
     try {
+      // If asset has a direct URL, use it
+      if (asset.url) {
+        window.open(asset.url, '_blank');
+        setDownloadToast({ type: 'success', text: `Downloading ${asset.name}` });
+        return;
+      }
+
       // Attempt to download from Supabase Storage
-      const { createClient } = await import('@/lib/supabase/client');
       const supabase = createClient();
       const filePath = `ambassador-materials/${asset.name.toLowerCase().replace(/\s+/g, '-')}.${asset.format.toLowerCase()}`;
       const { data } = await supabase.storage.from('public-assets').createSignedUrl(filePath, 60);
@@ -132,22 +205,10 @@ export default function MaterialsPage() {
         window.open(data.signedUrl, '_blank');
         setDownloadToast({ type: 'success', text: `Downloading ${asset.name}` });
       } else {
-        // File not yet available in storage — show friendly message
-        setDownloadToast({ type: 'info', text: `Download link for "${asset.name}" will be emailed to you shortly.` });
-        // Log the download request
-        try {
-          await supabase.from('download_requests').insert({
-            user_id: user?.id || null,
-            asset_name: asset.name,
-            asset_format: asset.format,
-            requested_at: new Date().toISOString(),
-          });
-        } catch {
-          // Silent — logging is best-effort
-        }
+        setDownloadToast({ type: 'info', text: `"${asset.name}" will be available for download soon. Check back later.` });
       }
     } catch {
-      setDownloadToast({ type: 'info', text: `Download link for "${asset.name}" will be emailed to you shortly.` });
+      setDownloadToast({ type: 'info', text: `"${asset.name}" will be available for download soon. Check back later.` });
     } finally {
       setDownloadingId(null);
       setTimeout(() => setDownloadToast(null), 4000);
@@ -213,45 +274,62 @@ export default function MaterialsPage() {
           <Download className="w-5 h-5 text-[#5DB347]" />
           <h2 className="text-lg font-semibold text-[#1B2A4A]">Downloadable Assets</h2>
         </div>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {marketingAssets.map((asset) => {
-            const Icon = asset.icon;
-            return (
-              <div
-                key={asset.id}
-                className="border border-gray-100 rounded-xl p-4 hover:shadow-md transition-shadow group"
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#1B2A4A]/5 flex items-center justify-center">
-                    <Icon className="w-5 h-5 text-[#1B2A4A]" />
-                  </div>
-                  <span className="text-[10px] font-medium text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full">
-                    {asset.category}
-                  </span>
-                </div>
-                <h3 className="text-sm font-medium text-[#1B2A4A] mb-1">{asset.name}</h3>
-                <p className="text-xs text-gray-400 mb-3">{asset.format} &middot; {asset.size}</p>
-                <button
-                  onClick={() => handleDownload(asset)}
-                  disabled={downloadingId === asset.id}
-                  className="w-full py-2 rounded-lg bg-gray-50 text-sm font-medium text-[#1B2A4A] hover:bg-[#5DB347] hover:text-white transition-colors flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+
+        {loadingMaterials ? (
+          <div className="flex items-center justify-center py-10">
+            <Loader2 className="w-6 h-6 animate-spin text-[#5DB347]" />
+          </div>
+        ) : assets.length === 0 ? (
+          <div className="text-center py-10">
+            <FolderOpen className="w-12 h-12 text-gray-200 mx-auto mb-3" />
+            <p className="text-sm text-gray-400">Marketing materials are being prepared. Check back soon.</p>
+          </div>
+        ) : (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {assets.map((asset) => {
+              const Icon = getAssetIcon(asset.category);
+              return (
+                <div
+                  key={asset.id}
+                  className="border border-gray-100 rounded-xl p-4 hover:shadow-md transition-shadow group"
                 >
-                  {downloadingId === asset.id ? (
-                    <>
-                      <svg className="animate-spin h-3.5 w-3.5" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
-                      Preparing...
-                    </>
-                  ) : (
-                    <>
-                      <Download className="w-3.5 h-3.5" />
-                      Download
-                    </>
-                  )}
-                </button>
-              </div>
-            );
-          })}
-        </div>
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="w-10 h-10 rounded-xl bg-[#1B2A4A]/5 flex items-center justify-center">
+                      <Icon className="w-5 h-5 text-[#1B2A4A]" />
+                    </div>
+                    <span className="text-[10px] font-medium text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full">
+                      {asset.category}
+                    </span>
+                  </div>
+                  <h3 className="text-sm font-medium text-[#1B2A4A] mb-1">{asset.name}</h3>
+                  <p className="text-xs text-gray-400 mb-3">
+                    <span className="inline-flex items-center gap-1 bg-[#1B2A4A]/5 px-1.5 py-0.5 rounded text-[10px] font-medium text-[#1B2A4A]">
+                      {asset.format}
+                    </span>
+                    {asset.size && <span className="ml-1.5">&middot; {asset.size}</span>}
+                  </p>
+                  <button
+                    onClick={() => handleDownload(asset)}
+                    disabled={downloadingId === asset.id}
+                    className="w-full py-2 rounded-lg bg-gray-50 text-sm font-medium text-[#1B2A4A] hover:bg-[#5DB347] hover:text-white transition-colors flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    {downloadingId === asset.id ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        Preparing...
+                      </>
+                    ) : (
+                      <>
+                        <Download className="w-3.5 h-3.5" />
+                        Download
+                      </>
+                    )}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </motion.div>
 
       {/* Email Templates */}

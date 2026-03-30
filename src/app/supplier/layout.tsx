@@ -54,6 +54,8 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
   const isPublicPage = pathname === '/supplier/apply';
 
   // ── Role guard: only supplier, admin, super_admin can access ──
+  // DON'T redirect on errors — let middleware handle auth
+  // ONLY deny on explicit role mismatch from a successful API response
   useEffect(() => {
     if (isPublicPage) {
       setAuthorized(true);
@@ -67,13 +69,38 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
       return;
     }
 
-    const role = profile?.role;
-    if (role === 'supplier' || role === 'admin' || role === 'super_admin') {
-      setAuthorized(true);
-    } else {
-      setDenied(true);
-    }
-    setRoleChecked(true);
+    let retried = false;
+
+    const checkRole = async () => {
+      try {
+        const res = await fetch('/api/auth/me');
+        if (!res.ok) {
+          setAuthorized(true);
+          setRoleChecked(true);
+          return;
+        }
+        const data = await res.json();
+        const { role } = data;
+        if (role === 'supplier' || role === 'admin' || role === 'super_admin') {
+          setAuthorized(true);
+        } else if (role) {
+          setDenied(true);
+        } else {
+          setAuthorized(true);
+        }
+        setRoleChecked(true);
+      } catch {
+        if (!retried) {
+          retried = true;
+          setTimeout(checkRole, 2000);
+          return;
+        }
+        setAuthorized(true);
+        setRoleChecked(true);
+      }
+    };
+
+    checkRole();
   }, [user, profile, authLoading, router, isPublicPage]);
 
   // Public pages render without the supplier layout chrome

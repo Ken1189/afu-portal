@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
   Award,
@@ -18,6 +19,7 @@ import {
   ArrowLeft,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { useAuth } from '@/lib/supabase/auth-context';
 
 const SECTORS = [
   { value: 'farming', label: 'Farming' },
@@ -27,7 +29,16 @@ const SECTORS = [
   { value: 'other', label: 'Other' },
 ];
 
+const COUNTRIES = [
+  'Zimbabwe', 'Kenya', 'Nigeria', 'Ghana', 'South Africa',
+  'Tanzania', 'Uganda', 'Ethiopia', 'Rwanda', 'Zambia',
+  'Mozambique', 'Malawi', 'Cameroon', 'Senegal', 'Other',
+];
+
 export default function AmbassadorApplyPage() {
+  const { user } = useAuth();
+  const router = useRouter();
+  const [checkingStatus, setCheckingStatus] = useState(true);
   const [form, setForm] = useState({
     fullName: '',
     email: '',
@@ -41,6 +52,52 @@ export default function AmbassadorApplyPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
+
+  // Check if user is already an ambassador — redirect to dashboard
+  useEffect(() => {
+    async function checkAmbassadorStatus() {
+      if (!user) {
+        setCheckingStatus(false);
+        return;
+      }
+
+      try {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from('ambassadors')
+          .select('id, status')
+          .eq('user_id', user.id)
+          .single();
+
+        if (data) {
+          if (data.status === 'active' || data.status === 'approved') {
+            router.replace('/ambassador');
+            return;
+          }
+          if (data.status === 'pending') {
+            // Already applied — show the pending message
+            setSuccess(true);
+          }
+        }
+      } catch {
+        // Not an ambassador — continue to form
+      } finally {
+        setCheckingStatus(false);
+      }
+    }
+
+    checkAmbassadorStatus();
+  }, [user, router]);
+
+  // Pre-fill form if user is logged in
+  useEffect(() => {
+    if (user) {
+      setForm((prev) => ({
+        ...prev,
+        email: user.email || prev.email,
+      }));
+    }
+  }, [user]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -61,38 +118,60 @@ export default function AmbassadorApplyPage() {
     try {
       const supabase = createClient();
 
-      // Insert into membership_applications
-      const { error: appError } = await supabase
-        .from('membership_applications')
-        .insert({
-          full_name: form.fullName,
-          email: form.email,
-          phone: form.phone || null,
-          country: form.country,
-          region: form.region || null,
-          requested_tier: 'new_enterprise',
-          status: 'pending',
-          notes: `[AMBASSADOR APPLICATION] Sector: ${form.sector} | Bio: ${form.bio || 'N/A'} | Social: ${form.socialLinks || 'N/A'}`,
-        });
+      // Primary: insert into ambassadors table with status='pending'
+      const insertData: Record<string, unknown> = {
+        status: 'pending',
+        tier: 'bronze',
+        total_earned: 0,
+        total_referrals: 0,
+      };
 
-      if (appError) {
-        // Try ambassadors table as fallback
-        const { error: ambError } = await supabase
-          .from('ambassadors')
+      // If user is logged in, link to their user_id
+      if (user) {
+        insertData.user_id = user.id;
+      }
+
+      const { error: ambError } = await supabase
+        .from('ambassadors')
+        .insert(insertData);
+
+      if (ambError) {
+        // Fallback: use membership_applications table
+        const { error: appError } = await supabase
+          .from('membership_applications')
           .insert({
             full_name: form.fullName,
             email: form.email,
             phone: form.phone || null,
             country: form.country,
-            country_flag: '',
-            sector: form.sector,
-            bio: form.bio || null,
+            region: form.region || null,
+            requested_tier: 'new_enterprise',
             status: 'pending',
+            notes: `[AMBASSADOR APPLICATION] Sector: ${form.sector} | Bio: ${form.bio || 'N/A'} | Social: ${form.socialLinks || 'N/A'}`,
           });
 
-        if (ambError) {
-          throw new Error(ambError.message);
+        if (appError) {
+          throw new Error(appError.message);
         }
+      } else if (user) {
+        // Also save the extended info to site_config so it persists
+        const configKey = `ambassador_settings_${user.id}`;
+        await supabase.from('site_config').upsert(
+          {
+            key: configKey,
+            value: {
+              bio: form.bio || '',
+              whatsapp: '',
+              linkedin: '',
+              twitter: '',
+              instagram: '',
+              public_profile: true,
+              application_sector: form.sector,
+              application_social: form.socialLinks,
+            },
+          },
+          { onConflict: 'key' }
+        );
       }
 
       setSuccess(true);
@@ -104,6 +183,17 @@ export default function AmbassadorApplyPage() {
     }
   };
 
+  if (checkingStatus) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <svg className="animate-spin h-8 w-8 text-[#5DB347]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+        </svg>
+      </div>
+    );
+  }
+
   if (success) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
@@ -112,8 +202,11 @@ export default function AmbassadorApplyPage() {
             <CheckCircle className="w-8 h-8 text-[#5DB347]" />
           </div>
           <h1 className="text-2xl font-bold text-[#1B2A4A] mb-3">Application Submitted</h1>
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-600 mb-2">
             Your ambassador application is under review. We will be in touch soon.
+          </p>
+          <p className="text-sm text-gray-400 mb-6">
+            You will receive an email once your application has been processed. This usually takes 1-3 business days.
           </p>
           <Link
             href="/"
@@ -227,16 +320,19 @@ export default function AmbassadorApplyPage() {
                 </label>
                 <div className="relative">
                   <Globe className="absolute left-4 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400 pointer-events-none" />
-                  <input
+                  <select
                     id="country"
                     name="country"
-                    type="text"
                     required
                     value={form.country}
                     onChange={handleChange}
-                    className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl bg-white text-[#1B2A4A] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#5DB347]/40 focus:border-[#5DB347] transition-shadow"
-                    placeholder="e.g. Zimbabwe"
-                  />
+                    className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl bg-white text-[#1B2A4A] focus:outline-none focus:ring-2 focus:ring-[#5DB347]/40 focus:border-[#5DB347] transition-shadow appearance-none"
+                  >
+                    <option value="">Select your country</option>
+                    {COUNTRIES.map((c) => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
               <div>
@@ -283,10 +379,10 @@ export default function AmbassadorApplyPage() {
               </div>
             </div>
 
-            {/* Bio */}
+            {/* Bio / Motivation */}
             <div>
               <label htmlFor="bio" className="block text-sm font-medium text-[#1B2A4A] mb-2">
-                Why do you want to be an ambassador?
+                Why do you want to be an ambassador? <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <FileText className="absolute left-4 top-3 w-[18px] h-[18px] text-gray-400 pointer-events-none" />
@@ -294,10 +390,11 @@ export default function AmbassadorApplyPage() {
                   id="bio"
                   name="bio"
                   rows={4}
+                  required
                   value={form.bio}
                   onChange={handleChange}
                   className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl bg-white text-[#1B2A4A] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#5DB347]/40 focus:border-[#5DB347] transition-shadow resize-none"
-                  placeholder="Share your background and motivation..."
+                  placeholder="Share your background, experience with agriculture, and what motivates you to represent AFU..."
                 />
               </div>
             </div>
@@ -316,9 +413,10 @@ export default function AmbassadorApplyPage() {
                   value={form.socialLinks}
                   onChange={handleChange}
                   className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl bg-white text-[#1B2A4A] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#5DB347]/40 focus:border-[#5DB347] transition-shadow"
-                  placeholder="LinkedIn, Twitter, Facebook links"
+                  placeholder="LinkedIn, Twitter, Facebook, Instagram links"
                 />
               </div>
+              <p className="text-xs text-gray-400 mt-1">Separate multiple links with commas.</p>
             </div>
 
             {/* Submit */}

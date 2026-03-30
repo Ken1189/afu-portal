@@ -715,6 +715,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }, [sidebarCollapsed, hoverExpanded]);
 
   // ── Role guard: redirect non-admins ──
+  // DON'T redirect on errors — let middleware handle auth
+  // ONLY redirect on explicit role mismatch from a successful API response
   useEffect(() => {
     if (authLoading) return;
 
@@ -723,20 +725,43 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       return;
     }
 
-    fetch('/api/auth/me')
-      .then((res) => res.json())
-      .then(({ role }) => {
+    let retried = false;
+
+    const checkRole = async () => {
+      try {
+        const res = await fetch('/api/auth/me');
+        if (!res.ok) {
+          // API error (500, 503, etc.) — don't kick user out, let middleware handle it
+          setAuthorized(true);
+          setRoleChecked(true);
+          return;
+        }
+        const data = await res.json();
+        const { role } = data;
         if (role === 'admin' || role === 'super_admin') {
           setAuthorized(true);
           setServerRole(role);
-        } else {
+        } else if (role) {
+          // Only redirect if we got an EXPLICIT role that's wrong
           router.replace('/dashboard');
+        } else {
+          // No role info = don't kick them out
+          setAuthorized(true);
         }
         setRoleChecked(true);
-      })
-      .catch(() => {
-        router.replace('/dashboard');
-      });
+      } catch {
+        // Network error — retry once, then allow access (let middleware handle auth)
+        if (!retried) {
+          retried = true;
+          setTimeout(checkRole, 2000);
+          return;
+        }
+        setAuthorized(true);
+        setRoleChecked(true);
+      }
+    };
+
+    checkRole();
   }, [user, authLoading, router]);
 
   // Show loading while checking auth

@@ -35,8 +35,8 @@ export default function SessionTimeout() {
   useEffect(() => {
     if (!user) return;
 
-    // Track user activity
-    const events = ['mousedown', 'keydown', 'scroll', 'touchstart'];
+    // Track user activity — mouse movement and keyboard resets the inactivity timer
+    const events = ['mousedown', 'mousemove', 'keydown', 'keypress', 'scroll', 'touchstart', 'touchmove'];
     events.forEach((event) => window.addEventListener(event, updateActivity, { passive: true }));
 
     // Check for timeout periodically

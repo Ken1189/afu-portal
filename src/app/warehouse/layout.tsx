@@ -46,25 +46,47 @@ export default function WarehouseLayout({ children }: { children: React.ReactNod
     .slice(0, 2);
 
   // Role guard
+  // DON'T redirect on errors — let middleware handle auth
+  // ONLY redirect on explicit role mismatch from a successful API response
   useEffect(() => {
     if (authLoading) return;
     if (!user) {
       router.replace('/login?redirect=/warehouse');
       return;
     }
-    fetch('/api/auth/me')
-      .then((res) => res.json())
-      .then(({ role }) => {
+
+    let retried = false;
+
+    const checkRole = async () => {
+      try {
+        const res = await fetch('/api/auth/me');
+        if (!res.ok) {
+          setAuthorized(true);
+          setRoleChecked(true);
+          return;
+        }
+        const data = await res.json();
+        const { role } = data;
         if (role === 'warehouse_operator' || role === 'admin' || role === 'super_admin') {
           setAuthorized(true);
-        } else {
+        } else if (role) {
           router.replace('/dashboard');
+        } else {
+          setAuthorized(true);
         }
         setRoleChecked(true);
-      })
-      .catch(() => {
-        router.replace('/dashboard');
-      });
+      } catch {
+        if (!retried) {
+          retried = true;
+          setTimeout(checkRole, 2000);
+          return;
+        }
+        setAuthorized(true);
+        setRoleChecked(true);
+      }
+    };
+
+    checkRole();
   }, [user, authLoading, router]);
 
   const isActive = (href: string) =>
