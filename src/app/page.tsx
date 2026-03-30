@@ -507,22 +507,12 @@ export default function Home() {
         {/* Content */}
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32 w-full">
           <div className="max-w-3xl">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="inline-flex items-center gap-2 bg-[#5DB347]/20 backdrop-blur-sm border border-[#5DB347]/30 text-[#EBF7E5] px-4 py-1.5 rounded-full text-sm font-medium mb-6"
-            >
+            <div className="inline-flex items-center gap-2 bg-[#5DB347]/20 backdrop-blur-sm border border-[#5DB347]/30 text-[#EBF7E5] px-4 py-1.5 rounded-full text-sm font-medium mb-6">
               <span className="w-2 h-2 bg-[#5DB347] rounded-full animate-pulse-soft" />
               Phase 1: Zimbabwe &bull; Botswana &bull; Tanzania
-            </motion.div>
+            </div>
 
-            <motion.h1
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.15 }}
-              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] text-white mb-6"
-            >
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] text-white mb-6">
               {hero.hero_headline.includes('Grow Together') ? (
                 <>
                   Let&apos;s{' '}
@@ -533,23 +523,13 @@ export default function Home() {
               ) : (
                 hero.hero_headline
               )}
-            </motion.h1>
+            </h1>
 
-            <motion.p
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="text-lg md:text-xl text-gray-300 mb-10 leading-relaxed max-w-2xl"
-            >
+            <p className="text-lg md:text-xl text-gray-300 mb-10 leading-relaxed max-w-2xl">
               {hero.hero_subtitle}
-            </motion.p>
+            </p>
 
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.45 }}
-              className="flex flex-col sm:flex-row gap-4"
-            >
+            <div className="flex flex-col sm:flex-row gap-4">
               <Link
                 href={hero.hero_cta_link}
                 className="group text-white px-8 py-4 rounded-xl font-semibold text-lg transition-smooth flex items-center justify-center gap-2 shadow-lg"
@@ -567,15 +547,10 @@ export default function Home() {
                 <Play className="w-5 h-5" />
                 See How It Works
               </Link>
-            </motion.div>
+            </div>
 
             {/* Trust badges */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.7 }}
-              className="mt-12 flex flex-wrap items-center gap-4 text-sm"
-            >
+            <div className="mt-12 flex flex-wrap items-center gap-4 text-sm">
               <div className="flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/10 px-4 py-2 rounded-full text-white/70">
                 <ShieldPlus className="w-4 h-4 text-[#5DB347]" />
                 <span>Licensed & Regulated</span>
@@ -588,19 +563,14 @@ export default function Home() {
                 <Users className="w-4 h-4 text-[#5DB347]" />
                 <span>19,000+ Farmers</span>
               </div>
-            </motion.div>
+            </div>
           </div>
         </div>
 
         {/* Scroll indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.2 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2"
-        >
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
           <ChevronDown className="w-6 h-6 text-white/50 animate-bounce-slow" />
-        </motion.div>
+        </div>
       </section>}
 
       {/* ─── IMPACT STATS (Animated counters) ─── */}
