@@ -59,7 +59,7 @@ ALTER TABLE IF EXISTS sponsorships ENABLE ROW LEVEL SECURITY;
 DO $$ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='sponsorships' AND policyname='users_read_own_sponsorships') THEN
     EXECUTE 'CREATE POLICY users_read_own_sponsorships ON sponsorships FOR SELECT USING (
-      sponsor_id = auth.uid() OR farmer_id IN (SELECT id FROM profiles WHERE id = auth.uid()) OR is_admin()
+      sponsor_email IN (SELECT email FROM profiles WHERE id = auth.uid()) OR is_admin()
     )';
   END IF;
 END $$;
