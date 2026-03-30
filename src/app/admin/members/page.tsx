@@ -241,14 +241,14 @@ export default function AdminMembersPage() {
                     </td>
                     <td className="py-3 px-4">
                       <div className="flex items-center justify-end gap-1">
-                        <Link href={`/admin/members/${m.id}`} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-navy transition-colors">
+                        <Link href={`/admin/members/${m.id}`} className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-navy transition-colors">
                           <Eye className="w-4 h-4" />
                         </Link>
                         {m.status === 'active' && (
                           <button
                             onClick={() => setConfirmAction({ id: m.id, action: 'suspend' })}
                             disabled={actionLoading === m.id}
-                            className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-600 transition-colors disabled:opacity-50"
+                            className="p-2 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-600 transition-colors disabled:opacity-50"
                             title="Suspend"
                           >
                             {actionLoading === m.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Ban className="w-4 h-4" />}
@@ -258,7 +258,7 @@ export default function AdminMembersPage() {
                           <button
                             onClick={() => setConfirmAction({ id: m.id, action: 'activate' })}
                             disabled={actionLoading === m.id}
-                            className="p-1.5 rounded-lg hover:bg-green-50 text-gray-400 hover:text-green-600 transition-colors disabled:opacity-50"
+                            className="p-2 rounded-lg hover:bg-green-50 text-gray-400 hover:text-green-600 transition-colors disabled:opacity-50"
                             title="Activate"
                           >
                             {actionLoading === m.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}

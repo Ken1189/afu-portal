@@ -487,7 +487,7 @@ function PhotoGallery({
         variants={listContainerVariants}
         initial="hidden"
         animate="visible"
-        className="grid grid-cols-3 gap-2"
+        className="grid grid-cols-1 md:grid-cols-3 gap-2"
       >
         {photosEntries.map((entry) => (
           <motion.button

@@ -534,7 +534,7 @@ function AnimalCard({ animal, onEdit, allVetRecords = FALLBACK_VET_RECORDS, allA
               )}
 
               {/* Action buttons */}
-              <div className="grid grid-cols-4 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
                 <button className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl bg-[#8CB89C]/10 text-[#8CB89C] active:bg-[#8CB89C]/20 transition-colors min-h-[64px]">
                   <Heart className="w-5 h-5" />
                   <span className="text-[11px] font-semibold">Health</span>

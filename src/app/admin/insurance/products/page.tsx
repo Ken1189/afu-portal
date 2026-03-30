@@ -243,7 +243,7 @@ function ProductFormModal({
           <h3 className="text-lg font-bold text-[#1B2A4A]">
             {isEdit ? 'Edit Insurance Product' : 'Create Insurance Product'}
           </h3>
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-100">
+          <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-100">
             <X className="w-5 h-5 text-gray-400" />
           </button>
         </div>
@@ -873,7 +873,7 @@ export default function AdminInsuranceProductsPage() {
                         {/* Edit */}
                         <button
                           onClick={() => openEditModal(product)}
-                          className="p-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
+                          className="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
                           title="Edit"
                         >
                           <Pencil className="w-3.5 h-3.5" />
@@ -882,7 +882,7 @@ export default function AdminInsuranceProductsPage() {
                         {/* Delete */}
                         <button
                           onClick={() => setDeleteTarget(product)}
-                          className="p-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
+                          className="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
                           title="Delete"
                         >
                           <Trash2 className="w-3.5 h-3.5" />

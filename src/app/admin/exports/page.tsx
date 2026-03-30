@@ -953,7 +953,7 @@ export default function AdminExportsPage() {
                               <div className="px-4 py-3.5 w-[60px] min-w-[60px]">
                                 <button
                                   onClick={(e) => { e.stopPropagation(); }}
-                                  className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+                                  className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
                                 >
                                   <MoreHorizontal className="w-4 h-4 text-gray-400" />
                                 </button>

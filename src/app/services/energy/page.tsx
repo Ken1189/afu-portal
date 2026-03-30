@@ -317,7 +317,7 @@ export default function EnergyPage() {
                   irrigation system. The farm previously relied on diesel pumps
                   costing over $800/month in fuel alone.
                 </p>
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="bg-white rounded-xl p-4 text-center">
                     <div className="text-2xl font-bold text-[#5DB347]">72%</div>
                     <div className="text-gray-500 text-xs">Cost Reduction</div>

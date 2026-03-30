@@ -1025,7 +1025,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 </Link>
                 <button
                   onClick={() => setMobileOpen(false)}
-                  className="p-1 rounded-lg text-gray-400 hover:text-white hover:bg-white/10"
+                  className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-gray-400 hover:text-white hover:bg-white/10"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -1112,7 +1112,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <header className="bg-white border-b border-gray-100 px-4 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-20">
           <div className="flex items-center gap-3">
             <button
-              className="lg:hidden p-2 -ml-2 rounded-lg hover:bg-gray-100 transition-colors"
+              className="lg:hidden p-2 -ml-2 rounded-lg hover:bg-gray-100 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
               onClick={() => setMobileOpen(true)}
             >
               <Menu className="w-5 h-5 text-navy" />

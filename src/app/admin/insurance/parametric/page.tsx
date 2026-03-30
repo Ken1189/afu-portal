@@ -513,10 +513,10 @@ export default function AdminParametricPage() {
                     </td>
                     <td className="px-4 py-3 text-right">
                       <div className="flex items-center justify-end gap-1">
-                        <button onClick={() => openEditProduct(p)} className="p-1.5 rounded-lg hover:bg-gray-100" title="Edit">
+                        <button onClick={() => openEditProduct(p)} className="p-2 rounded-lg hover:bg-gray-100" title="Edit">
                           <Edit2 className="w-3.5 h-3.5 text-gray-500" />
                         </button>
-                        <button onClick={() => deleteProduct(p.id)} className="p-1.5 rounded-lg hover:bg-red-50" title="Delete">
+                        <button onClick={() => deleteProduct(p.id)} className="p-2 rounded-lg hover:bg-red-50" title="Delete">
                           <Trash2 className="w-3.5 h-3.5 text-red-400" />
                         </button>
                       </div>
@@ -734,7 +734,7 @@ export default function AdminParametricPage() {
                   <textarea value={productForm.payout_structure} onChange={(e) => setProductForm({ ...productForm, payout_structure: e.target.value })} rows={4} className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm font-mono focus:outline-none focus:border-[#5DB347]" />
                 </div>
 
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label className="text-xs font-semibold text-gray-600 block mb-1">Premium Rate</label>
                     <input type="number" step="0.001" value={productForm.premium_rate} onChange={(e) => setProductForm({ ...productForm, premium_rate: parseFloat(e.target.value) || 0 })} className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#5DB347]" />
@@ -844,7 +844,7 @@ function WeatherCard({ policy }: { policy: Policy }) {
       {loading ? (
         <div className="flex items-center justify-center py-4"><Loader2 className="w-4 h-4 animate-spin text-gray-400" /></div>
       ) : weather ? (
-        <div className="grid grid-cols-3 gap-2 text-center text-xs">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-center text-xs">
           <div className="p-2 rounded-lg bg-white/60"><p className="font-bold text-[#1B2A4A]">{weather.temperature.toFixed(0)}&deg;C</p><p className="text-[10px] text-gray-400">Temp</p></div>
           <div className="p-2 rounded-lg bg-white/60"><p className="font-bold text-[#1B2A4A]">{weather.precipitation.toFixed(1)}mm</p><p className="text-[10px] text-gray-400">Rain</p></div>
           <div className="p-2 rounded-lg bg-white/60"><p className="font-bold text-[#1B2A4A]">{weather.humidity.toFixed(0)}%</p><p className="text-[10px] text-gray-400">Humidity</p></div>

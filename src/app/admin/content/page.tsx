@@ -655,7 +655,7 @@ function FlagEditModal({
       <div className="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6 space-y-5" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-bold text-navy">Edit Feature Flag</h3>
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-100"><X className="w-5 h-5 text-gray-400" /></button>
+          <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-100"><X className="w-5 h-5 text-gray-400" /></button>
         </div>
 
         <div className="space-y-4">
@@ -1069,7 +1069,7 @@ function TemplateEditModal({
               {template.channel.toUpperCase()}
             </span>
           </div>
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-100"><X className="w-5 h-5 text-gray-400" /></button>
+          <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-100"><X className="w-5 h-5 text-gray-400" /></button>
         </div>
 
         <div className="space-y-4">
@@ -1236,7 +1236,7 @@ function BroadcastsTab({ showToast }: { showToast: (m: string, t?: 'success' | '
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-5">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-navy">Create Broadcast</h3>
-            <button onClick={() => setShowForm(false)} className="p-1.5 rounded-lg hover:bg-gray-100">
+            <button onClick={() => setShowForm(false)} className="p-2 rounded-lg hover:bg-gray-100">
               <X className="w-5 h-5 text-gray-400" />
             </button>
           </div>

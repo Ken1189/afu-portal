@@ -558,7 +558,7 @@ function ShipmentCard({ shipment }: { shipment: ExportShipment }) {
                           Cold Chain Monitoring
                         </span>
                       </div>
-                      <div className="grid grid-cols-3 gap-2">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                         <div>
                           <p className="text-[10px] text-blue-500">
                             Set Point

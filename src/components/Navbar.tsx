@@ -224,7 +224,7 @@ function DesktopServicesDropdown({ openDropdown, handleMouseEnter, handleMouseLe
             onMouseLeave={handleMouseLeave}
           >
             <div className="p-6">
-              <div className="grid grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-8">
                 <div>
                   <div className="flex items-center gap-2 mb-3">
                     <Landmark className="w-4 h-4 text-[#5DB347]" />
@@ -777,7 +777,7 @@ export default function Navbar() {
                     onMouseLeave={handleMouseLeave}
                   >
                     <div className="p-6">
-                      <div className="grid grid-cols-3 gap-8">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-8">
                         {/* Finance Column */}
                         <div>
                           <div className="flex items-center gap-2 mb-3">

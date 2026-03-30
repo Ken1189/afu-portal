@@ -428,7 +428,7 @@ export default function SupplierProductDetailPage() {
           </div>
 
           {/* Gallery Thumbnails */}
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
             {galleryImages.map((img, idx) => (
               <button
                 key={idx}
@@ -664,7 +664,7 @@ export default function SupplierProductDetailPage() {
           </ResponsiveContainer>
         </div>
         {/* Summary Stats Row */}
-        <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t border-gray-100">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 pt-4 border-t border-gray-100">
           <div className="text-center">
             <p className="text-xs text-gray-500 mb-0.5">Total Revenue (6m)</p>
             <p className="text-lg font-bold text-[#1B2A4A] tabular-nums">

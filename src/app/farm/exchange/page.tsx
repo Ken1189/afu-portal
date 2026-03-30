@@ -562,7 +562,7 @@ export default function FarmExchangePage() {
               </div>
 
               {/* Condition + Quantity + Unit */}
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-gray-600 mb-1">Condition</label>
                   <select

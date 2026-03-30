@@ -412,10 +412,10 @@ export default function NavigationConfigPage() {
                     </td>
                     <td className="px-5 py-3 text-right">
                       <div className="flex items-center justify-end gap-1">
-                        <button onClick={() => openEditNav(idx)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-[#1B2A4A]">
+                        <button onClick={() => openEditNav(idx)} className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-[#1B2A4A]">
                           <Pencil className="w-4 h-4" />
                         </button>
-                        <button onClick={() => deleteNav(idx)} className="p-1.5 rounded-lg hover:bg-red-50 text-gray-500 hover:text-red-600">
+                        <button onClick={() => deleteNav(idx)} className="p-2 rounded-lg hover:bg-red-50 text-gray-500 hover:text-red-600">
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
@@ -517,7 +517,7 @@ export default function NavigationConfigPage() {
                     placeholder="icon name"
                     className="w-28 px-3 py-2 border border-gray-200 rounded-lg text-sm font-mono focus:ring-2 focus:ring-[#5DB347]/20 focus:border-[#5DB347] outline-none"
                   />
-                  <button onClick={() => removeSocial(idx)} className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500">
+                  <button onClick={() => removeSocial(idx)} className="p-2 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500">
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>

@@ -186,7 +186,7 @@ export default function StorageFeesPage() {
       )}
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
           <div className="flex items-center gap-2 text-gray-500 text-xs font-medium mb-1"><DollarSign size={14} /> Avg Fee/Ton/Month</div>
           <p className="text-2xl font-bold text-[#1B2A4A]">${fees.length > 0 ? (fees.reduce((s, f) => s + f.fee_per_ton_per_month, 0) / fees.length).toFixed(2) : '0.00'}</p>

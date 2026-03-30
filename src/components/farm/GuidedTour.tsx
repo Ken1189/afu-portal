@@ -139,7 +139,7 @@ const TOUR_STEPS: TourStep[] = [
     tip: 'You can replay this tour anytime from the help button',
     gradient: 'from-[#5DB347] to-emerald-600',
     extra: (
-      <div className="grid grid-cols-3 gap-2 mt-3">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-3">
         {[
           { emoji: '\u2600\uFE0F', label: 'Weather', href: '/farm/weather' },
           { emoji: '\u{1F393}', label: 'Training', href: '/farm/training' },

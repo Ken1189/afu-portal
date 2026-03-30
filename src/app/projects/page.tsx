@@ -281,7 +281,7 @@ export default function ProjectsPage() {
                   </span>
                 </div>
 
-                <div className="grid grid-cols-3 gap-3 mb-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
                   {opp.highlights.map((stat, j) => (
                     <div key={j} className="text-center">
                       <div className="text-lg font-bold bg-gradient-to-r from-[#5DB347] to-[#449933] bg-clip-text text-transparent">

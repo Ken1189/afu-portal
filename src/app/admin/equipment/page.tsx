@@ -208,8 +208,8 @@ export default function EquipmentRegistryPage() {
                   <td className="py-3 px-4"><div className="flex items-center gap-1 text-gray-500 text-xs"><MapPin className="w-3 h-3" />{eq.location}</div></td>
                   <td className="py-3 px-4">
                     <div className="flex items-center justify-end gap-1">
-                      <button onClick={() => openEdit(eq)} className="p-1.5 rounded-lg text-gray-400 hover:text-navy hover:bg-gray-100 transition-colors" title="Edit"><Pencil className="w-3.5 h-3.5" /></button>
-                      <button onClick={() => setDeleteConfirmId(eq.id)} className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors" title="Delete"><Trash2 className="w-3.5 h-3.5" /></button>
+                      <button onClick={() => openEdit(eq)} className="p-2 rounded-lg text-gray-400 hover:text-navy hover:bg-gray-100 transition-colors" title="Edit"><Pencil className="w-3.5 h-3.5" /></button>
+                      <button onClick={() => setDeleteConfirmId(eq.id)} className="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors" title="Delete"><Trash2 className="w-3.5 h-3.5" /></button>
                     </div>
                   </td>
                 </tr>
@@ -233,7 +233,7 @@ export default function EquipmentRegistryPage() {
                 <div><label className="block text-xs font-semibold text-gray-600 mb-1">Owner *</label><input value={form.ownerName} onChange={e => setForm({ ...form, ownerName: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-teal/30 outline-none" /></div>
                 <div><label className="block text-xs font-semibold text-gray-600 mb-1">Farm</label><input value={form.farmName} onChange={e => setForm({ ...form, farmName: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-teal/30 outline-none" /></div>
               </div>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div><label className="block text-xs font-semibold text-gray-600 mb-1">Status</label><select value={form.status} onChange={e => setForm({ ...form, status: e.target.value as EquipmentRecord['status'] })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-teal/30 outline-none bg-white"><option value="available">Available</option><option value="in-use">In Use</option><option value="maintenance">Maintenance</option></select></div>
                 <div><label className="block text-xs font-semibold text-gray-600 mb-1">Daily Rate ($)</label><input type="number" value={form.dailyRate} onChange={e => setForm({ ...form, dailyRate: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-teal/30 outline-none" /></div>
                 <div><label className="block text-xs font-semibold text-gray-600 mb-1">Location</label><input value={form.location} onChange={e => setForm({ ...form, location: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-teal/30 outline-none" placeholder="Zimbabwe" /></div>

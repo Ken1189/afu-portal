@@ -716,7 +716,7 @@ export default function AdminProgramDetailPage() {
 
                 <button
                   onClick={fetchEnrollments}
-                  className="p-1.5 rounded-lg text-gray-400 hover:text-navy hover:bg-gray-100 transition-colors"
+                  className="p-2 rounded-lg text-gray-400 hover:text-navy hover:bg-gray-100 transition-colors"
                   title="Refresh"
                 >
                   <RefreshCw className="w-4 h-4" />
@@ -831,7 +831,7 @@ export default function AdminProgramDetailPage() {
                                     onClick={() => handleEnrollmentAction(enrollment.id, 'approved', 'approved')}
                                     disabled={actionLoading === enrollment.id}
                                     title="Approve"
-                                    className="p-1.5 rounded-lg text-green-600 hover:bg-green-50 transition-colors disabled:opacity-50"
+                                    className="p-2 rounded-lg text-green-600 hover:bg-green-50 transition-colors disabled:opacity-50"
                                   >
                                     {actionLoading === enrollment.id ? (
                                       <Loader2 className="w-4 h-4 animate-spin" />
@@ -843,7 +843,7 @@ export default function AdminProgramDetailPage() {
                                     onClick={() => handleEnrollmentAction(enrollment.id, 'rejected')}
                                     disabled={actionLoading === enrollment.id}
                                     title="Reject"
-                                    className="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50"
+                                    className="p-2 rounded-lg text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50"
                                   >
                                     <X className="w-4 h-4" />
                                   </button>
@@ -853,7 +853,7 @@ export default function AdminProgramDetailPage() {
                                 <Link
                                   href={`/admin/members/${member.id}`}
                                   title="View Member"
-                                  className="p-1.5 rounded-lg text-gray-400 hover:text-navy hover:bg-gray-100 transition-colors"
+                                  className="p-2 rounded-lg text-gray-400 hover:text-navy hover:bg-gray-100 transition-colors"
                                 >
                                   <Eye className="w-4 h-4" />
                                 </Link>

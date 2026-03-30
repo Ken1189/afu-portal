@@ -155,7 +155,7 @@ export default function TradingCommissionsPage() {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
           <div className="flex items-center gap-2 text-gray-500 text-xs font-medium mb-1"><ArrowLeftRight size={14} /> Trade Types</div>
           <p className="text-2xl font-bold text-[#1B2A4A]">{commissions.length}</p>
@@ -190,7 +190,7 @@ export default function TradingCommissionsPage() {
                 className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347] outline-none" placeholder="Brief description" />
             </div>
           </div>
-          <div className="grid grid-cols-3 gap-4 mb-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
             <div>
               <label className="block text-xs font-medium text-gray-500 mb-1">Rate %</label>
               <input type="number" step="0.1" value={newForm.rate_percent} onChange={(e) => setNewForm({ ...newForm, rate_percent: parseFloat(e.target.value) || 0 })}

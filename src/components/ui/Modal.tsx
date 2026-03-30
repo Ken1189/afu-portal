@@ -136,7 +136,7 @@ function Modal({
                   <button
                     type="button"
                     onClick={onClose}
-                    className="rounded-lg p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal/50"
+                    className="rounded-lg p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal/50"
                     aria-label="Close modal"
                   >
                     <X className="h-5 w-5" />

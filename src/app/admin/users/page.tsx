@@ -265,21 +265,21 @@ function UserRow({ user, index, onAction, onStatusChange, onRoleChange }: { user
           <div className="flex items-center gap-1">
             <button
               onClick={() => onRoleChange?.(user.id, user.role, user.name)}
-              className="p-1.5 rounded-lg hover:bg-blue-50 text-blue-600 transition-colors"
+              className="p-2 rounded-lg hover:bg-blue-50 text-blue-600 transition-colors"
               title="Edit Role"
             >
               <Pencil className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={() => onAction?.(`Password reset link sent to ${user.name}`)}
-              className="p-1.5 rounded-lg hover:bg-amber-50 text-amber-600 transition-colors"
+              className="p-2 rounded-lg hover:bg-amber-50 text-amber-600 transition-colors"
               title="Reset Password"
             >
               <KeyRound className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={() => onStatusChange?.(user.id, user.status === 'locked' ? 'unlock' : 'lock', user.name)}
-              className="p-1.5 rounded-lg hover:bg-orange-50 text-orange-600 transition-colors"
+              className="p-2 rounded-lg hover:bg-orange-50 text-orange-600 transition-colors"
               title={user.status === 'locked' ? 'Unlock Account' : 'Lock Account'}
             >
               {user.status === 'locked' ? (
@@ -290,14 +290,14 @@ function UserRow({ user, index, onAction, onStatusChange, onRoleChange }: { user
             </button>
             <button
               onClick={() => onStatusChange?.(user.id, user.status === 'inactive' ? 'activate' : 'deactivate', user.name)}
-              className="p-1.5 rounded-lg hover:bg-red-50 text-red-500 transition-colors"
+              className="p-2 rounded-lg hover:bg-red-50 text-red-500 transition-colors"
               title={user.status === 'inactive' ? 'Activate' : 'Deactivate'}
             >
               <ShieldOff className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={() => setExpanded(!expanded)}
-              className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 transition-colors"
+              className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 transition-colors"
               title="Permissions"
             >
               <ChevronDown className={`w-3.5 h-3.5 transition-transform ${expanded ? 'rotate-180' : ''}`} />

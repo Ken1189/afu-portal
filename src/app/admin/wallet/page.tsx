@@ -503,8 +503,8 @@ export default function AdminWalletPage() {
             <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100">
               <p className="text-xs text-gray-500">Page {txnPage} of {txnTotalPages}</p>
               <div className="flex gap-1">
-                <button onClick={() => setTxnPage((p) => Math.max(1, p - 1))} disabled={txnPage === 1} className="p-1.5 rounded-lg hover:bg-gray-100 disabled:opacity-50"><ChevronLeft className="w-4 h-4" /></button>
-                <button onClick={() => setTxnPage((p) => Math.min(txnTotalPages, p + 1))} disabled={txnPage === txnTotalPages} className="p-1.5 rounded-lg hover:bg-gray-100 disabled:opacity-50"><ChevronRight className="w-4 h-4" /></button>
+                <button onClick={() => setTxnPage((p) => Math.max(1, p - 1))} disabled={txnPage === 1} className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-50"><ChevronLeft className="w-4 h-4" /></button>
+                <button onClick={() => setTxnPage((p) => Math.min(txnTotalPages, p + 1))} disabled={txnPage === txnTotalPages} className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-50"><ChevronRight className="w-4 h-4" /></button>
               </div>
             </div>
           )}
@@ -620,8 +620,8 @@ export default function AdminWalletPage() {
           <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100">
             <p className="text-xs text-gray-500">Page {walletPage} of {walletTotalPages} ({filteredWallets.length} wallets)</p>
             <div className="flex gap-1">
-              <button onClick={() => setWalletPage((p) => Math.max(1, p - 1))} disabled={walletPage === 1} className="p-1.5 rounded-lg hover:bg-gray-100 disabled:opacity-50"><ChevronLeft className="w-4 h-4" /></button>
-              <button onClick={() => setWalletPage((p) => Math.min(walletTotalPages, p + 1))} disabled={walletPage === walletTotalPages} className="p-1.5 rounded-lg hover:bg-gray-100 disabled:opacity-50"><ChevronRight className="w-4 h-4" /></button>
+              <button onClick={() => setWalletPage((p) => Math.max(1, p - 1))} disabled={walletPage === 1} className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-50"><ChevronLeft className="w-4 h-4" /></button>
+              <button onClick={() => setWalletPage((p) => Math.min(walletTotalPages, p + 1))} disabled={walletPage === walletTotalPages} className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-50"><ChevronRight className="w-4 h-4" /></button>
             </div>
           </div>
         )}

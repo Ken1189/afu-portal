@@ -651,7 +651,7 @@ function IrrigationSchedulerContent() {
         </>
       ) : (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div className="bg-cyan-50 rounded-xl p-3 text-center">
               <Droplets className="w-5 h-5 text-cyan-600 mx-auto mb-1" />
               <p className="text-xs text-gray-400">Next</p>

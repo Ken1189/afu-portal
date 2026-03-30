@@ -269,7 +269,7 @@ export default function DonatePage() {
               </div>
 
               {/* Amount Selection */}
-              <div className="grid grid-cols-3 gap-2 mb-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-4">
                 {selectedProgram.amounts.map((amount) => (
                   <button
                     key={amount}

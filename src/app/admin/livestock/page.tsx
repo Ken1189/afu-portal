@@ -254,8 +254,8 @@ export default function LivestockManagementPage() {
                   <td className="py-3 px-4 text-right tabular-nums font-medium text-navy">{formatCurrency(ls.valueEstimate)}</td>
                   <td className="py-3 px-4">
                     <div className="flex items-center justify-end gap-1">
-                      <button onClick={() => openEdit(ls)} className="p-1.5 rounded-lg text-gray-400 hover:text-navy hover:bg-gray-100 transition-colors" title="Edit"><Pencil className="w-3.5 h-3.5" /></button>
-                      <button onClick={() => setDeleteConfirmId(ls.id)} className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors" title="Delete"><Trash2 className="w-3.5 h-3.5" /></button>
+                      <button onClick={() => openEdit(ls)} className="p-2 rounded-lg text-gray-400 hover:text-navy hover:bg-gray-100 transition-colors" title="Edit"><Pencil className="w-3.5 h-3.5" /></button>
+                      <button onClick={() => setDeleteConfirmId(ls.id)} className="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors" title="Delete"><Trash2 className="w-3.5 h-3.5" /></button>
                     </div>
                   </td>
                 </tr>
@@ -286,7 +286,7 @@ export default function LivestockManagementPage() {
                 <div><label className="block text-xs font-semibold text-gray-600 mb-1">Member Name *</label><input value={form.memberName} onChange={e => setForm({ ...form, memberName: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-teal/30 outline-none" /></div>
                 <div><label className="block text-xs font-semibold text-gray-600 mb-1">Farm Name</label><input value={form.farmName} onChange={e => setForm({ ...form, farmName: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-teal/30 outline-none" /></div>
               </div>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div><label className="block text-xs font-semibold text-gray-600 mb-1">Count</label><input type="number" value={form.count} onChange={e => setForm({ ...form, count: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-teal/30 outline-none" /></div>
                 <div><label className="block text-xs font-semibold text-gray-600 mb-1">Health Status</label>
                   <select value={form.healthStatus} onChange={e => setForm({ ...form, healthStatus: e.target.value as LivestockRecord['healthStatus'] })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-teal/30 outline-none bg-white">

@@ -198,10 +198,10 @@ export default function VideoSectionPage() {
                 </td>
                 <td className="px-5 py-3 text-right">
                   <div className="flex items-center justify-end gap-1">
-                    <button onClick={() => openEdit(v)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-[#1B2A4A]">
+                    <button onClick={() => openEdit(v)} className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-[#1B2A4A]">
                       <Pencil className="w-4 h-4" />
                     </button>
-                    <button onClick={() => handleDelete(v.id)} className="p-1.5 rounded-lg hover:bg-red-50 text-gray-500 hover:text-red-600">
+                    <button onClick={() => handleDelete(v.id)} className="p-2 rounded-lg hover:bg-red-50 text-gray-500 hover:text-red-600">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>

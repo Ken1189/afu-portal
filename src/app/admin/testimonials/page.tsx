@@ -337,28 +337,28 @@ export default function TestimonialsAdmin() {
               <div className="absolute top-3 right-3 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button
                   onClick={() => toggleField(t.id, 'is_featured', t.is_featured)}
-                  className={`p-1.5 rounded-lg transition-colors ${t.is_featured ? 'bg-yellow-100 text-yellow-600' : 'bg-gray-100 text-gray-400 hover:text-yellow-600'}`}
+                  className={`p-2 rounded-lg transition-colors ${t.is_featured ? 'bg-yellow-100 text-yellow-600' : 'bg-gray-100 text-gray-400 hover:text-yellow-600'}`}
                   title={t.is_featured ? 'Remove featured' : 'Mark featured'}
                 >
                   <Award className="w-3.5 h-3.5" />
                 </button>
                 <button
                   onClick={() => toggleField(t.id, 'is_published', t.is_published)}
-                  className={`p-1.5 rounded-lg transition-colors ${t.is_published ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400 hover:text-green-600'}`}
+                  className={`p-2 rounded-lg transition-colors ${t.is_published ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400 hover:text-green-600'}`}
                   title={t.is_published ? 'Unpublish' : 'Publish'}
                 >
                   {t.is_published ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
                 </button>
                 <button
                   onClick={() => openEdit(t)}
-                  className="p-1.5 rounded-lg bg-gray-100 text-gray-500 hover:text-blue-600 transition-colors"
+                  className="p-2 rounded-lg bg-gray-100 text-gray-500 hover:text-blue-600 transition-colors"
                   title="Edit"
                 >
                   <Pencil className="w-3.5 h-3.5" />
                 </button>
                 <button
                   onClick={() => setDeleteConfirm(t.id)}
-                  className="p-1.5 rounded-lg bg-gray-100 text-gray-400 hover:text-red-600 transition-colors"
+                  className="p-2 rounded-lg bg-gray-100 text-gray-400 hover:text-red-600 transition-colors"
                   title="Delete"
                 >
                   <Trash2 className="w-3.5 h-3.5" />

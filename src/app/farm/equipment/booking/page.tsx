@@ -1057,7 +1057,7 @@ function BookingContent() {
                 <DollarSign size={16} className="text-[#8CB89C]" />
                 Pricing
               </h2>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div className="bg-[#EDF4EF]/50 rounded-xl p-4 text-center border border-[#EDF4EF]">
                   <div className="text-[10px] text-gray-400 uppercase tracking-wider mb-1">
                     Daily

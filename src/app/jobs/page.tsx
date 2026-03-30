@@ -301,7 +301,7 @@ export default function JobsPage() {
 
       {/* ── Stats Bar ── */}
       <section className="max-w-7xl mx-auto px-4 -mt-8 relative z-10">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 grid grid-cols-3 gap-6 text-center">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
           <div>
             <p className="text-3xl font-bold" style={{ color: '#5DB347' }}>{stats.total}</p>
             <p className="text-sm text-gray-500 mt-1">Open Positions</p>

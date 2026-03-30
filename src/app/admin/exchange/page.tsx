@@ -336,7 +336,7 @@ export default function AdminExchangePage() {
                             <button
                               onClick={() => handleListingAction(listing.id, 'active')}
                               disabled={actionLoading === listing.id}
-                              className="p-1.5 rounded-lg hover:bg-green-50 text-gray-400 hover:text-green-600 transition-colors disabled:opacity-50"
+                              className="p-2 rounded-lg hover:bg-green-50 text-gray-400 hover:text-green-600 transition-colors disabled:opacity-50"
                               title="Approve"
                             >
                               <CheckCircle2 className="w-4 h-4" />
@@ -346,7 +346,7 @@ export default function AdminExchangePage() {
                             <button
                               onClick={() => handleListingAction(listing.id, 'removed')}
                               disabled={actionLoading === listing.id}
-                              className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-600 transition-colors disabled:opacity-50"
+                              className="p-2 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-600 transition-colors disabled:opacity-50"
                               title="Remove"
                             >
                               <XCircle className="w-4 h-4" />
@@ -355,7 +355,7 @@ export default function AdminExchangePage() {
                           <button
                             onClick={() => handleListingAction(listing.id, listing.status === 'featured' ? 'active' : 'featured')}
                             disabled={actionLoading === listing.id}
-                            className={`p-1.5 rounded-lg transition-colors disabled:opacity-50 ${listing.status === 'featured' ? 'bg-amber-50 text-amber-600' : 'hover:bg-amber-50 text-gray-400 hover:text-amber-600'}`}
+                            className={`p-2 rounded-lg transition-colors disabled:opacity-50 ${listing.status === 'featured' ? 'bg-amber-50 text-amber-600' : 'hover:bg-amber-50 text-gray-400 hover:text-amber-600'}`}
                             title={listing.status === 'featured' ? 'Unfeature' : 'Feature'}
                           >
                             <Star className="w-4 h-4" />

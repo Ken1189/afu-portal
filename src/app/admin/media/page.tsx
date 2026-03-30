@@ -293,8 +293,8 @@ export default function AdminMediaPage() {
                   <td className="py-3 px-4 text-gray-500">{new Date(f.created_at).toLocaleDateString()}</td>
                   <td className="py-3 px-4">
                     <div className="flex items-center justify-end gap-1">
-                      <button onClick={() => copyUrl(f.url)} className="p-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100" title="Copy URL"><Copy className="w-3.5 h-3.5" /></button>
-                      <button onClick={() => setDeleteTarget(f)} className="p-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100" title="Delete"><Trash2 className="w-3.5 h-3.5" /></button>
+                      <button onClick={() => copyUrl(f.url)} className="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100" title="Copy URL"><Copy className="w-3.5 h-3.5" /></button>
+                      <button onClick={() => setDeleteTarget(f)} className="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100" title="Delete"><Trash2 className="w-3.5 h-3.5" /></button>
                     </div>
                   </td>
                 </tr>

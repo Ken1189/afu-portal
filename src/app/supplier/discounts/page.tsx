@@ -615,7 +615,7 @@ export default function MemberDiscounts() {
             {/* Tier discount summary */}
             <div className="mt-4 p-4 rounded-lg bg-[#8CB89C]/5 border border-[#8CB89C]/10">
               <p className="text-xs font-medium text-[#1B2A4A] mb-2">Effective Discount Summary</p>
-              <div className="grid grid-cols-4 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 {tierMultipliers.map((tier) => (
                   <div key={tier.tier} className="text-center">
                     <p className="text-lg font-bold text-[#8CB89C] tabular-nums">

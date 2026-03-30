@@ -230,7 +230,7 @@ export default function LegalServicesPage() {
                       <td className="px-6 py-4 whitespace-nowrap"><span className={`inline-flex items-center text-xs font-semibold px-2.5 py-1 rounded-full ${statusStyles[legalCase.status]}`}>{legalCase.status}</span></td>
                       <td className="px-6 py-4 text-gray-500 whitespace-nowrap">{formatDate(legalCase.dateSubmitted)}</td>
                       <td className="px-6 py-4 text-right whitespace-nowrap">
-                        <button onClick={() => handleExpand(legalCase)} className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors text-gray-400 hover:text-[#1B2A4A]" title="View details">
+                        <button onClick={() => handleExpand(legalCase)} className="p-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-400 hover:text-[#1B2A4A]" title="View details">
                           {isExpanded ? <ChevronUp className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                       </td>
@@ -323,7 +323,7 @@ export default function LegalServicesPage() {
                 </div>
                 <div className="flex items-center justify-between">
                   <p className="text-xs text-gray-400">{formatDate(legalCase.dateSubmitted)}</p>
-                  <button onClick={() => handleExpand(legalCase)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400">
+                  <button onClick={() => handleExpand(legalCase)} className="p-2 rounded-lg hover:bg-gray-100 text-gray-400">
                     {isExpanded ? <ChevronUp className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>

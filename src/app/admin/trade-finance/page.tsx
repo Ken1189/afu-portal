@@ -254,7 +254,7 @@ export default function AdminTradeFinancePage() {
                             <button
                               onClick={() => handleAction(loan.id, 'approved')}
                               disabled={actionLoading === loan.id}
-                              className="p-1.5 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 transition-colors disabled:opacity-50"
+                              className="p-2 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 transition-colors disabled:opacity-50"
                               title="Approve"
                             >
                               {actionLoading === loan.id ? (
@@ -266,7 +266,7 @@ export default function AdminTradeFinancePage() {
                             <button
                               onClick={() => handleAction(loan.id, 'rejected')}
                               disabled={actionLoading === loan.id}
-                              className="p-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors disabled:opacity-50"
+                              className="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors disabled:opacity-50"
                               title="Reject"
                             >
                               <ThumbsDown className="w-4 h-4" />

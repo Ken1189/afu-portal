@@ -988,7 +988,7 @@ export default function AdminAmbassadorsPage() {
                                 amb.is_featured
                               )
                             }
-                            className={`p-1.5 rounded-lg transition-colors mx-auto ${
+                            className={`p-2 rounded-lg transition-colors mx-auto ${
                               amb.is_featured
                                 ? 'bg-yellow-100 text-yellow-600'
                                 : 'bg-gray-50 text-gray-300 hover:text-yellow-600'
@@ -1013,7 +1013,7 @@ export default function AdminAmbassadorsPage() {
                             onClick={() =>
                               toggleField(amb.id, 'is_active', amb.is_active)
                             }
-                            className={`p-1.5 rounded-lg transition-colors mx-auto ${
+                            className={`p-2 rounded-lg transition-colors mx-auto ${
                               amb.is_active
                                 ? 'bg-green-100 text-green-600'
                                 : 'bg-gray-50 text-gray-300 hover:text-green-600'
@@ -1035,14 +1035,14 @@ export default function AdminAmbassadorsPage() {
                           <div className="flex items-center justify-end gap-1">
                             <button
                               onClick={() => openEdit(amb)}
-                              className="p-1.5 rounded-lg bg-gray-50 text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                              className="p-2 rounded-lg bg-gray-50 text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition-colors"
                               title="Edit"
                             >
                               <Pencil className="w-3.5 h-3.5" />
                             </button>
                             <button
                               onClick={() => setDeleteConfirm(amb.id)}
-                              className="p-1.5 rounded-lg bg-gray-50 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                              className="p-2 rounded-lg bg-gray-50 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
                               title="Delete"
                             >
                               <Trash2 className="w-3.5 h-3.5" />

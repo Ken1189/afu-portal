@@ -458,7 +458,7 @@ export default function CarbonCreditsPage() {
                       </span>
                     ))}
                   </div>
-                  <div className="grid grid-cols-3 gap-4 text-sm">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                     <div><p className="text-gray-400 text-xs">Enrolled</p><p className="font-medium text-[#1B2A4A]">{new Date(e.enrolled_at).toLocaleDateString()}</p></div>
                     <div><p className="text-gray-400 text-xs">Credits Earned</p><p className="font-medium text-[#5DB347]">{e.credits_earned || 0} t</p></div>
                     <div><p className="text-gray-400 text-xs">Revenue</p><p className="font-medium text-[#1B2A4A]">${(e.revenue_earned || 0).toFixed(2)}</p></div>
@@ -603,7 +603,7 @@ export default function CarbonCreditsPage() {
                       'bg-gray-100 text-gray-600'
                     }`}>{c.status}</span>
                   </div>
-                  <div className="grid grid-cols-4 gap-4 text-sm mt-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm mt-3">
                     <div><p className="text-gray-400 text-xs">Vintage</p><p className="font-medium">{c.vintage_year}</p></div>
                     <div><p className="text-gray-400 text-xs">Quantity</p><p className="font-medium">{c.quantity} t</p></div>
                     <div><p className="text-gray-400 text-xs">Price</p><p className="font-medium">${c.price_per_tonne}/t</p></div>

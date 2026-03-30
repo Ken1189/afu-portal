@@ -962,7 +962,7 @@ export default function SupplierDashboard() {
                 <p className="text-xs text-gray-500 mb-0.5">Total All-Time</p>
                 <p className="text-xl font-bold text-navy tabular-nums">{formatCurrency(commissionTotal)}</p>
               </div>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 {commissionDonutData.map((item) => (
                   <div key={item.name} className="text-center">
                     <div className="w-2 h-2 rounded-full mx-auto mb-1" style={{ backgroundColor: item.color }} />

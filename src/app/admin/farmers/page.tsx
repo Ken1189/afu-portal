@@ -1021,7 +1021,7 @@ function BulkImportTab() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div className="bg-gray-50 rounded-lg p-4 text-center">
                   <p className="text-2xl font-bold text-[#1B2A4A]">{result.total}</p>
                   <p className="text-xs text-gray-500">Total</p>

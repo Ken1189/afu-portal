@@ -213,7 +213,7 @@ export default function AdminResearchPage() {
               <h2 className="text-lg font-bold text-[#1B2A4A]">
                 {editingId ? 'Edit Research Centre' : 'Add Research Centre'}
               </h2>
-              <button onClick={() => setShowForm(false)} className="p-1.5 rounded-lg hover:bg-gray-100">
+              <button onClick={() => setShowForm(false)} className="p-2 rounded-lg hover:bg-gray-100">
                 <X className="w-5 h-5 text-gray-500" />
               </button>
             </div>

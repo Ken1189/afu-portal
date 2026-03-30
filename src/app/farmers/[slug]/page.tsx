@@ -729,7 +729,7 @@ export default function FarmerProfilePage({
                 <p className="text-xs text-gray-500 uppercase tracking-wide font-semibold mb-2">
                   Choose a Tier
                 </p>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                   {(Object.keys(TIER_CONFIG) as Tier[]).map((tier) => {
                     const t = TIER_CONFIG[tier];
                     const isActive = selectedTier === tier;

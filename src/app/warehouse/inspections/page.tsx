@@ -193,7 +193,7 @@ export default function InspectionsPage() {
           <BarChart3 className="w-5 h-5" />
           Grade Distribution ({totalInspections} total)
         </h3>
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {(['A', 'B', 'C', 'Reject'] as const).map((g) => (
             <div key={g} className="text-center">
               <div className={`text-3xl font-black mb-1 ${
@@ -297,7 +297,7 @@ export default function InspectionsPage() {
                         className="w-full h-3 rounded-full appearance-none bg-gray-200 accent-[#5DB347]"
                       />
                     </div>
-                    <div className="grid grid-cols-3 gap-3">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                       <div>
                         <label className="block text-xs text-gray-500 mb-1">Aflatoxin</label>
                         <select

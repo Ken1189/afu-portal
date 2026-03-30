@@ -299,7 +299,7 @@ export default function CropRecommendationsConfigPage() {
                     {SEASONS.map(s => <option key={s} value={s}>{s}</option>)}
                   </select>
                 </div>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                   <select value={newCrop.soil_type} onChange={e => setNewCrop({ ...newCrop, soil_type: e.target.value })} className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-green-200 focus:border-green-400 outline-none">
                     {SOIL_TYPES.map(s => <option key={s} value={s}>{s}</option>)}
                   </select>

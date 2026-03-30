@@ -347,16 +347,16 @@ export default function PartnershipsAdmin() {
 
               {/* Actions */}
               <div className="absolute top-3 right-3 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button onClick={() => toggleField(p.id, 'is_featured', p.is_featured)} className={`p-1.5 rounded-lg ${p.is_featured ? 'bg-yellow-100 text-yellow-600' : 'bg-gray-100 text-gray-400 hover:text-yellow-600'}`} title="Toggle featured">
+                <button onClick={() => toggleField(p.id, 'is_featured', p.is_featured)} className={`p-2 rounded-lg ${p.is_featured ? 'bg-yellow-100 text-yellow-600' : 'bg-gray-100 text-gray-400 hover:text-yellow-600'}`} title="Toggle featured">
                   <Award className="w-3.5 h-3.5" />
                 </button>
-                <button onClick={() => toggleField(p.id, 'is_published', p.is_published)} className={`p-1.5 rounded-lg ${p.is_published ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400 hover:text-green-600'}`} title="Toggle published">
+                <button onClick={() => toggleField(p.id, 'is_published', p.is_published)} className={`p-2 rounded-lg ${p.is_published ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400 hover:text-green-600'}`} title="Toggle published">
                   {p.is_published ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
                 </button>
-                <button onClick={() => openEdit(p)} className="p-1.5 rounded-lg bg-gray-100 text-gray-500 hover:text-blue-600" title="Edit">
+                <button onClick={() => openEdit(p)} className="p-2 rounded-lg bg-gray-100 text-gray-500 hover:text-blue-600" title="Edit">
                   <Pencil className="w-3.5 h-3.5" />
                 </button>
-                <button onClick={() => setDeleteConfirm(p.id)} className="p-1.5 rounded-lg bg-gray-100 text-gray-400 hover:text-red-600" title="Delete">
+                <button onClick={() => setDeleteConfirm(p.id)} className="p-2 rounded-lg bg-gray-100 text-gray-400 hover:text-red-600" title="Delete">
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
               </div>

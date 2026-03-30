@@ -762,7 +762,7 @@ function DispatchesTab({ dispatches: initialDispatches, onRefresh, showToast }: 
   return (
     <div className="space-y-5">
       {/* Summary Cards */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white border border-gray-100 rounded-xl p-4">
           <p className="text-xs text-gray-500">Total Dispatches</p>
           <p className="text-xl font-bold text-[#1B2A4A]">{dispatches.length}</p>

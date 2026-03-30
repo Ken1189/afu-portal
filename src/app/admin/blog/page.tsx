@@ -214,7 +214,7 @@ export default function AdminBlogPage() {
 
       {/* Stats & Filter */}
       <div className="flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
-        <div className="grid grid-cols-3 gap-4 flex-1">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 flex-1">
           <div className="bg-white rounded-xl p-4 border border-gray-100">
             <p className="text-2xl font-bold text-[#1B2A4A]">{posts.length}</p>
             <p className="text-xs text-gray-500">Total Posts</p>
@@ -271,9 +271,9 @@ export default function AdminBlogPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-1">
-                  <button onClick={() => setPreviewPost(p)} className="p-1.5 rounded-lg bg-gray-50 text-gray-600 hover:bg-gray-100" title="Preview"><Eye className="w-3.5 h-3.5" /></button>
-                  <button onClick={() => openEdit(p)} className="p-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100" title="Edit"><Pencil className="w-3.5 h-3.5" /></button>
-                  <button onClick={() => setDeleteTarget(p)} className="p-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100" title="Delete"><Trash2 className="w-3.5 h-3.5" /></button>
+                  <button onClick={() => setPreviewPost(p)} className="p-2 rounded-lg bg-gray-50 text-gray-600 hover:bg-gray-100" title="Preview"><Eye className="w-3.5 h-3.5" /></button>
+                  <button onClick={() => openEdit(p)} className="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100" title="Edit"><Pencil className="w-3.5 h-3.5" /></button>
+                  <button onClick={() => setDeleteTarget(p)} className="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100" title="Delete"><Trash2 className="w-3.5 h-3.5" /></button>
                 </div>
               </div>
             </div>
@@ -287,7 +287,7 @@ export default function AdminBlogPage() {
           <div className="bg-white rounded-2xl shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6 space-y-5" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-bold text-[#1B2A4A]">{editingId ? 'Edit Post' : 'Create Post'}</h3>
-              <button onClick={() => setShowModal(false)} className="p-1.5 rounded-lg hover:bg-gray-100"><X className="w-5 h-5 text-gray-400" /></button>
+              <button onClick={() => setShowModal(false)} className="p-2 rounded-lg hover:bg-gray-100"><X className="w-5 h-5 text-gray-400" /></button>
             </div>
             <div className="space-y-4">
               <div>
@@ -366,7 +366,7 @@ export default function AdminBlogPage() {
           <div className="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 space-y-4" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-bold text-[#1B2A4A]">Post Preview</h3>
-              <button onClick={() => setPreviewPost(null)} className="p-1.5 rounded-lg hover:bg-gray-100"><X className="w-5 h-5 text-gray-400" /></button>
+              <button onClick={() => setPreviewPost(null)} className="p-2 rounded-lg hover:bg-gray-100"><X className="w-5 h-5 text-gray-400" /></button>
             </div>
             {previewPost.featured_image && (
               <img src={previewPost.featured_image} alt={`Featured image for ${previewPost.title}`} className="w-full h-48 object-cover rounded-xl" />

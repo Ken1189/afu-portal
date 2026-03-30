@@ -202,7 +202,7 @@ export default function TradingRulesPage() {
       </div>
 
       {/* Summary */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
           <div className="flex items-center gap-2 text-gray-500 text-xs font-medium mb-1"><Globe size={14} /> Countries</div>
           <p className="text-2xl font-bold text-[#1B2A4A]">{rules.length}</p>
@@ -227,7 +227,7 @@ export default function TradingRulesPage() {
       {adding && (
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
           <h3 className="font-semibold text-[#1B2A4A] mb-3">New Country Trading Rules</h3>
-          <div className="grid grid-cols-3 gap-4 mb-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
             <div>
               <label className="block text-xs font-medium text-gray-500 mb-1">Country</label>
               <input type="text" value={newForm.country} onChange={(e) => setNewForm({ ...newForm, country: e.target.value })}
@@ -288,7 +288,7 @@ export default function TradingRulesPage() {
             /* Edit Mode */
             <div className="p-5">
               <h3 className="font-semibold text-[#1B2A4A] mb-3">Edit: {rule.country}</h3>
-              <div className="grid grid-cols-3 gap-4 mb-3">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
                 <div>
                   <label className="block text-xs font-medium text-gray-500 mb-1">Country</label>
                   <input type="text" value={editForm.country} onChange={(e) => setEditForm({ ...editForm, country: e.target.value })}

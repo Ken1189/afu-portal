@@ -1153,7 +1153,7 @@ function PlotCard({ plot, onEdit }: { plot: FarmPlot; onEdit?: () => void }) {
                 <ActivityLog plotId={plot.id} />
 
                 {/* Quick Actions */}
-                <div className="grid grid-cols-4 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
                   <button
                     onClick={() => setLogModalOpen(true)}
                     className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl bg-[#5DB347]/10 text-[#5DB347] active:bg-[#5DB347]/20 transition-colors min-h-[64px]"

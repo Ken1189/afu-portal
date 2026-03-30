@@ -418,7 +418,7 @@ export default function FinancingPage() {
                         className="space-y-4"
                       >
                         <h3 className="font-semibold text-navy">{tf.howMuch}</h3>
-                        <div className="grid grid-cols-3 gap-2">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                           {amountOptions.map((amt) => (
                             <button
                               key={amt}

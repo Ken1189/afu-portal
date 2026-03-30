@@ -494,7 +494,7 @@ export default function AdminCarbonCreditsPage() {
                 {mintForm.quantity > 0 && mintForm.price_per_tonne > 0 && (
                   <div className="bg-green-50 rounded-xl p-3 space-y-1">
                     <p className="text-sm font-medium text-[#1B2A4A]">Estimated Value: ${(mintForm.quantity * mintForm.price_per_tonne).toLocaleString()}</p>
-                    <div className="grid grid-cols-3 gap-2 text-xs text-gray-600">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs text-gray-600">
                       <span>Farmer 70%: ${(mintForm.quantity * mintForm.price_per_tonne * 0.7).toLocaleString()}</span>
                       <span>AFU 20%: ${(mintForm.quantity * mintForm.price_per_tonne * 0.2).toLocaleString()}</span>
                       <span>Buffer 10%: ${(mintForm.quantity * mintForm.price_per_tonne * 0.1).toLocaleString()}</span>

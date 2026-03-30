@@ -222,7 +222,7 @@ export default function WarehouseLayout({ children }: { children: React.ReactNod
               animate={{ x: 0 }}
               exit={{ x: -300 }}
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-              className="fixed inset-y-0 left-0 w-[300px] bg-[#1B2A4A] text-white z-50 flex flex-col lg:hidden shadow-2xl"
+              className="fixed inset-y-0 left-0 w-[85vw] max-w-[300px] bg-[#1B2A4A] text-white z-50 flex flex-col lg:hidden shadow-2xl"
             >
               <div className="p-5 border-b border-white/10 flex items-center justify-between">
                 <div className="flex items-center gap-2">

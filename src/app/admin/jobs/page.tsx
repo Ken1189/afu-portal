@@ -226,7 +226,7 @@ function JobFormModal({
           <h3 className="text-lg font-bold text-[#1B2A4A]">
             {isEdit ? 'Edit Job Listing' : 'Create Job Listing'}
           </h3>
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-100">
+          <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-100">
             <X className="w-5 h-5 text-gray-400" />
           </button>
         </div>
@@ -850,7 +850,7 @@ export default function AdminJobsPage() {
                             {/* Edit */}
                             <button
                               onClick={() => openEditModal(job)}
-                              className="p-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
+                              className="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
                               title="Edit"
                             >
                               <Pencil className="w-3.5 h-3.5" />
@@ -859,7 +859,7 @@ export default function AdminJobsPage() {
                             {/* Delete */}
                             <button
                               onClick={() => setDeleteTarget(job)}
-                              className="p-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
+                              className="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
                               title="Delete"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
@@ -869,7 +869,7 @@ export default function AdminJobsPage() {
                             {!job.is_approved && (
                               <button
                                 onClick={() => handleApprove(job.id)}
-                                className="p-1.5 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 transition-colors"
+                                className="p-2 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 transition-colors"
                                 title="Approve"
                               >
                                 <CheckCircle2 className="w-3.5 h-3.5" />
@@ -882,7 +882,7 @@ export default function AdminJobsPage() {
                               job.status !== 'expired' && (
                                 <button
                                   onClick={() => handleClose(job.id)}
-                                  className="p-1.5 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-100 transition-colors"
+                                  className="p-2 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-100 transition-colors"
                                   title="Close"
                                 >
                                   <XCircle className="w-3.5 h-3.5" />
@@ -894,7 +894,7 @@ export default function AdminJobsPage() {
                               onClick={() =>
                                 handleToggleFeatured(job.id, job.is_featured)
                               }
-                              className={`p-1.5 rounded-lg transition-colors ${
+                              className={`p-2 rounded-lg transition-colors ${
                                 job.is_featured
                                   ? 'bg-yellow-100 text-yellow-600 hover:bg-yellow-200'
                                   : 'bg-gray-50 text-gray-400 hover:text-yellow-600 hover:bg-yellow-50'

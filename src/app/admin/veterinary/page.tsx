@@ -218,7 +218,7 @@ export default function VeterinaryPage() {
                       <td className="px-6 py-4 whitespace-nowrap"><span className={`inline-flex items-center text-xs font-semibold px-2.5 py-1 rounded-full ${statusStyles[appt.status]}`}>{appt.status === 'Emergency' && <span className="w-1.5 h-1.5 bg-red-500 rounded-full mr-1.5 animate-pulse" />}{appt.status}</span></td>
                       <td className="px-6 py-4 text-gray-500 whitespace-nowrap">{formatDate(appt.dateScheduled)}</td>
                       <td className="px-6 py-4 text-right whitespace-nowrap">
-                        <button onClick={() => handleExpand(appt)} className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors text-gray-400 hover:text-[#1B2A4A]" title="View details">
+                        <button onClick={() => handleExpand(appt)} className="p-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-400 hover:text-[#1B2A4A]" title="View details">
                           {isExpanded ? <ChevronUp className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                       </td>
@@ -295,7 +295,7 @@ export default function VeterinaryPage() {
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2"><p className="text-xs text-gray-400">{formatDate(appt.dateScheduled)}</p><span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${priorityStyles[appt.priority]}`}>{appt.priority}</span></div>
-                  <button onClick={() => handleExpand(appt)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400">{isExpanded ? <ChevronUp className="w-4 h-4" /> : <Eye className="w-4 h-4" />}</button>
+                  <button onClick={() => handleExpand(appt)} className="p-2 rounded-lg hover:bg-gray-100 text-gray-400">{isExpanded ? <ChevronUp className="w-4 h-4" /> : <Eye className="w-4 h-4" />}</button>
                 </div>
                 {isExpanded && (
                   <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="mt-3 pt-3 border-t border-dashed border-gray-200 space-y-3">

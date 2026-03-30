@@ -855,7 +855,7 @@ export default function SustainabilityPage() {
               </div>
               <ChevronRight size={20} className="text-gray-400" />
             </div>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div className="bg-white/70 rounded-xl p-3 text-center">
                 <p className="text-lg font-bold text-[#5DB347]">
                   {carbonCredits.reduce((s, c) => s + c.credits, 0).toLocaleString()}

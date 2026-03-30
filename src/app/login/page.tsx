@@ -356,7 +356,7 @@ export default function LoginPage() {
           </div>
 
           {/* Bottom: Stats bar */}
-          <div className="grid grid-cols-3 gap-6 pt-8 border-t border-white/10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-8 border-t border-white/10">
             {[
               // S5.6: Updated to reflect actual platform scope (20 countries)
               { icon: Users, label: 'Members', value: '5,000+' },

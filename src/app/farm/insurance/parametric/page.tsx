@@ -672,7 +672,7 @@ export default function ParametricInsurancePage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-3 mt-2">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-2">
                   <div>
                     <p className="text-[10px] text-gray-400">Measured</p>
                     <p className="text-sm font-bold text-red-500">{trigger.measured_value}</p>

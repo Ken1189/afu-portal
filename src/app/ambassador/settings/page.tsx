@@ -559,7 +559,7 @@ export default function SettingsPage() {
 
           <div className="mb-5">
             <label className="block text-sm font-medium text-gray-700 mb-2">Select Payout Method</label>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               {[
                 { value: 'bank_transfer', label: 'Bank Transfer' },
                 { value: 'mobile_money', label: 'Mobile Money' },

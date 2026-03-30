@@ -934,13 +934,13 @@ export default function SettingsPage() {
                             </button>
                             <button
                               onClick={() => saveCommissionRate(rate.id)}
-                              className="p-1.5 rounded-lg bg-teal text-white hover:bg-teal-dark"
+                              className="p-2 rounded-lg bg-teal text-white hover:bg-teal-dark"
                             >
                               <Check className="w-3.5 h-3.5" />
                             </button>
                             <button
                               onClick={() => setEditingRate(null)}
-                              className="p-1.5 rounded-lg bg-gray-100 text-gray-500 hover:bg-gray-200"
+                              className="p-2 rounded-lg bg-gray-100 text-gray-500 hover:bg-gray-200"
                             >
                               <X className="w-3.5 h-3.5" />
                             </button>
@@ -958,7 +958,7 @@ export default function SettingsPage() {
                                   [rate.id]: { rate_percent: String(rate.rate_percent), is_active: rate.is_active },
                                 }));
                               }}
-                              className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-navy transition-colors"
+                              className="p-2 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-navy transition-colors"
                             >
                               <Pencil className="w-3.5 h-3.5" />
                             </button>

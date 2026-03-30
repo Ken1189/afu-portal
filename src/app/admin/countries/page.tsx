@@ -150,7 +150,7 @@ function CountryModal({
       <div className="bg-[#0F1A2E] border border-white/10 rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 space-y-5" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-bold text-white">{isEdit ? 'Edit Country' : 'Add Country'}</h3>
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/10"><X className="w-5 h-5 text-gray-400" /></button>
+          <button onClick={onClose} className="p-2 rounded-lg hover:bg-white/10"><X className="w-5 h-5 text-gray-400" /></button>
         </div>
 
         <div className="space-y-4">
@@ -510,7 +510,7 @@ export default function CountriesPage() {
                 )}
 
                 {/* Stats Grid */}
-                <div className="grid grid-cols-3 gap-3 mb-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
                   <div className="text-center p-2.5 bg-white/[0.03] rounded-lg">
                     <Users className="w-4 h-4 text-[#8CB89C] mx-auto mb-1" />
                     <p className="text-sm font-semibold text-white">{country.members.toLocaleString()}</p>

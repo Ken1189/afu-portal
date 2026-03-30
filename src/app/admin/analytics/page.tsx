@@ -409,7 +409,7 @@ export default function AdminAnalyticsPage() {
               <h3 className="text-sm font-semibold text-[#1B2A4A] mb-4 flex items-center gap-2">
                 <Activity className="w-4 h-4" /> Active Users
               </h3>
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {[
                   { label: 'Daily', value: activeUsers.daily, percent: Math.round((activeUsers.daily / (live?.totalMembers || 342)) * 100), color: 'bg-[#8CB89C]' },
                   { label: 'Weekly', value: activeUsers.weekly, percent: Math.round((activeUsers.weekly / (live?.totalMembers || 342)) * 100), color: 'bg-[#1B2A4A]' },

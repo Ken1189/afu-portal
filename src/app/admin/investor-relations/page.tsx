@@ -526,14 +526,14 @@ export default function InvestorRelationsPage() {
                             onClick={() =>
                               setExpandedId(isExpanded ? null : expr.id)
                             }
-                            className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors text-gray-400 hover:text-[#1B2A4A]"
+                            className="p-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-400 hover:text-[#1B2A4A]"
                             title="View details"
                           >
                             <Eye className="w-4 h-4" />
                           </button>
                           <a
                             href={`mailto:${expr.email}?subject=Re: ${expr.opportunity} Investment Interest`}
-                            className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors text-gray-400 hover:text-[#1B2A4A]"
+                            className="p-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-400 hover:text-[#1B2A4A]"
                             title="Send email"
                           >
                             <Send className="w-4 h-4" />
@@ -553,7 +553,7 @@ export default function InvestorRelationsPage() {
                             transition={{ duration: 0.2 }}
                             className="overflow-hidden"
                           >
-                            <div className="py-4 grid grid-cols-3 gap-6 border-t border-dashed border-gray-200">
+                            <div className="py-4 grid grid-cols-1 md:grid-cols-3 gap-6 border-t border-dashed border-gray-200">
                               <div>
                                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">
                                   Contact
@@ -647,7 +647,7 @@ export default function InvestorRelationsPage() {
                   <div className="flex items-center gap-1">
                     <button
                       onClick={() => setExpandedId(isExpanded ? null : expr.id)}
-                      className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400"
+                      className="p-2 rounded-lg hover:bg-gray-100 text-gray-400"
                     >
                       {isExpanded ? (
                         <ChevronUp className="w-4 h-4" />
@@ -657,7 +657,7 @@ export default function InvestorRelationsPage() {
                     </button>
                     <a
                       href={`mailto:${expr.email}`}
-                      className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400"
+                      className="p-2 rounded-lg hover:bg-gray-100 text-gray-400"
                     >
                       <Send className="w-4 h-4" />
                     </a>

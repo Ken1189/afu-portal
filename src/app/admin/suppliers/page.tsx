@@ -656,7 +656,7 @@ export default function AdminSuppliersPage() {
       {/* Expand toggle */}
       <button
         onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleExpand(supplier.id); }}
-        className={`p-1.5 rounded-lg hover:bg-gray-100 transition-colors ${
+        className={`p-2 rounded-lg hover:bg-gray-100 transition-colors ${
           expandedId === supplier.id ? 'bg-[#5DB347]/10 text-[#5DB347]' : 'text-gray-400 hover:text-[#1B2A4A]'
         }`}
         title="Expand Details"
@@ -667,7 +667,7 @@ export default function AdminSuppliersPage() {
       {/* View */}
       <Link
         href={`/admin/suppliers/${supplier.id}`}
-        className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-[#1B2A4A] transition-colors"
+        className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-[#1B2A4A] transition-colors"
         title="View Details"
       >
         <Eye className="w-4 h-4" />
@@ -678,7 +678,7 @@ export default function AdminSuppliersPage() {
         <button
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleApprove(supplier.id, supplier.company_name); }}
           disabled={actionLoading === supplier.id}
-          className="p-1.5 rounded-lg hover:bg-green-50 text-[#5DB347] hover:text-green-700 transition-colors disabled:opacity-50"
+          className="p-2 rounded-lg hover:bg-green-50 text-[#5DB347] hover:text-green-700 transition-colors disabled:opacity-50"
           title="Approve"
         >
           {actionLoading === supplier.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
@@ -690,7 +690,7 @@ export default function AdminSuppliersPage() {
         <button
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleReject(supplier.id, supplier.company_name); }}
           disabled={actionLoading === supplier.id}
-          className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-600 transition-colors disabled:opacity-50"
+          className="p-2 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-600 transition-colors disabled:opacity-50"
           title="Reject"
         >
           <XCircle className="w-4 h-4" />
@@ -702,7 +702,7 @@ export default function AdminSuppliersPage() {
         <button
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleSuspend(supplier.id, supplier.company_name); }}
           disabled={actionLoading === supplier.id}
-          className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-600 transition-colors disabled:opacity-50"
+          className="p-2 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-600 transition-colors disabled:opacity-50"
           title="Suspend"
         >
           {actionLoading === supplier.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Ban className="w-4 h-4" />}
@@ -714,7 +714,7 @@ export default function AdminSuppliersPage() {
         <button
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleActivate(supplier.id); }}
           disabled={actionLoading === supplier.id}
-          className="p-1.5 rounded-lg hover:bg-green-50 text-gray-400 hover:text-green-600 transition-colors disabled:opacity-50"
+          className="p-2 rounded-lg hover:bg-green-50 text-gray-400 hover:text-green-600 transition-colors disabled:opacity-50"
           title="Activate"
         >
           {actionLoading === supplier.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
@@ -723,7 +723,7 @@ export default function AdminSuppliersPage() {
 
       {/* Edit */}
       <button
-        className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-[#1B2A4A] transition-colors"
+        className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-[#1B2A4A] transition-colors"
         title="Edit"
       >
         <Pencil className="w-4 h-4" />
@@ -1172,7 +1172,7 @@ export default function AdminSuppliersPage() {
                       {supplier.region}, {supplier.country}
                     </div>
 
-                    <div className="grid grid-cols-4 gap-3 pt-3 border-t border-gray-100">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-3 border-t border-gray-100">
                       <div>
                         <p className="text-xs text-gray-400">Products</p>
                         <p className="text-sm font-semibold text-[#1B2A4A]">{supplier.products_count}</p>

@@ -209,12 +209,12 @@ export default function AdminAnnouncementsPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <button onClick={() => toggleActive(a)}
-                      className={`p-1.5 rounded-lg transition-colors ${a.is_active ? 'bg-green-50 text-green-600 hover:bg-green-100' : 'bg-gray-50 text-gray-400 hover:bg-gray-100'}`}
+                      className={`p-2 rounded-lg transition-colors ${a.is_active ? 'bg-green-50 text-green-600 hover:bg-green-100' : 'bg-gray-50 text-gray-400 hover:bg-gray-100'}`}
                       title={a.is_active ? 'Deactivate' : 'Activate'}>
                       {a.is_active ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
                     </button>
-                    <button onClick={() => openEdit(a)} className="p-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100"><Pencil className="w-3.5 h-3.5" /></button>
-                    <button onClick={() => setDeleteTarget(a)} className="p-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100"><Trash2 className="w-3.5 h-3.5" /></button>
+                    <button onClick={() => openEdit(a)} className="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100"><Pencil className="w-3.5 h-3.5" /></button>
+                    <button onClick={() => setDeleteTarget(a)} className="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100"><Trash2 className="w-3.5 h-3.5" /></button>
                   </div>
                 </div>
               </div>
@@ -229,7 +229,7 @@ export default function AdminAnnouncementsPage() {
           <div className="bg-white rounded-2xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 space-y-5" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-bold text-[#1B2A4A]">{editingId ? 'Edit Announcement' : 'Create Announcement'}</h3>
-              <button onClick={() => setShowModal(false)} className="p-1.5 rounded-lg hover:bg-gray-100"><X className="w-5 h-5 text-gray-400" /></button>
+              <button onClick={() => setShowModal(false)} className="p-2 rounded-lg hover:bg-gray-100"><X className="w-5 h-5 text-gray-400" /></button>
             </div>
             <div className="space-y-4">
               <div>
@@ -244,7 +244,7 @@ export default function AdminAnnouncementsPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
-                <div className="grid grid-cols-4 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
                   {Object.entries(TYPE_CONFIG).map(([key, cfg]) => (
                     <button key={key} onClick={() => setFormData({ ...formData, type: key as FormData['type'] })}
                       className={`flex items-center justify-center gap-1 px-3 py-2 rounded-lg text-xs font-medium border transition-all ${formData.type === key ? 'border-[#5DB347] bg-[#5DB347]/10 text-[#5DB347]' : 'border-gray-200 text-gray-600 hover:bg-gray-50'}`}>
