@@ -75,7 +75,7 @@ interface DemoVisit {
   animalType: string;
 }
 
-const demoVisits: DemoVisit[] = [
+const FALLBACK_VISITS: DemoVisit[] = [
   {
     id: 'VET-001',
     vetName: 'Dr. Amina Okafor',
@@ -128,7 +128,7 @@ export default function FarmVetPage() {
   const [notes, setNotes] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [liveVisits, setLiveVisits] = useState<DemoVisit[]>(demoVisits);
+  const [liveVisits, setLiveVisits] = useState<DemoVisit[]>(FALLBACK_VISITS);
 
   // Fetch real appointments from API on mount
   useEffect(() => {

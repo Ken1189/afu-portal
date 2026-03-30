@@ -73,7 +73,7 @@ interface DemoCase {
   firm: string;
 }
 
-const demoCases: DemoCase[] = [
+const FALLBACK_CASES: DemoCase[] = [
   {
     id: 'LEG-001',
     title: 'Boundary Dispute — Adjacent Farm',
@@ -119,7 +119,7 @@ export default function FarmLegalPage() {
   const [urgency, setUrgency] = useState<Urgency>('Medium');
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [liveCases, setLiveCases] = useState<DemoCase[]>(demoCases);
+  const [liveCases, setLiveCases] = useState<DemoCase[]>(FALLBACK_CASES);
   const [loadingCases, setLoadingCases] = useState(true);
 
   // Fetch real cases from API on mount

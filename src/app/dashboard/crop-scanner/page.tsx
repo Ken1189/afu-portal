@@ -130,7 +130,7 @@ interface RecentScan {
 // ---------------------------------------------------------------------------
 // Mock diagnoses
 // ---------------------------------------------------------------------------
-const mockDiagnoses: Diagnosis[] = [
+const FALLBACK_DIAGNOSES: Diagnosis[] = [
   {
     id: 'healthy',
     title: 'Healthy Crop',
@@ -260,7 +260,7 @@ const mockDiagnoses: Diagnosis[] = [
 // ---------------------------------------------------------------------------
 // Mock recent scans history
 // ---------------------------------------------------------------------------
-const mockRecentScans: RecentScan[] = [
+const FALLBACK_RECENT_SCANS: RecentScan[] = [
   {
     id: 'scan-001',
     date: 'Mar 10, 2026',
@@ -580,7 +580,7 @@ export default function CropScannerPage() {
         };
       } catch {
         // Fall back to random mock diagnosis on error
-        const fallback = mockDiagnoses[Math.floor(Math.random() * mockDiagnoses.length)];
+        const fallback = FALLBACK_DIAGNOSES[Math.floor(Math.random() * FALLBACK_DIAGNOSES.length)];
         apiResult = {
           ...fallback,
           confidence: Math.floor(Math.random() * 21) + 75,
@@ -637,8 +637,8 @@ export default function CropScannerPage() {
   }, []);
 
   const handleHistoryScanClick = useCallback((scan: RecentScan) => {
-    // Find the matching diagnosis from mockDiagnoses based on title
-    const matchingDiagnosis = mockDiagnoses.find(
+    // Find the matching diagnosis from FALLBACK_DIAGNOSES based on title
+    const matchingDiagnosis = FALLBACK_DIAGNOSES.find(
       (d) => d.title === scan.diagnosisTitle
     );
     if (matchingDiagnosis) {
@@ -1082,7 +1082,7 @@ export default function CropScannerPage() {
               </div>
             </div>
             <div className="divide-y divide-gray-50">
-              {mockRecentScans.map((scan) => {
+              {FALLBACK_RECENT_SCANS.map((scan) => {
                 const isSelected = selectedHistoryScan?.id === scan.id;
                 return (
                   <button
