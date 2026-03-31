@@ -287,7 +287,7 @@ const PROGRAM_ICON_MAP: Record<string, typeof Sprout> = {
 
 export default function Home() {
   const [testimonials, setTestimonials] = useState(fallbackTestimonials);
-  const [partners, setPartners] = useState(FALLBACK_PARTNERS);
+  const [partners, setPartners] = useState<{ name: string; initials: string; color: string; logo_url?: string }[]>(FALLBACK_PARTNERS);
   const [hero, setHero] = useState(HERO_DEFAULTS);
   const [services, setServices] = useState(FALLBACK_SERVICES);
   const [programs, setPrograms] = useState(FALLBACK_PROGRAMS);
@@ -394,6 +394,7 @@ export default function Home() {
               name: (p.name as string) || (p.company_name as string) || '',
               initials: (p.initials as string) || ((p.name as string) || '').slice(0, 2).toUpperCase(),
               color: (p.brand_color as string) || (p.color as string) || '#5DB347',
+              logo_url: (p.logo_url as string) || undefined,
             }))
           );
         }
@@ -1017,13 +1018,13 @@ export default function Home() {
               {[...partners, ...partners].map((partner, i) => (
                 <div
                   key={`${partner.name}-${i}`}
-                  className="flex-shrink-0 flex items-center gap-3 px-5 py-3 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md hover:border-[#5DB347]/20 transition-all"
+                  className="flex-shrink-0 flex items-center gap-3 px-6 py-4 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md hover:border-[#5DB347]/20 transition-all"
                 >
                   {partner.logo_url ? (
                     <img
                       src={partner.logo_url}
                       alt={partner.name}
-                      className="h-8 w-auto max-w-[120px] object-contain"
+                      className="h-12 w-auto max-w-[180px] object-contain"
                       onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.nextElementSibling?.classList.remove('hidden'); }}
                     />
                   ) : null}

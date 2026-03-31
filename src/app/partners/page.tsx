@@ -20,6 +20,8 @@ interface Partner {
   name: string;
   initials: string;
   color: string;
+  logo_url?: string;
+  website_url?: string;
   type: string;
   country: string;
   description: string;
@@ -326,6 +328,16 @@ const CATEGORY_TO_TAB: Record<string, PartnerTab> = {
   university: "universities",
   technology: "business",
   finance: "business",
+  trade: "business",
+  consulting: "business",
+  investment: "business",
+  processing: "business",
+  logistics: "business",
+  insurance: "business",
+  banking: "business",
+  dfi: "governments",
+  ngo: "governments",
+  research: "universities",
 };
 
 export default function PartnersPage() {
@@ -355,6 +367,8 @@ export default function PartnersPage() {
               name: (p.name as string) || (p.company_name as string) || "",
               initials: (p.initials as string) || ((p.name as string) || "").slice(0, 2).toUpperCase(),
               color: (p.brand_color as string) || (p.color as string) || "bg-green-600",
+              logo_url: (p.logo_url as string) || undefined,
+              website_url: (p.website_url as string) || undefined,
               type: (p.type as string) || (p.partner_type as string) || "",
               country: (p.country as string) || "Pan-African",
               description: (p.description as string) || "",
@@ -444,14 +458,24 @@ export default function PartnersPage() {
                 >
                   {/* Header with Logo + Name */}
                   <div className="flex items-start gap-4 mb-4">
-                    <div
-                      className={`w-14 h-14 ${partner.color} rounded-2xl flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-lg`}
-                    >
-                      {partner.initials}
-                    </div>
+                    {partner.logo_url ? (
+                      <div className="w-14 h-14 rounded-2xl bg-white border border-gray-100 flex items-center justify-center shrink-0 shadow-lg overflow-hidden p-1.5">
+                        <img src={partner.logo_url} alt={partner.name} className="w-full h-full object-contain" />
+                      </div>
+                    ) : (
+                      <div
+                        className={`w-14 h-14 ${partner.color} rounded-2xl flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-lg`}
+                      >
+                        {partner.initials}
+                      </div>
+                    )}
                     <div className="min-w-0">
                       <h3 className="text-base font-bold text-[#1B2A4A] leading-snug">
-                        {partner.name}
+                        {partner.website_url ? (
+                          <a href={partner.website_url} target="_blank" rel="noopener noreferrer" className="hover:text-[#5DB347] transition-colors">
+                            {partner.name}
+                          </a>
+                        ) : partner.name}
                       </h3>
                       <span className="inline-block text-xs text-gray-400 mt-0.5">
                         {partner.type}
