@@ -56,7 +56,7 @@ const FALLBACK_FOOTER_COLUMNS: FooterColumn[] = [
       { label: "Partners", href: "/partners" },
       { label: "Jobs", href: "/jobs" },
       { label: "Ambassadors", href: "/ambassadors" },
-      { label: "Become an Ambassador", href: "/ambassador/apply", highlight: true },
+      { label: "Become an Ambassador", href: "/ambassadors#apply", highlight: true },
       { label: "Farms", href: "/farms" },
       { label: "Sponsor a Farmer", href: "/sponsor" },
       { label: "Donate", href: "/donate" },

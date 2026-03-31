@@ -928,7 +928,7 @@ export default function SponsorPage() {
             Recognised across 20 countries. Reported quarterly. Fully transparent.
           </p>
           <a
-            href="mailto:partners@afu.org"
+            href="mailto:peterw@africanfarmingunion.org"
             className="inline-flex items-center gap-2 text-white font-bold px-8 py-4 rounded-xl text-lg transition-all duration-300 shadow-lg shadow-[#1B2A4A]/30 hover:scale-105 hover:shadow-xl"
             style={{ background: 'linear-gradient(135deg, #1B2A4A, #0F1A30)' }}
             onMouseEnter={(e) => (e.currentTarget.style.background = 'linear-gradient(135deg, #0F1A30, #060D1A)')}
