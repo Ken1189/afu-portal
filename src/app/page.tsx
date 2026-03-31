@@ -221,12 +221,6 @@ const FALLBACK_PARTNERS = [
   { name: 'Rajo Beheer BV', initials: 'RB', color: '#7B2D8E', logo_url: '/partners/rajo-beheer.png' },
   { name: 'Alvan Blanch', initials: 'AB', color: '#006633', logo_url: '/partners/alvan-blanch.png' },
   { name: 'Piso Aviation', initials: 'PA', color: '#1B2A4A', logo_url: '/partners/Piso Aviation Logo.jpeg' },
-  { name: 'M-Pesa', initials: 'MP', color: '#4CAF50' },
-  { name: 'EcoCash', initials: 'EC', color: '#0072BC' },
-  { name: 'MTN MoMo', initials: 'MTN', color: '#FFCC00' },
-  { name: 'Lloyd\'s of London', initials: 'LL', color: '#003DA5' },
-  { name: 'Airtel Money', initials: 'AM', color: '#ED1C24' },
-  { name: 'Orange Money', initials: 'OM', color: '#FF6600' },
 ];
 
 /* ─── How it works ─── */
