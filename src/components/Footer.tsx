@@ -139,6 +139,13 @@ export default function Footer() {
       const data = await res.json();
 
       if (res.ok) {
+        // Send newsletter welcome email (fire and forget)
+        fetch("/api/newsletter/notify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        }).catch(() => {});
+
         setStatus("success");
         setMessage("Thanks for subscribing!");
         setEmail("");

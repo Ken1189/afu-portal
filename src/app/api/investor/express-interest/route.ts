@@ -158,6 +158,38 @@ export async function POST(request: Request) {
             </div>
           `,
         });
+
+        // Auto-reply to investor
+        const investorFirstName = (expression.investorName || expression.entityName).split(' ')[0];
+        await resend.emails.send({
+          from: 'African Farming Union <noreply@mail.africanfarmingunion.org>',
+          to: expression.email,
+          subject: `Thank you for your interest in ${expression.opportunityName}`,
+          html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
+            <div style="background:#1B2A4A;padding:30px;text-align:center">
+              <h1 style="color:#5DB347;margin:0;font-size:24px">African Farming Union</h1>
+              <p style="color:#8CB89C;margin:8px 0 0;font-size:14px">Investor Relations</p>
+            </div>
+            <div style="padding:30px;background:#f8faf6">
+              <h2 style="color:#1B2A4A;margin-top:0">Thank you, ${investorFirstName}!</h2>
+              <p style="color:#333;line-height:1.6">Thank you for your interest in the AFU <strong>${expression.opportunityName}</strong>. Our investor relations team will contact you within <strong>24 hours</strong>.</p>
+              <div style="background:white;border-left:4px solid #5DB347;padding:15px;margin:20px 0;border-radius:4px">
+                <p style="margin:0;color:#555;font-size:14px"><strong>Your expression of interest:</strong></p>
+                <p style="margin:8px 0 0;color:#777;font-size:14px">Opportunity: ${expression.opportunityName}</p>
+                ${expression.amount ? `<p style="margin:4px 0 0;color:#777;font-size:14px">Amount: $${expression.amount.toLocaleString()}</p>` : ''}
+              </div>
+              <p style="color:#333;line-height:1.6">In the meantime, explore our platform:</p>
+              <ul style="color:#555;line-height:2">
+                <li><a href="https://africanfarmingunion.org/investor" style="color:#5DB347">Investment Opportunities</a></li>
+                <li><a href="https://africanfarmingunion.org/services" style="color:#5DB347">Our Services</a></li>
+                <li><a href="https://africanfarmingunion.org/countries" style="color:#5DB347">Countries We Operate In</a></li>
+                <li><a href="https://africanfarmingunion.org/about" style="color:#5DB347">About AFU</a></li>
+              </ul>
+              <p style="color:#333">Best regards,<br><strong>The AFU Investor Relations Team</strong></p>
+            </div>
+            <div style="padding:20px;text-align:center;color:#999;font-size:12px">African Farming Union | Gaborone, Botswana<br>africanfarmingunion.org</div>
+          </div>`,
+        });
       }
     } catch (emailErr) {
       // Email sending failed — log but don't fail the request

@@ -95,6 +95,22 @@ export default function SupplierApplyPage() {
         }
       }
 
+      // Send email notifications (fire and forget)
+      fetch('/api/supplier/notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          company: form.businessName,
+          contactName: form.contactName,
+          email: form.email,
+          phone: form.phone,
+          country: form.country,
+          category: form.category,
+          website: form.website,
+          description: form.description,
+        }),
+      }).catch(() => {});
+
       setSuccess(true);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Something went wrong. Please try again.';

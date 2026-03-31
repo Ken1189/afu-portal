@@ -127,6 +127,24 @@ export default function ApplyPage() {
         }).catch(() => {}); // Fire and forget
         sessionStorage.removeItem("afu_referral_code");
       }
+
+      // Send email notifications (fire and forget)
+      fetch("/api/apply/notify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: `${formData.firstName} ${formData.lastName}`.trim(),
+          email: formData.email,
+          tier: selectedTier ? tiers[selectedTier].name : selectedTier,
+          country: formData.country,
+          phone: formData.phone,
+          organization: formData.organization,
+          farmSize: formData.farmSize,
+          crops: formData.crops,
+          about: formData.about,
+        }),
+      }).catch(() => {});
+
       setSubmitted(true);
     }
   };

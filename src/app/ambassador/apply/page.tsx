@@ -183,6 +183,21 @@ export default function AmbassadorApplyPage() {
         );
       }
 
+      // Send email notifications (fire and forget)
+      fetch('/api/ambassador/notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: form.fullName,
+          email: form.email,
+          country: form.country,
+          phone: form.phone,
+          sector: form.sector,
+          bio: form.bio,
+          region: form.region,
+        }),
+      }).catch(() => {});
+
       setSuccess(true);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Something went wrong. Please try again.';
