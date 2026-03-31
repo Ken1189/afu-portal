@@ -233,34 +233,39 @@ export default function AmbassadorsPage() {
     async function init() {
       const supabase = createClient();
 
-      // Fetch user session for pre-fill
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('full_name, phone')
-          .eq('id', user.id)
-          .single();
-        setAuthUser({
-          id: user.id,
-          full_name: profile?.full_name || '',
-          email: user.email || '',
-          phone: profile?.phone || null,
-        });
-        setFormData((prev) => ({
-          ...prev,
-          full_name: profile?.full_name || '',
-          email: user.email || '',
-          phone: profile?.phone || '',
-        }));
+      // Fetch user session for pre-fill (non-blocking)
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('full_name, phone')
+            .eq('id', user.id)
+            .single();
+          setAuthUser({
+            id: user.id,
+            full_name: profile?.full_name || '',
+            email: user.email || '',
+            phone: profile?.phone || null,
+          });
+          setFormData((prev) => ({
+            ...prev,
+            full_name: profile?.full_name || '',
+            email: user.email || '',
+            phone: profile?.phone || '',
+          }));
+        }
+      } catch {
+        // Not logged in or profile fetch failed — continue without pre-fill
       }
 
-      // Fetch ambassadors
+      // Fetch active ambassadors for display
       try {
         const { data, error } = await supabase
           .from('ambassadors')
           .select('*')
-          .order('years_experience', { ascending: false });
+          .eq('status', 'active')
+          .order('sort_order', { ascending: true });
 
         if (error || !data || data.length === 0) {
           setAmbassadors(FALLBACK_AMBASSADORS);
