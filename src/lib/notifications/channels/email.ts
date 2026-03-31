@@ -3,7 +3,7 @@
  *
  * Requires:
  *   - RESEND_API_KEY
- *   - EMAIL_FROM (optional, defaults to 'AFU Portal <noreply@noreply.africanfarmingunion.org>')
+ *   - EMAIL_FROM (optional, defaults to 'AFU Portal <noreply@mail.africanfarmingunion.org>')
  */
 
 const RESEND_ENDPOINT = 'https://api.resend.com/emails';
@@ -19,7 +19,7 @@ function getApiKey(): string {
 }
 
 function getFromAddress(): string {
-  return process.env.EMAIL_FROM || 'AFU Portal <noreply@noreply.africanfarmingunion.org>';
+  return process.env.EMAIL_FROM || 'AFU Portal <noreply@mail.africanfarmingunion.org>';
 }
 
 /**

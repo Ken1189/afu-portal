@@ -95,7 +95,7 @@ async function sendEmail(email: string, subject: string, body: string): Promise<
     const { Resend } = await import('resend');
     const resend = new Resend(process.env.RESEND_API_KEY);
     await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'AFU <noreply@noreply.africanfarmingunion.org>',
+      from: process.env.RESEND_FROM_EMAIL || 'AFU <noreply@mail.africanfarmingunion.org>',
       to: email,
       subject,
       html: `
