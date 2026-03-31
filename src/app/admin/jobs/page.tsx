@@ -604,7 +604,7 @@ export default function AdminJobsPage() {
       pay_rate: formData.pay_rate || null,
       pay_type: formData.pay_type || null,
       pay_description: formData.pay_description || null,
-      duration: formData.duration || null,
+      duration_description: formData.duration || null,
       workers_needed: formData.workers_needed ? parseInt(formData.workers_needed, 10) : null,
       farm_name: formData.farm_name || null,
       description: formData.description || null,
