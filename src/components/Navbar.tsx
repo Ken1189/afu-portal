@@ -618,7 +618,7 @@ export default function Navbar() {
           </Link>
 
           {/* ── Desktop Nav ── */}
-          <div className="hidden lg:flex items-center gap-1">
+          <div className="hidden lg:flex items-center gap-0.5">
             {/* --- DB-driven nav items (when available) --- */}
             {dbNavItems ? (
               <>
@@ -1105,12 +1105,12 @@ export default function Navbar() {
                 </Link>
                 <Link
                   href="/apply"
-                  className="text-white px-5 py-2 rounded-lg text-sm font-semibold transition-colors"
+                  className="text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap"
                   style={{ background: '#5DB347' }}
                   onMouseEnter={e => (e.currentTarget.style.background = '#449933')}
                   onMouseLeave={e => (e.currentTarget.style.background = '#5DB347')}
                 >
-                  Become a Member
+                  Join AFU
                 </Link>
               </>
             )}
