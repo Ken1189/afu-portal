@@ -217,9 +217,10 @@ const fallbackTestimonials = [
 const FALLBACK_PARTNERS = [
   { name: 'RioTrade', initials: 'RT', color: '#1B2A4A', logo_url: '/partners/riotrade.png' },
   { name: 'Watson & Fine', initials: 'WF', color: '#000000', logo_url: '/partners/watson-fine.png' },
-  { name: 'Savithi Trading', initials: 'ST', color: '#CC0000', logo_url: '/partners/savithi.png' },
+  { name: 'Savithi Trading', initials: 'ST', color: '#CC0000', logo_url: '/partners/savithi.jpeg' },
   { name: 'Rajo Beheer BV', initials: 'RB', color: '#7B2D8E', logo_url: '/partners/rajo-beheer.png' },
   { name: 'Alvan Blanch', initials: 'AB', color: '#006633', logo_url: '/partners/alvan-blanch.png' },
+  { name: 'Piso Aviation', initials: 'PA', color: '#1B2A4A', logo_url: '/partners/Piso Aviation Logo.jpeg' },
   { name: 'M-Pesa', initials: 'MP', color: '#4CAF50' },
   { name: 'EcoCash', initials: 'EC', color: '#0072BC' },
   { name: 'MTN MoMo', initials: 'MTN', color: '#FFCC00' },
