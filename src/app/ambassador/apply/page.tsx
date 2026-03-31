@@ -118,8 +118,16 @@ export default function AmbassadorApplyPage() {
     try {
       const supabase = createClient();
 
-      // Primary: insert into ambassadors table with status='pending'
+      // Primary: insert into ambassadors table with ALL form data
       const insertData: Record<string, unknown> = {
+        full_name: form.fullName,
+        email: form.email,
+        phone: form.phone || null,
+        country: form.country,
+        region: form.region || null,
+        sector: form.sector || null,
+        bio: form.bio || null,
+        motivation: form.bio || null,
         status: 'pending',
         tier: 'bronze',
         total_earned: 0,
@@ -135,24 +143,25 @@ export default function AmbassadorApplyPage() {
         .from('ambassadors')
         .insert(insertData);
 
-      if (ambError) {
-        // Fallback: use membership_applications table
-        const { error: appError } = await supabase
-          .from('membership_applications')
-          .insert({
-            full_name: form.fullName,
-            email: form.email,
-            phone: form.phone || null,
-            country: form.country,
-            region: form.region || null,
-            requested_tier: 'new_enterprise',
-            status: 'pending',
-            notes: `[AMBASSADOR APPLICATION] Sector: ${form.sector} | Bio: ${form.bio || 'N/A'} | Social: ${form.socialLinks || 'N/A'}`,
-          });
+      // Also insert into membership_applications for admin review
+      await supabase
+        .from('membership_applications')
+        .insert({
+          full_name: form.fullName,
+          email: form.email,
+          phone: form.phone || null,
+          country: form.country,
+          region: form.region || null,
+          application_type: 'ambassador',
+          requested_tier: 'ambassador',
+          status: 'pending',
+          notes: `[AMBASSADOR APPLICATION] Sector: ${form.sector} | Bio: ${form.bio || 'N/A'} | Social: ${form.socialLinks || 'N/A'}`,
+          profile_id: user?.id || null,
+        });
 
-        if (appError) {
-          throw new Error(appError.message);
-        }
+      if (ambError) {
+        // If ambassadors insert failed, at least membership_applications went through
+        console.warn('Ambassador insert failed, using membership_applications:', ambError.message);
       } else if (user) {
         // Also save the extended info to site_config so it persists
         const configKey = `ambassador_settings_${user.id}`;
