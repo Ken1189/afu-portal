@@ -127,8 +127,8 @@ export default function AdminBankingPage() {
           supabase.from('wallet_accounts').select('*', { count: 'exact', head: true }),
           supabase.from('wallet_accounts').select('balance'),
           supabase.from('wallet_transactions').select('amount').gte('created_at', new Date().toISOString().slice(0, 10)),
-          supabase.from('transaction_flags').select('*', { count: 'exact', head: true }).eq('resolved', false),
-          supabase.from('transaction_flags').select('severity').eq('resolved', false).eq('severity', 'high'),
+          supabase.from('transaction_flags').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+          supabase.from('transaction_flags').select('severity').eq('status', 'pending').eq('severity', 'high'),
         ]);
 
         const totalAum = walletBalances?.reduce((s, w) => s + Number(w.balance || 0), 0) ?? 0;
@@ -207,7 +207,7 @@ export default function AdminBankingPage() {
         const { data: flagData } = await supabase
           .from('transaction_flags')
           .select('*')
-          .eq('resolved', false)
+          .eq('status', 'pending')
           .order('created_at', { ascending: false });
         if (flagData && flagData.length > 0) {
           setFlags(
@@ -237,9 +237,9 @@ export default function AdminBankingPage() {
               currency: (r.currency as string) || 'USD',
               our: Number(r.our_balance) || 0,
               theirs: Number(r.provider_balance) || 0,
-              disc: Number(r.unmatched_count) || 0,
-              matched: Number(r.matched_count) || 0,
-              unmatched: Number(r.unmatched_count) || 0,
+              disc: Number(r.untotal_matched) || 0,
+              matched: Number(r.total_matched) || 0,
+              unmatched: Number(r.untotal_matched) || 0,
               status: (r.status as string) || 'matched',
             }))
           );
@@ -264,7 +264,7 @@ export default function AdminBankingPage() {
       // Try updating in DB — the id stored may be truncated, so update by matching
       await supabase
         .from('transaction_flags')
-        .update({ resolved: action === 'clear', status: newStatus })
+        .update({ status: newStatus })
         .eq('id', targetFlag.id);
       // Update local state
       if (action === 'clear') {
@@ -297,10 +297,10 @@ export default function AdminBankingPage() {
         currency: 'USD',
         our_balance: 0,
         provider_balance: 0,
-        matched_count: 0,
-        unmatched_count: 0,
+        total_matched: 0,
+        untotal_matched: 0,
         status: 'pending',
-        started_at: now,
+        created_at: now,
       });
       // Refresh recon runs
       const { data: reconData } = await supabase
@@ -316,9 +316,9 @@ export default function AdminBankingPage() {
             currency: (r.currency as string) || 'USD',
             our: Number(r.our_balance) || 0,
             theirs: Number(r.provider_balance) || 0,
-            disc: Number(r.unmatched_count) || 0,
-            matched: Number(r.matched_count) || 0,
-            unmatched: Number(r.unmatched_count) || 0,
+            disc: Number(r.untotal_matched) || 0,
+            matched: Number(r.total_matched) || 0,
+            unmatched: Number(r.untotal_matched) || 0,
             status: (r.status as string) || 'matched',
           }))
         );

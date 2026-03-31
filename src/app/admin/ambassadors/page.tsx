@@ -36,7 +36,7 @@ interface Ambassador {
   full_name: string;
   photo_url: string | null;
   bio: string | null;
-  pull_quote: string | null;
+  quote: string | null;
   sector: string;
   country: string;
   region: string | null;
@@ -79,7 +79,7 @@ interface FormData {
   full_name: string;
   photo_url: string;
   bio: string;
-  pull_quote: string;
+  quote: string;
   sector: string;
   country: string;
   region: string;
@@ -96,7 +96,7 @@ const emptyForm: FormData = {
   full_name: '',
   photo_url: '',
   bio: '',
-  pull_quote: '',
+  quote: '',
   sector: '',
   country: '',
   region: '',
@@ -553,7 +553,7 @@ export default function AdminAmbassadorsPage() {
       full_name: a.full_name,
       photo_url: a.photo_url || '',
       bio: a.bio || '',
-      pull_quote: a.pull_quote || '',
+      quote: a.quote || '',
       sector: a.sector,
       country: a.country,
       region: a.region || '',
@@ -588,7 +588,7 @@ export default function AdminAmbassadorsPage() {
       full_name: form.full_name.trim(),
       photo_url: form.photo_url || null,
       bio: form.bio || null,
-      pull_quote: form.pull_quote || null,
+      quote: form.quote || null,
       sector: form.sector,
       country: form.country,
       region: form.region || null,
@@ -1643,9 +1643,9 @@ export default function AdminAmbassadorsPage() {
                   Pull Quote
                 </label>
                 <textarea
-                  value={form.pull_quote}
+                  value={form.quote}
                   onChange={(e) =>
-                    setForm({ ...form, pull_quote: e.target.value })
+                    setForm({ ...form, quote: e.target.value })
                   }
                   rows={2}
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-green-200 focus:border-green-400 outline-none resize-none"

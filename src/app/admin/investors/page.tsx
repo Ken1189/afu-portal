@@ -64,7 +64,7 @@ interface Investor {
 
 interface InvestorDocument {
   id: string;
-  investor_profile_id: string;
+  investor_id: string;
   name: string;
   type: string;
   file_url: string;
@@ -260,11 +260,11 @@ const demoInvestors: Investor[] = [
 ];
 
 const demoDocuments: InvestorDocument[] = [
-  { id: 'doc1', investor_profile_id: '1', name: 'KYC Verification - Devon Kennaird', type: 'KYC', file_url: '/docs/kyc_devon.pdf', created_at: '2024-11-05', investor_name: 'Devon Kennaird' },
-  { id: 'doc2', investor_profile_id: '1', name: 'Subscription Agreement - Uganda Pool', type: 'Agreement', file_url: '/docs/sub_uganda.pdf', created_at: '2025-01-15', investor_name: 'Devon Kennaird' },
-  { id: 'doc3', investor_profile_id: '4', name: 'KYC Verification - Lagos Angel Network', type: 'KYC', file_url: '/docs/kyc_lagos.pdf', created_at: '2025-06-20', investor_name: 'Oluwaseun Adebayo' },
-  { id: 'doc4', investor_profile_id: '5', name: 'NDA - Cape Agri Ventures', type: 'NDA', file_url: '/docs/nda_cape.pdf', created_at: '2025-03-05', investor_name: 'Emma Van Der Berg' },
-  { id: 'doc5', investor_profile_id: '2', name: 'NDA - Meridian Capital', type: 'NDA', file_url: '/docs/nda_meridian.pdf', created_at: '2026-03-21', investor_name: 'John Mitchell' },
+  { id: 'doc1', investor_id: '1', name: 'KYC Verification - Devon Kennaird', type: 'KYC', file_url: '/docs/kyc_devon.pdf', created_at: '2024-11-05', investor_name: 'Devon Kennaird' },
+  { id: 'doc2', investor_id: '1', name: 'Subscription Agreement - Uganda Pool', type: 'Agreement', file_url: '/docs/sub_uganda.pdf', created_at: '2025-01-15', investor_name: 'Devon Kennaird' },
+  { id: 'doc3', investor_id: '4', name: 'KYC Verification - Lagos Angel Network', type: 'KYC', file_url: '/docs/kyc_lagos.pdf', created_at: '2025-06-20', investor_name: 'Oluwaseun Adebayo' },
+  { id: 'doc4', investor_id: '5', name: 'NDA - Cape Agri Ventures', type: 'NDA', file_url: '/docs/nda_cape.pdf', created_at: '2025-03-05', investor_name: 'Emma Van Der Berg' },
+  { id: 'doc5', investor_id: '2', name: 'NDA - Meridian Capital', type: 'NDA', file_url: '/docs/nda_meridian.pdf', created_at: '2026-03-21', investor_name: 'John Mitchell' },
 ];
 
 const demoOpportunities: Opportunity[] = [
@@ -581,11 +581,11 @@ export default function AllInvestorsPage() {
         const { data: investmentsData } = await supabase
           .from('investments')
           .select('*')
-          .in('investor_profile_id', profileIds);
+          .in('investor_id', profileIds);
 
         const mapped: Investor[] = profiles.map((p: Record<string, unknown>) => {
           const myInvestments = (investmentsData || []).filter(
-            (i: Record<string, unknown>) => i.investor_profile_id === p.id
+            (i: Record<string, unknown>) => i.investor_id === p.id
           );
           const totalDeployed = myInvestments
             .filter((i: Record<string, unknown>) => i.status === 'Deployed' || i.status === 'Active')
@@ -611,7 +611,7 @@ export default function AllInvestorsPage() {
             accreditedStatus: p.accredited === true ? 'accredited' : p.accredited === false ? 'not verified' : 'pending',
             pipelineStage: ((p.pipeline_stage as string) || 'Contacted') as PipelineStage,
             investments: myInvestments.map((i: Record<string, unknown>) => ({
-              name: (i.opportunity_name as string) || 'Investment',
+              name: (i.investment_name as string) || 'Investment',
               type: (i.type as string) || 'Debt',
               amount: (i.amount as number) || 0,
               irr: 0,
@@ -630,7 +630,7 @@ export default function AllInvestorsPage() {
         setDocuments(
           docs.map((d: Record<string, unknown>) => ({
             id: d.id as string,
-            investor_profile_id: d.investor_profile_id as string,
+            investor_id: d.investor_id as string,
             name: d.name as string,
             type: d.type as string,
             file_url: d.file_url as string,
@@ -701,8 +701,8 @@ export default function AllInvestorsPage() {
   async function handleAssign(investorId: string, opportunityId: string, opportunityName: string) {
     try {
       await supabase.from('investments').insert({
-        investor_profile_id: investorId,
-        opportunity_name: opportunityName,
+        investor_id: investorId,
+        investment_name: opportunityName,
         amount: 0,
         status: 'Pending',
         invested_at: new Date().toISOString(),
@@ -733,7 +733,7 @@ export default function AllInvestorsPage() {
     const inv = investors.find((i) => i.id === investorId);
     const newDoc: InvestorDocument = {
       id: 'doc_' + Date.now(),
-      investor_profile_id: investorId,
+      investor_id: investorId,
       name,
       type,
       file_url: fileUrl,
@@ -745,7 +745,7 @@ export default function AllInvestorsPage() {
 
     try {
       await supabase.from('investor_documents').insert({
-        investor_profile_id: investorId,
+        investor_id: investorId,
         name,
         type,
         file_url: fileUrl,
@@ -1238,7 +1238,7 @@ export default function AllInvestorsPage() {
               </thead>
               <tbody>
                 {filteredDocs.map((doc, idx) => {
-                  const inv = investors.find((i) => i.id === doc.investor_profile_id);
+                  const inv = investors.find((i) => i.id === doc.investor_id);
                   const investorName = doc.investor_name || inv?.name || 'Unknown';
                   return (
                     <tr key={doc.id} className={idx % 2 === 0 ? '' : 'bg-gray-50/40'}>
