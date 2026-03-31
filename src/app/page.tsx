@@ -213,20 +213,19 @@ const fallbackTestimonials = [
   },
 ];
 
-/* ─── Partner logos (styled brand-color cards) — fallback ─── */
+/* ─── Partner logos — real partners, fallback if DB empty ─── */
 const FALLBACK_PARTNERS = [
-  { name: 'Stripe', initials: 'ST', color: '#635BFF' },
-  { name: 'Supabase', initials: 'SB', color: '#3ECF8E' },
-  { name: 'Vercel', initials: 'VL', color: '#000000' },
-  { name: 'Google AI', initials: 'AI', color: '#4285F4' },
+  { name: 'RioTrade', initials: 'RT', color: '#1B2A4A', logo_url: '/partners/riotrade.png' },
+  { name: 'Watson & Fine', initials: 'WF', color: '#000000', logo_url: '/partners/watson-fine.png' },
+  { name: 'Savithi Trading', initials: 'ST', color: '#CC0000', logo_url: '/partners/savithi.png' },
+  { name: 'Rajo Beheer BV', initials: 'RB', color: '#7B2D8E', logo_url: '/partners/rajo-beheer.png' },
+  { name: 'Alvan Blanch', initials: 'AB', color: '#006633', logo_url: '/partners/alvan-blanch.png' },
   { name: 'M-Pesa', initials: 'MP', color: '#4CAF50' },
   { name: 'EcoCash', initials: 'EC', color: '#0072BC' },
   { name: 'MTN MoMo', initials: 'MTN', color: '#FFCC00' },
-  { name: 'Resend', initials: 'RS', color: '#000000' },
-  { name: 'Lloyd\'s', initials: 'LL', color: '#003DA5' },
+  { name: 'Lloyd\'s of London', initials: 'LL', color: '#003DA5' },
   { name: 'Airtel Money', initials: 'AM', color: '#ED1C24' },
   { name: 'Orange Money', initials: 'OM', color: '#FF6600' },
-  { name: 'TypeScript', initials: 'TS', color: '#3178C6' },
 ];
 
 /* ─── How it works ─── */
@@ -1013,7 +1012,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeInWhenVisible>
             <p className="text-center text-sm font-semibold text-gray-400 uppercase tracking-wider mb-10">
-              Powered By
+              Our Partners
             </p>
           </FadeInWhenVisible>
           <div className="overflow-hidden relative">
@@ -1025,15 +1024,23 @@ export default function Home() {
                   key={`${partner.name}-${i}`}
                   className="flex-shrink-0 flex items-center gap-3 px-5 py-3 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md hover:border-[#5DB347]/20 transition-all"
                 >
+                  {partner.logo_url ? (
+                    <img
+                      src={partner.logo_url}
+                      alt={partner.name}
+                      className="h-8 w-auto max-w-[120px] object-contain"
+                      onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.nextElementSibling?.classList.remove('hidden'); }}
+                    />
+                  ) : null}
                   <div
-                    className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-sm"
+                    className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-sm ${partner.logo_url ? 'hidden' : ''}`}
                     style={{ backgroundColor: partner.color }}
                   >
                     <span className={`font-bold text-xs ${partner.color === '#FFCC00' ? 'text-[#1B2A4A]' : 'text-white'}`}>
                       {partner.initials}
                     </span>
                   </div>
-                  <span className="text-navy/70 font-semibold text-sm">{partner.name}</span>
+                  {!partner.logo_url && <span className="text-navy/70 font-semibold text-sm">{partner.name}</span>}
                 </div>
               ))}
             </div>
