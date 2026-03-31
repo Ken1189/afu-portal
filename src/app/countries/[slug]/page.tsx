@@ -168,7 +168,7 @@ const FALLBACK_COUNTRIES: CountryData[] = [
     slug: "nigeria",
     flag: "\u{1F1F3}\u{1F1EC}",
     role: "West African Scale",
-    heroImage: "https://images.unsplash.com/photo-1592982537447-6f2a6a0c8b8b?w=1600&q=80",
+    heroImage: "https://images.unsplash.com/photo-1589923188651-268a9765e432?w=1600&q=80",
     description:
       "Nigeria is Africa's largest economy and most populous nation, offering a massive domestic market for agricultural inputs, equipment, and processing. With a booming fintech ecosystem and enormous food import bill, Nigeria represents the single largest opportunity for agricultural development on the continent.",
     stats: {
@@ -405,7 +405,7 @@ const FALLBACK_COUNTRIES: CountryData[] = [
     slug: "egypt",
     flag: "\u{1F1EA}\u{1F1EC}",
     role: "North African Agri Powerhouse",
-    heroImage: "https://images.unsplash.com/photo-1539768942893-daf53e736b68?w=1600&q=80",
+    heroImage: "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=1600&q=80",
     description:
       "Egypt is Africa's largest agricultural economy with advanced irrigation infrastructure along the Nile. A strategic gateway to Middle Eastern and European export markets, Egypt offers established agri-finance systems and a large domestic market.",
     stats: {

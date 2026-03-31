@@ -128,7 +128,7 @@ const FALLBACK_EQUIPMENT: Equipment[] = [
     country: 'Zimbabwe',
     owner: 'Great Zimbabwe Transport',
     condition: 'good',
-    image: 'https://images.unsplash.com/photo-1605338198618-1773c1f7500e?w=400&h=300&fit=crop',
+    image: 'https://images.unsplash.com/photo-1560493676-04071c5f467b?w=400&h=300&fit=crop',
     rating: 4.5,
     reviewCount: 43,
     minBookingDays: 3,

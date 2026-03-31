@@ -173,7 +173,7 @@ const FALLBACK_SERVICES = [
     title: 'Training & Certification',
     desc: 'Vocational partnerships to build scalable farmer capacity, compliance, and export readiness.',
     link: '/services/training',
-    img: 'https://images.unsplash.com/photo-1595508064774-5ff825a8213f?w=800&h=500&fit=crop',
+    img: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=800&h=500&fit=crop',
   },
 ];
 
@@ -861,7 +861,7 @@ export default function Home() {
                 {
                   title: 'How Farmers Use AFU',
                   duration: '2 min',
-                  thumb: 'https://images.unsplash.com/photo-1595508064774-5ff825a8213f?w=400&h=300&fit=crop',
+                  thumb: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400&h=300&fit=crop',
                 },
                 {
                   title: 'Sponsor a Farmer Story',
@@ -896,7 +896,7 @@ export default function Home() {
             <FadeInWhenVisible direction="right">
               <div className="relative rounded-3xl overflow-hidden shadow-2xl">
                 <Image
-                  src="https://images.unsplash.com/photo-1595508064774-5ff825a8213f?w=800&h=600&fit=crop"
+                  src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=800&h=600&fit=crop"
                   alt="African farmer inspecting crops"
                   width={800}
                   height={600}

@@ -117,9 +117,9 @@ interface WeatherDay {
 // ---------------------------------------------------------------------------
 
 const CROP_IMAGES: Record<string, string> = {
-  blueberries: 'https://images.unsplash.com/photo-1498159332174-be5f8a9afc86?w=600&h=400&fit=crop',
+  blueberries: 'https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=600&h=400&fit=crop',
   tomatoes: 'https://images.unsplash.com/photo-1592841200221-a6898f307baa?w=600&h=400&fit=crop',
-  maize: 'https://images.unsplash.com/photo-1601004890684-d8573e10e7e7?w=600&h=400&fit=crop',
+  maize: 'https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=600&h=400&fit=crop',
   cassava: 'https://images.unsplash.com/photo-1590682680695-43b964a3ae17?w=600&h=400&fit=crop',
   sesame: 'https://images.unsplash.com/photo-1595855759920-86582396756a?w=600&h=400&fit=crop',
   sorghum: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&h=400&fit=crop',
