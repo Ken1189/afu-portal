@@ -127,6 +127,17 @@ export default function ContactPage() {
         }
       }
 
+      // Send email notification to Peter
+      fetch('/api/email/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: 'peterw@africanfarmingunion.org',
+          subject: `[AFU Contact] ${formData.subject} — from ${formData.name.trim()}`,
+          html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto"><div style="background:#1B2A4A;padding:20px;text-align:center"><h2 style="color:#5DB347;margin:0">New Contact Form Submission</h2></div><div style="padding:20px;background:#f8faf6"><p><strong>Name:</strong> ${formData.name.trim()}</p><p><strong>Email:</strong> ${formData.email.trim()}</p><p><strong>Organization:</strong> ${formData.organization.trim() || 'N/A'}</p><p><strong>Subject:</strong> ${formData.subject}</p><hr style="border:1px solid #eee"><p><strong>Message:</strong></p><p>${formData.message.trim().replace(/\n/g, '<br>')}</p></div><div style="padding:15px;text-align:center;color:#999;font-size:12px">African Farming Union | africanfarmingunion.org</div></div>`,
+        }),
+      }).catch(() => {}); // Fire and forget
+
       setSubmitted(true);
     } catch (err) {
       console.error("Contact form submission error:", err);
