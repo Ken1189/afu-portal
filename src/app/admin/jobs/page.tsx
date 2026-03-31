@@ -617,7 +617,7 @@ export default function AdminJobsPage() {
         .update(payload)
         .eq('id', editingJobId);
       if (error) {
-        setToast({ message: 'Failed to update job', type: 'error' });
+        setToast({ message: 'Failed to update job: ' + error.message, type: 'error' });
       } else {
         setToast({ message: 'Job updated successfully', type: 'success' });
         setShowFormModal(false);
@@ -628,7 +628,7 @@ export default function AdminJobsPage() {
         .from('job_listings')
         .insert({ ...payload, is_approved: false, is_featured: false });
       if (error) {
-        setToast({ message: 'Failed to create job', type: 'error' });
+        setToast({ message: 'Failed to create job: ' + error.message, type: 'error' });
       } else {
         setToast({ message: 'Job created successfully', type: 'success' });
         setShowFormModal(false);
