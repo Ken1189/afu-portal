@@ -114,7 +114,7 @@ export default function ContactPage() {
               full_name: formData.name.trim(),
               email: formData.email.trim(),
               status: "pending",
-              membership_tier: "contact",
+              requested_tier: "new_enterprise",
               country: formData.subject,
               notes: `[Contact Form] Subject: ${formData.subject}\nOrganization: ${formData.organization || "N/A"}\n\n${formData.message.trim()}`,
             });
