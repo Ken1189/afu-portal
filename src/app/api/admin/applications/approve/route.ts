@@ -151,16 +151,20 @@ export async function POST(request: Request) {
       // Not a fatal error — the user can still log in
     }
 
-    // Create a member record if applicable
-    await svc.from('members').insert({
+    // Create a member record
+    const memberId = `AFU-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 99999)).padStart(5, '0')}`;
+    const { error: memberError } = await svc.from('members').insert({
       profile_id: userId,
+      member_id: memberId,
       tier: application.requested_tier || 'new_enterprise',
       status: 'active',
       farm_name: application.farm_name || null,
       farm_size_ha: application.farm_size_ha || null,
       primary_crops: application.primary_crops || null,
     });
-    // Ignore member insert errors (table may not exist or have different schema)
+    if (memberError) {
+      console.error('Failed to create member:', memberError.message);
+    }
 
     // Update the application status to approved
     const { error: updateError } = await svc
