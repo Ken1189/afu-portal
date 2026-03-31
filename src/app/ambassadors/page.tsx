@@ -28,6 +28,8 @@ import {
   CheckCircle2,
   Send,
   Loader2,
+  Briefcase,
+  GraduationCap,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
@@ -145,17 +147,33 @@ const FALLBACK_AMBASSADORS: Ambassador[] = [
 
 /* ─── Constants ─── */
 
-const SECTOR_TABS = ['All', 'Grains', 'Cash Crops', 'Livestock', 'Horticulture', 'Poultry'];
+const SECTOR_TABS = ['All', 'Farming', 'Business', 'Community', 'Education', 'Technology'];
 
 const SECTOR_COLORS: Record<string, string> = {
+  farming: 'bg-green-100 text-green-700',
+  business: 'bg-blue-100 text-blue-700',
+  community: 'bg-purple-100 text-purple-700',
+  education: 'bg-amber-100 text-amber-700',
+  technology: 'bg-cyan-100 text-cyan-700',
+  // Legacy crop-based sectors (fallback data)
   Grains: 'bg-amber-100 text-amber-700',
   'Cash Crops': 'bg-green-100 text-green-700',
   Livestock: 'bg-orange-100 text-orange-700',
   Horticulture: 'bg-emerald-100 text-emerald-700',
   Poultry: 'bg-yellow-100 text-yellow-700',
+  grains: 'bg-amber-100 text-amber-700',
+  cash_crops: 'bg-green-100 text-green-700',
+  livestock: 'bg-orange-100 text-orange-700',
+  horticulture: 'bg-emerald-100 text-emerald-700',
+  poultry: 'bg-yellow-100 text-yellow-700',
 };
 
 const SECTOR_ICONS: Record<string, React.ReactNode> = {
+  farming: <Wheat className="w-3.5 h-3.5" />,
+  business: <Briefcase className="w-3.5 h-3.5" />,
+  community: <Users className="w-3.5 h-3.5" />,
+  education: <GraduationCap className="w-3.5 h-3.5" />,
+  technology: <Globe className="w-3.5 h-3.5" />,
   Grains: <Wheat className="w-3.5 h-3.5" />,
   'Cash Crops': <Sprout className="w-3.5 h-3.5" />,
   Livestock: <Beef className="w-3.5 h-3.5" />,
@@ -300,7 +318,7 @@ export default function AmbassadorsPage() {
 
   const filtered = useMemo(() => {
     if (activeSector === 'All') return ambassadors;
-    return ambassadors.filter((a) => a.sector === activeSector);
+    return ambassadors.filter((a) => (a.sector || '').toLowerCase() === activeSector.toLowerCase());
   }, [ambassadors, activeSector]);
 
   function scrollToApply() {
@@ -606,10 +624,10 @@ export default function AmbassadorsPage() {
             Our Ambassadors
           </div>
           <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4 tracking-tight">
-            Meet Our Ambassadors
+            Our Ambassadors
           </h2>
           <p className="text-lg text-white/70 max-w-2xl mx-auto">
-            The farmers leading Africa&apos;s agricultural transformation
+            The people driving Africa&apos;s agricultural revolution
           </p>
         </div>
       </section>
