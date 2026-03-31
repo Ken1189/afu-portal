@@ -819,7 +819,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         ref={sidebarRef}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        className="hidden lg:flex flex-col text-white fixed inset-y-0 left-0 z-30 overflow-hidden"
+        className="hidden lg:flex flex-col text-white fixed inset-y-0 left-0 z-30"
         style={{
           width: effectiveWidth,
           backgroundColor: '#1B2A4A',
