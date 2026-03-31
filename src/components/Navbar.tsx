@@ -91,7 +91,7 @@ const educationLinks = [
 
 const communityLinks: { label: string; href: string; desc: string; icon: LucideIcon }[] = [
   { label: "Jobs Board", href: "/jobs", desc: "Agricultural positions", icon: Briefcase },
-  { label: "Ambassadors", href: "/ambassadors", desc: "Meet our farmers", icon: Award },
+  { label: "Ambassadors", href: "/ambassadors", desc: "Join our ambassador program", icon: Award },
   { label: "Partner Farms", href: "/farms", desc: "Showcase farms", icon: Sprout },
   { label: "Partners", href: "/partners", desc: "Our network", icon: Handshake },
   { label: "Programs", href: "/programs", desc: "Active farming programs", icon: Target },
