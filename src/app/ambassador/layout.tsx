@@ -297,7 +297,7 @@ export default function AmbassadorLayout({ children }: { children: React.ReactNo
         </header>
 
         <main className="flex-1 p-4 sm:p-6">
-          <div className="max-w-6xl mx-auto">{children}</div>
+          <div className="max-w-6xl mx-auto" key={user?.id || 'anon'}>{children}</div>
         </main>
       </div>
     </div>

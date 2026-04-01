@@ -305,7 +305,7 @@ export default function WarehouseLayout({ children }: { children: React.ReactNod
         </header>
 
         <main className="flex-1 p-4 sm:p-6">
-          <div className="max-w-7xl mx-auto">{children}</div>
+          <div className="max-w-7xl mx-auto" key={user?.id || 'anon'}>{children}</div>
         </main>
       </div>
     </div>

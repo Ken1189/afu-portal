@@ -368,7 +368,7 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
 
         {/* ─── Page Content ─── */}
         <main className="flex-1 p-6 overflow-y-auto">
-          <div className="max-w-7xl mx-auto">{children}</div>
+          <div className="max-w-7xl mx-auto" key={user?.id || 'anon'}>{children}</div>
         </main>
       </div>
     </div>

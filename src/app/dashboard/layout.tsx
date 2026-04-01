@@ -345,7 +345,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 p-4 sm:p-6">{children}</main>
+        <main className="flex-1 p-4 sm:p-6" key={user?.id || 'anon'}>{children}</main>
       </div>
     </div>
   );
