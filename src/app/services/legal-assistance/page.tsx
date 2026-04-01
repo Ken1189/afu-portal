@@ -103,7 +103,7 @@ export default function LegalAssistancePage() {
           className="absolute inset-0 bg-cover bg-center"
           style={{
             backgroundImage:
-              "url('https://images.unsplash.com/photo-1560493676-04071c5f467b?w=1920&h=1080&fit=crop')",
+              "url('https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?w=1920&h=1080&fit=crop')",
           }}
         />
         <div

@@ -103,7 +103,7 @@ export default function VeterinaryServicesPage() {
           className="absolute inset-0 bg-cover bg-center"
           style={{
             backgroundImage:
-              "url('https://images.unsplash.com/photo-1473172707857-f9e276582ab6?w=1920&h=1080&fit=crop')",
+              "url('https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=1920&h=1080&fit=crop')",
           }}
         />
         <div

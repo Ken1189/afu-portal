@@ -181,7 +181,7 @@ export default async function AboutPage() {
       <section className="relative py-28 text-white overflow-hidden">
         <div className="absolute inset-0">
           <Image
-            src="https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=1920&h=700&fit=crop"
+            src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1920&h=700&fit=crop"
             alt=""
             aria-hidden="true"
             fill

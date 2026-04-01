@@ -138,42 +138,42 @@ const FALLBACK_SERVICES = [
     title: 'Financing',
     desc: 'Working capital, invoice finance, and crop financing from smallholder to commercial scale.',
     link: '/services/financing',
-    img: 'https://images.unsplash.com/photo-1589923188651-268a9765e432?w=800&h=500&fit=crop',
+    img: 'https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=800&h=500&fit=crop',
   },
   {
     icon: Cog,
     title: 'Inputs & Equipment',
     desc: 'Tractors, drones, irrigation, seeds, and fertilizers. Bulk procurement at better prices.',
     link: '/services/inputs',
-    img: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=800&h=500&fit=crop',
+    img: 'https://images.unsplash.com/photo-1509391366360-2e959784a276?w=800&h=500&fit=crop',
   },
   {
     icon: Factory,
     title: 'Processing Hubs',
     desc: 'Milling, drying, cold chain, and packaging. Value-addition at source.',
     link: '/services/processing',
-    img: 'https://images.unsplash.com/photo-1605000797499-95a51c5269ae?w=800&h=500&fit=crop',
+    img: 'https://images.unsplash.com/photo-1599058917765-a780eda07a3e?w=800&h=500&fit=crop',
   },
   {
     icon: ShieldCheck,
     title: 'Guaranteed Offtake',
     desc: 'Pre-arranged buyers and distribution. No more selling cheap or wasting crops.',
     link: '/services/offtake',
-    img: 'https://images.unsplash.com/photo-1473172707857-f9e276582ab6?w=800&h=500&fit=crop',
+    img: 'https://images.unsplash.com/photo-1504370805625-d32c54b16100?w=800&h=500&fit=crop',
   },
   {
     icon: CircleDollarSign,
     title: 'Trade Finance',
     desc: 'SBLCs, Letters of Credit, export pre-financing, and FX services via our banking partners.',
     link: '/services/trade-finance',
-    img: 'https://images.unsplash.com/photo-1560493676-04071c5f467b?w=800&h=500&fit=crop',
+    img: 'https://images.unsplash.com/photo-1530267981375-f0de937f5f13?w=800&h=500&fit=crop',
   },
   {
     icon: GraduationCap,
     title: 'Training & Certification',
     desc: 'Vocational partnerships to build scalable farmer capacity, compliance, and export readiness.',
     link: '/services/training',
-    img: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=800&h=500&fit=crop',
+    img: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=800&h=500&fit=crop',
   },
 ];
 
@@ -464,7 +464,7 @@ export default function Home() {
               title: (s.title as string) || '',
               desc: (s.description as string) || (s.content as string) || '',
               link: (s.link as string) || (s.url as string) || '/services',
-              img: (s.image_url as string) || (s.img as string) || 'https://images.unsplash.com/photo-1589923188651-268a9765e432?w=800&h=500&fit=crop',
+              img: (s.image_url as string) || (s.img as string) || 'https://images.unsplash.com/photo-1593113598332-cd288d649433?w=800&h=500&fit=crop',
             }))
           );
         }
@@ -866,7 +866,7 @@ export default function Home() {
               <VideoCard
                 title="AFU Platform Demo"
                 duration="3 min"
-                thumbnailUrl="https://images.unsplash.com/photo-1589923188651-268a9765e432?w=800&h=450&fit=crop"
+                thumbnailUrl="https://images.unsplash.com/photo-1508614589041-895b88991e3e?w=800&h=450&fit=crop"
                 size="large"
               />
             </FadeInWhenVisible>
@@ -877,17 +877,17 @@ export default function Home() {
                 {
                   title: 'How Farmers Use AFU',
                   duration: '2 min',
-                  thumb: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400&h=300&fit=crop',
+                  thumb: 'https://images.unsplash.com/photo-1560493676-04071c5f467b?w=400&h=300&fit=crop',
                 },
                 {
                   title: 'Sponsor a Farmer Story',
                   duration: '4 min',
-                  thumb: 'https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?w=400&h=300&fit=crop',
+                  thumb: 'https://images.unsplash.com/photo-1591604466107-ec97de577aff?w=400&h=300&fit=crop',
                 },
                 {
                   title: 'Investor Overview',
                   duration: '5 min',
-                  thumb: 'https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=400&h=300&fit=crop',
+                  thumb: 'https://images.unsplash.com/photo-1500595046743-cd271d694d30?w=400&h=300&fit=crop',
                 },
               ].map((v, i) => (
                 <FadeInWhenVisible key={v.title} delay={i * 0.12}>
@@ -912,7 +912,7 @@ export default function Home() {
             <FadeInWhenVisible direction="right">
               <div className="relative rounded-3xl overflow-hidden shadow-2xl">
                 <Image
-                  src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=800&h=600&fit=crop"
+                  src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&h=600&fit=crop"
                   alt="African farmer inspecting crops"
                   width={800}
                   height={600}
@@ -1488,7 +1488,7 @@ export default function Home() {
             <FadeInWhenVisible direction="left">
               <div className="relative rounded-3xl overflow-hidden shadow-2xl">
                 <Image
-                  src="https://images.unsplash.com/photo-1589923188651-268a9765e432?w=800&h=600&fit=crop"
+                  src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&h=600&fit=crop"
                   alt="African farmer in field"
                   width={800}
                   height={600}
@@ -1656,7 +1656,7 @@ export default function Home() {
       {showSection('cta') && <section className="relative py-32 overflow-hidden">
         <div className="absolute inset-0">
           <Image
-            src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=1920&h=1080&fit=crop"
+            src="https://images.unsplash.com/photo-1495107334309-fcf20504a5ab?w=1920&h=1080&fit=crop"
             alt="Green crop field"
             fill
             className="object-cover"

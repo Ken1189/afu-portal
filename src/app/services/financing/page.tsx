@@ -10,7 +10,7 @@ export default function FinancingServicePage() {
           className="absolute inset-0 bg-cover bg-center"
           style={{
             backgroundImage:
-              "url('https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=1920&h=1080&fit=crop')",
+              "url('https://images.unsplash.com/photo-1605000797499-95a51c5269ae?w=1920&h=1080&fit=crop')",
           }}
         />
         <div
