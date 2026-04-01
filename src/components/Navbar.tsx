@@ -1528,7 +1528,7 @@ export default function Navbar() {
                       onMouseLeave={e => (e.currentTarget.style.background = '#5DB347')}
                       onClick={closeMobile}
                     >
-                      Become a Member
+                      Join AFU
                     </Link>
                   </>
                 )}
