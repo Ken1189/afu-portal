@@ -259,7 +259,7 @@ export default function MembershipsPage() {
       if (data.url) {
         window.location.href = data.url;
       } else {
-        setCheckoutError(data.error || 'Payment system unavailable. Please try again.');
+        setCheckoutError('Payment system is being configured. Please contact us or try again later.');
         setCheckoutLoading(null);
       }
     } catch {
