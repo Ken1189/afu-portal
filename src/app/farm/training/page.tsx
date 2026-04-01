@@ -274,7 +274,7 @@ export default function TrainingPage() {
   // ── Render ────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-[#0F1A2E] text-white">
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div
