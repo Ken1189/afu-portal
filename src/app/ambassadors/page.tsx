@@ -196,11 +196,12 @@ const AFU_COUNTRIES = [
 ];
 
 const DEFAULT_COMMISSION_RATES: CommissionRate[] = [
-  { label: 'New Farmer Signup', amount: '$25 per referral', description: 'Earn for every farmer who joins through your link' },
-  { label: 'Supplier Onboarding', amount: '$100 per supplier', description: 'Bring suppliers onto the platform' },
-  { label: 'Loan Facilitation', amount: '2% of loan value', description: 'Commission on facilitated agricultural loans' },
-  { label: 'Insurance Sale', amount: '5% of first premium', description: 'Earn on crop and livestock insurance sales' },
-  { label: 'Trading Commission', amount: '1% of trade value', description: 'Commission on marketplace transactions' },
+  { label: 'Membership Fees', amount: '10% recurring', description: 'Earn 10% of every membership fee your referrals pay — every month, for life' },
+  { label: 'Fundraising $100K-$500K', amount: '2% commission', description: 'Commission on capital raised between $100K and $500K' },
+  { label: 'Fundraising $500K-$1M', amount: '2.5% commission', description: 'Commission on capital raised between $500K and $1M' },
+  { label: 'Fundraising $1M-$5M', amount: '5% commission', description: 'Commission on capital raised between $1M and $5M' },
+  { label: 'Fundraising $5M-$10M', amount: '7.5% commission', description: 'Commission on capital raised between $5M and $10M' },
+  { label: 'Fundraising $100M+', amount: '10% commission', description: 'Commission on capital raised above $100M' },
 ];
 
 const TIERS = [

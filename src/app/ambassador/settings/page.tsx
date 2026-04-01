@@ -62,7 +62,7 @@ export default function SettingsPage() {
   const [bankName, setBankName] = useState('');
   const [accountNumber, setAccountNumber] = useState('');
   const [mobileNumber, setMobileNumber] = useState('');
-  const [ecocashNumber, setEcocashNumber] = useState('');
+  const [mobile_moneyNumber, setEcocashNumber] = useState('');
 
   // Notification preferences
   const [notifyNewReferral, setNotifyNewReferral] = useState(true);
@@ -102,7 +102,7 @@ export default function SettingsPage() {
             setBankName(details.bank_name || '');
             setAccountNumber(details.account_number || '');
             setMobileNumber(details.mobile_number || '');
-            setEcocashNumber(details.ecocash_number || '');
+            setEcocashNumber(details.mobile_money_number || '');
           }
           if (ambassador.notification_preferences) {
             const prefs = typeof ambassador.notification_preferences === 'string'
@@ -203,8 +203,8 @@ export default function SettingsPage() {
         payoutDetails.account_number = accountNumber;
       } else if (payoutMethod === 'mobile_money') {
         payoutDetails.mobile_number = mobileNumber;
-      } else if (payoutMethod === 'ecocash') {
-        payoutDetails.ecocash_number = ecocashNumber;
+      } else if (payoutMethod === 'mobile_money') {
+        payoutDetails.mobile_money_number = mobile_moneyNumber;
       }
 
       await supabase
@@ -563,7 +563,7 @@ export default function SettingsPage() {
               {[
                 { value: 'bank_transfer', label: 'Bank Transfer' },
                 { value: 'mobile_money', label: 'Mobile Money' },
-                { value: 'ecocash', label: 'EcoCash' },
+                { value: 'mobile_money', label: 'Mobile Money' },
               ].map((method) => (
                 <button
                   key={method.value}
@@ -618,12 +618,12 @@ export default function SettingsPage() {
             </div>
           )}
 
-          {payoutMethod === 'ecocash' && (
+          {payoutMethod === 'mobile_money' && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">EcoCash Number</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Mobile Money Number</label>
               <input
                 type="tel"
-                value={ecocashNumber}
+                value={mobile_moneyNumber}
                 onChange={(e) => setEcocashNumber(e.target.value)}
                 placeholder="+263 7X XXX XXXX"
                 className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347] max-w-md"

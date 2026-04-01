@@ -1124,10 +1124,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <ExternalLink className="w-3.5 h-3.5" />
               View Site
             </Link>
-            <button className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors">
+            <Link href="/admin/notifications" className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors">
               <Bell className="w-5 h-5 text-gray-500" />
               <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
-            </button>
+            </Link>
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 bg-navy rounded-full flex items-center justify-center">
                 <span className="text-white text-xs font-bold">{initials}</span>

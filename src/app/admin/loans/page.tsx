@@ -72,7 +72,7 @@ const fadeUp = {
 
 type ApplicationStatus = 'pending' | 'submitted' | 'under_review' | 'approved' | 'rejected' | 'disbursed' | 'repaying' | 'completed';
 type LoanPurpose = 'working capital' | 'equipment' | 'inputs' | 'trade finance';
-type PaymentMethod = 'M-Pesa' | 'EcoCash' | 'Bank Transfer';
+type PaymentMethod = 'M-Pesa' | 'Mobile Money' | 'Bank Transfer';
 
 interface LoanApplication {
   id: string;
@@ -207,7 +207,7 @@ const FALLBACK_DISBURSEMENT_QUEUE: DisbursementEntry[] = [
     loanId: 'LN-2026-045',
     member: 'Grace Moyo',
     amount: 15000,
-    method: 'EcoCash',
+    method: 'Mobile Money',
     country: 'Zimbabwe',
     approvedDate: '2026-03-07',
   },
@@ -325,7 +325,7 @@ const activityTypeConfig: Record<RecentActivity['type'], { icon: React.ReactNode
 
 const methodIcons: Record<PaymentMethod, React.ReactNode> = {
   'M-Pesa': <Smartphone className="w-3.5 h-3.5" />,
-  EcoCash: <Zap className="w-3.5 h-3.5" />,
+  'Mobile Money': <Zap className="w-3.5 h-3.5" />,
   'Bank Transfer': <Building2 className="w-3.5 h-3.5" />,
 };
 

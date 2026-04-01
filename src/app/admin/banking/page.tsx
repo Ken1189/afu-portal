@@ -69,7 +69,7 @@ const fallback_flags = [
 const fallback_reconRuns = [
   { date: '2026-03-25', provider: 'Stripe', currency: 'USD', our: 127_450.00, theirs: 127_450.00, disc: 0, matched: 45, unmatched: 0, status: 'matched' },
   { date: '2026-03-25', provider: 'M-Pesa', currency: 'KES', our: 3_450_000, theirs: 3_448_500, disc: 1500, matched: 128, unmatched: 2, status: 'discrepancy' },
-  { date: '2026-03-25', provider: 'EcoCash', currency: 'ZWL', our: 12_500_000, theirs: 12_500_000, disc: 0, matched: 34, unmatched: 0, status: 'matched' },
+  { date: '2026-03-25', provider: 'Mobile Money', currency: 'ZWL', our: 12_500_000, theirs: 12_500_000, disc: 0, matched: 34, unmatched: 0, status: 'matched' },
   { date: '2026-03-24', provider: 'Stripe', currency: 'USD', our: 98_320.00, theirs: 98_320.00, disc: 0, matched: 38, unmatched: 0, status: 'matched' },
   { date: '2026-03-24', provider: 'MTN MoMo', currency: 'UGX', our: 85_000_000, theirs: 84_950_000, disc: 50000, matched: 67, unmatched: 1, status: 'discrepancy' },
 ];

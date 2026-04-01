@@ -66,7 +66,7 @@ const services = [
     status: 'degraded' as const,
     metrics: [
       { label: 'Active', value: '6 of 7' },
-      { label: 'Providers', value: 'M-Pesa, EcoCash, MTN, Airtel, Orange, Bank' },
+      { label: 'Providers', value: 'M-Pesa, Mobile Money, MTN, Airtel, Orange, Bank' },
     ],
   },
   {

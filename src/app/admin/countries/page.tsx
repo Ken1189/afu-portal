@@ -82,7 +82,7 @@ const EMPTY_FORM: CountryFormData = {
 // ── Mock Data ──
 const fallback_countries: Country[] = [
   { iso: 'BW', name: 'Botswana', flag: '\ud83c\udde7\ud83c\uddfc', currency: 'BWP', paymentProviders: ['Orange Money'], languages: ['Setswana', 'English'], status: 'live', members: 3842, activeLoans: 312, revenueThisMonth: 78400 },
-  { iso: 'ZW', name: 'Zimbabwe', flag: '\ud83c\uddff\ud83c\uddfc', currency: 'USD', paymentProviders: ['EcoCash'], languages: ['Shona', 'Ndebele', 'English'], status: 'live', members: 4215, activeLoans: 487, revenueThisMonth: 92100 },
+  { iso: 'ZW', name: 'Zimbabwe', flag: '\ud83c\uddff\ud83c\uddfc', currency: 'USD', paymentProviders: ['Mobile Money'], languages: ['Shona', 'Ndebele', 'English'], status: 'live', members: 4215, activeLoans: 487, revenueThisMonth: 92100 },
   { iso: 'TZ', name: 'Tanzania', flag: '\ud83c\uddf9\ud83c\uddff', currency: 'TZS', paymentProviders: ['M-Pesa', 'Airtel Money'], languages: ['Swahili', 'English'], status: 'live', members: 4780, activeLoans: 421, revenueThisMonth: 65300 },
   { iso: 'KE', name: 'Kenya', flag: '\ud83c\uddf0\ud83c\uddea', currency: 'KES', paymentProviders: ['M-Pesa', 'Airtel Money'], languages: ['Swahili', 'English'], status: 'live', members: 4950, activeLoans: 498, revenueThisMonth: 98700 },
   { iso: 'ZA', name: 'South Africa', flag: '\ud83c\uddff\ud83c\udde6', currency: 'ZAR', paymentProviders: ['Bank Transfer'], languages: ['Zulu', 'Afrikaans', 'English'], status: 'live', members: 3200, activeLoans: 275, revenueThisMonth: 87200 },
