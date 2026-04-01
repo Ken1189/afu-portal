@@ -387,7 +387,7 @@ export default function Home() {
                 'https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?w=200&h=200&fit=crop&crop=face',
                 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=200&h=200&fit=crop&crop=face',
                 'https://images.unsplash.com/photo-1580477667995-2b94f01c9516?w=200&h=200&fit=crop&crop=face',
-                'https://images.unsplash.com/photo-1590682680695-43b964a3ae17?w=200&h=200&fit=crop&crop=face',
+                'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face',
               ][i % 6],
               rating: (t.rating as number) || 5,
             }))
