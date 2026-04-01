@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect, use, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import {
   ArrowLeft,
@@ -36,8 +36,14 @@ import {
   Banknote,
   Megaphone,
   DollarSign,
+  X,
+  Upload,
+  Loader2,
+  FileText,
+  LogIn,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { useAuth } from '@/lib/supabase/auth-context';
 
 /* ─── Types ─── */
 
@@ -479,14 +485,374 @@ const STATUS_COLORS: Record<string, string> = {
   filled: 'bg-gray-100 text-gray-600',
 };
 
+/* ─── File Upload helpers ─── */
+
+const ALLOWED_TYPES = [
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'image/jpeg',
+  'image/png',
+];
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
+
+function getFileExt(name: string) {
+  return name.split('.').pop()?.toLowerCase() || 'pdf';
+}
+
+/* ─── Apply Modal ─── */
+
+function ApplyModal({
+  job,
+  onClose,
+}: {
+  job: JobDetail;
+  onClose: () => void;
+}) {
+  const { user, profile, session } = useAuth();
+  const supabase = createClient();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [form, setForm] = useState({
+    full_name: profile?.full_name || '',
+    email: user?.email || '',
+    phone: profile?.phone || '',
+    cover_message: '',
+  });
+  const [cvFile, setCvFile] = useState<File | null>(null);
+  const [cvUrl, setCvUrl] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [appId, setAppId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [dragOver, setDragOver] = useState(false);
+
+  // Pre-fill when profile loads
+  useEffect(() => {
+    if (profile?.full_name && !form.full_name) {
+      setForm((prev) => ({ ...prev, full_name: profile.full_name }));
+    }
+    if (user?.email && !form.email) {
+      setForm((prev) => ({ ...prev, email: user.email! }));
+    }
+    if (profile?.phone && !form.phone) {
+      setForm((prev) => ({ ...prev, phone: profile.phone || '' }));
+    }
+  }, [profile, user, form.full_name, form.email, form.phone]);
+
+  const handleFileSelect = useCallback(
+    async (file: File) => {
+      setError(null);
+      if (!ALLOWED_TYPES.includes(file.type)) {
+        setError('Please upload a PDF, Word doc, JPG, or PNG file.');
+        return;
+      }
+      if (file.size > MAX_FILE_SIZE) {
+        setError('File size must be under 10 MB.');
+        return;
+      }
+
+      setCvFile(file);
+      setUploading(true);
+      setUploadProgress(0);
+
+      // Simulate progress while uploading
+      const progressInterval = setInterval(() => {
+        setUploadProgress((prev) => (prev < 90 ? prev + 10 : prev));
+      }, 200);
+
+      try {
+        const ext = getFileExt(file.name);
+        const path = `cvs/${user?.id || 'anon'}/${Date.now()}.${ext}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('cvs')
+          .upload(path, file, { upsert: true });
+
+        clearInterval(progressInterval);
+
+        if (uploadError) {
+          setError('Upload failed: ' + uploadError.message);
+          setCvFile(null);
+          setUploadProgress(0);
+        } else {
+          const { data: urlData } = supabase.storage
+            .from('cvs')
+            .getPublicUrl(path);
+          setCvUrl(urlData.publicUrl);
+          setUploadProgress(100);
+        }
+      } catch {
+        clearInterval(progressInterval);
+        setError('Upload failed. Please try again.');
+        setCvFile(null);
+        setUploadProgress(0);
+      } finally {
+        setUploading(false);
+      }
+    },
+    [supabase, user],
+  );
+
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      setDragOver(false);
+      const file = e.dataTransfer.files[0];
+      if (file) handleFileSelect(file);
+    },
+    [handleFileSelect],
+  );
+
+  const handleSubmit = async () => {
+    setError(null);
+    if (!form.full_name.trim() || !form.email.trim() || !form.cover_message.trim()) {
+      setError('Please fill in all required fields.');
+      return;
+    }
+
+    setSubmitting(true);
+
+    try {
+      const res = await fetch('/api/jobs/apply', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session?.access_token
+            ? { Authorization: `Bearer ${session.access_token}` }
+            : {}),
+        },
+        body: JSON.stringify({
+          job_id: job.id,
+          job_title: job.title,
+          cover_message: form.cover_message,
+          cv_url: cvUrl,
+          full_name: form.full_name,
+          email: form.email,
+          phone: form.phone,
+          country: profile?.country || null,
+          skills: job.skills || job.required_skills || null,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || 'Something went wrong. Please try again.');
+      } else {
+        setAppId(data.applicationId);
+        setSubmitted(true);
+      }
+    } catch {
+      setError('Network error. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // Success state
+  if (submitted) {
+    return (
+      <div
+        className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4"
+        onClick={onClose}
+      >
+        <div
+          className="bg-white rounded-2xl shadow-xl max-w-md w-full p-8 text-center"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="w-16 h-16 bg-[#5DB347]/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <CheckCircle2 className="w-8 h-8 text-[#5DB347]" />
+          </div>
+          <h3 className="text-xl font-bold text-[#1B2A4A] mb-2">Application Submitted!</h3>
+          <p className="text-sm text-gray-500 mb-4">
+            Reference: <strong className="text-[#1B2A4A]">APP-{appId}</strong>
+          </p>
+          <p className="text-sm text-gray-500 mb-6">
+            We&apos;ll review your application within 48 hours. Check your email for a confirmation.
+          </p>
+          <button
+            onClick={onClose}
+            className="w-full py-3 bg-[#5DB347] text-white font-semibold rounded-xl hover:bg-[#449933] transition-colors"
+          >
+            Done
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-2xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b border-gray-100">
+          <div>
+            <h3 className="text-lg font-bold text-[#1B2A4A]">Apply for this role</h3>
+            <p className="text-sm text-gray-500 mt-0.5">{job.title}</p>
+          </div>
+          <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-100">
+            <X className="w-5 h-5 text-gray-400" />
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="p-6 space-y-4">
+          {error && (
+            <div className="p-3 bg-red-50 border border-red-100 rounded-lg text-sm text-red-600">
+              {error}
+            </div>
+          )}
+
+          {/* Full name */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
+            <input
+              value={form.full_name}
+              onChange={(e) => setForm({ ...form, full_name: e.target.value })}
+              placeholder="Your full name"
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#5DB347]/20 focus:border-[#5DB347] outline-none"
+            />
+          </div>
+
+          {/* Email */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+            <input
+              type="email"
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              placeholder="your@email.com"
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#5DB347]/20 focus:border-[#5DB347] outline-none"
+            />
+          </div>
+
+          {/* Phone */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+            <input
+              type="tel"
+              value={form.phone}
+              onChange={(e) => setForm({ ...form, phone: e.target.value })}
+              placeholder="+263 77 123 4567"
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#5DB347]/20 focus:border-[#5DB347] outline-none"
+            />
+          </div>
+
+          {/* Cover message */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Cover Message *</label>
+            <textarea
+              value={form.cover_message}
+              onChange={(e) => setForm({ ...form, cover_message: e.target.value })}
+              rows={4}
+              placeholder="Tell us why you're a great fit for this role..."
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#5DB347]/20 focus:border-[#5DB347] outline-none resize-y"
+            />
+          </div>
+
+          {/* CV Upload */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              CV / Resume
+            </label>
+            <div
+              onDragOver={(e) => {
+                e.preventDefault();
+                setDragOver(true);
+              }}
+              onDragLeave={() => setDragOver(false)}
+              onDrop={handleDrop}
+              onClick={() => fileInputRef.current?.click()}
+              className={`relative border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-colors ${
+                dragOver
+                  ? 'border-[#5DB347] bg-[#5DB347]/5'
+                  : cvFile
+                    ? 'border-[#5DB347]/40 bg-[#5DB347]/5'
+                    : 'border-gray-200 hover:border-gray-300 bg-gray-50'
+              }`}
+            >
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleFileSelect(file);
+                }}
+              />
+
+              {uploading ? (
+                <div className="space-y-2">
+                  <Loader2 className="w-6 h-6 animate-spin text-[#5DB347] mx-auto" />
+                  <p className="text-sm text-gray-500">Uploading...</p>
+                  <div className="w-full bg-gray-200 rounded-full h-1.5">
+                    <div
+                      className="bg-[#5DB347] h-1.5 rounded-full transition-all duration-300"
+                      style={{ width: `${uploadProgress}%` }}
+                    />
+                  </div>
+                </div>
+              ) : cvFile ? (
+                <div className="flex items-center justify-center gap-2">
+                  <FileText className="w-5 h-5 text-[#5DB347]" />
+                  <span className="text-sm font-medium text-[#1B2A4A]">{cvFile.name}</span>
+                  <CheckCircle2 className="w-4 h-4 text-[#5DB347]" />
+                </div>
+              ) : (
+                <div className="space-y-1">
+                  <Upload className="w-6 h-6 text-gray-400 mx-auto" />
+                  <p className="text-sm text-gray-500">
+                    <span className="font-medium text-[#5DB347]">Click to upload</span> or drag and drop
+                  </p>
+                  <p className="text-xs text-gray-400">PDF, DOC, DOCX, JPG, PNG (max 10 MB)</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="p-6 border-t border-gray-100">
+          <button
+            onClick={handleSubmit}
+            disabled={submitting || uploading}
+            className="w-full flex items-center justify-center gap-2 py-3 bg-[#5DB347] text-white font-semibold rounded-xl hover:bg-[#449933] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {submitting ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Submitting...
+              </>
+            ) : (
+              'Submit Application'
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ─── Component ─── */
 
 export default function JobDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
+  const { user, isLoading: authLoading } = useAuth();
   const [job, setJob] = useState<JobDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
   const [similarJobs, setSimilarJobs] = useState<JobDetail[]>([]);
+  const [showApplyModal, setShowApplyModal] = useState(false);
 
   useEffect(() => {
     async function fetchJob() {
@@ -777,15 +1143,30 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
           <div className="space-y-6">
             {/* Apply Card */}
             <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 sticky top-24">
-              <Link
-                href={`/contact?subject=job_application&job=${encodeURIComponent(job.title)}`}
-                className="block w-full text-center text-white font-semibold py-3 rounded-xl transition-colors"
-                style={{ background: '#5DB347' }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = '#449933')}
-                onMouseLeave={(e) => (e.currentTarget.style.background = '#5DB347')}
-              >
-                Apply Now
-              </Link>
+              {authLoading ? (
+                <div className="w-full py-3 rounded-xl bg-gray-100 animate-pulse" />
+              ) : user ? (
+                <button
+                  onClick={() => setShowApplyModal(true)}
+                  className="block w-full text-center text-white font-semibold py-3 rounded-xl transition-colors"
+                  style={{ background: '#5DB347' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = '#449933')}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = '#5DB347')}
+                >
+                  Apply Now
+                </button>
+              ) : (
+                <Link
+                  href={`/login?redirect=/jobs/${id}`}
+                  className="flex items-center justify-center gap-2 w-full text-center text-white font-semibold py-3 rounded-xl transition-colors"
+                  style={{ background: '#1B2A4A' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = '#0f1a2e')}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = '#1B2A4A')}
+                >
+                  <LogIn className="w-4 h-4" />
+                  Sign in to apply
+                </Link>
+              )}
 
               <button
                 onClick={handleShare}
@@ -850,6 +1231,11 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
           </div>
         </div>
       </div>
+
+      {/* Apply Modal */}
+      {showApplyModal && job && (
+        <ApplyModal job={job} onClose={() => setShowApplyModal(false)} />
+      )}
     </div>
   );
 }

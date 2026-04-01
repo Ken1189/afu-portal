@@ -16,6 +16,10 @@ import {
   Trash2,
   X,
   Save,
+  Download,
+  ChevronDown,
+  ChevronUp,
+  Eye,
 } from 'lucide-react';
 import FilterBar, {
   COUNTRY_FILTER,
@@ -126,6 +130,51 @@ const STATUS_BADGES: Record<string, string> = {
   filled: 'bg-blue-100 text-blue-700',
   expired: 'bg-red-100 text-red-700',
 };
+
+/* ─── Application Types ─── */
+
+interface JobApplication {
+  id: string;
+  job_id: string;
+  talent_id: string | null;
+  applicant_name: string;
+  applicant_email: string;
+  applicant_phone: string | null;
+  cover_message: string;
+  cv_url: string | null;
+  status: string;
+  created_at: string;
+  talent?: {
+    full_name: string;
+    email: string;
+    phone: string | null;
+    country: string | null;
+    cv_url: string | null;
+    skills: string[] | null;
+  } | null;
+  job?: {
+    title: string;
+    country: string;
+    sector: string;
+  } | null;
+}
+
+const APP_STATUS_BADGES: Record<string, string> = {
+  applied: 'bg-blue-100 text-blue-700',
+  shortlisted: 'bg-yellow-100 text-yellow-700',
+  interviewed: 'bg-purple-100 text-purple-700',
+  offered: 'bg-green-100 text-green-700',
+  hired: 'bg-[#5DB347]/10 text-[#5DB347]',
+  rejected: 'bg-red-100 text-red-700',
+};
+
+const APP_STATUS_OPTIONS = [
+  { value: 'shortlisted', label: 'Shortlist' },
+  { value: 'interviewed', label: 'Interview' },
+  { value: 'offered', label: 'Offer' },
+  { value: 'hired', label: 'Hire' },
+  { value: 'rejected', label: 'Reject' },
+];
 
 /* ─── Toast ─── */
 
@@ -442,6 +491,15 @@ export default function AdminJobsPage() {
   const [deleteTarget, setDeleteTarget] = useState<JobListing | null>(null);
   const [deleting, setDeleting] = useState(false);
 
+  // Tab state
+  const [activeTab, setActiveTab] = useState<'jobs' | 'applications'>('jobs');
+
+  // Applications state
+  const [applications, setApplications] = useState<JobApplication[]>([]);
+  const [appsLoading, setAppsLoading] = useState(false);
+  const [expandedAppId, setExpandedAppId] = useState<string | null>(null);
+  const [statusUpdating, setStatusUpdating] = useState<string | null>(null);
+
   const supabase = createClient();
 
   const fetchJobs = useCallback(async () => {
@@ -474,6 +532,49 @@ export default function AdminJobsPage() {
   useEffect(() => {
     fetchJobs();
   }, [fetchJobs]);
+
+  /* ─── Fetch Applications ─── */
+
+  const fetchApplications = useCallback(async () => {
+    setAppsLoading(true);
+    const { data, error } = await supabase
+      .from('job_applications')
+      .select('*, talent:talent_profiles(*), job:job_listings(title, country, sector)')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      setToast({ message: 'Failed to load applications', type: 'error' });
+      setApplications([]);
+    } else {
+      setApplications((data || []) as JobApplication[]);
+    }
+    setAppsLoading(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (activeTab === 'applications') {
+      fetchApplications();
+    }
+  }, [activeTab, fetchApplications]);
+
+  const handleUpdateAppStatus = async (appId: string, newStatus: string) => {
+    setStatusUpdating(appId);
+    const { error } = await supabase
+      .from('job_applications')
+      .update({ status: newStatus })
+      .eq('id', appId);
+
+    if (error) {
+      setToast({ message: 'Failed to update status', type: 'error' });
+    } else {
+      setApplications((prev) =>
+        prev.map((a) => (a.id === appId ? { ...a, status: newStatus } : a))
+      );
+      setToast({ message: `Status updated to ${newStatus}`, type: 'success' });
+    }
+    setStatusUpdating(null);
+  };
 
   /* ─── Filtered data ─── */
 
@@ -708,15 +809,49 @@ export default function AdminJobsPage() {
             Manage all job listings across the marketplace
           </p>
         </div>
+        {activeTab === 'jobs' && (
+          <button
+            onClick={openCreateModal}
+            className="flex items-center gap-2 px-4 py-2.5 bg-[#5DB347] text-white text-sm font-medium rounded-lg hover:bg-[#4a9a38] shadow-sm transition-all"
+          >
+            <Plus className="w-4 h-4" />
+            Create Job
+          </button>
+        )}
+      </div>
+
+      {/* Tab Bar */}
+      <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
         <button
-          onClick={openCreateModal}
-          className="flex items-center gap-2 px-4 py-2.5 bg-[#5DB347] text-white text-sm font-medium rounded-lg hover:bg-[#4a9a38] shadow-sm transition-all"
+          onClick={() => setActiveTab('jobs')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+            activeTab === 'jobs'
+              ? 'bg-white text-[#1B2A4A] shadow-sm'
+              : 'text-gray-500 hover:text-gray-700'
+          }`}
         >
-          <Plus className="w-4 h-4" />
-          Create Job
+          <Briefcase className="w-4 h-4" />
+          Jobs
+        </button>
+        <button
+          onClick={() => setActiveTab('applications')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+            activeTab === 'applications'
+              ? 'bg-white text-[#1B2A4A] shadow-sm'
+              : 'text-gray-500 hover:text-gray-700'
+          }`}
+        >
+          <FileText className="w-4 h-4" />
+          Applications
+          {applications.length > 0 && (
+            <span className="ml-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-[#5DB347]/10 text-[#5DB347]">
+              {applications.length}
+            </span>
+          )}
         </button>
       </div>
 
+      {activeTab === 'jobs' && (<>
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {summaryCards.map((card) => (
@@ -918,6 +1053,215 @@ export default function AdminJobsPage() {
               </tbody>
             </table>
           </div>
+        </div>
+      )}
+
+      </>)}
+
+      {/* ─── Applications Tab ─── */}
+      {activeTab === 'applications' && (
+        <div className="space-y-4">
+          {/* Applications Loading */}
+          {appsLoading && (
+            <div className="bg-white rounded-xl border border-gray-100 p-12 text-center">
+              <Loader2 className="w-8 h-8 animate-spin text-[#5DB347] mx-auto mb-3" />
+              <p className="text-sm text-gray-500">Loading applications...</p>
+            </div>
+          )}
+
+          {/* Applications Empty */}
+          {!appsLoading && applications.length === 0 && (
+            <div className="bg-white rounded-xl border border-gray-100 p-12 text-center">
+              <FileText className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+              <h3 className="text-lg font-semibold text-[#1B2A4A]">No applications yet</h3>
+              <p className="text-sm text-gray-500 mt-1">
+                Applications will appear here when candidates apply for jobs.
+              </p>
+            </div>
+          )}
+
+          {/* Applications Table */}
+          {!appsLoading && applications.length > 0 && (
+            <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-gray-100 bg-gray-50/50">
+                      <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase w-8"></th>
+                      <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Applicant</th>
+                      <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Job Title</th>
+                      <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Date Applied</th>
+                      <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Status</th>
+                      <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase">CV</th>
+                      <th className="text-right py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50">
+                    {applications.map((app) => (
+                      <>
+                        <tr
+                          key={app.id}
+                          className="hover:bg-gray-50/50 transition-colors cursor-pointer"
+                          onClick={() =>
+                            setExpandedAppId(expandedAppId === app.id ? null : app.id)
+                          }
+                        >
+                          <td className="py-3 px-4">
+                            {expandedAppId === app.id ? (
+                              <ChevronUp className="w-4 h-4 text-gray-400" />
+                            ) : (
+                              <ChevronDown className="w-4 h-4 text-gray-400" />
+                            )}
+                          </td>
+                          <td className="py-3 px-4">
+                            <div>
+                              <p className="font-medium text-[#1B2A4A]">
+                                {app.talent?.full_name || app.applicant_name}
+                              </p>
+                              <p className="text-xs text-gray-400 mt-0.5">
+                                {app.talent?.email || app.applicant_email}
+                              </p>
+                            </div>
+                          </td>
+                          <td className="py-3 px-4">
+                            <div>
+                              <p className="text-gray-700">{app.job?.title || 'Unknown'}</p>
+                              {app.job?.country && (
+                                <p className="text-xs text-gray-400 mt-0.5">
+                                  {app.job.country} &middot; {app.job.sector}
+                                </p>
+                              )}
+                            </div>
+                          </td>
+                          <td className="py-3 px-4 text-gray-500">
+                            {new Date(app.created_at).toLocaleDateString('en-GB', {
+                              day: 'numeric',
+                              month: 'short',
+                              year: 'numeric',
+                            })}
+                          </td>
+                          <td className="py-3 px-4">
+                            <span
+                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                                APP_STATUS_BADGES[app.status] || 'bg-gray-100 text-gray-600'
+                              }`}
+                            >
+                              {app.status}
+                            </span>
+                          </td>
+                          <td className="py-3 px-4 text-center">
+                            {(app.cv_url || app.talent?.cv_url) ? (
+                              <a
+                                href={app.cv_url || app.talent?.cv_url || '#'}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 text-xs font-medium text-[#5DB347] hover:underline"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <Download className="w-3.5 h-3.5" />
+                                Download
+                              </a>
+                            ) : (
+                              <span className="text-xs text-gray-400">None</span>
+                            )}
+                          </td>
+                          <td className="py-3 px-4">
+                            <div
+                              className="flex items-center justify-end gap-1"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              {statusUpdating === app.id ? (
+                                <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
+                              ) : (
+                                APP_STATUS_OPTIONS.filter((opt) => opt.value !== app.status).map(
+                                  (opt) => (
+                                    <button
+                                      key={opt.value}
+                                      onClick={() => handleUpdateAppStatus(app.id, opt.value)}
+                                      className={`px-2 py-1 rounded text-[10px] font-semibold transition-colors ${
+                                        opt.value === 'rejected'
+                                          ? 'bg-red-50 text-red-600 hover:bg-red-100'
+                                          : opt.value === 'hired'
+                                            ? 'bg-[#5DB347]/10 text-[#5DB347] hover:bg-[#5DB347]/20'
+                                            : opt.value === 'shortlisted'
+                                              ? 'bg-yellow-50 text-yellow-700 hover:bg-yellow-100'
+                                              : opt.value === 'interviewed'
+                                                ? 'bg-purple-50 text-purple-600 hover:bg-purple-100'
+                                                : 'bg-green-50 text-green-600 hover:bg-green-100'
+                                      }`}
+                                      title={opt.label}
+                                    >
+                                      {opt.label}
+                                    </button>
+                                  ),
+                                )
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+
+                        {/* Expanded details */}
+                        {expandedAppId === app.id && (
+                          <tr key={`${app.id}-detail`}>
+                            <td colSpan={7} className="bg-gray-50/50">
+                              <div className="px-6 py-4 space-y-3">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                                  <div>
+                                    <p className="text-xs font-semibold text-gray-400 uppercase mb-1">
+                                      Phone
+                                    </p>
+                                    <p className="text-[#1B2A4A]">
+                                      {app.applicant_phone || app.talent?.phone || 'N/A'}
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <p className="text-xs font-semibold text-gray-400 uppercase mb-1">
+                                      Country
+                                    </p>
+                                    <p className="text-[#1B2A4A]">
+                                      {app.talent?.country || 'N/A'}
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <p className="text-xs font-semibold text-gray-400 uppercase mb-1">
+                                      Skills
+                                    </p>
+                                    {app.talent?.skills && app.talent.skills.length > 0 ? (
+                                      <div className="flex flex-wrap gap-1">
+                                        {app.talent.skills.map((s) => (
+                                          <span
+                                            key={s}
+                                            className="px-2 py-0.5 bg-[#5DB347]/10 text-[#5DB347] rounded-full text-xs"
+                                          >
+                                            {s}
+                                          </span>
+                                        ))}
+                                      </div>
+                                    ) : (
+                                      <p className="text-gray-400">N/A</p>
+                                    )}
+                                  </div>
+                                </div>
+
+                                <div>
+                                  <p className="text-xs font-semibold text-gray-400 uppercase mb-1">
+                                    Cover Message
+                                  </p>
+                                  <div className="bg-white border border-gray-100 rounded-lg p-4 text-sm text-gray-600 leading-relaxed whitespace-pre-line">
+                                    {app.cover_message || 'No cover message provided.'}
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
         </div>
       )}
 

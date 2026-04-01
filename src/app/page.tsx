@@ -193,22 +193,36 @@ const fallbackTestimonials = [
   {
     name: 'Tendai Moyo',
     role: 'Blueberry Farmer, Zimbabwe',
-    quote: 'AFU connected me with EU buyers and financed my cold chain. My export revenue tripled in one season.',
-    img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face',
+    quote: 'Before AFU, I was selling blueberries at the farm gate for next to nothing. Now I have a direct EU export contract, cold chain financing, and my revenue has tripled. The platform changed my family\'s life.',
+    img: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop&crop=face',
     rating: 5,
   },
   {
     name: 'Amina Bakari',
     role: 'Cassava Processor, Tanzania',
-    quote: 'The processing hub access changed everything. We now sell dried cassava chips to three countries instead of raw tubers locally.',
+    quote: 'I went from processing cassava in my backyard to running a proper drying operation. AFU helped me access the processing hub, get certified, and now I export dried chips to three countries.',
     img: 'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=200&h=200&fit=crop&crop=face',
     rating: 5,
   },
   {
     name: 'Kabo Mothibi',
     role: 'Sesame Grower, Botswana',
-    quote: 'From seed to sale, AFU handled the inputs, training, and buyer contracts. I just focused on growing.',
-    img: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop&crop=face',
+    quote: 'As a first-time farmer, I had no idea where to start. AFU gave me seeds on credit, taught me modern techniques, and guaranteed a buyer before I even planted. That security is everything.',
+    img: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&crop=face',
+    rating: 5,
+  },
+  {
+    name: 'Farai Ndlovu',
+    role: 'Maize Cooperative Leader, Zambia',
+    quote: 'Our cooperative of 45 farmers was struggling with middlemen. Through AFU we negotiate directly with millers, access bulk inputs at 30% less, and every member now has crop insurance.',
+    img: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop&crop=face',
+    rating: 5,
+  },
+  {
+    name: 'Sarah Kimani',
+    role: 'Tea Farmer, Kenya',
+    quote: 'The mobile app lets me check market prices, track my shipments, and manage my finances from my phone. I don\'t need to travel to town anymore. AFU brought the market to my farm.',
+    img: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop&crop=face',
     rating: 5,
   },
 ];
@@ -363,11 +377,18 @@ export default function Home() {
           .limit(6);
         if (data && data.length > 0) {
           setTestimonials(
-            data.map((t: Record<string, unknown>) => ({
+            data.map((t: Record<string, unknown>, i: number) => ({
               name: (t.name as string) || (t.author_name as string) || '',
               role: (t.role as string) || (t.author_role as string) || '',
               quote: (t.quote as string) || (t.content as string) || '',
-              img: (t.img as string) || (t.avatar_url as string) || (t.photo_url as string) || 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop&crop=face',
+              img: (t.img as string) || (t.avatar_url as string) || (t.photo_url as string) || [
+                'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop&crop=face',
+                'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=200&h=200&fit=crop&crop=face',
+                'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&crop=face',
+                'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop&crop=face',
+                'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop&crop=face',
+                'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face',
+              ][i % 6],
               rating: (t.rating as number) || 5,
             }))
           );
