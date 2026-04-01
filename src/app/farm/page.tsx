@@ -308,7 +308,7 @@ function getWeatherIcon(condition: WeatherCondition, size = 20) {
     case 'partly-cloudy':
       return <CloudSun {...props} className="text-amber-300" />;
     case 'cloudy':
-      return <Cloud {...props} className="text-gray-400" />;
+      return <Cloud {...props} className="text-gray-600" />;
     case 'rainy':
       return <CloudRain {...props} className="text-blue-400" />;
     case 'stormy':
@@ -342,7 +342,7 @@ function getActivityIcon(type: ActivityType, size = 16) {
     case 'pruning':
       return <Scissors size={size} className={`${cls} text-[#5DB347]`} />;
     default:
-      return <Leaf size={size} className={`${cls} text-gray-400`} />;
+      return <Leaf size={size} className={`${cls} text-gray-600`} />;
   }
 }
 
@@ -523,7 +523,7 @@ export default function FarmDashboardPage() {
                 <span className="text-xs font-bold text-navy">
                   {day.tempHigh}°
                 </span>
-                <span className="text-[10px] text-gray-400">
+                <span className="text-[10px] text-gray-600">
                   {day.tempLow}°
                 </span>
                 {day.rainChance >= 30 && (
@@ -563,7 +563,7 @@ export default function FarmDashboardPage() {
                   onClick={() => setSelectedWeatherDay(null)}
                   className="shrink-0 w-8 h-8 flex items-center justify-center rounded-full active:bg-[#5DB347]/10 transition-colors"
                 >
-                  <X size={14} className="text-gray-400" />
+                  <X size={14} className="text-gray-600" />
                 </button>
               </div>
             </motion.div>
@@ -632,14 +632,14 @@ export default function FarmDashboardPage() {
                 <p className="text-sm font-bold text-navy leading-tight">
                   {plot.crop}
                 </p>
-                <p className="text-[11px] text-gray-400 mt-0.5">
+                <p className="text-[11px] text-gray-600 mt-0.5">
                   {plot.variety} &middot; {plot.size} ha
                 </p>
 
                 {/* Progress bar */}
                 <div className="mt-2.5">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-[10px] text-gray-400">Progress</span>
+                    <span className="text-[10px] text-gray-600">Progress</span>
                     <span className="text-[10px] font-semibold text-navy">
                       {plot.progressPercent}%
                     </span>
@@ -669,7 +669,7 @@ export default function FarmDashboardPage() {
         <div className="mb-2 flex items-center justify-between">
           <h3 className="text-sm font-bold text-navy">
             {t.dashboard.todaysTasks}{' '}
-            <span className="text-xs font-normal text-gray-400">
+            <span className="text-xs font-normal text-gray-600">
               ({tasks.filter((task) => !task.completed).length} pending)
             </span>
           </h3>
@@ -705,14 +705,14 @@ export default function FarmDashboardPage() {
                   <p
                     className={`text-sm leading-tight ${
                       task.completed
-                        ? 'text-gray-400 line-through'
+                        ? 'text-gray-600 line-through'
                         : 'text-navy font-medium'
                     }`}
                   >
                     {task.title}
                   </p>
                   {task.plotName && (
-                    <p className="text-[11px] text-gray-400 mt-0.5 truncate">
+                    <p className="text-[11px] text-gray-600 mt-0.5 truncate">
                       {task.plotName}
                     </p>
                   )}
@@ -755,7 +755,7 @@ export default function FarmDashboardPage() {
               <div className="w-7 h-7 rounded-lg bg-green-50 flex items-center justify-center">
                 <TrendingUp size={14} className="text-green-600" />
               </div>
-              <span className="text-[11px] text-gray-400 truncate">{t.dashboard.totalIncome}</span>
+              <span className="text-[11px] text-gray-600 truncate">{t.dashboard.totalIncome}</span>
             </div>
             <p className="text-lg font-bold text-green-600">
               ${summary.totalIncome.toLocaleString()}
@@ -771,7 +771,7 @@ export default function FarmDashboardPage() {
               <div className="w-7 h-7 rounded-lg bg-red-50 flex items-center justify-center">
                 <TrendingDown size={14} className="text-red-500" />
               </div>
-              <span className="text-[11px] text-gray-400 truncate">{t.dashboard.totalExpenses}</span>
+              <span className="text-[11px] text-gray-600 truncate">{t.dashboard.totalExpenses}</span>
             </div>
             <p className="text-lg font-bold text-red-500">
               ${summary.totalExpenses.toLocaleString()}
@@ -787,7 +787,7 @@ export default function FarmDashboardPage() {
               <div className="w-7 h-7 rounded-lg bg-[#EBF7E5] flex items-center justify-center">
                 <TrendingUp size={14} className="text-[#5DB347]" />
               </div>
-              <span className="text-[11px] text-gray-400 truncate">{t.dashboard.profit}</span>
+              <span className="text-[11px] text-gray-600 truncate">{t.dashboard.profit}</span>
             </div>
             <p className="text-lg font-bold text-[#5DB347]">
               ${summary.profit.toLocaleString()}
@@ -803,11 +803,11 @@ export default function FarmDashboardPage() {
               <div className="w-7 h-7 rounded-lg bg-amber-50 flex items-center justify-center">
                 <Heart size={14} className="text-gold" />
               </div>
-              <span className="text-[11px] text-gray-400 truncate">{t.dashboard.healthScore}</span>
+              <span className="text-[11px] text-gray-600 truncate">{t.dashboard.healthScore}</span>
             </div>
             <p className="text-lg font-bold text-gold">
               {summary.avgHealthScore}
-              <span className="text-xs font-normal text-gray-400">/100</span>
+              <span className="text-xs font-normal text-gray-600">/100</span>
             </p>
           </motion.div>
         </div>
@@ -840,7 +840,7 @@ export default function FarmDashboardPage() {
                 <p className="text-xs text-navy font-medium leading-tight truncate">
                   {activity.description}
                 </p>
-                <p className="text-[11px] text-gray-400 mt-0.5">
+                <p className="text-[11px] text-gray-600 mt-0.5">
                   {activity.plotName} &middot; {timeAgo(activity.date)}
                 </p>
               </div>
