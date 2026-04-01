@@ -310,6 +310,16 @@ export default function FileClaimPage() {
             description: `${incidentType}: ${description}`,
             evidence_urls: [],
           });
+          // Notify admin
+          fetch('/api/payments/notify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'insurance_claim',
+              email: user.email,
+              name: profile?.full_name || user.email,
+            }),
+          }).catch(() => {});
         } catch { /* silent — still show success UI */ }
       }
       setSubmitted(true);

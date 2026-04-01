@@ -55,6 +55,20 @@ export async function POST(req: Request) {
         subject: `[AFU Membership] New ${tier || 'Smallholder'} member — ${name || email || 'Unknown'}`,
         html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto"><div style="background:#1B2A4A;padding:20px;text-align:center"><h2 style="color:#5DB347;margin:0">New Membership Payment!</h2></div><div style="padding:20px;background:#f8faf6"><p><strong>Tier:</strong> ${tier || 'Smallholder'}</p><p><strong>Amount:</strong> ${amountFormatted}</p><p><strong>Member:</strong> ${name || 'Unknown'}</p><p><strong>Email:</strong> ${email || 'Not provided'}</p></div><div style="padding:15px;text-align:center;color:#999;font-size:12px">African Farming Union | africanfarmingunion.org</div></div>`,
       });
+    } else if (type === 'insurance_claim') {
+      await resend.emails.send({
+        from: FROM,
+        to: NOTIFY_TO,
+        subject: `[AFU Insurance] New claim filed by ${name || email || 'Unknown'}`,
+        html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto"><div style="background:#1B2A4A;padding:20px;text-align:center"><h2 style="color:#5DB347;margin:0">New Insurance Claim Filed</h2></div><div style="padding:20px;background:#f8faf6"><p><strong>Claimant:</strong> ${name || 'Unknown'}</p><p><strong>Email:</strong> ${email || 'Not provided'}</p><p>Review in <a href="https://africanfarmingunion.org/admin/insurance" style="color:#5DB347">Admin Portal</a></p></div><div style="padding:15px;text-align:center;color:#999;font-size:12px">African Farming Union | africanfarmingunion.org</div></div>`,
+      });
+    } else if (type === 'order') {
+      await resend.emails.send({
+        from: FROM,
+        to: NOTIFY_TO,
+        subject: `[AFU Order] New marketplace order — ${amountFormatted} from ${name || email || 'Unknown'}`,
+        html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto"><div style="background:#1B2A4A;padding:20px;text-align:center"><h2 style="color:#5DB347;margin:0">New Marketplace Order!</h2></div><div style="padding:20px;background:#f8faf6"><p><strong>Amount:</strong> ${amountFormatted}</p><p><strong>Customer:</strong> ${name || 'Unknown'}</p><p><strong>Email:</strong> ${email || 'Not provided'}</p><p>View in <a href="https://africanfarmingunion.org/admin/payments" style="color:#5DB347">Admin Portal</a></p></div><div style="padding:15px;text-align:center;color:#999;font-size:12px">African Farming Union | africanfarmingunion.org</div></div>`,
+      });
     }
 
     return NextResponse.json({ success: true });

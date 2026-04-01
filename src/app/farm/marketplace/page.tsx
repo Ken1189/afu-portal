@@ -550,6 +550,18 @@ export default function MarketplacePage() {
           }
         }
       }
+      // Notify admin of new orders
+      fetch('/api/payments/notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'order',
+          amount: getMemberTotal() * 100,
+          email: user?.email,
+          name: profile?.full_name || user?.email,
+        }),
+      }).catch(() => {});
+
       setCheckoutSuccess(true);
       setTimeout(() => {
         clearCart();
