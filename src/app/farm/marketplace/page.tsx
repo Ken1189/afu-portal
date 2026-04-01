@@ -285,9 +285,14 @@ function ProductCard({ product }: { product: SupplierProduct }) {
 
   const handleAdd = () => {
     if (product.availability === 'out-of-stock') return;
-    addItem(product, quantity);
-    setAdded(true);
-    setTimeout(() => setAdded(false), 1500);
+    try {
+      addItem(product, quantity);
+      setAdded(true);
+      setTimeout(() => setAdded(false), 1500);
+    } catch (err) {
+      console.error('Add to cart failed:', err);
+      alert('Failed to add to cart: ' + String(err));
+    }
   };
 
   return (
