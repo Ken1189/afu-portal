@@ -29,7 +29,25 @@ export default function PaymentSuccessPage() {
     if (!sessionId) return;
     fetch(`/api/payments/session?id=${sessionId}`)
       .then((r) => (r.ok ? r.json() : null))
-      .then((d) => d && setDetails(d))
+      .then((d) => {
+        if (d) {
+          setDetails(d);
+          // Send email notifications
+          fetch('/api/payments/notify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: d.type || 'membership',
+              amount: d.amount,
+              currency: d.currency,
+              email: d.customerEmail,
+              name: d.customerName || d.customerEmail,
+              tier: d.tier,
+              program: d.program,
+            }),
+          }).catch(() => {});
+        }
+      })
       .catch(() => {
         /* silent — details are optional */
       });
