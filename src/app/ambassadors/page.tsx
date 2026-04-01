@@ -383,7 +383,7 @@ export default function AmbassadorsPage() {
         });
 
       if (ambError && appError) {
-        setFormError('Something went wrong. Please try again.');
+        setFormError('Something went wrong: ' + (ambError?.message || appError?.message || 'Unknown error'));
       } else {
         // Send email notifications (fire and forget)
         fetch('/api/ambassador/notify', {
