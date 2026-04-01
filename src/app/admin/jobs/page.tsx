@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, Fragment } from 'react';
 import {
   Briefcase,
   CheckCircle2,
@@ -19,7 +19,6 @@ import {
   Download,
   ChevronDown,
   ChevronUp,
-  Eye,
 } from 'lucide-react';
 import FilterBar, {
   COUNTRY_FILTER,
@@ -1098,9 +1097,8 @@ export default function AdminJobsPage() {
                   </thead>
                   <tbody className="divide-y divide-gray-50">
                     {applications.map((app) => (
-                      <>
+                      <Fragment key={app.id}>
                         <tr
-                          key={app.id}
                           className="hover:bg-gray-50/50 transition-colors cursor-pointer"
                           onClick={() =>
                             setExpandedAppId(expandedAppId === app.id ? null : app.id)
@@ -1255,7 +1253,7 @@ export default function AdminJobsPage() {
                             </td>
                           </tr>
                         )}
-                      </>
+                      </Fragment>
                     ))}
                   </tbody>
                 </table>
