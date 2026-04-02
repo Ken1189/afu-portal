@@ -267,7 +267,7 @@ export default function MembershipsPage() {
       return;
     }
     if (tierSlug === 'partner') {
-      router.push('/contact');
+      router.push('/apply?tier=partner');
       return;
     }
     setCheckoutLoading(tierSlug);
@@ -418,7 +418,7 @@ export default function MembershipsPage() {
                 >
                   {checkoutLoading === tier.slug ? (
                     <span className="flex items-center justify-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /> Processing...</span>
-                  ) : 'byApplication' in tier && tier.byApplication ? 'Contact Us' : 'Get Started'}
+                  ) : 'byApplication' in tier && tier.byApplication ? 'Apply Now' : 'Get Started'}
                 </button>
                 {checkoutError && checkoutLoading === null && (
                   <p className="text-xs text-red-500 mt-2 text-center">{checkoutError}</p>
