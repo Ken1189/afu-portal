@@ -196,18 +196,24 @@ const SECTOR_ICONS: Record<string, React.ReactNode> = {
   Poultry: <Egg className="w-4 h-4" />,
 };
 
+const AFRICAN_REGIONS = [
+  'East Africa',
+  'West Africa',
+  'Southern Africa',
+  'Central Africa',
+  'North Africa',
+];
+
 const AFU_COUNTRIES = [
-  'Botswana',
-  'Ghana',
-  'Kenya',
-  'Mozambique',
-  'Nigeria',
-  'Sierra Leone',
-  'South Africa',
-  'Tanzania',
-  'Uganda',
-  'Zambia',
-  'Zimbabwe',
+  'Algeria', 'Angola', 'Benin', 'Botswana', 'Burkina Faso', 'Burundi',
+  'Cabo Verde', 'Cameroon', 'Central African Republic', 'Chad', 'Comoros',
+  'Congo (Brazzaville)', 'Congo (DRC)', 'Djibouti', 'Egypt', 'Equatorial Guinea',
+  'Eritrea', 'Eswatini', 'Ethiopia', 'Gabon', 'Gambia', 'Ghana', 'Guinea',
+  'Guinea-Bissau', 'Ivory Coast', 'Kenya', 'Lesotho', 'Liberia', 'Libya',
+  'Madagascar', 'Malawi', 'Mali', 'Mauritania', 'Mauritius', 'Morocco',
+  'Mozambique', 'Namibia', 'Niger', 'Nigeria', 'Rwanda', 'Senegal',
+  'Seychelles', 'Sierra Leone', 'Somalia', 'South Africa', 'South Sudan',
+  'Sudan', 'Tanzania', 'Togo', 'Tunisia', 'Uganda', 'Zambia', 'Zimbabwe',
 ];
 
 const DEFAULT_COMMISSION_RATES: CommissionRate[] = [
@@ -252,6 +258,7 @@ export default function AmbassadorsPage() {
     email: '',
     phone: '',
     country: '',
+    regions: [] as string[],
     whatsapp: '',
     motivation: '',
     promotion_plan: '',
@@ -365,16 +372,22 @@ export default function AmbassadorsPage() {
       const supabase = createClient();
 
       // Insert into ambassadors with pending status
+      const regionsStr = formData.regions.length > 0 ? formData.regions.join(', ') : '';
       const ambassadorInsert: Record<string, unknown> = {
         full_name: formData.full_name.trim(),
         email: formData.email.trim(),
         phone: formData.phone.trim(),
         country: formData.country,
         whatsapp: formData.whatsapp.trim() || null,
-        motivation: formData.motivation.trim(),
+        motivation: `${formData.motivation.trim()}${regionsStr ? ` [Regions: ${regionsStr}]` : ''}`,
         promotion_plan: formData.promotion_plan.trim() || null,
         status: 'pending',
       };
+
+      // Try adding regions array column if it exists
+      if (formData.regions.length > 0) {
+        ambassadorInsert.regions = formData.regions;
+      }
 
       if (authUser?.id) {
         ambassadorInsert.user_id = authUser.id;
@@ -393,7 +406,7 @@ export default function AmbassadorsPage() {
           phone: formData.phone.trim(),
           country: formData.country,
           requested_tier: 'ambassador',
-          notes: `Ambassador application. Motivation: ${formData.motivation.trim()}. Promotion plan: ${formData.promotion_plan.trim() || 'N/A'}. WhatsApp: ${formData.whatsapp.trim() || 'N/A'}`,
+          notes: `Ambassador application. Regions: ${formData.regions.join(', ') || 'N/A'}. Motivation: ${formData.motivation.trim()}. Promotion plan: ${formData.promotion_plan.trim() || 'N/A'}. WhatsApp: ${formData.whatsapp.trim() || 'N/A'}`,
           status: 'pending',
           profile_id: authUser?.id || null,
         });
@@ -928,6 +941,41 @@ export default function AmbassadorsPage() {
                     <option key={c} value={c}>{c}</option>
                   ))}
                 </select>
+              </div>
+
+              {/* Regions to assist */}
+              <div>
+                <label className="block text-sm font-semibold text-[#1B2A4A] mb-1.5">
+                  Which regions of Africa do you want to assist in?
+                </label>
+                <p className="text-xs text-gray-400 mb-2">Select all that apply</p>
+                <div className="flex flex-wrap gap-2">
+                  {AFRICAN_REGIONS.map((region) => {
+                    const selected = formData.regions.includes(region);
+                    return (
+                      <button
+                        key={region}
+                        type="button"
+                        onClick={() => {
+                          setFormData((prev) => ({
+                            ...prev,
+                            regions: selected
+                              ? prev.regions.filter((r) => r !== region)
+                              : [...prev.regions, region],
+                          }));
+                        }}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all border ${
+                          selected
+                            ? 'bg-[#5DB347] text-white border-[#5DB347]'
+                            : 'bg-white text-gray-600 border-gray-200 hover:border-[#5DB347]/40'
+                        }`}
+                      >
+                        {selected && <span className="mr-1">&#10003;</span>}
+                        {region}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
               {/* Motivation */}
