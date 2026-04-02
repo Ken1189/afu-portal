@@ -89,7 +89,7 @@ interface FarmPlot {
   name: string;
   latitude: number;
   longitude: number;
-  size_hectares: number;
+  size_ha: number;
 }
 
 interface WeatherData {
@@ -260,7 +260,7 @@ type Tab = 'products' | 'policies' | 'triggers';
 
 export default function ParametricInsurancePage() {
   const { user } = useAuth();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const [tab, setTab] = useState<Tab>('products');
   const [products, setProducts] = useState<Product[]>([]);
@@ -328,8 +328,8 @@ export default function ParametricInsurancePage() {
         // Fetch farm plots
         const { data: plotData } = await supabase
           .from('farm_plots')
-          .select('id, name, latitude, longitude, size_hectares')
-          .eq('user_id', user.id);
+          .select('id, name, latitude, longitude, size_ha')
+          .eq('member_id', user.id);
 
         if (plotData) setFarmPlots(plotData as FarmPlot[]);
       } else {
@@ -779,7 +779,7 @@ export default function ParametricInsurancePage() {
                               <span className="font-medium text-[#1B2A4A]">{plot.name}</span>
                               {selectedPlot?.id === plot.id && <Check className="w-4 h-4 text-[#5DB347] ml-auto" />}
                             </div>
-                            <p className="text-[11px] text-gray-400 ml-6">{plot.latitude.toFixed(3)}, {plot.longitude.toFixed(3)} ({plot.size_hectares}ha)</p>
+                            <p className="text-[11px] text-gray-400 ml-6">{plot.latitude.toFixed(3)}, {plot.longitude.toFixed(3)} ({plot.size_ha}ha)</p>
                           </button>
                         ))}
                       </div>

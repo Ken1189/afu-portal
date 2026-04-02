@@ -256,7 +256,7 @@ export default function PoliciesPage() {
         count: insurancePolicies.filter((p) => p.status === 'pending').length,
       },
     ],
-    []
+    [insurancePolicies]
   );
 
   const filteredPolicies = useMemo(
@@ -264,7 +264,7 @@ export default function PoliciesPage() {
       activeFilter === 'all'
         ? insurancePolicies
         : insurancePolicies.filter((p) => p.status === activeFilter),
-    [activeFilter]
+    [activeFilter, insurancePolicies]
   );
 
   const toggleExpand = (id: string) => {

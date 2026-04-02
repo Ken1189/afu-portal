@@ -30,6 +30,12 @@ import {
   Loader2,
   Briefcase,
   GraduationCap,
+  Repeat,
+  Landmark,
+  Building2,
+  Rocket,
+  BadgeDollarSign,
+  Trophy,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
@@ -54,6 +60,8 @@ interface CommissionRate {
   label: string;
   amount: string;
   description: string;
+  icon?: typeof DollarSign;
+  gradient?: string;
 }
 
 /* ─── Fallback data ─── */
@@ -147,7 +155,14 @@ const FALLBACK_AMBASSADORS: Ambassador[] = [
 
 /* ─── Constants ─── */
 
-const SECTOR_TABS = ['All', 'Farming', 'Business', 'Community', 'Education', 'Technology'];
+const SECTOR_TABS: { label: string; icon: typeof Globe | null }[] = [
+  { label: 'All', icon: null },
+  { label: 'Farming', icon: Wheat },
+  { label: 'Business', icon: Briefcase },
+  { label: 'Community', icon: Users },
+  { label: 'Education', icon: GraduationCap },
+  { label: 'Technology', icon: Globe },
+];
 
 const SECTOR_COLORS: Record<string, string> = {
   farming: 'bg-green-100 text-green-700',
@@ -169,16 +184,16 @@ const SECTOR_COLORS: Record<string, string> = {
 };
 
 const SECTOR_ICONS: Record<string, React.ReactNode> = {
-  farming: <Wheat className="w-3.5 h-3.5" />,
-  business: <Briefcase className="w-3.5 h-3.5" />,
-  community: <Users className="w-3.5 h-3.5" />,
-  education: <GraduationCap className="w-3.5 h-3.5" />,
-  technology: <Globe className="w-3.5 h-3.5" />,
-  Grains: <Wheat className="w-3.5 h-3.5" />,
-  'Cash Crops': <Sprout className="w-3.5 h-3.5" />,
-  Livestock: <Beef className="w-3.5 h-3.5" />,
-  Horticulture: <TreePine className="w-3.5 h-3.5" />,
-  Poultry: <Egg className="w-3.5 h-3.5" />,
+  farming: <Wheat className="w-4 h-4" />,
+  business: <Briefcase className="w-4 h-4" />,
+  community: <Users className="w-4 h-4" />,
+  education: <GraduationCap className="w-4 h-4" />,
+  technology: <Globe className="w-4 h-4" />,
+  Grains: <Wheat className="w-4 h-4" />,
+  'Cash Crops': <Sprout className="w-4 h-4" />,
+  Livestock: <Beef className="w-4 h-4" />,
+  Horticulture: <TreePine className="w-4 h-4" />,
+  Poultry: <Egg className="w-4 h-4" />,
 };
 
 const AFU_COUNTRIES = [
@@ -196,20 +211,20 @@ const AFU_COUNTRIES = [
 ];
 
 const DEFAULT_COMMISSION_RATES: CommissionRate[] = [
-  { label: 'Membership Fees', amount: '10% recurring', description: 'Earn 10% of every membership fee your referrals pay — every month, for life' },
-  { label: 'Fundraising $100K-$500K', amount: '2% commission', description: 'Commission on capital raised between $100K and $500K' },
-  { label: 'Fundraising $500K-$1M', amount: '2.5% commission', description: 'Commission on capital raised between $500K and $1M' },
-  { label: 'Fundraising $1M-$5M', amount: '5% commission', description: 'Commission on capital raised between $1M and $5M' },
-  { label: 'Fundraising $5M-$10M', amount: '7.5% commission', description: 'Commission on capital raised between $5M and $10M' },
-  { label: 'Fundraising $100M+', amount: '10% commission', description: 'Commission on capital raised above $100M' },
+  { label: 'Membership Fees', amount: '10% recurring', description: 'Earn 10% of every membership fee your referrals pay — every month, for life', icon: Repeat, gradient: 'from-[#5DB347] to-[#449933]' },
+  { label: 'Fundraising $100K-$500K', amount: '2%', description: 'Commission on capital raised between $100K and $500K', icon: Landmark, gradient: 'from-blue-500 to-blue-600' },
+  { label: 'Fundraising $500K-$1M', amount: '2.5%', description: 'Commission on capital raised between $500K and $1M', icon: Building2, gradient: 'from-indigo-500 to-indigo-600' },
+  { label: 'Fundraising $1M-$5M', amount: '5%', description: 'Commission on capital raised between $1M and $5M', icon: Rocket, gradient: 'from-purple-500 to-purple-600' },
+  { label: 'Fundraising $5M-$10M', amount: '7.5%', description: 'Commission on capital raised between $5M and $10M', icon: BadgeDollarSign, gradient: 'from-amber-500 to-amber-600' },
+  { label: 'Fundraising $100M+', amount: '10%', description: 'Commission on capital raised above $100M', icon: Trophy, gradient: 'from-[#FFD700] to-amber-500' },
 ];
 
 const TIERS = [
-  { name: 'Bronze', icon: Shield, color: '#CD7F32', minReferrals: 0, commission: '2%', perks: ['Base commission rate', 'Ambassador dashboard', 'Referral link'] },
-  { name: 'Silver', icon: Star, color: '#C0C0C0', minReferrals: 10, commission: '4%', perks: ['Increased commission', 'Monthly bonus', 'Priority email support'] },
-  { name: 'Gold', icon: Award, color: '#FFD700', minReferrals: 25, commission: '6%', perks: ['Premium commission', 'Quarterly bonus', 'Priority support'] },
-  { name: 'Platinum', icon: Crown, color: '#E5E4E2', minReferrals: 50, commission: '8%', perks: ['Top commission rate', 'Exclusive events', 'Dedicated manager'] },
-  { name: 'Diamond', icon: Gem, color: '#B9F2FF', minReferrals: 100, commission: '10%', perks: ['Maximum commission', 'Advisory role', 'Revenue sharing'] },
+  { name: 'Bronze', icon: Shield, color: '#CD7F32', bgColor: '#CD7F3220', minReferrals: 0, commission: '2%', perks: ['Base commission rate', 'Ambassador dashboard', 'Referral link'] },
+  { name: 'Silver', icon: Star, color: '#6B7280', bgColor: '#6B728020', minReferrals: 10, commission: '4%', perks: ['Increased commission', 'Monthly bonus', 'Priority email support'] },
+  { name: 'Gold', icon: Award, color: '#D97706', bgColor: '#D9770620', minReferrals: 25, commission: '6%', perks: ['Premium commission', 'Quarterly bonus', 'Priority support'] },
+  { name: 'Platinum', icon: Crown, color: '#6366F1', bgColor: '#6366F120', minReferrals: 50, commission: '8%', perks: ['Top commission rate', 'Exclusive events', 'Dedicated manager'] },
+  { name: 'Diamond', icon: Gem, color: '#0EA5E9', bgColor: '#0EA5E920', minReferrals: 100, commission: '10%', perks: ['Maximum commission', 'Advisory role', 'Revenue sharing'] },
 ];
 
 const HOW_IT_WORKS_STEPS = [
@@ -529,26 +544,29 @@ export default function AmbassadorsPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            {commissionRates.map((rate) => (
-              <div
-                key={rate.label}
-                className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm hover:shadow-md hover:border-[#5DB347]/30 transition-all"
-              >
-                <div className="flex items-start gap-4">
-                  <div
-                    className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center"
-                    style={{ background: 'linear-gradient(135deg, #5DB347/15, #5DB347/5)' }}
-                  >
-                    <DollarSign className="w-6 h-6 text-[#5DB347]" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-[#1B2A4A] mb-1">{rate.label}</h3>
-                    <p className="text-xl font-extrabold text-[#5DB347] mb-1">{rate.amount}</p>
-                    <p className="text-xs text-gray-400">{rate.description}</p>
+            {commissionRates.map((rate) => {
+              const Icon = rate.icon || DollarSign;
+              const grad = rate.gradient || 'from-[#5DB347] to-[#449933]';
+              return (
+                <div
+                  key={rate.label}
+                  className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm hover:shadow-lg hover:border-[#5DB347]/30 transition-all hover:-translate-y-0.5"
+                >
+                  <div className="flex items-start gap-4">
+                    <div
+                      className={`flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br ${grad} shadow-sm`}
+                    >
+                      <Icon className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-[#1B2A4A] mb-1">{rate.label}</h3>
+                      <p className="text-2xl font-extrabold text-[#5DB347] mb-1">{rate.amount}</p>
+                      <p className="text-xs text-gray-400 leading-relaxed">{rate.description}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           <p className="text-center text-xs text-gray-400 mt-8">
@@ -581,9 +599,9 @@ export default function AmbassadorsPage() {
                 {/* Tier icon */}
                 <div
                   className="inline-flex items-center justify-center w-14 h-14 rounded-full mb-4"
-                  style={{ backgroundColor: tier.color + '20' }}
+                  style={{ backgroundColor: tier.bgColor }}
                 >
-                  <tier.icon className="w-7 h-7" style={{ color: tier.color === '#C0C0C0' ? '#888' : tier.color }} />
+                  <tier.icon className="w-7 h-7" style={{ color: tier.color }} />
                 </div>
 
                 <h3 className="text-lg font-extrabold text-[#1B2A4A] mb-1">{tier.name}</h3>
@@ -636,20 +654,24 @@ export default function AmbassadorsPage() {
       {/* ── Sector Tabs ── */}
       <section className="max-w-7xl mx-auto px-4 -mt-6 relative z-10">
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-2 flex flex-wrap gap-1 justify-center">
-          {SECTOR_TABS.map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveSector(tab)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                activeSector === tab
-                  ? 'text-white shadow-sm'
-                  : 'text-gray-500 hover:bg-gray-50 hover:text-[#1B2A4A]'
-              }`}
-              style={activeSector === tab ? { background: '#5DB347' } : {}}
-            >
-              {tab}
-            </button>
-          ))}
+          {SECTOR_TABS.map((tab) => {
+            const TabIcon = tab.icon;
+            return (
+              <button
+                key={tab.label}
+                onClick={() => setActiveSector(tab.label)}
+                className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                  activeSector === tab.label
+                    ? 'text-white shadow-sm'
+                    : 'text-gray-500 hover:bg-gray-50 hover:text-[#1B2A4A]'
+                }`}
+                style={activeSector === tab.label ? { background: '#5DB347' } : {}}
+              >
+                {TabIcon && <TabIcon className="w-4 h-4" />}
+                {tab.label}
+              </button>
+            );
+          })}
         </div>
       </section>
 

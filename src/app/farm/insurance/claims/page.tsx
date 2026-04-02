@@ -288,7 +288,7 @@ export default function ClaimsPage() {
       activeFilter === 'all'
         ? insuranceClaims
         : insuranceClaims.filter((c) => c.status === activeFilter),
-    [activeFilter],
+    [activeFilter, insuranceClaims],
   );
 
   const totalClaims = insuranceClaims.length;
