@@ -38,7 +38,8 @@ interface TradeOrder {
   id: string;
   order_number: string;
   user_id: string;
-  type: 'buy' | 'sell';
+  order_type: 'buy' | 'sell';
+  type?: 'buy' | 'sell';
   commodity: string;
   quantity: number;
   unit: string;
@@ -72,11 +73,13 @@ interface CommodityPrice {
   id: string;
   commodity: string;
   country: string;
+  country_code: string;
   buy_price: number;
   sell_price: number;
   currency: string;
   unit: string;
   updated_at: string;
+  created_at: string;
 }
 
 interface InventoryPosition {
@@ -116,7 +119,7 @@ const CHART_COLORS = ['#5DB347', '#3B82F6', '#F59E0B', '#EF4444', '#8B5CF6', '#0
 type AdminTab = 'orders' | 'prices' | 'ledger' | 'counterparties' | 'inventory' | 'analytics' | 'auto-match';
 
 export default function AdminTradingPage() {
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<AdminTab>('orders');
 
@@ -163,7 +166,9 @@ export default function AdminTradingPage() {
         .from('trade_orders')
         .select('*')
         .order('created_at', { ascending: false });
-      setOrders(data || []);
+      // Normalize order_type → type for compatibility
+      const normalized = (data || []).map((o: Record<string, unknown>) => ({ ...o, type: o.order_type || o.type || 'buy' })) as TradeOrder[];
+      setOrders(normalized);
     } catch { /* ignore */ }
     setOrdersLoading(false);
   }, [supabase]);
@@ -178,7 +183,7 @@ export default function AdminTradingPage() {
   const fetchPrices = useCallback(async () => {
     setPricesLoading(true);
     try {
-      const { data } = await supabase.from('commodity_prices').select('*').order('country').order('commodity');
+      const { data } = await supabase.from('commodity_prices').select('*').order('country_code').order('commodity');
       setPrices(data || []);
     } catch { /* ignore */ }
     setPricesLoading(false);
@@ -201,7 +206,7 @@ export default function AdminTradingPage() {
 
   // ── Create order ──────────────────────────────────────────────────────
   const handleCreateOrder = async () => {
-    if (!newOrder.quantity || !newOrder.target_price || !newOrder.delivery_location || !newOrder.deadline) return;
+    if (!newOrder.quantity || !newOrder.target_price || !newOrder.delivery_location) return;
     setCreatingOrder(true);
     try {
       const res = await fetch('/api/trading', {
@@ -215,7 +220,6 @@ export default function AdminTradingPage() {
           quality_grade: newOrder.quality_grade,
           country: newOrder.country,
           delivery_location: newOrder.delivery_location,
-          deadline: newOrder.deadline,
           target_price: parseFloat(newOrder.target_price),
           currency: newOrder.currency,
           notes: newOrder.notes || null,
@@ -346,7 +350,8 @@ export default function AdminTradingPage() {
     orders.forEach(o => {
       const m = new Date(o.created_at).toLocaleDateString('en', { month: 'short', year: '2-digit' });
       if (!map[m]) map[m] = { buy: 0, sell: 0 };
-      map[m][o.type] += o.target_price * o.quantity;
+      const side = o.type || o.order_type || 'buy';
+      map[m][side] += o.target_price * o.quantity;
     });
     return Object.entries(map).map(([month, v]) => ({ month, buy: Math.round(v.buy), sell: Math.round(v.sell) }));
   }, [orders]);
@@ -637,7 +642,7 @@ export default function AdminTradingPage() {
                   {prices.map(p => (
                     <tr key={p.id} className="hover:bg-gray-50">
                       <td className="py-3 px-4 font-medium text-[#1B2A4A]">{p.commodity}</td>
-                      <td className="py-3 px-4 text-gray-700">{p.country}</td>
+                      <td className="py-3 px-4 text-gray-700">{p.country || p.country_code}</td>
                       <td className="py-3 px-4 text-right">
                         {editingPrice === p.id ? (
                           <input type="number" step="0.01" value={priceEdits[p.id]?.buy_price ?? p.buy_price} onChange={e => setPriceEdits(prev => ({ ...prev, [p.id]: { ...prev[p.id], buy_price: e.target.value, sell_price: prev[p.id]?.sell_price ?? String(p.sell_price) } }))} className="w-28 border border-gray-200 rounded-lg px-2 py-1 text-sm text-right" />
@@ -897,7 +902,7 @@ export default function AdminTradingPage() {
             </div>
             <div className="p-5 border-t border-gray-100 flex justify-end gap-3">
               <button onClick={() => setShowCreateOrder(false)} className="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100">Cancel</button>
-              <button onClick={handleCreateOrder} disabled={creatingOrder || !newOrder.quantity || !newOrder.target_price || !newOrder.delivery_location || !newOrder.deadline} className="flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium bg-[#5DB347] text-white hover:bg-[#449933] disabled:opacity-50 transition-colors">
+              <button onClick={handleCreateOrder} disabled={creatingOrder || !newOrder.quantity || !newOrder.target_price || !newOrder.delivery_location} className="flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium bg-[#5DB347] text-white hover:bg-[#449933] disabled:opacity-50 transition-colors">
                 {creatingOrder ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />} Create Order
               </button>
             </div>
