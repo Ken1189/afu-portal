@@ -263,7 +263,7 @@ export default function MembershipsPage() {
 
   const handleCheckout = async (tierSlug: string) => {
     if (tierSlug === 'free') {
-      router.push('/apply');
+      router.push('/apply?tier=free');
       return;
     }
     if (tierSlug === 'partner') {

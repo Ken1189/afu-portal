@@ -6,9 +6,10 @@ import { useSearchParams } from "next/navigation";
 import { useApplications } from "@/lib/supabase/use-applications";
 import { createClient } from "@/lib/supabase/client";
 
-type Tier = "smallholder" | "commercial" | "enterprise" | "partner";
+type Tier = "free" | "smallholder" | "commercial" | "enterprise" | "partner";
 
 const FALLBACK_TIERS: Record<Tier, { name: string; price: string; priceNote: string; desc: string }> = {
+  free: { name: "Free", price: "Free", priceNote: "forever", desc: "Explore the platform — no payment required" },
   smallholder: { name: "Smallholder", price: "$48/year", priceNote: "or $5/mo", desc: "For farms under 10 hectares" },
   commercial: { name: "Commercial", price: "$240/year", priceNote: "or $25/mo", desc: "For farms 10-500 hectares" },
   enterprise: { name: "Enterprise", price: "$950/year", priceNote: "or $99/mo", desc: "For large-scale operations + cooperatives" },
@@ -82,6 +83,16 @@ export default function ApplyPage() {
     fetchTiers();
   }, []);
 
+  // Auto-select tier from URL param
+  const tierParam = searchParams.get("tier");
+  useEffect(() => {
+    if (tierParam && tierParam in FALLBACK_TIERS) {
+      setSelectedTier(tierParam as Tier);
+      // Skip step 1 if free tier — go straight to form
+      if (tierParam === 'free') setStep(2);
+    }
+  }, [tierParam]);
+
   // Capture referral code from URL
   useEffect(() => {
     if (refCode) {
@@ -107,9 +118,7 @@ export default function ApplyPage() {
       farm_name: formData.organization || undefined,
       farm_size_ha: formData.farmSize ? parseFloat(formData.farmSize) : undefined,
       primary_crops: formData.crops ? formData.crops.split(',').map((c: string) => c.trim()) : undefined,
-      requested_tier: (selectedTier === 'smallholder' ? 'smallholder' :
-                       selectedTier === 'commercial' ? 'commercial' :
-                       selectedTier === 'enterprise' ? 'enterprise' : 'partner') as any,
+      requested_tier: (selectedTier || 'free') as any,
     });
 
     setSubmitting(false);
@@ -164,12 +173,25 @@ export default function ApplyPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <h2 className="text-3xl font-bold text-[#1B2A4A] mb-4">Welcome to the Family!</h2>
-              <p className="text-gray-600 mb-2">
-                Your <strong>{selectedTier && tiers[selectedTier].name}</strong> application has been received — we&apos;re excited to learn more about you and your farm.
-              </p>
-              <p className="text-gray-500 mb-8">
-                A real person from our team will be in touch within 3-5 business days. We can&apos;t wait to start this journey with you.
-              </p>
+              {selectedTier === 'free' ? (
+                <>
+                  <p className="text-gray-600 mb-2">
+                    Your <strong>Free</strong> membership is being set up. You can start exploring the platform right away.
+                  </p>
+                  <p className="text-gray-500 mb-8">
+                    Upgrade anytime to unlock full access to financing, insurance, marketplace discounts, and more.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="text-gray-600 mb-2">
+                    Your <strong>{selectedTier && tiers[selectedTier].name}</strong> application has been received — we&apos;re excited to learn more about you and your farm.
+                  </p>
+                  <p className="text-gray-500 mb-8">
+                    A real person from our team will be in touch within 3-5 business days. We can&apos;t wait to start this journey with you.
+                  </p>
+                </>
+              )}
               <Link href="/" className="inline-block bg-gradient-to-r from-[#5DB347] to-[#449933] hover:scale-105 text-white px-8 py-3 rounded-xl font-semibold transition-all duration-300 shadow-lg shadow-[#5DB347]/20">
                 Back to Home
               </Link>
