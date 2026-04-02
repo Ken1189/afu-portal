@@ -217,7 +217,7 @@ const incidentTypes = [
 
 export default function FileClaimPage() {
   const { t } = useLanguage();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
 
   const [insurancePolicies, setInsurancePolicies] = useState<InsurancePolicy[]>(mockInsurancePolicies);
   const [dataLoading, setDataLoading] = useState(true);

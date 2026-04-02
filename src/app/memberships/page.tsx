@@ -9,6 +9,25 @@ import { createClient } from '@/lib/supabase/client';
 
 const FALLBACK_TIERS = [
   {
+    name: 'Free',
+    slug: 'free',
+    priceMonthly: 'Free',
+    priceAnnual: 'Free',
+    priceNote: 'forever',
+    audience: 'Get started — explore the platform',
+    accent: 'border-gray-300 bg-gray-50',
+    accentBadge: 'bg-gray-100 text-gray-600',
+    popular: false,
+    features: {
+      'Crop Tracking': 'Basic',
+      'Financing Access': false,
+      Insurance: false,
+      Marketplace: 'Browse Only',
+      'Training Courses': '1 Free Course',
+      'AI Assistant': 'Limited',
+    },
+  },
+  {
     name: 'Smallholder',
     slug: 'smallholder',
     priceMonthly: '$4.99',
@@ -243,6 +262,10 @@ export default function MembershipsPage() {
   }, []);
 
   const handleCheckout = async (tierSlug: string) => {
+    if (tierSlug === 'free') {
+      router.push('/apply');
+      return;
+    }
     if (tierSlug === 'partner') {
       router.push('/contact');
       return;

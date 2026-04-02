@@ -205,11 +205,11 @@ const DEFAULT_COMMISSION_RATES: CommissionRate[] = [
 ];
 
 const TIERS = [
-  { name: 'Bronze', icon: Shield, color: '#CD7F32', minReferrals: 0, commission: '5%', perks: ['Base commission rate', 'Ambassador dashboard', 'Referral link'] },
-  { name: 'Silver', icon: Star, color: '#C0C0C0', minReferrals: 10, commission: '8%', perks: ['Increased commission', 'Monthly bonus', 'Priority email support'] },
-  { name: 'Gold', icon: Award, color: '#FFD700', minReferrals: 25, commission: '12%', perks: ['Premium commission', 'Quarterly bonus', 'Priority support'] },
-  { name: 'Platinum', icon: Crown, color: '#E5E4E2', minReferrals: 50, commission: '15%', perks: ['Top commission rate', 'Exclusive events', 'Dedicated manager'] },
-  { name: 'Diamond', icon: Gem, color: '#B9F2FF', minReferrals: 100, commission: 'Custom', perks: ['Custom rates', 'Advisory role', 'Revenue sharing'] },
+  { name: 'Bronze', icon: Shield, color: '#CD7F32', minReferrals: 0, commission: '2%', perks: ['Base commission rate', 'Ambassador dashboard', 'Referral link'] },
+  { name: 'Silver', icon: Star, color: '#C0C0C0', minReferrals: 10, commission: '4%', perks: ['Increased commission', 'Monthly bonus', 'Priority email support'] },
+  { name: 'Gold', icon: Award, color: '#FFD700', minReferrals: 25, commission: '6%', perks: ['Premium commission', 'Quarterly bonus', 'Priority support'] },
+  { name: 'Platinum', icon: Crown, color: '#E5E4E2', minReferrals: 50, commission: '8%', perks: ['Top commission rate', 'Exclusive events', 'Dedicated manager'] },
+  { name: 'Diamond', icon: Gem, color: '#B9F2FF', minReferrals: 100, commission: '10%', perks: ['Maximum commission', 'Advisory role', 'Revenue sharing'] },
 ];
 
 const HOW_IT_WORKS_STEPS = [

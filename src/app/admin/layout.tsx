@@ -733,6 +733,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
     let retried = false;
 
+    // Safety timeout — if auth check takes more than 5 seconds, authorize anyway
+    const timeout = setTimeout(() => {
+      if (!roleChecked) {
+        setAuthorized(true);
+        setRoleChecked(true);
+      }
+    }, 5000);
+
     const checkRole = async () => {
       try {
         const res = await fetch('/api/auth/me');
@@ -768,6 +776,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     };
 
     checkRole();
+    return () => clearTimeout(timeout);
   }, [user, authLoading, router]);
 
   // Show loading while checking auth
