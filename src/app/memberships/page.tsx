@@ -207,14 +207,14 @@ const faqs = [
   },
 ];
 
-function FeatureCell({ value }: { value: boolean | string }) {
+function FeatureCell({ value }: { value: boolean | string | undefined }) {
   if (value === true)
     return (
       <svg className="w-5 h-5 text-[#5DB347] mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
       </svg>
     );
-  if (value === false)
+  if (value === false || value === undefined)
     return (
       <svg className="w-5 h-5 text-gray-300 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -280,7 +280,7 @@ export default function MembershipsPage() {
       });
       const data = await res.json();
       if (data.url) {
-        window.location.href = data.url;
+        window.location.assign(data.url);
       } else {
         setCheckoutError('Payment system is being configured. Please contact us or try again later.');
         setCheckoutLoading(null);
