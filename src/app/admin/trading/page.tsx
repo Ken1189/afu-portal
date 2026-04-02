@@ -21,6 +21,12 @@ import {
   Save,
   Download,
   Zap,
+  Plus,
+  X,
+  BookOpen,
+  Users,
+  Edit3,
+  Trash2,
 } from 'lucide-react';
 import {
   BarChart, Bar, LineChart as RechartsLine, Line,
@@ -107,7 +113,7 @@ const STATUS_LABELS: Record<string, string> = {
 const ALL_STATUSES = Object.keys(STATUS_LABELS);
 const CHART_COLORS = ['#5DB347', '#3B82F6', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4', '#EC4899', '#10B981'];
 
-type AdminTab = 'orders' | 'prices' | 'inventory' | 'analytics' | 'auto-match';
+type AdminTab = 'orders' | 'prices' | 'ledger' | 'counterparties' | 'inventory' | 'analytics' | 'auto-match';
 
 export default function AdminTradingPage() {
   const supabase = createClient();
@@ -138,6 +144,16 @@ export default function AdminTradingPage() {
   // Inventory state
   const [inventory, setInventory] = useState<InventoryPosition[]>([]);
   const [inventoryLoading, setInventoryLoading] = useState(false);
+
+  // Create order modal
+  const [showCreateOrder, setShowCreateOrder] = useState(false);
+  const [newOrder, setNewOrder] = useState({ type: 'buy', commodity: 'Maize', quantity: '', unit: 'tonnes', quality_grade: 'Grade A (Premium)', country: 'Kenya', delivery_location: '', deadline: '', target_price: '', currency: 'USD', notes: '' });
+  const [creatingOrder, setCreatingOrder] = useState(false);
+
+  // Add inventory modal
+  const [showAddInventory, setShowAddInventory] = useState(false);
+  const [newInventory, setNewInventory] = useState({ commodity: 'Maize', country: 'Kenya', quantity: '', unit: 'tonnes', avg_cost: '', currency: 'USD', warehouse_location: '', notes: '' });
+  const [addingInventory, setAddingInventory] = useState(false);
 
   // ── Fetch orders ────────────────────────────────────────────────────────
   const fetchOrders = useCallback(async () => {
@@ -178,10 +194,76 @@ export default function AdminTradingPage() {
   }, [supabase]);
 
   useEffect(() => {
-    if (activeTab === 'orders' || activeTab === 'analytics' || activeTab === 'auto-match') fetchOrders();
+    if (activeTab === 'orders' || activeTab === 'analytics' || activeTab === 'auto-match' || activeTab === 'ledger' || activeTab === 'counterparties') fetchOrders();
     if (activeTab === 'prices') fetchPrices();
     if (activeTab === 'inventory') fetchInventory();
   }, [activeTab, fetchOrders, fetchPrices, fetchInventory]);
+
+  // ── Create order ──────────────────────────────────────────────────────
+  const handleCreateOrder = async () => {
+    if (!newOrder.quantity || !newOrder.target_price || !newOrder.delivery_location || !newOrder.deadline) return;
+    setCreatingOrder(true);
+    try {
+      const res = await fetch('/api/trading', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: newOrder.type,
+          commodity: newOrder.commodity,
+          quantity: parseFloat(newOrder.quantity),
+          unit: newOrder.unit,
+          quality_grade: newOrder.quality_grade,
+          country: newOrder.country,
+          delivery_location: newOrder.delivery_location,
+          deadline: newOrder.deadline,
+          target_price: parseFloat(newOrder.target_price),
+          currency: newOrder.currency,
+          notes: newOrder.notes || null,
+        }),
+      });
+      if (res.ok) {
+        setShowCreateOrder(false);
+        setNewOrder({ type: 'buy', commodity: 'Maize', quantity: '', unit: 'tonnes', quality_grade: 'Grade A (Premium)', country: 'Kenya', delivery_location: '', deadline: '', target_price: '', currency: 'USD', notes: '' });
+        setSuccess('Trade order created!');
+        fetchOrders();
+        setTimeout(() => setSuccess(''), 3000);
+      }
+    } catch { /* ignore */ }
+    setCreatingOrder(false);
+  };
+
+  // ── Add inventory position ────────────────────────────────────────────
+  const handleAddInventory = async () => {
+    if (!newInventory.quantity || !newInventory.avg_cost || !newInventory.warehouse_location) return;
+    setAddingInventory(true);
+    try {
+      await supabase.from('inventory_positions').insert({
+        commodity: newInventory.commodity,
+        country: newInventory.country,
+        quantity: parseFloat(newInventory.quantity),
+        unit: newInventory.unit,
+        avg_cost: parseFloat(newInventory.avg_cost),
+        currency: newInventory.currency,
+        warehouse_location: newInventory.warehouse_location,
+        notes: newInventory.notes || null,
+      });
+      setShowAddInventory(false);
+      setNewInventory({ commodity: 'Maize', country: 'Kenya', quantity: '', unit: 'tonnes', avg_cost: '', currency: 'USD', warehouse_location: '', notes: '' });
+      setSuccess('Inventory position added!');
+      fetchInventory();
+      setTimeout(() => setSuccess(''), 3000);
+    } catch { /* ignore */ }
+    setAddingInventory(false);
+  };
+
+  const handleDeleteInventory = async (id: string) => {
+    setActionLoading(id);
+    try {
+      await supabase.from('inventory_positions').delete().eq('id', id);
+      fetchInventory();
+    } catch { /* ignore */ }
+    setActionLoading(null);
+  };
 
   // ── Admin actions ───────────────────────────────────────────────────────
   const handleFulfilAFU = async (orderId: string) => {
@@ -280,6 +362,26 @@ export default function AdminTradingPage() {
     return Object.entries(map).sort((a, b) => b[1].volume - a[1].volume).slice(0, 5).map(([name, v]) => ({ name, ...v }));
   }, [orders]);
 
+  // ── Ledger: completed/delivered trades ──────────────────────────────
+  const completedTrades = useMemo(() => orders.filter(o => ['completed', 'delivered', 'accepted'].includes(o.status)), [orders]);
+  const ledgerTotalVolume = completedTrades.reduce((sum, o) => sum + o.target_price * o.quantity, 0);
+  const ledgerTotalCommission = completedTrades.reduce((sum, o) => sum + (o.target_price * o.quantity * 0.025), 0); // 2.5% commission estimate
+
+  // ── Counterparties: aggregated trader stats ────────────────────────
+  const counterparties = useMemo(() => {
+    const map: Record<string, { name: string; country: string; totalOrders: number; totalVolume: number; buys: number; sells: number; lastTrade: string }> = {};
+    orders.forEach(o => {
+      const key = o.user_id || 'unknown';
+      const name = o.user_name || o.user_id?.slice(0, 8) || 'Unknown';
+      if (!map[key]) map[key] = { name, country: o.country, totalOrders: 0, totalVolume: 0, buys: 0, sells: 0, lastTrade: o.created_at };
+      map[key].totalOrders += 1;
+      map[key].totalVolume += o.target_price * o.quantity;
+      if (o.type === 'buy') map[key].buys += 1; else map[key].sells += 1;
+      if (o.created_at > map[key].lastTrade) { map[key].lastTrade = o.created_at; map[key].country = o.country; }
+    });
+    return Object.values(map).sort((a, b) => b.totalVolume - a.totalVolume);
+  }, [orders]);
+
   // ── Auto-match: find buy orders that match sell orders ──────────────────
   const potentialMatches = useMemo(() => {
     const buys = orders.filter(o => o.type === 'buy' && ['open', 'afu_review', 'marketplace'].includes(o.status));
@@ -324,10 +426,12 @@ export default function AdminTradingPage() {
   // ── Tab defs ────────────────────────────────────────────────────────────
   const adminTabs: { key: AdminTab; label: string; icon: React.ReactNode }[] = [
     { key: 'orders', label: 'Orders', icon: <ArrowLeftRight className="w-4 h-4" /> },
-    { key: 'prices', label: 'Commodity Prices', icon: <BarChart3 className="w-4 h-4" /> },
+    { key: 'prices', label: 'Prices', icon: <BarChart3 className="w-4 h-4" /> },
+    { key: 'ledger', label: 'Ledger', icon: <BookOpen className="w-4 h-4" /> },
+    { key: 'counterparties', label: 'Counterparties', icon: <Users className="w-4 h-4" /> },
     { key: 'inventory', label: 'Inventory', icon: <Boxes className="w-4 h-4" /> },
     { key: 'analytics', label: 'Analytics', icon: <TrendingUp className="w-4 h-4" /> },
-    { key: 'auto-match', label: 'Auto-Match', icon: <Zap className="w-4 h-4" /> },
+    { key: 'auto-match', label: 'Match', icon: <Zap className="w-4 h-4" /> },
   ];
 
   return (
@@ -337,9 +441,14 @@ export default function AdminTradingPage() {
           <h1 className="text-2xl font-bold text-[#1B2A4A]">Trade Desk</h1>
           <p className="text-sm text-gray-500 mt-1">Manage trade orders, commodity prices, inventory, and analytics</p>
         </div>
-        <button onClick={handleExportCSV} className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium px-4 py-2.5 rounded-xl transition-colors">
-          <Download className="w-4 h-4" /> Export CSV
-        </button>
+        <div className="flex gap-2">
+          <button onClick={() => setShowCreateOrder(true)} className="flex items-center gap-2 bg-[#5DB347] hover:bg-[#449933] text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-colors">
+            <Plus className="w-4 h-4" /> New Order
+          </button>
+          <button onClick={handleExportCSV} className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium px-4 py-2.5 rounded-xl transition-colors">
+            <Download className="w-4 h-4" /> Export
+          </button>
+        </div>
       </div>
 
       {success && (
@@ -570,7 +679,10 @@ export default function AdminTradingPage() {
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm">
           <div className="p-4 border-b border-gray-100 flex items-center justify-between">
             <h3 className="font-semibold text-[#1B2A4A]">Inventory Positions</h3>
-            <button onClick={fetchInventory} className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 transition-colors"><RefreshCw className="w-4 h-4" /></button>
+            <div className="flex gap-2">
+              <button onClick={() => setShowAddInventory(true)} className="flex items-center gap-1.5 text-xs bg-[#5DB347] text-white px-3 py-2 rounded-lg hover:bg-[#449933] transition-colors"><Plus className="w-3.5 h-3.5" /> Add Position</button>
+              <button onClick={fetchInventory} className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 transition-colors"><RefreshCw className="w-4 h-4" /></button>
+            </div>
           </div>
           {inventoryLoading ? (
             <div className="flex items-center justify-center py-16"><Loader2 className="w-6 h-6 animate-spin text-[#5DB347]" /></div>
@@ -587,6 +699,7 @@ export default function AdminTradingPage() {
                     <th className="text-right py-3 px-4 font-medium text-gray-500">Avg Cost</th>
                     <th className="text-left py-3 px-4 font-medium text-gray-500">Warehouse</th>
                     <th className="text-right py-3 px-4 font-medium text-gray-500">Updated</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-500"></th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
@@ -594,16 +707,255 @@ export default function AdminTradingPage() {
                     <tr key={inv.id} className="hover:bg-gray-50">
                       <td className="py-3 px-4 font-medium text-[#1B2A4A]">{inv.commodity}</td>
                       <td className="py-3 px-4 text-gray-700">{inv.country}</td>
-                      <td className="py-3 px-4 text-right font-medium">{inv.quantity_available?.toLocaleString()} {inv.unit}</td>
+                      <td className="py-3 px-4 text-right font-medium">{(inv.quantity_available ?? (inv as unknown as Record<string, number>).quantity)?.toLocaleString()} {inv.unit}</td>
                       <td className="py-3 px-4 text-right text-gray-700">{inv.currency} {inv.avg_cost?.toLocaleString()}</td>
                       <td className="py-3 px-4 text-gray-700">{inv.warehouse_location}</td>
                       <td className="py-3 px-4 text-right text-gray-400 text-xs">{new Date(inv.updated_at).toLocaleDateString()}</td>
+                      <td className="py-3 px-4"><button onClick={() => handleDeleteInventory(inv.id)} disabled={actionLoading === inv.id} className="text-gray-400 hover:text-red-500 disabled:opacity-50"><Trash2 className="w-4 h-4" /></button></td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
           )}
+        </div>
+      )}
+
+      {/* ─── Trade Ledger Tab ─── */}
+      {activeTab === 'ledger' && (
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <KPICard label="Completed Trades" value={completedTrades.length} icon={<CheckCircle className="w-5 h-5 text-green-500" />} />
+            <KPICard label="Total Volume" value={`$${(ledgerTotalVolume / 1000).toFixed(0)}K`} icon={<DollarSign className="w-5 h-5 text-blue-500" />} />
+            <KPICard label="Est. Commission (2.5%)" value={`$${ledgerTotalCommission.toFixed(0)}`} icon={<TrendingUp className="w-5 h-5 text-[#5DB347]" />} />
+          </div>
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm">
+            <div className="p-4 border-b border-gray-100 flex items-center justify-between">
+              <h3 className="font-semibold text-[#1B2A4A]">Completed Trades</h3>
+              <button onClick={() => {
+                const headers = ['Date', 'Order #', 'Type', 'Commodity', 'Qty', 'Unit', 'Price', 'Value', 'Est Commission', 'Status'];
+                const rows = completedTrades.map(o => [new Date(o.created_at).toLocaleDateString(), o.order_number, o.type, o.commodity, o.quantity, o.unit, o.target_price, (o.target_price * o.quantity).toFixed(2), (o.target_price * o.quantity * 0.025).toFixed(2), o.status]);
+                const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a'); a.href = url; a.download = `afu-trade-ledger-${new Date().toISOString().split('T')[0]}.csv`; a.click(); URL.revokeObjectURL(url);
+              }} className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-700"><Download className="w-3.5 h-3.5" /> Export CSV</button>
+            </div>
+            {completedTrades.length === 0 ? (
+              <div className="text-center py-16"><BookOpen className="w-10 h-10 text-gray-300 mx-auto mb-3" /><p className="text-gray-500 text-sm">No completed trades yet.</p></div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-gray-100 bg-gray-50/50">
+                      <th className="text-left py-3 px-4 font-medium text-gray-500">Date</th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-500">Order #</th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-500">Type</th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-500">Commodity</th>
+                      <th className="text-right py-3 px-4 font-medium text-gray-500">Qty</th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-500">Country</th>
+                      <th className="text-right py-3 px-4 font-medium text-gray-500">Price</th>
+                      <th className="text-right py-3 px-4 font-medium text-gray-500">Value</th>
+                      <th className="text-right py-3 px-4 font-medium text-gray-500">Commission</th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-500">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50">
+                    {completedTrades.map(o => (
+                      <tr key={o.id} className="hover:bg-gray-50">
+                        <td className="py-3 px-4 text-gray-500 text-xs">{new Date(o.created_at).toLocaleDateString()}</td>
+                        <td className="py-3 px-4 font-medium text-[#1B2A4A]">{o.order_number}</td>
+                        <td className="py-3 px-4"><span className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full ${o.type === 'buy' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'}`}>{o.type}</span></td>
+                        <td className="py-3 px-4 text-gray-700">{o.commodity}</td>
+                        <td className="py-3 px-4 text-right">{o.quantity.toLocaleString()} {o.unit}</td>
+                        <td className="py-3 px-4 text-gray-700">{o.country}</td>
+                        <td className="py-3 px-4 text-right font-medium">{o.currency} {o.target_price?.toLocaleString()}</td>
+                        <td className="py-3 px-4 text-right font-medium text-[#1B2A4A]">{o.currency} {(o.target_price * o.quantity).toLocaleString()}</td>
+                        <td className="py-3 px-4 text-right text-[#5DB347] font-medium">{o.currency} {(o.target_price * o.quantity * 0.025).toFixed(0)}</td>
+                        <td className="py-3 px-4"><span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[o.status] || 'bg-gray-100 text-gray-600'}`}>{STATUS_LABELS[o.status] || o.status}</span></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ─── Counterparties Tab ─── */}
+      {activeTab === 'counterparties' && (
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm">
+          <div className="p-4 border-b border-gray-100">
+            <h3 className="font-semibold text-[#1B2A4A]">Counterparties</h3>
+            <p className="text-sm text-gray-500">All buyers and sellers with aggregated trade statistics</p>
+          </div>
+          {counterparties.length === 0 ? (
+            <div className="text-center py-16"><Users className="w-10 h-10 text-gray-300 mx-auto mb-3" /><p className="text-gray-500 text-sm">No trade counterparties yet.</p></div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-gray-100 bg-gray-50/50">
+                    <th className="text-left py-3 px-4 font-medium text-gray-500">#</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-500">Trader</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-500">Country</th>
+                    <th className="text-right py-3 px-4 font-medium text-gray-500">Total Orders</th>
+                    <th className="text-right py-3 px-4 font-medium text-gray-500">Buys</th>
+                    <th className="text-right py-3 px-4 font-medium text-gray-500">Sells</th>
+                    <th className="text-right py-3 px-4 font-medium text-gray-500">Volume (USD)</th>
+                    <th className="text-right py-3 px-4 font-medium text-gray-500">Avg Order</th>
+                    <th className="text-right py-3 px-4 font-medium text-gray-500">Last Trade</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {counterparties.map((cp, i) => (
+                    <tr key={i} className="hover:bg-gray-50">
+                      <td className="py-3 px-4 text-gray-400 text-xs">{i + 1}</td>
+                      <td className="py-3 px-4 font-medium text-[#1B2A4A]">{cp.name}</td>
+                      <td className="py-3 px-4 text-gray-700">{cp.country}</td>
+                      <td className="py-3 px-4 text-right">{cp.totalOrders}</td>
+                      <td className="py-3 px-4 text-right text-blue-600">{cp.buys}</td>
+                      <td className="py-3 px-4 text-right text-green-600">{cp.sells}</td>
+                      <td className="py-3 px-4 text-right font-medium">${cp.totalVolume.toLocaleString()}</td>
+                      <td className="py-3 px-4 text-right text-gray-500">${cp.totalOrders > 0 ? Math.round(cp.totalVolume / cp.totalOrders).toLocaleString() : 0}</td>
+                      <td className="py-3 px-4 text-right text-gray-400 text-xs">{new Date(cp.lastTrade).toLocaleDateString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ─── Create Order Modal ─── */}
+      {showCreateOrder && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="p-5 border-b border-gray-100 flex items-center justify-between">
+              <h3 className="text-lg font-bold text-[#1B2A4A]">Create Trade Order</h3>
+              <button onClick={() => setShowCreateOrder(false)} className="p-1 rounded-lg hover:bg-gray-100"><X className="w-5 h-5 text-gray-400" /></button>
+            </div>
+            <div className="p-5 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">Type</label>
+                  <select value={newOrder.type} onChange={e => setNewOrder(p => ({ ...p, type: e.target.value }))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
+                    <option value="buy">Buy</option><option value="sell">Sell</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">Commodity</label>
+                  <select value={newOrder.commodity} onChange={e => setNewOrder(p => ({ ...p, commodity: e.target.value }))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
+                    {['Maize', 'Wheat', 'Rice', 'Sorghum', 'Coffee', 'Tea', 'Cocoa', 'Cotton', 'Soybeans', 'Sunflower', 'Sugar Cane', 'Cassava', 'Groundnuts', 'Sesame', 'Beans', 'Tobacco', 'Avocados', 'Mangoes'].map(c => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">Quantity</label>
+                  <input type="number" value={newOrder.quantity} onChange={e => setNewOrder(p => ({ ...p, quantity: e.target.value }))} placeholder="100" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">Unit</label>
+                  <select value={newOrder.unit} onChange={e => setNewOrder(p => ({ ...p, unit: e.target.value }))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
+                    {['kg', 'tonnes', 'bags (50kg)', 'bags (90kg)', 'litres', 'heads', 'pieces', 'crates'].map(u => <option key={u} value={u}>{u}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">Target Price</label>
+                  <input type="number" step="0.01" value={newOrder.target_price} onChange={e => setNewOrder(p => ({ ...p, target_price: e.target.value }))} placeholder="350" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">Country</label>
+                  <select value={newOrder.country} onChange={e => setNewOrder(p => ({ ...p, country: e.target.value }))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
+                    {['Kenya', 'Tanzania', 'Uganda', 'Ghana', 'Nigeria', 'South Africa', 'Zambia', 'Zimbabwe', 'Mozambique', 'Sierra Leone', 'Botswana'].map(c => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">Quality</label>
+                  <select value={newOrder.quality_grade} onChange={e => setNewOrder(p => ({ ...p, quality_grade: e.target.value }))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
+                    {['Grade A (Premium)', 'Grade B (Standard)', 'Grade C (Economy)', 'Organic Certified', 'Fair Trade'].map(g => <option key={g} value={g}>{g}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Delivery Location</label>
+                <input type="text" value={newOrder.delivery_location} onChange={e => setNewOrder(p => ({ ...p, delivery_location: e.target.value }))} placeholder="Nairobi Depot" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Deadline</label>
+                <input type="date" value={newOrder.deadline} onChange={e => setNewOrder(p => ({ ...p, deadline: e.target.value }))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Notes (optional)</label>
+                <textarea value={newOrder.notes} onChange={e => setNewOrder(p => ({ ...p, notes: e.target.value }))} rows={2} placeholder="Any special requirements..." className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm resize-none" />
+              </div>
+            </div>
+            <div className="p-5 border-t border-gray-100 flex justify-end gap-3">
+              <button onClick={() => setShowCreateOrder(false)} className="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100">Cancel</button>
+              <button onClick={handleCreateOrder} disabled={creatingOrder || !newOrder.quantity || !newOrder.target_price || !newOrder.delivery_location || !newOrder.deadline} className="flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium bg-[#5DB347] text-white hover:bg-[#449933] disabled:opacity-50 transition-colors">
+                {creatingOrder ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />} Create Order
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ─── Add Inventory Modal ─── */}
+      {showAddInventory && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4">
+            <div className="p-5 border-b border-gray-100 flex items-center justify-between">
+              <h3 className="text-lg font-bold text-[#1B2A4A]">Add Inventory Position</h3>
+              <button onClick={() => setShowAddInventory(false)} className="p-1 rounded-lg hover:bg-gray-100"><X className="w-5 h-5 text-gray-400" /></button>
+            </div>
+            <div className="p-5 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">Commodity</label>
+                  <select value={newInventory.commodity} onChange={e => setNewInventory(p => ({ ...p, commodity: e.target.value }))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
+                    {['Maize', 'Wheat', 'Rice', 'Coffee', 'Cocoa', 'Cotton', 'Soybeans', 'Groundnuts', 'Sesame', 'Tobacco'].map(c => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">Country</label>
+                  <select value={newInventory.country} onChange={e => setNewInventory(p => ({ ...p, country: e.target.value }))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
+                    {['Kenya', 'Tanzania', 'Uganda', 'Ghana', 'Nigeria', 'South Africa', 'Zambia', 'Zimbabwe', 'Mozambique'].map(c => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">Quantity</label>
+                  <input type="number" value={newInventory.quantity} onChange={e => setNewInventory(p => ({ ...p, quantity: e.target.value }))} placeholder="500" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">Unit</label>
+                  <select value={newInventory.unit} onChange={e => setNewInventory(p => ({ ...p, unit: e.target.value }))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
+                    {['kg', 'tonnes', 'bags (50kg)', 'bags (90kg)', 'litres'].map(u => <option key={u} value={u}>{u}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">Avg Cost</label>
+                  <input type="number" step="0.01" value={newInventory.avg_cost} onChange={e => setNewInventory(p => ({ ...p, avg_cost: e.target.value }))} placeholder="340" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Warehouse Location</label>
+                <input type="text" value={newInventory.warehouse_location} onChange={e => setNewInventory(p => ({ ...p, warehouse_location: e.target.value }))} placeholder="Nairobi Central Depot" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
+              </div>
+            </div>
+            <div className="p-5 border-t border-gray-100 flex justify-end gap-3">
+              <button onClick={() => setShowAddInventory(false)} className="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100">Cancel</button>
+              <button onClick={handleAddInventory} disabled={addingInventory || !newInventory.quantity || !newInventory.avg_cost || !newInventory.warehouse_location} className="flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium bg-[#5DB347] text-white hover:bg-[#449933] disabled:opacity-50 transition-colors">
+                {addingInventory ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />} Add Position
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
