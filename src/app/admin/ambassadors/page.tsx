@@ -473,21 +473,46 @@ export default function AdminAmbassadorsPage() {
     status: 'approved' | 'rejected'
   ) => {
     setUpdatingStatus(id);
-    const { error } = await supabase
-      .from('ambassadors')
-      .update({ status })
-      .eq('id', id);
-    if (error) {
-      setToast({ message: `Failed to ${status} ambassador`, type: 'error' });
+
+    if (status === 'approved') {
+      // Use the full approval API — creates account, sends email, generates referral code
+      try {
+        const res = await fetch('/api/admin/ambassadors/approve', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ambassadorId: id }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          setToast({
+            message: data.message || 'Ambassador approved! Welcome email sent.',
+            type: 'success',
+          });
+          setAmbassadors((prev) =>
+            prev.map((a) => (a.id === id ? { ...a, status: 'active', referral_code: data.referralCode } : a))
+          );
+        } else {
+          setToast({ message: data.error || 'Failed to approve ambassador', type: 'error' });
+        }
+      } catch {
+        setToast({ message: 'Failed to approve ambassador', type: 'error' });
+      }
     } else {
-      setToast({
-        message: `Ambassador ${status} successfully`,
-        type: 'success',
-      });
-      setAmbassadors((prev) =>
-        prev.map((a) => (a.id === id ? { ...a, status } : a))
-      );
+      // Simple reject — just update status
+      const { error } = await supabase
+        .from('ambassadors')
+        .update({ status })
+        .eq('id', id);
+      if (error) {
+        setToast({ message: 'Failed to reject ambassador', type: 'error' });
+      } else {
+        setToast({ message: 'Ambassador rejected', type: 'success' });
+        setAmbassadors((prev) =>
+          prev.map((a) => (a.id === id ? { ...a, status } : a))
+        );
+      }
     }
+
     setUpdatingStatus(null);
   };
 
