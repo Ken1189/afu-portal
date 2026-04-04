@@ -2,8 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
 import { getStripe } from '@/lib/stripe';
 import Stripe from 'stripe';
+import { Resend } from 'resend';
 import { emitEventAsync } from '@/lib/events/event-bus';
 import '@/lib/events/handlers';
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+const FROM = 'African Farming Union <noreply@mail.africanfarmingunion.org>';
+const NOTIFY_TO = ['peterw@africanfarmingunion.org', 'devonk@africanfarmingunion.org'];
 
 /**
  * POST /api/payments/webhook/stripe
@@ -131,6 +136,62 @@ export async function POST(request: NextRequest) {
                 .eq('id', farmerId);
             }
           }
+        }
+
+        // Handle donation confirmation
+        if (paymentType === 'donation') {
+          const donorEmail = session.customer_details?.email || session.customer_email;
+          const donorName = session.customer_details?.name || meta.donorName || 'Generous Donor';
+          const amount = ((session.amount_total || 0) / 100).toFixed(2);
+          const program = meta.program || 'General Fund';
+          const isMonthly = meta.isMonthly === 'true';
+
+          // Thank-you email to donor
+          if (donorEmail) {
+            try {
+              await resend.emails.send({
+                from: FROM,
+                to: donorEmail,
+                subject: 'Thank You for Your Donation to AFU! 🌾',
+                html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
+                  <div style="background:#1B2A4A;padding:30px;text-align:center">
+                    <h1 style="color:#5DB347;margin:0;font-size:24px">African Farming Union</h1>
+                    <p style="color:#8CB89C;margin:8px 0 0;font-size:14px">Thank You</p>
+                  </div>
+                  <div style="padding:30px;background:#f8faf6">
+                    <h2 style="color:#1B2A4A;margin-top:0">Thank you, ${donorName.split(' ')[0]}!</h2>
+                    <p style="color:#333;font-size:15px;line-height:1.6">
+                      Your ${isMonthly ? 'monthly ' : ''}donation of <strong>$${amount}</strong> to the <strong>${program.replace(/-/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase())}</strong> is helping African farmers build a better future.
+                    </p>
+                    <div style="background:white;border-left:4px solid #5DB347;padding:16px;border-radius:4px;margin:20px 0">
+                      <p style="margin:0;font-size:14px;color:#1B2A4A"><strong>Amount:</strong> $${amount}${isMonthly ? '/month' : ''}</p>
+                      <p style="margin:8px 0 0;font-size:14px;color:#1B2A4A"><strong>Program:</strong> ${program.replace(/-/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase())}</p>
+                    </div>
+                    <p style="color:#333;font-size:14px">Every dollar goes directly to supporting farmers across Africa with financing, inputs, training, and market access.</p>
+                    <div style="text-align:center;margin-top:24px">
+                      <a href="https://africanfarmingunion.org" style="display:inline-block;background:#5DB347;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600">Visit AFU</a>
+                    </div>
+                  </div>
+                  <div style="padding:12px;text-align:center;color:#999;font-size:12px">African Farming Union | africanfarmingunion.org</div>
+                </div>`,
+              });
+            } catch { /* non-critical */ }
+          }
+
+          // Notify Devon + Peter
+          try {
+            await resend.emails.send({
+              from: FROM,
+              to: NOTIFY_TO,
+              subject: `New Donation: $${amount} from ${donorName}`,
+              html: `<div style="font-family:Arial,sans-serif;padding:20px">
+                <h2 style="color:#1B2A4A">New Donation Received</h2>
+                <p><strong>${donorName}</strong> donated <strong>$${amount}</strong>${isMonthly ? ' (monthly)' : ''} to ${program}</p>
+                <p>Email: ${donorEmail || 'N/A'}</p>
+                <a href="https://africanfarmingunion.org/admin/payments" style="display:inline-block;background:#5DB347;color:white;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600">View in Admin</a>
+              </div>`,
+            });
+          } catch { /* non-critical */ }
         }
 
         break;

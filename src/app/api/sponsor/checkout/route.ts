@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { Resend } from 'resend';
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+const FROM = 'African Farming Union <noreply@mail.africanfarmingunion.org>';
+const NOTIFY_TO = ['peterw@africanfarmingunion.org', 'devonk@africanfarmingunion.org'];
 
 // NOTE: Stripe integration coming soon — currently records the sponsorship in DB only.
 
@@ -154,6 +159,56 @@ export async function POST(req: NextRequest) {
       // Log but don't fail — the sponsorship record was created successfully
       console.error('POST /api/sponsor/checkout farmer update error:', updateError);
     }
+
+    // Send thank-you email to sponsor
+    try {
+      const firstName = body.sponsor_name.split(' ')[0];
+      await resend.emails.send({
+        from: FROM,
+        to: body.sponsor_email,
+        subject: 'Thank You for Sponsoring an African Farmer! 🌾',
+        html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
+          <div style="background:#1B2A4A;padding:30px;text-align:center">
+            <h1 style="color:#5DB347;margin:0;font-size:24px">African Farming Union</h1>
+            <p style="color:#8CB89C;margin:8px 0 0;font-size:14px">Sponsor a Farmer</p>
+          </div>
+          <div style="padding:30px;background:#f8faf6">
+            <h2 style="color:#1B2A4A;margin-top:0">Thank you, ${firstName}!</h2>
+            <p style="color:#333;font-size:15px;line-height:1.6">
+              Your <strong>${body.tier.charAt(0).toUpperCase() + body.tier.slice(1)}</strong> sponsorship of <strong>$${body.amount_usd}</strong> (${body.billing_cycle}) is making a real difference in an African farmer's life.
+            </p>
+            <div style="background:white;border-left:4px solid #5DB347;padding:16px;border-radius:4px;margin:20px 0">
+              <p style="margin:0;font-size:14px;color:#1B2A4A"><strong>Sponsorship ID:</strong> ${sponsorship.id.slice(0, 8).toUpperCase()}</p>
+              <p style="margin:8px 0 0;font-size:14px;color:#1B2A4A"><strong>Tier:</strong> ${body.tier.charAt(0).toUpperCase() + body.tier.slice(1)}</p>
+              <p style="margin:8px 0 0;font-size:14px;color:#1B2A4A"><strong>Amount:</strong> $${body.amount_usd} (${body.billing_cycle})</p>
+            </div>
+            <p style="color:#333;font-size:14px;line-height:1.6">
+              We'll keep you updated on your sponsored farmer's progress. You'll receive regular updates showing the impact of your support.
+            </p>
+            <div style="text-align:center;margin-top:24px">
+              <a href="https://africanfarmingunion.org/sponsor" style="display:inline-block;background:#5DB347;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600">View Your Sponsorship</a>
+            </div>
+          </div>
+          <div style="padding:12px;text-align:center;color:#999;font-size:12px">African Farming Union | africanfarmingunion.org</div>
+        </div>`,
+      });
+    } catch { /* non-critical */ }
+
+    // Notify Devon + Peter
+    try {
+      await resend.emails.send({
+        from: FROM,
+        to: NOTIFY_TO,
+        subject: `New Sponsorship: ${body.sponsor_name} — $${body.amount_usd} (${body.tier})`,
+        html: `<div style="font-family:Arial,sans-serif;padding:20px">
+          <h2 style="color:#1B2A4A">New Farmer Sponsorship</h2>
+          <p><strong>${body.sponsor_name}</strong>${body.sponsor_company ? ` (${body.sponsor_company})` : ''}</p>
+          <p>Tier: ${body.tier} | Amount: $${body.amount_usd} | Cycle: ${body.billing_cycle}</p>
+          <p>Email: ${body.sponsor_email} | Country: ${body.sponsor_country || 'N/A'}</p>
+          <a href="https://africanfarmingunion.org/admin/sponsor" style="display:inline-block;background:#5DB347;color:white;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600">View in Admin</a>
+        </div>`,
+      });
+    } catch { /* non-critical */ }
 
     return NextResponse.json({
       success: true,
