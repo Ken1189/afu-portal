@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Search, FileText, CheckCircle2, XCircle, Clock, Eye,
-  Users, Loader2, AlertCircle,
+  Users, Loader2, AlertCircle, ChevronRight, Phone, MapPin, Wheat, Building2,
 } from 'lucide-react';
 import { useApplications, type ApplicationRow } from '@/lib/supabase/use-applications';
 import type { ApplicationStatus } from '@/lib/supabase/types';
@@ -34,19 +34,27 @@ const statusIcons: Record<ApplicationStatus, React.ReactNode> = {
 // ── Tier styling ────────────────────────────────────────────────────────────
 
 const tierColors: Record<string, string> = {
+  free: 'bg-gray-100 text-gray-600',
   student: 'bg-gray-100 text-gray-600',
   new_enterprise: 'bg-blue-100 text-blue-700',
   smallholder: 'bg-teal/10 text-teal',
   farmer_grower: 'bg-green-100 text-green-700',
   commercial: 'bg-navy/10 text-navy',
+  enterprise: 'bg-purple-100 text-purple-700',
+  partner: 'bg-indigo-100 text-indigo-700',
+  ambassador: 'bg-amber-100 text-amber-700',
 };
 
 const tierLabels: Record<string, string> = {
+  free: 'Free',
   student: 'Student',
   new_enterprise: 'New Enterprise',
   smallholder: 'Smallholder',
   farmer_grower: 'Farmer Grower',
   commercial: 'Commercial',
+  enterprise: 'Enterprise',
+  partner: 'Partner / Vendor',
+  ambassador: 'Ambassador',
 };
 
 // ── Filter tab type ─────────────────────────────────────────────────────────
@@ -88,6 +96,7 @@ export default function AdminApplicationsPage() {
   const [activeTab, setActiveTab] = useState<FilterTab>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
   const [toast, setToast] = useState<{message: string, type: 'success'|'error'}|null>(null);
   const showToast = (message: string, type: 'success'|'error' = 'success') => { setToast({message, type}); setTimeout(() => setToast(null), 3000); };
   const [tempPasswordModal, setTempPasswordModal] = useState<{
@@ -270,8 +279,10 @@ export default function AdminApplicationsPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-100 bg-cream/50">
+                  <th className="w-8 py-3 px-2"></th>
                   <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Name</th>
                   <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Email</th>
+                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Phone</th>
                   <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Country</th>
                   <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Tier</th>
                   <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Status</th>
@@ -281,66 +292,121 @@ export default function AdminApplicationsPage() {
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {filtered.map((app) => (
-                  <tr key={app.id} className="hover:bg-cream/50 transition-colors">
-                    <td className="py-3 px-4">
-                      <p className="font-medium text-navy">{app.full_name}</p>
-                    </td>
-                    <td className="py-3 px-4 text-gray-500">{app.email}</td>
-                    <td className="py-3 px-4 text-gray-500">{app.country}</td>
-                    <td className="py-3 px-4">
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${tierColors[app.requested_tier] || 'bg-gray-100 text-gray-600'}`}>
-                        {tierLabels[app.requested_tier] || app.requested_tier}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4">
-                      <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${statusColors[app.status]}`}>
-                        {statusIcons[app.status]}
-                        {statusLabels[app.status]}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 text-gray-400 text-xs">
-                      {formatDate(app.created_at)}
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="flex items-center justify-end gap-1">
-                        {(app.status === 'pending' || app.status === 'under_review') && (
-                          <>
-                            <button
-                              onClick={() => handleApprove(app)}
-                              disabled={actionLoading === app.id}
-                              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-green-50 text-green-700 hover:bg-green-100 transition-colors disabled:opacity-50"
-                              title="Approve"
-                            >
-                              <CheckCircle2 className="w-3.5 h-3.5" />
-                              Approve
-                            </button>
-                            <button
-                              onClick={() => handleReject(app)}
-                              disabled={actionLoading === app.id}
-                              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-red-50 text-red-600 hover:bg-red-100 transition-colors disabled:opacity-50"
-                              title="Reject"
-                            >
-                              <XCircle className="w-3.5 h-3.5" />
-                              Reject
-                            </button>
-                          </>
-                        )}
-                        {app.status === 'approved' && (
-                          <span className="text-xs text-green-600 font-medium flex items-center gap-1">
-                            <CheckCircle2 className="w-3.5 h-3.5" /> Approved
-                          </span>
-                        )}
-                        {app.status === 'rejected' && (
-                          <span className="text-xs text-red-500 font-medium flex items-center gap-1">
-                            <XCircle className="w-3.5 h-3.5" /> Rejected
-                          </span>
-                        )}
-                        {actionLoading === app.id && (
-                          <Loader2 className="w-4 h-4 text-teal animate-spin ml-1" />
-                        )}
-                      </div>
-                    </td>
-                  </tr>
+                  <React.Fragment key={app.id}>
+                    <tr
+                      className="hover:bg-cream/50 transition-colors cursor-pointer"
+                      onClick={() => setExpandedId(expandedId === app.id ? null : app.id)}
+                    >
+                      <td className="py-3 px-2">
+                        <ChevronRight className={`w-4 h-4 text-gray-400 transition-transform ${expandedId === app.id ? 'rotate-90' : ''}`} />
+                      </td>
+                      <td className="py-3 px-4">
+                        <p className="font-medium text-navy">{app.full_name}</p>
+                      </td>
+                      <td className="py-3 px-4 text-gray-500 text-xs">{app.email}</td>
+                      <td className="py-3 px-4 text-gray-500 text-xs">{app.phone || '—'}</td>
+                      <td className="py-3 px-4 text-gray-500">{app.country}</td>
+                      <td className="py-3 px-4">
+                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${tierColors[app.requested_tier] || 'bg-gray-100 text-gray-600'}`}>
+                          {tierLabels[app.requested_tier] || app.requested_tier}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4">
+                        <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${statusColors[app.status]}`}>
+                          {statusIcons[app.status]}
+                          {statusLabels[app.status]}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-gray-400 text-xs">
+                        {formatDate(app.created_at)}
+                      </td>
+                      <td className="py-3 px-4" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center justify-end gap-1">
+                          {(app.status === 'pending' || app.status === 'under_review') && (
+                            <>
+                              <button
+                                onClick={() => handleApprove(app)}
+                                disabled={actionLoading === app.id}
+                                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-green-50 text-green-700 hover:bg-green-100 transition-colors disabled:opacity-50"
+                                title="Approve"
+                              >
+                                <CheckCircle2 className="w-3.5 h-3.5" />
+                                Approve
+                              </button>
+                              <button
+                                onClick={() => handleReject(app)}
+                                disabled={actionLoading === app.id}
+                                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-red-50 text-red-600 hover:bg-red-100 transition-colors disabled:opacity-50"
+                                title="Reject"
+                              >
+                                <XCircle className="w-3.5 h-3.5" />
+                                Reject
+                              </button>
+                            </>
+                          )}
+                          {app.status === 'approved' && (
+                            <span className="text-xs text-green-600 font-medium flex items-center gap-1">
+                              <CheckCircle2 className="w-3.5 h-3.5" /> Approved
+                            </span>
+                          )}
+                          {app.status === 'rejected' && (
+                            <span className="text-xs text-red-500 font-medium flex items-center gap-1">
+                              <XCircle className="w-3.5 h-3.5" /> Rejected
+                            </span>
+                          )}
+                          {actionLoading === app.id && (
+                            <Loader2 className="w-4 h-4 text-teal animate-spin ml-1" />
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                    {/* ── Expanded Detail Row ── */}
+                    {expandedId === app.id && (
+                      <tr>
+                        <td colSpan={9} className="bg-gray-50 px-6 py-4">
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                            <div className="space-y-2">
+                              <p className="text-xs font-semibold text-gray-500 uppercase">Contact</p>
+                              <div className="flex items-center gap-2 text-gray-700">
+                                <Phone className="w-3.5 h-3.5 text-gray-400" />
+                                {app.phone || 'No phone'}
+                              </div>
+                              <div className="flex items-center gap-2 text-gray-700">
+                                <MapPin className="w-3.5 h-3.5 text-gray-400" />
+                                {app.country}{app.region ? `, ${app.region}` : ''}
+                              </div>
+                            </div>
+                            <div className="space-y-2">
+                              <p className="text-xs font-semibold text-gray-500 uppercase">Farm Details</p>
+                              <div className="flex items-center gap-2 text-gray-700">
+                                <Building2 className="w-3.5 h-3.5 text-gray-400" />
+                                {app.farm_name || 'No farm name'}
+                              </div>
+                              <div className="flex items-center gap-2 text-gray-700">
+                                <MapPin className="w-3.5 h-3.5 text-gray-400" />
+                                {app.farm_size_ha ? `${app.farm_size_ha} hectares` : 'No size specified'}
+                              </div>
+                              <div className="flex items-center gap-2 text-gray-700">
+                                <Wheat className="w-3.5 h-3.5 text-gray-400" />
+                                {app.primary_crops?.length ? app.primary_crops.join(', ') : 'No crops listed'}
+                              </div>
+                            </div>
+                            <div className="space-y-2">
+                              <p className="text-xs font-semibold text-gray-500 uppercase">Notes</p>
+                              <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">
+                                {app.notes || 'No notes'}
+                              </p>
+                              {app.reviewed_at && (
+                                <p className="text-xs text-gray-400 mt-2">
+                                  Reviewed: {formatDate(app.reviewed_at)}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
                 ))}
               </tbody>
             </table>

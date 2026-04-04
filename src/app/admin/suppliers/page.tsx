@@ -509,7 +509,21 @@ export default function AdminSuppliersPage() {
   // ── Action handlers ───────────────────────────────────────────────────
   const handleApprove = async (id: string, companyName: string) => {
     setActionLoading(id);
-    await approveSupplier(id);
+    try {
+      const res = await fetch('/api/admin/suppliers/approve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ supplierId: id }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        // Update local state
+        await approveSupplier(id);
+      }
+    } catch {
+      // Fallback to basic approval
+      await approveSupplier(id);
+    }
     setActionLoading(null);
   };
 
