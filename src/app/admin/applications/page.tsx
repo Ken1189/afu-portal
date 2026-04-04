@@ -158,6 +158,18 @@ export default function AdminApplicationsPage() {
   const handleReject = async (app: ApplicationRow) => {
     setActionLoading(app.id);
     await rejectApplication(app.id);
+    // Send rejection notification email (fire and forget)
+    fetch('/api/admin/applications/reject-notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: app.email,
+        full_name: app.full_name,
+        notes: app.notes || '',
+        type: app.requested_tier,
+      }),
+    }).catch(() => {});
+    showToast('Application rejected. Notification sent.', 'success');
     setActionLoading(null);
   };
 

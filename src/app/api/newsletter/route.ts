@@ -3,7 +3,7 @@ import { createAdminClient } from '@/lib/supabase/server';
 
 export async function POST(req: NextRequest) {
   try {
-    const { email } = await req.json();
+    const { email, name, country, interests } = await req.json();
 
     if (!email || typeof email !== 'string') {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 });
@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
           page: 'global',
           section: 'newsletter_subscribers',
           key: email.toLowerCase().trim(),
-          value: new Date().toISOString(),
+          value: JSON.stringify({ subscribed: new Date().toISOString(), name: name || null, country: country || null, interests: interests || null }),
           content_type: 'text',
         },
         { onConflict: 'page,section,key' }

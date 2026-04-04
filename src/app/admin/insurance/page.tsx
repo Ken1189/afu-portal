@@ -301,12 +301,33 @@ export default function InsuranceOverviewPage() {
 
       if (error) throw error;
 
-      // Update local state
+      // Notify the claimant via email (fire and forget)
+      // Notify the claimant via email (fire and forget)
+      const claim = claims.find((c) => c.id === claimId) as Record<string, unknown> | undefined;
+      if (claim) {
+        const claimEmail = (claim.member_email || claim.email || claim.contact_email || '') as string;
+        const claimName = (claim.member_name || claim.full_name || claim.claimant_name || 'Member') as string;
+        const claimRef = (claim.claim_number || claim.reference || claimId.slice(0, 8)) as string;
+        if (claimEmail) {
+          fetch('/api/notifications/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              to: claimEmail,
+              name: claimName,
+              subject: `Insurance Claim ${newStatus === 'approved' ? 'Approved' : 'Update'} — ${claimRef}`,
+              message: newStatus === 'approved'
+                ? `Your insurance claim has been approved. Our team will process the payout shortly.`
+                : `Your insurance claim has been reviewed. Unfortunately it was not approved at this time. Please contact us for more information.`,
+            }),
+          }).catch(() => {});
+        }
+      }
+
       setClaims((prev) =>
         prev.map((c) => (c.id === claimId ? { ...c, status: newStatus } : c))
       );
     } catch {
-      // If it fails (e.g. mock data IDs), update local state anyway for demo
       setClaims((prev) =>
         prev.map((c) => (c.id === claimId ? { ...c, status: newStatus } : c))
       );

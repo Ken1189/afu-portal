@@ -280,60 +280,40 @@ export default function AdminDashboard() {
     const supabase = createClient();
     (async () => {
       try {
-        const [
-          membersRes,
-          farmersRes,
-          loansRes,
-          loansDeployedRes,
-          pendingAppsRes,
-          totalAppsRes,
-          approvedAppsRes,
-          rejectedAppsRes,
-          suppliersRes,
-          ordersRes,
-          productsRes,
-          auditRes,
-        ] = await Promise.all([
-          // totalMembers: COUNT from profiles WHERE role != 'pending'
-          supabase.from('profiles').select('id', { count: 'exact', head: true }).neq('role', 'pending'),
-          // totalFarmers: COUNT from profiles WHERE role = 'farmer'
-          supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'farmer'),
-          // totalLoans: COUNT from loans
-          supabase.from('loans').select('id', { count: 'exact', head: true }),
-          // totalLoansDeployed: SUM of amount from loans WHERE status IN ('active','disbursed')
-          supabase.from('loans').select('amount').in('status', ['active', 'disbursed']),
-          // pendingApplications: COUNT from membership_applications WHERE status = 'pending'
-          supabase.from('membership_applications').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
-          // total applications
-          supabase.from('membership_applications').select('id', { count: 'exact', head: true }),
-          // approved applications
-          supabase.from('membership_applications').select('id', { count: 'exact', head: true }).eq('status', 'approved'),
-          // rejected applications
-          supabase.from('membership_applications').select('id', { count: 'exact', head: true }).eq('status', 'rejected'),
-          // suppliers
-          supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'supplier'),
-          // orders
-          supabase.from('orders').select('id, total_amount', { count: 'exact' }),
-          // products
-          supabase.from('products').select('id, status', { count: 'exact' }),
-          // recentActivities: SELECT from audit_log ORDER BY created_at DESC LIMIT 10
-          supabase.from('audit_log').select('id, action, entity_type, details, created_at').order('created_at', { ascending: false }).limit(10),
-        ]);
+        // Run each query independently so one failing table doesn't break all stats
+        const empty = { data: null, count: null, error: null };
 
-        const totalLoansDeployed = loansDeployedRes.data
-          ? loansDeployedRes.data.reduce((sum: number, l: { amount: number }) => sum + (l.amount || 0), 0)
+        const wrap = (p: PromiseLike<unknown>) => Promise.resolve(p).catch(() => empty);
+        const [membersRes, farmersRes, loansRes, loansDeployedRes, pendingAppsRes, totalAppsRes, approvedAppsRes, rejectedAppsRes, suppliersRes, ordersRes, productsRes, auditRes] = await Promise.all([
+          wrap(supabase.from('profiles').select('id', { count: 'exact', head: true }).neq('role', 'pending')),
+          wrap(supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'farmer')),
+          wrap(supabase.from('loans').select('id', { count: 'exact', head: true })),
+          wrap(supabase.from('loans').select('amount').in('status', ['active', 'disbursed'])),
+          wrap(supabase.from('membership_applications').select('id', { count: 'exact', head: true }).eq('status', 'pending')),
+          wrap(supabase.from('membership_applications').select('id', { count: 'exact', head: true })),
+          wrap(supabase.from('membership_applications').select('id', { count: 'exact', head: true }).eq('status', 'approved')),
+          wrap(supabase.from('membership_applications').select('id', { count: 'exact', head: true }).eq('status', 'rejected')),
+          wrap(supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'supplier')),
+          wrap(supabase.from('orders').select('id, total_amount', { count: 'exact' })),
+          wrap(supabase.from('products').select('id, status', { count: 'exact' })),
+          wrap(supabase.from('audit_log').select('id, action, entity_type, details, created_at').order('created_at', { ascending: false }).limit(10)),
+        ]) as { data: unknown; count: number | null; error: unknown }[];
+
+        const loansData = (loansDeployedRes.data || []) as { amount: number }[];
+        const totalLoansDeployed = loansData.length > 0
+          ? loansData.reduce((sum: number, l) => sum + (l.amount || 0), 0)
           : FALLBACK_STATS.totalLoansDeployed;
 
-        const activeLoansCount = loansDeployedRes.data ? loansDeployedRes.data.length : FALLBACK_STATS.activeLoans;
+        const activeLoansCount = loansData.length || FALLBACK_STATS.activeLoans;
 
-        const ordersRevenue = ordersRes.data
-          ? ordersRes.data.reduce((sum: number, o: { total_amount: number }) => sum + (o.total_amount || 0), 0)
+        const ordersData = (ordersRes.data || []) as { total_amount: number }[];
+        const ordersRevenue = ordersData.length > 0
+          ? ordersData.reduce((sum: number, o) => sum + (o.total_amount || 0), 0)
           : FALLBACK_STATS.monthlyRevenue;
 
         const productsTotal = productsRes.count ?? 0;
-        const productsInStock = productsRes.data
-          ? productsRes.data.filter((p: { status: string }) => p.status === 'active' || p.status === 'in_stock').length
-          : 0;
+        const productsData = (productsRes.data || []) as { status: string }[];
+        const productsInStock = productsData.filter((p) => p.status === 'active' || p.status === 'in_stock').length;
 
         setLive({
           members: {

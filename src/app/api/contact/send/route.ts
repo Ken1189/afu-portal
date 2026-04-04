@@ -15,7 +15,7 @@ export async function POST(req: Request) {
     // Email to Peter
     await resend.emails.send({
       from: FROM,
-      to: 'peterw@africanfarmingunion.org',
+      to: ['peterw@africanfarmingunion.org', 'devonk@africanfarmingunion.org'],
       subject: `[AFU Contact] ${subject} — from ${name}`,
       html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto"><div style="background:#1B2A4A;padding:20px;text-align:center"><h2 style="color:#5DB347;margin:0">New Contact Form Submission</h2></div><div style="padding:20px;background:#f8faf6"><p><strong>Name:</strong> ${name}</p><p><strong>Email:</strong> ${email}</p><p><strong>Organization:</strong> ${organization || 'N/A'}</p><p><strong>Subject:</strong> ${subject}</p><hr style="border:1px solid #eee"><p><strong>Message:</strong></p><p>${message.replace(/\n/g, '<br>')}</p></div><div style="padding:15px;text-align:center;color:#999;font-size:12px">African Farming Union | africanfarmingunion.org</div></div>`,
     });
