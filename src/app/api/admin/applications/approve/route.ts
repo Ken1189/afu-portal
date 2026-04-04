@@ -3,8 +3,12 @@ import { createServerClient } from '@supabase/ssr';
 import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 import crypto from 'crypto';
+import { Resend } from 'resend';
 import { emitEventAsync } from '@/lib/events/event-bus';
 import '@/lib/events/handlers';
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+const FROM = 'African Farming Union <noreply@mail.africanfarmingunion.org>';
 
 /**
  * POST /api/admin/applications/approve
@@ -121,10 +125,32 @@ export async function POST(request: Request) {
           return NextResponse.json({ success: false, error: 'Failed to update application: ' + updateError.message }, { status: 500 });
         }
 
+        // Still send a notification email
+        const fn = application.full_name?.split(' ')[0] || 'Member';
+        try {
+          await resend.emails.send({
+            from: FROM,
+            to: application.email,
+            subject: 'Your AFU Membership Has Been Approved! 🌾',
+            html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
+              <div style="background:#1B2A4A;padding:30px;text-align:center">
+                <h1 style="color:#5DB347;margin:0;font-size:24px">African Farming Union</h1>
+              </div>
+              <div style="padding:30px;background:#f8faf6">
+                <h2 style="color:#1B2A4A;margin-top:0">Welcome, ${fn}!</h2>
+                <p style="color:#333;font-size:15px;line-height:1.6">Your membership application has been <strong style="color:#5DB347">approved</strong>. Log in to access your dashboard.</p>
+                <div style="text-align:center;margin-top:24px">
+                  <a href="https://africanfarmingunion.org/login" style="display:inline-block;background:#5DB347;color:white;padding:14px 32px;border-radius:10px;text-decoration:none;font-weight:700;font-size:15px">Log In</a>
+                </div>
+              </div>
+            </div>`,
+          });
+        } catch { /* non-critical */ }
+
         return NextResponse.json({
           success: true,
           tempPassword: null,
-          message: 'Application approved. User already has an account — no new credentials generated.',
+          message: 'Application approved. User already has an account — approval email sent.',
         });
       }
 
@@ -182,21 +208,101 @@ export async function POST(request: Request) {
     }
 
     // Emit cross-system event (fire-and-forget)
-    // Note: tempPassword intentionally excluded from event data for security
     emitEventAsync({
       type: 'APPLICATION_APPROVED',
-      data: {
-        applicationId,
-        userId,
-        email: application.email,
-        fullName: application.full_name,
-      },
+      data: { applicationId, userId, email: application.email, fullName: application.full_name },
     });
+
+    // Send welcome email with credentials
+    const firstName = application.full_name?.split(' ')[0] || 'Member';
+    const tierName = application.requested_tier
+      ? application.requested_tier.charAt(0).toUpperCase() + application.requested_tier.slice(1).replace(/_/g, ' ')
+      : 'Member';
+
+    try {
+      await resend.emails.send({
+        from: FROM,
+        to: application.email,
+        subject: 'Welcome to African Farming Union! 🌾',
+        html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
+          <div style="background:#1B2A4A;padding:30px;text-align:center">
+            <h1 style="color:#5DB347;margin:0;font-size:24px">African Farming Union</h1>
+            <p style="color:#8CB89C;margin:8px 0 0;font-size:14px">Welcome to the Family</p>
+          </div>
+          <div style="padding:30px;background:#f8faf6">
+            <h2 style="color:#1B2A4A;margin-top:0">Welcome, ${firstName}!</h2>
+            <p style="color:#333;font-size:15px;line-height:1.6">
+              Your <strong>${tierName}</strong> membership has been <strong style="color:#5DB347">approved</strong>.
+              You now have access to the AFU platform — financing, insurance, marketplace, training, and more.
+            </p>
+
+            <div style="background:white;border:2px solid #5DB347;border-radius:12px;padding:20px;margin:20px 0">
+              <h3 style="color:#1B2A4A;margin-top:0;font-size:16px">Your Login Credentials</h3>
+              <table style="width:100%;font-size:14px">
+                <tr>
+                  <td style="padding:8px 0;color:#64748b;width:120px">Login URL</td>
+                  <td style="padding:8px 0"><a href="https://africanfarmingunion.org/login" style="color:#2563eb;font-weight:600">africanfarmingunion.org/login</a></td>
+                </tr>
+                <tr>
+                  <td style="padding:8px 0;color:#64748b">Email</td>
+                  <td style="padding:8px 0;color:#1B2A4A;font-weight:600">${application.email}</td>
+                </tr>
+                <tr>
+                  <td style="padding:8px 0;color:#64748b">Password</td>
+                  <td style="padding:8px 0;color:#1B2A4A;font-weight:600;font-family:monospace;font-size:16px">${tempPassword}</td>
+                </tr>
+                <tr>
+                  <td style="padding:8px 0;color:#64748b">Member ID</td>
+                  <td style="padding:8px 0;color:#1B2A4A;font-weight:600">${memberId}</td>
+                </tr>
+              </table>
+              <p style="color:#EF4444;font-size:12px;margin-bottom:0">Please change your password after your first login.</p>
+            </div>
+
+            <div style="background:white;border:1px solid #e5e7eb;border-radius:12px;padding:20px;margin:20px 0">
+              <h3 style="color:#1B2A4A;margin-top:0;font-size:16px">What You Can Do Now</h3>
+              <ol style="color:#333;font-size:14px;line-height:1.8;padding-left:20px">
+                <li>Log into your <a href="https://africanfarmingunion.org/dashboard" style="color:#2563eb">Member Dashboard</a></li>
+                <li>Complete your farm profile</li>
+                <li>Browse the <a href="https://africanfarmingunion.org/marketplace" style="color:#2563eb">Marketplace</a> for seeds, fertilizer & equipment</li>
+                <li>Apply for <a href="https://africanfarmingunion.org/dashboard/financing" style="color:#2563eb">financing</a> and <a href="https://africanfarmingunion.org/farm/insurance" style="color:#2563eb">insurance</a></li>
+                <li>Access free <a href="https://africanfarmingunion.org/farm/training" style="color:#2563eb">training courses</a></li>
+              </ol>
+            </div>
+
+            <div style="text-align:center;margin-top:24px">
+              <a href="https://africanfarmingunion.org/dashboard" style="display:inline-block;background:#5DB347;color:white;padding:14px 32px;border-radius:10px;text-decoration:none;font-weight:700;font-size:15px">Go to Dashboard</a>
+            </div>
+          </div>
+          <div style="padding:16px;text-align:center;color:#999;font-size:12px">
+            African Farming Union | <a href="https://africanfarmingunion.org" style="color:#999">africanfarmingunion.org</a>
+          </div>
+        </div>`,
+      });
+    } catch (emailErr) {
+      console.error('Failed to send welcome email:', emailErr);
+    }
+
+    // Notify Devon + Peter
+    try {
+      await resend.emails.send({
+        from: FROM,
+        to: ['peterw@africanfarmingunion.org', 'devonk@africanfarmingunion.org'],
+        subject: `Member Approved: ${application.full_name} (${tierName})`,
+        html: `<div style="font-family:Arial,sans-serif;padding:20px">
+          <h2 style="color:#1B2A4A">Member Approved</h2>
+          <p><strong>${application.full_name}</strong> — ${tierName} tier</p>
+          <p>Country: ${application.country || 'N/A'} | Email: ${application.email}</p>
+          <p>Member ID: ${memberId}</p>
+          <a href="https://africanfarmingunion.org/admin/members" style="display:inline-block;background:#5DB347;color:white;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600">View in Admin</a>
+        </div>`,
+      });
+    } catch { /* non-critical */ }
 
     return NextResponse.json({
       success: true,
       tempPassword,
-      message: `Account created for ${application.email}. Share the temporary password with the applicant.`,
+      message: `Account created for ${application.email}. Welcome email sent with login credentials.`,
     });
   } catch (err: unknown) {
     console.error('Approve application error:', err);
