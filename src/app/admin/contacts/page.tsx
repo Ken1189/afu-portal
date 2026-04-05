@@ -7,7 +7,7 @@ import {
   Users, Search, Download, Plus, Loader2, Mail, Phone, Globe,
   Tag, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, X,
   Building2, Award, Shield, User, Calendar, RefreshCw, Upload,
-  MessageSquare, Filter, Settings, ArrowUpDown, Check,
+  MessageSquare, Filter, ArrowUpDown,
 } from 'lucide-react';
 
 /* ─── Types ─── */
@@ -56,6 +56,7 @@ export default function AdminContactsPage() {
   const [showAddContact, setShowAddContact] = useState(false);
   const [newContact, setNewContact] = useState({ name: '', email: '', phone: '', business: '', type: 'lead', country: '', tags: '' });
   const [saving, setSaving] = useState(false);
+  const [showSortMenu, setShowSortMenu] = useState(false);
 
   // Bulk
   const [bulkAction, setBulkAction] = useState('');
@@ -202,7 +203,7 @@ export default function AdminContactsPage() {
               <span className="text-xs font-medium text-[#5DB347] bg-[#5DB347]/10 px-2.5 py-1 rounded-full">{filtered.length} Contacts</span>
             </div>
             <div className="flex items-center gap-2">
-              <button onClick={exportCSV} className="flex items-center gap-1.5 text-xs text-gray-500 border border-gray-200 rounded-lg px-3 py-2 hover:bg-gray-50"><Download className="w-3.5 h-3.5" /> Import</button>
+              <button onClick={exportCSV} className="flex items-center gap-1.5 text-xs text-gray-500 border border-gray-200 rounded-lg px-3 py-2 hover:bg-gray-50"><Download className="w-3.5 h-3.5" /> Export CSV</button>
               <button onClick={() => setShowAddContact(true)} className="flex items-center gap-1.5 text-xs bg-[#5DB347] text-white rounded-lg px-3 py-2 hover:bg-[#449933]"><Plus className="w-3.5 h-3.5" /> Add Contact</button>
             </div>
           </div>
@@ -223,15 +224,33 @@ export default function AdminContactsPage() {
             <button onClick={() => setShowAdvFilters(!showAdvFilters)} className={`flex items-center gap-1.5 text-xs border rounded-lg px-3 py-2 ${showAdvFilters ? 'border-[#5DB347] text-[#5DB347] bg-[#5DB347]/5' : 'border-gray-200 text-gray-500'}`}>
               <Filter className="w-3.5 h-3.5" /> Advanced filters
             </button>
-            <button className="flex items-center gap-1.5 text-xs border border-gray-200 rounded-lg px-3 py-2 text-gray-500">
-              <ArrowUpDown className="w-3.5 h-3.5" /> Sort ({sortField.replace('_', ' ')})
-            </button>
+            <div className="relative">
+              <button onClick={() => setShowSortMenu(!showSortMenu)} className="flex items-center gap-1.5 text-xs border border-gray-200 rounded-lg px-3 py-2 text-gray-500 hover:bg-gray-50">
+                <ArrowUpDown className="w-3.5 h-3.5" /> Sort ({sortField.replace(/_/g, ' ')})
+              </button>
+              {showSortMenu && (
+                <div className="absolute left-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg py-1 w-48 z-20">
+                  {[
+                    { field: 'contact_name' as SortField, label: 'Name' },
+                    { field: 'contact_email' as SortField, label: 'Email' },
+                    { field: 'business_name' as SortField, label: 'Business' },
+                    { field: 'contact_type' as SortField, label: 'Type' },
+                    { field: 'created_at' as SortField, label: 'Created' },
+                    { field: 'last_message_at' as SortField, label: 'Last activity' },
+                  ].map(s => (
+                    <button key={s.field} onClick={() => { toggleSort(s.field); setShowSortMenu(false); }} className={`w-full text-left px-4 py-2 text-xs hover:bg-gray-50 flex items-center justify-between ${sortField === s.field ? 'text-[#5DB347] font-medium' : 'text-gray-600'}`}>
+                      {s.label}
+                      {sortField === s.field && <span className="text-[10px]">{sortDir === 'asc' ? '↑' : '↓'}</span>}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
             <div className="flex-1" />
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input type="text" value={searchTerm} onChange={e => { setSearchTerm(e.target.value); setPage(1); }} placeholder="Search Contacts" className="pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm w-64 focus:ring-2 focus:ring-[#5DB347]" />
             </div>
-            <button className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-600"><Settings className="w-3.5 h-3.5" /> Manage fields</button>
           </div>
 
           {/* Advanced filters */}
