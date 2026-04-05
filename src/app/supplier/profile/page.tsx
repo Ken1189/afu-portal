@@ -119,6 +119,7 @@ export default function SupplierProfilePage() {
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [usingFallback, setUsingFallback] = useState(false);
 
   // -- Editable form state
@@ -266,8 +267,8 @@ export default function SupplierProfilePage() {
       setSaveSuccess(true);
       setEditing(false);
       setTimeout(() => setSaveSuccess(false), 2500);
-    } catch {
-      // Silent — could add error toast
+    } catch (err) {
+      setSaveError('Failed to save. Please try again.');
     } finally {
       setSaving(false);
     }

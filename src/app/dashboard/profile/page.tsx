@@ -275,11 +275,13 @@ export default function ProfilePage() {
   };
 
   // ── Save handler ──
+  const [saveError, setSaveError] = useState<string | null>(null);
   const handleSave = async () => {
     if (!user) return;
     setSaving(true);
+    setSaveError(null);
 
-    await supabase
+    const { error } = await supabase
       .from('profiles')
       .update({
         full_name: editName,
@@ -287,6 +289,12 @@ export default function ProfilePage() {
         country: editCountry || null,
       })
       .eq('id', user.id);
+
+    if (error) {
+      setSaveError('Failed to save: ' + error.message);
+      setSaving(false);
+      return;
+    }
 
     await refreshProfile();
     setSaving(false);

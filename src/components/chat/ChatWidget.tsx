@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageCircle, X, Minimize2, Send, Mic, Sparkles } from 'lucide-react';
+import { MessageCircle, X, Minimize2, Send, Mic, Sparkles, User } from 'lucide-react';
 import ChatMessage from './ChatMessage';
 import TypingIndicator from './TypingIndicator';
 import QuickActions from './QuickActions';
@@ -91,6 +91,66 @@ export default function ChatWidget() {
     sendMessage(label);
   };
 
+  // ── Talk to Human — collect details then save to inbox ──
+  const [humanRequested, setHumanRequested] = useState(false);
+  const [showHumanForm, setShowHumanForm] = useState(false);
+  const [humanForm, setHumanForm] = useState({ name: '', email: '', phone: '', message: '' });
+  const [humanSending, setHumanSending] = useState(false);
+
+  const talkToHuman = () => {
+    setShowHumanForm(true);
+    const botMsg: ChatMessageType = {
+      id: generateMessageId(),
+      role: 'bot',
+      text: "I'd love to connect you with our team! Please fill in your details below and we'll get back to you shortly.",
+      timestamp: new Date(),
+    };
+    setMessages(prev => [...prev, botMsg]);
+  };
+
+  const submitHumanRequest = async () => {
+    if (!humanForm.name || !humanForm.email) return;
+    setHumanSending(true);
+    setHumanRequested(true);
+
+    try {
+      const chatHistory = messages.map(m => `${m.role === 'user' ? 'Visitor' : 'Amara'}: ${m.text}`).join('\n');
+      const fullMessage = `${humanForm.message ? humanForm.message + '\n\n' : ''}--- Chat History ---\n${chatHistory}`;
+
+      await fetch('/api/admin/inbox', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contact_name: humanForm.name,
+          contact_email: humanForm.email,
+          contact_phone: humanForm.phone || null,
+          contact_type: 'lead',
+          subject: 'Chat — Talk to Human',
+          message: fullMessage,
+          channel: 'form',
+        }),
+      });
+
+      setShowHumanForm(false);
+      const confirmMsg: ChatMessageType = {
+        id: generateMessageId(),
+        role: 'bot',
+        text: `Thanks ${humanForm.name.split(' ')[0]}! Our team will reach out to you at ${humanForm.email} shortly. In the meantime, feel free to keep chatting with me!`,
+        timestamp: new Date(),
+      };
+      setMessages(prev => [...prev, confirmMsg]);
+    } catch {
+      const errorMsg: ChatMessageType = {
+        id: generateMessageId(),
+        role: 'bot',
+        text: "Something went wrong. Please email us directly at devonk@africanfarmingunion.org",
+        timestamp: new Date(),
+      };
+      setMessages(prev => [...prev, errorMsg]);
+    }
+    setHumanSending(false);
+  };
+
   const unreadCount = hasOpened ? 0 : 1;
 
   return (
@@ -143,11 +203,20 @@ export default function ChatWidget() {
                   <Sparkles className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-white font-semibold text-sm">Mkulima AI</h3>
-                  <p className="text-teal-light text-xs">AFU&apos;s Farming Assistant</p>
+                  <h3 className="text-white font-semibold text-sm">Amara</h3>
+                  <p className="text-teal-light text-xs">Your AFU Assistant</p>
                 </div>
               </div>
               <div className="flex items-center gap-1">
+                <button
+                  onClick={talkToHuman}
+                  disabled={humanRequested}
+                  className="p-1.5 hover:bg-white/10 rounded-lg transition-colors disabled:opacity-50"
+                  aria-label="Talk to a human"
+                  title="Talk to a human"
+                >
+                  <User className="w-4 h-4 text-white/70" />
+                </button>
                 <button
                   onClick={() => setIsOpen(false)}
                   className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
@@ -190,10 +259,26 @@ export default function ChatWidget() {
               <div ref={messagesEndRef} />
             </div>
 
+            {/* Human form */}
+            {showHumanForm && !humanRequested && (
+              <div className="px-3 py-3 bg-amber-50 border-t border-amber-200 flex-shrink-0 space-y-2">
+                <p className="text-xs font-semibold text-amber-800">Your Details</p>
+                <input type="text" value={humanForm.name} onChange={e => setHumanForm(p => ({ ...p, name: e.target.value }))} placeholder="Your name *" className="w-full text-xs border border-amber-200 rounded-lg px-3 py-2 focus:ring-1 focus:ring-amber-400" />
+                <input type="email" value={humanForm.email} onChange={e => setHumanForm(p => ({ ...p, email: e.target.value }))} placeholder="Email address *" className="w-full text-xs border border-amber-200 rounded-lg px-3 py-2 focus:ring-1 focus:ring-amber-400" />
+                <input type="tel" value={humanForm.phone} onChange={e => setHumanForm(p => ({ ...p, phone: e.target.value }))} placeholder="Phone (optional)" className="w-full text-xs border border-amber-200 rounded-lg px-3 py-2 focus:ring-1 focus:ring-amber-400" />
+                <textarea value={humanForm.message} onChange={e => setHumanForm(p => ({ ...p, message: e.target.value }))} placeholder="What can we help with?" rows={2} className="w-full text-xs border border-amber-200 rounded-lg px-3 py-2 resize-none focus:ring-1 focus:ring-amber-400" />
+                <button onClick={submitHumanRequest} disabled={humanSending || !humanForm.name || !humanForm.email} className="w-full text-xs bg-amber-500 text-white rounded-lg py-2 font-semibold hover:bg-amber-600 disabled:opacity-50">
+                  {humanSending ? 'Sending...' : 'Request Callback'}
+                </button>
+              </div>
+            )}
+
             {/* Quick Actions */}
-            <div className="px-3 py-1.5 bg-white border-t border-gray-100 flex-shrink-0">
-              <QuickActions onAction={handleQuickAction} />
-            </div>
+            {!showHumanForm && (
+              <div className="px-3 py-1.5 bg-white border-t border-gray-100 flex-shrink-0">
+                <QuickActions onAction={handleQuickAction} />
+              </div>
+            )}
 
             {/* Input Area */}
             <form onSubmit={handleSubmit} className="px-3 py-2.5 bg-white border-t border-gray-100 flex-shrink-0">
@@ -203,7 +288,7 @@ export default function ChatWidget() {
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Ask Mkulima anything..."
+                  placeholder="Ask Amara anything..."
                   className="flex-1 bg-transparent text-sm text-navy placeholder:text-gray-400 focus:outline-none"
                   disabled={isTyping}
                 />
