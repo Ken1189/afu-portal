@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import GettingStarted from '@/components/ui/GettingStarted';
 import {
   PieChart,
   Pie,
@@ -624,6 +625,18 @@ export default function SupplierDashboard() {
       animate="visible"
       className="space-y-6"
     >
+      {/* Getting Started */}
+      <GettingStarted
+        title="Set Up Your Supplier Portal"
+        storageKey="afu_supplier_onboarding"
+        steps={[
+          { id: 'profile', label: 'Complete your company profile', href: '/supplier/profile', check: () => !!liveSupplier?.companyName },
+          { id: 'logo', label: 'Upload your company logo', href: '/supplier/profile', check: () => !!profile?.avatar_url },
+          { id: 'product', label: 'Add your first product', href: '/supplier/products', check: () => (liveStats?.activeProducts || 0) > 0 },
+          { id: 'estimate', label: 'Create your first estimate', href: '/supplier/estimates', check: () => false },
+        ]}
+      />
+
       {/* ══════════════════════════════════════════════════════════════════
           1. WELCOME BANNER
       ═════════════════════════════════════════════════════════════════ */}

@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import GettingStarted from '@/components/ui/GettingStarted';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Sun,
@@ -379,7 +380,7 @@ const priorityBadge: Record<string, { bg: string; dot: string; label: string }> 
 
 export default function FarmDashboardPage() {
   const { t } = useLanguage();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const { plots: livePlots } = useFarmPlots(user?.id);
   const { activities: liveActivities } = useFarmActivities();
   const { transactions: liveTransactions, income: liveIncome, expenses: liveExpenses } = useFarmTransactions(user?.id);
@@ -448,6 +449,21 @@ export default function FarmDashboardPage() {
       animate="visible"
       className="space-y-5 py-4"
     >
+      {/* Getting Started Checklist */}
+      <div className="px-4">
+        <GettingStarted
+          title="Getting Started with Your Farm"
+          storageKey="afu_farm_onboarding"
+          steps={[
+            { id: 'profile', label: 'Complete your profile', href: '/dashboard/profile', check: () => !!(profile?.full_name && profile?.phone) },
+            { id: 'photo', label: 'Upload your profile photo', href: '/dashboard/profile', check: () => !!profile?.avatar_url },
+            { id: 'plot', label: 'Add your first farm plot', href: '/farm/crops', check: () => farmPlots.length > 0 },
+            { id: 'marketplace', label: 'Browse the marketplace', href: '/farm/marketplace', check: () => false },
+            { id: 'training', label: 'Start a training course', href: '/farm/training', check: () => false },
+          ]}
+        />
+      </div>
+
       {/* ================================================================= */}
       {/* 1. WELCOME BANNER                                                 */}
       {/* ================================================================= */}

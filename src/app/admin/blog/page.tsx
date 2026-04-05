@@ -126,15 +126,30 @@ export default function AdminBlogPage() {
 
   const fetchPosts = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('site_content')
+    // Try blog_posts table first, fall back to site_content
+    const { data: blogData, error: blogErr } = await supabase
+      .from('blog_posts')
       .select('*')
-      .eq('content_type', 'blog_post')
-      .order('updated_at', { ascending: false });
-    if (error) {
-      setPosts([]);
+      .order('created_at', { ascending: false });
+
+    if (!blogErr && blogData && blogData.length > 0) {
+      setPosts(blogData.map((p: Record<string, unknown>) => ({
+        id: String(p.id), title: String(p.title || ''), slug: String(p.slug || ''),
+        excerpt: String(p.excerpt || ''), body: String(p.content || ''),
+        category: String(p.category || 'news'), featured_image: String(p.cover_image || ''),
+        author: String(p.author_name || 'AFU Editorial'),
+        published: p.status === 'published', featured: false,
+        created_at: String(p.created_at), updated_at: String(p.updated_at || p.created_at),
+      })));
     } else {
-      setPosts((data || []).map(parsePost));
+      // Fallback to site_content
+      const { data, error } = await supabase
+        .from('site_content')
+        .select('*')
+        .eq('content_type', 'blog_post')
+        .order('updated_at', { ascending: false });
+      if (error) { setPosts([]); }
+      else { setPosts((data || []).map(parsePost)); }
     }
     setLoading(false);
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -162,22 +177,34 @@ export default function AdminBlogPage() {
     if (!formData.title.trim()) { setToast({ message: 'Title is required', type: 'error' }); return; }
     setSaving(true);
     const slug = formData.slug || generateSlug(formData.title);
-    const value = JSON.stringify({
-      title: formData.title, slug, excerpt: formData.excerpt, body: formData.body,
-      category: formData.category, featured_image: formData.featured_image,
-      author: formData.author, published: formData.published, featured: formData.featured,
-    });
+
+    const blogPayload = {
+      title: formData.title, slug, excerpt: formData.excerpt, content: formData.body,
+      category: formData.category, cover_image: formData.featured_image,
+      author_name: formData.author, status: formData.published ? 'published' : 'draft',
+      published_at: formData.published ? new Date().toISOString() : null,
+      updated_at: new Date().toISOString(),
+    };
 
     if (editingId) {
-      const { error } = await supabase.from('site_content').update({ value, key: slug }).eq('id', editingId);
-      if (error) { setToast({ message: 'Failed to update', type: 'error' }); }
-      else { setToast({ message: 'Post updated', type: 'success' }); setShowModal(false); await fetchPosts(); }
+      // Try blog_posts first, fall back to site_content
+      const { error: blogErr } = await supabase.from('blog_posts').update(blogPayload).eq('id', editingId);
+      if (blogErr) {
+        // Fallback to site_content
+        const value = JSON.stringify({ title: formData.title, slug, excerpt: formData.excerpt, body: formData.body, category: formData.category, featured_image: formData.featured_image, author: formData.author, published: formData.published, featured: formData.featured });
+        const { error } = await supabase.from('site_content').update({ value, key: slug }).eq('id', editingId);
+        if (error) { setToast({ message: 'Failed to update', type: 'error' }); }
+        else { setToast({ message: 'Post updated', type: 'success' }); setShowModal(false); await fetchPosts(); }
+      } else { setToast({ message: 'Post updated', type: 'success' }); setShowModal(false); await fetchPosts(); }
     } else {
-      const { error } = await supabase.from('site_content').insert({
-        page: 'blog', section: 'posts', key: slug, value, content_type: 'blog_post',
-      });
-      if (error) { setToast({ message: 'Failed to create', type: 'error' }); }
-      else { setToast({ message: 'Post created', type: 'success' }); setShowModal(false); await fetchPosts(); }
+      const { error: blogErr } = await supabase.from('blog_posts').insert(blogPayload);
+      if (blogErr) {
+        // Fallback to site_content
+        const value = JSON.stringify({ title: formData.title, slug, excerpt: formData.excerpt, body: formData.body, category: formData.category, featured_image: formData.featured_image, author: formData.author, published: formData.published, featured: formData.featured });
+        const { error } = await supabase.from('site_content').insert({ page: 'blog', section: 'posts', key: slug, value, content_type: 'blog_post' });
+        if (error) { setToast({ message: 'Failed to create', type: 'error' }); }
+        else { setToast({ message: 'Post created', type: 'success' }); setShowModal(false); await fetchPosts(); }
+      } else { setToast({ message: 'Post created', type: 'success' }); setShowModal(false); await fetchPosts(); }
     }
     setSaving(false);
   };
@@ -185,9 +212,15 @@ export default function AdminBlogPage() {
   const handleDelete = async () => {
     if (!deleteTarget) return;
     setDeleting(true);
-    const { error } = await supabase.from('site_content').delete().eq('id', deleteTarget.id);
-    if (error) { setToast({ message: 'Failed to delete', type: 'error' }); }
-    else { setToast({ message: 'Post deleted', type: 'success' }); setPosts((p) => p.filter((x) => x.id !== deleteTarget.id)); }
+    // Try blog_posts first, fall back to site_content
+    const { error: blogErr } = await supabase.from('blog_posts').delete().eq('id', deleteTarget.id);
+    if (blogErr) {
+      const { error } = await supabase.from('site_content').delete().eq('id', deleteTarget.id);
+      if (error) { setToast({ message: 'Failed to delete', type: 'error' }); }
+      else { setToast({ message: 'Post deleted', type: 'success' }); setPosts((p) => p.filter((x) => x.id !== deleteTarget.id)); }
+    } else {
+      setToast({ message: 'Post deleted', type: 'success' }); setPosts((p) => p.filter((x) => x.id !== deleteTarget.id));
+    }
     setDeleteTarget(null); setDeleting(false);
   };
 
