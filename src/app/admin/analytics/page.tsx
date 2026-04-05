@@ -83,11 +83,14 @@ export default function AdminAnalyticsPage() {
     setAmbassadors((ambRes.data || []) as AmbassadorRow[]);
     setProfiles((profRes.data || []) as typeof profiles);
 
-    // Extract unique countries
+    // Extract unique countries from ALL data sources
     const allCountries = new Set<string>();
     ((appRes.data || []) as AppRow[]).forEach(a => { if (a.country) allCountries.add(a.country); });
     ((trdRes.data || []) as TradeRow[]).forEach(t => { if (t.country) allCountries.add(t.country); });
     ((profRes.data || []) as typeof profiles).forEach(p => { if (p.country) allCountries.add(p.country); });
+    ((ambRes.data || []) as AmbassadorRow[]).forEach(a => { if (a.country) allCountries.add(a.country); });
+    // Also add the AFU core countries in case data is sparse
+    ['Botswana', 'Ghana', 'Kenya', 'Mozambique', 'Nigeria', 'Sierra Leone', 'South Africa', 'Tanzania', 'Uganda', 'Zambia', 'Zimbabwe'].forEach(c => allCountries.add(c));
     setCountries([...allCountries].sort());
 
     setLoading(false);

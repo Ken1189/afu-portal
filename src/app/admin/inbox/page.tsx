@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/supabase/auth-context';
 import Link from 'next/link';
@@ -82,10 +83,12 @@ export default function AdminInboxPage() {
   const supabase = useMemo(() => createClient(), []);
   const { user, profile } = useAuth();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const searchParams = useSearchParams();
+  const urlConversationId = searchParams.get('conversation');
 
   // Core state
   const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(urlConversationId);
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const [messagesLoading, setMessagesLoading] = useState(false);
@@ -114,59 +117,59 @@ export default function AdminInboxPage() {
   const [showActions, setShowActions] = useState(false);
 
   // ── Fetch ──
+  const importedRef = useRef(false);
   const fetchConversations = useCallback(async () => {
     setLoading(true);
     const { data } = await supabase.from('conversations').select('*').order('last_message_at', { ascending: false });
 
-    if (!data || data.length === 0) {
-      // Auto-import from contact_submissions + membership_applications
-      const { data: contacts } = await supabase.from('contact_submissions').select('*').order('created_at', { ascending: false });
-      const { data: apps } = await supabase.from('membership_applications').select('*').order('created_at', { ascending: false }).limit(50);
+    // One-time auto-import if conversations table is empty
+    if ((!data || data.length === 0) && !importedRef.current) {
+      importedRef.current = true;
+      try {
+        const { data: contacts } = await supabase.from('contact_submissions').select('*').order('created_at', { ascending: false });
+        const { data: apps } = await supabase.from('membership_applications').select('*').order('created_at', { ascending: false }).limit(50);
 
-      const convos: Record<string, unknown>[] = [];
-      const msgQueue: { convIdx: number; msg: Record<string, unknown> }[] = [];
+        const convos: Record<string, unknown>[] = [];
+        const msgQueue: { convIdx: number; msg: Record<string, unknown> }[] = [];
+        const seenEmails = new Set<string>();
 
-      (contacts || []).forEach((c, i) => {
-        convos.push({
-          contact_name: c.full_name || c.name,
-          contact_email: c.email,
-          contact_type: c.subject === 'investor' ? 'investor' : c.subject === 'membership' ? 'member' : 'lead',
-          subject: c.subject || 'Contact Form',
-          status: 'open', priority: 'normal', unread_count: 1,
-          last_message_at: c.created_at, tags: c.subject ? [c.subject] : [],
+        (contacts || []).forEach(c => {
+          if (!c.email || seenEmails.has(c.email)) return;
+          seenEmails.add(c.email);
+          convos.push({ contact_name: c.full_name || c.name, contact_email: c.email, contact_type: c.subject === 'investor' ? 'investor' : c.subject === 'membership' ? 'member' : 'lead', subject: c.subject || 'Contact Form', status: 'open', priority: 'normal', unread_count: 1, last_message_at: c.created_at, tags: c.subject ? [c.subject] : [] });
+          msgQueue.push({ convIdx: convos.length - 1, msg: { direction: 'inbound', channel: 'form', sender_name: c.full_name || c.name, sender_email: c.email, body: c.message || 'Contact form submission', status: 'delivered', created_at: c.created_at } });
         });
-        msgQueue.push({ convIdx: convos.length - 1, msg: { direction: 'inbound', channel: 'form', sender_name: c.full_name || c.name, sender_email: c.email, body: c.message || 'Contact form submission', status: 'delivered', created_at: c.created_at } });
-      });
 
-      const seenEmails = new Set((contacts || []).map(c => c.email));
-      (apps || []).forEach(a => {
-        if (!a.email || seenEmails.has(a.email)) return;
-        seenEmails.add(a.email);
-        convos.push({
-          contact_name: a.full_name, contact_email: a.email, contact_phone: a.phone || null,
-          contact_type: a.requested_tier === 'ambassador' ? 'ambassador' : a.requested_tier === 'partner' ? 'supplier' : 'member',
-          subject: `${a.requested_tier || 'Membership'} Application`,
-          status: a.status === 'approved' ? 'resolved' : a.status === 'rejected' ? 'closed' : 'open',
-          priority: 'normal', unread_count: a.status === 'pending' ? 1 : 0,
-          last_message_at: a.created_at, tags: [a.requested_tier || 'application'],
+        (apps || []).forEach(a => {
+          if (!a.email || seenEmails.has(a.email)) return;
+          seenEmails.add(a.email);
+          convos.push({ contact_name: a.full_name, contact_email: a.email, contact_phone: a.phone || null, contact_type: a.requested_tier === 'ambassador' ? 'ambassador' : a.requested_tier === 'partner' ? 'supplier' : 'member', subject: `${a.requested_tier || 'Membership'} Application`, status: a.status === 'approved' ? 'resolved' : a.status === 'rejected' ? 'closed' : 'open', priority: 'normal', unread_count: a.status === 'pending' ? 1 : 0, last_message_at: a.created_at, tags: [a.requested_tier || 'application'] });
+          msgQueue.push({ convIdx: convos.length - 1, msg: { direction: 'inbound', channel: 'form', sender_name: a.full_name, sender_email: a.email, body: `Application: ${a.requested_tier || 'membership'}\nCountry: ${a.country || 'N/A'}\nPhone: ${a.phone || 'N/A'}\n${a.notes || ''}`.trim(), status: 'delivered', created_at: a.created_at } });
         });
-        msgQueue.push({ convIdx: convos.length - 1, msg: { direction: 'inbound', channel: 'form', sender_name: a.full_name, sender_email: a.email, body: `Application: ${a.requested_tier || 'membership'}\nCountry: ${a.country || 'N/A'}\nPhone: ${a.phone || 'N/A'}\n${a.notes || ''}`.trim(), status: 'delivered', created_at: a.created_at } });
-      });
 
-      if (convos.length > 0) {
-        const { data: inserted } = await supabase.from('conversations').insert(convos).select();
-        if (inserted) {
-          const msgs = msgQueue.map(q => ({ ...q.msg, conversation_id: inserted[q.convIdx].id }));
-          await supabase.from('conversation_messages').insert(msgs);
+        if (convos.length > 0) {
+          const { data: inserted } = await supabase.from('conversations').insert(convos).select();
+          if (inserted) {
+            const msgs = msgQueue.map(q => ({ ...q.msg, conversation_id: inserted[q.convIdx].id }));
+            await supabase.from('conversation_messages').insert(msgs);
+          }
         }
-      }
+      } catch { /* import failed, continue with empty */ }
     }
 
-    // Re-fetch clean
+    // Fetch final state
     const { data: final } = await supabase.from('conversations').select('*').order('last_message_at', { ascending: false });
-    setConversations((final || []) as Conversation[]);
+    const convList = (final || []) as Conversation[];
+    setConversations(convList);
+
+    // Auto-select from URL param if not already selected
+    if (urlConversationId && !selectedId) {
+      const exists = convList.find(c => c.id === urlConversationId);
+      if (exists) setSelectedId(urlConversationId);
+    }
+
     setLoading(false);
-  }, [supabase]);
+  }, [supabase, urlConversationId, selectedId]);
 
   useEffect(() => { fetchConversations(); }, [fetchConversations]);
 

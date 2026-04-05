@@ -299,7 +299,7 @@ export default function AdminContactsPage() {
                   <tr key={c.id} className={`hover:bg-gray-50 transition-colors ${selectedIds.has(c.id) ? 'bg-blue-50/30' : ''}`}>
                     <td className="py-3 px-4"><input type="checkbox" checked={selectedIds.has(c.id)} onChange={() => toggleSelect(c.id)} className="rounded border-gray-300 text-[#5DB347]" /></td>
                     <td className="py-3 px-4">
-                      <Link href={`/admin/inbox`} className="flex items-center gap-3 group">
+                      <Link href={`/admin/inbox?conversation=${c.id}`} className="flex items-center gap-3 group">
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${TYPE_COLORS[c.contact_type] || 'bg-gray-100 text-gray-600'}`}>
                           {(c.contact_name || '?').substring(0, 2).toUpperCase()}
                         </div>
