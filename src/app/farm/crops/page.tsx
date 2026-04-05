@@ -945,13 +945,17 @@ function AddPlotModal({
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-xs font-semibold text-navy block mb-1">Country</label>
-                  <input
-                    type="text"
+                  <select
                     value={country}
                     onChange={(e) => setCountry(e.target.value)}
-                    placeholder="e.g. Zimbabwe"
-                    className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-navy placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#5DB347]/40 focus:border-[#5DB347]"
-                  />
+                    className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-navy focus:outline-none focus:ring-2 focus:ring-[#5DB347]/40 focus:border-[#5DB347]"
+                  >
+                    <option value="">Select country</option>
+                    {['Botswana', 'Ghana', 'Kenya', 'Mozambique', 'Nigeria', 'Sierra Leone', 'South Africa', 'Tanzania', 'Uganda', 'Zambia', 'Zimbabwe'].map(c => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                    <option value="Other">Other</option>
+                  </select>
                 </div>
                 <div>
                   <label className="text-xs font-semibold text-navy block mb-1">Region</label>

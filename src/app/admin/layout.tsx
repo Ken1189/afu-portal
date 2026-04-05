@@ -1208,11 +1208,28 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
           </div>
         </header>
-        <main className="flex-1 p-4 sm:p-6" key={user?.id || 'anon'}>
+        <main className="flex-1 p-4 sm:p-6 pb-20 lg:pb-6" key={user?.id || 'anon'}>
           <Breadcrumbs />
           {children}
         </main>
       </div>
+
+      {/* ── Mobile Bottom Tab Bar ─────────────────── */}
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 flex items-center justify-around py-2 px-1 safe-area-inset-bottom">
+        {SECTIONS.map(s => {
+          const isActive = activeSection === s.key;
+          return (
+            <button
+              key={s.key}
+              onClick={() => { setActiveSection(s.key); setMobileOpen(false); }}
+              className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg min-w-0 ${isActive ? 'text-[#5DB347]' : 'text-gray-400'}`}
+            >
+              {s.icon}
+              <span className="text-[9px] font-medium truncate">{s.label}</span>
+            </button>
+          );
+        })}
+      </nav>
 
       {/* ── Search Modal Overlay (Ctrl+K) ─────────────────── */}
       <AnimatePresence>
