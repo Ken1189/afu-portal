@@ -9,6 +9,7 @@ import CookieConsent from "@/components/CookieConsent";
 import SessionTimeout from "@/components/SessionTimeout";
 import { JsonLd, AFU_ORGANIZATION, AFU_WEBSITE } from "@/components/JsonLd";
 import { WebVitals } from "@/components/WebVitals";
+import { Analytics } from "@vercel/analytics/next";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -94,6 +95,7 @@ export default function RootLayout({
           <SiteFooter />
           <CookieConsent />
           <SessionTimeout />
+          <Analytics />
         </AuthProvider>
       </body>
     </html>

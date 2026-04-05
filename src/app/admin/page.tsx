@@ -284,19 +284,22 @@ export default function AdminDashboard() {
         const empty = { data: null, count: null, error: null };
 
         const wrap = (p: PromiseLike<unknown>) => Promise.resolve(p).catch(() => empty);
-        const [membersRes, farmersRes, loansRes, loansDeployedRes, pendingAppsRes, totalAppsRes, approvedAppsRes, rejectedAppsRes, suppliersRes, ordersRes, productsRes, auditRes] = await Promise.all([
-          wrap(supabase.from('profiles').select('id', { count: 'exact', head: true }).neq('role', 'pending')),
-          wrap(supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'farmer')),
+        const [membersRes, activeMembersRes, loansRes, loansDeployedRes, pendingAppsRes, totalAppsRes, approvedAppsRes, rejectedAppsRes, suppliersRes, ordersRes, productsRes, auditRes, ambassadorsRes] = await Promise.all([
+          // Total members from members table (not profiles)
+          wrap(supabase.from('members').select('id', { count: 'exact', head: true })),
+          // Active members
+          wrap(supabase.from('members').select('id', { count: 'exact', head: true }).eq('status', 'active')),
           wrap(supabase.from('loans').select('id', { count: 'exact', head: true })),
           wrap(supabase.from('loans').select('amount').in('status', ['active', 'disbursed'])),
           wrap(supabase.from('membership_applications').select('id', { count: 'exact', head: true }).eq('status', 'pending')),
           wrap(supabase.from('membership_applications').select('id', { count: 'exact', head: true })),
           wrap(supabase.from('membership_applications').select('id', { count: 'exact', head: true }).eq('status', 'approved')),
           wrap(supabase.from('membership_applications').select('id', { count: 'exact', head: true }).eq('status', 'rejected')),
-          wrap(supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'supplier')),
+          wrap(supabase.from('suppliers').select('id', { count: 'exact', head: true }).eq('status', 'active')),
           wrap(supabase.from('orders').select('id, total_amount', { count: 'exact' })),
           wrap(supabase.from('products').select('id, status', { count: 'exact' })),
           wrap(supabase.from('audit_log').select('id, action, entity_type, details, created_at').order('created_at', { ascending: false }).limit(10)),
+          wrap(supabase.from('ambassadors').select('id', { count: 'exact', head: true }).eq('status', 'active')),
         ]) as { data: unknown; count: number | null; error: unknown }[];
 
         const loansData = (loansDeployedRes.data || []) as { amount: number }[];
@@ -318,7 +321,7 @@ export default function AdminDashboard() {
         setLive({
           members: {
             total: membersRes.count ?? FALLBACK_STATS.totalMembers,
-            active: farmersRes.count ?? 0,
+            active: activeMembersRes.count ?? 0,
             pending: 0,
             suspended: 0,
             byTier: {},
