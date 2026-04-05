@@ -10,6 +10,7 @@ import SessionTimeout from "@/components/SessionTimeout";
 import { JsonLd, AFU_ORGANIZATION, AFU_WEBSITE } from "@/components/JsonLd";
 import { WebVitals } from "@/components/WebVitals";
 import { Analytics } from "@vercel/analytics/next";
+import { ToastProvider } from "@/components/ui/Toast";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -94,6 +95,7 @@ export default function RootLayout({
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>
         <AuthProvider>
+          <ToastProvider>
           <WebVitals />
           <ServiceWorkerRegister />
           <AnnouncementBanner />
@@ -103,6 +105,7 @@ export default function RootLayout({
           <CookieConsent />
           <SessionTimeout />
           <Analytics />
+          </ToastProvider>
         </AuthProvider>
       </body>
     </html>

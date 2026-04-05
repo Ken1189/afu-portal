@@ -605,21 +605,21 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   type SectionKey = 'dashboard' | 'crm' | 'finance' | 'operations' | 'marketplace' | 'content' | 'system';
   const SECTIONS: { key: SectionKey; label: string; icon: React.ReactNode; groups: string[] }[] = [
     { key: 'dashboard', label: 'Home', icon: <LayoutDashboard className="w-4 h-4" />, groups: ['Overview'] },
-    { key: 'crm', label: 'CRM', icon: <Inbox className="w-4 h-4" />, groups: ['Overview', 'Members & Applications', 'Messaging', 'Portal Management'] },
+    { key: 'crm', label: 'CRM', icon: <Inbox className="w-4 h-4" />, groups: ['Overview', 'Members & Applications', 'Messaging'] },
     { key: 'finance', label: 'Finance', icon: <Landmark className="w-4 h-4" />, groups: ['Finance & Loans', 'Investor Management', 'Trading', 'Carbon'] },
-    { key: 'operations', label: 'Ops', icon: <Sprout className="w-4 h-4" />, groups: ['Farm Operations', 'Programs & Training'] },
-    { key: 'marketplace', label: 'Market', icon: <Store className="w-4 h-4" />, groups: ['Marketplace & Partners'] },
+    { key: 'operations', label: 'Ops', icon: <Sprout className="w-4 h-4" />, groups: ['Farm Operations', 'Programs & Training', 'Marketplace & Partners'] },
+    { key: 'marketplace', label: 'Portals', icon: <Store className="w-4 h-4" />, groups: ['Portal Management', 'Switch Portal'] },
     { key: 'content', label: 'Content', icon: <FileEdit className="w-4 h-4" />, groups: ['Content & CMS'] },
-    { key: 'system', label: 'System', icon: <Settings className="w-4 h-4" />, groups: ['System & Security', 'Configuration', 'Switch Portal'] },
+    { key: 'system', label: 'Settings', icon: <Settings className="w-4 h-4" />, groups: ['System & Security', 'Configuration'] },
   ];
 
   // Auto-detect section from current path
   const detectSection = useCallback((): SectionKey => {
     const p = pathname;
-    if (p.startsWith('/admin/inbox') || p.startsWith('/admin/contacts') || p.startsWith('/admin/automations') || p.startsWith('/admin/members') || p.startsWith('/admin/applications') || p.startsWith('/admin/farmers') || p.startsWith('/admin/kyc') || p.startsWith('/admin/messaging') || p.startsWith('/admin/ambassadors')) return 'crm';
+    if (p.startsWith('/admin/inbox') || p.startsWith('/admin/contacts') || p.startsWith('/admin/automations') || p.startsWith('/admin/members') || p.startsWith('/admin/applications') || p.startsWith('/admin/farmers') || p.startsWith('/admin/kyc') || p.startsWith('/admin/messaging')) return 'crm';
     if (p.startsWith('/admin/loans') || p.startsWith('/admin/payments') || p.startsWith('/admin/financial') || p.startsWith('/admin/banking') || p.startsWith('/admin/credit') || p.startsWith('/admin/trade') || p.startsWith('/admin/wallet') || p.startsWith('/admin/investor') || p.startsWith('/admin/investments') || p.startsWith('/admin/carbon') || p.startsWith('/admin/exports')) return 'finance';
-    if (p.startsWith('/admin/farm') || p.startsWith('/admin/crops') || p.startsWith('/admin/livestock') || p.startsWith('/admin/equipment') || p.startsWith('/admin/insurance') || p.startsWith('/admin/warehouse') || p.startsWith('/admin/cooperatives') || p.startsWith('/admin/veterinary') || p.startsWith('/admin/legal-services') || p.startsWith('/admin/map') || p.startsWith('/admin/training') || p.startsWith('/admin/programs') || p.startsWith('/admin/sponsor') || p.startsWith('/admin/jobs')) return 'operations';
-    if (p.startsWith('/admin/exchange') || p.startsWith('/admin/suppliers') || p.startsWith('/admin/partnerships') || p.startsWith('/admin/contracts') || p.startsWith('/admin/advertising') || p.startsWith('/admin/testimonials')) return 'marketplace';
+    if (p.startsWith('/admin/farm') || p.startsWith('/admin/crops') || p.startsWith('/admin/livestock') || p.startsWith('/admin/equipment') || p.startsWith('/admin/insurance') || p.startsWith('/admin/warehouse') || p.startsWith('/admin/cooperatives') || p.startsWith('/admin/veterinary') || p.startsWith('/admin/legal-services') || p.startsWith('/admin/map') || p.startsWith('/admin/training') || p.startsWith('/admin/programs') || p.startsWith('/admin/sponsor') || p.startsWith('/admin/jobs') || p.startsWith('/admin/exchange') || p.startsWith('/admin/suppliers') || p.startsWith('/admin/partnerships') || p.startsWith('/admin/contracts') || p.startsWith('/admin/advertising') || p.startsWith('/admin/testimonials')) return 'operations';
+    if (p.startsWith('/admin/ambassadors')) return 'marketplace';
     if (p.startsWith('/admin/content') || p.startsWith('/admin/blog') || p.startsWith('/admin/announcements') || p.startsWith('/admin/partners') || p.startsWith('/admin/media') || p.startsWith('/admin/research') || p.startsWith('/admin/faq') || p.startsWith('/admin/legal') || p.startsWith('/admin/countries')) return 'content';
     if (p.startsWith('/admin/users') || p.startsWith('/admin/audit') || p.startsWith('/admin/compliance') || p.startsWith('/admin/settings') || p.startsWith('/admin/system') || p.startsWith('/admin/events') || p.startsWith('/admin/blockchain') || p.startsWith('/admin/reports') || p.startsWith('/admin/notifications') || p.startsWith('/admin/run-migration')) return 'system';
     return 'dashboard';
