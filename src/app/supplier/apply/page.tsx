@@ -50,7 +50,7 @@ export default function SupplierApplyPage() {
     e.preventDefault();
     setError('');
 
-    if (!form.businessName || !form.contactName || !form.email || !form.country || !form.category) {
+    if (!form.businessName || !form.contactName || !form.email || !form.phone || !form.country || !form.category) {
       setError('Please fill in all required fields.');
       return;
     }
@@ -238,7 +238,7 @@ export default function SupplierApplyPage() {
               </div>
               <div>
                 <label htmlFor="phone" className="block text-sm font-medium text-[#1B2A4A] mb-2">
-                  Phone
+                  Phone <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400 pointer-events-none" />

@@ -320,8 +320,8 @@ export default function ApplyPage() {
                     <input type="email" required className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5DB347]/50 focus:border-[#5DB347] transition-shadow" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-[#1B2A4A] mb-2">Phone</label>
-                    <input type="tel" className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5DB347]/50 focus:border-[#5DB347] transition-shadow" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} />
+                    <label className="block text-sm font-medium text-[#1B2A4A] mb-2">Phone Number *</label>
+                    <input type="tel" required className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5DB347]/50 focus:border-[#5DB347] transition-shadow" placeholder="+263 77 123 4567" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} />
                   </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -329,17 +329,18 @@ export default function ApplyPage() {
                     <label className="block text-sm font-medium text-[#1B2A4A] mb-2">Country *</label>
                     <select required className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5DB347]/50 focus:border-[#5DB347] transition-shadow" value={formData.country} onChange={(e) => setFormData({ ...formData, country: e.target.value })}>
                       <option value="">Select country</option>
-                      <option value="BW">Botswana</option>
-                      <option value="KE">Kenya</option>
-                      <option value="MZ">Mozambique</option>
-                      <option value="NG">Nigeria</option>
-                      <option value="SL">Sierra Leone</option>
-                      <option value="ZA">South Africa</option>
-                      <option value="TZ">Tanzania</option>
-                      <option value="UG">Uganda</option>
-                      <option value="ZM">Zambia</option>
-                      <option value="ZW">Zimbabwe</option>
-                      <option value="other">Other</option>
+                      <option value="Botswana">Botswana</option>
+                      <option value="Ghana">Ghana</option>
+                      <option value="Kenya">Kenya</option>
+                      <option value="Mozambique">Mozambique</option>
+                      <option value="Nigeria">Nigeria</option>
+                      <option value="Sierra Leone">Sierra Leone</option>
+                      <option value="South Africa">South Africa</option>
+                      <option value="Tanzania">Tanzania</option>
+                      <option value="Uganda">Uganda</option>
+                      <option value="Zambia">Zambia</option>
+                      <option value="Zimbabwe">Zimbabwe</option>
+                      <option value="Other">Other</option>
                     </select>
                   </div>
                   <div>
