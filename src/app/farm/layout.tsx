@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import {
   Home,
   Sprout,
@@ -658,7 +659,7 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
 
         {/* ─── Page Content ─── */}
         <main className="flex-1 pb-24 lg:pb-6 overflow-y-auto">
-          <div className="max-w-5xl mx-auto">{children}</div>
+          <div className="max-w-5xl mx-auto"><Breadcrumbs />{children}</div>
         </main>
       </div>
 
