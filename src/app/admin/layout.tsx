@@ -601,6 +601,33 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const sidebarRef = useRef<HTMLElement>(null);
 
+  // ── Section nav (two-tier) ──
+  type SectionKey = 'dashboard' | 'crm' | 'finance' | 'operations' | 'marketplace' | 'content' | 'system';
+  const SECTIONS: { key: SectionKey; label: string; icon: React.ReactNode; groups: string[] }[] = [
+    { key: 'dashboard', label: 'Home', icon: <LayoutDashboard className="w-4 h-4" />, groups: ['Overview'] },
+    { key: 'crm', label: 'CRM', icon: <Inbox className="w-4 h-4" />, groups: ['Overview', 'Members & Applications', 'Messaging', 'Portal Management'] },
+    { key: 'finance', label: 'Finance', icon: <Landmark className="w-4 h-4" />, groups: ['Finance & Loans', 'Investor Management', 'Trading', 'Carbon'] },
+    { key: 'operations', label: 'Ops', icon: <Sprout className="w-4 h-4" />, groups: ['Farm Operations', 'Programs & Training'] },
+    { key: 'marketplace', label: 'Market', icon: <Store className="w-4 h-4" />, groups: ['Marketplace & Partners'] },
+    { key: 'content', label: 'Content', icon: <FileEdit className="w-4 h-4" />, groups: ['Content & CMS'] },
+    { key: 'system', label: 'System', icon: <Settings className="w-4 h-4" />, groups: ['System & Security', 'Configuration', 'Switch Portal'] },
+  ];
+
+  // Auto-detect section from current path
+  const detectSection = useCallback((): SectionKey => {
+    const p = pathname;
+    if (p.startsWith('/admin/inbox') || p.startsWith('/admin/contacts') || p.startsWith('/admin/automations') || p.startsWith('/admin/members') || p.startsWith('/admin/applications') || p.startsWith('/admin/farmers') || p.startsWith('/admin/kyc') || p.startsWith('/admin/messaging') || p.startsWith('/admin/ambassadors')) return 'crm';
+    if (p.startsWith('/admin/loans') || p.startsWith('/admin/payments') || p.startsWith('/admin/financial') || p.startsWith('/admin/banking') || p.startsWith('/admin/credit') || p.startsWith('/admin/trade') || p.startsWith('/admin/wallet') || p.startsWith('/admin/investor') || p.startsWith('/admin/investments') || p.startsWith('/admin/carbon') || p.startsWith('/admin/exports')) return 'finance';
+    if (p.startsWith('/admin/farm') || p.startsWith('/admin/crops') || p.startsWith('/admin/livestock') || p.startsWith('/admin/equipment') || p.startsWith('/admin/insurance') || p.startsWith('/admin/warehouse') || p.startsWith('/admin/cooperatives') || p.startsWith('/admin/veterinary') || p.startsWith('/admin/legal-services') || p.startsWith('/admin/map') || p.startsWith('/admin/training') || p.startsWith('/admin/programs') || p.startsWith('/admin/sponsor') || p.startsWith('/admin/jobs')) return 'operations';
+    if (p.startsWith('/admin/exchange') || p.startsWith('/admin/suppliers') || p.startsWith('/admin/partnerships') || p.startsWith('/admin/contracts') || p.startsWith('/admin/advertising') || p.startsWith('/admin/testimonials')) return 'marketplace';
+    if (p.startsWith('/admin/content') || p.startsWith('/admin/blog') || p.startsWith('/admin/announcements') || p.startsWith('/admin/partners') || p.startsWith('/admin/media') || p.startsWith('/admin/research') || p.startsWith('/admin/faq') || p.startsWith('/admin/legal') || p.startsWith('/admin/countries')) return 'content';
+    if (p.startsWith('/admin/users') || p.startsWith('/admin/audit') || p.startsWith('/admin/compliance') || p.startsWith('/admin/settings') || p.startsWith('/admin/system') || p.startsWith('/admin/events') || p.startsWith('/admin/blockchain') || p.startsWith('/admin/reports') || p.startsWith('/admin/notifications') || p.startsWith('/admin/run-migration')) return 'system';
+    return 'dashboard';
+  }, [pathname]);
+
+  const [activeSection, setActiveSection] = useState<SectionKey>('dashboard');
+  useEffect(() => { setActiveSection(detectSection()); }, [detectSection]);
+
   // ── Search state ──
   const [searchQuery, setSearchQuery] = useState('');
   const [searchModalOpen, setSearchModalOpen] = useState(false);
@@ -920,6 +947,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           )}
         </div>
 
+        {/* Section tabs */}
+        {showLabels && (
+          <div className="border-b border-white/10 px-2 py-2 flex flex-wrap gap-1">
+            {SECTIONS.map(s => (
+              <button key={s.key} onClick={() => setActiveSection(s.key)} className={`flex items-center gap-1 px-2 py-1.5 rounded-lg text-[10px] font-medium transition-colors ${activeSection === s.key ? 'bg-[#5DB347] text-white' : 'text-gray-400 hover:text-white hover:bg-white/10'}`}>
+                {s.icon}
+                <span>{s.label}</span>
+              </button>
+            ))}
+          </div>
+        )}
+
         {/* Nav content */}
         <nav className="flex-1 overflow-y-auto scrollbar-hide" style={{ padding: showLabels ? '8px 12px' : '4px 0' }}>
           {/* Favorites section */}
@@ -934,8 +973,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             />
           )}
 
-          {/* Nav groups */}
-          {visibleGroups.map((group) => (
+          {/* Nav groups — filtered by active section */}
+          {visibleGroups.filter(g => searchQuery || SECTIONS.find(s => s.key === activeSection)?.groups.includes(g.label)).map((group) => (
             <NavSection
               key={group.label}
               group={group}
