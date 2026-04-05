@@ -99,7 +99,7 @@ export default function ReferralsPage() {
           setAmbassadorId(ambassador.id);
           if (ambassador.referral_code) setReferralCode(ambassador.referral_code);
 
-          // Fetch referral links
+          // Fetch referral links (people who signed up via this ambassador)
           const { data: links } = await supabase
             .from('referral_links')
             .select('*')
@@ -109,37 +109,38 @@ export default function ReferralsPage() {
           if (links && links.length > 0) {
             setReferralLinks(links.map((l: Record<string, unknown>) => ({
               id: String(l.id),
-              code: String(l.code || ''),
-              clicks: Number(l.clicks || 0),
-              conversions: Number(l.conversions || 0),
-              created_at: String(l.created_at),
+              code: String(l.referral_code || l.code || ''),
+              clicks: 0,
+              conversions: 1,
+              created_at: String(l.created_at || l.signed_up_at),
             })));
           }
 
-          // Fetch referrals (people referred)
-          const { data: refs } = await supabase
-            .from('referral_links')
-            .select('*')
-            .eq('ambassador_id', ambassador.id)
-            .order('created_at', { ascending: false });
+          // Use same data for referrals list
+          const refs = links;
 
-          // Also try the referrals-as-people approach
-          const { data: referralPeople } = await supabase
-            .from('referrals')
-            .select('*')
-            .eq('ambassador_id', ambassador.id)
-            .order('created_at', { ascending: false });
-
-          if (referralPeople && referralPeople.length > 0) {
-            setReferrals(referralPeople.map((r: Record<string, unknown>) => ({
-              id: String(r.id),
-              referred_name: String(r.referred_name || 'Unknown'),
-              referred_email: String(r.referred_email || ''),
-              signed_up_date: String(r.created_at),
-              status: String(r.status || 'pending'),
-              lifetime_value: Number(r.lifetime_value || 0),
-              commission_earned: Number(r.commission_earned || 0),
-            })));
+          // Map referral_links to referral people
+          if (refs && refs.length > 0) {
+            const referralPeople = [];
+            for (const r of refs as Record<string, unknown>[]) {
+              // Try to look up the referred user's profile
+              let name = 'Referred User';
+              let email = '';
+              if (r.referred_user_id) {
+                const { data: prof } = await supabase.from('profiles').select('full_name, email').eq('id', String(r.referred_user_id)).single();
+                if (prof) { name = prof.full_name || name; email = prof.email || ''; }
+              }
+              referralPeople.push({
+                id: String(r.id),
+                referred_name: name,
+                referred_email: email,
+                signed_up_date: String(r.signed_up_at || r.created_at),
+                status: String(r.status || 'active'),
+                lifetime_value: Number(r.lifetime_value || 0),
+                commission_earned: Number(r.total_commission_earned || 0),
+              });
+            }
+            setReferrals(referralPeople);
           }
         }
       } catch {

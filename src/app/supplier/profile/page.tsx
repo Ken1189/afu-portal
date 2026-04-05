@@ -259,7 +259,7 @@ export default function SupplierProfilePage() {
     try {
       // Update supplier record
       if (supplierId) {
-        await supabase
+        const { error: supError } = await supabase
           .from('suppliers')
           .update({
             company_name: companyName,
@@ -275,16 +275,18 @@ export default function SupplierProfilePage() {
             certifications,
           })
           .eq('id', supplierId);
+        if (supError) { setSaveError('Failed to save supplier details: ' + supError.message); setSaving(false); return; }
       }
 
       // Also update profiles table for name/phone
-      await supabase
+      const { error: profError } = await supabase
         .from('profiles')
         .update({
           full_name: contactPerson || undefined,
           phone: phone || null,
         })
         .eq('id', user.id);
+      if (profError) { setSaveError('Failed to save profile: ' + profError.message); setSaving(false); return; }
 
       await refreshProfile();
 

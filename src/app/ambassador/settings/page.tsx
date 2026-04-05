@@ -203,8 +203,8 @@ export default function SettingsPage() {
         payoutDetails.account_number = accountNumber;
       } else if (payoutMethod === 'mobile_money') {
         payoutDetails.mobile_number = mobileNumber;
-      } else if (payoutMethod === 'mobile_money') {
-        payoutDetails.mobile_money_number = mobile_moneyNumber;
+      } else if (payoutMethod === 'paypal') {
+        payoutDetails.paypal_email = email;
       }
 
       await supabase
