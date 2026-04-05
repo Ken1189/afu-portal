@@ -943,7 +943,7 @@ export default function AIToolsPage() {
             </div>
             <div>
               <h1 className="text-2xl lg:text-3xl font-bold text-white">AI Farm Tools</h1>
-              <p className="text-purple-200 text-sm lg:text-base">Powered by Mkulima AI</p>
+              <p className="text-purple-200 text-sm lg:text-base">Powered by Amara AI</p>
             </div>
           </div>
           <div className="flex items-center gap-2 mt-4">

@@ -684,7 +684,7 @@ export default function CropScannerPage() {
                 <div className="flex items-center gap-2 mt-0.5">
                   <span className="inline-flex items-center gap-1.5 text-xs font-medium bg-gradient-to-r from-[#8CB89C]/10 to-gold/10 text-teal px-2.5 py-1 rounded-full border border-teal/20">
                     <Sparkles className="w-3 h-3 text-gold" />
-                    Powered by Mkulima AI
+                    Powered by Amara AI
                   </span>
                 </div>
               </div>

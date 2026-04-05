@@ -600,7 +600,7 @@ export default function FinancingApplyPage() {
                         ? 'Blueberry financing typically gets approved faster with confirmed EU buyer contracts. Average yield: 4-8 tons/ha.'
                         : formData.cropType === 'cassava'
                         ? 'Cassava loans have strong approval rates. Consider value-addition (chipping/drying) for higher loan amounts.'
-                        : 'Select a crop above to get personalized financing insights from Mkulima AI.'}
+                        : 'Select a crop above to get personalized financing insights from Amara AI.'}
                     </p>
                   </div>
                 </div>

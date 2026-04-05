@@ -134,6 +134,30 @@ export default function SupplierProfilePage() {
   const [category, setCategory] = useState('');
   const [address, setAddress] = useState('');
 
+  // -- Logo/photo upload
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [logoUploading, setLogoUploading] = useState(false);
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+    setLogoUploading(true);
+    try {
+      const ext = file.name.split('.').pop();
+      const fileName = `supplier-${user.id}-${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage.from('avatars').upload(fileName, file, { cacheControl: '3600', upsert: true });
+      if (!upErr) {
+        const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(fileName);
+        if (urlData?.publicUrl) {
+          setLogoUrl(urlData.publicUrl);
+          await supabase.from('profiles').update({ avatar_url: urlData.publicUrl }).eq('id', user.id);
+          if (supplierId) await supabase.from('suppliers').update({ logo_url: urlData.publicUrl }).eq('id', supplierId);
+        }
+      }
+    } catch { /* silent */ }
+    setLogoUploading(false);
+  };
+
   // -- Display-only from DB
   const [joinDate, setJoinDate] = useState('');
   const [rating, setRating] = useState(0);
@@ -455,13 +479,18 @@ export default function SupplierProfilePage() {
       >
         <div className="flex flex-col sm:flex-row items-start gap-6">
           <div className="relative group">
-            <div className="w-24 h-24 rounded-2xl bg-[#5DB347] flex items-center justify-center text-white text-3xl font-bold shadow-lg">
-              {companyInitials}
+            <div className="w-24 h-24 rounded-2xl bg-[#5DB347] flex items-center justify-center text-white text-3xl font-bold shadow-lg overflow-hidden">
+              {logoUrl || profile?.avatar_url ? (
+                <img src={logoUrl || profile?.avatar_url || ''} alt="Logo" className="w-full h-full object-cover" />
+              ) : (
+                companyInitials
+              )}
             </div>
             {editing && (
-              <button className="absolute inset-0 w-24 h-24 rounded-2xl bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
-                <Upload className="w-5 h-5" />
-              </button>
+              <label className="absolute inset-0 w-24 h-24 rounded-2xl bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white cursor-pointer">
+                {logoUploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Upload className="w-5 h-5" />}
+                <input type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" />
+              </label>
             )}
           </div>
 

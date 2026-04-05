@@ -940,7 +940,7 @@ export default function Home() {
                   AI-Powered Agriculture for Smarter Farming
                 </h2>
                 <p className="text-gray-500 mb-8 leading-relaxed">
-                  Our Mkulima AI assistant helps farmers with crop diagnostics, market pricing,
+                  Our Amara AI assistant helps farmers with crop diagnostics, market pricing,
                   weather alerts, and personalized recommendations — accessible via the portal or WhatsApp.
                 </p>
                 <div className="space-y-4">

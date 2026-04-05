@@ -672,7 +672,7 @@ export const en: Translations = {
     compareProducts: 'Compare Products',
   },
   aiAssistant: {
-    title: 'Mkulima AI',
+    title: 'Amara AI',
     poweredBy: 'Powered by AFU',
     online: 'Online — Ready to help',
     askAnything: 'Ask me anything about your farm...',
@@ -981,7 +981,7 @@ export const sn: Translations = {
     compareProducts: 'Enzanisa Zvigadzirwa',
   },
   aiAssistant: {
-    title: 'Mkulima AI',
+    title: 'Amara AI',
     poweredBy: 'Yakagadzirwa neAFU',
     online: 'Online — Yakagadzirira kukubatsira',
     askAnything: 'Bvunza chero chaunoda pamusoro pemunda wako...',
@@ -1290,7 +1290,7 @@ export const nd: Translations = {
     compareProducts: 'Qathanisa Imikhiqizo',
   },
   aiAssistant: {
-    title: 'Mkulima AI',
+    title: 'Amara AI',
     poweredBy: 'Yakwenziwa yi-AFU',
     online: 'Online — Ilungele ukukunceda',
     askAnything: 'Buza loba yini mayelana lensimu yakho...',

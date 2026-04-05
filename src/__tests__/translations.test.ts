@@ -41,7 +41,7 @@ describe('Translations', () => {
     expect(t.farmJournal.title).toBe('Farm Journal');
     expect(t.financing.title).toBe('Financing');
     expect(t.insurance.title).toBe('Farm Insurance');
-    expect(t.aiAssistant.title).toBe('Mkulima AI');
+    expect(t.aiAssistant.title).toBe('Amara AI');
   });
 
   it('Swahili common translations are in Kiswahili', () => {
