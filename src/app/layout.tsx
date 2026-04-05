@@ -84,6 +84,13 @@ export default function RootLayout({
         {/* S4.8: JSON-LD structured data */}
         <JsonLd data={AFU_ORGANIZATION} />
         <JsonLd data={AFU_WEBSITE} />
+        {/* Google Analytics GA4 */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-CBSXFCZRHQ" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-CBSXFCZRHQ');`,
+          }}
+        />
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>
         <AuthProvider>
