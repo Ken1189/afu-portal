@@ -338,6 +338,22 @@ export default function SupplierApplyPage() {
               </div>
             </div>
 
+            {/* Consent */}
+            <div className="space-y-3 bg-gray-50 rounded-xl p-4">
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input type="checkbox" required className="mt-1 rounded border-gray-300 text-[#5DB347] focus:ring-[#5DB347]" />
+                <span className="text-sm text-gray-600">
+                  I agree to the <a href="/legal/terms" target="_blank" className="text-[#5DB347] underline">Terms &amp; Conditions</a> and <a href="/legal/privacy" target="_blank" className="text-[#5DB347] underline">Privacy Policy</a> <span className="text-red-500">*</span>
+                </span>
+              </label>
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input type="checkbox" required className="mt-1 rounded border-gray-300 text-[#5DB347] focus:ring-[#5DB347]" />
+                <span className="text-sm text-gray-600">
+                  I consent to receive emails, SMS, and notifications from AFU about my account <span className="text-red-500">*</span>
+                </span>
+              </label>
+            </div>
+
             {/* Submit */}
             <button
               type="submit"
@@ -357,7 +373,7 @@ export default function SupplierApplyPage() {
           </form>
 
           <p className="text-xs text-gray-400 text-center mt-4">
-            By submitting, you agree to AFU&apos;s supplier terms. No account is created until your application is approved.
+            No account is created until your application is approved.
           </p>
         </div>
       </section>

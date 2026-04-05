@@ -1017,6 +1017,22 @@ export default function AmbassadorsPage() {
               )}
 
               {/* Submit */}
+              {/* Consent */}
+              <div className="space-y-3 bg-gray-50 rounded-xl p-4">
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input type="checkbox" required className="mt-1 rounded border-gray-300 text-[#5DB347] focus:ring-[#5DB347]" />
+                  <span className="text-sm text-gray-600">
+                    I agree to the <a href="/legal/ambassador-terms" target="_blank" className="text-[#5DB347] underline">Ambassador Terms</a> and <a href="/legal/privacy" target="_blank" className="text-[#5DB347] underline">Privacy Policy</a> <span className="text-red-500">*</span>
+                  </span>
+                </label>
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input type="checkbox" required className="mt-1 rounded border-gray-300 text-[#5DB347] focus:ring-[#5DB347]" />
+                  <span className="text-sm text-gray-600">
+                    I consent to receive emails, SMS, and notifications from AFU <span className="text-red-500">*</span>
+                  </span>
+                </label>
+              </div>
+
               <button
                 type="submit"
                 disabled={submitting}
@@ -1037,7 +1053,7 @@ export default function AmbassadorsPage() {
               </button>
 
               <p className="text-xs text-gray-400 text-center">
-                By applying, you agree to our ambassador terms and conditions.
+                Your application will be reviewed within 48 hours.
                 {authUser && (
                   <span className="block mt-1 text-[#5DB347]">
                     Signed in as {authUser.email} -- your profile will be linked automatically.

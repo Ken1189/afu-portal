@@ -367,6 +367,28 @@ export default function ApplyPage() {
                   <textarea required rows={4} className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5DB347]/50 focus:border-[#5DB347] resize-none transition-shadow" placeholder={selectedTier === "partner" ? "Tell us about your organization and how we can work together..." : "Share your farming story — what you grow, the challenges you face, and where you want to take your farm..."} value={formData.about} onChange={(e) => setFormData({ ...formData, about: e.target.value })} />
                 </div>
 
+                {/* Consent checkboxes */}
+                <div className="space-y-3 bg-gray-50 rounded-xl p-4">
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input type="checkbox" required className="mt-1 rounded border-gray-300 text-[#5DB347] focus:ring-[#5DB347]" />
+                    <span className="text-sm text-gray-600">
+                      I agree to the <a href="/legal/terms" target="_blank" className="text-[#5DB347] underline">Terms &amp; Conditions</a> and <a href="/legal/privacy" target="_blank" className="text-[#5DB347] underline">Privacy Policy</a> <span className="text-red-500">*</span>
+                    </span>
+                  </label>
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input type="checkbox" required className="mt-1 rounded border-gray-300 text-[#5DB347] focus:ring-[#5DB347]" />
+                    <span className="text-sm text-gray-600">
+                      I consent to receive emails, SMS, and notifications from AFU about my account and services <span className="text-red-500">*</span>
+                    </span>
+                  </label>
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input type="checkbox" defaultChecked className="mt-1 rounded border-gray-300 text-[#5DB347] focus:ring-[#5DB347]" />
+                    <span className="text-sm text-gray-600">
+                      I&apos;d like to receive marketing updates, farming tips, and special offers from AFU
+                    </span>
+                  </label>
+                </div>
+
                 <div className="flex gap-4">
                   <button type="button" onClick={() => setStep(1)} className="px-8 py-3 border border-gray-200 rounded-xl font-semibold text-[#1B2A4A] hover:bg-gray-50 transition-all duration-300">
                     Back

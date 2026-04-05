@@ -109,6 +109,7 @@ const navGroups: NavGroup[] = [
     links: [
       { href: '/admin', label: 'Dashboard', icon: <LayoutDashboard className={ICON_CLS} /> },
       { href: '/admin/inbox', label: 'Inbox', icon: <Inbox className={ICON_CLS} /> },
+      { href: '/admin/inbox/pipeline', label: 'CRM Pipeline', icon: <Users className={ICON_CLS} /> },
       { href: '/admin/analytics', label: 'Analytics', icon: <TrendingUp className={ICON_CLS} /> },
       { href: '/admin/automations', label: 'Automations', icon: <Zap className={ICON_CLS} /> },
     ],
