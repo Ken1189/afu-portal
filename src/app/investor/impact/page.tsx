@@ -313,7 +313,7 @@ export default function InvestorImpactPage() {
             const { count: profileCount } = await supabase
               .from('profiles')
               .select('*', { count: 'exact', head: true })
-              .eq('role', 'farmer');
+              .in('role', ['member', 'farmer']);
             if (profileCount !== null && profileCount > 0) {
               setFarmersCount(profileCount);
             } else {

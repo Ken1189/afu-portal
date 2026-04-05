@@ -269,11 +269,11 @@ function AllFarmersTab() {
   const fetchFarmers = useCallback(async () => {
     setLoading(true);
     try {
-      // Fetch farmers from profiles
+      // Fetch farmers from profiles (role is 'member' in DB, not 'farmer')
       const { data: profileData } = await supabase
         .from('profiles')
         .select('*')
-        .eq('role', 'farmer')
+        .in('role', ['member', 'farmer'])
         .order('created_at', { ascending: false });
 
       if (profileData && profileData.length > 0) {

@@ -183,7 +183,7 @@ export default function AdminTradingPage() {
   const fetchPrices = useCallback(async () => {
     setPricesLoading(true);
     try {
-      const { data } = await supabase.from('commodity_prices').select('*').order('country_code').order('commodity');
+      const { data } = await supabase.from('commodity_prices').select('*').order('commodity');
       setPrices(data || []);
     } catch { /* ignore */ }
     setPricesLoading(false);

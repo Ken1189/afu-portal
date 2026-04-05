@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
     let query = adminClient.from('trade_orders').select('*').order('created_at', { ascending: false });
 
     if (status) query = query.eq('status', status);
-    if (type) query = query.eq('type', type);
+    if (type) query = query.eq('order_type', type);
     if (country) query = query.eq('country', country);
     if (commodity) query = query.eq('commodity', commodity);
     if (userId) query = query.eq('user_id', userId);
