@@ -686,6 +686,18 @@ export default function InvestorDashboard() {
         </motion.div>
       </div>
 
+      {/* ── Action Bar ─── */}
+      <motion.div initial="hidden" animate="visible" custom={1.5} variants={fadeIn} className="bg-gradient-to-r from-[#1B2A4A] to-[#2A3F6A] rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="text-white">
+          <h3 className="font-bold text-lg">Interested in investing?</h3>
+          <p className="text-white/60 text-sm">Explore opportunities or schedule a call with our team.</p>
+        </div>
+        <div className="flex gap-3">
+          <a href="/investor/opportunities" className="px-6 py-3 bg-[#5DB347] hover:bg-[#449933] text-white rounded-xl font-semibold text-sm transition-colors">View Opportunities</a>
+          <a href="mailto:devonk@africanfarmingunion.org?subject=Investment%20Inquiry" className="px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl font-semibold text-sm transition-colors border border-white/20">Request Meeting</a>
+        </div>
+      </motion.div>
+
       {/* ── Bottom Row: Activity Feed & Quick Links ───────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Recent Activity Feed */}

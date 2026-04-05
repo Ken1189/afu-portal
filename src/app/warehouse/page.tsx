@@ -195,14 +195,17 @@ export default function WarehouseDashboard() {
             </p>
             <p className="text-gray-300 mt-1 text-lg">{formatDate(currentTime)}</p>
           </div>
-          <Link
-            href="/warehouse/receive"
-            className="inline-flex items-center justify-center gap-3 bg-[#5DB347] hover:bg-[#4ea03c] text-white text-xl font-bold px-8 py-4 rounded-2xl transition-colors min-h-[56px] shadow-lg"
-          >
-            <Package className="w-6 h-6" />
-            Start Receiving
-            <ArrowRight className="w-5 h-5" />
-          </Link>
+          <div className="flex flex-wrap gap-3">
+            <Link href="/warehouse/receive" className="inline-flex items-center gap-2 bg-[#5DB347] hover:bg-[#4ea03c] text-white font-bold px-6 py-3 rounded-xl transition-colors shadow-lg">
+              <Package className="w-5 h-5" /> Receive
+            </Link>
+            <Link href="/warehouse/dispatch" className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-bold px-6 py-3 rounded-xl transition-colors border border-white/20">
+              <ArrowRight className="w-5 h-5" /> Dispatch
+            </Link>
+            <Link href="/warehouse/inspections" className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-bold px-6 py-3 rounded-xl transition-colors border border-white/20">
+              <BarChart3 className="w-5 h-5" /> Inspect
+            </Link>
+          </div>
         </div>
       </div>
 

@@ -295,6 +295,35 @@ export default function AmbassadorDashboard() {
         })}
       </div>
 
+      {/* Share Your Link — CTA */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="bg-gradient-to-r from-[#1B2A4A] to-[#2A3F6A] rounded-2xl p-6 text-white relative overflow-hidden"
+      >
+        <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-[#5DB347]/10" />
+        <div className="relative z-10">
+          <h2 className="text-lg font-bold mb-2">Share Your Referral Link</h2>
+          <p className="text-white/60 text-sm mb-4">Every signup through your link earns you commissions. Share it everywhere!</p>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex-1 bg-white/10 rounded-xl px-4 py-3 text-sm font-mono text-white/80 truncate border border-white/20">
+              africanfarmingunion.org/apply?ref={referralCode || user?.id?.slice(0, 8).toUpperCase()}
+            </div>
+            <button
+              onClick={() => { navigator.clipboard.writeText(`https://africanfarmingunion.org/apply?ref=${referralCode || user?.id?.slice(0, 8).toUpperCase()}`); }}
+              className="px-6 py-3 bg-[#5DB347] hover:bg-[#449933] rounded-xl font-semibold text-sm transition-colors whitespace-nowrap"
+            >
+              Copy Link
+            </button>
+          </div>
+          <div className="flex gap-3 mt-3">
+            <a href={`https://wa.me/?text=${encodeURIComponent(`Join the African Farming Union! Sign up here: https://africanfarmingunion.org/apply?ref=${referralCode || user?.id?.slice(0, 8).toUpperCase()}`)}`} target="_blank" rel="noopener noreferrer" className="text-xs text-white/50 hover:text-white/80 underline">Share on WhatsApp</a>
+            <a href={`mailto:?subject=Join AFU&body=${encodeURIComponent(`Join the African Farming Union! Sign up here: https://africanfarmingunion.org/apply?ref=${referralCode || user?.id?.slice(0, 8).toUpperCase()}`)}`} className="text-xs text-white/50 hover:text-white/80 underline">Share via Email</a>
+          </div>
+        </div>
+      </motion.div>
+
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Tier Progress */}
         <motion.div

@@ -40,6 +40,7 @@ const supplierLinks = [
   { href: '/supplier/analytics', label: 'Analytics', icon: BarChart3 },
   { href: '/supplier/reviews', label: 'Reviews', icon: Star },
   { href: '/supplier/estimates', label: 'Estimates', icon: FileText },
+  { href: '/supplier/inventory', label: 'Inventory', icon: Package },
   { href: '/supplier/trade', label: 'Trade Marketplace', icon: ArrowLeftRight },
   { href: '/supplier/marketplace', label: 'Marketplace', icon: Store },
   { href: '/supplier/profile', label: 'Profile', icon: Building2 },
