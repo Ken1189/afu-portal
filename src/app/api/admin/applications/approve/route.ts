@@ -6,6 +6,7 @@ import crypto from 'crypto';
 import { Resend } from 'resend';
 import { emitEventAsync } from '@/lib/events/event-bus';
 import '@/lib/events/handlers';
+import { fireAutomations } from '@/lib/automations/executor';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM = 'African Farming Union <noreply@mail.africanfarmingunion.org>';
@@ -298,6 +299,15 @@ export async function POST(request: Request) {
         </div>`,
       });
     } catch { /* non-critical */ }
+
+    // Fire marketing automations (non-blocking)
+    fireAutomations('member_approved', {
+      name: application.full_name,
+      email: application.email,
+      phone: application.phone || undefined,
+      country: application.country || undefined,
+      tier: application.requested_tier || undefined,
+    }).catch(() => {});
 
     return NextResponse.json({
       success: true,

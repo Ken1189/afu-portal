@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 import crypto from 'crypto';
 import { Resend } from 'resend';
+import { fireAutomations } from '@/lib/automations/executor';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM = 'African Farming Union <noreply@mail.africanfarmingunion.org>';
@@ -209,6 +210,14 @@ export async function POST(request: Request) {
         </div>`,
       });
     } catch { /* non-critical */ }
+
+    // Fire marketing automations
+    fireAutomations('supplier_approved', {
+      name: supplier.company_name || supplier.contact_name,
+      email,
+      phone: supplier.phone || supplier.contact_phone || undefined,
+      country: supplier.country || undefined,
+    }).catch(() => {});
 
     return NextResponse.json({
       success: true,

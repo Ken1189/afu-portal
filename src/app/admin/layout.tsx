@@ -200,6 +200,7 @@ const navGroups: NavGroup[] = [
       { href: '/admin/exchange', label: 'Exchange', icon: <HandCoins className={ICON_CLS} /> },
       { href: '/admin/suppliers', label: 'Suppliers', icon: <Store className={ICON_CLS} /> },
       { href: '/admin/partnerships', label: 'Partners', icon: <Handshake className={ICON_CLS} /> },
+      { href: '/admin/contracts', label: 'Contracts', icon: <ScrollText className={ICON_CLS} /> },
       { href: '/admin/advertising', label: 'Advertising', icon: <Megaphone className={ICON_CLS} /> },
       { href: '/admin/testimonials', label: 'Testimonials', icon: <MessageSquare className={ICON_CLS} /> },
     ],
