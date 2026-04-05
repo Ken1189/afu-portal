@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/lib/supabase/auth-context';
 import { usePermissions, SIDEBAR_PERMISSION_MAP } from '@/lib/permissions';
@@ -1207,7 +1208,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
           </div>
         </header>
-        <main className="flex-1 p-4 sm:p-6" key={user?.id || 'anon'}>{children}</main>
+        <main className="flex-1 p-4 sm:p-6" key={user?.id || 'anon'}>
+          <Breadcrumbs />
+          {children}
+        </main>
       </div>
 
       {/* ── Search Modal Overlay (Ctrl+K) ─────────────────── */}
