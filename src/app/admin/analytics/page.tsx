@@ -1,824 +1,631 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import {
-  BarChart3,
-  Users,
-  DollarSign,
-  CreditCard,
-  Store,
-  Ship,
-  Star,
-  TrendingUp,
-  TrendingDown,
-  ArrowUpRight,
-  ArrowDownRight,
-  Activity,
-  Globe,
-  PieChart,
-  Clock,
-  Package,
-  Truck,
-  Headphones,
-  Server,
-  Zap,
-  CheckCircle2,
-  AlertTriangle,
+  Users, DollarSign, TrendingUp, Globe, Filter, Download, Search,
+  ArrowLeftRight, Shield, Award, CreditCard, Package, BarChart3,
+  Calendar, ChevronDown, Loader2, RefreshCw,
 } from 'lucide-react';
+import {
+  BarChart, Bar, LineChart, Line, PieChart, Pie, Cell,
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
+} from 'recharts';
 
-// ── Animation variants ──
-const containerVariants = {
-  hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { staggerChildren: 0.08 } },
-};
+/* ─── Types ─── */
 
-const cardVariants = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 100, damping: 15 } },
-};
+type TabKey = 'members' | 'applications' | 'financial' | 'trading';
+type DateRange = '7d' | '30d' | '90d' | '365d' | 'all';
 
-// ── Types ──
-type TabKey = 'overview' | 'members' | 'financial' | 'operations';
+interface MemberRow { id: string; profile_id: string; tier: string; status: string; created_at: string }
+interface AppRow { id: string; full_name: string; email: string; country: string; requested_tier: string; status: string; phone: string | null; created_at: string }
+interface PaymentRow { id: string; amount: number; currency: string; status: string; type: string; created_at: string }
+interface TradeRow { id: string; order_number: string; order_type: string; commodity: string; quantity: number; target_price: number; country: string; status: string; created_at: string }
+interface AmbassadorRow { id: string; full_name: string; country: string; status: string; created_at: string }
 
-// ── Fallback Data (used when DB fetch fails or returns empty) ──
+const CHART_COLORS = ['#5DB347', '#1B2A4A', '#3B82F6', '#F59E0B', '#8B5CF6', '#EF4444', '#06B6D4', '#EC4899', '#10B981', '#D97706'];
+const TIER_LABELS: Record<string, string> = { free: 'Free', smallholder: 'Smallholder', farmer_grower: 'Farmer Grower', commercial: 'Commercial', enterprise: 'Enterprise', partner: 'Partner', ambassador: 'Ambassador' };
+const DATE_LABELS: Record<DateRange, string> = { '7d': 'Last 7 days', '30d': 'Last 30 days', '90d': 'Last 90 days', '365d': 'Last year', all: 'All time' };
 
-// KPI data
-const FALLBACK_KPIS = [
-  { label: 'Total Members', value: '342', change: '+12%', up: true, icon: <Users className="w-5 h-5" />, color: 'text-[#1B2A4A]', iconBg: 'bg-[#1B2A4A]/10' },
-  { label: 'Revenue (MTD)', value: '$487K', change: '+8.3%', up: true, icon: <DollarSign className="w-5 h-5" />, color: 'text-[#8CB89C]', iconBg: 'bg-[#8CB89C]/10' },
-  { label: 'Active Loans', value: '89', change: '+5', up: true, icon: <CreditCard className="w-5 h-5" />, color: 'text-blue-600', iconBg: 'bg-blue-50' },
-  { label: 'Marketplace GMV', value: '$1.2M', change: '+23%', up: true, icon: <Store className="w-5 h-5" />, color: 'text-purple-600', iconBg: 'bg-purple-50' },
-  { label: 'Export Value', value: '$2.8M', change: '-3.1%', up: false, icon: <Ship className="w-5 h-5" />, color: 'text-[#D4A843]', iconBg: 'bg-[#D4A843]/10' },
-  { label: 'NPS Score', value: '72', change: '+4', up: true, icon: <Star className="w-5 h-5" />, color: 'text-amber-500', iconBg: 'bg-amber-50' },
-];
-
-// Member growth (12 months)
-const FALLBACK_MEMBER_GROWTH = [
-  { month: 'Apr', count: 180 }, { month: 'May', count: 195 }, { month: 'Jun', count: 210 },
-  { month: 'Jul', count: 228 }, { month: 'Aug', count: 245 }, { month: 'Sep', count: 258 },
-  { month: 'Oct', count: 275 }, { month: 'Nov', count: 290 }, { month: 'Dec', count: 298 },
-  { month: 'Jan', count: 315 }, { month: 'Feb', count: 330 }, { month: 'Mar', count: 342 },
-];
-
-// Revenue trend (12 months)
-const FALLBACK_REVENUE_TREND = [
-  { month: 'Apr', value: 320 }, { month: 'May', value: 345 }, { month: 'Jun', value: 380 },
-  { month: 'Jul', value: 365 }, { month: 'Aug', value: 410 }, { month: 'Sep', value: 398 },
-  { month: 'Oct', value: 425 }, { month: 'Nov', value: 450 }, { month: 'Dec', value: 432 },
-  { month: 'Jan', value: 468 }, { month: 'Feb', value: 475 }, { month: 'Mar', value: 487 },
-];
-
-// Active users
-const FALLBACK_ACTIVE_USERS = { daily: 186, weekly: 298, monthly: 342 };
-
-// Top features
-const FALLBACK_TOP_FEATURES = [
-  { name: 'Marketplace', usage: 89 }, { name: 'Loan Applications', usage: 76 },
-  { name: 'Training Portal', usage: 68 }, { name: 'Export Tracking', usage: 52 },
-  { name: 'Financial Dashboard', usage: 45 }, { name: 'Document Library', usage: 38 },
-];
-
-// Member distribution by country
-const FALLBACK_MEMBERS_BY_COUNTRY = [
-  { country: 'Zimbabwe', count: 128 }, { country: 'Tanzania', count: 85 },
-  { country: 'Kenya', count: 62 }, { country: 'Botswana', count: 42 },
-  { country: 'Uganda', count: 15 }, { country: 'Mozambique', count: 10 },
-];
-
-// Tier distribution
-const FALLBACK_TIER_DISTRIBUTION = [
-  { tier: 'Tier A - Commercial', count: 145, percent: 42, color: 'bg-[#1B2A4A]' },
-  { tier: 'Tier B - Smallholder', count: 128, percent: 38, color: 'bg-[#8CB89C]' },
-  { tier: 'Tier C - Enterprise', count: 45, percent: 13, color: 'bg-[#D4A843]' },
-  { tier: 'Partners', count: 24, percent: 7, color: 'bg-gray-400' },
-];
-
-// Growth rate by month
-const FALLBACK_GROWTH_RATES = [
-  { month: 'Oct', rate: 6.2 }, { month: 'Nov', rate: 5.5 }, { month: 'Dec', rate: 2.8 },
-  { month: 'Jan', rate: 5.7 }, { month: 'Feb', rate: 4.8 }, { month: 'Mar', rate: 3.6 },
-];
-
-// Churn analysis
-const FALLBACK_CHURN_DATA = { rate: 2.1, atRisk: 12, churned: 7, recovered: 3 };
-
-// Engagement scores
-const FALLBACK_ENGAGEMENT_SCORES = [
-  { metric: 'Login Frequency', score: 78 }, { metric: 'Feature Adoption', score: 65 },
-  { metric: 'Transaction Activity', score: 82 }, { metric: 'Training Participation', score: 58 },
-  { metric: 'Support Interaction', score: 44 },
-];
-
-// Loan portfolio
-const FALLBACK_LOAN_PORTFOLIO = [
-  { type: 'Working Capital', amount: 2500000, count: 45, rate: 95.2 },
-  { type: 'Invoice Finance', amount: 1200000, count: 32, rate: 93.8 },
-  { type: 'Equipment Finance', amount: 350000, count: 8, rate: 97.1 },
-  { type: 'Input Bundle', amount: 150000, count: 4, rate: 100 },
-];
-
-// Revenue by service line
-const FALLBACK_REVENUE_BY_SERVICE = [
-  { service: 'Interest Income', amount: 312000, percent: 64 },
-  { service: 'Origination Fees', amount: 78000, percent: 16 },
-  { service: 'Membership Fees', amount: 47000, percent: 10 },
-  { service: 'Training Revenue', amount: 35000, percent: 7 },
-  { service: 'Processing Fees', amount: 15000, percent: 3 },
-];
-
-// Collection rate trends
-const FALLBACK_COLLECTION_RATES = [
-  { month: 'Oct', rate: 92.1 }, { month: 'Nov', rate: 93.4 }, { month: 'Dec', rate: 91.8 },
-  { month: 'Jan', rate: 94.0 }, { month: 'Feb', rate: 94.2 }, { month: 'Mar', rate: 94.8 },
-];
-
-// Operations data
-const FALLBACK_MARKETPLACE_METRICS = { totalOrders: 1245, gmv: 1200000, avgOrderValue: 964, activeListings: 342 };
-const FALLBACK_LOGISTICS_METRICS = { totalShipments: 89, avgDeliveryDays: 4.2, onTimeRate: 91, inTransit: 12 };
-const FALLBACK_SUPPORT_METRICS = { openTickets: 23, resolvedMtd: 145, avgResolutionHrs: 6.4, satisfaction: 4.6 };
-const FALLBACK_SYSTEM_METRICS = { uptime: 99.97, responseTime: 142, errorRate: 0.03, activeConnections: 86 };
-
-// ═══════════════════════════════════════════════════════
-//  MAIN PAGE COMPONENT
-// ═══════════════════════════════════════════════════════
-
-// ── Live analytics state shape ──
-interface LiveAnalytics {
-  totalMembers: number;
-  totalFarmers: number;
-  totalSuppliers: number;
-  totalInvestors: number;
-  activeLoans: number;
-  totalRevenue: number;
-  membersByCountry: { country: string; count: number }[];
-  membersByRole: { role: string; count: number }[];
+function getDateFrom(range: DateRange): string | null {
+  if (range === 'all') return null;
+  const d = new Date();
+  const days = range === '7d' ? 7 : range === '30d' ? 30 : range === '90d' ? 90 : 365;
+  d.setDate(d.getDate() - days);
+  return d.toISOString();
 }
 
+function formatCurrency(n: number) { return `$${n.toLocaleString(undefined, { maximumFractionDigits: 0 })}`; }
+
+/* ─── Component ─── */
+
 export default function AdminAnalyticsPage() {
-  const [activeTab, setActiveTab] = useState<TabKey>('overview');
-  const [live, setLive] = useState<LiveAnalytics | null>(null);
+  const supabase = useMemo(() => createClient(), []);
 
-  // Fetch live analytics directly from Supabase in parallel
-  useEffect(() => {
-    const supabase = createClient();
-    (async () => {
-      try {
-        const [
-          membersRes,
-          farmersRes,
-          suppliersRes,
-          investorsRes,
-          activeLoansRes,
-          revenueRes,
-          countriesRes,
-          rolesRes,
-        ] = await Promise.all([
-          // totalMembers: COUNT from profiles
-          supabase.from('profiles').select('id', { count: 'exact', head: true }),
-          // totalFarmers: COUNT from profiles WHERE role = 'farmer'
-          supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'farmer'),
-          // totalSuppliers: COUNT from profiles WHERE role = 'supplier'
-          supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'supplier'),
-          // totalInvestors: COUNT from profiles WHERE role = 'investor'
-          supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'investor'),
-          // activeLoans: COUNT from loans WHERE status IN ('active','disbursed')
-          supabase.from('loans').select('id', { count: 'exact', head: true }).in('status', ['active', 'disbursed']),
-          // totalRevenue: SUM from payments WHERE status = 'completed'
-          supabase.from('payments').select('amount').eq('status', 'completed'),
-          // membersByCountry: SELECT country, COUNT(*) from profiles GROUP BY country
-          supabase.from('profiles').select('country'),
-          // membersByRole: SELECT role, COUNT(*) from profiles GROUP BY role
-          supabase.from('profiles').select('role'),
-        ]);
+  const [tab, setTab] = useState<TabKey>('members');
+  const [dateRange, setDateRange] = useState<DateRange>('90d');
+  const [countryFilter, setCountryFilter] = useState('all');
+  const [tierFilter, setTierFilter] = useState('all');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(true);
 
-        // Compute totalRevenue from payments
-        const totalRevenue = revenueRes.data
-          ? revenueRes.data.reduce((sum: number, p: { amount: number }) => sum + (p.amount || 0), 0)
-          : 0;
+  // Data
+  const [members, setMembers] = useState<MemberRow[]>([]);
+  const [applications, setApplications] = useState<AppRow[]>([]);
+  const [payments, setPayments] = useState<PaymentRow[]>([]);
+  const [trades, setTrades] = useState<TradeRow[]>([]);
+  const [ambassadors, setAmbassadors] = useState<AmbassadorRow[]>([]);
+  const [countries, setCountries] = useState<string[]>([]);
+  const [profiles, setProfiles] = useState<{ id: string; country: string | null; role: string; created_at: string }[]>([]);
 
-        // Group members by country
-        const countryMap: Record<string, number> = {};
-        if (countriesRes.data) {
-          countriesRes.data.forEach((p: { country: string | null }) => {
-            const c = p.country || 'Unknown';
-            countryMap[c] = (countryMap[c] || 0) + 1;
-          });
-        }
-        const membersByCountry = Object.entries(countryMap)
-          .sort((a, b) => b[1] - a[1])
-          .map(([country, count]) => ({ country, count }));
+  // Fetch all data
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    const dateFrom = getDateFrom(dateRange);
+    const wrap = (p: PromiseLike<unknown>) => Promise.resolve(p).catch(() => ({ data: null }));
 
-        // Group members by role
-        const roleMap: Record<string, number> = {};
-        if (rolesRes.data) {
-          rolesRes.data.forEach((p: { role: string | null }) => {
-            const r = p.role || 'unknown';
-            roleMap[r] = (roleMap[r] || 0) + 1;
-          });
-        }
-        const membersByRole = Object.entries(roleMap)
-          .sort((a, b) => b[1] - a[1])
-          .map(([role, count]) => ({ role, count }));
+    const [memRes, appRes, payRes, trdRes, ambRes, profRes] = await Promise.all([
+      wrap(supabase.from('members').select('id, profile_id, tier, status, created_at').order('created_at', { ascending: false })),
+      wrap(dateFrom
+        ? supabase.from('membership_applications').select('id, full_name, email, country, requested_tier, status, phone, created_at').gte('created_at', dateFrom).order('created_at', { ascending: false })
+        : supabase.from('membership_applications').select('id, full_name, email, country, requested_tier, status, phone, created_at').order('created_at', { ascending: false })
+      ),
+      wrap(supabase.from('payments').select('id, amount, currency, status, type, created_at').order('created_at', { ascending: false }).limit(500)),
+      wrap(supabase.from('trade_orders').select('id, order_number, order_type, commodity, quantity, target_price, country, status, created_at').order('created_at', { ascending: false }).limit(500)),
+      wrap(supabase.from('ambassadors').select('id, full_name, country, status, created_at').order('created_at', { ascending: false })),
+      wrap(supabase.from('profiles').select('id, country, role, created_at').order('created_at', { ascending: false })),
+    ]) as { data: unknown }[];
 
-        setLive({
-          totalMembers: membersRes.count ?? 0,
-          totalFarmers: farmersRes.count ?? 0,
-          totalSuppliers: suppliersRes.count ?? 0,
-          totalInvestors: investorsRes.count ?? 0,
-          activeLoans: activeLoansRes.count ?? 0,
-          totalRevenue,
-          membersByCountry,
-          membersByRole,
-        });
-      } catch {
-        // On failure, live stays null and fallback data is used
-      }
-    })();
-  }, []);
+    setMembers((memRes.data || []) as MemberRow[]);
+    setApplications((appRes.data || []) as AppRow[]);
+    setPayments((payRes.data || []) as PaymentRow[]);
+    setTrades((trdRes.data || []) as TradeRow[]);
+    setAmbassadors((ambRes.data || []) as AmbassadorRow[]);
+    setProfiles((profRes.data || []) as typeof profiles);
 
-  // Format currency helper
-  const fmtCurrency = (v: number) =>
-    v >= 1_000_000 ? `$${(v / 1_000_000).toFixed(1)}M`
-      : v >= 1_000 ? `$${(v / 1_000).toFixed(0)}K`
-      : `$${v}`;
+    // Extract unique countries
+    const allCountries = new Set<string>();
+    ((appRes.data || []) as AppRow[]).forEach(a => { if (a.country) allCountries.add(a.country); });
+    ((trdRes.data || []) as TradeRow[]).forEach(t => { if (t.country) allCountries.add(t.country); });
+    ((profRes.data || []) as typeof profiles).forEach(p => { if (p.country) allCountries.add(p.country); });
+    setCountries([...allCountries].sort());
 
-  // Build KPI list with live overrides
-  const liveKpis = FALLBACK_KPIS.map((kpi) => {
-    if (!live) return kpi;
-    if (kpi.label === 'Total Members') {
-      return { ...kpi, value: live.totalMembers.toLocaleString() };
+    setLoading(false);
+  }, [supabase, dateRange]);
+
+  useEffect(() => { fetchData(); }, [fetchData]);
+
+  // ── Filtered data ──
+  const filteredApps = useMemo(() => {
+    let list = applications;
+    if (countryFilter !== 'all') list = list.filter(a => a.country === countryFilter);
+    if (tierFilter !== 'all') list = list.filter(a => a.requested_tier === tierFilter);
+    if (searchTerm) {
+      const q = searchTerm.toLowerCase();
+      list = list.filter(a => a.full_name?.toLowerCase().includes(q) || a.email?.toLowerCase().includes(q) || a.country?.toLowerCase().includes(q));
     }
-    if (kpi.label === 'Active Loans') {
-      return { ...kpi, value: live.activeLoans.toString() };
-    }
-    if (kpi.label === 'Revenue (MTD)') {
-      return { ...kpi, value: fmtCurrency(live.totalRevenue) };
-    }
-    if (kpi.label === 'Export Value') {
-      return { ...kpi, value: live.totalSuppliers.toString(), label: 'Total Suppliers' };
-    }
-    if (kpi.label === 'NPS Score') {
-      return { ...kpi, value: live.totalInvestors.toString(), label: 'Investors' };
-    }
-    return kpi;
-  });
+    return list;
+  }, [applications, countryFilter, tierFilter, searchTerm]);
 
-  const tabs: { key: TabKey; label: string }[] = [
-    { key: 'overview', label: 'Overview' },
-    { key: 'members', label: 'Members' },
-    { key: 'financial', label: 'Financial' },
-    { key: 'operations', label: 'Operations' },
+  const filteredTrades = useMemo(() => {
+    let list = trades;
+    if (countryFilter !== 'all') list = list.filter(t => t.country === countryFilter);
+    return list;
+  }, [trades, countryFilter]);
+
+  // ── Computed stats ──
+
+  // Members
+  const membersByTier = useMemo(() => {
+    const map: Record<string, number> = {};
+    members.forEach(m => { map[m.tier] = (map[m.tier] || 0) + 1; });
+    return Object.entries(map).map(([name, value]) => ({ name: TIER_LABELS[name] || name, value })).sort((a, b) => b.value - a.value);
+  }, [members]);
+
+  const membersByStatus = useMemo(() => {
+    const map: Record<string, number> = {};
+    members.forEach(m => { map[m.status] = (map[m.status] || 0) + 1; });
+    return Object.entries(map).map(([name, value]) => ({ name, value }));
+  }, [members]);
+
+  // Applications
+  const appsByCountry = useMemo(() => {
+    const map: Record<string, number> = {};
+    filteredApps.forEach(a => { if (a.country) map[a.country] = (map[a.country] || 0) + 1; });
+    return Object.entries(map).sort((a, b) => b[1] - a[1]).map(([name, value]) => ({ name, value }));
+  }, [filteredApps]);
+
+  const appsByTier = useMemo(() => {
+    const map: Record<string, number> = {};
+    filteredApps.forEach(a => { map[a.requested_tier] = (map[a.requested_tier] || 0) + 1; });
+    return Object.entries(map).map(([name, value]) => ({ name: TIER_LABELS[name] || name, value })).sort((a, b) => b.value - a.value);
+  }, [filteredApps]);
+
+  const appsByStatus = useMemo(() => {
+    const map: Record<string, number> = {};
+    filteredApps.forEach(a => { map[a.status] = (map[a.status] || 0) + 1; });
+    return map;
+  }, [filteredApps]);
+
+  const appsByMonth = useMemo(() => {
+    const map: Record<string, { applied: number; approved: number; rejected: number }> = {};
+    filteredApps.forEach(a => {
+      const m = new Date(a.created_at).toLocaleDateString('en', { month: 'short', year: '2-digit' });
+      if (!map[m]) map[m] = { applied: 0, approved: 0, rejected: 0 };
+      map[m].applied += 1;
+      if (a.status === 'approved') map[m].approved += 1;
+      if (a.status === 'rejected') map[m].rejected += 1;
+    });
+    return Object.entries(map).map(([month, v]) => ({ month, ...v }));
+  }, [filteredApps]);
+
+  // Trading
+  const tradesByComm = useMemo(() => {
+    const map: Record<string, number> = {};
+    filteredTrades.forEach(t => { map[t.commodity] = (map[t.commodity] || 0) + t.target_price * t.quantity; });
+    return Object.entries(map).sort((a, b) => b[1] - a[1]).slice(0, 10).map(([name, value]) => ({ name, value: Math.round(value) }));
+  }, [filteredTrades]);
+
+  const tradesByCountry = useMemo(() => {
+    const map: Record<string, number> = {};
+    filteredTrades.forEach(t => { if (t.country) map[t.country] = (map[t.country] || 0) + 1; });
+    return Object.entries(map).sort((a, b) => b[1] - a[1]).map(([name, value]) => ({ name, value }));
+  }, [filteredTrades]);
+
+  const tradesByStatus = useMemo(() => {
+    const map: Record<string, number> = {};
+    filteredTrades.forEach(t => { map[t.status] = (map[t.status] || 0) + 1; });
+    return map;
+  }, [filteredTrades]);
+
+  const totalTradeVolume = filteredTrades.reduce((s, t) => s + t.target_price * t.quantity, 0);
+
+  // CSV export
+  const exportCSV = (data: Record<string, unknown>[], filename: string) => {
+    if (!data.length) return;
+    const headers = Object.keys(data[0]);
+    const rows = data.map(r => headers.map(h => JSON.stringify(r[h] ?? '')).join(','));
+    const csv = [headers.join(','), ...rows].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${filename}-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  // ── Tabs ──
+  const tabs: { key: TabKey; label: string; icon: React.ReactNode }[] = [
+    { key: 'members', label: 'Members', icon: <Users className="w-4 h-4" /> },
+    { key: 'applications', label: 'Applications', icon: <Package className="w-4 h-4" /> },
+    { key: 'financial', label: 'Financial', icon: <DollarSign className="w-4 h-4" /> },
+    { key: 'trading', label: 'Trading', icon: <ArrowLeftRight className="w-4 h-4" /> },
   ];
 
-  // Use live membersByCountry if available, otherwise fallback
-  const membersByCountry = (live?.membersByCountry && live.membersByCountry.length > 0)
-    ? live.membersByCountry
-    : FALLBACK_MEMBERS_BY_COUNTRY;
-
-  // Use live membersByRole to build tier distribution if available
-  const tierDistribution = (live?.membersByRole && live.membersByRole.length > 0)
-    ? (() => {
-        const total = live.membersByRole.reduce((s, r) => s + r.count, 0) || 1;
-        const colors = ['bg-[#1B2A4A]', 'bg-[#8CB89C]', 'bg-[#D4A843]', 'bg-gray-400', 'bg-blue-400', 'bg-purple-400'];
-        return live.membersByRole.map((r, i) => ({
-          tier: r.role.charAt(0).toUpperCase() + r.role.slice(1),
-          count: r.count,
-          percent: Math.round((r.count / total) * 100),
-          color: colors[i % colors.length],
-        }));
-      })()
-    : FALLBACK_TIER_DISTRIBUTION;
-
-  const memberGrowth = FALLBACK_MEMBER_GROWTH;
-  const revenueTrend = FALLBACK_REVENUE_TREND;
-  const activeUsers = FALLBACK_ACTIVE_USERS;
-  const topFeatures = FALLBACK_TOP_FEATURES;
-  const growthRates = FALLBACK_GROWTH_RATES;
-  const churnData = FALLBACK_CHURN_DATA;
-  const engagementScores = FALLBACK_ENGAGEMENT_SCORES;
-  const loanPortfolio = FALLBACK_LOAN_PORTFOLIO;
-  const revenueByService = FALLBACK_REVENUE_BY_SERVICE;
-  const collectionRates = FALLBACK_COLLECTION_RATES;
-  const marketplaceMetrics = FALLBACK_MARKETPLACE_METRICS;
-  const logisticsMetrics = FALLBACK_LOGISTICS_METRICS;
-  const supportMetrics = FALLBACK_SUPPORT_METRICS;
-  const systemMetrics = FALLBACK_SYSTEM_METRICS;
-
-  const maxMemberCount = Math.max(...memberGrowth.map((m) => m.count));
-  const maxRevenue = Math.max(...revenueTrend.map((r) => r.value));
-  const maxCountryCount = Math.max(...membersByCountry.map((c) => c.count));
-  const totalLoanAmount = loanPortfolio.reduce((s, l) => s + l.amount, 0);
+  // ── KPI cards ──
+  const kpis = [
+    { label: 'Total Members', value: members.length.toString(), icon: <Users className="w-5 h-5 text-[#5DB347]" /> },
+    { label: 'Applications', value: applications.length.toString(), sub: `${appsByStatus.pending || 0} pending`, icon: <Package className="w-5 h-5 text-blue-500" /> },
+    { label: 'Ambassadors', value: ambassadors.filter(a => a.status === 'active').length.toString(), icon: <Award className="w-5 h-5 text-amber-500" /> },
+    { label: 'Trade Volume', value: formatCurrency(totalTradeVolume), sub: `${trades.length} orders`, icon: <ArrowLeftRight className="w-5 h-5 text-purple-500" /> },
+    { label: 'Countries', value: countries.length.toString(), icon: <Globe className="w-5 h-5 text-teal-500" /> },
+  ];
 
   return (
-    <motion.div variants={containerVariants} initial="hidden" animate="show" className="space-y-6">
-      {/* ── Header ── */}
-      <motion.div variants={cardVariants} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-[#1B2A4A] rounded-xl flex items-center justify-center">
-            <BarChart3 className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-[#1B2A4A]">Platform Analytics</h1>
-            <p className="text-gray-500 text-sm mt-0.5">Comprehensive platform performance metrics</p>
-          </div>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold text-[#1B2A4A]">Analytics</h1>
+          <p className="text-sm text-gray-500">Deep-dive into your platform data</p>
         </div>
-      </motion.div>
+        <div className="flex items-center gap-2">
+          <button onClick={fetchData} className="p-2 rounded-lg hover:bg-gray-100 text-gray-500"><RefreshCw className="w-4 h-4" /></button>
+        </div>
+      </div>
+
+      {/* ── Filters Bar ── */}
+      <div className="bg-white rounded-xl border border-gray-100 p-4 flex flex-wrap gap-3 items-center">
+        <Filter className="w-4 h-4 text-gray-400" />
+
+        {/* Date range */}
+        <div className="relative">
+          <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+          <select value={dateRange} onChange={e => setDateRange(e.target.value as DateRange)} className="pl-9 pr-8 py-2 border border-gray-200 rounded-lg text-sm appearance-none bg-white cursor-pointer focus:ring-2 focus:ring-[#5DB347]">
+            {Object.entries(DATE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+          </select>
+          <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+        </div>
+
+        {/* Country */}
+        <div className="relative">
+          <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+          <select value={countryFilter} onChange={e => setCountryFilter(e.target.value)} className="pl-9 pr-8 py-2 border border-gray-200 rounded-lg text-sm appearance-none bg-white cursor-pointer focus:ring-2 focus:ring-[#5DB347]">
+            <option value="all">All Countries</option>
+            {countries.map(c => <option key={c} value={c}>{c}</option>)}
+          </select>
+          <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+        </div>
+
+        {/* Tier */}
+        <div className="relative">
+          <Shield className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+          <select value={tierFilter} onChange={e => setTierFilter(e.target.value)} className="pl-9 pr-8 py-2 border border-gray-200 rounded-lg text-sm appearance-none bg-white cursor-pointer focus:ring-2 focus:ring-[#5DB347]">
+            <option value="all">All Tiers</option>
+            {Object.entries(TIER_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+          </select>
+          <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+        </div>
+
+        {/* Search */}
+        <div className="relative flex-1 min-w-[180px]">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+          <input type="text" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} placeholder="Search name, email, country..." className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#5DB347]" />
+        </div>
+
+        {(countryFilter !== 'all' || tierFilter !== 'all' || searchTerm) && (
+          <button onClick={() => { setCountryFilter('all'); setTierFilter('all'); setSearchTerm(''); }} className="text-xs text-gray-500 hover:text-red-500 px-2 py-1">Clear filters</button>
+        )}
+      </div>
 
       {/* ── KPI Row ── */}
-      <motion.div variants={cardVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
-        {liveKpis.map((kpi, i) => (
-          <div key={i} className="bg-white rounded-xl p-4 border border-gray-100">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+        {kpis.map(k => (
+          <div key={k.label} className="bg-white rounded-xl border border-gray-100 p-4">
             <div className="flex items-center justify-between mb-2">
-              <div className={`w-8 h-8 ${kpi.iconBg} rounded-lg flex items-center justify-center ${kpi.color}`}>
-                {kpi.icon}
-              </div>
-              <span className={`text-xs font-semibold flex items-center gap-0.5 ${kpi.up ? 'text-green-600' : 'text-red-500'}`}>
-                {kpi.up ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
-                {kpi.change}
-              </span>
+              <span className="text-xs font-medium text-gray-500">{k.label}</span>
+              {k.icon}
             </div>
-            <p className="text-xl font-bold text-[#1B2A4A]">{kpi.value}</p>
-            <p className="text-[10px] text-gray-400 mt-0.5">{kpi.label}</p>
+            <p className="text-2xl font-bold text-[#1B2A4A]">{loading ? '—' : k.value}</p>
+            {k.sub && <p className="text-xs text-gray-400 mt-1">{k.sub}</p>}
           </div>
         ))}
-      </motion.div>
+      </div>
 
-      {/* ── Tab Switcher ── */}
-      <motion.div variants={cardVariants} className="flex gap-1 bg-white rounded-xl p-1 border border-gray-100 w-fit">
-        {tabs.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-              activeTab === tab.key
-                ? 'bg-[#1B2A4A] text-white shadow-sm'
-                : 'text-gray-500 hover:text-[#1B2A4A] hover:bg-gray-50'
-            }`}
-          >
-            {tab.label}
+      {/* ── Tabs ── */}
+      <div className="flex gap-1 bg-gray-100 p-1 rounded-xl overflow-x-auto">
+        {tabs.map(t => (
+          <button key={t.key} onClick={() => setTab(t.key)} className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${tab === t.key ? 'bg-white text-[#1B2A4A] shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
+            {t.icon} {t.label}
           </button>
         ))}
-      </motion.div>
+      </div>
 
-      {/* ===== OVERVIEW TAB ===== */}
-      {activeTab === 'overview' && (
-        <motion.div variants={containerVariants} initial="hidden" animate="show" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Member Growth Chart */}
-            <motion.div variants={cardVariants} className="bg-white rounded-xl border border-gray-100 p-6">
-              <h3 className="text-sm font-semibold text-[#1B2A4A] mb-4 flex items-center gap-2">
-                <Users className="w-4 h-4" /> Member Growth (12 Months)
-              </h3>
-              <div className="flex items-end gap-2 h-44">
-                {memberGrowth.map((m, i) => (
-                  <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                    <span className="text-[10px] font-medium text-[#1B2A4A]">{m.count}</span>
-                    <div
-                      className="w-full bg-[#8CB89C] rounded-t-md transition-all hover:bg-[#8CB89C]/80"
-                      style={{ height: `${(m.count / maxMemberCount) * 100}%` }}
-                    />
-                    <span className="text-[9px] text-gray-400">{m.month}</span>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-
-            {/* Revenue Trend */}
-            <motion.div variants={cardVariants} className="bg-white rounded-xl border border-gray-100 p-6">
-              <h3 className="text-sm font-semibold text-[#1B2A4A] mb-4 flex items-center gap-2">
-                <TrendingUp className="w-4 h-4" /> Revenue Trend ($K)
-              </h3>
-              <div className="flex items-end gap-2 h-44">
-                {revenueTrend.map((r, i) => (
-                  <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                    <span className="text-[10px] font-medium text-[#1B2A4A]">{r.value}</span>
-                    <div
-                      className="w-full bg-[#D4A843] rounded-t-md transition-all hover:bg-[#D4A843]/80"
-                      style={{ height: `${(r.value / maxRevenue) * 100}%` }}
-                    />
-                    <span className="text-[9px] text-gray-400">{r.month}</span>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-
-            {/* Active Users */}
-            <motion.div variants={cardVariants} className="bg-white rounded-xl border border-gray-100 p-6">
-              <h3 className="text-sm font-semibold text-[#1B2A4A] mb-4 flex items-center gap-2">
-                <Activity className="w-4 h-4" /> Active Users
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {[
-                  { label: 'Daily', value: activeUsers.daily, percent: Math.round((activeUsers.daily / (live?.totalMembers || 342)) * 100), color: 'bg-[#8CB89C]' },
-                  { label: 'Weekly', value: activeUsers.weekly, percent: Math.round((activeUsers.weekly / (live?.totalMembers || 342)) * 100), color: 'bg-[#1B2A4A]' },
-                  { label: 'Monthly', value: activeUsers.monthly, percent: Math.round((activeUsers.monthly / (live?.totalMembers || 342)) * 100), color: 'bg-[#D4A843]' },
-                ].map((u, i) => (
-                  <div key={i} className="text-center">
-                    <div className="relative w-20 h-20 mx-auto mb-2">
-                      <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 36 36">
-                        <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#E5E7EB" strokeWidth="3" />
-                        <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke={u.color === 'bg-[#8CB89C]' ? '#8CB89C' : u.color === 'bg-[#1B2A4A]' ? '#1B2A4A' : '#D4A843'} strokeWidth="3" strokeDasharray={`${u.percent}, 100`} />
-                      </svg>
-                      <span className="absolute inset-0 flex items-center justify-center text-sm font-bold text-[#1B2A4A]">{u.percent}%</span>
-                    </div>
-                    <p className="text-xl font-bold text-[#1B2A4A]">{u.value}</p>
-                    <p className="text-[10px] text-gray-400">{u.label}</p>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-
-            {/* Top Features by Usage */}
-            <motion.div variants={cardVariants} className="bg-white rounded-xl border border-gray-100 p-6">
-              <h3 className="text-sm font-semibold text-[#1B2A4A] mb-4 flex items-center gap-2">
-                <Zap className="w-4 h-4" /> Top Features by Usage
-              </h3>
-              <div className="space-y-3">
-                {topFeatures.map((f, i) => (
-                  <div key={i}>
-                    <div className="flex items-center justify-between text-xs mb-1">
-                      <span className="text-gray-600">{f.name}</span>
-                      <span className="font-semibold text-[#1B2A4A]">{f.usage}%</span>
-                    </div>
-                    <div className="w-full bg-gray-100 rounded-full h-2">
-                      <div
-                        className="h-2 rounded-full bg-[#8CB89C]"
-                        style={{ width: `${f.usage}%` }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          </div>
-        </motion.div>
+      {loading && (
+        <div className="flex items-center justify-center py-16"><Loader2 className="w-6 h-6 animate-spin text-[#5DB347]" /></div>
       )}
 
-      {/* ===== MEMBERS TAB ===== */}
-      {activeTab === 'members' && (
-        <motion.div variants={containerVariants} initial="hidden" animate="show" className="space-y-6">
+      {/* ═══ MEMBERS TAB ═══ */}
+      {!loading && tab === 'members' && (
+        <div className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Member Distribution by Country */}
-            <motion.div variants={cardVariants} className="bg-white rounded-xl border border-gray-100 p-6">
-              <h3 className="text-sm font-semibold text-[#1B2A4A] mb-4 flex items-center gap-2">
-                <Globe className="w-4 h-4" /> Member Distribution by Country
-              </h3>
-              <div className="space-y-3">
-                {membersByCountry.map((c, i) => (
-                  <div key={i}>
-                    <div className="flex items-center justify-between text-sm mb-1">
-                      <span className="text-gray-600">{c.country}</span>
-                      <span className="font-medium text-[#1B2A4A]">{c.count} members</span>
-                    </div>
-                    <div className="w-full bg-gray-100 rounded-full h-3">
-                      <div
-                        className="h-3 rounded-full bg-[#1B2A4A] transition-all"
-                        style={{ width: `${(c.count / maxCountryCount) * 100}%` }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-
-            {/* Tier Distribution */}
-            <motion.div variants={cardVariants} className="bg-white rounded-xl border border-gray-100 p-6">
-              <h3 className="text-sm font-semibold text-[#1B2A4A] mb-4 flex items-center gap-2">
-                <PieChart className="w-4 h-4" /> Tier Distribution
-              </h3>
-              {/* CSS donut-style */}
-              <div className="flex items-center gap-6">
-                <div className="relative w-32 h-32 flex-shrink-0">
-                  <svg viewBox="0 0 36 36" className="w-32 h-32 transform -rotate-90">
-                    {tierDistribution.reduce<{ elements: React.ReactNode[], offset: number }>((acc, tier, i) => {
-                      const strokeColor = tier.color === 'bg-[#1B2A4A]' ? '#1B2A4A' : tier.color === 'bg-[#8CB89C]' ? '#8CB89C' : tier.color === 'bg-[#D4A843]' ? '#D4A843' : '#9CA3AF';
-                      acc.elements.push(
-                        <path
-                          key={i}
-                          d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                          fill="none"
-                          stroke={strokeColor}
-                          strokeWidth="4"
-                          strokeDasharray={`${tier.percent} ${100 - tier.percent}`}
-                          strokeDashoffset={`${-acc.offset}`}
-                        />
-                      );
-                      acc.offset += tier.percent;
-                      return acc;
-                    }, { elements: [], offset: 0 }).elements}
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-center">
-                      <p className="text-lg font-bold text-[#1B2A4A]">{live?.totalMembers ?? 342}</p>
-                      <p className="text-[9px] text-gray-400">Total</p>
-                    </div>
-                  </div>
+            {/* Tier distribution pie */}
+            <div className="bg-white rounded-2xl border border-gray-100 p-5">
+              <h3 className="font-semibold text-[#1B2A4A] mb-4">Members by Tier</h3>
+              {membersByTier.length === 0 ? <p className="text-sm text-gray-400 py-8 text-center">No members yet</p> : (
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie data={membersByTier} cx="50%" cy="50%" innerRadius={50} outerRadius={90} paddingAngle={3} dataKey="value" label={({ name, value }) => `${name}: ${value}`}>
+                        {membersByTier.map((_, i) => <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />)}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
                 </div>
-                <div className="space-y-2 flex-1">
-                  {tierDistribution.map((t, i) => (
-                    <div key={i} className="flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-2">
-                        <div className={`w-2.5 h-2.5 rounded-full ${t.color}`} />
-                        <span className="text-gray-600">{t.tier}</span>
-                      </div>
-                      <span className="font-semibold text-[#1B2A4A]">{t.count} ({t.percent}%)</span>
+              )}
+            </div>
+
+            {/* Status breakdown */}
+            <div className="bg-white rounded-2xl border border-gray-100 p-5">
+              <h3 className="font-semibold text-[#1B2A4A] mb-4">Member Status</h3>
+              {membersByStatus.length === 0 ? <p className="text-sm text-gray-400 py-8 text-center">No data</p> : (
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={membersByStatus}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                      <YAxis tick={{ fontSize: 12 }} />
+                      <Tooltip />
+                      <Bar dataKey="value" fill="#5DB347" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+            </div>
+
+            {/* Ambassador stats */}
+            <div className="bg-white rounded-2xl border border-gray-100 p-5 lg:col-span-2">
+              <h3 className="font-semibold text-[#1B2A4A] mb-4">Ambassadors by Country</h3>
+              {ambassadors.length === 0 ? <p className="text-sm text-gray-400 py-8 text-center">No ambassadors yet</p> : (
+                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">
+                  {Object.entries(ambassadors.reduce((m: Record<string, { total: number; active: number }>, a) => {
+                    if (!m[a.country]) m[a.country] = { total: 0, active: 0 };
+                    m[a.country].total += 1;
+                    if (a.status === 'active') m[a.country].active += 1;
+                    return m;
+                  }, {})).sort((a, b) => b[1].total - a[1].total).map(([country, stats]) => (
+                    <div key={country} className="bg-gray-50 rounded-lg p-3 text-center">
+                      <p className="text-sm font-medium text-[#1B2A4A]">{country}</p>
+                      <p className="text-xl font-bold text-[#5DB347]">{stats.total}</p>
+                      <p className="text-xs text-gray-400">{stats.active} active</p>
                     </div>
                   ))}
                 </div>
-              </div>
-            </motion.div>
-
-            {/* Growth Rate by Month */}
-            <motion.div variants={cardVariants} className="bg-white rounded-xl border border-gray-100 p-6">
-              <h3 className="text-sm font-semibold text-[#1B2A4A] mb-4 flex items-center gap-2">
-                <TrendingUp className="w-4 h-4" /> Growth Rate by Month (%)
-              </h3>
-              <div className="flex items-end gap-3 h-32">
-                {growthRates.map((g, i) => (
-                  <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                    <span className="text-[10px] font-medium text-[#1B2A4A]">{g.rate}%</span>
-                    <div
-                      className="w-full bg-[#8CB89C] rounded-t-md transition-all"
-                      style={{ height: `${(g.rate / Math.max(...growthRates.map((r) => r.rate))) * 100}%` }}
-                    />
-                    <span className="text-[9px] text-gray-400">{g.month}</span>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-
-            {/* Churn Analysis */}
-            <motion.div variants={cardVariants} className="bg-white rounded-xl border border-gray-100 p-6">
-              <h3 className="text-sm font-semibold text-[#1B2A4A] mb-4 flex items-center gap-2">
-                <TrendingDown className="w-4 h-4" /> Churn Analysis
-              </h3>
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div className="p-3 bg-red-50 rounded-lg text-center">
-                  <p className="text-2xl font-bold text-red-600">{churnData.rate}%</p>
-                  <p className="text-[10px] text-red-500">Churn Rate</p>
-                </div>
-                <div className="p-3 bg-amber-50 rounded-lg text-center">
-                  <p className="text-2xl font-bold text-amber-600">{churnData.atRisk}</p>
-                  <p className="text-[10px] text-amber-500">At Risk</p>
-                </div>
-                <div className="p-3 bg-gray-50 rounded-lg text-center">
-                  <p className="text-2xl font-bold text-gray-600">{churnData.churned}</p>
-                  <p className="text-[10px] text-gray-500">Churned (MTD)</p>
-                </div>
-                <div className="p-3 bg-green-50 rounded-lg text-center">
-                  <p className="text-2xl font-bold text-green-600">{churnData.recovered}</p>
-                  <p className="text-[10px] text-green-500">Recovered</p>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Engagement Scores */}
-            <motion.div variants={cardVariants} className="bg-white rounded-xl border border-gray-100 p-6 lg:col-span-2">
-              <h3 className="text-sm font-semibold text-[#1B2A4A] mb-4 flex items-center gap-2">
-                <Activity className="w-4 h-4" /> Engagement Scores
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-5 gap-4">
-                {engagementScores.map((e, i) => (
-                  <div key={i} className="text-center">
-                    <div className="relative w-16 h-16 mx-auto mb-2">
-                      <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 36 36">
-                        <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#E5E7EB" strokeWidth="3" />
-                        <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none"
-                          stroke={e.score >= 70 ? '#8CB89C' : e.score >= 50 ? '#D4A843' : '#EF4444'}
-                          strokeWidth="3"
-                          strokeDasharray={`${e.score}, 100`}
-                        />
-                      </svg>
-                      <span className="absolute inset-0 flex items-center justify-center text-sm font-bold text-[#1B2A4A]">{e.score}</span>
-                    </div>
-                    <p className="text-[10px] text-gray-500 leading-tight">{e.metric}</p>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
+              )}
+            </div>
           </div>
-        </motion.div>
+        </div>
       )}
 
-      {/* ===== FINANCIAL TAB ===== */}
-      {activeTab === 'financial' && (
-        <motion.div variants={containerVariants} initial="hidden" animate="show" className="space-y-6">
+      {/* ═══ APPLICATIONS TAB ═══ */}
+      {!loading && tab === 'applications' && (
+        <div className="space-y-6">
+          {/* Status summary */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {[
+              { label: 'Total', value: filteredApps.length, color: 'text-[#1B2A4A]' },
+              { label: 'Pending', value: appsByStatus.pending || 0, color: 'text-amber-600' },
+              { label: 'Approved', value: appsByStatus.approved || 0, color: 'text-green-600' },
+              { label: 'Rejected', value: appsByStatus.rejected || 0, color: 'text-red-500' },
+            ].map(s => (
+              <div key={s.label} className="bg-white rounded-xl border border-gray-100 p-4 text-center">
+                <p className="text-xs font-medium text-gray-500">{s.label}</p>
+                <p className={`text-3xl font-bold ${s.color}`}>{s.value}</p>
+              </div>
+            ))}
+          </div>
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Loan Portfolio Overview */}
-            <motion.div variants={cardVariants} className="bg-white rounded-xl border border-gray-100 p-6">
-              <h3 className="text-sm font-semibold text-[#1B2A4A] mb-4 flex items-center gap-2">
-                <CreditCard className="w-4 h-4" /> Loan Portfolio Overview
-              </h3>
-              <div className="space-y-4">
-                {loanPortfolio.map((loan, i) => (
-                  <div key={i}>
-                    <div className="flex items-center justify-between text-sm mb-1">
-                      <span className="text-gray-600 font-medium">{loan.type}</span>
-                      <span className="text-[#1B2A4A] font-semibold">${(loan.amount / 1000000).toFixed(1)}M</span>
-                    </div>
-                    <div className="flex items-center justify-between text-[10px] text-gray-400 mb-1">
-                      <span>{loan.count} active loans</span>
-                      <span>Repayment: {loan.rate}%</span>
-                    </div>
-                    <div className="w-full bg-gray-100 rounded-full h-2">
-                      <div
-                        className="h-2 rounded-full bg-[#8CB89C]"
-                        style={{ width: `${(loan.amount / totalLoanAmount) * 100}%` }}
-                      />
-                    </div>
-                  </div>
-                ))}
+            {/* By country */}
+            <div className="bg-white rounded-2xl border border-gray-100 p-5">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold text-[#1B2A4A]">Applications by Country</h3>
+                <button onClick={() => exportCSV(appsByCountry as Record<string, unknown>[], 'apps-by-country')} className="text-xs text-gray-400 hover:text-gray-600"><Download className="w-3.5 h-3.5" /></button>
               </div>
-              <div className="mt-4 pt-3 border-t border-gray-50 flex items-center justify-between text-sm">
-                <span className="text-gray-500">Total Portfolio</span>
-                <span className="font-bold text-[#1B2A4A]">${(totalLoanAmount / 1000000).toFixed(1)}M</span>
-              </div>
-            </motion.div>
+              {appsByCountry.length === 0 ? <p className="text-sm text-gray-400 py-8 text-center">No data</p> : (
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={appsByCountry} layout="vertical">
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <XAxis type="number" tick={{ fontSize: 11 }} />
+                      <YAxis dataKey="name" type="category" tick={{ fontSize: 11 }} width={100} />
+                      <Tooltip />
+                      <Bar dataKey="value" fill="#5DB347" radius={[0, 4, 4, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+            </div>
 
-            {/* Revenue by Service Line */}
-            <motion.div variants={cardVariants} className="bg-white rounded-xl border border-gray-100 p-6">
-              <h3 className="text-sm font-semibold text-[#1B2A4A] mb-4 flex items-center gap-2">
-                <DollarSign className="w-4 h-4" /> Revenue by Service Line
-              </h3>
-              <div className="space-y-3">
-                {revenueByService.map((r, i) => (
-                  <div key={i}>
-                    <div className="flex items-center justify-between text-sm mb-1">
-                      <span className="text-gray-600">{r.service}</span>
-                      <span className="font-medium text-[#1B2A4A]">${(r.amount / 1000).toFixed(0)}K ({r.percent}%)</span>
-                    </div>
-                    <div className="w-full bg-gray-100 rounded-full h-2">
-                      <div
-                        className="h-2 rounded-full bg-[#D4A843]"
-                        style={{ width: `${r.percent}%` }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
+            {/* By tier */}
+            <div className="bg-white rounded-2xl border border-gray-100 p-5">
+              <h3 className="font-semibold text-[#1B2A4A] mb-4">Applications by Tier</h3>
+              {appsByTier.length === 0 ? <p className="text-sm text-gray-400 py-8 text-center">No data</p> : (
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie data={appsByTier} cx="50%" cy="50%" innerRadius={50} outerRadius={90} paddingAngle={3} dataKey="value" label={({ name, value }) => `${name}: ${value}`}>
+                        {appsByTier.map((_, i) => <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />)}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+            </div>
 
-            {/* Collection Rate Trends */}
-            <motion.div variants={cardVariants} className="bg-white rounded-xl border border-gray-100 p-6">
-              <h3 className="text-sm font-semibold text-[#1B2A4A] mb-4 flex items-center gap-2">
-                <TrendingUp className="w-4 h-4" /> Collection Rate Trends (%)
-              </h3>
-              <div className="flex items-end gap-3 h-36">
-                {collectionRates.map((c, i) => (
-                  <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                    <span className="text-[10px] font-medium text-[#1B2A4A]">{c.rate}%</span>
-                    <div
-                      className="w-full bg-green-500 rounded-t-md transition-all"
-                      style={{ height: `${((c.rate - 90) / 5) * 100}%` }}
-                    />
-                    <span className="text-[9px] text-gray-400">{c.month}</span>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-3 pt-2 border-t border-gray-50 flex items-center justify-between text-xs">
-                <span className="text-gray-400">Target: 92%</span>
-                <span className="text-green-600 font-semibold flex items-center gap-1">
-                  <CheckCircle2 className="w-3 h-3" /> Above target
-                </span>
-              </div>
-            </motion.div>
-
-            {/* Outstanding & NPL */}
-            <motion.div variants={cardVariants} className="bg-white rounded-xl border border-gray-100 p-6">
-              <h3 className="text-sm font-semibold text-[#1B2A4A] mb-4 flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4" /> Outstanding & Risk Metrics
-              </h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 bg-gray-50 rounded-xl text-center">
-                  <p className="text-2xl font-bold text-[#1B2A4A]">$2.8M</p>
-                  <p className="text-[10px] text-gray-500 mt-1">Outstanding Amount</p>
+            {/* Timeline */}
+            <div className="bg-white rounded-2xl border border-gray-100 p-5 lg:col-span-2">
+              <h3 className="font-semibold text-[#1B2A4A] mb-4">Application Timeline</h3>
+              {appsByMonth.length === 0 ? <p className="text-sm text-gray-400 py-8 text-center">No data</p> : (
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={appsByMonth}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <XAxis dataKey="month" tick={{ fontSize: 11 }} />
+                      <YAxis tick={{ fontSize: 11 }} />
+                      <Tooltip />
+                      <Legend />
+                      <Bar dataKey="applied" fill="#3B82F6" radius={[4, 4, 0, 0]} name="Applied" />
+                      <Bar dataKey="approved" fill="#5DB347" radius={[4, 4, 0, 0]} name="Approved" />
+                      <Bar dataKey="rejected" fill="#EF4444" radius={[4, 4, 0, 0]} name="Rejected" />
+                    </BarChart>
+                  </ResponsiveContainer>
                 </div>
-                <div className="p-4 bg-gray-50 rounded-xl text-center">
-                  <p className="text-2xl font-bold text-[#8CB89C]">$4.2M</p>
-                  <p className="text-[10px] text-gray-500 mt-1">Total Deployed</p>
-                </div>
-                <div className="p-4 bg-green-50 rounded-xl text-center">
-                  <p className="text-2xl font-bold text-green-600">1.8%</p>
-                  <p className="text-[10px] text-green-500 mt-1">NPL Ratio</p>
-                </div>
-                <div className="p-4 bg-amber-50 rounded-xl text-center">
-                  <p className="text-2xl font-bold text-amber-600">$76K</p>
-                  <p className="text-[10px] text-amber-500 mt-1">Non-Performing</p>
-                </div>
-              </div>
-            </motion.div>
+              )}
+            </div>
           </div>
-        </motion.div>
+
+          {/* Application table */}
+          <div className="bg-white rounded-2xl border border-gray-100">
+            <div className="p-4 border-b border-gray-100 flex items-center justify-between">
+              <h3 className="font-semibold text-[#1B2A4A]">All Applications ({filteredApps.length})</h3>
+              <button onClick={() => exportCSV(filteredApps as unknown as Record<string, unknown>[], 'applications')} className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-700"><Download className="w-3.5 h-3.5" /> Export CSV</button>
+            </div>
+            <div className="overflow-x-auto max-h-96">
+              <table className="w-full text-sm">
+                <thead className="sticky top-0 bg-gray-50">
+                  <tr className="border-b border-gray-100">
+                    <th className="text-left py-2.5 px-4 text-xs font-medium text-gray-500">Name</th>
+                    <th className="text-left py-2.5 px-4 text-xs font-medium text-gray-500">Email</th>
+                    <th className="text-left py-2.5 px-4 text-xs font-medium text-gray-500">Country</th>
+                    <th className="text-left py-2.5 px-4 text-xs font-medium text-gray-500">Tier</th>
+                    <th className="text-left py-2.5 px-4 text-xs font-medium text-gray-500">Status</th>
+                    <th className="text-left py-2.5 px-4 text-xs font-medium text-gray-500">Date</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {filteredApps.slice(0, 100).map(a => (
+                    <tr key={a.id} className="hover:bg-gray-50">
+                      <td className="py-2.5 px-4 font-medium text-[#1B2A4A]">{a.full_name}</td>
+                      <td className="py-2.5 px-4 text-gray-500 text-xs">{a.email}</td>
+                      <td className="py-2.5 px-4 text-gray-500">{a.country}</td>
+                      <td className="py-2.5 px-4"><span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">{TIER_LABELS[a.requested_tier] || a.requested_tier}</span></td>
+                      <td className="py-2.5 px-4"><span className={`text-xs px-2 py-0.5 rounded-full font-medium ${a.status === 'approved' ? 'bg-green-100 text-green-700' : a.status === 'rejected' ? 'bg-red-100 text-red-600' : 'bg-amber-100 text-amber-700'}`}>{a.status}</span></td>
+                      <td className="py-2.5 px-4 text-gray-400 text-xs">{new Date(a.created_at).toLocaleDateString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       )}
 
-      {/* ===== OPERATIONS TAB ===== */}
-      {activeTab === 'operations' && (
-        <motion.div variants={containerVariants} initial="hidden" animate="show" className="space-y-6">
+      {/* ═══ FINANCIAL TAB ═══ */}
+      {!loading && tab === 'financial' && (
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="bg-white rounded-xl border border-gray-100 p-4 text-center">
+              <p className="text-xs font-medium text-gray-500">Total Payments</p>
+              <p className="text-3xl font-bold text-[#1B2A4A]">{payments.length}</p>
+            </div>
+            <div className="bg-white rounded-xl border border-gray-100 p-4 text-center">
+              <p className="text-xs font-medium text-gray-500">Total Revenue</p>
+              <p className="text-3xl font-bold text-[#5DB347]">{formatCurrency(payments.filter(p => p.status === 'completed').reduce((s, p) => s + (p.amount || 0), 0))}</p>
+            </div>
+            <div className="bg-white rounded-xl border border-gray-100 p-4 text-center">
+              <p className="text-xs font-medium text-gray-500">Pending</p>
+              <p className="text-3xl font-bold text-amber-600">{payments.filter(p => p.status === 'pending').length}</p>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl border border-gray-100 p-5">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-semibold text-[#1B2A4A]">Recent Payments</h3>
+              <button onClick={() => exportCSV(payments as unknown as Record<string, unknown>[], 'payments')} className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-700"><Download className="w-3.5 h-3.5" /> Export CSV</button>
+            </div>
+            {payments.length === 0 ? <p className="text-sm text-gray-400 py-8 text-center">No payment data yet</p> : (
+              <div className="overflow-x-auto max-h-96">
+                <table className="w-full text-sm">
+                  <thead className="sticky top-0 bg-gray-50">
+                    <tr className="border-b border-gray-100">
+                      <th className="text-left py-2.5 px-4 text-xs font-medium text-gray-500">Date</th>
+                      <th className="text-right py-2.5 px-4 text-xs font-medium text-gray-500">Amount</th>
+                      <th className="text-left py-2.5 px-4 text-xs font-medium text-gray-500">Type</th>
+                      <th className="text-left py-2.5 px-4 text-xs font-medium text-gray-500">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50">
+                    {payments.slice(0, 50).map(p => (
+                      <tr key={p.id} className="hover:bg-gray-50">
+                        <td className="py-2.5 px-4 text-gray-500 text-xs">{new Date(p.created_at).toLocaleDateString()}</td>
+                        <td className="py-2.5 px-4 text-right font-medium">{p.currency || 'USD'} {p.amount?.toLocaleString()}</td>
+                        <td className="py-2.5 px-4 text-gray-500">{p.type || 'payment'}</td>
+                        <td className="py-2.5 px-4"><span className={`text-xs px-2 py-0.5 rounded-full font-medium ${p.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>{p.status}</span></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ═══ TRADING TAB ═══ */}
+      {!loading && tab === 'trading' && (
+        <div className="space-y-6">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="bg-white rounded-xl border border-gray-100 p-4 text-center">
+              <p className="text-xs font-medium text-gray-500">Total Orders</p>
+              <p className="text-3xl font-bold text-[#1B2A4A]">{filteredTrades.length}</p>
+            </div>
+            <div className="bg-white rounded-xl border border-gray-100 p-4 text-center">
+              <p className="text-xs font-medium text-gray-500">Trade Volume</p>
+              <p className="text-3xl font-bold text-[#5DB347]">{formatCurrency(totalTradeVolume)}</p>
+            </div>
+            <div className="bg-white rounded-xl border border-gray-100 p-4 text-center">
+              <p className="text-xs font-medium text-gray-500">Open</p>
+              <p className="text-3xl font-bold text-blue-600">{tradesByStatus.open || 0}</p>
+            </div>
+            <div className="bg-white rounded-xl border border-gray-100 p-4 text-center">
+              <p className="text-xs font-medium text-gray-500">Completed</p>
+              <p className="text-3xl font-bold text-green-600">{tradesByStatus.completed || 0}</p>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Marketplace Metrics */}
-            <motion.div variants={cardVariants} className="bg-white rounded-xl border border-gray-100 p-6">
-              <h3 className="text-sm font-semibold text-[#1B2A4A] mb-4 flex items-center gap-2">
-                <Store className="w-4 h-4" /> Marketplace Metrics
-              </h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <p className="text-xs text-gray-500">Total Orders</p>
-                  <p className="text-xl font-bold text-[#1B2A4A] mt-1">{marketplaceMetrics.totalOrders.toLocaleString()}</p>
+            {/* By commodity */}
+            <div className="bg-white rounded-2xl border border-gray-100 p-5">
+              <h3 className="font-semibold text-[#1B2A4A] mb-4">Volume by Commodity (USD)</h3>
+              {tradesByComm.length === 0 ? <p className="text-sm text-gray-400 py-8 text-center">No trades</p> : (
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={tradesByComm} layout="vertical">
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <XAxis type="number" tick={{ fontSize: 11 }} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}K`} />
+                      <YAxis dataKey="name" type="category" tick={{ fontSize: 11 }} width={80} />
+                      <Tooltip formatter={(v) => formatCurrency(Number(v))} />
+                      <Bar dataKey="value" fill="#5DB347" radius={[0, 4, 4, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
                 </div>
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <p className="text-xs text-gray-500">GMV</p>
-                  <p className="text-xl font-bold text-[#8CB89C] mt-1">${(marketplaceMetrics.gmv / 1000000).toFixed(1)}M</p>
-                </div>
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <p className="text-xs text-gray-500">Avg Order Value</p>
-                  <p className="text-xl font-bold text-[#D4A843] mt-1">${marketplaceMetrics.avgOrderValue}</p>
-                </div>
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <p className="text-xs text-gray-500">Active Listings</p>
-                  <p className="text-xl font-bold text-[#1B2A4A] mt-1">{marketplaceMetrics.activeListings}</p>
-                </div>
-              </div>
-            </motion.div>
+              )}
+            </div>
 
-            {/* Logistics Metrics */}
-            <motion.div variants={cardVariants} className="bg-white rounded-xl border border-gray-100 p-6">
-              <h3 className="text-sm font-semibold text-[#1B2A4A] mb-4 flex items-center gap-2">
-                <Truck className="w-4 h-4" /> Logistics Metrics
-              </h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <p className="text-xs text-gray-500">Total Shipments</p>
-                  <p className="text-xl font-bold text-[#1B2A4A] mt-1">{logisticsMetrics.totalShipments}</p>
+            {/* By country */}
+            <div className="bg-white rounded-2xl border border-gray-100 p-5">
+              <h3 className="font-semibold text-[#1B2A4A] mb-4">Orders by Country</h3>
+              {tradesByCountry.length === 0 ? <p className="text-sm text-gray-400 py-8 text-center">No trades</p> : (
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={tradesByCountry}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <XAxis dataKey="name" tick={{ fontSize: 10 }} angle={-30} textAnchor="end" height={60} />
+                      <YAxis tick={{ fontSize: 11 }} />
+                      <Tooltip />
+                      <Bar dataKey="value" fill="#3B82F6" radius={[4, 4, 0, 0]}>
+                        {tradesByCountry.map((_, i) => <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />)}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
                 </div>
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <p className="text-xs text-gray-500">Avg Delivery (days)</p>
-                  <p className="text-xl font-bold text-[#8CB89C] mt-1">{logisticsMetrics.avgDeliveryDays}</p>
-                </div>
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <p className="text-xs text-gray-500">On-Time Rate</p>
-                  <p className="text-xl font-bold text-green-600 mt-1">{logisticsMetrics.onTimeRate}%</p>
-                </div>
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <p className="text-xs text-gray-500">In Transit</p>
-                  <p className="text-xl font-bold text-amber-600 mt-1">{logisticsMetrics.inTransit}</p>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Support Tickets */}
-            <motion.div variants={cardVariants} className="bg-white rounded-xl border border-gray-100 p-6">
-              <h3 className="text-sm font-semibold text-[#1B2A4A] mb-4 flex items-center gap-2">
-                <Headphones className="w-4 h-4" /> Support Tickets
-              </h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="p-3 bg-amber-50 rounded-lg">
-                  <p className="text-xs text-amber-600">Open Tickets</p>
-                  <p className="text-xl font-bold text-amber-700 mt-1">{supportMetrics.openTickets}</p>
-                </div>
-                <div className="p-3 bg-green-50 rounded-lg">
-                  <p className="text-xs text-green-600">Resolved (MTD)</p>
-                  <p className="text-xl font-bold text-green-700 mt-1">{supportMetrics.resolvedMtd}</p>
-                </div>
-                <div className="p-3 bg-blue-50 rounded-lg">
-                  <p className="text-xs text-blue-600">Avg Resolution (hrs)</p>
-                  <p className="text-xl font-bold text-blue-700 mt-1">{supportMetrics.avgResolutionHrs}</p>
-                </div>
-                <div className="p-3 bg-purple-50 rounded-lg">
-                  <p className="text-xs text-purple-600">Satisfaction</p>
-                  <p className="text-xl font-bold text-purple-700 mt-1">{supportMetrics.satisfaction}/5</p>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* System Uptime & Performance */}
-            <motion.div variants={cardVariants} className="bg-white rounded-xl border border-gray-100 p-6">
-              <h3 className="text-sm font-semibold text-[#1B2A4A] mb-4 flex items-center gap-2">
-                <Server className="w-4 h-4" /> System Uptime & Performance
-              </h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="p-3 bg-green-50 rounded-lg">
-                  <p className="text-xs text-green-600">Uptime</p>
-                  <p className="text-xl font-bold text-green-700 mt-1">{systemMetrics.uptime}%</p>
-                </div>
-                <div className="p-3 bg-blue-50 rounded-lg">
-                  <p className="text-xs text-blue-600">Response Time (ms)</p>
-                  <p className="text-xl font-bold text-blue-700 mt-1">{systemMetrics.responseTime}</p>
-                </div>
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <p className="text-xs text-gray-500">Error Rate</p>
-                  <p className="text-xl font-bold text-gray-700 mt-1">{systemMetrics.errorRate}%</p>
-                </div>
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <p className="text-xs text-gray-500">Active Connections</p>
-                  <p className="text-xl font-bold text-[#1B2A4A] mt-1">{systemMetrics.activeConnections}</p>
-                </div>
-              </div>
-            </motion.div>
+              )}
+            </div>
           </div>
-        </motion.div>
+
+          {/* Trades table */}
+          <div className="bg-white rounded-2xl border border-gray-100">
+            <div className="p-4 border-b border-gray-100 flex items-center justify-between">
+              <h3 className="font-semibold text-[#1B2A4A]">Trade Orders ({filteredTrades.length})</h3>
+              <button onClick={() => exportCSV(filteredTrades as unknown as Record<string, unknown>[], 'trades')} className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-700"><Download className="w-3.5 h-3.5" /> Export CSV</button>
+            </div>
+            <div className="overflow-x-auto max-h-96">
+              <table className="w-full text-sm">
+                <thead className="sticky top-0 bg-gray-50">
+                  <tr className="border-b border-gray-100">
+                    <th className="text-left py-2.5 px-4 text-xs font-medium text-gray-500">Order #</th>
+                    <th className="text-left py-2.5 px-4 text-xs font-medium text-gray-500">Type</th>
+                    <th className="text-left py-2.5 px-4 text-xs font-medium text-gray-500">Commodity</th>
+                    <th className="text-right py-2.5 px-4 text-xs font-medium text-gray-500">Qty</th>
+                    <th className="text-left py-2.5 px-4 text-xs font-medium text-gray-500">Country</th>
+                    <th className="text-right py-2.5 px-4 text-xs font-medium text-gray-500">Value</th>
+                    <th className="text-left py-2.5 px-4 text-xs font-medium text-gray-500">Status</th>
+                    <th className="text-left py-2.5 px-4 text-xs font-medium text-gray-500">Date</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {filteredTrades.slice(0, 100).map(t => (
+                    <tr key={t.id} className="hover:bg-gray-50">
+                      <td className="py-2.5 px-4 font-medium text-[#1B2A4A]">{t.order_number}</td>
+                      <td className="py-2.5 px-4"><span className={`text-xs px-2 py-0.5 rounded-full font-medium ${t.order_type === 'buy' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'}`}>{t.order_type}</span></td>
+                      <td className="py-2.5 px-4 text-gray-700">{t.commodity}</td>
+                      <td className="py-2.5 px-4 text-right">{t.quantity?.toLocaleString()}</td>
+                      <td className="py-2.5 px-4 text-gray-500">{t.country}</td>
+                      <td className="py-2.5 px-4 text-right font-medium">{formatCurrency(t.target_price * t.quantity)}</td>
+                      <td className="py-2.5 px-4"><span className={`text-xs px-2 py-0.5 rounded-full font-medium ${t.status === 'completed' ? 'bg-green-100 text-green-700' : t.status === 'open' ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700'}`}>{t.status}</span></td>
+                      <td className="py-2.5 px-4 text-gray-400 text-xs">{new Date(t.created_at).toLocaleDateString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       )}
-    </motion.div>
+    </div>
   );
 }
