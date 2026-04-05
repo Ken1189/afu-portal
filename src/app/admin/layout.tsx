@@ -80,6 +80,7 @@ import {
   Crown,
   Banknote,
   Mail,
+  Inbox,
 } from 'lucide-react';
 
 // ── Navigation structure with collapsible groups ──
@@ -107,7 +108,9 @@ const navGroups: NavGroup[] = [
     defaultOpen: true,
     links: [
       { href: '/admin', label: 'Dashboard', icon: <LayoutDashboard className={ICON_CLS} /> },
+      { href: '/admin/inbox', label: 'Inbox', icon: <Inbox className={ICON_CLS} /> },
       { href: '/admin/analytics', label: 'Analytics', icon: <TrendingUp className={ICON_CLS} /> },
+      { href: '/admin/automations', label: 'Automations', icon: <Zap className={ICON_CLS} /> },
     ],
   },
   {
