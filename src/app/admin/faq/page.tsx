@@ -169,6 +169,7 @@ export default function FaqAdmin() {
   };
 
   const handleDelete = async (id: string) => {
+    if (!window.confirm('Are you sure you want to delete this?')) return;
     const { error } = await supabase.from('faq_items').delete().eq('id', id);
     if (error) {
       setToast({ message: 'Failed to delete FAQ item', type: 'error' });

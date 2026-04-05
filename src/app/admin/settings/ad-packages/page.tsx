@@ -168,6 +168,7 @@ export default function AdPackagesConfig() {
   };
 
   const handleDelete = async (id: string) => {
+    if (!window.confirm('Are you sure you want to delete this?')) return;
     const { error } = await supabase.from('ad_packages').delete().eq('id', id);
     if (error) {
       setToast({ message: 'Failed to delete package', type: 'error' });

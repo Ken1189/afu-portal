@@ -137,6 +137,7 @@ export default function EquipmentRegistryPage() {
 
   const handleDelete = async (id: string) => {
     setDeleting(true);
+    if (!window.confirm('Are you sure you want to delete this?')) return;
     const { error } = await supabase.from('equipment').delete().eq('id', id);
     if (error) { setEquipment(prev => prev.filter(e => e.id !== id)); setToast({ message: 'Equipment removed (local)', type: 'success' }); }
     else { setToast({ message: 'Equipment deleted successfully', type: 'success' }); await fetchData(); }

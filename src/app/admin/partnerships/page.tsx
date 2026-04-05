@@ -192,6 +192,7 @@ export default function PartnershipsAdmin() {
   };
 
   const handleDelete = async (id: string) => {
+    if (!window.confirm('Are you sure you want to delete this?')) return;
     const { error } = await supabase.from('managed_partners').delete().eq('id', id);
     if (error) {
       setToast({ message: 'Failed to delete partner', type: 'error' });

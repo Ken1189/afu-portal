@@ -8,6 +8,7 @@ import {
   Search, Edit3, Trash2, Download, Calendar, DollarSign, Globe,
   Users, Building2, Award, Shield, ChevronRight, RefreshCw,
 } from 'lucide-react';
+import { useConfirm } from '@/components/ui/useConfirm';
 
 /* ─── Types ─── */
 interface Contract {
@@ -64,6 +65,7 @@ const COUNTRIES = ['Botswana', 'Ghana', 'Kenya', 'Mozambique', 'Nigeria', 'Sierr
 export default function AdminContractsPage() {
   const supabase = useMemo(() => createClient(), []);
   const { user } = useAuth();
+  const [ConfirmDialog, confirm] = useConfirm();
 
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [loading, setLoading] = useState(true);
@@ -182,12 +184,15 @@ export default function AdminContractsPage() {
   };
 
   const deleteContract = async (id: string) => {
+    const ok = await confirm('Delete Contract', 'This will permanently delete this contract. Are you sure?');
+    if (!ok) return;
     await supabase.from('contracts').delete().eq('id', id);
     setContracts(prev => prev.filter(c => c.id !== id));
   };
 
   return (
     <div className="space-y-6">
+      {ConfirmDialog}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-[#1B2A4A]">Contracts</h1>

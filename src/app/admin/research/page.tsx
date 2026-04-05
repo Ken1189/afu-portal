@@ -148,6 +148,7 @@ export default function AdminResearchPage() {
 
   const handleDelete = async (id: string) => {
     if (!confirm('Delete this research centre?')) return;
+    if (!window.confirm('Are you sure you want to delete this?')) return;
     const { error } = await supabase.from('research_centres').delete().eq('id', id);
     if (error) {
       showToast('Failed to delete', 'error');

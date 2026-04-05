@@ -261,6 +261,7 @@ export default function AdminTradingPage() {
   };
 
   const handleDeleteInventory = async (id: string) => {
+    if (!window.confirm('Delete this inventory position?')) return;
     setActionLoading(id);
     try {
       await supabase.from('inventory_positions').delete().eq('id', id);

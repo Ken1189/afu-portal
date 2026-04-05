@@ -181,6 +181,7 @@ export default function LivestockManagementPage() {
 
   const handleDelete = async (id: string) => {
     setDeleting(true);
+    if (!window.confirm('Are you sure you want to delete this?')) return;
     const { error } = await supabase.from('livestock').delete().eq('id', id);
     if (error) { setLivestockRecords(prev => prev.filter(l => l.id !== id)); setToast({ message: 'Record removed (local)', type: 'success' }); }
     else { setToast({ message: 'Record deleted successfully', type: 'success' }); await fetchData(); }

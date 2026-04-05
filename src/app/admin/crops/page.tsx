@@ -305,6 +305,7 @@ export default function CropManagementPage() {
 
   const handleDelete = async (id: string) => {
     setDeleting(true);
+    if (!window.confirm('Are you sure you want to delete this?')) return;
     const { error } = await supabase.from('farm_plots').delete().eq('id', id);
     if (error) {
       // Fallback: remove locally
