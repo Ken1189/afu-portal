@@ -20,7 +20,7 @@ export function getInitialGreeting(userName?: string): ChatMessage {
   return {
     id: generateMessageId(),
     role: 'bot',
-    text: `Hello ${name}! Welcome to AFU — Africa\u2019s Agriculture Development Platform. \ud83c\udf0d\n\nI can help you learn about our services, membership options, investment opportunities, and how AFU works.\n\nWhat would you like to know?`,
+    text: `Hi ${name}! I'm Amara, your AFU assistant. \ud83c\udf0d\n\nI can help you with membership, services, investment opportunities, and more.\n\nWhat would you like to know?`,
     suggestions: ['How does AFU work?', 'Membership options', 'Investment opportunity', 'Sponsor a farmer', 'Contact us', 'Our countries'],
     timestamp: new Date(),
   };

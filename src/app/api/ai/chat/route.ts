@@ -25,12 +25,13 @@ const BUSINESS_PROMPT =
 
 export async function POST(request: NextRequest) {
   try {
-    // S1.10: Auth guard — require authenticated user
-    const supabase = await createServerSupabaseClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
+    // Allow both authenticated and unauthenticated users (public chatbot)
+    let userId: string | null = null;
+    try {
+      const supabase = await createServerSupabaseClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      userId = user?.id || null;
+    } catch { /* public access OK */ }
 
     if (!GEMINI_API_KEY) {
       return NextResponse.json(
