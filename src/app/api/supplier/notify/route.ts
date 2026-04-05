@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
+import { createInboxConversation } from '@/lib/inbox/create-conversation';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM = 'African Farming Union <noreply@mail.africanfarmingunion.org>';
@@ -75,6 +76,13 @@ export async function POST(req: Request) {
         <div style="padding:20px;text-align:center;color:#999;font-size:12px">African Farming Union | Gaborone, Botswana<br>africanfarmingunion.org</div>
       </div>`,
     });
+
+    createInboxConversation({
+      name: contactName || company, email, phone, country, type: 'supplier',
+      subject: 'Supplier Application',
+      message: `Company: ${company}\nContact: ${contactName}\nCategory: ${category || 'N/A'}\nCountry: ${country || 'N/A'}\nWebsite: ${website || 'N/A'}\n\n${description || ''}`,
+      tags: ['supplier', 'application'], businessName: company,
+    }).catch(() => {});
 
     return NextResponse.json({ success: true });
   } catch (err) {

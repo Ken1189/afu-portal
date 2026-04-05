@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
+import { createInboxConversation } from '@/lib/inbox/create-conversation';
 
 // ── In-memory store (will be replaced with Supabase table) ────────────────
 interface InvestorExpression {
@@ -195,6 +196,18 @@ export async function POST(request: Request) {
       // Email sending failed — log but don't fail the request
       console.error('[express-interest] Email notification failed:', emailErr);
     }
+
+    // Create inbox conversation
+    createInboxConversation({
+      name: expression.investorName || expression.email,
+      email: expression.email,
+      phone: expression.phone,
+      type: 'investor',
+      subject: `Investor Interest: ${expression.opportunityName}`,
+      message: `Investor: ${expression.investorName}\nEntity: ${expression.entityName || 'N/A'}\nOpportunity: ${expression.opportunityName}\nAmount: $${expression.amount?.toLocaleString() || 'N/A'}\n\n${expression.notes || ''}`,
+      tags: ['investor', 'interest'],
+      businessName: expression.entityName,
+    }).catch(() => {});
 
     return NextResponse.json({
       success: true,

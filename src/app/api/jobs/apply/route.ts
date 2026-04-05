@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
+import { createInboxConversation } from '@/lib/inbox/create-conversation';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM = 'African Farming Union <noreply@mail.africanfarmingunion.org>';
@@ -241,6 +242,14 @@ export async function POST(req: Request) {
     } catch (emailErr) {
       console.error('[applicant auto-reply email]', emailErr);
     }
+
+    // Create inbox conversation
+    createInboxConversation({
+      name: full_name, email, phone, type: 'lead',
+      subject: `Job Application: ${job_title}`,
+      message: `Applied for: ${job_title}\nCV: ${cv_url || 'Not uploaded'}\n\n${cover_message}`,
+      tags: ['job-application', 'recruitment'],
+    }).catch(() => {});
 
     return NextResponse.json({
       success: true,

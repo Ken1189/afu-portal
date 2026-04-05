@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
+import { createInboxConversation } from '@/lib/inbox/create-conversation';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM = 'African Farming Union <noreply@mail.africanfarmingunion.org>';
@@ -209,6 +210,13 @@ export async function POST(req: NextRequest) {
         </div>`,
       });
     } catch { /* non-critical */ }
+
+    createInboxConversation({
+      name: body.sponsor_name, email: body.sponsor_email, type: 'investor',
+      subject: `Sponsorship: ${body.tier} — $${body.amount_usd}`,
+      message: `New sponsorship!\nTier: ${body.tier}\nAmount: $${body.amount_usd} (${body.billing_cycle})\nCompany: ${body.sponsor_company || 'N/A'}\nCountry: ${body.sponsor_country || 'N/A'}`,
+      tags: ['sponsorship', body.tier], businessName: body.sponsor_company, country: body.sponsor_country,
+    }).catch(() => {});
 
     return NextResponse.json({
       success: true,
