@@ -229,7 +229,7 @@ export default function LoginPage() {
       >
         {/* Background image */}
         <Image
-          src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=1200&h=1800&fit=crop"
+          src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=1200&h=1800&fit=crop"
           alt="African farming landscape"
           fill
           className="object-cover"

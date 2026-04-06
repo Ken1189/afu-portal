@@ -102,7 +102,7 @@ export default function InputsServicePage() {
           className="absolute inset-0 bg-cover bg-center"
           style={{
             backgroundImage:
-              "url('https://images.unsplash.com/photo-1473172707857-f9e276582ab6?w=1920&h=1080&fit=crop')",
+              "url('https://images.unsplash.com/photo-1509391366360-2e959784a276?w=1920&h=1080&fit=crop')",
           }}
         />
         <div

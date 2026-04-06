@@ -44,10 +44,10 @@ const FALLBACK_FARMERS: FarmerProfile[] = [
     farm_description:
       'A 4.5-hectare dryland farm on the banks of the Manyame River, planted with hybrid maize, groundnuts and a market garden of tomatoes and leafy greens.',
     photo_urls: [
-      'https://picsum.photos/seed/grace2/400/400',
-      'https://picsum.photos/seed/grace3/400/400',
+      'https://images.unsplash.com/photo-1546484958-7ee64d4dd76e?w=800&h=500&fit=crop',
+      'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800&h=500&fit=crop',
     ],
-    hero_photo_url: 'https://picsum.photos/seed/grace1/900/400',
+    hero_photo_url: 'https://images.unsplash.com/photo-1601648764658-cf37e8c89b70?w=1200&h=600&fit=crop',
     country: 'Zimbabwe',
     region: 'Mashonaland West',
     crops: ['Maize', 'Groundnuts', 'Vegetables'],
@@ -74,10 +74,10 @@ const FALLBACK_FARMERS: FarmerProfile[] = [
     farm_description:
       'A 7-hectare highland farm at 1,900m elevation. Tea rows inter-planted with Hass avocado trees. Water from a nearby stream powers a small drip irrigation system.',
     photo_urls: [
-      'https://picsum.photos/seed/joseph2/400/400',
-      'https://picsum.photos/seed/joseph3/400/400',
+      'https://images.unsplash.com/photo-1591282916091-9e35a7b6e9e6?w=800&h=500&fit=crop',
+      'https://images.unsplash.com/photo-1447933601403-56dc2df1ed5a?w=800&h=500&fit=crop',
     ],
-    hero_photo_url: 'https://picsum.photos/seed/joseph1/900/400',
+    hero_photo_url: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=1200&h=600&fit=crop',
     country: 'Kenya',
     region: 'Kisii County',
     crops: ['Tea', 'Avocado'],
@@ -104,9 +104,9 @@ const FALLBACK_FARMERS: FarmerProfile[] = [
     farm_description:
       'A 3-hectare paddy in the Kilombero floodplain. I use a combination of rain-fed and supplemental irrigation. Paddy is milled locally and sold to the regional food bank.',
     photo_urls: [
-      'https://picsum.photos/seed/amina2/400/400',
+      'https://images.unsplash.com/photo-1622383563227-04401ab4e5ea?w=800&h=500&fit=crop',
     ],
-    hero_photo_url: 'https://picsum.photos/seed/amina1/900/400',
+    hero_photo_url: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=1200&h=600&fit=crop',
     country: 'Tanzania',
     region: 'Morogoro',
     crops: ['Rice'],
@@ -128,10 +128,10 @@ const FALLBACK_FARMERS: FarmerProfile[] = [
     farm_description:
       'A 120-hectare cattle post with borehole water supply and 6 paddocks under rotational grazing. Herd size: 84 cattle and 230 goats.',
     photo_urls: [
-      'https://picsum.photos/seed/sipho2/400/400',
-      'https://picsum.photos/seed/sipho3/400/400',
+      'https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?w=800&h=500&fit=crop',
+      'https://images.unsplash.com/photo-1524024973431-2ad916746264?w=800&h=500&fit=crop',
     ],
-    hero_photo_url: 'https://picsum.photos/seed/sipho1/900/400',
+    hero_photo_url: 'https://images.unsplash.com/photo-1500595046743-cd271d694d30?w=1200&h=600&fit=crop',
     country: 'Botswana',
     region: 'Central District',
     crops: ['Livestock'],
@@ -158,9 +158,9 @@ const FALLBACK_FARMERS: FarmerProfile[] = [
     farm_description:
       'A 6-hectare rain-fed farm focused on soybean rotation with maize. I also run an informal grain bank for 12 local women smallholders, buying and storing at harvest and selling at higher dry-season prices.',
     photo_urls: [
-      'https://picsum.photos/seed/fatima2/400/400',
+      'https://images.unsplash.com/photo-1593113598332-cd288d649433?w=800&h=500&fit=crop',
     ],
-    hero_photo_url: 'https://picsum.photos/seed/fatima1/900/400',
+    hero_photo_url: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1200&h=600&fit=crop',
     country: 'Zambia',
     region: 'Eastern Province',
     crops: ['Soybean', 'Maize'],
@@ -182,10 +182,10 @@ const FALLBACK_FARMERS: FarmerProfile[] = [
     farm_description:
       'A 10-hectare cassava plantation using TMS improved varieties. A small processing shed produces dry chips and flour for biscuit manufacturers in Enugu and Onitsha.',
     photo_urls: [
-      'https://picsum.photos/seed/emeka2/400/400',
-      'https://picsum.photos/seed/emeka3/400/400',
+      'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=800&h=500&fit=crop',
+      'https://images.unsplash.com/photo-1605000797499-95a51c5269ae?w=800&h=500&fit=crop',
     ],
-    hero_photo_url: 'https://picsum.photos/seed/emeka1/900/400',
+    hero_photo_url: 'https://images.unsplash.com/photo-1606312619070-d48b4c652a52?w=1200&h=600&fit=crop',
     country: 'Nigeria',
     region: 'Enugu State',
     crops: ['Cassava'],

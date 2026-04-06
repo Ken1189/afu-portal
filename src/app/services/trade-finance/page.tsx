@@ -102,7 +102,7 @@ export default function TradeFinanceServicePage() {
           className="absolute inset-0 bg-cover bg-center"
           style={{
             backgroundImage:
-              "url('https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?w=1920&h=1080&fit=crop')",
+              "url('https://images.unsplash.com/photo-1530267981375-f0de937f5f13?w=1920&h=1080&fit=crop')",
           }}
         />
         <div

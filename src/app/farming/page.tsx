@@ -44,7 +44,7 @@ export const metadata: Metadata = {
     url: "https://africanfarmersunion.org/farming",
     images: [
       {
-        url: "https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=1200&h=630&fit=crop",
+        url: "https://images.unsplash.com/photo-1516467508483-a7212febe31a?w=1200&h=630&fit=crop",
         width: 1200,
         height: 630,
         alt: "African farming landscape",
@@ -63,7 +63,7 @@ const sectors = [
     accent: "#5DB347",
     accentBg: "rgba(93,179,71,0.1)",
     image:
-      "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600&h=400&fit=crop",
     description:
       "From staple grains to high-value export crops, AFU supports farmers cultivating over 50 crop types across 9 African countries. Access premium seeds, modern techniques, and guaranteed market channels.",
   },
@@ -572,7 +572,7 @@ export default function FarmingPage() {
           </div>
           <div className="relative">
             <img
-              src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&h=500&fit=crop"
+              src="https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?w=600&h=500&fit=crop"
               alt="Sustainable farming in Africa"
               className="rounded-2xl shadow-lg w-full object-cover"
             />

@@ -212,7 +212,7 @@ function DesktopServicesDropdown({ openDropdown, handleMouseEnter, handleMouseLe
             exit="exit"
             transition={{ duration: 0.15 }}
             className="absolute top-full left-0 mt-1 bg-white rounded-xl shadow-xl border border-gray-100 py-4 px-2 z-50"
-            style={{ width: '680px' }}
+            style={{ width: '720px' }}
             onMouseEnter={() => handleMouseEnter?.("services")}
             onMouseLeave={handleMouseLeave}
           >
@@ -677,62 +677,13 @@ export default function Navbar() {
               </AnimatePresence>
             </div>
 
-            {/* Services Mega Dropdown */}
-            <div
-              className="relative"
-              onMouseEnter={() => handleMouseEnter("services")}
-              onMouseLeave={handleMouseLeave}
-            >
-              <button
-                className={`flex items-center gap-1 text-sm font-medium px-3 py-2 rounded-lg transition-colors ${
-                  openDropdown === "services"
-                    ? "text-[#5DB347] bg-[#EBF7E5]/50"
-                    : "text-navy hover:text-[#5DB347] hover:bg-[#EBF7E5]/50"
-                }`}
-                onClick={() =>
-                  setOpenDropdown(
-                    openDropdown === "services" ? null : "services"
-                  )
-                }
-              >
-                Services
-                <ChevronDown
-                  className={`w-4 h-4 transition-transform ${
-                    openDropdown === "services" ? "rotate-180" : ""
-                  }`}
-                />
-              </button>
-
-              <AnimatePresence>
-                {openDropdown === "services" && (
-                  <motion.div
-                    variants={dropdownVariants}
-                    initial="hidden"
-                    animate="visible"
-                    exit="exit"
-                    transition={{ duration: 0.15 }}
-                    className="absolute top-full left-0 mt-1 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
-                    onMouseEnter={() => handleMouseEnter("services")}
-                    onMouseLeave={handleMouseLeave}
-                  >
-                    {moreServicesLinks.map((link) => {
-                      const Icon = link.icon;
-                      return (
-                        <Link
-                          key={link.href}
-                          href={link.href}
-                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-navy hover:bg-[#EBF7E5] hover:text-[#5DB347] transition-colors"
-                          onClick={() => setOpenDropdown(null)}
-                        >
-                          <Icon className="w-4 h-4 text-gray-400" />
-                          {link.label}
-                        </Link>
-                      );
-                    })}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+            {/* Services Mega Dropdown (3 columns: Finance / Insurance / More) */}
+            <DesktopServicesDropdown
+              openDropdown={openDropdown}
+              handleMouseEnter={handleMouseEnter}
+              handleMouseLeave={handleMouseLeave}
+              setOpenDropdown={setOpenDropdown}
+            />
 
             {/* Clean nav: 3 links + 1 dropdown */}
             <Link
@@ -1125,48 +1076,12 @@ export default function Navbar() {
                   </AnimatePresence>
                 </div>
 
-                {/* Services Accordion (fallback) */}
-                <div>
-                  <button
-                    className="flex items-center justify-between w-full text-navy text-base font-medium py-3 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors"
-                    onClick={() => setMobileServicesOpen(!mobileServicesOpen)}
-                  >
-                    Services
-                    <ChevronDown
-                      className={`w-5 h-5 transition-transform ${
-                        mobileServicesOpen ? "rotate-180" : ""
-                      }`}
-                    />
-                  </button>
-                  <AnimatePresence>
-                    {mobileServicesOpen && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.2 }}
-                        className="overflow-hidden"
-                      >
-                        <div className="pl-4 py-1 space-y-0.5">
-                          {moreServicesLinks.map((link) => {
-                            const Icon = link.icon;
-                            return (
-                              <Link
-                                key={link.href}
-                                href={link.href}
-                                className="flex items-center gap-3 text-navy/70 hover:text-[#5DB347] text-sm py-2.5 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors"
-                                onClick={closeMobile}
-                              >
-                                <Icon className="w-4 h-4" />
-                                {link.label}
-                              </Link>
-                            );
-                          })}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
+                {/* Services Accordion (fallback) — 3 sections: Finance / Insurance / More */}
+                <MobileServicesSection
+                  mobileServicesOpen={mobileServicesOpen}
+                  setMobileServicesOpen={setMobileServicesOpen}
+                  closeMobile={closeMobile}
+                />
 
                 {/* Clean mobile nav */}
                 <Link

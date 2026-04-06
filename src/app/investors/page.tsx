@@ -64,7 +64,7 @@ export default function InvestorsPage() {
       <section className="relative min-h-[85vh] flex items-center overflow-hidden">
         <div className="absolute inset-0">
           <Image
-            src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1920&q=80"
+            src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1920&q=80"
             alt=""
             fill
             className="object-cover"
@@ -166,7 +166,7 @@ export default function InvestorsPage() {
           <VideoCard
             title="AFU Investment Thesis"
             duration="5 min"
-            thumbnailUrl="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1200&h=675&fit=crop"
+            thumbnailUrl="https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1200&h=675&fit=crop"
             size="large"
           />
         </div>

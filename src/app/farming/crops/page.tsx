@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     url: 'https://africanfarmingunion.org/farming/crops',
     images: [
       {
-        url: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1200&h=630&fit=crop',
+        url: 'https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=1200&h=630&fit=crop',
         width: 1200,
         height: 630,
         alt: 'African agriculture — crops and farming',
@@ -47,7 +47,7 @@ export default function CropsPage() {
       <section className="relative overflow-hidden bg-navy text-white">
         <div className="absolute inset-0">
           <Image
-            src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1600&q=80"
+            src="https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=1600&q=80"
             alt="African farmland stretching to the horizon"
             fill
             className="object-cover opacity-25"

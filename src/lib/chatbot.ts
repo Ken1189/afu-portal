@@ -70,7 +70,7 @@ export async function getChatResponse(
   // --- How AFU works ---
   if (/how.*work|what.*do|what.*afu|about.*afu|tell.*more/.test(lowerMessage)) {
     return {
-      text: "AFU is a vertically integrated agriculture development platform. We connect farmers to everything they need:\n\n\u2022 **Financing** \u2014 Working capital, input finance, trade finance (SBLCs via our banking partners)\n\u2022 **Inputs** \u2014 Seeds, fertilizer, equipment at bulk pricing\n\u2022 **Insurance** \u2014 Crop, livestock, equipment (underwritten by Lloyd's of London)\n\u2022 **Off-take** \u2014 Guaranteed buyers for your harvest\n\u2022 **Training** \u2014 AI-powered advisory and progressive certification\n\u2022 **Trade Finance** \u2014 SBLCs and Letters of Credit for export\n\nWe operate across Africa. Visit /services to learn more.",
+      text: "AFU is building Africa's integrated agriculture platform. We're developing services to connect farmers with what they need:\n\n\u2022 **Financing** \u2014 Working capital and input finance\n\u2022 **Inputs & Equipment** \u2014 Seeds, fertilizer, machinery\n\u2022 **Insurance** \u2014 Crop, livestock, and equipment cover (in development)\n\u2022 **Market Access** \u2014 Connecting farmers to buyers\n\u2022 **Training** \u2014 Capacity building and AI advisory\n\u2022 **Veterinary & Legal** \u2014 Professional support services\n\u2022 **Trade Finance** \u2014 SBLCs and Letters of Credit (operating model)\n\nWe operate across 9 African countries. Visit /services to learn more.",
       suggestions: ['Membership options', 'Our services', 'Which countries?', 'Apply now'],
     };
   }
@@ -78,7 +78,7 @@ export async function getChatResponse(
   // --- Membership ---
   if (/member|join|sign\s*up|register|tier|pricing|cost|how\s*much/.test(lowerMessage)) {
     return {
-      text: "AFU offers five membership tiers:\n\n\u2022 **Smallholder** \u2014 $50/year \u2014 Platform access, training, AI advisory, market prices\n\u2022 **Commercial Bronze** \u2014 $500/year \u2014 Discounted inputs, market access, basic trade finance\n\u2022 **Commercial Gold** \u2014 $5,000/year \u2014 Equipment leasing, 15% insurance discounts, dedicated advisor\n\u2022 **Commercial Platinum** \u2014 $10,000+/year \u2014 Legal support, off-take priority, farm manager visits\n\u2022 **Partner/Vendor** \u2014 $2,500+/year \u2014 Directory listing, co-branded programs\n\nVisit /memberships for full details or /apply to get started.",
+      text: "AFU offers five membership tiers:\n\n\u2022 **Free** \u2014 Basic platform access\n\u2022 **Smallholder** \u2014 $4.99/month \u2014 For individual smallholder farmers\n\u2022 **Commercial** \u2014 $49/month \u2014 For commercial farming operations\n\u2022 **Enterprise** \u2014 $499/month \u2014 For large agribusinesses\n\u2022 **Partner** \u2014 By application \u2014 For suppliers and service providers\n\nVisit /memberships for full details or /apply to get started.",
       suggestions: ['Apply now', 'Compare tiers', 'Contact us'],
     };
   }
@@ -86,40 +86,40 @@ export async function getChatResponse(
   // --- Investment ---
   if (/invest|investor|return|roi|fund|capital|seed\s*round|equity/.test(lowerMessage)) {
     return {
-      text: "AFU is raising a $500M seed round with three investor tiers:\n\n\u2022 **Seed Investor** ($1M min) \u2014 8% target annual return\n\u2022 **Growth Partner** ($10M min) \u2014 10% target return + board observer\n\u2022 **Strategic Partner** ($100M min) \u2014 13% target return + board seat + co-investment rights\n\nReturns paid quarterly via revenue participation notes.\n\nVisit /investors for the full opportunity, or /contact?subject=investor to request the investor pack.",
-      suggestions: ['Investor page', 'Request investor pack', 'View demo'],
+      text: "AFU is building Africa's integrated agriculture platform and welcomes conversations with mission-aligned investors.\n\nFor investment inquiries, please visit /contact?subject=investor or email info@africanfarmingunion.org and our team will share current opportunities directly.",
+      suggestions: ['Contact us', 'Our services', 'Our countries'],
     };
   }
 
   // --- Sponsorship ---
   if (/sponsor|donate|support.*farmer|give|help.*farmer|philanthropy/.test(lowerMessage)) {
     return {
-      text: "You can sponsor an African farmer directly through AFU. Your contribution covers their membership, inputs, and program access \u2014 and you'll receive monthly updates as their season unfolds.\n\nVisit /sponsor to meet our farmers and choose who to support. Every dollar makes a measurable difference.\n\n10% of all AFU profits go to community programs: Women in Agriculture, Feed a Child, and Young Farmers.",
-      suggestions: ['Sponsor a farmer', 'Meet our farmers', 'Our impact'],
+      text: "You can support African farmers through AFU's sponsorship program. Contributions help cover membership, inputs, and program access for smallholder farmers across our operating countries.\n\nVisit /sponsor to learn more, or /contact to get in touch with our team.",
+      suggestions: ['Sponsor a farmer', 'Our countries', 'Contact us'],
     };
   }
 
   // --- Insurance ---
   if (/insurance|insure|cover|protect|lloyd|risk/.test(lowerMessage)) {
     return {
-      text: "AFU offers 10 insurance products underwritten by Lloyd's of London:\n\n\u2022 Crop Insurance\n\u2022 Livestock Insurance\n\u2022 Equipment Insurance\n\u2022 Farm Property Insurance\n\u2022 Trade Insurance\n\u2022 Life & Personal Insurance\n\u2022 Vehicle Insurance\n\u2022 Medical Insurance\n\u2022 Pension & Retirement\n\u2022 Asset Insurance\n\nVisit /services/insurance to explore all products.",
-      suggestions: ['Crop insurance', 'All insurance products', 'Get a quote'],
+      text: "AFU is developing a range of insurance products for farmers, including crop, livestock, equipment, and farm property cover. These products are currently in development and we haven't announced an underwriter yet.\n\nVisit /services/insurance for updates, or /contact to register interest.",
+      suggestions: ['Our services', 'Contact us', 'Apply now'],
     };
   }
 
   // --- Trade Finance ---
   if (/trade\s*finance|sblc|letter\s*of\s*credit|export|import|warehouse\s*receipt/.test(lowerMessage)) {
     return {
-      text: "AFU provides trade finance via our banking partners:\n\n\u2022 **Standby Letters of Credit (SBLCs)** \u2014 Guarantee your export deals\n\u2022 **Documentary Credits** \u2014 Secure international trade payments\n\u2022 **Export Pre-Financing** \u2014 Capital before shipment\n\u2022 **Warehouse Receipt Finance** \u2014 Borrow against stored commodity\n\u2022 **Foreign Exchange** \u2014 Competitive rates across African currencies\n\nVisit /services/finance/trade-finance for details.",
-      suggestions: ['Trade finance page', 'Apply now', 'Contact us'],
+      text: "Trade finance is part of AFU's operating model. Instruments we're building toward include:\n\n\u2022 **Standby Letters of Credit (SBLCs)**\n\u2022 **Documentary Credits**\n\u2022 **Export Pre-Financing**\n\u2022 **Warehouse Receipt Finance**\n\nThese are offered as a model for how AFU will support farmers and agribusinesses. Visit /services or /contact for current status.",
+      suggestions: ['Our services', 'Contact us', 'Apply now'],
     };
   }
 
   // --- Countries ---
-  if (/countr|where|africa|zimbabwe|uganda|kenya|nigeria|ghana|tanzania|zambia|mozambique|botswana|south\s*africa|sierra\s*leone|egypt|ethiopia|malawi|namibia|guinea|liberia|mali|ivory\s*coast|c[oô]te/.test(lowerMessage)) {
+  if (/countr|where|africa|zimbabwe|uganda|kenya|nigeria|ghana|tanzania|zambia|mozambique|botswana|south\s*africa/.test(lowerMessage)) {
     return {
-      text: "AFU operates across Africa:\n\n**Live:** Botswana, Zimbabwe, Tanzania, Kenya, South Africa\n**Pilot:** Nigeria, Zambia, Mozambique, Uganda\n**Planned:** Sierra Leone, Egypt, Ethiopia, Malawi, Namibia, Ghana, Republic of Guinea, Guinea-Bissau, Liberia, Mali, Ivory Coast\n\nEach country has a dedicated team, local partnerships, and country-specific programs. Zimbabwe is our flagship market with the blueberry export project and Watson & Fine showcase farm.\n\nVisit /countries to explore each market.",
-      suggestions: ['Zimbabwe', 'Uganda', 'All countries', 'Our programs'],
+      text: "AFU operates across 9 African countries:\n\nZimbabwe, Botswana, Kenya, Tanzania, South Africa, Nigeria, Ghana, Uganda, Zambia, and Mozambique.\n\nWe're building local infrastructure and partnerships in each market. Visit /countries to learn more.",
+      suggestions: ['Our services', 'Membership options', 'Contact us'],
     };
   }
 
@@ -134,8 +134,8 @@ export async function getChatResponse(
   // --- Contact ---
   if (/contact|email|phone|reach|talk|speak|call/.test(lowerMessage)) {
     return {
-      text: "You can reach AFU through:\n\n\u2022 **Contact Form** \u2014 /contact\n\u2022 **Investor Inquiries** \u2014 /contact?subject=investor\n\u2022 **Membership** \u2014 /apply\n\u2022 **Sponsorship** \u2014 /sponsor\n\nOur team responds within 24 hours.",
-      suggestions: ['Contact form', 'Apply now', 'Investor inquiry'],
+      text: "You can reach AFU through:\n\n\u2022 **Email** \u2014 info@africanfarmingunion.org\n\u2022 **Twitter** \u2014 @UnionAfric82069\n\u2022 **Contact Form** \u2014 /contact\n\u2022 **Membership** \u2014 /apply\n\u2022 **Sponsorship** \u2014 /sponsor\n\nOur team aims to respond within 1-2 business days.",
+      suggestions: ['Contact form', 'Apply now', 'Membership options'],
     };
   }
 
@@ -157,7 +157,7 @@ export async function getChatResponse(
 
   // --- Default ---
   return {
-    text: "I can help you learn about AFU. Here are some topics:\n\n\u2022 How AFU works\n\u2022 Membership tiers and pricing\n\u2022 Investment opportunities ($500M seed round)\n\u2022 Insurance products (Lloyd's of London)\n\u2022 Trade finance (SBLCs, Letters of Credit)\n\u2022 Our African countries\n\u2022 Sponsoring a farmer\n\u2022 Jobs marketplace\n\nWhat would you like to know?",
-    suggestions: ['How does AFU work?', 'Membership options', 'Investment opportunity', 'Insurance', 'Trade finance', 'Contact us'],
+    text: "I can help you learn about AFU. Here are some topics:\n\n\u2022 How AFU works\n\u2022 Membership tiers and pricing\n\u2022 Our services (financing, insurance, training, market access)\n\u2022 Trade finance model\n\u2022 Our 9 operating countries across Africa\n\u2022 Sponsoring a farmer\n\u2022 Jobs marketplace\n\nWhat would you like to know?",
+    suggestions: ['How does AFU work?', 'Membership options', 'Our services', 'Our countries', 'Contact us'],
   };
 }

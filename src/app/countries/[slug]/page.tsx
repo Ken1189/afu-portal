@@ -34,7 +34,7 @@ const FALLBACK_COUNTRIES: CountryData[] = [
     slug: "botswana",
     flag: "",
     role: "Institutional Base & Bank HQ",
-    heroImage: "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=1600&q=80",
+    heroImage: "https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?w=1600&q=80",
     description:
       "Botswana serves as AFU's institutional base, providing a stable regulatory environment for our banking licence pathway. With Africa's strongest governance record and a growing agricultural sector, Botswana anchors the AFU platform with credibility and compliance infrastructure.",
     stats: {
@@ -202,7 +202,7 @@ const FALLBACK_COUNTRIES: CountryData[] = [
     slug: "zambia",
     flag: "",
     role: "Processing Hub",
-    heroImage: "https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?w=1600&q=80",
+    heroImage: "https://images.unsplash.com/photo-1523805009345-7448845a9e53?w=1600&q=80",
     description:
       "Zambia is AFU's processing hub, with established grain milling, soya processing, and value-addition capacity serving the Southern African region. A stable policy environment and strong agricultural traditions make Zambia ideal for post-harvest infrastructure investment.",
     stats: {
@@ -235,7 +235,7 @@ const FALLBACK_COUNTRIES: CountryData[] = [
     slug: "mozambique",
     flag: "",
     role: "Southern Corridor",
-    heroImage: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1600&q=80",
+    heroImage: "https://images.unsplash.com/photo-1606312619070-d48b4c652a52?w=1600&q=80",
     description:
       "Mozambique provides strategic port access for Southern African agricultural trade through the Port of Maputo. With significant cashew, maize, and cassava production, Mozambique connects landlocked SADC countries to global markets.",
     stats: {
@@ -270,7 +270,7 @@ const FALLBACK_COUNTRIES: CountryData[] = [
     slug: "south-africa",
     flag: "",
     role: "Financial Hub",
-    heroImage: "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=1600&q=80",
+    heroImage: "https://images.unsplash.com/photo-1500595046743-cd271d694d30?w=1600&q=80",
     description:
       "South Africa anchors AFU's financial infrastructure with the continent's most advanced banking system, agricultural insurance market, and institutional capital access. The country's commercial farming scale and sophisticated financial services ecosystem make it central to AFU's development finance model.",
     stats: {
@@ -373,7 +373,7 @@ const FALLBACK_COUNTRIES: CountryData[] = [
     slug: "sierra-leone",
     flag: "",
     role: "West African Agriculture Revival",
-    heroImage: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1600&q=80",
+    heroImage: "https://images.unsplash.com/photo-1504370805625-d32c54b16100?w=1600&q=80",
     description:
       "Sierra Leone is an emerging agricultural market with strong potential in rice, cocoa, and palm oil production. AFU is building partnerships to support farmer cooperatives and drive post-conflict agricultural revival across the country.",
     stats: {
@@ -405,7 +405,7 @@ const FALLBACK_COUNTRIES: CountryData[] = [
     slug: "egypt",
     flag: "",
     role: "North African Agri Powerhouse",
-    heroImage: "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=1600&q=80",
+    heroImage: "https://images.unsplash.com/photo-1605000797499-95a51c5269ae?w=1600&q=80",
     description:
       "Egypt is Africa's largest agricultural economy with advanced irrigation infrastructure along the Nile. A strategic gateway to Middle Eastern and European export markets, Egypt offers established agri-finance systems and a large domestic market.",
     stats: {
@@ -438,7 +438,7 @@ const FALLBACK_COUNTRIES: CountryData[] = [
     slug: "ethiopia",
     flag: "",
     role: "Coffee Origin & Highland Agriculture",
-    heroImage: "https://images.unsplash.com/photo-1523805009345-7448845a9e53?w=1600&q=80",
+    heroImage: "https://images.unsplash.com/photo-1447933601403-56dc2df1ed5a?w=1600&q=80",
     description:
       "Ethiopia is the birthplace of coffee and Africa's second most populous nation. With a massive smallholder farming base and growing commercial agriculture sector, Ethiopia offers enormous scale potential for AFU's integrated platform.",
     stats: {
@@ -471,7 +471,7 @@ const FALLBACK_COUNTRIES: CountryData[] = [
     slug: "malawi",
     flag: "",
     role: "Warm Heart of Africa",
-    heroImage: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1600&q=80",
+    heroImage: "https://images.unsplash.com/photo-1530267981375-f0de937f5f13?w=1600&q=80",
     description:
       "Malawi presents a tobacco diversification opportunity alongside growing tea, sugar, and legume sectors. A strong NGO ecosystem supporting smallholder development makes it ideal for AFU's cooperative-led model.",
     stats: {
@@ -504,7 +504,7 @@ const FALLBACK_COUNTRIES: CountryData[] = [
     slug: "namibia",
     flag: "",
     role: "Southern African Livestock & Horticulture",
-    heroImage: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1600&q=80",
+    heroImage: "https://images.unsplash.com/photo-1484557985045-edf25e08da73?w=1600&q=80",
     description:
       "Namibia offers premium beef exports and an emerging horticulture sector. A stable economy with strong governance and trade links to South Africa and the EU makes it a reliable market for AFU's expansion.",
     stats: {
@@ -537,7 +537,7 @@ const FALLBACK_COUNTRIES: CountryData[] = [
     slug: "republic-of-guinea",
     flag: "",
     role: "West African Mining-to-Agriculture Transition",
-    heroImage: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1600&q=80",
+    heroImage: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=1600&q=80",
     description:
       "Guinea has rich agricultural potential in rice, cassava, and tropical fruits. AFU aims to support the country's diversification away from mining dependency through farmer cooperatives and input finance.",
     stats: {
@@ -569,7 +569,7 @@ const FALLBACK_COUNTRIES: CountryData[] = [
     slug: "guinea-bissau",
     flag: "",
     role: "Cashew Capital of West Africa",
-    heroImage: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1600&q=80",
+    heroImage: "https://images.unsplash.com/photo-1523805009345-7448845a9e53?w=1600&q=80",
     description:
       "Guinea-Bissau is the world's fifth-largest cashew producer, with agriculture as the backbone of the economy. AFU sees significant potential for value-added cashew processing and rice production.",
     stats: {
@@ -600,7 +600,7 @@ const FALLBACK_COUNTRIES: CountryData[] = [
     slug: "liberia",
     flag: "",
     role: "West African Rubber & Palm Oil Hub",
-    heroImage: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1600&q=80",
+    heroImage: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=1600&q=80",
     description:
       "Liberia is a major rubber and palm oil producer rebuilding its agricultural sector. With significant rainforest-based agriculture and cocoa potential, Liberia offers long-term development opportunities.",
     stats: {
@@ -632,7 +632,7 @@ const FALLBACK_COUNTRIES: CountryData[] = [
     slug: "mali",
     flag: "",
     role: "Sahel Cotton & Grain Belt",
-    heroImage: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1600&q=80",
+    heroImage: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=1600&q=80",
     description:
       "Mali is one of Africa's largest cotton producers and a major rice-growing nation along the Niger River. As a key market for Sahel food security, Mali represents a strategic entry point for AFU's West African expansion.",
     stats: {
@@ -664,7 +664,7 @@ const FALLBACK_COUNTRIES: CountryData[] = [
     slug: "ivory-coast",
     flag: "",
     role: "Global Cocoa & Cashew Leader",
-    heroImage: "https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=1600&q=80",
+    heroImage: "https://images.unsplash.com/photo-1582719508461-905c673771fd?w=1600&q=80",
     description:
       "Ivory Coast (Cote d'Ivoire) is the world's largest cocoa producer and a leading cashew exporter. As West Africa's economic powerhouse with the strongest agricultural GDP in the region, it anchors AFU's West African strategy.",
     stats: {
