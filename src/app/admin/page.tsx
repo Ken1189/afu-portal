@@ -258,9 +258,9 @@ const memberGrowthData = FALLBACK_STATS.memberGrowthLabels.map((label, i) => ({
 const loanPortfolioLast6 = FALLBACK_STATS.loanPortfolio.slice(-6);
 
 const defaultCountryData = [
-  { country: 'Zimbabwe', count: FALLBACK_STATS.membersByCountry.Zimbabwe, flag: '🇿🇼' },
-  { country: 'Tanzania', count: FALLBACK_STATS.membersByCountry.Tanzania, flag: '🇹🇿' },
-  { country: 'Botswana', count: FALLBACK_STATS.membersByCountry.Botswana, flag: '🇧🇼' },
+  { country: 'Zimbabwe', count: FALLBACK_STATS.membersByCountry.Zimbabwe, flag: 'ZW' },
+  { country: 'Tanzania', count: FALLBACK_STATS.membersByCountry.Tanzania, flag: 'TZ' },
+  { country: 'Botswana', count: FALLBACK_STATS.membersByCountry.Botswana, flag: 'BW' },
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════

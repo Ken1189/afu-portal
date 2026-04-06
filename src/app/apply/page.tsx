@@ -23,6 +23,7 @@ export default function ApplyPage() {
   const [selectedTier, setSelectedTier] = useState<Tier | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [referredBy, setReferredBy] = useState<string | null>(null);
+  const [referralInput, setReferralInput] = useState("");
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -365,6 +366,13 @@ export default function ApplyPage() {
                 <div>
                   <label className="block text-sm font-medium text-[#1B2A4A] mb-2">What&apos;s your vision? Tell us about your farm and your dreams. *</label>
                   <textarea required rows={4} className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5DB347]/50 focus:border-[#5DB347] resize-none transition-shadow" placeholder={selectedTier === "partner" ? "Tell us about your organization and how we can work together..." : "Share your farming story — what you grow, the challenges you face, and where you want to take your farm..."} value={formData.about} onChange={(e) => setFormData({ ...formData, about: e.target.value })} />
+                </div>
+
+                {/* Referral code */}
+                <div>
+                  <label className="block text-sm font-medium text-[#1B2A4A] mb-2">Referral Code (optional)</label>
+                  <input type="text" className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5DB347]/50 focus:border-[#5DB347] transition-shadow" placeholder="Enter a referral code if you have one, e.g. AMB-STEVE-A3F2B1" value={referralInput || referredBy || ''} onChange={(e) => { setReferralInput(e.target.value); setReferredBy(e.target.value); }} />
+                  {referredBy && <p className="text-xs text-[#5DB347] mt-1">Referral code captured — your referrer will earn rewards when you join!</p>}
                 </div>
 
                 {/* Consent checkboxes */}

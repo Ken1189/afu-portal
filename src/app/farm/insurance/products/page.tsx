@@ -70,7 +70,7 @@ const FALLBACK_INSURANCE_PRODUCTS: InsuranceProduct[] = [
       'Crops registered on platform',
     ],
     popular: true,
-    icon: '🌾',
+    icon: '●',
   },
   {
     id: 'INS-PROD-002',
@@ -96,7 +96,7 @@ const FALLBACK_INSURANCE_PRODUCTS: InsuranceProduct[] = [
       'Active crop tracking on platform',
     ],
     popular: false,
-    icon: '🛡️',
+    icon: '●',
   },
   {
     id: 'INS-PROD-003',
@@ -122,7 +122,7 @@ const FALLBACK_INSURANCE_PRODUCTS: InsuranceProduct[] = [
       'Vaccination records up to date',
     ],
     popular: true,
-    icon: '🐄',
+    icon: '●',
   },
   {
     id: 'INS-PROD-004',
@@ -148,7 +148,7 @@ const FALLBACK_INSURANCE_PRODUCTS: InsuranceProduct[] = [
       'Equipment value verified',
     ],
     popular: false,
-    icon: '🚜',
+    icon: '●',
   },
   {
     id: 'INS-PROD-005',
@@ -174,7 +174,7 @@ const FALLBACK_INSURANCE_PRODUCTS: InsuranceProduct[] = [
       'Active for current growing season',
     ],
     popular: true,
-    icon: '🌦️',
+    icon: '●',
   },
   {
     id: 'INS-PROD-006',

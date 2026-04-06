@@ -180,10 +180,17 @@ const stepTransition = {
 // ---------------------------------------------------------------------------
 
 const typeIcons: Record<InsuranceType, string> = {
-  crop: '🌾',
-  livestock: '🐄',
-  equipment: '🚜',
-  'weather-index': '🌦️',
+  crop: '●',
+  livestock: '●',
+  equipment: '●',
+  'weather-index': '●',
+};
+
+const typeColors: Record<InsuranceType, string> = {
+  crop: 'text-green-500',
+  livestock: 'text-amber-500',
+  equipment: 'text-blue-500',
+  'weather-index': 'text-purple-500',
 };
 
 function formatCurrency(amount: number): string {

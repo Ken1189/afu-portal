@@ -164,10 +164,10 @@ const itemVariants = {
 // ---------------------------------------------------------------------------
 
 const typeIcons: Record<InsuranceType, string> = {
-  crop: '🌾',
-  livestock: '🐄',
-  equipment: '🚜',
-  'weather-index': '🌦️',
+  crop: '●',
+  livestock: '●',
+  equipment: '●',
+  'weather-index': '●',
 };
 
 const statusBadge: Record<PolicyStatus, { bg: string; label: string }> = {

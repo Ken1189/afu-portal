@@ -51,9 +51,9 @@ const FALLBACK_PROGRAMS: { iconName: string; title: string; description: string;
 
 const FALLBACK_STATS = [
   { value: "Growing", label: "Young farmers community" },
-  { value: "45", label: "Partner schools" },
+  { value: "Growing", label: "Partner schools" },
   { value: "9", label: "Countries active" },
-  { value: "$120K", label: "Seed funding awarded" },
+  { value: "Launching", label: "Seed funding program" },
 ];
 
 /* ─── ICON MAP ─── */

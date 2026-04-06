@@ -66,7 +66,7 @@ const mockInsuranceProducts: InsuranceProduct[] = [
       'Crops registered on platform',
     ],
     popular: true,
-    icon: '🌾',
+    icon: '●',
   },
   {
     id: 'INS-PROD-002',
@@ -92,7 +92,7 @@ const mockInsuranceProducts: InsuranceProduct[] = [
       'Active crop tracking on platform',
     ],
     popular: false,
-    icon: '🛡️',
+    icon: '●',
   },
   {
     id: 'INS-PROD-003',
@@ -118,7 +118,7 @@ const mockInsuranceProducts: InsuranceProduct[] = [
       'Vaccination records up to date',
     ],
     popular: true,
-    icon: '🐄',
+    icon: '●',
   },
   {
     id: 'INS-PROD-004',
@@ -144,7 +144,7 @@ const mockInsuranceProducts: InsuranceProduct[] = [
       'Equipment value verified',
     ],
     popular: false,
-    icon: '🚜',
+    icon: '●',
   },
   {
     id: 'INS-PROD-005',
@@ -170,7 +170,7 @@ const mockInsuranceProducts: InsuranceProduct[] = [
       'Active for current growing season',
     ],
     popular: true,
-    icon: '🌦️',
+    icon: '●',
   },
   {
     id: 'INS-PROD-006',

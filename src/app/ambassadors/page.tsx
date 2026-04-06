@@ -728,7 +728,7 @@ export default function AmbassadorsPage() {
                   </div>
 
                   <h3 className="text-lg font-bold text-[#1B2A4A]">
-                    {amb.full_name} {amb.country_flag}
+                    {amb.full_name}
                   </h3>
 
                   <div className="flex items-center justify-center gap-2 mt-2">

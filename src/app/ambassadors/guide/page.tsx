@@ -237,14 +237,14 @@ export default function AmbassadorGuidePage() {
             <div className="space-y-4">
               <h4 className="font-semibold" style={{ color: '#1B2A4A' }}>Your Elevator Pitch</h4>
               <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 italic">
-                &ldquo;The African Farming Union is a one-stop platform for African farmers. We provide financing, insurance, inputs, guaranteed markets, and training to help farmers grow their operations profitably. With over 19,000 farmers across 20 countries, AFU is transforming how agriculture works in Africa.&rdquo;
+                &ldquo;The African Farming Union is a one-stop platform for African farmers. We provide financing, insurance, inputs, guaranteed markets, and training to help farmers grow their operations profitably. With over our community of farmers across 20 countries, AFU is transforming how agriculture works in Africa.&rdquo;
               </div>
 
               <h4 className="font-semibold mt-6" style={{ color: '#1B2A4A' }}>Talking Points</h4>
               <ul className="space-y-2 ml-2">
                 <li className="flex items-start gap-2">
                   <span style={{ color: '#5DB347' }} className="mt-1">&bull;</span>
-                  AFU serves 19,000+ farmers across 20 African countries.
+                  AFU serves our growing community of farmers across 20 African countries.
                 </li>
                 <li className="flex items-start gap-2">
                   <span style={{ color: '#5DB347' }} className="mt-1">&bull;</span>
@@ -292,7 +292,7 @@ export default function AmbassadorGuidePage() {
               <div>
                 <h4 className="font-semibold mb-2" style={{ color: '#1B2A4A' }}>Farmers</h4>
                 <p>
-                  African farmers face enormous challenges: limited access to finance, expensive inputs, no insurance safety net, and unreliable markets. AFU solves all of these in one platform. When speaking to farmers, emphasise that membership gives them access to affordable crop financing, free crop insurance, inputs at wholesale prices, guaranteed buyers for their produce, and expert training programmes. AFU already works with over 19,000 farmers managing more than 1 million hectares across 20 countries.
+                  African farmers face enormous challenges: limited access to finance, expensive inputs, no insurance safety net, and unreliable markets. AFU solves all of these in one platform. When speaking to farmers, emphasise that membership gives them access to affordable crop financing, free crop insurance, inputs at wholesale prices, guaranteed buyers for their produce, and expert training programmes. AFU already works with over our community of farmers managing more than thousands of hectares across 20 countries.
                 </p>
               </div>
               <div>

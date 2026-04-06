@@ -351,10 +351,10 @@ const cardVariants = {
 // ---------------------------------------------------------------------------
 
 const typeIcons: Record<InsuranceType, string> = {
-  crop: '🌾',
-  livestock: '🐄',
-  equipment: '🚜',
-  'weather-index': '🌦️',
+  crop: '●',
+  livestock: '●',
+  equipment: '●',
+  'weather-index': '●',
 };
 
 const typeLabels: Record<InsuranceType, string> = {
