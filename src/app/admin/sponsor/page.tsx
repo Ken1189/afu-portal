@@ -100,6 +100,16 @@ export default function AdminSponsorPage() {
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [savingFarmer, setSavingFarmer] = useState(false);
+  const [newFarmer, setNewFarmer] = useState({
+    display_name: '',
+    country: '',
+    crops: '',
+    bio: '',
+    monthly_funding_needed: '',
+    photo_url: '',
+  });
 
   const supabase = createClient();
 
@@ -163,6 +173,61 @@ export default function AdminSponsorPage() {
     setToast({ message: !currentValue ? 'Farmer featured' : 'Farmer unfeatured', type: 'success' });
   }, [supabase]);
 
+  // ── Add new farmer profile ──
+  const handleAddFarmer = async () => {
+    if (!newFarmer.display_name || !newFarmer.country) {
+      setToast({ message: 'Name and country are required', type: 'error' });
+      return;
+    }
+    setSavingFarmer(true);
+    try {
+      const slug = newFarmer.display_name.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Math.random().toString(36).slice(2, 6);
+      const { data, error } = await supabase.from('farmer_public_profiles').insert({
+        display_name: newFarmer.display_name,
+        country: newFarmer.country,
+        crops: newFarmer.crops || null,
+        bio: newFarmer.bio || null,
+        monthly_funding_needed: newFarmer.monthly_funding_needed ? parseFloat(newFarmer.monthly_funding_needed) : 0,
+        photo_url: newFarmer.photo_url || null,
+        slug,
+        is_featured: false,
+        active_sponsors: 0,
+        monthly_funding_received: 0,
+      }).select().single();
+
+      if (error) {
+        console.error('[sponsor] add farmer failed', error);
+        setToast({ message: `Failed to add: ${error.message}`, type: 'error' });
+        setSavingFarmer(false);
+        return;
+      }
+
+      // Add to local state
+      if (data) {
+        setFarmers(prev => [...prev, {
+          id: data.id,
+          display_name: data.display_name,
+          country: data.country,
+          crops: data.crops || '',
+          active_sponsors: 0,
+          monthly_funding_received: 0,
+          monthly_funding_needed: data.monthly_funding_needed || 0,
+          is_featured: false,
+          slug: data.slug,
+        }]);
+      }
+
+      setToast({ message: 'Farmer profile added successfully', type: 'success' });
+      setShowAddModal(false);
+      setNewFarmer({ display_name: '', country: '', crops: '', bio: '', monthly_funding_needed: '', photo_url: '' });
+    } catch (err) {
+      console.error('[sponsor] add farmer exception', err);
+      setToast({ message: 'Failed to add farmer profile', type: 'error' });
+    } finally {
+      setSavingFarmer(false);
+    }
+  };
+
   // ── Approve/Reject sponsorship ──
   const handleSponsorshipAction = async (id: string, newStatus: SponsorshipStatus) => {
     setActionLoading(id);
@@ -196,7 +261,7 @@ export default function AdminSponsorPage() {
           </h1>
           <p className="text-gray-500 text-sm mt-1">Manage sponsorships and farmer public profiles</p>
         </div>
-        <button className="inline-flex items-center gap-2 bg-teal text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-teal/90 transition-colors shadow-sm">
+        <button onClick={() => setShowAddModal(true)} className="inline-flex items-center gap-2 bg-teal text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-teal/90 transition-colors shadow-sm">
           <Plus className="w-4 h-4" />
           Add Farmer Profile
         </button>
@@ -445,6 +510,110 @@ export default function AdminSponsorPage() {
           )}
         </div>
       </div>
+
+      {/* Add Farmer Profile Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setShowAddModal(false)}>
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+              <h3 className="text-lg font-bold text-navy">Add Farmer Profile</h3>
+              <button onClick={() => setShowAddModal(false)} className="p-1 hover:bg-gray-100 rounded-lg">
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">Display Name *</label>
+                <input
+                  type="text"
+                  value={newFarmer.display_name}
+                  onChange={(e) => setNewFarmer({ ...newFarmer, display_name: e.target.value })}
+                  placeholder="e.g. Grace Moyo"
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal/40"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">Country *</label>
+                <select
+                  value={newFarmer.country}
+                  onChange={(e) => setNewFarmer({ ...newFarmer, country: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal/40"
+                >
+                  <option value="">Select country</option>
+                  <option value="Zimbabwe">Zimbabwe</option>
+                  <option value="Botswana">Botswana</option>
+                  <option value="Kenya">Kenya</option>
+                  <option value="Tanzania">Tanzania</option>
+                  <option value="South Africa">South Africa</option>
+                  <option value="Nigeria">Nigeria</option>
+                  <option value="Ghana">Ghana</option>
+                  <option value="Uganda">Uganda</option>
+                  <option value="Zambia">Zambia</option>
+                  <option value="Mozambique">Mozambique</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">Crops</label>
+                <input
+                  type="text"
+                  value={newFarmer.crops}
+                  onChange={(e) => setNewFarmer({ ...newFarmer, crops: e.target.value })}
+                  placeholder="e.g. Maize, Beans, Coffee"
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal/40"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">Bio</label>
+                <textarea
+                  value={newFarmer.bio}
+                  onChange={(e) => setNewFarmer({ ...newFarmer, bio: e.target.value })}
+                  rows={3}
+                  placeholder="Brief background about this farmer..."
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal/40 resize-none"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">Monthly Funding Needed (USD)</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="10"
+                  value={newFarmer.monthly_funding_needed}
+                  onChange={(e) => setNewFarmer({ ...newFarmer, monthly_funding_needed: e.target.value })}
+                  placeholder="500"
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal/40"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">Photo URL (optional)</label>
+                <input
+                  type="url"
+                  value={newFarmer.photo_url}
+                  onChange={(e) => setNewFarmer({ ...newFarmer, photo_url: e.target.value })}
+                  placeholder="https://..."
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal/40"
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-3 px-6 py-4 border-t border-gray-100 bg-gray-50 rounded-b-2xl">
+              <button
+                onClick={() => setShowAddModal(false)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAddFarmer}
+                disabled={savingFarmer || !newFarmer.display_name || !newFarmer.country}
+                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold bg-teal text-white rounded-lg hover:bg-teal/90 disabled:opacity-50 transition-colors"
+              >
+                {savingFarmer ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+                {savingFarmer ? 'Saving...' : 'Add Farmer'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
