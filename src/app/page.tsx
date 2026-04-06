@@ -1506,7 +1506,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
             <span className="inline-block bg-[#5DB347]/10 text-sm font-semibold px-4 py-1.5 rounded-full mb-4" style={{ color: '#5DB347' }}>
-              🤝 Sponsor a Farmer
+              Sponsor a Farmer
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-navy mb-4">
               Turn <span className="text-gradient-green">$5 a Month</span> Into a Farm&apos;s Future

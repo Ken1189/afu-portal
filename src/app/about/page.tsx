@@ -198,7 +198,7 @@ export default async function AboutPage() {
             <span
               className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5 text-sm font-medium mb-6 text-[var(--color-green-bar)]"
             >
-              🌍 Pan-African Agriculture Development Platform
+              Pan-African Agriculture Development Platform
             </span>
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
               About <span className="bg-gradient-to-r from-[#5DB347] to-[#6ABF4B] bg-clip-text text-transparent">AFU</span>

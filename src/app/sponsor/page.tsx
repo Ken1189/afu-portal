@@ -200,51 +200,16 @@ const FALLBACK_FARMERS: FarmerProfile[] = [
   },
 ];
 
-/* ─── Country flag emojis ─── */
+/* ─── Country codes (no emoji flags) ─── */
 const COUNTRY_FLAGS: Record<string, string> = {
-  Uganda: '🇺🇬',
-  Zimbabwe: '🇿🇼',
-  Tanzania: '🇹🇿',
-  Kenya: '🇰🇪',
-  Ghana: '🇬🇭',
-  Nigeria: '🇳🇬',
-  Ethiopia: '🇪🇹',
-  Zambia: '🇿🇲',
-  Botswana: '🇧🇼',
-  Mozambique: '🇲🇿',
-  Malawi: '🇲🇼',
-  Rwanda: '🇷🇼',
+  Uganda: 'UG', Zimbabwe: 'ZW', Tanzania: 'TZ', Kenya: 'KE',
+  Ghana: 'GH', Nigeria: 'NG', Ethiopia: 'ET', Zambia: 'ZM',
+  Botswana: 'BW', Mozambique: 'MZ', Malawi: 'MW', Rwanda: 'RW',
 };
 
-/* ─── Crop emojis ─── */
-const CROP_EMOJI: Record<string, string> = {
-  Coffee: '☕',
-  Cashews: '🌰',
-  Maize: '🌽',
-  Rice: '🌾',
-  Tobacco: '🌿',
-  Cotton: '🪴',
-  Sunflower: '🌻',
-  Soybean: '🫘',
-  Groundnuts: '🥜',
-  Tea: '🍵',
-  Cocoa: '🍫',
-  Mango: '🥭',
-  Avocado: '🥑',
-  Cassava: '🍠',
-  Banana: '🍌',
-  Sugarcane: '🌱',
-  Wheat: '🌾',
-  Vegetables: '🥦',
-  Livestock: '🐄',
-  Poultry: '🐔',
-};
-
-function getCropEmoji(crop: string): string {
-  for (const [key, emoji] of Object.entries(CROP_EMOJI)) {
-    if (crop.toLowerCase().includes(key.toLowerCase())) return emoji;
-  }
-  return '🌱';
+/* ─── Crop initials (no emojis) ─── */
+function getCropEmoji(_crop: string): string {
+  return '';
 }
 
 /* ─── Farmer Card ─── */
@@ -258,7 +223,7 @@ function FarmerCard({ farmer }: { farmer: FarmerProfile }) {
       )
     : 0;
 
-  const flag = COUNTRY_FLAGS[farmer.country] ?? '🌍';
+  const flag = COUNTRY_FLAGS[farmer.country] ?? '';
   const initials = farmer.display_name
     .split(' ')
     .map((w) => w[0])
@@ -290,7 +255,7 @@ function FarmerCard({ farmer }: { farmer: FarmerProfile }) {
               className="text-white text-xs font-bold px-2.5 py-1 rounded-full shadow"
               style={{ background: '#C9A84C' }}
             >
-              ⭐ Featured
+              Featured
             </span>
           </div>
         )}
@@ -648,7 +613,6 @@ export default function SponsorPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
           <div className="max-w-3xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-sm font-medium mb-6">
-              <span>🌍</span>
               <span>Supporting African smallholder farmers</span>
             </div>
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold leading-tight mb-6">
@@ -687,10 +651,10 @@ export default function SponsorPage() {
             {/* Impact stats row */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-0 divide-x divide-white/10 border border-white/10 rounded-2xl overflow-hidden bg-white/5">
               {[
-                { value: '2,400+', label: 'Farmers' },
+                { value: 'Growing', label: 'Farmers' },
                 { value: '9', label: 'Countries' },
                 { value: '3', label: 'Sponsorship Tiers' },
-                { value: '📊', label: 'Monthly Impact Reports' },
+                { value: 'Yes', label: 'Monthly Impact Reports' },
               ].map((stat) => (
                 <ImpactStat key={stat.label} value={stat.value} label={stat.label} />
               ))}
@@ -830,7 +794,7 @@ export default function SponsorPage() {
                 >
                   {country === 'All'
                     ? 'All Countries'
-                    : `${COUNTRY_FLAGS[country] ?? '🌍'} ${country}`}
+                    : `${COUNTRY_FLAGS[country] ?? ''} ${country}`}
                 </button>
               ))}
             </div>

@@ -220,7 +220,7 @@ export default async function CountriesPage() {
         <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full opacity-10 blur-3xl" style={{ background: '#5DB347' }} />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <span className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5 text-sm font-medium mb-6" style={{ color: '#6ABF4B' }}>
-            🌍 Pan-African Reach
+            Pan-African Reach
           </span>
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6">
             Our <span className="bg-gradient-to-r from-[#5DB347] to-[#6ABF4B] bg-clip-text text-transparent">Countries</span>

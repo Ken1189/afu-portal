@@ -378,7 +378,7 @@ export default function ExchangePage() {
               <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
-              href="/farm/exchange"
+              href="/join?feature=marketplace"
               className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-8 py-3 rounded-xl font-semibold text-sm transition-colors"
             >
               List Something
