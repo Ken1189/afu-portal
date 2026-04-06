@@ -132,7 +132,7 @@ const FALLBACK_OPPORTUNITIES: Opportunity[] = [
     subscribedAmount: 1500000,
     status: 'Fully Subscribed',
     description:
-      'Fully subscribed. 19,000 pre-identified farmers. MTN MoMo disbursement. 94% repayment rate on existing Zimbabwe portfolio.',
+      'Fully subscribed. Pre-identified farmer network. MTN MoMo disbursement. 94% repayment rate on existing Zimbabwe portfolio.',
   },
 ];
 

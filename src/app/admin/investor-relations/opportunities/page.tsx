@@ -216,7 +216,7 @@ const FALLBACK_OPPORTUNITIES: Opportunity[] = [
     id: 'fallback-5',
     name: 'Uganda Smallholder Lending',
     type: 'Debt',
-    description: '19,000 pre-identified farmers. MTN MoMo disbursement. 94% repayment rate on existing Zimbabwe portfolio.',
+    description: 'Pre-identified farmer network. MTN MoMo disbursement. 94% repayment rate on existing Zimbabwe portfolio.',
     target: 1500000,
     min_investment: 50000,
     target_irr: '13-16%',

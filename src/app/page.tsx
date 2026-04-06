@@ -305,7 +305,7 @@ export default function Home() {
   const [hero, setHero] = useState(HERO_DEFAULTS);
   const [services, setServices] = useState(FALLBACK_SERVICES);
   const [programs, setPrograms] = useState(FALLBACK_PROGRAMS);
-  const [memberCount, setMemberCount] = useState(19000);
+  const [memberCount, setMemberCount] = useState(0);
 
   // Section visibility from site_config key "homepage_sections"
   const [sectionVisibility, setSectionVisibility] = useState<Record<string, boolean>>({});
@@ -438,7 +438,7 @@ export default function Home() {
           setMemberCount(count);
         }
       } catch {
-        // keep fallback 19000
+        // keep fallback 0 – will show "Growing community of" instead
       }
     }
     fetchMemberCount();
@@ -577,7 +577,7 @@ export default function Home() {
               </div>
               <div className="flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/10 px-4 py-2 rounded-full text-white/70">
                 <Users className="w-4 h-4 text-[#5DB347]" />
-                <span>19,000+ Farmers</span>
+                <span>{memberCount > 0 ? `${memberCount.toLocaleString()}+ Farmers` : 'Growing Community'}</span>
               </div>
             </div>
           </div>

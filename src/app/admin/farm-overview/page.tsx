@@ -65,16 +65,16 @@ const fallback_livestock: LivestockSummary[] = [
 ];
 
 const fallback_countryProduction: CountryProduction[] = [
-  { country: 'Zimbabwe', flag: '\uD83C\uDDFF\uD83C\uDDFC', tonnes: 48_200 },
-  { country: 'Tanzania', flag: '\uD83C\uDDF9\uD83C\uDDFF', tonnes: 36_800 },
-  { country: 'Botswana', flag: '\uD83C\uDDE7\uD83C\uDDFC', tonnes: 22_400 },
-  { country: 'Kenya', flag: '\uD83C\uDDF0\uD83C\uDDEA', tonnes: 18_900 },
-  { country: 'Zambia', flag: '\uD83C\uDDFF\uD83C\uDDF2', tonnes: 15_300 },
-  { country: 'Nigeria', flag: '\uD83C\uDDF3\uD83C\uDDEC', tonnes: 12_100 },
-  { country: 'South Africa', flag: '\uD83C\uDDFF\uD83C\uDDE6', tonnes: 9_800 },
-  { country: 'Mozambique', flag: '\uD83C\uDDF2\uD83C\uDDFF', tonnes: 7_200 },
-  { country: 'Sierra Leone', flag: '\uD83C\uDDF8\uD83C\uDDF1', tonnes: 4_600 },
-  { country: 'Uganda', flag: '\uD83C\uDDFA\uD83C\uDDEC', tonnes: 11_500 },
+  { country: 'Zimbabwe', flag: 'ZW', tonnes: 48_200 },
+  { country: 'Tanzania', flag: 'TZ', tonnes: 36_800 },
+  { country: 'Botswana', flag: 'BW', tonnes: 22_400 },
+  { country: 'Kenya', flag: 'KE', tonnes: 18_900 },
+  { country: 'Zambia', flag: 'ZM', tonnes: 15_300 },
+  { country: 'Nigeria', flag: 'NG', tonnes: 12_100 },
+  { country: 'South Africa', flag: 'ZA', tonnes: 9_800 },
+  { country: 'Mozambique', flag: 'MZ', tonnes: 7_200 },
+  { country: 'Sierra Leone', flag: 'SL', tonnes: 4_600 },
+  { country: 'Uganda', flag: 'UG', tonnes: 11_500 },
 ];
 
 // ── Animation ────────────────────────────────────────────────────────────────

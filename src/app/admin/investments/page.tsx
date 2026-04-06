@@ -57,16 +57,16 @@ interface TopInvestment {
 const PRODUCT_COLORS = ['#1B2A4A', '#5DB347', '#3B82F6', '#8B5CF6', '#F59E0B', '#EC4899', '#14B8A6', '#EF4444'];
 
 const COUNTRY_FLAGS: Record<string, string> = {
-  Zimbabwe: '\uD83C\uDDFF\uD83C\uDDFC',
-  Uganda: '\uD83C\uDDFA\uD83C\uDDEC',
-  Kenya: '\uD83C\uDDF0\uD83C\uDDEA',
-  Tanzania: '\uD83C\uDDF9\uD83C\uDDFF',
-  Botswana: '\uD83C\uDDE7\uD83C\uDDFC',
-  Mozambique: '\uD83C\uDDF2\uD83C\uDDFF',
-  Zambia: '\uD83C\uDDFF\uD83C\uDDF2',
-  Ghana: '\uD83C\uDDEC\uD83C\uDDED',
-  Nigeria: '\uD83C\uDDF3\uD83C\uDDEC',
-  Ethiopia: '\uD83C\uDDEA\uD83C\uDDF9',
+  Zimbabwe: 'ZW',
+  Uganda: 'UG',
+  Kenya: 'KE',
+  Tanzania: 'TZ',
+  Botswana: 'BW',
+  Mozambique: 'MZ',
+  Zambia: 'ZM',
+  Ghana: 'GH',
+  Nigeria: 'NG',
+  Ethiopia: 'ET',
 };
 
 const COUNTRY_COLORS: Record<string, string> = {
@@ -91,12 +91,12 @@ const FALLBACK_FUND_PRODUCTS: FundProduct[] = [
 ];
 
 const FALLBACK_COUNTRY_ALLOCATIONS: CountryAllocation[] = [
-  { country: 'Zimbabwe', flag: '\uD83C\uDDFF\uD83C\uDDFC', invested: 1625000, pct: 34, color: '#1B2A4A' },
-  { country: 'Uganda', flag: '\uD83C\uDDFA\uD83C\uDDEC', invested: 1000000, pct: 21, color: '#5DB347' },
-  { country: 'Kenya', flag: '\uD83C\uDDF0\uD83C\uDDEA', invested: 925000, pct: 20, color: '#3B82F6' },
-  { country: 'Tanzania', flag: '\uD83C\uDDF9\uD83C\uDDFF', invested: 500000, pct: 11, color: '#8B5CF6' },
-  { country: 'Botswana', flag: '\uD83C\uDDE7\uD83C\uDDFC', invested: 375000, pct: 8, color: '#F59E0B' },
-  { country: 'Mozambique', flag: '\uD83C\uDDF2\uD83C\uDDFF', invested: 325000, pct: 6, color: '#EC4899' },
+  { country: 'Zimbabwe', flag: 'ZW', invested: 1625000, pct: 34, color: '#1B2A4A' },
+  { country: 'Uganda', flag: 'UG', invested: 1000000, pct: 21, color: '#5DB347' },
+  { country: 'Kenya', flag: 'KE', invested: 925000, pct: 20, color: '#3B82F6' },
+  { country: 'Tanzania', flag: 'TZ', invested: 500000, pct: 11, color: '#8B5CF6' },
+  { country: 'Botswana', flag: 'BW', invested: 375000, pct: 8, color: '#F59E0B' },
+  { country: 'Mozambique', flag: 'MZ', invested: 325000, pct: 6, color: '#EC4899' },
 ];
 
 const FALLBACK_QUARTERLY_DATA: QuarterlyData[] = [
@@ -219,7 +219,7 @@ export default function TotalInvestmentsPage() {
             setCountryAllocations(
               sorted.map(([country, invested], idx) => ({
                 country,
-                flag: COUNTRY_FLAGS[country] || '\uD83C\uDF0D',
+                flag: COUNTRY_FLAGS[country] || '',
                 invested,
                 pct: Math.round((invested / totalInvested) * 100),
                 color: COUNTRY_COLORS[country] || PRODUCT_COLORS[idx % PRODUCT_COLORS.length],
