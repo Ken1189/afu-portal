@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { useAuth } from '@/lib/supabase/auth-context';
 
 const FALLBACK_TIERS = [
   {
@@ -197,6 +198,7 @@ function FeatureCell({ value }: { value: boolean | string | undefined }) {
 
 export default function MembershipsPage() {
   const router = useRouter();
+  const { user } = useAuth();
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [showComparison, setShowComparison] = useState(false);
   const [isAnnual, setIsAnnual] = useState(false);
@@ -242,13 +244,24 @@ export default function MembershipsPage() {
       router.push('/apply?tier=partner');
       return;
     }
+    // Logged-out users must apply (and create an account) first so we can
+    // attach the resulting subscription to a real profile.
+    if (!user) {
+      router.push(`/apply?tier=${tierSlug}`);
+      return;
+    }
     setCheckoutLoading(tierSlug);
     setCheckoutError('');
     try {
       const res = await fetch('/api/payments/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'membership', tier: tierSlug }),
+        body: JSON.stringify({
+          type: 'membership',
+          tier: tierSlug,
+          userId: user.id,
+          email: user.email,
+        }),
       });
       const data = await res.json();
       if (data.url) {

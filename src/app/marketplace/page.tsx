@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createClient } from '@/lib/supabase/client';
 import {
@@ -89,10 +90,59 @@ const AVAILABILITY_LABELS: Record<string, { text: string; color: string }> = {
 /* ─── Component ─── */
 
 export default function PublicMarketplacePage() {
+  const router = useRouter();
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
   const [products, setProducts] = useState<Product[]>(PRODUCTS);
+  const [buyModalProduct, setBuyModalProduct] = useState<Product | null>(null);
+  const [buyQty, setBuyQty] = useState(1);
+  const [buyAddress, setBuyAddress] = useState('');
+  const [buyNotes, setBuyNotes] = useState('');
+  const [buySubmitting, setBuySubmitting] = useState(false);
+  const [buyError, setBuyError] = useState<string | null>(null);
+
+  const handleBuyClick = useCallback(async (product: Product) => {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      router.push('/login?redirect=/marketplace');
+      return;
+    }
+    setBuyModalProduct(product);
+    setBuyQty(1);
+    setBuyAddress('');
+    setBuyNotes('');
+    setBuyError(null);
+  }, [router]);
+
+  const handleBuySubmit = useCallback(async () => {
+    if (!buyModalProduct) return;
+    setBuySubmitting(true);
+    setBuyError(null);
+    try {
+      const res = await fetch('/api/marketplace/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productId: buyModalProduct.id,
+          quantity: buyQty,
+          deliveryAddress: buyAddress,
+          deliveryNotes: buyNotes,
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        setBuyError(json.error || 'Checkout failed');
+      } else if (json.url) {
+        window.location.href = json.url;
+      }
+    } catch (e) {
+      setBuyError(e instanceof Error ? e.message : 'Checkout failed');
+    } finally {
+      setBuySubmitting(false);
+    }
+  }, [buyModalProduct, buyQty, buyAddress, buyNotes]);
 
   // Fetch real products from DB
   useEffect(() => {
@@ -341,12 +391,14 @@ export default function PublicMarketplacePage() {
                           Member: ${product.memberPrice.toFixed(2)}
                         </p>
                       </div>
-                      <Link
-                        href="/memberships"
-                        className="p-2 rounded-lg bg-[#5DB347]/10 text-[#5DB347] hover:bg-[#5DB347] hover:text-white transition-colors"
+                      <button
+                        onClick={() => handleBuyClick(product)}
+                        disabled={product.availability === 'out-of-stock'}
+                        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#5DB347] text-white text-xs font-bold hover:bg-[#449933] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
                       >
-                        <ShoppingCart className="w-5 h-5" />
-                      </Link>
+                        <ShoppingCart className="w-4 h-4" />
+                        Buy Now
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -383,6 +435,93 @@ export default function PublicMarketplacePage() {
           </div>
         </div>
       </section>
+
+      {/* Buy Now modal */}
+      <AnimatePresence>
+        {buyModalProduct && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+            onClick={() => !buySubmitting && setBuyModalProduct(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <h3 className="text-lg font-bold text-[#1B2A4A]">Buy {buyModalProduct.name}</h3>
+                  <p className="text-xs text-gray-500">{buyModalProduct.supplierName}</p>
+                </div>
+                <button
+                  onClick={() => setBuyModalProduct(null)}
+                  disabled={buySubmitting}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">Quantity</label>
+                  <input
+                    type="number"
+                    min={1}
+                    value={buyQty}
+                    onChange={(e) => setBuyQty(Math.max(1, parseInt(e.target.value) || 1))}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5DB347]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">Delivery Address</label>
+                  <textarea
+                    rows={2}
+                    value={buyAddress}
+                    onChange={(e) => setBuyAddress(e.target.value)}
+                    placeholder="Street, city, region, country"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5DB347]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">Delivery Notes (optional)</label>
+                  <textarea
+                    rows={2}
+                    value={buyNotes}
+                    onChange={(e) => setBuyNotes(e.target.value)}
+                    placeholder="Landmarks, contact phone, etc."
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5DB347]"
+                  />
+                </div>
+
+                <div className="bg-gray-50 rounded-lg p-3 flex items-center justify-between">
+                  <span className="text-sm text-gray-500">Total</span>
+                  <span className="text-lg font-extrabold text-[#1B2A4A]">
+                    ${(buyModalProduct.price * buyQty).toFixed(2)}
+                  </span>
+                </div>
+
+                {buyError && (
+                  <p className="text-sm text-red-600 bg-red-50 rounded p-2">{buyError}</p>
+                )}
+
+                <button
+                  onClick={handleBuySubmit}
+                  disabled={buySubmitting || !buyAddress.trim() || buyQty < 1}
+                  className="w-full py-3 rounded-lg bg-[#5DB347] text-white font-bold hover:bg-[#449933] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                >
+                  {buySubmitting ? 'Redirecting to checkout…' : 'Proceed to Payment'}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -193,6 +193,23 @@ export async function POST(request: Request) {
       console.error('Failed to create member:', memberError.message);
     }
 
+    // If approved as supplier or partner, create a suppliers row
+    if (assignedRole === 'supplier' || assignedRole === 'partner') {
+      const companyName = application.farm_name || application.full_name || 'Unnamed';
+      const { error: supplierRowError } = await svc.from('suppliers').insert({
+        profile_id: userId,
+        company_name: companyName,
+        category: 'general',
+        country: application.country || null,
+        status: 'active',
+        verified: false,
+        partner_type: assignedRole === 'partner' ? 'partner' : null,
+      });
+      if (supplierRowError) {
+        console.error('Failed to create suppliers row:', supplierRowError.message);
+      }
+    }
+
     // Update the application status to approved
     const { error: updateError } = await svc
       .from('membership_applications')

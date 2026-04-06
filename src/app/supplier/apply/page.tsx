@@ -69,7 +69,8 @@ export default function SupplierApplyPage() {
           phone: form.phone || null,
           country: form.country,
           farm_name: form.businessName,
-          requested_tier: 'commercial',
+          requested_tier: 'partner',
+          application_type: 'supplier',
           status: 'pending',
           notes: `[SUPPLIER APPLICATION] Category: ${form.category} | Website: ${form.website || 'N/A'} | Description: ${form.description || 'N/A'}`,
         });

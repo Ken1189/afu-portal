@@ -560,6 +560,31 @@ export default function SupplierDashboard() {
     fetchLiveDashboard();
   }, [fetchLiveDashboard]);
 
+  // ── Empty state: no suppliers row exists for this user yet ────────────────
+  if (!dbLoading && !liveSupplier) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center px-4">
+        <div className="max-w-md w-full text-center bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+          <div className="w-16 h-16 rounded-full bg-[#8CB89C]/10 flex items-center justify-center mx-auto mb-6">
+            <Package className="w-8 h-8 text-[#8CB89C]" />
+          </div>
+          <h1 className="text-2xl font-bold text-[#1B2A4A] mb-3">Welcome!</h1>
+          <p className="text-gray-600 mb-6">
+            Complete your profile to start selling on the AFU marketplace.
+          </p>
+          <Link
+            href="/supplier/profile"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-white font-semibold text-sm transition-all hover:shadow-lg"
+            style={{ background: 'linear-gradient(135deg, #8CB89C, #729E82)' }}
+          >
+            Complete Your Profile
+            <ChevronRight className="w-4 h-4" />
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   // ── Resolve live vs fallback data ─────────────────────────────────────────
   const supplier = liveSupplier || FALLBACK_SUPPLIER;
   const totalRevenue = liveStats?.totalRevenue ?? FALLBACK_TOTAL_REVENUE;

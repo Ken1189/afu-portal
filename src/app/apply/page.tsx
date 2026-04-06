@@ -148,6 +148,7 @@ export default function ApplyPage() {
       farm_size_ha: formData.farmSize ? parseFloat(formData.farmSize) : undefined,
       primary_crops: formData.crops ? formData.crops.split(',').map((c: string) => c.trim()) : undefined,
       requested_tier: (selectedTier || 'free') as any,
+      application_type: (selectedTier === 'partner' ? 'partner' : 'member') as any,
       notes: formData.about || undefined,
       referral_code: storedRef || undefined,
     } as any);

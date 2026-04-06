@@ -488,9 +488,23 @@ export default function CommissionTracking() {
             </div>
             <div className="flex items-end">
               <button
-                onClick={() => {
-                  alert('Payout request submitted! You will receive payment within 3-5 business days.');
-                  setShowPayoutModal(false);
+                onClick={async () => {
+                  try {
+                    const res = await fetch('/api/supplier/payouts/request', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ payoutMethod: 'bank_transfer' }),
+                    });
+                    const j = await res.json();
+                    if (!res.ok) {
+                      alert(j.error || 'Failed to request payout');
+                    } else {
+                      alert(`Payout requested for $${Number(j.payout?.amount || 0).toFixed(2)}. Admin will process within 3-5 business days.`);
+                      setShowPayoutModal(false);
+                    }
+                  } catch (e) {
+                    alert(e instanceof Error ? e.message : 'Failed to request payout');
+                  }
                 }}
                 className="w-full px-4 py-2 rounded-lg text-sm font-medium bg-[#8CB89C] text-white hover:bg-[#729E82] transition-colors"
               >
