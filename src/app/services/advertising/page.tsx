@@ -54,7 +54,7 @@ const packages = [
     price: '$1,500',
     period: '/month',
     description: 'All pages including homepage. Maximum visibility.',
-    features: ['Banner + featured product', '75,000 impressions', 'All 20 countries', 'Newsletter inclusion', 'Conversion tracking', 'A/B testing'],
+    features: ['Banner + featured product', '75,000 impressions', 'All countries', 'Newsletter inclusion', 'Conversion tracking', 'A/B testing'],
     cta: 'Go Premium',
     popular: false,
   },
@@ -82,7 +82,7 @@ const countryTiers = [
   { tier: 'Tier 1 — Premium', countries: 'Kenya, South Africa, Nigeria, Ghana', banner: '$500', featured: '$300', directory: '$100' },
   { tier: 'Tier 2 — Standard', countries: 'Zimbabwe, Uganda, Tanzania, Botswana, Rwanda, Mozambique', banner: '$300', featured: '$200', directory: '$75' },
   { tier: 'Tier 3 — Emerging', countries: 'Egypt, Ethiopia, Malawi, Namibia, + 6 more', banner: '$150', featured: '$100', directory: '$50' },
-  { tier: 'All Countries', countries: 'Bundle — all 20 countries', banner: '$2,500', featured: '$1,500', directory: '$500' },
+  { tier: 'All Countries', countries: 'Bundle — all countries', banner: '$2,500', featured: '$1,500', directory: '$500' },
 ];
 
 export default function AdvertisingPage() {
@@ -98,7 +98,7 @@ export default function AdvertisingPage() {
             Reach 1M+ Verified African Farmers
           </h1>
           <p className="text-xl text-white/60 max-w-2xl mx-auto mb-10">
-            Advertise your agricultural products and services directly to active farmers across 20 countries. No bots, no wasted spend — just real farmers who need your products.
+            Advertise your agricultural products and services directly to active farmers across Africa. No bots, no wasted spend — just real farmers who need your products.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link

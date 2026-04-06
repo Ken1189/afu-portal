@@ -134,7 +134,7 @@ export default function AmbassadorMarketingPage() {
             <div className="space-y-4">
               <ContentCard
                 title="30-Second Pitch"
-                content="The African Farming Union is a one-stop platform that gives African farmers access to financing, insurance, inputs, guaranteed markets, and training. We serve over our community of farmers across 20 countries, helping them grow profitable, sustainable operations. Whether you're a farmer, supplier, or investor, AFU connects you to Africa's $50 billion agricultural opportunity."
+                content="The African Farming Union is a one-stop platform that gives African farmers access to financing, insurance, inputs, guaranteed markets, and training. We serve over our community of farmers across Africa, helping them grow profitable, sustainable operations. Whether you're a farmer, supplier, or investor, AFU connects you to Africa's $50 billion agricultural opportunity."
               />
               <ContentCard
                 title="60-Second Pitch"
@@ -142,7 +142,7 @@ export default function AmbassadorMarketingPage() {
 
 AFU is an integrated platform that provides everything a farmer needs: crop financing at affordable rates, free crop insurance, agricultural inputs at wholesale prices, guaranteed offtake agreements so they always have a buyer, access to processing hubs, and professional training programmes.
 
-We already serve our growing community of farmers managing thousands of hectares across 20 African countries. For suppliers, it's access to a massive, aggregated customer base. For investors, it's a diversified, de-risked agricultural portfolio with real impact and strong returns. I'd love to tell you more about how you can get involved.`}
+We already serve our growing community of farmers managing thousands of hectares across Africa. For suppliers, it's access to a massive, aggregated customer base. For investors, it's a diversified, de-risked agricultural portfolio with real impact and strong returns. I'd love to tell you more about how you can get involved.`}
               />
               <ContentCard
                 title="2-Minute Pitch"
@@ -150,7 +150,7 @@ We already serve our growing community of farmers managing thousands of hectares
 
 The African Farming Union was built to change that. AFU is an integrated agricultural platform that bundles everything a farmer needs into one membership. Financing to buy seeds and equipment. Crop and asset insurance so one bad season doesn't wipe them out. Inputs at wholesale prices through our bulk purchasing power. Guaranteed offtake agreements so they know exactly who's buying their harvest and at what price. Access to processing hubs to add value to their produce. And professional training to help them adopt modern farming techniques.
 
-Today, AFU serves over our community of farmers managing more than thousands of hectares across 20 countries in Africa. The results speak for themselves: farmers who join AFU see significant increases in yield and income because they finally have the tools and support they need.
+Today, AFU serves over our community of farmers managing more than thousands of hectares across Africa. The results speak for themselves: farmers who join AFU see significant increases in yield and income because they finally have the tools and support they need.
 
 For suppliers and equipment companies, AFU offers access to a massive, aggregated customer base with predictable demand and payment security. For investors, this is a $50 billion market opportunity with a diversified, de-risked portfolio across multiple countries and crop types. And because AFU integrates insurance and guaranteed offtake into the model, the risk profile is fundamentally different from traditional agricultural investment in Africa.
 
@@ -164,7 +164,7 @@ I'm an AFU Ambassador, and I can connect you directly with the team. Whether you
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
               {[
                 { value: 'our growing community of', label: 'Farmers Served' },
-                { value: '20', label: 'Countries' },
+                { value: '9', label: 'Countries' },
                 { value: '$50B', label: 'Market Size' },
                 { value: '1M+', label: 'Hectares Managed' },
               ].map((stat) => (
@@ -181,7 +181,7 @@ I'm an AFU Ambassador, and I can connect you directly with the team. Whether you
             </div>
             <div className="flex justify-end">
               <CopyButton
-                text="AFU Key Stats: our growing community of farmers served | 20 countries | $50B market opportunity | growing hectares managed | Integrated platform: financing, insurance, inputs, offtake, processing, training"
+                text="AFU Key Stats: our growing community of farmers served | multiple African countries | $50B market opportunity | growing hectares managed | Integrated platform: financing, insurance, inputs, offtake, processing, training"
                 label="Copy all stats"
               />
             </div>
@@ -195,7 +195,7 @@ I'm an AFU Ambassador, and I can connect you directly with the team. Whether you
                 title="LinkedIn Post 1"
                 content={`African agriculture is a $50 billion opportunity, and most of the world is missing it.
 
-The African Farming Union is changing the game for our growing community of farmers across 20 countries by providing financing, insurance, inputs, guaranteed markets, and training in one integrated platform.
+The African Farming Union is changing the game for our growing community of farmers across Africa by providing financing, insurance, inputs, guaranteed markets, and training in one integrated platform.
 
 Whether you're in agriculture, impact investing, or agri-business supply chains, this is worth knowing about.
 
@@ -219,7 +219,7 @@ I'm proud to be an AFU Ambassador. If you know anyone in agriculture, supply cha
               <h3 className="text-lg font-semibold mt-6" style={{ color: '#1B2A4A' }}>Twitter / X</h3>
               <ContentCard
                 title="Tweet 1"
-                content={`Africa's $50B agriculture market is largely untapped. @AFU_Official is changing that with our growing community of farmers across 20 countries. Financing, insurance, inputs, markets, all in one platform. [Your Referral Link] #AfricanAgriculture #AgriTech`}
+                content={`Africa's $50B agriculture market is largely untapped. @AFU_Official is changing that with our growing community of farmers across Africa. Financing, insurance, inputs, markets, all in one platform. [Your Referral Link] #AfricanAgriculture #AgriTech`}
               />
               <ContentCard
                 title="Tweet 2"
@@ -229,13 +229,13 @@ I'm proud to be an AFU Ambassador. If you know anyone in agriculture, supply cha
               <h3 className="text-lg font-semibold mt-6" style={{ color: '#1B2A4A' }}>WhatsApp Status / Facebook</h3>
               <ContentCard
                 title="WhatsApp Status"
-                content={`I'm helping African farmers access financing, insurance, and guaranteed markets through the African Farming Union. Over our community of farmers across 20 countries are already benefiting. If you're a farmer, supplier, or investor interested in African agriculture, message me or visit: [Your Referral Link]`}
+                content={`I'm helping African farmers access financing, insurance, and guaranteed markets through the African Farming Union. Over our community of farmers across Africa are already benefiting. If you're a farmer, supplier, or investor interested in African agriculture, message me or visit: [Your Referral Link]`}
               />
               <ContentCard
                 title="Facebook Post"
                 content={`Excited to share something I'm passionate about! The African Farming Union (AFU) is an amazing platform that helps African farmers access everything they need to succeed: financing, insurance, inputs at wholesale prices, guaranteed markets for their produce, and professional training.
 
-They already serve our growing community of farmers across 20 countries, and the impact on farming communities is incredible.
+They already serve our growing community of farmers across Africa, and the impact on farming communities is incredible.
 
 I'm an AFU Ambassador, so if you or anyone you know is involved in farming, agricultural supplies, or investing in Africa, I'd love to chat about how AFU can help. Drop me a message or check it out here: [Your Referral Link]`}
               />
@@ -251,7 +251,7 @@ I'm an AFU Ambassador, so if you or anyone you know is involved in farming, agri
 
 Dear [Name],
 
-I hope this message finds you well. I wanted to introduce you to the African Farming Union (AFU), an integrated agricultural platform that is helping over our community of farmers across 20 African countries access the tools they need to grow profitably.
+I hope this message finds you well. I wanted to introduce you to the African Farming Union (AFU), an integrated agricultural platform that is helping over our community of farmers across Africa access the tools they need to grow profitably.
 
 As an AFU member, you would gain access to:
 - Affordable crop financing
@@ -279,7 +279,7 @@ Dear [Name],
 
 I'm reaching out because I believe your products could reach a significantly larger market through the African Farming Union (AFU).
 
-AFU is an integrated agricultural platform serving our growing community of farmers managing thousands of hectares across 20 African countries. As a supplier partner, you would benefit from:
+AFU is an integrated agricultural platform serving our growing community of farmers managing thousands of hectares across Africa. As a supplier partner, you would benefit from:
 - Access to a large, aggregated customer base
 - Predictable demand through structured procurement
 - Payment security through AFU's integrated finance system
@@ -301,7 +301,7 @@ Dear [Name],
 
 I wanted to bring to your attention an investment opportunity in African agriculture that combines strong commercial returns with measurable social impact.
 
-The African Farming Union (AFU) is an integrated agricultural platform operating across 20 African countries, serving our growing community of farmers managing thousands of hectares. The platform provides financing, crop insurance, input supply, guaranteed offtake, processing, and farmer training.
+The African Farming Union (AFU) is an integrated agricultural platform operating across Africa, serving our growing community of farmers managing thousands of hectares. The platform provides financing, crop insurance, input supply, guaranteed offtake, processing, and farmer training.
 
 What makes AFU distinctive from an investment perspective:
 - Diversified exposure across multiple countries and crop types
@@ -329,15 +329,15 @@ AFU Ambassador`}
               />
               <ContentCard
                 title="Message to a Supplier"
-                content={`Hi [Name], I thought you might be interested in this. The African Farming Union (AFU) serves our growing community of farmers across 20 countries and they're looking for suppliers of [seeds/fertiliser/equipment]. It's a great way to reach thousands of customers through one platform with guaranteed payment. Check it out: [Your Referral Link]. Want me to connect you with their team?`}
+                content={`Hi [Name], I thought you might be interested in this. The African Farming Union (AFU) serves our growing community of farmers across Africa and they're looking for suppliers of [seeds/fertiliser/equipment]. It's a great way to reach thousands of customers through one platform with guaranteed payment. Check it out: [Your Referral Link]. Want me to connect you with their team?`}
               />
               <ContentCard
                 title="Message to an Investor"
-                content={`Hi [Name], I've come across an interesting investment opportunity in African agriculture. The African Farming Union operates across 20 countries with our growing community of farmers. They've built an integrated model with insurance and guaranteed offtake that significantly reduces risk. The African ag market is $50B and growing. Here's more info: [Your Referral Link]. Would you be open to hearing more?`}
+                content={`Hi [Name], I've come across an interesting investment opportunity in African agriculture. The African Farming Union operates across Africa with our growing community of farmers. They've built an integrated model with insurance and guaranteed offtake that significantly reduces risk. The African ag market is $50B and growing. Here's more info: [Your Referral Link]. Would you be open to hearing more?`}
               />
               <ContentCard
                 title="Message to a Friend/Contact"
-                content={`Hey [Name]! I've become an Ambassador for the African Farming Union, a platform helping African farmers access finance, insurance, and markets. It's making a real difference for farming families across 20 countries. If you know any farmers, agricultural businesses, or people interested in investing in African agriculture, I'd love an introduction. Here's my link: [Your Referral Link]. Thanks!`}
+                content={`Hey [Name]! I've become an Ambassador for the African Farming Union, a platform helping African farmers access finance, insurance, and markets. It's making a real difference for farming families across Africa. If you know any farmers, agricultural businesses, or people interested in investing in African agriculture, I'd love an introduction. Here's my link: [Your Referral Link]. Thanks!`}
               />
             </div>
           </Section>
@@ -366,14 +366,14 @@ AFU Ambassador`}
                 <h3 className="text-lg font-semibold mb-3" style={{ color: '#1B2A4A' }}>For Suppliers</h3>
                 <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
                   <ul className="space-y-2 text-gray-600 text-sm">
-                    <li className="flex items-start gap-2"><span style={{ color: '#5DB347' }}>&bull;</span> Reach our growing community of farmers across 20 African countries through one platform.</li>
+                    <li className="flex items-start gap-2"><span style={{ color: '#5DB347' }}>&bull;</span> Reach our growing community of farmers across Africa through one platform.</li>
                     <li className="flex items-start gap-2"><span style={{ color: '#5DB347' }}>&bull;</span> Predictable, aggregated demand simplifies your planning and logistics.</li>
                     <li className="flex items-start gap-2"><span style={{ color: '#5DB347' }}>&bull;</span> Payment security through AFU&apos;s integrated finance system.</li>
                     <li className="flex items-start gap-2"><span style={{ color: '#5DB347' }}>&bull;</span> Streamlined distribution via AFU&apos;s processing hub network.</li>
                     <li className="flex items-start gap-2"><span style={{ color: '#5DB347' }}>&bull;</span> Long-term contracts with a growing customer base.</li>
                   </ul>
                   <div className="mt-3 flex justify-end">
-                    <CopyButton text="For Suppliers: Reach our growing community of farmers in 20 countries | Predictable aggregated demand | Payment security | Streamlined logistics via processing hubs | Long-term contracts" />
+                    <CopyButton text="For Suppliers: Reach our growing community of farmers across Africa | Predictable aggregated demand | Payment security | Streamlined logistics via processing hubs | Long-term contracts" />
                   </div>
                 </div>
               </div>
@@ -383,13 +383,13 @@ AFU Ambassador`}
                 <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
                   <ul className="space-y-2 text-gray-600 text-sm">
                     <li className="flex items-start gap-2"><span style={{ color: '#5DB347' }}>&bull;</span> $50 billion addressable market with significant growth potential.</li>
-                    <li className="flex items-start gap-2"><span style={{ color: '#5DB347' }}>&bull;</span> Diversified portfolio across 20 countries and multiple crop types.</li>
+                    <li className="flex items-start gap-2"><span style={{ color: '#5DB347' }}>&bull;</span> Diversified portfolio across Africa and multiple crop types.</li>
                     <li className="flex items-start gap-2"><span style={{ color: '#5DB347' }}>&bull;</span> Integrated insurance and guaranteed offtake reduce investment risk.</li>
                     <li className="flex items-start gap-2"><span style={{ color: '#5DB347' }}>&bull;</span> Strong impact credentials aligned with SDGs 1, 2, and 8.</li>
                     <li className="flex items-start gap-2"><span style={{ color: '#5DB347' }}>&bull;</span> Proven model with our growing community of active farmers and growing hectares.</li>
                   </ul>
                   <div className="mt-3 flex justify-end">
-                    <CopyButton text="For Investors: $50B market | 20-country diversification | Insurance + offtake reduce risk | SDG-aligned impact | our growing community of farmers, growing hectares" />
+                    <CopyButton text="For Investors: $50B market | Multi-country diversification across Africa | Insurance + offtake reduce risk | SDG-aligned impact | our growing community of farmers, growing hectares" />
                   </div>
                 </div>
               </div>
@@ -474,7 +474,7 @@ AFU Ambassador`}
             <div className="space-y-4">
               <ContentCard
                 title="What is the African Farming Union?"
-                content="The African Farming Union (AFU) is an integrated agricultural platform that provides financing, crop insurance, agricultural inputs, guaranteed market access through offtake agreements, processing hub access, and farmer training programmes. We serve over our community of farmers managing more than thousands of hectares across 20 African countries."
+                content="The African Farming Union (AFU) is an integrated agricultural platform that provides financing, crop insurance, agricultural inputs, guaranteed market access through offtake agreements, processing hub access, and farmer training programmes. We serve over our community of farmers managing more than thousands of hectares across Africa."
               />
               <ContentCard
                 title="How much does membership cost?"
@@ -482,7 +482,7 @@ AFU Ambassador`}
               />
               <ContentCard
                 title="Is this a legitimate organisation?"
-                content="Yes. The African Farming Union is a registered organisation operating across 20 African countries with over our community of active farmer members. AFU is headquartered in Botswana and works with established financial institutions, insurance providers, and offtake partners. You can visit our website, read our terms of service, and contact our team directly."
+                content="Yes. The African Farming Union is a registered organisation operating across Africa with over our community of active farmer members. AFU is headquartered in Botswana and works with established financial institutions, insurance providers, and offtake partners. You can visit our website, read our terms of service, and contact our team directly."
               />
               <ContentCard
                 title="How does the financing work?"
@@ -490,7 +490,7 @@ AFU Ambassador`}
               />
               <ContentCard
                 title="What countries does AFU operate in?"
-                content="AFU currently operates across 20 countries in Africa, including Botswana, Kenya, Zimbabwe, Tanzania, Uganda, Zambia, Malawi, Mozambique, Ghana, and Nigeria, among others. We are continuously expanding to new markets."
+                content="AFU currently operates across Africa in Africa, including Botswana, Kenya, Zimbabwe, Tanzania, Uganda, Zambia, Malawi, Mozambique, Ghana, and Nigeria, among others. We are continuously expanding to new markets."
               />
               <ContentCard
                 title="How do I invest in AFU?"

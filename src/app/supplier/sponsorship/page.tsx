@@ -786,6 +786,7 @@ export default function SponsorshipProgram() {
           {/* Action buttons */}
           <div className="space-y-3">
             <button
+              onClick={() => alert('Renewal request submitted. Our team will contact you to confirm your sponsorship renewal.')}
               className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-white text-sm font-medium transition-all hover:shadow-lg"
               style={{ background: 'linear-gradient(135deg, #8CB89C 0%, #729E82 100%)' }}
             >

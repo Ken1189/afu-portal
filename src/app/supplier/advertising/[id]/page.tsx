@@ -387,7 +387,10 @@ export default function AdDetailPage() {
             </button>
           )}
           {canEdit && (
-            <button className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
+            <button
+              onClick={() => alert('Ad editing coming soon. To make changes, create a new ad campaign.')}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
+            >
               <Pencil className="w-4 h-4" />
               Edit
             </button>

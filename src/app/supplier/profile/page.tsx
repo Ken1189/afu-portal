@@ -754,7 +754,10 @@ export default function SupplierProfilePage() {
             <CreditCard className="w-4.5 h-4.5 text-[#5DB347]" />
             Banking Details
           </h3>
-          <button className="inline-flex items-center gap-1.5 bg-[#5DB347]/10 text-[#5DB347] hover:bg-[#5DB347]/20 px-4 py-2 rounded-lg text-xs font-medium transition-colors">
+          <button
+            onClick={() => alert('To update banking details, please contact AFU support at support@afu.africa for security verification.')}
+            className="inline-flex items-center gap-1.5 bg-[#5DB347]/10 text-[#5DB347] hover:bg-[#5DB347]/20 px-4 py-2 rounded-lg text-xs font-medium transition-colors"
+          >
             <Edit3 className="w-3.5 h-3.5" />
             Edit Banking
           </button>

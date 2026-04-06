@@ -305,13 +305,22 @@ export default function SupplierReviewsPage() {
 
   const displayedReviews = showAllReviews ? filteredReviews : filteredReviews.slice(0, 8);
 
-  const handleSubmitResponse = (reviewId: string) => {
+  const handleSubmitResponse = async (reviewId: string) => {
     if (!responseText.trim()) return;
+    const text = responseText.trim();
+    // Optimistic UI update
     setReviews((prev) =>
-      prev.map((r) => (r.id === reviewId ? { ...r, response: responseText.trim() } : r))
+      prev.map((r) => (r.id === reviewId ? { ...r, response: text } : r))
     );
     setRespondingTo(null);
     setResponseText('');
+    // Persist to DB if review ID looks like a UUID (not fallback)
+    try {
+      if (reviewId.length > 10) {
+        const supabase = createClient();
+        await supabase.from('reviews').update({ response: text }).eq('id', reviewId);
+      }
+    } catch { /* silent - local state already updated */ }
   };
 
   return (

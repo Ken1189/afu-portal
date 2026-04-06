@@ -62,7 +62,7 @@ const FALLBACK_OPPORTUNITIES: Opportunity[] = [
     subscribedAmount: 3100000,
     status: 'Open',
     description:
-      'Senior secured lending to verified African farmers. Portfolio diversified across 20 countries, 15+ crop types. All loans backed by crop insurance and guaranteed offtake agreements.',
+      'Senior secured lending to verified African farmers. Portfolio diversified across Africa, 15+ crop types. All loans backed by crop insurance and guaranteed offtake agreements.',
   },
   {
     id: 'zim-blueberry',

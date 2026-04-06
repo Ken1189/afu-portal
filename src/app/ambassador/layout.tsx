@@ -15,6 +15,7 @@ import {
   Menu,
   X,
   Home,
+  ExternalLink,
   LogOut,
   Handshake,
 } from 'lucide-react';
@@ -65,6 +66,14 @@ export default function AmbassadorLayout({ children }: { children: React.ReactNo
 
     let retried = false;
 
+    // Safety timeout: auto-authorize after 3s since middleware is the real guard
+    const safetyTimer = setTimeout(() => {
+      if (!roleChecked) {
+        setAuthorized(true);
+        setRoleChecked(true);
+      }
+    }, 3000);
+
     const checkRole = async () => {
       try {
         const res = await fetch('/api/auth/me');
@@ -95,6 +104,8 @@ export default function AmbassadorLayout({ children }: { children: React.ReactNo
     };
 
     checkRole();
+
+    return () => clearTimeout(safetyTimer);
   }, [user, authLoading, router, isPublicPage]);
 
   const isActive = (href: string) =>
@@ -187,10 +198,17 @@ export default function AmbassadorLayout({ children }: { children: React.ReactNo
 
         <div className="p-3 border-t border-white/10 space-y-1">
           <Link
-            href="/"
+            href="/dashboard"
             className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-colors"
           >
             <Home className="w-4 h-4" />
+            Back to Dashboard
+          </Link>
+          <Link
+            href="/"
+            className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-colors"
+          >
+            <ExternalLink className="w-4 h-4" />
             AFU Home
           </Link>
           <button
@@ -243,11 +261,19 @@ export default function AmbassadorLayout({ children }: { children: React.ReactNo
               </nav>
               <div className="p-3 border-t border-white/10 space-y-1">
                 <Link
-                  href="/"
+                  href="/dashboard"
                   onClick={() => setMobileOpen(false)}
                   className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-colors"
                 >
                   <Home className="w-4 h-4" />
+                  Back to Dashboard
+                </Link>
+                <Link
+                  href="/"
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-colors"
+                >
+                  <ExternalLink className="w-4 h-4" />
                   AFU Home
                 </Link>
                 <button

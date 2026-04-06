@@ -434,7 +434,28 @@ export default function InvestorSettingsPage() {
                 <p className="text-xs text-gray-400">Last changed 45 days ago</p>
               </div>
             </div>
-            <button className="px-4 py-1.5 text-xs font-medium text-[#1B2A4A] border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+            <button
+              onClick={async () => {
+                if (!user?.email) {
+                  alert('No email associated with this account.');
+                  return;
+                }
+                try {
+                  const supabase = createClient();
+                  const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
+                    redirectTo: `${window.location.origin}/auth/reset-password`,
+                  });
+                  if (error) {
+                    alert('Failed to send password reset email. Please try again.');
+                  } else {
+                    alert('Password reset email sent. Please check your inbox.');
+                  }
+                } catch {
+                  alert('Failed to send password reset email. Please try again.');
+                }
+              }}
+              className="px-4 py-1.5 text-xs font-medium text-[#1B2A4A] border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+            >
               Change Password
             </button>
           </div>

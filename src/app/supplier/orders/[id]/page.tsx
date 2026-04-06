@@ -727,7 +727,10 @@ export default function SupplierOrderDetailPage() {
                 <span className="text-gray-500">Total Amount</span>
                 <span className="font-bold text-[#8CB89C] tabular-nums">{formatCurrency(order.amount)}</span>
               </div>
-              <button className="w-full inline-flex items-center justify-center gap-2 bg-[#8CB89C]/10 text-[#8CB89C] hover:bg-[#8CB89C]/20 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors mt-2">
+              <button
+                onClick={() => alert('PDF invoice generation coming soon.')}
+                className="w-full inline-flex items-center justify-center gap-2 bg-[#8CB89C]/10 text-[#8CB89C] hover:bg-[#8CB89C]/20 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors mt-2"
+              >
                 <Download className="w-4 h-4" />
                 Download PDF
               </button>
@@ -771,13 +774,19 @@ export default function SupplierOrderDetailPage() {
           )}
 
           {/* Contact Buyer */}
-          <button className="inline-flex items-center gap-2 bg-[#1B2A4A]/5 hover:bg-[#1B2A4A]/10 text-[#1B2A4A] px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors">
+          <button
+            onClick={() => alert('Messaging feature coming soon. For now, contact the buyer directly.')}
+            className="inline-flex items-center gap-2 bg-[#1B2A4A]/5 hover:bg-[#1B2A4A]/10 text-[#1B2A4A] px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors"
+          >
             <MessageSquare className="w-4 h-4" />
             Contact Buyer
           </button>
 
           {/* Print Invoice */}
-          <button className="inline-flex items-center gap-2 bg-white hover:bg-gray-50 text-[#1B2A4A] border border-gray-200 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors">
+          <button
+            onClick={() => window.print()}
+            className="inline-flex items-center gap-2 bg-white hover:bg-gray-50 text-[#1B2A4A] border border-gray-200 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors"
+          >
             <Printer className="w-4 h-4" />
             Print Invoice
           </button>

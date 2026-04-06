@@ -158,9 +158,9 @@ const FALLBACK_PRODUCT_DEPLOYMENT = [
 // ── Deployment by Country (Fallback) ──────────────────────────────────────
 
 const FALLBACK_COUNTRY_DEPLOYMENT = [
-  { label: 'Zimbabwe', value: 4.1, pct: 50, flag: '\u{1F1FF}\u{1F1FC}' },
-  { label: 'Uganda', value: 2.5, pct: 30, flag: '\u{1F1FA}\u{1F1EC}' },
-  { label: 'Kenya', value: 1.6, pct: 20, flag: '\u{1F1F0}\u{1F1EA}' },
+  { label: 'Zimbabwe', value: 4.1, pct: 50, flag: 'ZW' },
+  { label: 'Uganda', value: 2.5, pct: 30, flag: 'UG' },
+  { label: 'Kenya', value: 1.6, pct: 20, flag: 'KE' },
 ];
 
 // ── Activity Feed ───────────────────────────────────────────────────────────
@@ -211,7 +211,7 @@ const activityFeed = [
     icon: Rocket,
     iconColor: 'text-rose-600',
     iconBg: 'bg-rose-50',
-    title: 'Kenya country launch completed \u2014 operations live',
+    title: 'Kenya country launch completed -- operations live',
     time: '5 days ago',
   },
   {
@@ -272,15 +272,15 @@ const PRODUCT_ICON_MAP: Record<string, typeof Banknote> = {
 };
 
 const COUNTRY_FLAG_MAP: Record<string, string> = {
-  Zimbabwe: '\u{1F1FF}\u{1F1FC}',
-  Uganda: '\u{1F1FA}\u{1F1EC}',
-  Kenya: '\u{1F1F0}\u{1F1EA}',
-  Tanzania: '\u{1F1F9}\u{1F1FF}',
-  Mozambique: '\u{1F1F2}\u{1F1FF}',
-  Malawi: '\u{1F1F2}\u{1F1FC}',
-  Zambia: '\u{1F1FF}\u{1F1F2}',
-  Rwanda: '\u{1F1F7}\u{1F1FC}',
-  Ethiopia: '\u{1F1EA}\u{1F1F9}',
+  Zimbabwe: 'ZW',
+  Uganda: 'UG',
+  Kenya: 'KE',
+  Tanzania: 'TZ',
+  Mozambique: 'MZ',
+  Malawi: 'MW',
+  Zambia: 'ZM',
+  Rwanda: 'RW',
+  Ethiopia: 'ET',
 };
 
 function fmtCompact(val: number): string {
@@ -392,13 +392,25 @@ export default function InvestorDashboard() {
           }
         }
 
-        // 3. Fetch recent investor updates
-        const { data: upd } = await supabase
+        // 3. Fetch recent investor updates (try is_published boolean first, then status string)
+        let upd: InvestorUpdate[] | null = null;
+        const { data: updByBool } = await supabase
           .from('investor_updates')
           .select('*')
-          .eq('status', 'published')
+          .eq('is_published', true)
           .order('published_at', { ascending: false })
           .limit(5);
+        if (updByBool && updByBool.length > 0) {
+          upd = updByBool as InvestorUpdate[];
+        } else {
+          const { data: updByStatus } = await supabase
+            .from('investor_updates')
+            .select('*')
+            .eq('status', 'published')
+            .order('published_at', { ascending: false })
+            .limit(5);
+          if (updByStatus && updByStatus.length > 0) upd = updByStatus as InvestorUpdate[];
+        }
         if (upd && upd.length > 0) setUpdates(upd);
       } catch {
         // Fall back to demo data on error
@@ -525,7 +537,7 @@ export default function InvestorDashboard() {
         label,
         value: Number((value / 1_000_000).toFixed(1)),
         pct: Math.round((value / total) * 100),
-        flag: COUNTRY_FLAG_MAP[label] || '\u{1F30D}',
+        flag: COUNTRY_FLAG_MAP[label] || '--',
       }));
   }, [investments]);
 

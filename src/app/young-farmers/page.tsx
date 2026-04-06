@@ -31,7 +31,7 @@ const FALLBACK_PROGRAMS: { iconName: string; title: string; description: string;
     title: "School Farm Partnerships",
     description:
       "AFU partners with schools across our member countries to create learning gardens and mini-farms on school grounds. Students learn agriculture from planting to harvest while contributing fresh produce to their school communities.",
-    highlight: "Active in 20 countries",
+    highlight: "Active across Africa",
   },
   {
     iconName: "Trophy",

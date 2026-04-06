@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/supabase/auth-context';
+import FeatureGate from '@/components/ui/FeatureGate';
+import { useMembershipTier } from '@/lib/membership-context';
 import Link from 'next/link';
 import {
   Coins,
@@ -40,9 +42,11 @@ interface Transaction {
 
 interface MyListing {
   id: string;
+  dbId?: string; // actual Supabase record ID for mutations
   title: string;
   category: string;
   price: string;
+  quantity?: number;
   priceType: string;
   status: 'active' | 'sold' | 'paused';
   views: number;
@@ -113,6 +117,7 @@ const STATUS_ICONS: Record<string, React.ComponentType<{ className?: string }>> 
 // ── Page ──
 export default function FarmExchangePage() {
   const { user } = useAuth();
+  const { membershipTier } = useMembershipTier();
   const [dbTransactions, setDbTransactions] = useState<Transaction[]>([]);
   const [dbListings, setDbListings] = useState<MyListing[]>([]);
   const [dbTrades, setDbTrades] = useState<Trade[]>([]);
@@ -143,10 +148,12 @@ export default function FarmExchangePage() {
             .filter((o: Record<string, unknown>) => o.status === 'marketplace' || o.status === 'active' || o.status === 'open')
             .map((o: Record<string, unknown>, idx: number) => ({
               id: String(idx + 1),
+              dbId: (o.id as string) || undefined,
               title: (o.title as string) || (o.commodity as string) || 'Listing',
               category: (o.category as string) || 'produce',
               price: String((o.price as number) || (o.total_amount as number) || 0),
-              priceType: 'credits',
+              quantity: (o.quantity as number) || 1,
+              priceType: (o.price_type as string) || 'credits',
               status: 'active' as const,
               views: 0,
             }));
@@ -197,6 +204,139 @@ export default function FarmExchangePage() {
     region: '',
     delivery: false,
   });
+
+  // ── Edit modal state ──
+  const [editingListing, setEditingListing] = useState<MyListing | null>(null);
+  const [editForm, setEditForm] = useState({ title: '', price: '', quantity: '1' });
+  const [editSubmitting, setEditSubmitting] = useState(false);
+
+  // ── Wallet balance ──
+  const [walletBalance, setWalletBalance] = useState<number | null>(null);
+  const [walletLoading, setWalletLoading] = useState(true);
+
+  // Fetch wallet balance from DB
+  useEffect(() => {
+    const supabase = createClient();
+    async function fetchWalletBalance() {
+      try {
+        if (!user?.id) { setWalletLoading(false); return; }
+        // Try wallet/balance table first
+        const { data: wallet } = await supabase
+          .from('wallets')
+          .select('balance')
+          .eq('user_id', user.id)
+          .single();
+        if (wallet && typeof wallet.balance === 'number') {
+          setWalletBalance(wallet.balance);
+        } else {
+          // Fallback: compute from trade_orders
+          const { data: earned } = await supabase
+            .from('trade_orders')
+            .select('total_amount, amount')
+            .eq('user_id', user.id)
+            .eq('order_type', 'sell')
+            .in('status', ['completed', 'active']);
+          const { data: spent } = await supabase
+            .from('trade_orders')
+            .select('total_amount, amount')
+            .eq('user_id', user.id)
+            .eq('order_type', 'buy')
+            .in('status', ['completed', 'active']);
+          const totalEarned = (earned || []).reduce((s, o) => s + ((o.total_amount as number) || (o.amount as number) || 0), 0);
+          const totalSpent = (spent || []).reduce((s, o) => s + ((o.total_amount as number) || (o.amount as number) || 0), 0);
+          setWalletBalance(totalEarned - totalSpent);
+        }
+      } catch {
+        // No wallet table or error — leave null to show fallback
+      } finally {
+        setWalletLoading(false);
+      }
+    }
+    fetchWalletBalance();
+  }, [user?.id]);
+
+  // ── Listing action handlers ──
+  const handleEditListing = (listing: MyListing) => {
+    setEditingListing(listing);
+    setEditForm({
+      title: listing.title,
+      price: listing.price.replace(/,/g, ''),
+      quantity: String(listing.quantity || 1),
+    });
+  };
+
+  const handleEditSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingListing) return;
+    setEditSubmitting(true);
+    try {
+      if (editingListing.dbId) {
+        const supabase = createClient();
+        const { error } = await supabase
+          .from('trade_orders')
+          .update({
+            title: editForm.title,
+            price: parseFloat(editForm.price) || 0,
+            total_amount: parseFloat(editForm.price) || 0,
+            quantity: parseInt(editForm.quantity) || 1,
+          })
+          .eq('id', editingListing.dbId);
+        if (error) throw error;
+      }
+      // Update local state
+      const updateList = (prev: MyListing[]) =>
+        prev.map((l) =>
+          l.id === editingListing.id
+            ? { ...l, title: editForm.title, price: editForm.price, quantity: parseInt(editForm.quantity) || 1 }
+            : l
+        );
+      setDbListings(updateList);
+      setEditingListing(null);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to update listing.');
+    } finally {
+      setEditSubmitting(false);
+    }
+  };
+
+  const handleDeleteListing = async (listing: MyListing) => {
+    if (!window.confirm(`Delete "${listing.title}"? This cannot be undone.`)) return;
+    try {
+      if (listing.dbId) {
+        const supabase = createClient();
+        const { error } = await supabase
+          .from('trade_orders')
+          .delete()
+          .eq('id', listing.dbId);
+        if (error) throw error;
+      }
+      setDbListings((prev) => prev.filter((l) => l.id !== listing.id));
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to delete listing.');
+    }
+  };
+
+  const handleMarkAsSold = async (listing: MyListing) => {
+    try {
+      if (listing.dbId) {
+        const supabase = createClient();
+        const { error } = await supabase
+          .from('trade_orders')
+          .update({ status: 'completed' })
+          .eq('id', listing.dbId);
+        if (error) throw error;
+      }
+      setDbListings((prev) =>
+        prev.map((l) => (l.id === listing.id ? { ...l, status: 'sold' as const } : l))
+      );
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to update listing status.');
+    }
+  };
+
+  const handleRateTrade = () => {
+    alert('Rating feature coming soon! You will be able to rate your trade partners here.');
+  };
 
   const handleFormChange = (field: string, value: string | boolean) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -263,6 +403,7 @@ export default function FarmExchangePage() {
   };
 
   return (
+    <FeatureGate feature="exchange" tier={membershipTier}>
     <div className="p-4 sm:p-6 space-y-6">
       {/* ── Header ── */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
@@ -287,9 +428,14 @@ export default function FarmExchangePage() {
             <p className="text-white/60 text-xs uppercase tracking-wider mb-1">Credit Balance</p>
             <div className="flex items-center gap-2 mb-1">
               <Coins className="w-6 h-6 text-amber-400" />
-              <span className="text-3xl sm:text-4xl font-bold">2,450</span>
+              <span className="text-3xl sm:text-4xl font-bold">
+                {walletLoading ? '...' : walletBalance !== null ? walletBalance.toLocaleString() : '---'}
+              </span>
               <span className="text-white/50 text-sm mt-2">credits</span>
             </div>
+            {walletBalance === null && !walletLoading && (
+              <p className="text-white/40 text-[10px]">Balance reflects trade activity</p>
+            )}
             <div className="flex gap-4 text-sm mt-3">
               <div>
                 <p className="text-white/50 text-xs">Total Earned</p>
@@ -394,15 +540,29 @@ export default function FarmExchangePage() {
                   {listing.status}
                 </span>
                 <div className="flex items-center gap-1">
-                  <button className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-[#5DB347] transition-colors" title="Edit">
+                  <button
+                    onClick={() => handleEditListing(listing)}
+                    className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-[#5DB347] transition-colors"
+                    title="Edit"
+                  >
                     <Edit3 className="w-4 h-4" />
                   </button>
-                  <button className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-red-500 transition-colors" title="Delete">
+                  <button
+                    onClick={() => handleDeleteListing(listing)}
+                    className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-red-500 transition-colors"
+                    title="Delete"
+                  >
                     <Trash2 className="w-4 h-4" />
                   </button>
-                  <button className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-blue-500 transition-colors" title="Mark as Sold">
-                    <CheckCircle2 className="w-4 h-4" />
-                  </button>
+                  {listing.status !== 'sold' && (
+                    <button
+                      onClick={() => handleMarkAsSold(listing)}
+                      className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-blue-500 transition-colors"
+                      title="Mark as Sold"
+                    >
+                      <CheckCircle2 className="w-4 h-4" />
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
@@ -457,7 +617,11 @@ export default function FarmExchangePage() {
                   {trade.status}
                 </span>
                 {trade.status === 'completed' && !trade.rated && (
-                  <button className="text-amber-500 hover:text-amber-600 transition-colors" title="Rate this trade">
+                  <button
+                    onClick={handleRateTrade}
+                    className="text-amber-500 hover:text-amber-600 transition-colors"
+                    title="Rate this trade"
+                  >
                     <Star className="w-4 h-4" />
                   </button>
                 )}
@@ -466,6 +630,65 @@ export default function FarmExchangePage() {
           })}
         </div>
       </section>
+
+      {/* ── Edit Listing Modal ── */}
+      {editingListing && (
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+              <h3 className="font-bold text-[#1B2A4A]">Edit Listing</h3>
+              <button
+                onClick={() => setEditingListing(null)}
+                className="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center text-gray-400"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <form onSubmit={handleEditSubmit} className="p-6 space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">Title</label>
+                <input
+                  type="text"
+                  required
+                  value={editForm.title}
+                  onChange={(e) => setEditForm((prev) => ({ ...prev, title: e.target.value }))}
+                  className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347] outline-none"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">Price (credits)</label>
+                  <input
+                    type="number"
+                    required
+                    min="1"
+                    value={editForm.price}
+                    onChange={(e) => setEditForm((prev) => ({ ...prev, price: e.target.value }))}
+                    className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347] outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">Quantity</label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={editForm.quantity}
+                    onChange={(e) => setEditForm((prev) => ({ ...prev, quantity: e.target.value }))}
+                    className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347] outline-none"
+                  />
+                </div>
+              </div>
+              <button
+                type="submit"
+                disabled={editSubmitting}
+                className="w-full bg-[#5DB347] hover:bg-[#4A9E35] text-white py-3 rounded-xl font-semibold text-sm transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {editSubmitting ? 'Saving...' : 'Save Changes'}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* ── D) Create Listing Modal ── */}
       {showCreateModal && (
@@ -684,5 +907,6 @@ export default function FarmExchangePage() {
         </div>
       )}
     </div>
+    </FeatureGate>
   );
 }

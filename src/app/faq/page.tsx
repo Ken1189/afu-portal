@@ -24,7 +24,7 @@ const FALLBACK_FAQ: FaqItem[] = [
   {
     id: 'faq-2',
     question: 'Which countries does AFU operate in?',
-    answer: 'AFU currently operates across 9 African countries including Zimbabwe, Botswana, Tanzania, Kenya, Nigeria, Ghana, Uganda, Zambia, and Mozambique, with expansion planned to 20 countries.',
+    answer: 'AFU currently operates across 9 African countries including Zimbabwe, Botswana, Tanzania, Kenya, Nigeria, Ghana, Uganda, Zambia, and Mozambique, with expansion planned across Africa.',
     category: 'General',
     display_order: 2,
   },

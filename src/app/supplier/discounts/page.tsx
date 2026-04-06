@@ -245,7 +245,13 @@ export default function MemberDiscounts() {
   };
 
   // ── Save global discount ──────────────────────────────────────────────
-  const handleSaveGlobal = () => {
+  const handleSaveGlobal = async () => {
+    try {
+      if (liveSupplier.id && liveSupplier.id !== 'SUP-001') {
+        const supabase = createClient();
+        await supabase.from('suppliers').update({ member_discount_percent: globalDiscount }).eq('id', liveSupplier.id);
+      }
+    } catch { /* silent */ }
     setSavedGlobalDiscount(globalDiscount);
     setGlobalSaved(true);
     setTimeout(() => setGlobalSaved(false), 2000);

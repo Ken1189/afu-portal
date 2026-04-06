@@ -18,6 +18,8 @@ import {
 } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
+import FeatureGate from '@/components/ui/FeatureGate';
+import { useMembershipTier } from '@/lib/membership-context';
 import { useInsurancePolicies, useInsuranceClaims } from '@/lib/supabase/use-insurance';
 
 // ---------------------------------------------------------------------------
@@ -404,6 +406,7 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<
 
 export default function InsuranceHomePage() {
   const { t } = useLanguage();
+  const { membershipTier } = useMembershipTier();
 
   // --- Supabase data ---
   const { policies: dbPolicies, loading: policiesLoading } = useInsurancePolicies();
@@ -533,6 +536,7 @@ export default function InsuranceHomePage() {
   }
 
   return (
+    <FeatureGate feature="insurance" tier={membershipTier}>
     <motion.div
       variants={containerVariants}
       initial="hidden"
@@ -807,5 +811,6 @@ export default function InsuranceHomePage() {
         </div>
       </motion.section>
     </motion.div>
+    </FeatureGate>
   );
 }

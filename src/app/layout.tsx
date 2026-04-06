@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: "African Farming Union (AFU) - Africa's Agriculture Development Platform",
   description:
-    "By Farmers, For Farmers. Financing, insurance, legal assistance, veterinary services, training, and market access for farmers across 20 African countries.",
+    "By Farmers, For Farmers. Financing, insurance, legal assistance, veterinary services, training, and market access for farmers across Africa.",
   manifest: "/manifest.json",
   themeColor: "#5DB347",
   // S4.3: Canonical URL
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "African Farming Union (AFU) - Africa's Agriculture Development Platform",
     description:
-      "By Farmers, For Farmers. Financing, insurance, legal assistance, veterinary services, training, and market access for farmers across 20 African countries.",
+      "By Farmers, For Farmers. Financing, insurance, legal assistance, veterinary services, training, and market access for farmers across Africa.",
     url: "https://africanfarmingunion.org",
     siteName: "African Farming Union",
     images: [
@@ -61,7 +61,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "African Farming Union (AFU) - Africa's Agriculture Development Platform",
     description:
-      "By Farmers, For Farmers. Financing, insurance, legal assistance, veterinary services, training, and market access for farmers across 20 African countries.",
+      "By Farmers, For Farmers. Financing, insurance, legal assistance, veterinary services, training, and market access for farmers across Africa.",
     images: ["https://africanfarmingunion.org/og-image.png"],
   },
   appleWebApp: {

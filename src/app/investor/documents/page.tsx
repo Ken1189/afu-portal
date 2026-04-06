@@ -321,7 +321,26 @@ export default function DocumentsPage() {
               Secure access to fund documents, reports, and legal agreements.
             </p>
           </div>
-          <button className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#1B2A4A] text-white text-sm font-medium hover:bg-[#1B2A4A]/90 transition-colors shadow-sm">
+          <button
+            onClick={() => {
+              const downloadable = documents.filter((d) => d.file_url && d.file_url !== '#');
+              if (downloadable.length === 0) {
+                alert('No downloadable documents available yet. Documents will become available once uploaded by the AFU team.');
+                return;
+              }
+              downloadable.forEach((d) => {
+                const a = document.createElement('a');
+                a.href = d.file_url!;
+                a.target = '_blank';
+                a.rel = 'noopener noreferrer';
+                a.download = d.name;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+              });
+            }}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#1B2A4A] text-white text-sm font-medium hover:bg-[#1B2A4A]/90 transition-colors shadow-sm"
+          >
             <DownloadCloud className="w-4 h-4" />
             Download All
           </button>
@@ -505,7 +524,7 @@ export default function DocumentsPage() {
                     </div>
 
                     {/* Download button */}
-                    {doc.file_url && (
+                    {doc.file_url && doc.file_url !== '#' ? (
                       <a
                         href={doc.file_url}
                         target="_blank"
@@ -515,6 +534,15 @@ export default function DocumentsPage() {
                         <Download className="w-4 h-4" />
                         <span className="hidden sm:inline">Download</span>
                       </a>
+                    ) : (
+                      <button
+                        onClick={() => alert('This document is not yet available for download. Please contact investor relations for access.')}
+                        className="shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gray-100 text-gray-400 text-sm font-medium hover:bg-gray-200 transition-all cursor-pointer"
+                        title="Document not yet uploaded"
+                      >
+                        <Download className="w-4 h-4" />
+                        <span className="hidden sm:inline">Pending</span>
+                      </button>
                     )}
                   </div>
                 </motion.div>

@@ -419,9 +419,9 @@ export default function AdminDashboard() {
         .select('country');
       if (!error && data && data.length > 0) {
         const countryFlags: Record<string, string> = {
-          'Zimbabwe': '\u{1F1FF}\u{1F1FC}', 'Tanzania': '\u{1F1F9}\u{1F1FF}', 'Botswana': '\u{1F1E7}\u{1F1FC}',
-          'Kenya': '\u{1F1F0}\u{1F1EA}', 'South Africa': '\u{1F1FF}\u{1F1E6}', 'Zambia': '\u{1F1FF}\u{1F1F2}',
-          'Mozambique': '\u{1F1F2}\u{1F1FF}', 'Malawi': '\u{1F1F2}\u{1F1FC}', 'Namibia': '\u{1F1F3}\u{1F1E6}',
+          'Zimbabwe': 'ZW', 'Tanzania': 'TZ', 'Botswana': 'BW',
+          'Kenya': 'KE', 'South Africa': 'ZA', 'Zambia': 'ZM',
+          'Mozambique': 'MZ', 'Malawi': 'MW', 'Namibia': 'NA',
         };
         const counts: Record<string, number> = {};
         data.forEach((p: { country: string | null }) => {
@@ -430,7 +430,7 @@ export default function AdminDashboard() {
         });
         const sorted = Object.entries(counts)
           .sort((a, b) => b[1] - a[1])
-          .map(([country, count]) => ({ country, count, flag: countryFlags[country] || '\u{1F30D}' }));
+          .map(([country, count]) => ({ country, count, flag: countryFlags[country] || '--' }));
         setLiveCountryData(sorted);
       }
     })();
@@ -900,7 +900,7 @@ export default function AdminDashboard() {
 
           {/* Country total summary */}
           <div className="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between">
-            <span className="text-xs text-gray-400">Total across 20 countries</span>
+            <span className="text-xs text-gray-400">Total across Africa</span>
             <span className="text-sm font-bold text-navy">{totalMemberCount} members</span>
           </div>
         </motion.div>

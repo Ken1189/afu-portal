@@ -824,9 +824,9 @@ const bookingStatusConfig: Record<
 };
 
 const countryFlags: Record<string, string> = {
-  Botswana: '\u{1F1E7}\u{1F1FC}',
-  Zimbabwe: '\u{1F1FF}\u{1F1FC}',
-  Tanzania: '\u{1F1F9}\u{1F1FF}',
+  Botswana: 'BW',
+  Zimbabwe: 'ZW',
+  Tanzania: 'TZ',
 };
 
 // ---------------------------------------------------------------------------

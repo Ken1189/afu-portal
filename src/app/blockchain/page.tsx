@@ -32,7 +32,7 @@ const roadmap = [
     status: "live",
     title: "Platform Live — Traditional Finance Rails",
     items: [
-      "Full digital platform operational across 20 countries",
+      "Full digital platform operational across Africa",
       "Traditional banking infrastructure via our banking partners",
       "Escrow-controlled loan disbursement and repayment",
       "Foundation laid for blockchain integration",

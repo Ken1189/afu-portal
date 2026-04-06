@@ -58,6 +58,7 @@ import {
   getSidebarItemsByTier,
   type FarmerTier,
 } from '@/lib/farmer-tiers';
+import { MembershipProvider } from '@/lib/membership-context';
 
 // ── Icon Lookup ──────────────────────────────────────────────────────────
 const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -113,26 +114,20 @@ export default function FarmLayout({ children }: { children: React.ReactNode }) 
 function FarmLayoutInner({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, profile, signOut } = useAuth();
+  const { user, profile, signOut, isLoading: authLoading } = useAuth();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
   const [sidebarLangOpen, setSidebarLangOpen] = useState(false);
   const { locale, setLocale, t } = useLanguage();
-  // Auth redirect handled by middleware — no duplicate guard needed
 
-  if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#5DB347]" />
-      </div>
-    );
-  }
-
-  // Tier state
+  // ALL hooks must be called before any conditional returns (React Rules of Hooks)
+  // Gamification tier state (seedling/sprout/growth/harvest/pioneer)
   const [currentTier, setCurrentTier] = useState<FarmerTier>('seedling');
   const [totalXp, setTotalXp] = useState(0);
   const [totalCoursesCompleted, setTotalCoursesCompleted] = useState(0);
   const [tierLoading, setTierLoading] = useState(true);
+  // Membership tier state (free/smallholder/commercial/enterprise/partner)
+  const [membershipTier, setMembershipTier] = useState<string>('free');
 
   // Guided tour state
   const [showTour, setShowTour] = useState(false);
@@ -151,6 +146,15 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
 
   const supabase = createClient();
 
+  // Auth loading state — show spinner with timeout
+  if (authLoading || !user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#5DB347]" />
+      </div>
+    );
+  }
+
   const displayName = profile?.full_name || profile?.email?.split('@')[0] || 'Farmer';
   const firstName = displayName.split(' ')[0];
   const initials = displayName
@@ -160,7 +164,24 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
     .toUpperCase()
     .slice(0, 2);
 
-  // Fetch or auto-create farmer tier record
+  // Fetch membership tier from members table
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      try {
+        const { data } = await supabase
+          .from('members')
+          .select('tier')
+          .eq('profile_id', user.id)
+          .single();
+        if (data?.tier) setMembershipTier(data.tier);
+      } catch {
+        // Fallback to 'free'
+      }
+    })();
+  }, [user, supabase]);
+
+  // Fetch or auto-create farmer gamification tier record
   const fetchTier = useCallback(async () => {
     if (!user) return;
     setTierLoading(true);
@@ -659,7 +680,7 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
 
         {/* ─── Page Content ─── */}
         <main className="flex-1 pb-24 lg:pb-6 overflow-y-auto">
-          <div className="max-w-5xl mx-auto"><Breadcrumbs />{children}</div>
+          <div className="max-w-5xl mx-auto"><Breadcrumbs /><MembershipProvider tier={membershipTier}>{children}</MembershipProvider></div>
         </main>
       </div>
 

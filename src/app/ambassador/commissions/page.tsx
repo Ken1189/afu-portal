@@ -20,7 +20,7 @@ interface CommissionEntry {
   id: string;
   commission_type: string;
   source_amount: number;
-  rate: number;
+  rate_percent: number;
   commission_amount: number;
   status: string;
   created_at: string;
@@ -30,21 +30,21 @@ interface CommissionEntry {
 // ── Demo Data ────────────────────────────────────────────────────────────────
 
 const FALLBACK_ENTRIES: CommissionEntry[] = [
-  { id: '1', commission_type: 'membership', source_amount: 250, rate: 0.10, commission_amount: 25, status: 'paid', created_at: '2026-03-25T10:00:00Z', description: 'John Mwangi membership signup' },
-  { id: '2', commission_type: 'fundraising', source_amount: 5000, rate: 0.05, commission_amount: 250, status: 'paid', created_at: '2026-03-22T14:00:00Z', description: 'Community fundraiser - Kampala' },
-  { id: '3', commission_type: 'advertising', source_amount: 1200, rate: 0.10, commission_amount: 120, status: 'pending', created_at: '2026-03-20T09:00:00Z', description: 'AgriTech Co. ad placement' },
-  { id: '4', commission_type: 'membership', source_amount: 250, rate: 0.10, commission_amount: 25, status: 'paid', created_at: '2026-03-18T16:00:00Z', description: 'Sarah Kimani membership signup' },
-  { id: '5', commission_type: 'membership', source_amount: 500, rate: 0.10, commission_amount: 50, status: 'pending', created_at: '2026-03-15T11:00:00Z', description: 'Cooperative Premium membership' },
-  { id: '6', commission_type: 'fundraising', source_amount: 2000, rate: 0.05, commission_amount: 100, status: 'paid', created_at: '2026-03-12T08:00:00Z', description: 'Water project fundraiser' },
-  { id: '7', commission_type: 'advertising', source_amount: 800, rate: 0.10, commission_amount: 80, status: 'paid', created_at: '2026-03-10T13:00:00Z', description: 'Farm Supplies Ltd. ad' },
-  { id: '8', commission_type: 'membership', source_amount: 250, rate: 0.10, commission_amount: 25, status: 'pending', created_at: '2026-03-08T15:00:00Z', description: 'Peter Obi membership signup' },
-  { id: '9', commission_type: 'fundraising', source_amount: 10000, rate: 0.07, commission_amount: 700, status: 'paid', created_at: '2026-03-05T10:00:00Z', description: 'Large-scale irrigation fundraiser' },
-  { id: '10', commission_type: 'membership', source_amount: 250, rate: 0.10, commission_amount: 25, status: 'paid', created_at: '2026-03-01T09:00:00Z', description: 'Grace Achieng membership signup' },
-  { id: '11', commission_type: 'supplier', source_amount: 15000, rate: 0.05, commission_amount: 750, status: 'paid', created_at: '2026-02-25T10:00:00Z', description: 'Seed supplier partnership' },
-  { id: '12', commission_type: 'advertising', source_amount: 2500, rate: 0.10, commission_amount: 250, status: 'paid', created_at: '2026-02-20T14:00:00Z', description: 'Equipment dealer ad campaign' },
-  { id: '13', commission_type: 'fundraising', source_amount: 8000, rate: 0.07, commission_amount: 560, status: 'paid', created_at: '2026-02-15T09:00:00Z', description: 'Solar pump fundraiser' },
-  { id: '14', commission_type: 'membership', source_amount: 250, rate: 0.10, commission_amount: 25, status: 'paid', created_at: '2026-02-10T16:00:00Z', description: 'Moses Okello membership signup' },
-  { id: '15', commission_type: 'membership', source_amount: 250, rate: 0.10, commission_amount: 25, status: 'paid', created_at: '2026-02-05T11:00:00Z', description: 'Fatima Diallo membership signup' },
+  { id: '1', commission_type: 'membership', source_amount: 250, rate_percent: 10, commission_amount: 25, status: 'paid', created_at: '2026-03-25T10:00:00Z', description: 'John Mwangi membership signup' },
+  { id: '2', commission_type: 'fundraising', source_amount: 5000, rate_percent: 5, commission_amount: 250, status: 'paid', created_at: '2026-03-22T14:00:00Z', description: 'Community fundraiser - Kampala' },
+  { id: '3', commission_type: 'advertising', source_amount: 1200, rate_percent: 10, commission_amount: 120, status: 'pending', created_at: '2026-03-20T09:00:00Z', description: 'AgriTech Co. ad placement' },
+  { id: '4', commission_type: 'membership', source_amount: 250, rate_percent: 10, commission_amount: 25, status: 'paid', created_at: '2026-03-18T16:00:00Z', description: 'Sarah Kimani membership signup' },
+  { id: '5', commission_type: 'membership', source_amount: 500, rate_percent: 10, commission_amount: 50, status: 'pending', created_at: '2026-03-15T11:00:00Z', description: 'Cooperative Premium membership' },
+  { id: '6', commission_type: 'fundraising', source_amount: 2000, rate_percent: 5, commission_amount: 100, status: 'paid', created_at: '2026-03-12T08:00:00Z', description: 'Water project fundraiser' },
+  { id: '7', commission_type: 'advertising', source_amount: 800, rate_percent: 10, commission_amount: 80, status: 'paid', created_at: '2026-03-10T13:00:00Z', description: 'Farm Supplies Ltd. ad' },
+  { id: '8', commission_type: 'membership', source_amount: 250, rate_percent: 10, commission_amount: 25, status: 'pending', created_at: '2026-03-08T15:00:00Z', description: 'Peter Obi membership signup' },
+  { id: '9', commission_type: 'fundraising', source_amount: 10000, rate_percent: 7, commission_amount: 700, status: 'paid', created_at: '2026-03-05T10:00:00Z', description: 'Large-scale irrigation fundraiser' },
+  { id: '10', commission_type: 'membership', source_amount: 250, rate_percent: 10, commission_amount: 25, status: 'paid', created_at: '2026-03-01T09:00:00Z', description: 'Grace Achieng membership signup' },
+  { id: '11', commission_type: 'marketplace', source_amount: 15000, rate_percent: 5, commission_amount: 750, status: 'paid', created_at: '2026-02-25T10:00:00Z', description: 'Seed supplier partnership' },
+  { id: '12', commission_type: 'advertising', source_amount: 2500, rate_percent: 10, commission_amount: 250, status: 'paid', created_at: '2026-02-20T14:00:00Z', description: 'Equipment dealer ad campaign' },
+  { id: '13', commission_type: 'fundraising', source_amount: 8000, rate_percent: 7, commission_amount: 560, status: 'paid', created_at: '2026-02-15T09:00:00Z', description: 'Solar pump fundraiser' },
+  { id: '14', commission_type: 'membership', source_amount: 250, rate_percent: 10, commission_amount: 25, status: 'paid', created_at: '2026-02-10T16:00:00Z', description: 'Moses Okello membership signup' },
+  { id: '15', commission_type: 'membership', source_amount: 250, rate_percent: 10, commission_amount: 25, status: 'paid', created_at: '2026-02-05T11:00:00Z', description: 'Fatima Diallo membership signup' },
 ];
 
 // ── Component ────────────────────────────────────────────────────────────────
@@ -137,7 +137,10 @@ export default function CommissionsPage() {
       membership: 'bg-blue-50 text-blue-700',
       fundraising: 'bg-purple-50 text-purple-700',
       advertising: 'bg-orange-50 text-orange-700',
-      supplier: 'bg-teal-50 text-teal-700',
+      marketplace: 'bg-teal-50 text-teal-700',
+      insurance: 'bg-emerald-50 text-emerald-700',
+      sponsorship: 'bg-pink-50 text-pink-700',
+      loan_origination: 'bg-cyan-50 text-cyan-700',
     };
     return (
       <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${styles[type] || 'bg-gray-100 text-gray-600'}`}>
@@ -209,7 +212,9 @@ export default function CommissionsPage() {
             <option value="membership">Membership</option>
             <option value="fundraising">Fundraising</option>
             <option value="advertising">Advertising</option>
-            <option value="supplier">Supplier</option>
+            <option value="marketplace">Marketplace</option>
+            <option value="insurance">Insurance</option>
+            <option value="sponsorship">Sponsorship</option>
           </select>
         </div>
         <div className="relative">
@@ -262,7 +267,7 @@ export default function CommissionsPage() {
                     <td className="px-5 py-3">{typeBadge(e.commission_type)}</td>
                     <td className="px-5 py-3 font-medium text-[#1B2A4A] max-w-[200px] truncate">{e.description}</td>
                     <td className="px-5 py-3 text-right text-gray-600">{formatCurrency(e.source_amount)}</td>
-                    <td className="px-5 py-3 text-right text-gray-600">{(e.rate * 100).toFixed(0)}%</td>
+                    <td className="px-5 py-3 text-right text-gray-600">{Number(e.rate_percent).toFixed(0)}%</td>
                     <td className="px-5 py-3 text-right font-bold text-[#5DB347]">{formatCurrency(e.commission_amount)}</td>
                     <td className="px-5 py-3">{statusBadge(e.status)}</td>
                   </tr>

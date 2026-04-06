@@ -186,7 +186,7 @@ const communityPrograms = [
   {
     title: 'Women in Agriculture',
     stat: '1,600 women enrolled',
-    detail: '12 training centres across 20 countries',
+    detail: '12 training centres across Africa',
     icon: Heart,
     color: 'text-pink-600',
     bg: 'bg-pink-50',

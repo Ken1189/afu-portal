@@ -6,11 +6,16 @@ import {
   Sprout,
   Home,
   CloudSun,
+  Sun,
   TrendingUp,
   Bot,
   Camera,
   GraduationCap,
   Layers,
+  Leaf,
+  Flower2,
+  Wheat,
+  Star,
   UsersRound,
   Rocket,
   ChevronLeft,
@@ -24,7 +29,6 @@ import { createClient } from '@/lib/supabase/client';
 
 interface TourStep {
   icon: React.ComponentType<{ className?: string }>;
-  emoji: string;
   title: string;
   description: string;
   tip: string;
@@ -35,7 +39,6 @@ interface TourStep {
 const TOUR_STEPS: TourStep[] = [
   {
     icon: Sprout,
-    emoji: '\u{1F331}',
     title: 'Welcome to Mkulima Hub',
     description:
       'Welcome to your farm command center! This quick tour will show you everything you need to get started.',
@@ -44,7 +47,6 @@ const TOUR_STEPS: TourStep[] = [
   },
   {
     icon: Home,
-    emoji: '\u{1F3E0}',
     title: 'Your Farm Dashboard',
     description:
       "This is your home base. See your farm's health, weather, and tasks at a glance.",
@@ -53,7 +55,6 @@ const TOUR_STEPS: TourStep[] = [
   },
   {
     icon: CloudSun,
-    emoji: '\u2600\uFE0F',
     title: 'Weather Forecasts',
     description:
       'Get 7-day weather forecasts specific to your region. Plan irrigation and spraying around the weather.',
@@ -62,7 +63,6 @@ const TOUR_STEPS: TourStep[] = [
   },
   {
     icon: TrendingUp,
-    emoji: '\u{1F4C8}',
     title: 'Market Prices',
     description:
       'Check real-time commodity prices before you sell. Know what your crops are worth in different markets.',
@@ -71,7 +71,6 @@ const TOUR_STEPS: TourStep[] = [
   },
   {
     icon: Bot,
-    emoji: '\u{1F916}',
     title: 'AI Farm Assistant',
     description:
       'Your 24/7 farming advisor. Ask about pests, diseases, planting times, or any farming question.',
@@ -80,7 +79,6 @@ const TOUR_STEPS: TourStep[] = [
   },
   {
     icon: Camera,
-    emoji: '\u{1F4F8}',
     title: 'Crop Doctor',
     description:
       'Take a photo of a sick plant and get instant diagnosis. Identifies diseases, pests, and nutrient deficiencies.',
@@ -89,7 +87,6 @@ const TOUR_STEPS: TourStep[] = [
   },
   {
     icon: GraduationCap,
-    emoji: '\u{1F393}',
     title: 'Training Hub',
     description:
       'Complete courses to level up your farming skills AND unlock new platform features.',
@@ -98,7 +95,6 @@ const TOUR_STEPS: TourStep[] = [
   },
   {
     icon: Layers,
-    emoji: '\u{1F33F}',
     title: 'Your Tier Progress',
     description:
       'You start as a Seedling. Complete training courses to unlock higher tiers with more powerful tools.',
@@ -107,14 +103,14 @@ const TOUR_STEPS: TourStep[] = [
     extra: (
       <div className="flex items-center justify-center gap-3 mt-3 px-2">
         {[
-          { emoji: '\u{1F331}', name: 'Seedling' },
-          { emoji: '\u{1FAB4}', name: 'Sprout' },
-          { emoji: '\u{1F33E}', name: 'Growth' },
-          { emoji: '\u{1F33D}', name: 'Harvest' },
-          { emoji: '\u{1F31F}', name: 'Pioneer' },
+          { Icon: Sprout, name: 'Seedling' },
+          { Icon: Flower2, name: 'Sprout' },
+          { Icon: Wheat, name: 'Growth' },
+          { Icon: Leaf, name: 'Harvest' },
+          { Icon: Star, name: 'Pioneer' },
         ].map((tier) => (
           <div key={tier.name} className="flex flex-col items-center gap-1">
-            <span className="text-xl">{tier.emoji}</span>
+            <tier.Icon className="w-5 h-5 text-[#5DB347]" />
             <span className="text-[10px] font-medium text-gray-500">{tier.name}</span>
           </div>
         ))}
@@ -123,7 +119,6 @@ const TOUR_STEPS: TourStep[] = [
   },
   {
     icon: UsersRound,
-    emoji: '\u{1F465}',
     title: 'Cooperatives',
     description:
       'Join or create a farming cooperative to access bulk pricing, shared equipment, and collective bargaining power.',
@@ -132,7 +127,6 @@ const TOUR_STEPS: TourStep[] = [
   },
   {
     icon: Rocket,
-    emoji: '\u{1F680}',
     title: "You're Ready!",
     description:
       "That's everything to get started! Your first mission: check today's weather and explore the Training Hub.",
@@ -141,15 +135,15 @@ const TOUR_STEPS: TourStep[] = [
     extra: (
       <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-3">
         {[
-          { emoji: '\u2600\uFE0F', label: 'Weather', href: '/farm/weather' },
-          { emoji: '\u{1F393}', label: 'Training', href: '/farm/training' },
-          { emoji: '\u{1F916}', label: 'AI Assistant', href: '/farm/assistant' },
+          { Icon: Sun, label: 'Weather', href: '/farm/weather' },
+          { Icon: GraduationCap, label: 'Training', href: '/farm/training' },
+          { Icon: Bot, label: 'AI Assistant', href: '/farm/assistant' },
         ].map((item) => (
           <div
             key={item.label}
-            className="bg-[#EBF7E5] rounded-xl p-3 text-center"
+            className="bg-[#EBF7E5] rounded-xl p-3 text-center flex flex-col items-center"
           >
-            <span className="text-xl block mb-1">{item.emoji}</span>
+            <item.Icon className="w-5 h-5 text-[#5DB347] mb-1" />
             <span className="text-xs font-semibold text-[#1B2A4A]">{item.label}</span>
           </div>
         ))}
@@ -301,9 +295,9 @@ export function GuidedTour({ onComplete, userId }: GuidedTourProps) {
               <StepIcon className="w-8 h-8 text-white" />
             </motion.div>
 
-            {/* Title with emoji */}
+            {/* Title */}
             <h2 className="text-xl font-bold leading-tight">
-              {step.emoji} {step.title}
+              {step.title}
             </h2>
           </div>
 
@@ -332,7 +326,7 @@ export function GuidedTour({ onComplete, userId }: GuidedTourProps) {
                   </p>
                 </div>
 
-                {/* Extra content (tier emojis, quick-access grid) */}
+                {/* Extra content (tier icons, quick-access grid) */}
                 {step.extra}
               </motion.div>
             </AnimatePresence>

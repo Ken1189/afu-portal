@@ -182,7 +182,7 @@ export default function DonatePage() {
             <h1 className="text-3xl md:text-4xl font-bold">Support African Farmers</h1>
           </div>
           <p className="text-white/70 text-lg max-w-2xl">
-            Every donation directly supports smallholder farmers across 20 African countries.
+            Every donation directly supports smallholder farmers across Africa.
             100% of programme donations go to the field.
           </p>
         </div>

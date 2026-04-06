@@ -76,9 +76,9 @@ export default function PayoutsPage() {
             setPayouts(data.map((p: any) => ({
               id: p.id,
               amount: p.amount,
-              method: p.method || 'Bank Transfer',
+              method: p.payout_method || p.method || 'Bank Transfer',
               status: p.status,
-              reference: p.reference || `PAY-${p.id.slice(0, 8)}`,
+              reference: p.payout_reference || p.reference || `PAY-${p.id.slice(0, 8)}`,
               created_at: p.created_at,
             })));
           }
@@ -121,9 +121,9 @@ export default function PayoutsPage() {
         await supabase.from('ambassador_payouts').insert({
           ambassador_id: ambassador.id,
           amount: pendingBalance,
-          method: payoutMethod,
+          payout_method: payoutMethod,
           status: 'pending',
-          reference: `PAY-${Date.now().toString(36).toUpperCase()}`,
+          payout_reference: `PAY-${Date.now().toString(36).toUpperCase()}`,
         });
       }
 

@@ -4,6 +4,8 @@ import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/lib/supabase/auth-context';
+import FeatureGate from '@/components/ui/FeatureGate';
+import { useMembershipTier } from '@/lib/membership-context';
 import { createClient } from '@/lib/supabase/client';
 import {
   Ship,
@@ -637,6 +639,7 @@ function HistoryCard({ shipment }: { shipment: ExportShipment }) {
 
 export default function ExportHubPage() {
   const { user } = useAuth();
+  const { membershipTier } = useMembershipTier();
   const [activeTab, setActiveTab] = useState<TabType>('active');
   const [historyFilter, setHistoryFilter] = useState<ShipmentStatus | 'all'>(
     'all'
@@ -808,6 +811,7 @@ export default function ExportHubPage() {
   ];
 
   return (
+    <FeatureGate feature="exports" tier={membershipTier}>
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-gradient-to-br from-[#1B2A4A] via-[#1B2A4A] to-[#8CB89C]/30 text-white">
@@ -1207,5 +1211,6 @@ export default function ExportHubPage() {
         )}
       </AnimatePresence>
     </div>
+    </FeatureGate>
   );
 }

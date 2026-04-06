@@ -9,11 +9,11 @@ import { createClient } from "@supabase/supabase-js";
 export const metadata = {
   title: "About AFU - African Farming Union",
   description:
-    "Learn about AFU's mission to transform African agriculture through integrated financing, inputs, processing, and offtake across 20 countries.",
+    "Learn about AFU's mission to transform African agriculture through integrated financing, inputs, processing, and offtake across Africa.",
   openGraph: {
     title: "About AFU - African Farming Union",
     description:
-      "Learn about AFU's mission to transform African agriculture through integrated financing, inputs, processing, and offtake across 20 countries.",
+      "Learn about AFU's mission to transform African agriculture through integrated financing, inputs, processing, and offtake across Africa.",
     url: "https://afu-portal.vercel.app/about",
     images: [
       {
@@ -28,14 +28,14 @@ export const metadata = {
     card: "summary_large_image",
     title: "About AFU - African Farming Union",
     description:
-      "Learn about AFU's mission to transform African agriculture through integrated financing, inputs, processing, and offtake across 20 countries.",
+      "Learn about AFU's mission to transform African agriculture through integrated financing, inputs, processing, and offtake across Africa.",
   },
 };
 
 /* ─── FALLBACK DATA ─── */
 
 const FALLBACK_HERO_STATS = [
-  { value: '20', label: 'Countries' },
+  { value: '10+', label: 'Countries' },
   { value: '19,000+', label: 'Farmers' },
   { value: '$50B+', label: 'Market Opportunity' },
 ];

@@ -11,6 +11,8 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/lib/supabase/auth-context';
 import { createClient } from '@/lib/supabase/client';
+import FeatureGate from '@/components/ui/FeatureGate';
+import { useMembershipTier } from '@/lib/membership-context';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -132,6 +134,7 @@ const demoPlots: FarmPlot[] = [
 
 export default function CarbonCreditsPage() {
   const { user } = useAuth();
+  const { membershipTier } = useMembershipTier();
   const supabase = createClient();
 
   const [activeTab, setActiveTab] = useState<TabKey>('projects');
@@ -311,6 +314,7 @@ export default function CarbonCreditsPage() {
   }
 
   return (
+    <FeatureGate feature="carbon_credits" tier={membershipTier}>
     <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
       {/* Toast */}
       <AnimatePresence>
@@ -748,5 +752,6 @@ export default function CarbonCreditsPage() {
         )}
       </AnimatePresence>
     </div>
+    </FeatureGate>
   );
 }

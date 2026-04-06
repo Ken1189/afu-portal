@@ -22,6 +22,8 @@ import {
 } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 import { useLoans } from '@/lib/supabase/use-loans';
+import FeatureGate from '@/components/ui/FeatureGate';
+import { useMembershipTier } from '@/lib/membership-context';
 
 /* ------------------------------------------------------------------ */
 /* Interest rates by loan type (used in application form)              */
@@ -63,6 +65,7 @@ const seasonOptions = ['2024/2025 Rain', '2025 Dry', '2025/2026 Rain'];
 
 export default function FinancingPage() {
   const { t } = useLanguage();
+  const { membershipTier } = useMembershipTier();
   const tf = t.financing;
   const { loans, loading, stats, applyForLoan } = useLoans();
 
@@ -122,6 +125,7 @@ export default function FinancingPage() {
   };
 
   return (
+    <FeatureGate feature="financing" tier={membershipTier}>
     <div className="px-4 py-5 sm:px-6 lg:px-8 space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
@@ -550,5 +554,6 @@ export default function FinancingPage() {
         )}
       </AnimatePresence>
     </div>
+    </FeatureGate>
   );
 }

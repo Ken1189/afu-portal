@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Search,
   Filter,
@@ -66,7 +66,7 @@ export default function ReceiptsPage() {
       const supabase = createClient();
       let query = supabase
         .from('warehouse_receipts')
-        .select('*')
+        .select('*, quality_inspections(moisture_percent, foreign_matter_percent, damage_percent, aflatoxin_level, color_assessment, odor)')
         .order(sortField, { ascending: sortAsc })
         .limit(200);
 
@@ -76,7 +76,13 @@ export default function ReceiptsPage() {
       if (dateTo) query = query.lte('created_at', `${dateTo}T23:59:59`);
 
       const { data } = await query;
-      setReceipts(data || []);
+      // Map the joined quality_inspections array to a single quality_inspection object
+      const mapped = (data || []).map((r: Record<string, unknown>) => {
+        const inspections = r.quality_inspections as Array<Record<string, unknown>> | null;
+        const qi = inspections && inspections.length > 0 ? inspections[0] : null;
+        return { ...r, quality_inspection: qi, quality_inspections: undefined };
+      });
+      setReceipts(mapped as unknown as Receipt[]);
     } catch (err) {
       console.error('Fetch receipts error:', err);
     } finally {
@@ -275,80 +281,83 @@ export default function ReceiptsPage() {
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {filtered.map((r) => (
-                  <tr key={r.id} className="group">
-                    <td className="px-4 py-3">
-                      <button onClick={() => setExpandedId(expandedId === r.id ? null : r.id)} className="font-mono text-sm text-[#1B2A4A] hover:text-[#5DB347] font-medium">
-                        {r.receipt_number}
-                      </button>
-                    </td>
-                    <td className="px-4 py-3 text-sm">{r.farmer_name || 'Walk-in'}</td>
-                    <td className="px-4 py-3 text-sm capitalize">{r.commodity}</td>
-                    <td className="px-4 py-3 text-sm font-medium">{r.net_weight_kg?.toLocaleString()}</td>
-                    <td className="px-4 py-3">
-                      <span className={`text-xs font-semibold px-2 py-0.5 rounded ${gradeColor(r.grade)}`}>{r.grade || '-'}</span>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-500">{new Date(r.created_at).toLocaleDateString()}</td>
-                    <td className="px-4 py-3">
-                      <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${statusColor(r.status)}`}>{r.status}</span>
-                    </td>
-                    <td className="px-4 py-3 text-sm font-medium text-right">${r.total_value?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                    <td className="px-4 py-3">
-                      <button onClick={() => setExpandedId(expandedId === r.id ? null : r.id)} className="p-1 hover:bg-gray-100 rounded min-w-[44px] min-h-[44px] flex items-center justify-center">
-                        {expandedId === r.id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                      </button>
-                    </td>
-                    {/* Expanded Details Row — rendered via CSS trick with colSpan */}
+                  <React.Fragment key={r.id}>
+                    <tr className="group hover:bg-gray-50">
+                      <td className="px-4 py-3">
+                        <button onClick={() => setExpandedId(expandedId === r.id ? null : r.id)} className="font-mono text-sm text-[#1B2A4A] hover:text-[#5DB347] font-medium">
+                          {r.receipt_number}
+                        </button>
+                      </td>
+                      <td className="px-4 py-3 text-sm">{r.farmer_name || 'Walk-in'}</td>
+                      <td className="px-4 py-3 text-sm capitalize">{r.commodity}</td>
+                      <td className="px-4 py-3 text-sm font-medium">{r.net_weight_kg?.toLocaleString()}</td>
+                      <td className="px-4 py-3">
+                        <span className={`text-xs font-semibold px-2 py-0.5 rounded ${gradeColor(r.grade)}`}>{r.grade || '-'}</span>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-500">{new Date(r.created_at).toLocaleDateString()}</td>
+                      <td className="px-4 py-3">
+                        <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${statusColor(r.status)}`}>{r.status}</span>
+                      </td>
+                      <td className="px-4 py-3 text-sm font-medium text-right">${r.total_value?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                      <td className="px-4 py-3">
+                        <button onClick={() => setExpandedId(expandedId === r.id ? null : r.id)} className="p-1 hover:bg-gray-100 rounded min-w-[44px] min-h-[44px] flex items-center justify-center">
+                          {expandedId === r.id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                        </button>
+                      </td>
+                    </tr>
                     {expandedId === r.id && (
-                      <td colSpan={9} className="px-4 py-4 bg-gray-50 border-t border-gray-100">
-                        <div className="grid sm:grid-cols-3 gap-4 text-sm">
-                          <div>
-                            <p className="text-gray-500 text-xs uppercase font-medium mb-2">Weight Details</p>
-                            <p>Gross: {r.gross_weight_kg?.toLocaleString()} kg</p>
-                            <p>Tare: {r.tare_weight_kg?.toLocaleString()} kg</p>
-                            <p className="font-bold">Net: {r.net_weight_kg?.toLocaleString()} kg</p>
-                            <p>Bags: {r.bags}</p>
-                            <p>Unit Price: ${r.unit_price?.toFixed(2)}/kg</p>
-                          </div>
-                          <div>
-                            <p className="text-gray-500 text-xs uppercase font-medium mb-2">Quality</p>
-                            {r.quality_inspection ? (
-                              <>
-                                <p>Moisture: {r.quality_inspection.moisture_percent}%</p>
-                                <p>Foreign Matter: {r.quality_inspection.foreign_matter_percent}%</p>
-                                <p>Damage: {r.quality_inspection.damage_percent}%</p>
-                                <p>Aflatoxin: <span className="capitalize">{r.quality_inspection.aflatoxin_level}</span></p>
-                                <p>Color: <span className="capitalize">{r.quality_inspection.color_assessment}</span></p>
-                                <p>Odor: <span className="capitalize">{r.quality_inspection.odor}</span></p>
-                              </>
-                            ) : (
-                              <p className="text-gray-400">No inspection data</p>
-                            )}
-                          </div>
-                          <div>
-                            <p className="text-gray-500 text-xs uppercase font-medium mb-2">Actions</p>
-                            <div className="flex flex-col gap-2">
-                              {r.status === 'received' && (
-                                <button
-                                  onClick={() => handleRelease(r.id)}
-                                  className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-medium hover:bg-blue-700 min-h-[44px]"
-                                >
-                                  <Package className="w-4 h-4" />
-                                  Release
-                                </button>
+                      <tr>
+                        <td colSpan={9} className="px-4 py-4 bg-gray-50 border-t border-gray-100">
+                          <div className="grid sm:grid-cols-3 gap-4 text-sm">
+                            <div>
+                              <p className="text-gray-500 text-xs uppercase font-medium mb-2">Weight Details</p>
+                              <p>Gross: {r.gross_weight_kg?.toLocaleString()} kg</p>
+                              <p>Tare: {r.tare_weight_kg?.toLocaleString()} kg</p>
+                              <p className="font-bold">Net: {r.net_weight_kg?.toLocaleString()} kg</p>
+                              <p>Bags: {r.bags}</p>
+                              <p>Unit Price: ${r.unit_price?.toFixed(2)}/kg</p>
+                            </div>
+                            <div>
+                              <p className="text-gray-500 text-xs uppercase font-medium mb-2">Quality</p>
+                              {r.quality_inspection ? (
+                                <>
+                                  <p>Moisture: {r.quality_inspection.moisture_percent}%</p>
+                                  <p>Foreign Matter: {r.quality_inspection.foreign_matter_percent}%</p>
+                                  <p>Damage: {r.quality_inspection.damage_percent}%</p>
+                                  <p>Aflatoxin: <span className="capitalize">{r.quality_inspection.aflatoxin_level}</span></p>
+                                  <p>Color: <span className="capitalize">{r.quality_inspection.color_assessment}</span></p>
+                                  <p>Odor: <span className="capitalize">{r.quality_inspection.odor}</span></p>
+                                </>
+                              ) : (
+                                <p className="text-gray-400">No inspection data</p>
                               )}
-                              <button
-                                onClick={() => window.print()}
-                                className="inline-flex items-center justify-center gap-2 px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-medium hover:bg-gray-50 min-h-[44px]"
-                              >
-                                <Printer className="w-4 h-4" />
-                                Print
-                              </button>
+                            </div>
+                            <div>
+                              <p className="text-gray-500 text-xs uppercase font-medium mb-2">Actions</p>
+                              <div className="flex flex-col gap-2">
+                                {r.status === 'received' && (
+                                  <button
+                                    onClick={() => handleRelease(r.id)}
+                                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-medium hover:bg-blue-700 min-h-[44px]"
+                                  >
+                                    <Package className="w-4 h-4" />
+                                    Release
+                                  </button>
+                                )}
+                                <button
+                                  onClick={() => window.print()}
+                                  className="inline-flex items-center justify-center gap-2 px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-medium hover:bg-gray-50 min-h-[44px]"
+                                >
+                                  <Printer className="w-4 h-4" />
+                                  Print
+                                </button>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </td>
+                        </td>
+                      </tr>
                     )}
-                  </tr>
+                  </React.Fragment>
                 ))}
               </tbody>
             </table>

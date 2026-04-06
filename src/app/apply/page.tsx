@@ -13,7 +13,7 @@ const FALLBACK_TIERS: Record<Tier, { name: string; price: string; priceNote: str
   smallholder: { name: "Smallholder", price: "$48/year", priceNote: "or $5/mo", desc: "For farms under 10 hectares" },
   commercial: { name: "Commercial", price: "$240/year", priceNote: "or $25/mo", desc: "For farms 10-500 hectares" },
   enterprise: { name: "Enterprise", price: "$950/year", priceNote: "or $99/mo", desc: "For large-scale operations + cooperatives" },
-  partner: { name: "Partner", price: "$2,400/year", priceNote: "or $250/mo", desc: "Suppliers, offtakers, investors" },
+  partner: { name: "Partner", price: "On Request", priceNote: "by application", desc: "Suppliers, offtakers, investors" },
 };
 
 export default function ApplyPage() {
@@ -39,6 +39,7 @@ export default function ApplyPage() {
 
   const { submitApplication } = useApplications();
   const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [tiers, setTiers] = useState<Record<Tier, { name: string; price: string; priceNote: string; desc: string }>>(FALLBACK_TIERS);
 
   // Fetch tier pricing from site_config
@@ -109,8 +110,18 @@ export default function ApplyPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
+    setSubmitError(null);
 
-    // Submit to Supabase
+    // Validate farm size is numeric if provided
+    if (formData.farmSize && isNaN(parseFloat(formData.farmSize))) {
+      setSubmitError('Please enter a valid number for farm size.');
+      setSubmitting(false);
+      return;
+    }
+
+    const storedRef = referredBy || referralInput || sessionStorage.getItem("afu_referral_code") || undefined;
+
+    // Submit to Supabase — include about and referral_code
     const { error } = await submitApplication({
       full_name: `${formData.firstName} ${formData.lastName}`.trim(),
       email: formData.email,
@@ -120,12 +131,17 @@ export default function ApplyPage() {
       farm_size_ha: formData.farmSize ? parseFloat(formData.farmSize) : undefined,
       primary_crops: formData.crops ? formData.crops.split(',').map((c: string) => c.trim()) : undefined,
       requested_tier: (selectedTier || 'free') as any,
-    });
+      notes: formData.about || undefined,
+      referral_code: storedRef || undefined,
+    } as any);
 
     setSubmitting(false);
-    if (!error) {
+    if (error) {
+      setSubmitError(typeof error === 'string' ? error : (error as any)?.message || 'Something went wrong. Please try again.');
+      return;
+    }
+
       // Register referral if there's a referral code
-      const storedRef = referredBy || sessionStorage.getItem("afu_referral_code");
       if (storedRef) {
         fetch("/api/ambassadors", {
           method: "POST",
@@ -156,7 +172,6 @@ export default function ApplyPage() {
       }).catch(() => {});
 
       setSubmitted(true);
-    }
   };
 
   if (submitted) {
@@ -397,6 +412,11 @@ export default function ApplyPage() {
                   </label>
                 </div>
 
+                {submitError && (
+                  <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm mb-4">
+                    {submitError}
+                  </div>
+                )}
                 <div className="flex gap-4">
                   <button type="button" onClick={() => setStep(1)} className="px-8 py-3 border border-gray-200 rounded-xl font-semibold text-[#1B2A4A] hover:bg-gray-50 transition-all duration-300">
                     Back

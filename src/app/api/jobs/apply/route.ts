@@ -228,7 +228,7 @@ export async function POST(req: Request) {
   </div>
   <div style="padding:20px;text-align:center;color:#999;font-size:12px;">
     African Farming Union | Gaborone, Botswana<br>
-    africanfarmingunion.org | 20 African Countries
+    africanfarmingunion.org | African Countries
   </div>
 </div>`;
 

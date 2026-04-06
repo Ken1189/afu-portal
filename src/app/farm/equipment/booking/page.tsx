@@ -6,6 +6,8 @@ import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/lib/supabase/auth-context';
 import { createClient } from '@/lib/supabase/client';
+import FeatureGate from '@/components/ui/FeatureGate';
+import { useMembershipTier } from '@/lib/membership-context';
 import {
   ArrowLeft,
   Star,
@@ -545,9 +547,9 @@ const conditionConfig: Record<
 };
 
 const countryFlags: Record<string, string> = {
-  Botswana: '\u{1F1E7}\u{1F1FC}',
-  Zimbabwe: '\u{1F1FF}\u{1F1FC}',
-  Tanzania: '\u{1F1F9}\u{1F1FF}',
+  Botswana: 'BW',
+  Zimbabwe: 'ZW',
+  Tanzania: 'TZ',
 };
 
 // ---------------------------------------------------------------------------
@@ -1395,7 +1397,10 @@ function BookingContent() {
 // ---------------------------------------------------------------------------
 
 export default function EquipmentBookingPage() {
+  const { membershipTier } = useMembershipTier();
+
   return (
+    <FeatureGate feature="equipment_booking" tier={membershipTier}>
     <Suspense
       fallback={
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -1410,5 +1415,6 @@ export default function EquipmentBookingPage() {
     >
       <BookingContent />
     </Suspense>
+    </FeatureGate>
   );
 }

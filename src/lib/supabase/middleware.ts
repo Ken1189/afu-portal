@@ -30,14 +30,14 @@ async function getUserRole(userId: string): Promise<string | null> {
       // Retry once
       const { data: retry } = await svc.from('profiles').select('role').eq('id', userId).single();
       if (retry?.role) return retry.role;
-      // If still fails, allow access (don't lock out) — the page-level auth will verify
-      return 'super_admin';
+      // If still fails, return member (safe default — page-level guards handle admin access)
+      return 'member';
     }
     return data?.role ?? 'member';
   } catch (err) {
     console.error('[Middleware] Role lookup error:', err);
-    // On total failure, allow access — page-level guards are the backup
-    return 'super_admin';
+    // On total failure, return member (safe default — never grant admin on error)
+    return 'member';
   }
 }
 
@@ -108,6 +108,9 @@ export async function updateSession(request: NextRequest) {
       case 'super_admin':
       case 'admin':
         dest.pathname = '/admin';
+        break;
+      case 'farmer':
+        dest.pathname = '/farm';
         break;
       case 'investor':
         dest.pathname = '/investor';

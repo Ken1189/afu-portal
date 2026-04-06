@@ -66,7 +66,7 @@ export const ORGANIZATION_JSONLD = {
   name: 'African Farming Union',
   url: SITE_URL,
   logo: `${SITE_URL}/afu-logo.svg`,
-  description: "Africa's integrated agriculture development platform providing financing, insurance, training, and market access across 20 countries.",
+  description: "Africa's integrated agriculture development platform providing financing, insurance, training, and market access across Africa.",
   sameAs: [],
   contactPoint: {
     '@type': 'ContactPoint',

@@ -53,7 +53,7 @@ const features = [
     icon: MapPin,
     title: "Land Rights & Tenure",
     description:
-      "Secure your land. We help farmers navigate title deeds, customary land rights, lease agreements, and land dispute resolution. Our specialists understand both statutory and traditional tenure systems across 20 African countries.",
+      "Secure your land. We help farmers navigate title deeds, customary land rights, lease agreements, and land dispute resolution. Our specialists understand both statutory and traditional tenure systems across Africa.",
   },
   {
     icon: FileText,

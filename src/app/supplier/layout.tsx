@@ -77,6 +77,14 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
 
     let retried = false;
 
+    // Safety timeout: auto-authorize after 3s since middleware is the real guard
+    const safetyTimer = setTimeout(() => {
+      if (!roleChecked) {
+        setAuthorized(true);
+        setRoleChecked(true);
+      }
+    }, 3000);
+
     const checkRole = async () => {
       try {
         const res = await fetch('/api/auth/me');
@@ -107,6 +115,8 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
     };
 
     checkRole();
+
+    return () => clearTimeout(safetyTimer);
   }, [user, profile, authLoading, router, isPublicPage]);
 
   // Public pages render without the supplier layout chrome
@@ -186,10 +196,6 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
               <span className="font-bold text-lg leading-tight block">{displayName}</span>
             </div>
           </Link>
-          <div className="inline-flex items-center gap-1.5 bg-gold/20 text-gold px-3 py-1 rounded-full text-xs font-bold">
-            <span>★</span>
-            <span>Platinum Sponsor</span>
-          </div>
         </div>
 
         {/* Sidebar Nav */}
@@ -246,11 +252,8 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
             </button>
             <h1 className="text-base font-bold leading-tight truncate">{getPageTitle()}</h1>
           </div>
-          <button className="w-9 h-9 flex items-center justify-center rounded-lg bg-white/15 active:bg-white/25 transition-colors relative">
+          <button onClick={() => alert('Notifications coming soon')} className="w-9 h-9 flex items-center justify-center rounded-lg bg-white/15 active:bg-white/25 transition-colors relative">
             <Bell className="w-5 h-5" />
-            <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center border-2 border-[#729E82]">
-              3
-            </span>
           </button>
         </header>
 
@@ -261,11 +264,8 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
             <p className="text-xs text-gray-400">Supplier Portal — {displayName}</p>
           </div>
           <div className="flex items-center gap-4">
-            <button className="relative text-gray-400 hover:text-navy transition-colors">
+            <button onClick={() => alert('Notifications coming soon')} className="relative text-gray-400 hover:text-navy transition-colors">
               <Bell className="w-5 h-5" />
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
-                3
-              </span>
             </button>
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 bg-[#729E82] rounded-full flex items-center justify-center">
@@ -316,10 +316,6 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
                       <p className="font-semibold">{displayName}</p>
                       <p className="text-xs opacity-80">Supplier Partner</p>
                     </div>
-                  </div>
-                  <div className="mt-3 inline-flex items-center gap-1.5 bg-gold/20 text-gold px-3 py-1 rounded-full text-xs font-bold">
-                    <span>★</span>
-                    <span>Platinum Sponsor</span>
                   </div>
                 </div>
 

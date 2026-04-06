@@ -19,6 +19,8 @@ import {
   Info,
 } from 'lucide-react';
 import { useLoans } from '@/lib/supabase/use-loans';
+import FeatureGate from '@/components/ui/FeatureGate';
+import { useMembershipTier } from '@/lib/membership-context';
 
 /* ------------------------------------------------------------------ */
 /* Mock active instruments                                              */
@@ -103,6 +105,7 @@ const currencies = ['USD', 'EUR', 'GBP'];
 
 export default function TradeFinancePage() {
   const { applyForLoan } = useLoans();
+  const { membershipTier } = useMembershipTier();
 
   const [showForm, setShowForm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -153,6 +156,7 @@ export default function TradeFinancePage() {
     form.commodity !== '';
 
   return (
+    <FeatureGate feature="trade_finance" tier={membershipTier}>
     <div className="px-4 py-5 sm:px-6 lg:px-8 space-y-8">
       {/* ── A) Header ── */}
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
@@ -464,5 +468,6 @@ export default function TradeFinancePage() {
         </div>
       </section>
     </div>
+    </FeatureGate>
   );
 }

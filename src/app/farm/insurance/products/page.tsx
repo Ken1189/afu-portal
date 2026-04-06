@@ -21,6 +21,11 @@ import {
   Calendar,
   DollarSign,
   MapPin,
+  Globe,
+  Wheat,
+  Beef,
+  Tractor,
+  Cloud,
 } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 import type { FarmPlotRow } from '@/lib/supabase/use-farm-plots';
@@ -201,7 +206,7 @@ const FALLBACK_INSURANCE_PRODUCTS: InsuranceProduct[] = [
       'Active crop + livestock records',
     ],
     popular: false,
-    icon: '⭐',
+    icon: '●',
   },
 ];
 
@@ -222,12 +227,12 @@ const itemVariants = {
 /* ------------------------------------------------------------------ */
 type FilterKey = 'all' | InsuranceType;
 
-const filterOptions: { key: FilterKey; label: string; emoji: string }[] = [
-  { key: 'all', label: 'All', emoji: '\u{1F30D}' },
-  { key: 'crop', label: 'Crop', emoji: '\u{1F33E}' },
-  { key: 'livestock', label: 'Livestock', emoji: '\u{1F404}' },
-  { key: 'equipment', label: 'Equipment', emoji: '\u{1F69C}' },
-  { key: 'weather-index', label: 'Weather Index', emoji: '\u{1F326}\uFE0F' },
+const filterOptions: { key: FilterKey; label: string; icon: typeof Globe }[] = [
+  { key: 'all', label: 'All', icon: Globe },
+  { key: 'crop', label: 'Crop', icon: Wheat },
+  { key: 'livestock', label: 'Livestock', icon: Beef },
+  { key: 'equipment', label: 'Equipment', icon: Tractor },
+  { key: 'weather-index', label: 'Weather Index', icon: Cloud },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -264,7 +269,7 @@ export default function ProductsPage() {
             claimProcess: 'Submit photos + verification within 14 days',
             eligibility: p.eligibility || ['AFU member in good standing'],
             popular: false,
-            icon: p.type === 'livestock' ? '\u{1F404}' : p.type === 'equipment' ? '\u{1F69C}' : p.type === 'weather-index' ? '\u{1F326}\uFE0F' : '\u{1F33E}',
+            icon: '●',
           })));
         }
       } catch { /* keep fallback */ }
@@ -439,7 +444,7 @@ export default function ProductsPage() {
                     : 'bg-white text-gray-600 border border-gray-200 hover:border-gray-300 active:bg-gray-50'
                 }`}
               >
-                <span className="text-base">{f.emoji}</span>
+                <f.icon className="w-4 h-4" />
                 {f.label}
               </button>
             );
@@ -476,8 +481,12 @@ export default function ProductsPage() {
                   {/* Product Header */}
                   <div className="flex items-start justify-between gap-3 mb-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cream to-gray-100 flex items-center justify-center text-2xl flex-shrink-0">
-                        {product.icon}
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cream to-gray-100 flex items-center justify-center flex-shrink-0">
+                        {(() => {
+                          const iconMap: Record<string, typeof Wheat> = { crop: Wheat, livestock: Beef, equipment: Tractor, 'weather-index': Cloud };
+                          const TypeIcon = iconMap[product.type] || Shield;
+                          return <TypeIcon className="w-5 h-5 text-navy" />;
+                        })()}
                       </div>
                       <div>
                         <div className="flex items-center gap-2">

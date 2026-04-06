@@ -14,7 +14,7 @@ import {
   Users,
   Globe,
   DollarSign,
-  Info,
+
   MessageCircle,
   CheckCircle,
 } from 'lucide-react';
@@ -144,6 +144,7 @@ export default function LoginPage() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [fullName, setFullName] = useState('');
   const [activeTestimonial, setActiveTestimonial] = useState(0);
+  const [resetSent, setResetSent] = useState(false);
 
   // Helper: fetch role from server API (bypasses RLS) and redirect by role
   const fetchRoleAndRedirect = useCallback(async () => {
@@ -358,9 +359,9 @@ export default function LoginPage() {
           {/* Bottom: Stats bar */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-8 border-t border-white/10">
             {[
-              // S5.6: Updated to reflect actual platform scope (20 countries)
+              // S5.6: Updated to reflect actual platform scope
               { icon: Users, label: 'Members', value: '5,000+' },
-              { icon: Globe, label: 'Countries', value: '20' },
+              { icon: Globe, label: 'Countries', value: '9+' },
               { icon: DollarSign, label: 'Financed', value: '$50M+' },
             ].map((stat, i) => (
               <motion.div
@@ -533,27 +534,38 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              {/* Remember / Forgot */}
-              <div className="flex items-center justify-between">
-                <label className="flex items-center gap-2 cursor-pointer select-none">
-                  <input
-                    type="checkbox"
-                    className="w-4 h-4 rounded border-gray-300 text-[#5DB347] focus:ring-[#5DB347]/40"
-                  />
-                  <span className="text-sm text-gray-500">Remember me</span>
-                </label>
+              {/* Reset password confirmation */}
+              <AnimatePresence>
+                {resetSent && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="flex items-start gap-3 bg-green-50 border border-green-100 text-green-700 text-sm p-3 rounded-lg mb-1">
+                      <CheckCircle className="w-5 h-5 mt-0.5 shrink-0" />
+                      <p>Password reset link sent to <strong>{email}</strong>. Check your inbox.</p>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Forgot password */}
+              <div className="flex items-center justify-end">
                 <button
                   type="button"
                   onClick={async () => {
                     if (!email) { setError('Enter your email first, then click Forgot Password'); return; }
                     setIsLoading(true);
+                    setResetSent(false);
                     const supabase = (await import('@/lib/supabase/client')).createClient();
                     const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
                       redirectTo: `${window.location.origin}/login`,
                     });
                     setIsLoading(false);
                     if (resetError) { setError(resetError.message); }
-                    else { setError(''); alert('Password reset link sent to ' + email + '. Check your inbox.'); }
+                    else { setError(''); setResetSent(true); }
                   }}
                   className="text-sm text-[#5DB347] hover:text-[#449933] font-medium transition-colors"
                 >
@@ -649,6 +661,13 @@ export default function LoginPage() {
                 >
                   Create one
                 </button>
+                <span className="mx-1.5 text-gray-300">|</span>
+                <Link
+                  href="/apply"
+                  className="text-[#5DB347] hover:text-[#449933] font-medium transition-colors"
+                >
+                  Apply for membership
+                </Link>
               </>
             )}
           </p>

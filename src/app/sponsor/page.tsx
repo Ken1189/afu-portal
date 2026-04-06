@@ -395,7 +395,7 @@ function TierCard({
         </div>
       )}
 
-      <div className="text-3xl mb-2">{emoji}</div>
+      <div className="text-3xl mb-2">{emoji || name.charAt(0)}</div>
       <h3 className={`font-bold text-xl mb-1 ${isCorporate ? 'text-white' : 'text-navy'}`}>
         {name}
       </h3>
@@ -496,7 +496,7 @@ interface SponsorTier {
 
 const FALLBACK_TIERS: SponsorTier[] = [
   {
-    emoji: "\u{1F949}",
+    emoji: "",
     name: "Bronze",
     label: "Bronze",
     monthlyPrice: 5,
@@ -505,7 +505,7 @@ const FALLBACK_TIERS: SponsorTier[] = [
     annualSaving: 10,
   },
   {
-    emoji: "\u{1F948}",
+    emoji: "",
     name: "Silver",
     label: "Silver",
     monthlyPrice: 100,
@@ -515,7 +515,7 @@ const FALLBACK_TIERS: SponsorTier[] = [
     annualSaving: 200,
   },
   {
-    emoji: "\u{1F947}",
+    emoji: "",
     name: "Gold",
     label: "Gold",
     monthlyPrice: 500,
@@ -524,7 +524,7 @@ const FALLBACK_TIERS: SponsorTier[] = [
     annualSaving: 1000,
   },
   {
-    emoji: "\u{1F3E2}",
+    emoji: "",
     name: "Corporate",
     label: "Corporate",
     monthlyPrice: null,
@@ -578,7 +578,7 @@ export default function SponsorPage() {
         if (data && data.length > 0) {
           setSponsorTiers(
             data.map((t: Record<string, unknown>) => ({
-              emoji: (t.icon as string) || "\u{1F949}",
+              emoji: (t.icon as string) || "",
               name: (t.name as string) || '',
               label: (t.name as string) || '',
               monthlyPrice: t.price_usd != null ? Number(t.price_usd) : null,
@@ -889,7 +889,7 @@ export default function SponsorPage() {
             that your company is transforming African agriculture at scale.
           </p>
           <p className="text-gray-500 mb-8">
-            Recognised across 20 countries. Reported quarterly. Fully transparent.
+            Recognised across Africa. Reported quarterly. Fully transparent.
           </p>
           <a
             href="mailto:peterw@africanfarmingunion.org"

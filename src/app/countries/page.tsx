@@ -4,18 +4,18 @@ import { createClient } from "@supabase/supabase-js";
 export const metadata = {
   title: "Our Countries - AFU",
   description:
-    "AFU operates across 20 African countries including Botswana, Ghana, Kenya, Mozambique, Nigeria, South Africa, Tanzania, Uganda, Zambia, Zimbabwe, Sierra Leone, Egypt, Ethiopia, Malawi, Namibia, Guinea, Guinea-Bissau, Liberia, Mali, and Ivory Coast.",
+    "AFU operates across Africa including Botswana, Ghana, Kenya, Mozambique, Nigeria, South Africa, Tanzania, Uganda, Zambia, Zimbabwe, Sierra Leone, Egypt, Ethiopia, Malawi, Namibia, Guinea, Guinea-Bissau, Liberia, Mali, and Ivory Coast.",
   openGraph: {
     title: "Our Countries - AFU",
     description:
-      "Twenty strategic markets across Africa, each serving a distinct purpose in the AFU agricultural development platform.",
+      "Strategic markets across Africa, each serving a distinct purpose in the AFU agricultural development platform.",
     url: "https://afu-portal.vercel.app/countries",
     images: [
       {
         url: "https://afu-portal.vercel.app/og-image.png",
         width: 1200,
         height: 630,
-        alt: "AFU Countries - 20 African Nations",
+        alt: "AFU Countries - African Nations",
       },
     ],
   },
@@ -23,7 +23,7 @@ export const metadata = {
     card: "summary_large_image",
     title: "Our Countries - AFU",
     description:
-      "Twenty strategic markets across Africa, each serving a distinct purpose in the AFU agricultural development platform.",
+      "Strategic markets across Africa, each serving a distinct purpose in the AFU agricultural development platform.",
   },
 };
 
@@ -226,7 +226,7 @@ export default async function CountriesPage() {
             Our <span className="bg-gradient-to-r from-[#5DB347] to-[#6ABF4B] bg-clip-text text-transparent">Countries</span>
           </h1>
           <p className="text-xl text-gray-300 max-w-3xl">
-            Twenty strategic markets across Africa, each serving a distinct purpose in the AFU flywheel.
+            Strategic markets across Africa, each serving a distinct purpose in the AFU flywheel.
           </p>
           <div className="flex flex-wrap gap-3 mt-8">
             {countries.map((c) => (
@@ -299,7 +299,7 @@ export default async function CountriesPage() {
               <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">
                 Join the Pan-African <span className="bg-gradient-to-r from-[#5DB347] to-[#6ABF4B] bg-clip-text text-transparent">Agricultural Revolution</span>
               </h3>
-              <p className="text-white/70 mb-8 max-w-lg mx-auto">20 countries. One integrated platform. Apply for membership or become a supplier today.</p>
+              <p className="text-white/70 mb-8 max-w-lg mx-auto">Multiple countries. One integrated platform. Apply for membership or become a supplier today.</p>
               <div className="flex flex-wrap gap-4 justify-center">
                 <Link
                   href="/apply"

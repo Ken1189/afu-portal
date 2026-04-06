@@ -18,6 +18,12 @@ import {
   DollarSign,
   Calculator,
   Sparkles,
+  Beef,
+  Rabbit,
+  Wheat,
+  Tractor,
+  Cloud,
+  Bird,
 } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 
@@ -197,7 +203,7 @@ const mockInsuranceProducts: InsuranceProduct[] = [
       'Active crop + livestock records',
     ],
     popular: false,
-    icon: '⭐',
+    icon: '●',
   },
 ];
 
@@ -228,10 +234,10 @@ const cropTypes = [
 ];
 
 const livestockTypes = [
-  { key: 'cattle', label: 'Cattle', emoji: '\u{1F404}' },
-  { key: 'goats', label: 'Goats', emoji: '\u{1F410}' },
-  { key: 'sheep', label: 'Sheep', emoji: '\u{1F411}' },
-  { key: 'poultry', label: 'Poultry', emoji: '\u{1F414}' },
+  { key: 'cattle', label: 'Cattle', icon: Beef },
+  { key: 'goats', label: 'Goats', icon: Rabbit },
+  { key: 'sheep', label: 'Sheep', icon: Cloud },
+  { key: 'poultry', label: 'Poultry', icon: Bird },
 ];
 
 const regions = {
@@ -282,7 +288,7 @@ export default function QuotePage() {
             claimProcess: 'Submit photos + verification within 14 days',
             eligibility: p.eligibility || ['AFU member in good standing'],
             popular: false,
-            icon: p.type === 'livestock' ? '\u{1F404}' : p.type === 'equipment' ? '\u{1F69C}' : p.type === 'weather-index' ? '\u{1F326}\uFE0F' : '\u{1F33E}',
+            icon: '●',
           })));
         }
       } catch { /* keep fallback */ }
@@ -457,13 +463,17 @@ export default function QuotePage() {
                 >
                   <div className="flex items-start gap-3">
                     <div
-                      className={`w-11 h-11 rounded-xl flex items-center justify-center text-xl flex-shrink-0 ${
+                      className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${
                         isSelected
                           ? 'bg-teal/10'
                           : 'bg-gray-50'
                       }`}
                     >
-                      {product.icon}
+                      {(() => {
+                        const iconMap: Record<string, typeof Wheat> = { crop: Wheat, livestock: Beef, equipment: Tractor, 'weather-index': Cloud };
+                        const TypeIcon = iconMap[product.type] || Shield;
+                        return <TypeIcon className={`w-5 h-5 ${isSelected ? 'text-teal' : 'text-navy'}`} />;
+                      })()}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
@@ -585,7 +595,7 @@ export default function QuotePage() {
                           key={lt.key}
                           className="bg-gray-50 rounded-xl p-3 flex items-center gap-3"
                         >
-                          <span className="text-xl">{lt.emoji}</span>
+                          <lt.icon className="w-5 h-5 text-navy" />
                           <div className="flex-1">
                             <p className="text-xs font-medium text-navy">{lt.label}</p>
                             <input

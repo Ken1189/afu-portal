@@ -59,7 +59,7 @@ const FALLBACK_SERVICES: { title: string; desc: string; features: string[]; link
   },
   {
     title: "Legal Assistance",
-    desc: "Professional legal support covering land rights, contract review, dispute resolution, regulatory compliance, and cooperative governance across 20 African countries.",
+    desc: "Professional legal support covering land rights, contract review, dispute resolution, regulatory compliance, and cooperative governance across Africa.",
     features: ["Land rights & tenure", "Contract review", "Dispute resolution", "Regulatory compliance"],
     link: "/services/legal-assistance",
     icon: Scale,

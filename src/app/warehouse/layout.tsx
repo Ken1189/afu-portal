@@ -37,6 +37,7 @@ export default function WarehouseLayout({ children }: { children: React.ReactNod
   const [mobileOpen, setMobileOpen] = useState(false);
   const [authorized, setAuthorized] = useState(false);
   const [roleChecked, setRoleChecked] = useState(false);
+  const [serverRole, setServerRole] = useState<string | null>(null);
 
   const displayName = profile?.full_name || user?.email?.split('@')[0] || 'Operator';
   const initials = displayName
@@ -58,6 +59,14 @@ export default function WarehouseLayout({ children }: { children: React.ReactNod
 
     let retried = false;
 
+    // Safety timeout: auto-authorize after 3s since middleware is the real guard
+    const safetyTimer = setTimeout(() => {
+      if (!roleChecked) {
+        setAuthorized(true);
+        setRoleChecked(true);
+      }
+    }, 3000);
+
     const checkRole = async () => {
       try {
         const res = await fetch('/api/auth/me');
@@ -68,6 +77,7 @@ export default function WarehouseLayout({ children }: { children: React.ReactNod
         }
         const data = await res.json();
         const { role } = data;
+        setServerRole(role || null);
         if (role === 'warehouse_operator' || role === 'admin' || role === 'super_admin') {
           setAuthorized(true);
         } else if (role) {
@@ -88,6 +98,8 @@ export default function WarehouseLayout({ children }: { children: React.ReactNod
     };
 
     checkRole();
+
+    return () => clearTimeout(safetyTimer);
   }, [user, authLoading, router]);
 
   const isActive = (href: string) =>
@@ -294,10 +306,12 @@ export default function WarehouseLayout({ children }: { children: React.ReactNod
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <Link href="/admin" className="hidden sm:flex items-center gap-1.5 text-xs text-gray-500 hover:text-[#1B2A4A] transition-colors px-3 py-1.5 rounded-lg hover:bg-gray-100">
-              <ExternalLink className="w-3.5 h-3.5" />
-              Admin
-            </Link>
+            {(serverRole === 'admin' || serverRole === 'super_admin') && (
+              <Link href="/admin" className="hidden sm:flex items-center gap-1.5 text-xs text-gray-500 hover:text-[#1B2A4A] transition-colors px-3 py-1.5 rounded-lg hover:bg-gray-100">
+                <ExternalLink className="w-3.5 h-3.5" />
+                Admin
+              </Link>
+            )}
             <div className="w-9 h-9 bg-[#5DB347] rounded-full flex items-center justify-center">
               <span className="text-white text-xs font-bold">{initials}</span>
             </div>

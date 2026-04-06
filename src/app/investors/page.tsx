@@ -34,7 +34,7 @@ import VideoCard from "@/components/VideoCard";
 export const metadata = {
   title: "Invest in AFU - $500M Seed Round | African Farming Union",
   description:
-    "Join AFU's $500M seed round to build Africa's first vertically integrated agriculture development bank. $1T market opportunity. De-risked, technology-enabled model across 20 countries.",
+    "Join AFU's $500M seed round to build Africa's first vertically integrated agriculture development bank. $1T market opportunity. De-risked, technology-enabled model across Africa.",
   openGraph: {
     title: "Invest in AFU - $500M Seed Round",
     description:

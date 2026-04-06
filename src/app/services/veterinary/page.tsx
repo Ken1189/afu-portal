@@ -32,7 +32,7 @@ const steps = [
     number: "02",
     title: "Schedule a Visit",
     description:
-      "Book a routine check-up, vaccination session, or specialist consultation through the app. Our network of 200+ qualified veterinarians covers both urban and remote farming areas across 20 countries.",
+      "Book a routine check-up, vaccination session, or specialist consultation through the app. Our network of 200+ qualified veterinarians covers both urban and remote farming areas across Africa.",
   },
   {
     number: "03",

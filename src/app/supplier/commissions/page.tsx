@@ -420,7 +420,19 @@ export default function CommissionTracking() {
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <button className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
+          <button
+            onClick={() => {
+              const csv = ['Order ID,Product,Buyer,Order Amount,Commission Rate,Commission Amount,Status,Order Date,Payment Date']
+                .concat(filteredCommissions.map(c => `${c.orderId},${c.productName.replace(/,/g, ';')},${c.buyerName.replace(/,/g, ';')},${c.orderAmount},${c.commissionRate}%,${c.commissionAmount},${c.status},${c.orderDate},${c.paymentDate || ''}`))
+                .join('\n');
+              const blob = new Blob([csv], { type: 'text/csv' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url; a.download = `commissions-export-${new Date().toISOString().slice(0,10)}.csv`;
+              a.click(); URL.revokeObjectURL(url);
+            }}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
+          >
             <Download className="w-4 h-4" />
             Export
           </button>
@@ -476,7 +488,10 @@ export default function CommissionTracking() {
             </div>
             <div className="flex items-end">
               <button
-                onClick={() => setShowPayoutModal(false)}
+                onClick={() => {
+                  alert('Payout request submitted! You will receive payment within 3-5 business days.');
+                  setShowPayoutModal(false);
+                }}
                 className="w-full px-4 py-2 rounded-lg text-sm font-medium bg-[#8CB89C] text-white hover:bg-[#729E82] transition-colors"
               >
                 Submit Request

@@ -624,7 +624,7 @@ export default function Home() {
             </FadeInWhenVisible>
             <FadeInWhenVisible delay={0.3}>
               <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border-l-4 border-[#5DB347] shadow-lg shadow-[#5DB347]/5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                <CountStat target={memberCount} suffix="+" label="farmers across 20 African countries" />
+                <CountStat target={memberCount} suffix="+" label="farmers across Africa" />
               </div>
             </FadeInWhenVisible>
           </div>

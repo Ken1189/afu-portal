@@ -12,8 +12,7 @@ import {
   Link as LinkIcon,
   Plus,
   ExternalLink,
-  BarChart3,
-  MousePointerClick,
+  DollarSign,
   ArrowRightLeft,
 } from 'lucide-react';
 import { useAuth } from '@/lib/supabase/auth-context';
@@ -33,9 +32,9 @@ interface Referral {
 
 interface ReferralLink {
   id: string;
-  code: string;
-  clicks: number;
-  conversions: number;
+  referral_code: string;
+  status: string;
+  lifetime_value: number;
   created_at: string;
 }
 
@@ -54,17 +53,6 @@ const FALLBACK_REFERRALS: Referral[] = [
   { id: '10', referred_name: 'Blessing Chikwere', referred_email: 'bchikwere@zimag.co.zw', signed_up_date: '2026-01-15T00:00:00Z', status: 'pending', lifetime_value: 0, commission_earned: 0 },
 ];
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
-
-function randomString(len: number): string {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  let result = '';
-  for (let i = 0; i < len; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return result;
-}
-
 // ── Component ────────────────────────────────────────────────────────────────
 
 export default function ReferralsPage() {
@@ -77,7 +65,7 @@ export default function ReferralsPage() {
   const [ambassadorId, setAmbassadorId] = useState<string | null>(null);
   const [referralCode, setReferralCode] = useState('');
   const [copied, setCopied] = useState('');
-  const [generating, setGenerating] = useState(false);
+  const generating = false; // Campaign link generation coming soon
 
   useEffect(() => {
     if (!user) return;
@@ -109,9 +97,9 @@ export default function ReferralsPage() {
           if (links && links.length > 0) {
             setReferralLinks(links.map((l: Record<string, unknown>) => ({
               id: String(l.id),
-              code: String(l.referral_code || l.code || ''),
-              clicks: 0,
-              conversions: 1,
+              referral_code: String(l.referral_code || ''),
+              status: String(l.status || 'active'),
+              lifetime_value: Number(l.lifetime_value || 0),
               created_at: String(l.created_at || l.signed_up_at),
             })));
           }
@@ -154,47 +142,15 @@ export default function ReferralsPage() {
   }, [user]);
 
   const generateNewLink = async () => {
-    if (!ambassadorId) return;
-    setGenerating(true);
-
-    const code = `AFU-${randomString(8)}`;
-    const supabase = createClient();
-
-    try {
-      const { data, error } = await supabase
-        .from('referral_links')
-        .insert({
-          ambassador_id: ambassadorId,
-          code,
-          clicks: 0,
-          conversions: 0,
-        })
-        .select()
-        .single();
-
-      if (!error && data) {
-        setReferralLinks((prev) => [
-          {
-            id: String(data.id),
-            code: String(data.code),
-            clicks: 0,
-            conversions: 0,
-            created_at: String(data.created_at),
-          },
-          ...prev,
-        ]);
-      }
-    } catch {
-      // silent
-    } finally {
-      setGenerating(false);
-    }
+    // Campaign links are tracked automatically when referred users sign up.
+    // The referral_links table records each referred user, not standalone links.
+    alert('Campaign link generation is coming soon. For now, share your main referral link above -- all signups through it are tracked automatically.');
   };
 
-  const handleCopyLink = async (code: string) => {
-    const link = `https://africanfarmingunion.org/join?ref=${code}`;
+  const handleCopyLink = async (refCode: string) => {
+    const link = `https://africanfarmingunion.org/apply?ref=${refCode}`;
     await navigator.clipboard.writeText(link);
-    setCopied(code);
+    setCopied(refCode);
     setTimeout(() => setCopied(''), 2000);
   };
 
@@ -288,9 +244,9 @@ export default function ReferralsPage() {
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-2">
             <ExternalLink className="w-5 h-5 text-[#1B2A4A]" />
-            <h2 className="font-semibold text-[#1B2A4A]">Campaign Links</h2>
+            <h2 className="font-semibold text-[#1B2A4A]">Referral Links</h2>
             <span className="text-xs text-gray-400 ml-1">
-              {referralLinks.length} link{referralLinks.length !== 1 ? 's' : ''}
+              {referralLinks.length} referral{referralLinks.length !== 1 ? 's' : ''}
             </span>
           </div>
           <button
@@ -313,7 +269,7 @@ export default function ReferralsPage() {
         {referralLinks.length === 0 ? (
           <div className="text-center py-8 text-gray-400">
             <LinkIcon className="w-8 h-8 mx-auto mb-2 opacity-50" />
-            <p className="text-sm">No campaign links yet. Generate one to start tracking specific campaigns.</p>
+            <p className="text-sm">No referral links yet. Share your main link above to start getting referrals.</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -324,31 +280,33 @@ export default function ReferralsPage() {
               >
                 <div className="flex-1 min-w-0">
                   <div className="font-mono text-sm text-[#1B2A4A] truncate">
-                    africanfarmingunion.org/join?ref={link.code}
+                    africanfarmingunion.org/apply?ref={link.referral_code}
                   </div>
                   <div className="text-xs text-gray-400 mt-1">
-                    Created {formatDate(link.created_at)}
+                    Signed up {formatDate(link.created_at)}
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                    <MousePointerClick className="w-3.5 h-3.5" />
-                    <span className="font-medium">{link.clicks}</span> clicks
+                    <ArrowRightLeft className="w-3.5 h-3.5" />
+                    <span className={`font-medium px-2 py-0.5 rounded-full ${
+                      link.status === 'active' ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-500'
+                    }`}>{link.status}</span>
                   </div>
                   <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                    <ArrowRightLeft className="w-3.5 h-3.5" />
-                    <span className="font-medium">{link.conversions}</span> conversions
+                    <DollarSign className="w-3.5 h-3.5" />
+                    <span className="font-medium">{formatCurrency(link.lifetime_value)}</span>
                   </div>
                   <button
-                    onClick={() => handleCopyLink(link.code)}
+                    onClick={() => handleCopyLink(link.referral_code)}
                     className={`px-3 py-2 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all ${
-                      copied === link.code
+                      copied === link.referral_code
                         ? 'bg-green-100 text-green-700'
                         : 'bg-[#5DB347]/10 text-[#5DB347] hover:bg-[#5DB347]/20'
                     }`}
                   >
-                    {copied === link.code ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                    {copied === link.code ? 'Copied' : 'Copy'}
+                    {copied === link.referral_code ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                    {copied === link.referral_code ? 'Copied' : 'Copy'}
                   </button>
                 </div>
               </div>

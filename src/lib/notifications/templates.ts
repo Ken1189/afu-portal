@@ -304,7 +304,7 @@ export function onboardingReminderDay7Template(name: string): NotificationTempla
       'Don&rsquo;t Miss Out',
       `<p>Hi${name ? ` ${name}` : ''},</p>
        <p>It&rsquo;s been a week since you signed up for the African Farming Union, but your profile is still incomplete.</p>
-       <p>Thousands of farmers across 20 countries are already using AFU to:</p>
+       <p>Thousands of farmers across Africa are already using AFU to:</p>
        <ul>
          <li>Access affordable financing</li>
          <li>Protect their crops with insurance</li>

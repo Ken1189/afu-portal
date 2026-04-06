@@ -576,11 +576,21 @@ export default function SupplierProductDetailPage() {
 
             {/* Action Buttons */}
             <div className="flex items-center gap-3 pt-3 border-t border-gray-100">
-              <button className="flex-1 inline-flex items-center justify-center gap-2 bg-[#8CB89C] hover:bg-[#729E82] text-white px-4 py-3 rounded-xl text-sm font-semibold transition-colors">
+              <button
+                onClick={() => window.open('/supplier/products', '_self')}
+                className="flex-1 inline-flex items-center justify-center gap-2 bg-[#8CB89C] hover:bg-[#729E82] text-white px-4 py-3 rounded-xl text-sm font-semibold transition-colors"
+              >
                 <Pencil className="w-4 h-4" />
                 Edit Product
               </button>
-              <button className="inline-flex items-center justify-center gap-2 bg-red-50 hover:bg-red-100 text-red-600 px-4 py-3 rounded-xl text-sm font-semibold transition-colors">
+              <button
+                onClick={() => {
+                  if (window.confirm('Are you sure you want to remove this product listing?')) {
+                    alert('Product removal coming soon. Go to Products page to manage listings.');
+                  }
+                }}
+                className="inline-flex items-center justify-center gap-2 bg-red-50 hover:bg-red-100 text-red-600 px-4 py-3 rounded-xl text-sm font-semibold transition-colors"
+              >
                 <Trash2 className="w-4 h-4" />
                 Remove Listing
               </button>
@@ -800,7 +810,10 @@ export default function SupplierProductDetailPage() {
                   </span>
                 </div>
               </div>
-              <button className="w-full inline-flex items-center justify-center gap-2 bg-[#1B2A4A]/5 hover:bg-[#1B2A4A]/10 text-[#1B2A4A] px-4 py-2.5 rounded-xl text-sm font-medium transition-colors">
+              <button
+                onClick={() => window.open('/supplier/discounts', '_self')}
+                className="w-full inline-flex items-center justify-center gap-2 bg-[#1B2A4A]/5 hover:bg-[#1B2A4A]/10 text-[#1B2A4A] px-4 py-2.5 rounded-xl text-sm font-medium transition-colors"
+              >
                 <Pencil className="w-3.5 h-3.5" />
                 Edit Discount
               </button>

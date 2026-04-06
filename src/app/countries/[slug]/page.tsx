@@ -32,7 +32,7 @@ const FALLBACK_COUNTRIES: CountryData[] = [
   {
     name: "Botswana",
     slug: "botswana",
-    flag: "\u{1F1E7}\u{1F1FC}",
+    flag: "",
     role: "Institutional Base & Bank HQ",
     heroImage: "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=1600&q=80",
     description:
@@ -49,10 +49,10 @@ const FALLBACK_COUNTRIES: CountryData[] = [
       paymentMethods: ["Bank Transfer", "Orange Money", "Card"],
     },
     crops: [
-      { name: "Sorghum", icon: "\u{1F33E}" },
-      { name: "Maize", icon: "\u{1F33D}" },
-      { name: "Millet", icon: "\u{1F33E}" },
-      { name: "Beef Cattle", icon: "\u{1F404}" },
+      { name: "Sorghum", icon: "" },
+      { name: "Maize", icon: "" },
+      { name: "Millet", icon: "" },
+      { name: "Beef Cattle", icon: "" },
     ],
     highlights: [
       "Bank licensing pathway in progress",
@@ -64,7 +64,7 @@ const FALLBACK_COUNTRIES: CountryData[] = [
   {
     name: "Zimbabwe",
     slug: "zimbabwe",
-    flag: "\u{1F1FF}\u{1F1FC}",
+    flag: "",
     role: "Export Lane (Blueberries)",
     heroImage: "https://images.unsplash.com/photo-1591019479261-1a103585c559?w=1600&q=80",
     description:
@@ -81,11 +81,11 @@ const FALLBACK_COUNTRIES: CountryData[] = [
       paymentMethods: ["EcoCash", "Bank Transfer", "USD Cash"],
     },
     crops: [
-      { name: "Blueberries", icon: "\u{1FAD0}" },
-      { name: "Tobacco", icon: "\u{1F33F}" },
-      { name: "Maize", icon: "\u{1F33D}" },
-      { name: "Cotton", icon: "\u{2601}\u{FE0F}" },
-      { name: "Soya", icon: "\u{1F331}" },
+      { name: "Blueberries", icon: "" },
+      { name: "Tobacco", icon: "" },
+      { name: "Maize", icon: "" },
+      { name: "Cotton", icon: "" },
+      { name: "Soya", icon: "" },
     ],
     highlights: [
       "Blueberry export to EU & UK markets",
@@ -97,7 +97,7 @@ const FALLBACK_COUNTRIES: CountryData[] = [
   {
     name: "Tanzania",
     slug: "tanzania",
-    flag: "\u{1F1F9}\u{1F1FF}",
+    flag: "",
     role: "Scale Lane (Cassava + Sesame)",
     heroImage: "https://images.unsplash.com/photo-1504432842672-1a79f78e4084?w=1600&q=80",
     description:
@@ -114,13 +114,13 @@ const FALLBACK_COUNTRIES: CountryData[] = [
       paymentMethods: ["M-Pesa", "Tigo Pesa", "Bank Transfer"],
     },
     crops: [
-      { name: "Cassava", icon: "\u{1F360}" },
-      { name: "Sesame", icon: "\u{1F33E}" },
-      { name: "Cashews", icon: "\u{1F95C}" },
+      { name: "Cassava", icon: "" },
+      { name: "Sesame", icon: "" },
+      { name: "Cashews", icon: "" },
       { name: "Coffee", icon: "\u2615" },
-      { name: "Avocados", icon: "\u{1F951}" },
-      { name: "Maize", icon: "\u{1F33D}" },
-      { name: "Rice", icon: "\u{1F35A}" },
+      { name: "Avocados", icon: "" },
+      { name: "Maize", icon: "" },
+      { name: "Rice", icon: "" },
     ],
     highlights: [
       "Cassava processing for starch & flour",
@@ -133,7 +133,7 @@ const FALLBACK_COUNTRIES: CountryData[] = [
   {
     name: "Kenya",
     slug: "kenya",
-    flag: "\u{1F1F0}\u{1F1EA}",
+    flag: "",
     role: "East African Gateway",
     heroImage: "https://images.unsplash.com/photo-1582719508461-905c673771fd?w=1600&q=80",
     description:
@@ -150,11 +150,11 @@ const FALLBACK_COUNTRIES: CountryData[] = [
       paymentMethods: ["M-Pesa", "Bank Transfer", "Airtel Money", "Card"],
     },
     crops: [
-      { name: "Tea", icon: "\u{1F375}" },
+      { name: "Tea", icon: "" },
       { name: "Coffee", icon: "\u2615" },
-      { name: "Flowers", icon: "\u{1F33A}" },
-      { name: "Avocados", icon: "\u{1F951}" },
-      { name: "Maize", icon: "\u{1F33D}" },
+      { name: "Flowers", icon: "" },
+      { name: "Avocados", icon: "" },
+      { name: "Maize", icon: "" },
     ],
     highlights: [
       "M-Pesa integration for instant payments",
@@ -166,7 +166,7 @@ const FALLBACK_COUNTRIES: CountryData[] = [
   {
     name: "Nigeria",
     slug: "nigeria",
-    flag: "\u{1F1F3}\u{1F1EC}",
+    flag: "",
     role: "West African Scale",
     heroImage: "https://images.unsplash.com/photo-1589923188651-268a9765e432?w=1600&q=80",
     description:
@@ -183,12 +183,12 @@ const FALLBACK_COUNTRIES: CountryData[] = [
       paymentMethods: ["Bank Transfer", "USSD", "Card", "Mobile Money"],
     },
     crops: [
-      { name: "Cassava", icon: "\u{1F360}" },
-      { name: "Cocoa", icon: "\u{1F36B}" },
-      { name: "Rice", icon: "\u{1F35A}" },
-      { name: "Yams", icon: "\u{1F360}" },
-      { name: "Maize", icon: "\u{1F33D}" },
-      { name: "Palm Oil", icon: "\u{1F334}" },
+      { name: "Cassava", icon: "" },
+      { name: "Cocoa", icon: "" },
+      { name: "Rice", icon: "" },
+      { name: "Yams", icon: "" },
+      { name: "Maize", icon: "" },
+      { name: "Palm Oil", icon: "" },
     ],
     highlights: [
       "200M+ population — largest food market in Africa",
@@ -200,7 +200,7 @@ const FALLBACK_COUNTRIES: CountryData[] = [
   {
     name: "Zambia",
     slug: "zambia",
-    flag: "\u{1F1FF}\u{1F1F2}",
+    flag: "",
     role: "Processing Hub",
     heroImage: "https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?w=1600&q=80",
     description:
@@ -217,11 +217,11 @@ const FALLBACK_COUNTRIES: CountryData[] = [
       paymentMethods: ["Bank Transfer", "Airtel Money", "MTN MoMo"],
     },
     crops: [
-      { name: "Maize", icon: "\u{1F33D}" },
-      { name: "Soya", icon: "\u{1F331}" },
-      { name: "Sunflower", icon: "\u{1F33B}" },
-      { name: "Wheat", icon: "\u{1F33E}" },
-      { name: "Cotton", icon: "\u{2601}\u{FE0F}" },
+      { name: "Maize", icon: "" },
+      { name: "Soya", icon: "" },
+      { name: "Sunflower", icon: "" },
+      { name: "Wheat", icon: "" },
+      { name: "Cotton", icon: "" },
     ],
     highlights: [
       "Maize milling capacity serving SADC region",
@@ -233,7 +233,7 @@ const FALLBACK_COUNTRIES: CountryData[] = [
   {
     name: "Mozambique",
     slug: "mozambique",
-    flag: "\u{1F1F2}\u{1F1FF}",
+    flag: "",
     role: "Southern Corridor",
     heroImage: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1600&q=80",
     description:
@@ -250,12 +250,12 @@ const FALLBACK_COUNTRIES: CountryData[] = [
       paymentMethods: ["M-Pesa", "e-Mola", "Bank Transfer"],
     },
     crops: [
-      { name: "Cashews", icon: "\u{1F95C}" },
-      { name: "Sesame", icon: "\u{1F33E}" },
-      { name: "Fruit", icon: "\u{1F34A}" },
-      { name: "Maize", icon: "\u{1F33D}" },
-      { name: "Cassava", icon: "\u{1F360}" },
-      { name: "Coconut", icon: "\u{1F965}" },
+      { name: "Cashews", icon: "" },
+      { name: "Sesame", icon: "" },
+      { name: "Fruit", icon: "" },
+      { name: "Maize", icon: "" },
+      { name: "Cassava", icon: "" },
+      { name: "Coconut", icon: "" },
     ],
     highlights: [
       "Port of Maputo — key SADC trade gateway",
@@ -268,7 +268,7 @@ const FALLBACK_COUNTRIES: CountryData[] = [
   {
     name: "South Africa",
     slug: "south-africa",
-    flag: "\u{1F1FF}\u{1F1E6}",
+    flag: "",
     role: "Financial Hub",
     heroImage: "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=1600&q=80",
     description:
@@ -285,12 +285,12 @@ const FALLBACK_COUNTRIES: CountryData[] = [
       paymentMethods: ["Bank Transfer", "Card", "SnapScan", "EFT"],
     },
     crops: [
-      { name: "Maize", icon: "\u{1F33D}" },
-      { name: "Citrus", icon: "\u{1F34A}" },
-      { name: "Grapes", icon: "\u{1F347}" },
-      { name: "Sugarcane", icon: "\u{1F33F}" },
-      { name: "Wheat", icon: "\u{1F33E}" },
-      { name: "Soya", icon: "\u{1F331}" },
+      { name: "Maize", icon: "" },
+      { name: "Citrus", icon: "" },
+      { name: "Grapes", icon: "" },
+      { name: "Sugarcane", icon: "" },
+      { name: "Wheat", icon: "" },
+      { name: "Soya", icon: "" },
     ],
     highlights: [
       "Africa's most advanced banking & insurance system",
@@ -302,7 +302,7 @@ const FALLBACK_COUNTRIES: CountryData[] = [
   {
     name: "Ghana",
     slug: "ghana",
-    flag: "\u{1F1EC}\u{1F1ED}",
+    flag: "",
     role: "West African Cocoa Belt",
     heroImage: "https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=1600&q=80",
     description:
@@ -319,11 +319,11 @@ const FALLBACK_COUNTRIES: CountryData[] = [
       paymentMethods: ["MTN MoMo", "Bank Transfer", "Vodafone Cash"],
     },
     crops: [
-      { name: "Cocoa", icon: "\u{1F36B}" },
-      { name: "Cashews", icon: "\u{1F95C}" },
-      { name: "Maize", icon: "\u{1F33D}" },
-      { name: "Rice", icon: "\u{1F35A}" },
-      { name: "Oil Palm", icon: "\u{1F334}" },
+      { name: "Cocoa", icon: "" },
+      { name: "Cashews", icon: "" },
+      { name: "Maize", icon: "" },
+      { name: "Rice", icon: "" },
+      { name: "Oil Palm", icon: "" },
     ],
     highlights: [
       "World's #2 cocoa producer — $2B+ annual exports",
@@ -335,7 +335,7 @@ const FALLBACK_COUNTRIES: CountryData[] = [
   {
     name: "Uganda",
     slug: "uganda",
-    flag: "\u{1F1FA}\u{1F1EC}",
+    flag: "",
     role: "East African Breadbasket",
     heroImage: "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=1600&q=80",
     description:
@@ -353,11 +353,11 @@ const FALLBACK_COUNTRIES: CountryData[] = [
     },
     crops: [
       { name: "Coffee", icon: "\u2615" },
-      { name: "Cashews", icon: "\u{1F95C}" },
-      { name: "Tea", icon: "\u{1F375}" },
-      { name: "Maize", icon: "\u{1F33D}" },
-      { name: "Bananas", icon: "\u{1F34C}" },
-      { name: "Beans", icon: "\u{1FAD8}" },
+      { name: "Cashews", icon: "" },
+      { name: "Tea", icon: "" },
+      { name: "Maize", icon: "" },
+      { name: "Bananas", icon: "" },
+      { name: "Beans", icon: "" },
     ],
     highlights: [
       "Africa's top coffee exporter by volume",
@@ -371,7 +371,7 @@ const FALLBACK_COUNTRIES: CountryData[] = [
   {
     name: "Sierra Leone",
     slug: "sierra-leone",
-    flag: "\u{1F1F8}\u{1F1F1}",
+    flag: "",
     role: "West African Agriculture Revival",
     heroImage: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1600&q=80",
     description:
@@ -388,10 +388,10 @@ const FALLBACK_COUNTRIES: CountryData[] = [
       paymentMethods: ["Orange Money", "Bank Transfer"],
     },
     crops: [
-      { name: "Rice", icon: "\u{1F35A}" },
-      { name: "Cocoa", icon: "\u{1F36B}" },
-      { name: "Palm Oil", icon: "\u{1F334}" },
-      { name: "Cassava", icon: "\u{1F360}" },
+      { name: "Rice", icon: "" },
+      { name: "Cocoa", icon: "" },
+      { name: "Palm Oil", icon: "" },
+      { name: "Cassava", icon: "" },
     ],
     highlights: [
       "Rice self-sufficiency drive",
@@ -403,7 +403,7 @@ const FALLBACK_COUNTRIES: CountryData[] = [
   {
     name: "Egypt",
     slug: "egypt",
-    flag: "\u{1F1EA}\u{1F1EC}",
+    flag: "",
     role: "North African Agri Powerhouse",
     heroImage: "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=1600&q=80",
     description:
@@ -420,11 +420,11 @@ const FALLBACK_COUNTRIES: CountryData[] = [
       paymentMethods: ["Bank Transfer", "Fawry", "Card"],
     },
     crops: [
-      { name: "Cotton", icon: "\u{2601}\u{FE0F}" },
-      { name: "Citrus", icon: "\u{1F34A}" },
-      { name: "Rice", icon: "\u{1F35A}" },
-      { name: "Wheat", icon: "\u{1F33E}" },
-      { name: "Sugarcane", icon: "\u{1F33F}" },
+      { name: "Cotton", icon: "" },
+      { name: "Citrus", icon: "" },
+      { name: "Rice", icon: "" },
+      { name: "Wheat", icon: "" },
+      { name: "Sugarcane", icon: "" },
     ],
     highlights: [
       "Nile basin irrigation infrastructure",
@@ -436,7 +436,7 @@ const FALLBACK_COUNTRIES: CountryData[] = [
   {
     name: "Ethiopia",
     slug: "ethiopia",
-    flag: "\u{1F1EA}\u{1F1F9}",
+    flag: "",
     role: "Coffee Origin & Highland Agriculture",
     heroImage: "https://images.unsplash.com/photo-1523805009345-7448845a9e53?w=1600&q=80",
     description:
@@ -454,10 +454,10 @@ const FALLBACK_COUNTRIES: CountryData[] = [
     },
     crops: [
       { name: "Coffee", icon: "\u2615" },
-      { name: "Teff", icon: "\u{1F33E}" },
-      { name: "Flowers", icon: "\u{1F33A}" },
-      { name: "Sesame", icon: "\u{1F33E}" },
-      { name: "Pulses", icon: "\u{1FAD8}" },
+      { name: "Teff", icon: "" },
+      { name: "Flowers", icon: "" },
+      { name: "Sesame", icon: "" },
+      { name: "Pulses", icon: "" },
     ],
     highlights: [
       "World's #5 coffee producer & origin of Arabica",
@@ -469,7 +469,7 @@ const FALLBACK_COUNTRIES: CountryData[] = [
   {
     name: "Malawi",
     slug: "malawi",
-    flag: "\u{1F1F2}\u{1F1FC}",
+    flag: "",
     role: "Warm Heart of Africa",
     heroImage: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1600&q=80",
     description:
@@ -486,11 +486,11 @@ const FALLBACK_COUNTRIES: CountryData[] = [
       paymentMethods: ["Airtel Money", "TNM Mpamba", "Bank Transfer"],
     },
     crops: [
-      { name: "Tobacco", icon: "\u{1F33F}" },
-      { name: "Tea", icon: "\u{1F375}" },
-      { name: "Sugar", icon: "\u{1F33F}" },
-      { name: "Maize", icon: "\u{1F33D}" },
-      { name: "Legumes", icon: "\u{1FAD8}" },
+      { name: "Tobacco", icon: "" },
+      { name: "Tea", icon: "" },
+      { name: "Sugar", icon: "" },
+      { name: "Maize", icon: "" },
+      { name: "Legumes", icon: "" },
     ],
     highlights: [
       "Tobacco diversification into higher-value crops",
@@ -502,7 +502,7 @@ const FALLBACK_COUNTRIES: CountryData[] = [
   {
     name: "Namibia",
     slug: "namibia",
-    flag: "\u{1F1F3}\u{1F1E6}",
+    flag: "",
     role: "Southern African Livestock & Horticulture",
     heroImage: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1600&q=80",
     description:
@@ -519,10 +519,10 @@ const FALLBACK_COUNTRIES: CountryData[] = [
       paymentMethods: ["Bank Transfer", "MTC MoMo", "Card"],
     },
     crops: [
-      { name: "Beef Cattle", icon: "\u{1F404}" },
-      { name: "Grapes", icon: "\u{1F347}" },
-      { name: "Dates", icon: "\u{1F334}" },
-      { name: "Maize", icon: "\u{1F33D}" },
+      { name: "Beef Cattle", icon: "" },
+      { name: "Grapes", icon: "" },
+      { name: "Dates", icon: "" },
+      { name: "Maize", icon: "" },
     ],
     highlights: [
       "Premium beef exports to EU markets",
@@ -535,7 +535,7 @@ const FALLBACK_COUNTRIES: CountryData[] = [
   {
     name: "Republic of Guinea",
     slug: "republic-of-guinea",
-    flag: "\u{1F1EC}\u{1F1F3}",
+    flag: "",
     role: "West African Mining-to-Agriculture Transition",
     heroImage: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1600&q=80",
     description:
@@ -552,10 +552,10 @@ const FALLBACK_COUNTRIES: CountryData[] = [
       paymentMethods: ["Orange Money", "MTN MoMo", "Bank Transfer"],
     },
     crops: [
-      { name: "Rice", icon: "\u{1F35A}" },
-      { name: "Cassava", icon: "\u{1F360}" },
-      { name: "Tropical Fruit", icon: "\u{1F34A}" },
-      { name: "Palm Oil", icon: "\u{1F334}" },
+      { name: "Rice", icon: "" },
+      { name: "Cassava", icon: "" },
+      { name: "Tropical Fruit", icon: "" },
+      { name: "Palm Oil", icon: "" },
     ],
     highlights: [
       "Rice & cassava farming at scale",
@@ -567,7 +567,7 @@ const FALLBACK_COUNTRIES: CountryData[] = [
   {
     name: "Guinea-Bissau",
     slug: "guinea-bissau",
-    flag: "\u{1F1EC}\u{1F1FC}",
+    flag: "",
     role: "Cashew Capital of West Africa",
     heroImage: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1600&q=80",
     description:
@@ -584,9 +584,9 @@ const FALLBACK_COUNTRIES: CountryData[] = [
       paymentMethods: ["Orange Money", "Bank Transfer"],
     },
     crops: [
-      { name: "Cashews", icon: "\u{1F95C}" },
-      { name: "Rice", icon: "\u{1F35A}" },
-      { name: "Palm Oil", icon: "\u{1F334}" },
+      { name: "Cashews", icon: "" },
+      { name: "Rice", icon: "" },
+      { name: "Palm Oil", icon: "" },
     ],
     highlights: [
       "Top 5 global cashew producer",
@@ -598,7 +598,7 @@ const FALLBACK_COUNTRIES: CountryData[] = [
   {
     name: "Liberia",
     slug: "liberia",
-    flag: "\u{1F1F1}\u{1F1F7}",
+    flag: "",
     role: "West African Rubber & Palm Oil Hub",
     heroImage: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1600&q=80",
     description:
@@ -615,10 +615,10 @@ const FALLBACK_COUNTRIES: CountryData[] = [
       paymentMethods: ["Orange Money", "MTN MoMo", "Bank Transfer"],
     },
     crops: [
-      { name: "Rubber", icon: "\u{1F333}" },
-      { name: "Palm Oil", icon: "\u{1F334}" },
-      { name: "Cocoa", icon: "\u{1F36B}" },
-      { name: "Rice", icon: "\u{1F35A}" },
+      { name: "Rubber", icon: "" },
+      { name: "Palm Oil", icon: "" },
+      { name: "Cocoa", icon: "" },
+      { name: "Rice", icon: "" },
     ],
     highlights: [
       "Rubber & palm oil export industries",
@@ -630,7 +630,7 @@ const FALLBACK_COUNTRIES: CountryData[] = [
   {
     name: "Mali",
     slug: "mali",
-    flag: "\u{1F1F2}\u{1F1F1}",
+    flag: "",
     role: "Sahel Cotton & Grain Belt",
     heroImage: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1600&q=80",
     description:
@@ -647,10 +647,10 @@ const FALLBACK_COUNTRIES: CountryData[] = [
       paymentMethods: ["Orange Money", "Moov Money", "Bank Transfer"],
     },
     crops: [
-      { name: "Cotton", icon: "\u{2601}\u{FE0F}" },
-      { name: "Rice", icon: "\u{1F35A}" },
-      { name: "Mango", icon: "\u{1F96D}" },
-      { name: "Shea", icon: "\u{1F333}" },
+      { name: "Cotton", icon: "" },
+      { name: "Rice", icon: "" },
+      { name: "Mango", icon: "" },
+      { name: "Shea", icon: "" },
     ],
     highlights: [
       "Top African cotton producer",
@@ -662,7 +662,7 @@ const FALLBACK_COUNTRIES: CountryData[] = [
   {
     name: "Ivory Coast",
     slug: "ivory-coast",
-    flag: "\u{1F1E8}\u{1F1EE}",
+    flag: "",
     role: "Global Cocoa & Cashew Leader",
     heroImage: "https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=1600&q=80",
     description:
@@ -679,10 +679,10 @@ const FALLBACK_COUNTRIES: CountryData[] = [
       paymentMethods: ["Orange Money", "MTN MoMo", "Moov Money", "Bank Transfer"],
     },
     crops: [
-      { name: "Cocoa", icon: "\u{1F36B}" },
-      { name: "Cashews", icon: "\u{1F95C}" },
-      { name: "Rubber", icon: "\u{1F333}" },
-      { name: "Palm Oil", icon: "\u{1F334}" },
+      { name: "Cocoa", icon: "" },
+      { name: "Cashews", icon: "" },
+      { name: "Rubber", icon: "" },
+      { name: "Palm Oil", icon: "" },
       { name: "Coffee", icon: "\u2615" },
     ],
     highlights: [

@@ -40,6 +40,7 @@ export default function InvestorLayout({ children }: { children: React.ReactNode
   const [mobileOpen, setMobileOpen] = useState(false);
   const [authorized, setAuthorized] = useState(false);
   const [roleChecked, setRoleChecked] = useState(false);
+  const [serverRole, setServerRole] = useState<string | null>(null);
 
   const displayName = profile?.full_name || user?.email?.split('@')[0] || 'Investor';
   const initials = displayName
@@ -55,11 +56,19 @@ export default function InvestorLayout({ children }: { children: React.ReactNode
   useEffect(() => {
     if (authLoading) return;
     if (!user) {
-      router.replace('/investor-login');
+      router.replace('/login?redirect=/investor');
       return;
     }
 
     let retried = false;
+
+    // Safety timeout: auto-authorize after 3s since middleware is the real guard
+    const safetyTimer = setTimeout(() => {
+      if (!roleChecked) {
+        setAuthorized(true);
+        setRoleChecked(true);
+      }
+    }, 3000);
 
     const checkRole = async () => {
       try {
@@ -71,6 +80,7 @@ export default function InvestorLayout({ children }: { children: React.ReactNode
         }
         const data = await res.json();
         const { role } = data;
+        setServerRole(role || null);
         if (role === 'investor' || role === 'admin' || role === 'super_admin') {
           setAuthorized(true);
         } else if (role) {
@@ -91,6 +101,8 @@ export default function InvestorLayout({ children }: { children: React.ReactNode
     };
 
     checkRole();
+
+    return () => clearTimeout(safetyTimer);
   }, [user, authLoading, router]);
 
   const isActive = (href: string) =>
@@ -184,13 +196,15 @@ export default function InvestorLayout({ children }: { children: React.ReactNode
             <Home className="w-4 h-4" />
             AFU Home
           </Link>
-          <Link
-            href="/admin"
-            className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-colors"
-          >
-            <ExternalLink className="w-4 h-4" />
-            Admin Portal
-          </Link>
+          {(serverRole === 'admin' || serverRole === 'super_admin') && (
+            <Link
+              href="/admin"
+              className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-colors"
+            >
+              <ExternalLink className="w-4 h-4" />
+              Admin Portal
+            </Link>
+          )}
           <button
             onClick={async () => {
               const { createBrowserClient } = await import('@supabase/ssr');
@@ -199,7 +213,7 @@ export default function InvestorLayout({ children }: { children: React.ReactNode
                 process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
               );
               await supabase.auth.signOut();
-              router.push('/investor-login');
+              router.push('/login');
             }}
             className="w-full flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-medium text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors"
           >
@@ -248,14 +262,16 @@ export default function InvestorLayout({ children }: { children: React.ReactNode
                   <Home className="w-4 h-4" />
                   AFU Home
                 </Link>
-                <Link
-                  href="/admin"
-                  onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-colors"
-                >
-                  <ExternalLink className="w-4 h-4" />
-                  Admin Portal
-                </Link>
+                {(serverRole === 'admin' || serverRole === 'super_admin') && (
+                  <Link
+                    href="/admin"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-colors"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    Admin Portal
+                  </Link>
+                )}
                 <button
                   onClick={async () => {
                     const { createBrowserClient } = await import('@supabase/ssr');
@@ -264,7 +280,7 @@ export default function InvestorLayout({ children }: { children: React.ReactNode
                       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
                     );
                     await supabase.auth.signOut();
-                    router.push('/investor-login');
+                    router.push('/login');
                   }}
                   className="w-full flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-medium text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors"
                 >
@@ -296,10 +312,12 @@ export default function InvestorLayout({ children }: { children: React.ReactNode
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <Link href="/admin" className="hidden sm:flex items-center gap-1.5 text-xs text-gray-500 hover:text-[#1B2A4A] transition-colors px-3 py-1.5 rounded-lg hover:bg-gray-100">
-              <ExternalLink className="w-3.5 h-3.5" />
-              Admin
-            </Link>
+            {(serverRole === 'admin' || serverRole === 'super_admin') && (
+              <Link href="/admin" className="hidden sm:flex items-center gap-1.5 text-xs text-gray-500 hover:text-[#1B2A4A] transition-colors px-3 py-1.5 rounded-lg hover:bg-gray-100">
+                <ExternalLink className="w-3.5 h-3.5" />
+                Admin
+              </Link>
+            )}
             <div className="w-8 h-8 bg-[#5DB347] rounded-full flex items-center justify-center">
               <span className="text-white text-xs font-bold">{initials}</span>
             </div>

@@ -25,7 +25,7 @@ export const AFU_ORGANIZATION = {
   url: 'https://africanfarmingunion.org',
   logo: 'https://africanfarmingunion.org/afu-logo.svg',
   description:
-    "Africa's integrated agriculture development platform providing financing, insurance, training, and market access across 20 countries.",
+    "Africa's integrated agriculture development platform providing financing, insurance, training, and market access across Africa.",
   foundingDate: '2024',
   contactPoint: {
     '@type': 'ContactPoint',

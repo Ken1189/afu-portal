@@ -592,6 +592,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const { user, profile, signOut, isLoading: authLoading, isSuperAdmin } = useAuth();
   const { hasAnyPermission, loading: permissionsLoading } = usePermissions(user?.id);
   const [mobileOpen, setMobileOpen] = useState(false);
+  // If user exists and profile says admin/super_admin, trust it immediately
+  // Middleware already guards /admin routes — no need to wait for extra API call
+  const profileIsAdmin = profile?.role === 'admin' || profile?.role === 'super_admin';
   const [roleChecked, setRoleChecked] = useState(false);
   const [authorized, setAuthorized] = useState(false);
   const [serverRole, setServerRole] = useState<string | null>(null);
@@ -761,8 +764,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }, [searchModalOpen]);
 
   // ── Role guard: redirect non-admins ──
-  // DON'T redirect on errors — let middleware handle auth
-  // ONLY redirect on explicit role mismatch from a successful API response
+  // Middleware already protects /admin — this is a secondary client-side check.
+  // If profile already says admin, skip the API call entirely for faster load.
   useEffect(() => {
     if (authLoading) return;
 
@@ -771,21 +774,27 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       return;
     }
 
-    let retried = false;
+    // FAST PATH: if auth context profile already confirms admin role, authorize immediately
+    if (profileIsAdmin) {
+      setAuthorized(true);
+      setServerRole(profile?.role || 'admin');
+      setRoleChecked(true);
+      return;
+    }
 
-    // Safety timeout — if auth check takes more than 5 seconds, authorize anyway
+    // SLOW PATH: profile not loaded yet or role unknown — check API
+    // Safety timeout — 2 seconds max before we authorize anyway (middleware is the real guard)
     const timeout = setTimeout(() => {
       if (!roleChecked) {
         setAuthorized(true);
         setRoleChecked(true);
       }
-    }, 5000);
+    }, 2000);
 
     const checkRole = async () => {
       try {
         const res = await fetch('/api/auth/me');
         if (!res.ok) {
-          // API error (500, 503, etc.) — don't kick user out, let middleware handle it
           setAuthorized(true);
           setRoleChecked(true);
           return;
@@ -796,20 +805,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           setAuthorized(true);
           setServerRole(role);
         } else if (role) {
-          // Only redirect if we got an EXPLICIT role that's wrong
           router.replace('/dashboard');
         } else {
-          // No role info = don't kick them out
           setAuthorized(true);
         }
         setRoleChecked(true);
       } catch {
-        // Network error — retry once, then allow access (let middleware handle auth)
-        if (!retried) {
-          retried = true;
-          setTimeout(checkRole, 2000);
-          return;
-        }
+        // Network error — just authorize, middleware is the real guard
         setAuthorized(true);
         setRoleChecked(true);
       }
@@ -817,10 +819,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
     checkRole();
     return () => clearTimeout(timeout);
-  }, [user, authLoading, router]);
+  }, [user, authLoading, profileIsAdmin, profile, router]);
 
-  // Show loading while checking auth
-  if (authLoading || !roleChecked || !authorized) {
+  // Show loading while checking auth — but NEVER for more than 2s
+  // If profile already confirms admin, skip loading entirely
+  if (authLoading || (!roleChecked && !profileIsAdmin) || (!authorized && !profileIsAdmin)) {
     return (
       <div className="min-h-screen bg-cream flex items-center justify-center">
         <div className="text-center">

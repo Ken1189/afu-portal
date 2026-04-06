@@ -46,8 +46,8 @@ function getNextTier(referralCount: number) {
 
 interface CommissionEntry {
   id: string;
-  amount: number;
-  type: string;
+  commission_amount: number;
+  commission_type: string;
   status: string;
   description: string | null;
   created_at: string;
@@ -79,16 +79,16 @@ interface DashboardStats {
 // ── Fallback (Demo) Data ────────────────────────────────────────────────────
 
 const FALLBACK_COMMISSIONS: CommissionEntry[] = [
-  { id: '1', type: 'membership', amount: 25, status: 'paid', created_at: '2026-03-25T10:00:00Z', description: 'John Doe membership signup' },
-  { id: '2', type: 'fundraising', amount: 250, status: 'paid', created_at: '2026-03-22T14:00:00Z', description: 'Community fundraiser - Kampala' },
-  { id: '3', type: 'advertising', amount: 120, status: 'pending', created_at: '2026-03-20T09:00:00Z', description: 'AgriTech Co. ad placement' },
-  { id: '4', type: 'membership', amount: 25, status: 'paid', created_at: '2026-03-18T16:00:00Z', description: 'Sarah Kimani membership signup' },
-  { id: '5', type: 'membership', amount: 50, status: 'pending', created_at: '2026-03-15T11:00:00Z', description: 'Cooperative Premium membership' },
-  { id: '6', type: 'fundraising', amount: 100, status: 'paid', created_at: '2026-03-12T08:00:00Z', description: 'Water project fundraiser' },
-  { id: '7', type: 'advertising', amount: 80, status: 'paid', created_at: '2026-03-10T13:00:00Z', description: 'Farm Supplies Ltd. ad' },
-  { id: '8', type: 'membership', amount: 25, status: 'pending', created_at: '2026-03-08T15:00:00Z', description: 'Peter Obi membership signup' },
-  { id: '9', type: 'fundraising', amount: 700, status: 'paid', created_at: '2026-03-05T10:00:00Z', description: 'Large-scale irrigation fundraiser' },
-  { id: '10', type: 'membership', amount: 25, status: 'paid', created_at: '2026-03-01T09:00:00Z', description: 'Grace Achieng membership signup' },
+  { id: '1', commission_type: 'membership', commission_amount: 25, status: 'paid', created_at: '2026-03-25T10:00:00Z', description: 'John Doe membership signup' },
+  { id: '2', commission_type: 'fundraising', commission_amount: 250, status: 'paid', created_at: '2026-03-22T14:00:00Z', description: 'Community fundraiser - Kampala' },
+  { id: '3', commission_type: 'advertising', commission_amount: 120, status: 'pending', created_at: '2026-03-20T09:00:00Z', description: 'AgriTech Co. ad placement' },
+  { id: '4', commission_type: 'membership', commission_amount: 25, status: 'paid', created_at: '2026-03-18T16:00:00Z', description: 'Sarah Kimani membership signup' },
+  { id: '5', commission_type: 'membership', commission_amount: 50, status: 'pending', created_at: '2026-03-15T11:00:00Z', description: 'Cooperative Premium membership' },
+  { id: '6', commission_type: 'fundraising', commission_amount: 100, status: 'paid', created_at: '2026-03-12T08:00:00Z', description: 'Water project fundraiser' },
+  { id: '7', commission_type: 'advertising', commission_amount: 80, status: 'paid', created_at: '2026-03-10T13:00:00Z', description: 'Farm Supplies Ltd. ad' },
+  { id: '8', commission_type: 'membership', commission_amount: 25, status: 'pending', created_at: '2026-03-08T15:00:00Z', description: 'Peter Obi membership signup' },
+  { id: '9', commission_type: 'fundraising', commission_amount: 700, status: 'paid', created_at: '2026-03-05T10:00:00Z', description: 'Large-scale irrigation fundraiser' },
+  { id: '10', commission_type: 'membership', commission_amount: 25, status: 'paid', created_at: '2026-03-01T09:00:00Z', description: 'Grace Achieng membership signup' },
 ];
 
 const FALLBACK_STATS: DashboardStats = {
@@ -147,7 +147,7 @@ export default function AmbassadorDashboard() {
           // Recent commissions for the activity list (latest 20)
           supabase
             .from('commission_entries')
-            .select('id, amount, type, status, description, created_at')
+            .select('id, commission_amount, commission_type, status, description, created_at')
             .eq('ambassador_id', ambassador.id)
             .order('created_at', { ascending: false })
             .limit(20),
@@ -167,7 +167,7 @@ export default function AmbassadorDashboard() {
           // All commission entries for accurate totals (not just latest 20)
           supabase
             .from('commission_entries')
-            .select('amount, status')
+            .select('commission_amount, status')
             .eq('ambassador_id', ambassador.id),
         ]);
 
@@ -193,15 +193,15 @@ export default function AmbassadorDashboard() {
 
         // Total earned = sum of all paid commissions
         const totalEarnings = allCommissions.reduce(
-          (sum: number, e: { amount: number; status: string }) =>
-            e.status === 'paid' ? sum + (e.amount || 0) : sum,
+          (sum: number, e: { commission_amount: number; status: string }) =>
+            e.status === 'paid' ? sum + (e.commission_amount || 0) : sum,
           0
         );
 
         // Pending payout = sum of pending commissions minus any pending/completed payouts
         const pendingCommissions = allCommissions.reduce(
-          (sum: number, e: { amount: number; status: string }) =>
-            e.status === 'pending' ? sum + (e.amount || 0) : sum,
+          (sum: number, e: { commission_amount: number; status: string }) =>
+            e.status === 'pending' ? sum + (e.commission_amount || 0) : sum,
           0
         );
 
@@ -311,10 +311,15 @@ export default function AmbassadorDashboard() {
               africanfarmingunion.org/apply?ref={referralCode || user?.id?.slice(0, 8).toUpperCase()}
             </div>
             <button
-              onClick={() => { navigator.clipboard.writeText(`https://africanfarmingunion.org/apply?ref=${referralCode || user?.id?.slice(0, 8).toUpperCase()}`); }}
-              className="px-6 py-3 bg-[#5DB347] hover:bg-[#449933] rounded-xl font-semibold text-sm transition-colors whitespace-nowrap"
+              onClick={() => {
+                navigator.clipboard.writeText(`https://africanfarmingunion.org/apply?ref=${referralCode || user?.id?.slice(0, 8).toUpperCase()}`);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+              }}
+              className={`px-6 py-3 ${copied ? 'bg-green-500' : 'bg-[#5DB347] hover:bg-[#449933]'} rounded-xl font-semibold text-sm transition-colors whitespace-nowrap flex items-center gap-2`}
             >
-              Copy Link
+              {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+              {copied ? 'Copied!' : 'Copy Link'}
             </button>
           </div>
           <div className="flex gap-3 mt-3">
@@ -453,11 +458,11 @@ export default function AmbassadorDashboard() {
                 <div className={`w-2 h-2 rounded-full ${entry.status === 'paid' ? 'bg-green-400' : 'bg-amber-400'}`} />
                 <div>
                   <p className="text-sm font-medium text-[#1B2A4A]">{entry.description || 'Commission'}</p>
-                  <p className="text-xs text-gray-400">{formatDate(entry.created_at)} &middot; {entry.type}</p>
+                  <p className="text-xs text-gray-400">{formatDate(entry.created_at)} &middot; {entry.commission_type}</p>
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-sm font-bold text-[#1B2A4A]">{formatCurrency(entry.amount)}</p>
+                <p className="text-sm font-bold text-[#1B2A4A]">{formatCurrency(entry.commission_amount)}</p>
                 <p className={`text-xs ${entry.status === 'paid' ? 'text-green-500' : 'text-amber-500'}`}>
                   {entry.status}
                 </p>

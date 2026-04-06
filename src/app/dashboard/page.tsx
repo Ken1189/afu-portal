@@ -111,7 +111,9 @@ interface CommodityPrice {
   icon: string;
 }
 
-/** Market prices with sparkline data (DB format lacks sparkline/change fields). */
+/** Market prices with sparkline data (DB format lacks sparkline/change fields).
+ *  TODO: Replace hardcoded sample data with real market data integration
+ *  (e.g. API feed, database table, or external pricing service). */
 const MARKET_PRICES: CommodityPrice[] = [
   {
     crop: 'Blueberries', currentPrice: 12.50, currency: 'USD', unit: 'kg', change24h: 0.8, change7d: 3.2, icon: '\uD83E\uDED0',
@@ -262,7 +264,7 @@ const staggerItem = {
 // Helper: relative time
 // ---------------------------------------------------------------------------
 function relativeTime(timestamp: string): string {
-  const now = new Date('2026-03-13T12:00:00Z');
+  const now = new Date();
   const date = new Date(timestamp);
   const diffMs = now.getTime() - date.getTime();
   const diffMins = Math.floor(diffMs / 60000);

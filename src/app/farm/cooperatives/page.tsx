@@ -277,18 +277,18 @@ function timeAgo(dateStr: string): string {
 
 function getCountryFlag(country: string): string {
   const flags: Record<string, string> = {
-    Botswana: '\u{1F1E7}\u{1F1FC}',
-    Zimbabwe: '\u{1F1FF}\u{1F1FC}',
-    Tanzania: '\u{1F1F9}\u{1F1FF}',
-    Kenya: '\u{1F1F0}\u{1F1EA}',
-    Zambia: '\u{1F1FF}\u{1F1F2}',
-    Malawi: '\u{1F1F2}\u{1F1FC}',
-    Namibia: '\u{1F1F3}\u{1F1E6}',
-    Uganda: '\u{1F1FA}\u{1F1EC}',
-    Mozambique: '\u{1F1F2}\u{1F1FF}',
-    'South Africa': '\u{1F1FF}\u{1F1E6}',
+    Botswana: 'BW',
+    Zimbabwe: 'ZW',
+    Tanzania: 'TZ',
+    Kenya: 'KE',
+    Zambia: 'ZM',
+    Malawi: 'MW',
+    Namibia: 'NA',
+    Uganda: 'UG',
+    Mozambique: 'MZ',
+    'South Africa': 'ZA',
   };
-  return flags[country] || '\u{1F30D}';
+  return flags[country] || '--';
 }
 
 function getInitials(name: string): string {

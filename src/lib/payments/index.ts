@@ -1,7 +1,7 @@
 /**
  * AFU Portal Payment Gateway Infrastructure
  *
- * Multi-country payment processing for 20 African countries:
+ * Multi-country payment processing across Africa:
  * Botswana, Zimbabwe, Tanzania, Kenya, South Africa,
  * Nigeria, Zambia, Mozambique, Sierra Leone, Uganda,
  * Egypt, Ethiopia, Malawi, Namibia, Republic of Guinea,

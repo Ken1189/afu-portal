@@ -31,7 +31,13 @@ import {
   Filter,
   Calendar,
   DollarSign,
+  Smile,
+  Meh,
+  Frown,
+  AlertCircle,
+  ThumbsUp,
 } from 'lucide-react';
+import { type LucideIcon } from 'lucide-react';
 // ---------------------------------------------------------------------------
 // Inlined types & data (previously from @/lib/data/farm)
 // ---------------------------------------------------------------------------
@@ -60,7 +66,7 @@ const initialEntries: JournalEntry[] = [
   { id: 'JRN-002', date: '2026-03-11', time: '06:00', type: 'scouting', plotId: 'PLT-001', plotName: 'Main Blueberry Field', title: 'Morning scout — aphid check', description: 'Walked all 12 rows. Found minimal aphid activity on row 7. Will monitor closely. Neem oil sprayed as precaution.', mood: 'good', weather: 'partly-cloudy' },
   { id: 'JRN-003', date: '2026-03-10', time: '08:00', type: 'weeding', plotId: 'PLT-002', plotName: 'Cassava Plot', title: 'Weeding day', description: 'Hired 3 laborers to weed between cassava rows. Took 4 hours. Soil looking dry — need to irrigate soon.', mood: 'okay', weather: 'sunny', cost: 36, currency: 'USD' },
   { id: 'JRN-004', date: '2026-03-09', time: '05:30', type: 'watering', plotId: 'PLT-003', plotName: 'Sesame Strip', title: 'Early morning irrigation', description: 'Ran drip system for 2 hours. Sesame flowers opening beautifully. Should see pods forming within the week.', mood: 'great', weather: 'sunny' },
-  { id: 'JRN-005', date: '2026-03-07', time: '06:00', type: 'harvesting', plotId: 'PLT-001', plotName: 'Main Blueberry Field', title: 'First harvest! \u{0001F389}', description: 'First pick of the season! 120kg Grade A berries. Sold immediately to FreshPack at $8/kg. Revenue: $960. Great start!', photo: 'https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=400&h=300&fit=crop', mood: 'great', weather: 'sunny' },
+  { id: 'JRN-005', date: '2026-03-07', time: '06:00', type: 'harvesting', plotId: 'PLT-001', plotName: 'Main Blueberry Field', title: 'First harvest!', description: 'First pick of the season! 120kg Grade A berries. Sold immediately to FreshPack at $8/kg. Revenue: $960. Great start!', photo: 'https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=400&h=300&fit=crop', mood: 'great', weather: 'sunny' },
   { id: 'JRN-006', date: '2026-03-05', time: '07:00', type: 'fertilizing', plotId: 'PLT-002', plotName: 'Cassava Plot', title: 'NPK side dressing', description: 'Applied NPK 15-15-15 at 200kg/ha. Cassava stems growing strong but need to watch for mosaic symptoms.', mood: 'good', weather: 'cloudy', cost: 90, currency: 'USD' },
   { id: 'JRN-007', date: '2026-03-03', time: '09:00', type: 'soil-test', plotId: 'PLT-001', plotName: 'Main Blueberry Field', title: 'Soil pH check', description: 'Tested soil pH across 6 points. Average 4.8 — perfect for blueberries. No sulfur needed this month.', mood: 'great', weather: 'partly-cloudy', cost: 15, currency: 'USD' },
   { id: 'JRN-008', date: '2026-03-01', time: '06:00', type: 'planting', plotId: 'PLT-004', plotName: 'Maize Field', title: 'Planted maize!', description: 'Planted SC 513 variety. 75cm row spacing, 25cm between plants. Used 10kg seed for 1 hectare. Rain expected this week — perfect timing.', photo: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400&h=300&fit=crop', mood: 'great', weather: 'cloudy', cost: 85, currency: 'USD' },
@@ -102,20 +108,20 @@ const weatherIcons: Record<WeatherCondition, typeof Sun> = {
   windy: Wind,
 };
 
-const moodOptions: { key: JournalEntry['mood']; emoji: string; label: string }[] = [
-  { key: 'great', emoji: '\u{1F60A}', label: 'Great' },
-  { key: 'good', emoji: '\u{1F642}', label: 'Good' },
-  { key: 'okay', emoji: '\u{1F610}', label: 'Okay' },
-  { key: 'concerned', emoji: '\u{1F61F}', label: 'Concerned' },
-  { key: 'worried', emoji: '\u{1F630}', label: 'Worried' },
+const moodOptions: { key: JournalEntry['mood']; icon: LucideIcon; label: string; color: string }[] = [
+  { key: 'great', icon: Smile, label: 'Great', color: '#5DB347' },
+  { key: 'good', icon: ThumbsUp, label: 'Good', color: '#6ABF4B' },
+  { key: 'okay', icon: Meh, label: 'Okay', color: '#F59E0B' },
+  { key: 'concerned', icon: Frown, label: 'Concerned', color: '#F97316' },
+  { key: 'worried', icon: AlertCircle, label: 'Worried', color: '#EF4444' },
 ];
 
-const moodEmoji: Record<string, string> = {
-  great: '\u{1F60A}',
-  good: '\u{1F642}',
-  okay: '\u{1F610}',
-  concerned: '\u{1F61F}',
-  worried: '\u{1F630}',
+const moodIcons: Record<string, { icon: LucideIcon; color: string }> = {
+  great: { icon: Smile, color: '#5DB347' },
+  good: { icon: ThumbsUp, color: '#6ABF4B' },
+  okay: { icon: Meh, color: '#F59E0B' },
+  concerned: { icon: Frown, color: '#F97316' },
+  worried: { icon: AlertCircle, color: '#EF4444' },
 };
 
 // Map ActivityType values to farmJournal.activities translation keys
@@ -362,9 +368,10 @@ function JournalCard({
             {/* Time + Mood + Weather row */}
             <div className="flex items-center gap-2 mb-0.5">
               <span className="text-[11px] text-gray-400 font-medium">{entry.time}</span>
-              {entry.mood && (
-                <span className="text-base leading-none">{moodEmoji[entry.mood]}</span>
-              )}
+              {entry.mood && moodIcons[entry.mood] && (() => {
+                const MoodIcon = moodIcons[entry.mood].icon;
+                return <MoodIcon className="w-4 h-4" style={{ color: moodIcons[entry.mood].color }} />;
+              })()}
               {WeatherIcon && (
                 <WeatherIcon className="w-3.5 h-3.5 text-gray-400" />
               )}
@@ -447,11 +454,14 @@ function JournalCard({
                 <span className={`text-[11px] font-semibold ${cfg.bgColor} ${cfg.color} px-2 py-0.5 rounded-full`}>
                   {t.farmJournal.activities[activityTranslationKey[entry.type]]}
                 </span>
-                {entry.mood && (
-                  <span className="text-[11px] font-medium bg-gray-50 text-gray-500 px-2 py-0.5 rounded-full">
-                    {moodEmoji[entry.mood]} {t.farmJournal.moods[entry.mood as keyof typeof t.farmJournal.moods]}
+                {entry.mood && moodIcons[entry.mood] && (() => {
+                  const ChipMoodIcon = moodIcons[entry.mood].icon;
+                  return (
+                  <span className="inline-flex items-center gap-1 text-[11px] font-medium bg-gray-50 text-gray-500 px-2 py-0.5 rounded-full">
+                    <ChipMoodIcon className="w-3 h-3" style={{ color: moodIcons[entry.mood].color }} /> {t.farmJournal.moods[entry.mood as keyof typeof t.farmJournal.moods]}
                   </span>
-                )}
+                  );
+                })()}
                 {entry.weather && (
                   <span className="text-[11px] font-medium bg-gray-50 text-gray-500 px-2 py-0.5 rounded-full capitalize">
                     {entry.weather.replace('-', ' ')}
@@ -726,7 +736,7 @@ function NewEntryForm({ onClose, onSave }: { onClose: () => void; onSave: (entry
                       : 'bg-gray-50 active:bg-gray-100'
                   }`}
                 >
-                  <span className="text-2xl leading-none">{m.emoji}</span>
+                  <m.icon className="w-6 h-6" style={{ color: m.color }} />
                   <span className="text-[9px] font-semibold text-gray-500">{t.farmJournal.moods[m.key as keyof typeof t.farmJournal.moods]}</span>
                 </button>
               ))}

@@ -148,7 +148,7 @@ const FALLBACK_OPPORTUNITIES: Opportunity[] = [
     id: 'fallback-1',
     name: 'AFU Agricultural Debt Fund II',
     type: 'Debt Fund',
-    description: 'Senior secured lending to verified African farmers. Portfolio diversified across 20 countries, 15+ crop types.',
+    description: 'Senior secured lending to verified African farmers. Portfolio diversified across Africa, 15+ crop types.',
     target: 5000000,
     min_investment: 100000,
     target_irr: '12-16%',

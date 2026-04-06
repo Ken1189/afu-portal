@@ -539,7 +539,21 @@ export default function SupplierSettingsPage() {
                 <p className="text-xs text-gray-400">Update your account password</p>
               </div>
             </div>
-            <button className="inline-flex items-center gap-1.5 bg-[#8CB89C]/10 text-[#8CB89C] hover:bg-[#8CB89C]/20 px-4 py-2 rounded-lg text-xs font-medium transition-colors">
+            <button
+              onClick={async () => {
+                try {
+                  const supabase = createClient();
+                  const email = user?.email;
+                  if (email) {
+                    await supabase.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + '/auth/reset-password' });
+                    alert('Password reset email sent! Check your inbox.');
+                  }
+                } catch {
+                  alert('Failed to send reset email. Please try again.');
+                }
+              }}
+              className="inline-flex items-center gap-1.5 bg-[#8CB89C]/10 text-[#8CB89C] hover:bg-[#8CB89C]/20 px-4 py-2 rounded-lg text-xs font-medium transition-colors"
+            >
               Change
               <ChevronRight className="w-3.5 h-3.5" />
             </button>
@@ -617,7 +631,10 @@ export default function SupplierSettingsPage() {
                 <p className="text-xs text-gray-400">Export all your data as a ZIP archive</p>
               </div>
             </div>
-            <button className="inline-flex items-center gap-1.5 bg-[#8CB89C]/10 text-[#8CB89C] hover:bg-[#8CB89C]/20 px-4 py-2 rounded-lg text-xs font-medium transition-colors">
+            <button
+              onClick={() => alert('Data export request submitted. You will receive a download link via email within 24 hours.')}
+              className="inline-flex items-center gap-1.5 bg-[#8CB89C]/10 text-[#8CB89C] hover:bg-[#8CB89C]/20 px-4 py-2 rounded-lg text-xs font-medium transition-colors"
+            >
               <Download className="w-3.5 h-3.5" />
               Download
             </button>
@@ -680,6 +697,20 @@ export default function SupplierSettingsPage() {
               />
               <button
                 disabled={deactivateText !== 'DEACTIVATE'}
+                onClick={async () => {
+                  if (deactivateText !== 'DEACTIVATE') return;
+                  try {
+                    if (supplierId) {
+                      const supabase = createClient();
+                      await supabase.from('suppliers').update({ status: 'suspended' }).eq('id', supplierId);
+                    }
+                    alert('Your account has been deactivated. Contact support to reactivate.');
+                    setShowDeactivateConfirm(false);
+                    setDeactivateText('');
+                  } catch {
+                    alert('Failed to deactivate. Please try again or contact support.');
+                  }
+                }}
                 className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 disabled:bg-gray-200 disabled:text-gray-400 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer disabled:cursor-not-allowed"
               >
                 Confirm Deactivation

@@ -62,7 +62,6 @@ export default function SettingsPage() {
   const [bankName, setBankName] = useState('');
   const [accountNumber, setAccountNumber] = useState('');
   const [mobileNumber, setMobileNumber] = useState('');
-  const [mobile_moneyNumber, setEcocashNumber] = useState('');
 
   // Notification preferences
   const [notifyNewReferral, setNotifyNewReferral] = useState(true);
@@ -101,8 +100,7 @@ export default function SettingsPage() {
               : ambassador.payout_details;
             setBankName(details.bank_name || '');
             setAccountNumber(details.account_number || '');
-            setMobileNumber(details.mobile_number || '');
-            setEcocashNumber(details.mobile_money_number || '');
+            setMobileNumber(details.mobile_number || details.mobile_money_number || '');
           }
           if (ambassador.notification_preferences) {
             const prefs = typeof ambassador.notification_preferences === 'string'
@@ -563,7 +561,7 @@ export default function SettingsPage() {
               {[
                 { value: 'bank_transfer', label: 'Bank Transfer' },
                 { value: 'mobile_money', label: 'Mobile Money' },
-                { value: 'mobile_money', label: 'Mobile Money' },
+                { value: 'paypal', label: 'PayPal' },
               ].map((method) => (
                 <button
                   key={method.value}
@@ -618,16 +616,16 @@ export default function SettingsPage() {
             </div>
           )}
 
-          {payoutMethod === 'mobile_money' && (
+          {payoutMethod === 'paypal' && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Mobile Money Number</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">PayPal Email</label>
               <input
-                type="tel"
-                value={mobile_moneyNumber}
-                onChange={(e) => setEcocashNumber(e.target.value)}
-                placeholder="+263 7X XXX XXXX"
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347] max-w-md"
+                type="email"
+                value={email}
+                disabled
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-gray-50 text-gray-500 max-w-md"
               />
+              <p className="text-xs text-gray-400 mt-1">Payouts will be sent to your account email address.</p>
             </div>
           )}
 
