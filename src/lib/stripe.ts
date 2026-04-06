@@ -24,9 +24,11 @@ export function getStripe(): Stripe {
 // Membership tier pricing (amounts in cents)
 export const MEMBERSHIP_PRICES: Record<string, { amount: number; currency: string; name: string; interval: 'month' }> = {
   smallholder: { amount: 499, currency: 'usd', name: 'Smallholder Membership', interval: 'month' },
-  bronze: { amount: 4900, currency: 'usd', name: 'Commercial Bronze Membership', interval: 'month' },
-  gold: { amount: 49900, currency: 'usd', name: 'Commercial Gold Membership', interval: 'month' },
-  platinum: { amount: 99900, currency: 'usd', name: 'Commercial Platinum Membership', interval: 'month' },
+  commercial: { amount: 4900, currency: 'usd', name: 'Commercial Membership', interval: 'month' },
+  enterprise: { amount: 49900, currency: 'usd', name: 'Enterprise Membership', interval: 'month' },
+  // Legacy names (kept for backwards compatibility)
+  bronze: { amount: 4900, currency: 'usd', name: 'Commercial Membership', interval: 'month' },
+  gold: { amount: 49900, currency: 'usd', name: 'Enterprise Membership', interval: 'month' },
 };
 
 // Sponsor tier pricing (amounts in cents)
