@@ -257,7 +257,7 @@ export default function SupplierProfilePage() {
     setSaving(true);
 
     try {
-      // Update supplier record
+      // Update or create supplier record
       if (supplierId) {
         const { error: supError } = await supabase
           .from('suppliers')
@@ -276,6 +276,32 @@ export default function SupplierProfilePage() {
           })
           .eq('id', supplierId);
         if (supError) { setSaveError('Failed to save supplier details: ' + supError.message); setSaving(false); return; }
+      } else if (user) {
+        // No supplier record yet — create one so new suppliers can save their profile
+        const { data: newSupplier, error: insertError } = await supabase
+          .from('suppliers')
+          .insert({
+            profile_id: user.id,
+            company_name: companyName || 'My Company',
+            contact_name: contactPerson,
+            email: email || user.email,
+            phone,
+            website,
+            description,
+            country,
+            region,
+            category: category || 'input-supplier',
+            address,
+            certifications,
+            status: 'active',
+          })
+          .select('id')
+          .single();
+        if (insertError) { setSaveError('Failed to create supplier profile: ' + insertError.message); setSaving(false); return; }
+        if (newSupplier) {
+          setSupplierId(newSupplier.id);
+          setUsingFallback(false);
+        }
       }
 
       // Also update profiles table for name/phone

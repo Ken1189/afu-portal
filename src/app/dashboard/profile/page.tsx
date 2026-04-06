@@ -162,6 +162,15 @@ export default function ProfilePage() {
   const [editPhone, setEditPhone] = useState('');
   const [editCountry, setEditCountry] = useState('');
 
+  // Farm editable fields
+  const [editFarmName, setEditFarmName] = useState('');
+  const [editFarmSize, setEditFarmSize] = useState('');
+  const [editPrimaryCrops, setEditPrimaryCrops] = useState('');
+  const [editBio, setEditBio] = useState('');
+
+  // Save feedback
+  const [saveSuccess, setSaveSuccess] = useState(false);
+
   // Avatar upload
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
@@ -213,6 +222,16 @@ export default function ProfilePage() {
       setAvatarUrl(profile.avatar_url || null);
     }
   }, [profile, editing]);
+
+  // Sync farm edit fields when member data loads
+  useEffect(() => {
+    if (member) {
+      setEditFarmName(member.farm_name || '');
+      setEditFarmSize(member.farm_size_ha != null ? String(member.farm_size_ha) : '');
+      setEditPrimaryCrops(member.primary_crops?.join(', ') || '');
+      setEditBio(member.bio || '');
+    }
+  }, [member, editing]);
 
   // ── Avatar upload handler ──
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -280,8 +299,10 @@ export default function ProfilePage() {
     if (!user) return;
     setSaving(true);
     setSaveError(null);
+    setSaveSuccess(false);
 
-    const { error } = await supabase
+    // 1. Update profiles table (personal info)
+    const { error: profileError } = await supabase
       .from('profiles')
       .update({
         full_name: editName,
@@ -290,15 +311,41 @@ export default function ProfilePage() {
       })
       .eq('id', user.id);
 
-    if (error) {
-      setSaveError('Failed to save: ' + error.message);
+    if (profileError) {
+      setSaveError('Failed to save profile: ' + profileError.message);
       setSaving(false);
       return;
     }
 
+    // 2. Update members table (farm info) if member record exists
+    if (member) {
+      const cropsArray = editPrimaryCrops
+        ? editPrimaryCrops.split(',').map((c) => c.trim()).filter(Boolean)
+        : null;
+
+      const { error: memberError } = await supabase
+        .from('members')
+        .update({
+          farm_name: editFarmName || null,
+          farm_size_ha: editFarmSize ? parseFloat(editFarmSize) : null,
+          primary_crops: cropsArray,
+          bio: editBio || null,
+        })
+        .eq('id', member.id);
+
+      if (memberError) {
+        setSaveError('Failed to save farm details: ' + memberError.message);
+        setSaving(false);
+        return;
+      }
+    }
+
     await refreshProfile();
+    await fetchExtras();
     setSaving(false);
     setEditing(false);
+    setSaveSuccess(true);
+    setTimeout(() => setSaveSuccess(false), 3000);
   };
 
   // ── Copy member ID ──
@@ -362,10 +409,14 @@ export default function ProfilePage() {
         <button
           onClick={() => {
             if (editing) {
-              // cancel — reset fields
+              // cancel — reset all fields
               setEditName(profile?.full_name || '');
               setEditPhone(profile?.phone || '');
               setEditCountry(profile?.country || '');
+              setEditFarmName(member?.farm_name || '');
+              setEditFarmSize(member?.farm_size_ha != null ? String(member.farm_size_ha) : '');
+              setEditPrimaryCrops(member?.primary_crops?.join(', ') || '');
+              setEditBio(member?.bio || '');
             }
             setEditing(!editing);
           }}
@@ -379,6 +430,28 @@ export default function ProfilePage() {
           {editing ? 'Cancel Editing' : 'Edit Profile'}
         </button>
       </div>
+
+      {/* Save feedback banners */}
+      {saveSuccess && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-green-50 border border-green-200 rounded-xl p-4 mb-4 text-sm text-green-700 flex items-center gap-2"
+        >
+          <CheckCircle2 className="w-4 h-4" />
+          Profile saved successfully!
+        </motion.div>
+      )}
+      {saveError && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-red-50 border border-red-200 rounded-xl p-4 mb-4 text-sm text-red-700 flex items-center gap-2"
+        >
+          <AlertCircle className="w-4 h-4" />
+          {saveError}
+        </motion.div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* ==================== LEFT COLUMN ==================== */}
@@ -647,12 +720,66 @@ export default function ProfilePage() {
                       Farm Information
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      <Field label="Farm Name" value={member?.farm_name || ''} editing={false} icon={Sprout} />
-                      <Field label="Farm Size (hectares)" value={member?.farm_size_ha != null ? String(member.farm_size_ha) : ''} editing={false} icon={Ruler} />
-                      <Field label="Primary Crops" value={member?.primary_crops?.join(', ') || ''} editing={false} icon={Leaf} />
-                      <Field label="Location" value={[profile?.region, profile?.country].filter(Boolean).join(', ') || ''} editing={false} icon={MapPin} />
+                      <Field
+                        label="Farm Name"
+                        value={editing ? editFarmName : (member?.farm_name || '')}
+                        editing={editing}
+                        icon={Sprout}
+                        onChange={setEditFarmName}
+                      />
+                      <Field
+                        label="Farm Size (hectares)"
+                        value={editing ? editFarmSize : (member?.farm_size_ha != null ? String(member.farm_size_ha) : '')}
+                        editing={editing}
+                        type="number"
+                        icon={Ruler}
+                        onChange={setEditFarmSize}
+                      />
+                      <Field
+                        label="Primary Crops (comma-separated)"
+                        value={editing ? editPrimaryCrops : (member?.primary_crops?.join(', ') || '')}
+                        editing={editing}
+                        icon={Leaf}
+                        onChange={setEditPrimaryCrops}
+                      />
+                      <Field
+                        label="Location"
+                        value={[profile?.region, profile?.country].filter(Boolean).join(', ') || ''}
+                        editing={false}
+                        icon={MapPin}
+                      />
                     </div>
                   </div>
+
+                  {/* Farm Save / Cancel buttons */}
+                  {editing && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="flex gap-3"
+                    >
+                      <button
+                        onClick={handleSave}
+                        disabled={saving}
+                        className="flex items-center gap-2 bg-[#5DB347] hover:bg-[#449933] text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition-colors shadow-sm disabled:opacity-60"
+                      >
+                        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                        {saving ? 'Saving...' : 'Save Changes'}
+                      </button>
+                      <button
+                        onClick={() => {
+                          setEditing(false);
+                          setEditFarmName(member?.farm_name || '');
+                          setEditFarmSize(member?.farm_size_ha != null ? String(member.farm_size_ha) : '');
+                          setEditPrimaryCrops(member?.primary_crops?.join(', ') || '');
+                          setEditBio(member?.bio || '');
+                        }}
+                        className="px-6 py-2.5 rounded-xl font-semibold text-sm border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </motion.div>
+                  )}
 
                   {/* Farm Stats */}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

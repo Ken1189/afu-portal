@@ -483,55 +483,69 @@ export default function SupplierDashboard() {
       });
 
       // 2. Fetch dashboard stats in parallel
-      const [ordersRes, productsRes, revenueRes, pendingRes] = await Promise.all([
+      // NOTE: orders table has no reliable supplier_id — use order_items
+      const [orderItemsRes, productsRes] = await Promise.all([
         supabase
-          .from('orders')
-          .select('id', { count: 'exact', head: true })
+          .from('order_items')
+          .select('order_id, total_price, order:orders(status)')
           .eq('supplier_id', supplierId),
         supabase
           .from('products')
           .select('id', { count: 'exact', head: true })
           .eq('supplier_id', supplierId),
-        supabase
-          .from('orders')
-          .select('total_amount')
-          .eq('supplier_id', supplierId),
-        supabase
-          .from('orders')
-          .select('id', { count: 'exact', head: true })
-          .eq('supplier_id', supplierId)
-          .in('status', ['pending', 'processing', 'new']),
       ]);
 
-      const totalRev = (revenueRes.data || []).reduce(
-        (sum: number, o: { total_amount: number }) => sum + (o.total_amount || 0),
+      const orderItems = orderItemsRes.data || [];
+      // Deduplicate order IDs to count distinct orders
+      const uniqueOrderIds = new Set(orderItems.map((oi: any) => oi.order_id));
+      const totalRev = orderItems.reduce(
+        (sum: number, oi: any) => sum + (Number(oi.total_price) || 0),
         0
       );
+      const pendingCount = orderItems.filter((oi: any) => {
+        const status = (oi.order as any)?.status;
+        return status === 'pending' || status === 'processing' || status === 'new';
+      }).length;
 
       setLiveStats({
         totalRevenue: totalRev || supplierRow.total_sales || 0,
         activeProducts: productsRes.count || supplierRow.products_count || 0,
-        pendingOrders: pendingRes.count || 0,
-        totalOrders: ordersRes.count || supplierRow.total_orders || 0,
+        pendingOrders: pendingCount,
+        totalOrders: uniqueOrderIds.size || supplierRow.total_orders || 0,
       });
 
-      // 3. Fetch recent orders
-      const { data: ordersData } = await supabase
-        .from('orders')
-        .select('id, total_amount, status, created_at, member:profiles!orders_member_id_fkey(full_name)')
+      // 3. Fetch recent orders via order_items -> orders -> members -> profiles
+      const { data: recentItems } = await supabase
+        .from('order_items')
+        .select(`
+          order_id,
+          total_price,
+          product:products(name),
+          order:orders(
+            id,
+            order_number,
+            status,
+            created_at,
+            member:members(
+              profile:profiles(full_name)
+            )
+          )
+        `)
         .eq('supplier_id', supplierId)
         .order('created_at', { ascending: false })
         .limit(8);
 
-      if (ordersData && ordersData.length > 0) {
+      if (recentItems && recentItems.length > 0) {
         setLiveRecentOrders(
-          ordersData.map((o: Record<string, unknown>) => ({
-            id: o.id as string,
-            product: 'Order',
-            buyer: ((o.member as Record<string, unknown>)?.full_name as string) || 'Customer',
-            amount: (o.total_amount as number) || 0,
-            status: (o.status as string) || 'new',
-            date: new Date(o.created_at as string).toISOString().slice(0, 10),
+          recentItems.map((item: any) => ({
+            id: item.order?.order_number || item.order_id,
+            product: item.product?.name || 'Order',
+            buyer: item.order?.member?.profile?.full_name || 'Customer',
+            amount: Number(item.total_price) || 0,
+            status: item.order?.status || 'new',
+            date: item.order?.created_at
+              ? new Date(item.order.created_at).toISOString().slice(0, 10)
+              : '',
           }))
         );
       }

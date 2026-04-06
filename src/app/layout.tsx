@@ -11,6 +11,7 @@ import { JsonLd, AFU_ORGANIZATION, AFU_WEBSITE } from "@/components/JsonLd";
 import { WebVitals } from "@/components/WebVitals";
 import { Analytics } from "@vercel/analytics/next";
 import { ToastProvider } from "@/components/ui/Toast";
+import ChatWidget from "@/components/chat/ChatWidget";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -102,6 +103,7 @@ export default function RootLayout({
           <SiteNavbar />
           <main className="min-h-screen">{children}</main>
           <SiteFooter />
+          <ChatWidget />
           <CookieConsent />
           <SessionTimeout />
           <Analytics />
