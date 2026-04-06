@@ -569,13 +569,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   // ── Section nav (two-tier) ──
   type SectionKey = 'dashboard' | 'crm' | 'finance' | 'operations' | 'marketplace' | 'content' | 'system';
   const SECTIONS: { key: SectionKey; label: string; icon: React.ReactNode; groups: string[] }[] = [
-    { key: 'dashboard', label: 'Home', icon: <LayoutDashboard className="w-4 h-4" />, groups: ['Overview'] },
-    { key: 'crm', label: 'CRM', icon: <Inbox className="w-4 h-4" />, groups: ['Overview', 'Members & Applications', 'Messaging'] },
-    { key: 'finance', label: 'Finance', icon: <Landmark className="w-4 h-4" />, groups: ['Finance & Loans', 'Investor Management', 'Trading', 'Carbon'] },
-    { key: 'operations', label: 'Ops', icon: <Sprout className="w-4 h-4" />, groups: ['Farm Operations', 'Programs & Training', 'Marketplace & Partners'] },
-    { key: 'marketplace', label: 'Portals', icon: <Store className="w-4 h-4" />, groups: ['Portal Management', 'Switch Portal'] },
-    { key: 'content', label: 'Content', icon: <FileEdit className="w-4 h-4" />, groups: ['Content & CMS'] },
-    { key: 'system', label: 'Settings', icon: <Settings className="w-4 h-4" />, groups: ['System & Security', 'Configuration'] },
+    { key: 'dashboard', label: 'Home', icon: <LayoutDashboard className="w-4 h-4" />, groups: ['Dashboard'] },
+    { key: 'crm', label: 'CRM', icon: <Inbox className="w-4 h-4" />, groups: ['Dashboard', 'People', 'Marketing'] },
+    { key: 'finance', label: 'Finance', icon: <Landmark className="w-4 h-4" />, groups: ['Finance'] },
+    { key: 'operations', label: 'Ops', icon: <Sprout className="w-4 h-4" />, groups: ['Operations'] },
+    { key: 'marketplace', label: 'Portals', icon: <Store className="w-4 h-4" />, groups: ['Switch Portal'] },
+    { key: 'content', label: 'Content', icon: <FileEdit className="w-4 h-4" />, groups: ['Content'] },
+    { key: 'system', label: 'Settings', icon: <Settings className="w-4 h-4" />, groups: ['Settings'] },
   ];
 
   // Auto-detect section from current path
