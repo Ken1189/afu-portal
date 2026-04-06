@@ -210,11 +210,12 @@ export default function ChatWidget() {
                 <button
                   onClick={talkToHuman}
                   disabled={humanRequested}
-                  className="p-1.5 hover:bg-white/10 rounded-lg transition-colors disabled:opacity-50"
+                  className="flex items-center gap-1 px-2 py-1 bg-amber-500/90 hover:bg-amber-500 text-white text-[10px] font-semibold rounded-lg transition-colors disabled:opacity-50"
                   aria-label="Talk to a human"
                   title="Talk to a human"
                 >
-                  <User className="w-4 h-4 text-white/70" />
+                  <User className="w-3 h-3" />
+                  {humanRequested ? 'Requested' : 'Human'}
                 </button>
                 <button
                   onClick={() => setIsOpen(false)}
