@@ -1,0 +1,114 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { createInboxConversation } from '@/lib/inbox/create-conversation';
+import { Resend } from 'resend';
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+const FROM = 'African Farming Union <noreply@mail.africanfarmingunion.org>';
+const ADMIN_EMAILS = ['peterw@africanfarmingunion.org', 'devonk@africanfarmingunion.org'];
+
+/**
+ * POST /api/chat/human — Public endpoint for chatbot "Talk to Human" requests.
+ * No authentication required (visitors are not logged in).
+ * Creates an inbox conversation and notifies admins via email.
+ */
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json();
+    const { name, email, phone, message, chatHistory } = body;
+
+    if (!name || !email) {
+      return NextResponse.json({ error: 'Name and email are required' }, { status: 400 });
+    }
+
+    // Build the full message body with chat context
+    const fullMessage = [
+      message || '',
+      '',
+      '--- Chat History ---',
+      chatHistory || '(no history)',
+    ].filter(Boolean).join('\n');
+
+    // Create inbox conversation using service-role client (no auth needed)
+    const result = await createInboxConversation({
+      name,
+      email,
+      phone: phone || undefined,
+      type: 'lead',
+      subject: 'Chat — Talk to Human',
+      message: fullMessage,
+      channel: 'form',
+      tags: ['chatbot', 'talk-to-human'],
+    });
+
+    // Send email notification to admins
+    try {
+      const firstName = name.split(' ')[0];
+      await resend.emails.send({
+        from: FROM,
+        to: ADMIN_EMAILS,
+        subject: `[AFU Chat] Talk to Human request from ${name}`,
+        html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
+          <div style="background:#1B2A4A;padding:20px;text-align:center">
+            <h2 style="color:#5DB347;margin:0">New Chat Request</h2>
+            <p style="color:#8CB89C;margin:4px 0 0;font-size:13px">Someone wants to talk to a human</p>
+          </div>
+          <div style="padding:24px;background:#f8faf6">
+            <p style="color:#333;font-size:14px"><strong>Name:</strong> ${name}</p>
+            <p style="color:#333;font-size:14px"><strong>Email:</strong> ${email}</p>
+            ${phone ? `<p style="color:#333;font-size:14px"><strong>Phone:</strong> ${phone}</p>` : ''}
+            ${message ? `<hr style="border:1px solid #eee;margin:16px 0"><p style="color:#333;font-size:14px"><strong>Message:</strong></p><p style="color:#555;font-size:14px;white-space:pre-wrap">${message}</p>` : ''}
+            <hr style="border:1px solid #eee;margin:16px 0">
+            <p style="color:#999;font-size:12px"><strong>Chat History:</strong></p>
+            <pre style="color:#777;font-size:12px;white-space:pre-wrap;background:#fff;padding:12px;border-radius:6px;border:1px solid #eee">${chatHistory || '(no history)'}</pre>
+          </div>
+          <div style="padding:16px;text-align:center">
+            <a href="https://africanfarmingunion.org/admin/inbox${result.id ? `?conversation=${result.id}` : ''}" style="display:inline-block;padding:10px 24px;background:#5DB347;color:#fff;text-decoration:none;border-radius:6px;font-size:14px;font-weight:600">View in Inbox</a>
+          </div>
+          <div style="padding:12px;text-align:center;color:#999;font-size:11px">
+            African Farming Union | africanfarmingunion.org
+          </div>
+        </div>`,
+      });
+    } catch (emailErr) {
+      console.error('Chat human email notification error:', emailErr);
+      // Don't fail the request if email notification fails
+    }
+
+    // Send auto-reply to the visitor
+    try {
+      const firstName = name.split(' ')[0];
+      await resend.emails.send({
+        from: FROM,
+        to: email,
+        subject: 'We received your message - African Farming Union',
+        html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
+          <div style="background:#1B2A4A;padding:24px;text-align:center">
+            <h1 style="color:#5DB347;margin:0;font-size:22px">African Farming Union</h1>
+            <p style="color:#8CB89C;margin:6px 0 0;font-size:13px">Farmers for Farmers</p>
+          </div>
+          <div style="padding:28px;background:#f8faf6">
+            <h2 style="color:#1B2A4A;margin-top:0">Hi ${firstName}!</h2>
+            <p style="color:#333;line-height:1.6;font-size:14px">Thanks for reaching out through our chat. A member of our team will get back to you within <strong>24 hours</strong>.</p>
+            <p style="color:#333;line-height:1.6;font-size:14px">In the meantime, feel free to explore:</p>
+            <ul style="color:#555;line-height:2;font-size:14px">
+              <li><a href="https://africanfarmingunion.org/services" style="color:#5DB347">Our Services</a></li>
+              <li><a href="https://africanfarmingunion.org/memberships" style="color:#5DB347">Membership Tiers</a></li>
+              <li><a href="https://africanfarmingunion.org/countries" style="color:#5DB347">Countries We Serve</a></li>
+            </ul>
+            <p style="color:#333;font-size:14px">Best regards,<br><strong>The AFU Team</strong></p>
+          </div>
+          <div style="padding:16px;text-align:center;color:#999;font-size:11px">
+            African Farming Union | Gaborone, Botswana<br>africanfarmingunion.org
+          </div>
+        </div>`,
+      });
+    } catch (autoReplyErr) {
+      console.error('Chat human auto-reply error:', autoReplyErr);
+    }
+
+    return NextResponse.json({ success: true, conversationId: result.id });
+  } catch (err) {
+    console.error('Chat human endpoint error:', err);
+    return NextResponse.json({ error: 'Something went wrong' }, { status: 500 });
+  }
+}

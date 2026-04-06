@@ -111,26 +111,25 @@ export default function ChatWidget() {
   const submitHumanRequest = async () => {
     if (!humanForm.name || !humanForm.email) return;
     setHumanSending(true);
-    setHumanRequested(true);
 
     try {
       const chatHistory = messages.map(m => `${m.role === 'user' ? 'Visitor' : 'Amara'}: ${m.text}`).join('\n');
-      const fullMessage = `${humanForm.message ? humanForm.message + '\n\n' : ''}--- Chat History ---\n${chatHistory}`;
 
-      await fetch('/api/admin/inbox', {
+      const res = await fetch('/api/chat/human', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          contact_name: humanForm.name,
-          contact_email: humanForm.email,
-          contact_phone: humanForm.phone || null,
-          contact_type: 'lead',
-          subject: 'Chat — Talk to Human',
-          message: fullMessage,
-          channel: 'form',
+          name: humanForm.name,
+          email: humanForm.email,
+          phone: humanForm.phone || null,
+          message: humanForm.message || null,
+          chatHistory,
         }),
       });
 
+      if (!res.ok) throw new Error('Request failed');
+
+      setHumanRequested(true);
       setShowHumanForm(false);
       const confirmMsg: ChatMessageType = {
         id: generateMessageId(),
