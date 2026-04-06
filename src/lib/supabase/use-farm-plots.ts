@@ -21,6 +21,7 @@ export interface FarmPlotRow {
   soil_ph: number | null;
   location: string | null;
   notes: string | null;
+  photo_url: string | null;
   created_at: string;
   updated_at: string;
 }

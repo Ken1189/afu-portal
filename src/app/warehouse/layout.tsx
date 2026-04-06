@@ -172,9 +172,13 @@ export default function WarehouseLayout({ children }: { children: React.ReactNod
             </div>
           </div>
           <div className="flex items-center gap-3 bg-white/5 rounded-xl px-3 py-2.5">
-            <div className="w-9 h-9 bg-[#5DB347] rounded-full flex items-center justify-center text-xs font-bold">
-              {initials}
-            </div>
+            {profile?.avatar_url ? (
+              <img src={profile.avatar_url} alt="" className="w-9 h-9 rounded-full object-cover" />
+            ) : (
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#1B2A4A] to-[#2A3F6A] flex items-center justify-center text-white text-xs font-bold">
+                {initials}
+              </div>
+            )}
             <div className="min-w-0 flex-1">
               <p className="text-sm font-medium truncate">{displayName}</p>
               <p className="text-[11px] text-gray-400 truncate">Warehouse Operator</p>
@@ -312,9 +316,13 @@ export default function WarehouseLayout({ children }: { children: React.ReactNod
                 Admin
               </Link>
             )}
-            <div className="w-9 h-9 bg-[#5DB347] rounded-full flex items-center justify-center">
-              <span className="text-white text-xs font-bold">{initials}</span>
-            </div>
+            {profile?.avatar_url ? (
+              <img src={profile.avatar_url} alt="" className="w-8 h-8 rounded-full object-cover" />
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#1B2A4A] to-[#2A3F6A] flex items-center justify-center text-white text-xs font-bold">
+                {initials}
+              </div>
+            )}
             <span className="hidden sm:block text-sm font-medium text-[#1B2A4A]">{displayName}</span>
           </div>
         </header>

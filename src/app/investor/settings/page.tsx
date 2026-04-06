@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import {
   Settings,
@@ -19,6 +20,7 @@ import {
   UserCircle,
   Lock,
   Loader2,
+  Camera,
 } from 'lucide-react';
 import { useAuth } from '@/lib/supabase/auth-context';
 import { createClient } from '@/lib/supabase/client';
@@ -139,6 +141,12 @@ export default function InvestorSettingsPage() {
   const [investorType, setInvestorType] = useState('institutional');
   const [accountOpened, setAccountOpened] = useState('15 January 2025');
 
+  // Avatar upload
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const [avatarError, setAvatarError] = useState<string | null>(null);
+
   // Communication preferences
   const [commPrefs, setCommPrefs] = useState<CommPreferences>({
     quarterlyReports: 'both',
@@ -166,6 +174,9 @@ export default function InvestorSettingsPage() {
             }
             if (profileData.phone || profileData.phone_number) {
               setPhoneNumber(String(profileData.phone || profileData.phone_number));
+            }
+            if (profileData.avatar_url) {
+              setAvatarUrl(profileData.avatar_url);
             }
           }
 
@@ -221,6 +232,61 @@ export default function InvestorSettingsPage() {
     }
     loadSettings();
   }, [user]);
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+
+    const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+      setAvatarError('Please select a JPG, PNG, or WebP image.');
+      setTimeout(() => setAvatarError(null), 4000);
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setAvatarError('Image must be under 5MB.');
+      setTimeout(() => setAvatarError(null), 4000);
+      return;
+    }
+
+    setAvatarUploading(true);
+    setAvatarError(null);
+
+    try {
+      const supabase = createClient();
+      const ext = file.name.split('.').pop() || 'jpg';
+      const filePath = `avatars/${user.id}/${Date.now()}.${ext}`;
+
+      const { data, error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      if (data) {
+        const { data: { publicUrl } } = supabase.storage
+          .from('avatars')
+          .getPublicUrl(data.path);
+
+        const urlWithBuster = `${publicUrl}?t=${Date.now()}`;
+
+        await supabase
+          .from('profiles')
+          .update({ avatar_url: publicUrl })
+          .eq('id', user.id);
+
+        setAvatarUrl(urlWithBuster);
+      }
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Upload failed. Please try again.';
+      setAvatarError(message);
+      setTimeout(() => setAvatarError(null), 4000);
+    } finally {
+      setAvatarUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
 
   const handleSave = async () => {
     if (!user) return;
@@ -278,6 +344,12 @@ export default function InvestorSettingsPage() {
 
   const displayName = profile?.full_name || 'Peter Watson';
   const displayEmail = profile?.email || user?.email || 'peter@watsoncapital.com';
+  const initials = displayName
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
 
   if (authLoading || loading) {
     return (
@@ -307,6 +379,51 @@ export default function InvestorSettingsPage() {
         <div className="flex items-center gap-2 mb-6">
           <User className="w-5 h-5 text-[#1B2A4A]" />
           <h2 className="text-lg font-bold text-[#1B2A4A]">Profile</h2>
+        </div>
+
+        {/* Avatar Upload */}
+        <div className="flex flex-col items-center mb-6">
+          <div className="relative">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={handleAvatarUpload}
+              className="hidden"
+            />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={avatarUploading}
+              className="w-20 h-20 bg-[#1B2A4A]/10 rounded-full flex items-center justify-center border-2 border-[#1B2A4A]/20 overflow-hidden cursor-pointer hover:border-[#1B2A4A]/40 transition-colors group relative"
+              title="Click to upload avatar"
+            >
+              {avatarUploading ? (
+                <Loader2 className="w-6 h-6 text-[#1B2A4A] animate-spin" />
+              ) : avatarUrl ? (
+                <>
+                  <Image
+                    src={avatarUrl}
+                    alt={displayName}
+                    width={80}
+                    height={80}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-full">
+                    <Camera className="w-5 h-5 text-white" />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <span className="text-[#1B2A4A] text-xl font-bold group-hover:hidden">{initials}</span>
+                  <Camera className="w-5 h-5 text-[#1B2A4A] hidden group-hover:block" />
+                </>
+              )}
+            </button>
+          </div>
+          <p className="text-xs text-gray-400 mt-2">Click to upload photo</p>
+          {avatarError && (
+            <p className="text-xs text-red-500 mt-1">{avatarError}</p>
+          )}
         </div>
 
         <div className="space-y-4">
