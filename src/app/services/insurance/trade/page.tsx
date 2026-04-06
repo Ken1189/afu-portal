@@ -81,7 +81,7 @@ export default function TradeInsurancePage() {
           </p>
           <div className="flex gap-4 mt-8 flex-wrap">
             <Link
-              href="/farm/insurance/quote"
+              href="/join?feature=insurance"
               className="bg-gold hover:bg-gold/90 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
             >
               Get a Quote
@@ -259,7 +259,7 @@ export default function TradeInsurancePage() {
             trade insurance quote tailored to your export profile.
           </p>
           <Link
-            href="/farm/insurance/quote"
+            href="/join?feature=insurance"
             className="inline-block bg-gold hover:bg-gold/90 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
           >
             Get a Trade Insurance Quote

@@ -69,7 +69,7 @@ export default function LifeInsurancePage() {
           </p>
           <div className="flex gap-4 mt-8 flex-wrap">
             <Link
-              href="/farm/insurance/quote"
+              href="/join?feature=insurance"
               className="bg-gold hover:bg-gold/90 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
             >
               Get a Quote
@@ -184,7 +184,7 @@ export default function LifeInsurancePage() {
             no matter what happens. Get affordable life cover in under 5 minutes.
           </p>
           <Link
-            href="/farm/insurance/quote"
+            href="/join?feature=insurance"
             className="inline-block bg-gold hover:bg-gold/90 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
           >
             Get a Life Insurance Quote

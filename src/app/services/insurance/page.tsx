@@ -352,7 +352,7 @@ export default async function InsuranceHubPage() {
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
             <Link
-              href="/farm/insurance/quote"
+              href="/join?feature=insurance"
               className="text-white px-8 py-3 rounded-xl font-semibold transition-all duration-300 hover:scale-105 shadow-md shadow-[#5DB347]/20"
               style={{ background: 'linear-gradient(135deg, #5DB347, #449933)' }}
             >

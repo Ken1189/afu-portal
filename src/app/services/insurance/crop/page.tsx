@@ -70,7 +70,7 @@ export default function CropInsurancePage() {
           </p>
           <div className="flex gap-4 mt-8 flex-wrap">
             <Link
-              href="/farm/insurance/quote"
+              href="/join?feature=insurance"
               className="bg-gold hover:bg-gold/90 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
             >
               Get a Quote
@@ -258,7 +258,7 @@ export default function CropInsurancePage() {
             insurance that pays when you need it most.
           </p>
           <Link
-            href="/farm/insurance/quote"
+            href="/join?feature=insurance"
             className="inline-block bg-gold hover:bg-gold/90 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
           >
             Get a Crop Insurance Quote

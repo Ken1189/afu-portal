@@ -112,7 +112,7 @@ export default function FarmInsurancePage() {
           </p>
           <div className="flex gap-4 mt-8 flex-wrap">
             <Link
-              href="/farm/insurance/quote"
+              href="/join?feature=insurance"
               className="bg-gold hover:bg-gold/90 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
             >
               Get a Quote
@@ -206,7 +206,7 @@ export default function FarmInsurancePage() {
                   ))}
                 </ul>
                 <Link
-                  href="/farm/insurance/quote"
+                  href="/join?feature=insurance"
                   className={`block text-center px-6 py-3 rounded-lg font-semibold transition-colors ${
                     plan.featured
                       ? "bg-gold hover:bg-gold/90 text-white"
@@ -277,7 +277,7 @@ export default function FarmInsurancePage() {
             liability. Get a personalized quote in minutes.
           </p>
           <Link
-            href="/farm/insurance/quote"
+            href="/join?feature=insurance"
             className="inline-block bg-gold hover:bg-gold/90 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
           >
             Get a Farm Insurance Quote
