@@ -302,6 +302,10 @@ export default function AdminAnalyticsPage() {
       {/* ═══ MEMBERS TAB ═══ */}
       {!loading && tab === 'members' && (
         <div className="space-y-6">
+          {/* Members export */}
+          <div className="flex justify-end">
+            <button onClick={() => exportCSV(members.map(m => ({ id: m.id, tier: m.tier, status: m.status, created: m.created_at })) as unknown as Record<string, unknown>[], 'members')} className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-700 border border-gray-200 rounded-lg px-3 py-2"><Download className="w-3.5 h-3.5" /> Export Members CSV</button>
+          </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Tier distribution pie */}
             <div className="bg-white rounded-2xl border border-gray-100 p-5">

@@ -84,7 +84,7 @@ const FALLBACK_STATS = {
   defaultRate: 0,
 };
 
-/** Loan portfolio chart data (static — no live DB source yet). */
+/** Loan portfolio chart data (sample — shown when no real loans exist). */
 const LOAN_PORTFOLIO = [
   { month: 'Apr', workingCapital: 180000, invoiceFinance: 95000, equipment: 45000, inputBundle: 22000 },
   { month: 'May', workingCapital: 210000, invoiceFinance: 110000, equipment: 52000, inputBundle: 28000 },
@@ -691,9 +691,8 @@ export default function DashboardPage() {
                 <h3 className="text-base font-semibold text-navy">Loan Portfolio</h3>
                 <p className="text-sm text-gray-500">12-month stacked breakdown by product type</p>
               </div>
-              <div className="flex items-center gap-1 text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">
-                <TrendingUp className="w-3.5 h-3.5" />
-                Growing steadily
+              <div className="flex items-center gap-1 text-xs font-medium text-gray-400 bg-gray-50 px-2 py-1 rounded-full">
+                Sample data
               </div>
             </div>
             <div className="w-full" style={{ height: 320 }}>
