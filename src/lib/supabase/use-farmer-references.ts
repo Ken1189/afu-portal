@@ -44,18 +44,23 @@ export function useFarmerReferences() {
   const fetchReferences = useCallback(async () => {
     if (!user) return;
     setLoading(true);
-    const supabase = createClient();
+    try {
+      const supabase = createClient();
 
-    const { data, error } = await supabase
-      .from('farmer_references')
-      .select('*')
-      .eq('farmer_id', user.id)
-      .order('is_primary', { ascending: false });
+      const { data, error } = await supabase
+        .from('farmer_references')
+        .select('*')
+        .eq('farmer_id', user.id)
+        .order('is_primary', { ascending: false });
 
-    if (!error && data) {
-      setReferences(data as FarmerReference[]);
+      if (!error && data) {
+        setReferences(data as FarmerReference[]);
+      }
+    } catch (err) {
+      console.error("[use-farmer-references.ts] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [user]);
 
   useEffect(() => {

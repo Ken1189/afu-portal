@@ -64,16 +64,21 @@ export default function MarketplaceRulesConfig() {
 
   const fetchData = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('site_config')
-      .select('value')
-      .eq('key', CONFIG_KEY)
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('site_config')
+        .select('value')
+        .eq('key', CONFIG_KEY)
+        .single();
 
-    if (!error && data) {
-      setRules(data.value as MarketplaceRules);
+      if (!error && data) {
+        setRules(data.value as MarketplaceRules);
+      }
+    } catch (err) {
+      console.error("[marketplace-rules/page.tsx] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
   useEffect(() => { fetchData(); }, [fetchData]);

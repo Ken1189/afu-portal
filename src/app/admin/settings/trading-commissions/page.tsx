@@ -65,18 +65,23 @@ export default function TradingCommissionsPage() {
   // ── Load ────────────────────────────────────────────────────────────────
   const loadData = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('site_config')
-      .select('*')
-      .eq('key', 'trading_commission_rates')
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('site_config')
+        .select('*')
+        .eq('key', 'trading_commission_rates')
+        .single();
 
-    if (error && error.code !== 'PGRST116') {
-      setToast({ message: 'Failed to load commission rates', type: 'error' });
+      if (error && error.code !== 'PGRST116') {
+        setToast({ message: 'Failed to load commission rates', type: 'error' });
+      }
+
+      setCommissions(data?.value ? (data.value as CommissionRate[]) : DEFAULT_COMMISSIONS);
+    } catch (err) {
+      console.error("[trading-commissions/page.tsx] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-
-    setCommissions(data?.value ? (data.value as CommissionRate[]) : DEFAULT_COMMISSIONS);
-    setLoading(false);
   }, []);
 
   useEffect(() => { loadData(); }, [loadData]);

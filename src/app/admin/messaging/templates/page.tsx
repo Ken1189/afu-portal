@@ -49,9 +49,14 @@ export default function AdminTemplatesPage() {
 
   const fetchTemplates = useCallback(async () => {
     setLoading(true);
-    const { data } = await supabase.from('message_templates').select('*').order('created_at', { ascending: false });
-    setTemplates(data && data.length > 0 ? (data as Template[]) : DEMO_TEMPLATES);
-    setLoading(false);
+    try {
+      const { data } = await supabase.from('message_templates').select('*').order('created_at', { ascending: false });
+      setTemplates(data && data.length > 0 ? (data as Template[]) : DEMO_TEMPLATES);
+    } catch (err) {
+      console.error("[templates/page.tsx] fetch error:", err);
+    } finally {
+      setLoading(false);
+    }
   }, [supabase]);
 
   useEffect(() => { fetchTemplates(); }, [fetchTemplates]);

@@ -461,21 +461,26 @@ export default function AdminInsuranceProductsPage() {
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('insurance_products')
-      .select('*')
-      .order('created_at', { ascending: false });
+    try {
+      const { data, error } = await supabase
+        .from('insurance_products')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-    if (error) {
-      setToast({ message: 'Failed to load insurance products', type: 'error' });
-      // Use fallback data if DB fails or is empty
-      setProducts(FALLBACK_PRODUCTS);
-    } else if (!data || data.length === 0) {
-      setProducts(FALLBACK_PRODUCTS);
-    } else {
-      setProducts(data as InsuranceProduct[]);
+      if (error) {
+        setToast({ message: 'Failed to load insurance products', type: 'error' });
+        // Use fallback data if DB fails or is empty
+        setProducts(FALLBACK_PRODUCTS);
+      } else if (!data || data.length === 0) {
+        setProducts(FALLBACK_PRODUCTS);
+      } else {
+        setProducts(data as InsuranceProduct[]);
+      }
+    } catch (err) {
+      console.error("[products/page.tsx] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

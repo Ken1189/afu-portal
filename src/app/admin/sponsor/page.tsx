@@ -107,22 +107,27 @@ export default function AdminSponsorPage() {
   useEffect(() => {
     async function fetchSponsorships() {
       setLoading(true);
-      const { data, error } = await supabase.from('sponsorships').select('*').order('created_at', { ascending: false });
-      if (error) {
-        console.error('[sponsor] fetch failed', error);
-        setToast({ message: `Failed to load sponsorships: ${error.message || 'unknown error'}`, type: 'error' });
-        setSponsorships([]);
-      } else {
-        setSponsorships((data || []).map((row: Record<string, unknown>) => ({
-          id: (row.id as string) || '', sponsor_name: (row.sponsor_name as string) || 'Unknown',
-          sponsor_email: (row.sponsor_email as string) || '', tier: ((row.tier as string) || 'bronze') as SponsorshipTier,
-          farmer_name: (row.farmer_name as string) || '', amount: (row.amount as number) || 0,
-          billing_cycle: ((row.billing_cycle as string) || 'monthly') as 'monthly' | 'annual',
-          status: ((row.status as string) || 'active') as SponsorshipStatus,
-          started_at: (row.started_at as string) || (row.created_at as string) || '',
-        })));
+      try {
+        const { data, error } = await supabase.from('sponsorships').select('*').order('created_at', { ascending: false });
+        if (error) {
+          console.error('[sponsor] fetch failed', error);
+          setToast({ message: `Failed to load sponsorships: ${error.message || 'unknown error'}`, type: 'error' });
+          setSponsorships([]);
+        } else {
+          setSponsorships((data || []).map((row: Record<string, unknown>) => ({
+            id: (row.id as string) || '', sponsor_name: (row.sponsor_name as string) || 'Unknown',
+            sponsor_email: (row.sponsor_email as string) || '', tier: ((row.tier as string) || 'bronze') as SponsorshipTier,
+            farmer_name: (row.farmer_name as string) || '', amount: (row.amount as number) || 0,
+            billing_cycle: ((row.billing_cycle as string) || 'monthly') as 'monthly' | 'annual',
+            status: ((row.status as string) || 'active') as SponsorshipStatus,
+            started_at: (row.started_at as string) || (row.created_at as string) || '',
+          })));
+        }
+      } catch (err) {
+        console.error("[sponsor/page.tsx] fetch error:", err);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     }
     fetchSponsorships();
   }, [supabase]);

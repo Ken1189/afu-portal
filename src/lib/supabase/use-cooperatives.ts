@@ -51,18 +51,23 @@ export function useCooperatives(country?: string) {
 
   const fetchCooperatives = useCallback(async () => {
     setLoading(true);
-    let query = supabase.from('cooperatives').select('*').order('name');
-    if (country) query = query.eq('country', country);
+    try {
+      let query = supabase.from('cooperatives').select('*').order('name');
+      if (country) query = query.eq('country', country);
 
-    const { data, error: fetchError } = await query;
+      const { data, error: fetchError } = await query;
 
-    if (fetchError) {
-      setError(fetchError.message);
-      setCooperatives([]);
-    } else {
-      setCooperatives((data as CooperativeRow[]) || []);
+      if (fetchError) {
+        setError(fetchError.message);
+        setCooperatives([]);
+      } else {
+        setCooperatives((data as CooperativeRow[]) || []);
+      }
+    } catch (err) {
+      console.error("[use-cooperatives.ts] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [supabase, country]);
 
   useEffect(() => {
@@ -98,19 +103,24 @@ export function useCooperativeMembers(cooperativeId: string) {
 
   const fetchMembers = useCallback(async () => {
     setLoading(true);
-    const { data, error: fetchError } = await supabase
-      .from('cooperative_members')
-      .select('*, member:members(id, profile:profiles(full_name, email, avatar_url))')
-      .eq('cooperative_id', cooperativeId)
-      .order('joined_at', { ascending: false });
+    try {
+      const { data, error: fetchError } = await supabase
+        .from('cooperative_members')
+        .select('*, member:members(id, profile:profiles(full_name, email, avatar_url))')
+        .eq('cooperative_id', cooperativeId)
+        .order('joined_at', { ascending: false });
 
-    if (fetchError) {
-      setError(fetchError.message);
-      setMembers([]);
-    } else {
-      setMembers((data as CooperativeMemberRow[]) || []);
+      if (fetchError) {
+        setError(fetchError.message);
+        setMembers([]);
+      } else {
+        setMembers((data as CooperativeMemberRow[]) || []);
+      }
+    } catch (err) {
+      console.error("[use-cooperatives.ts] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [supabase, cooperativeId]);
 
   useEffect(() => {

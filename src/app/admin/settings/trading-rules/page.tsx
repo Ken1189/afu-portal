@@ -112,18 +112,23 @@ export default function TradingRulesPage() {
   // ── Load ────────────────────────────────────────────────────────────────
   const loadData = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('site_config')
-      .select('*')
-      .eq('key', 'country_trading_rules')
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('site_config')
+        .select('*')
+        .eq('key', 'country_trading_rules')
+        .single();
 
-    if (error && error.code !== 'PGRST116') {
-      setToast({ message: 'Failed to load trading rules', type: 'error' });
+      if (error && error.code !== 'PGRST116') {
+        setToast({ message: 'Failed to load trading rules', type: 'error' });
+      }
+
+      setRules(data?.value ? (data.value as CountryRule[]) : DEFAULT_RULES);
+    } catch (err) {
+      console.error("[trading-rules/page.tsx] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-
-    setRules(data?.value ? (data.value as CountryRule[]) : DEFAULT_RULES);
-    setLoading(false);
   }, []);
 
   useEffect(() => { loadData(); }, [loadData]);

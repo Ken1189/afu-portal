@@ -76,18 +76,23 @@ export default function AdminTradeFinancePage() {
   /* ── Fetch trade finance loans from Supabase ── */
   const fetchLoans = useCallback(async () => {
     setLoading(true);
-    const supabase = createClient();
+    try {
+      const supabase = createClient();
 
-    const { data, error } = await supabase
-      .from('loans')
-      .select('*, members(full_name, country)')
-      .eq('loan_type', 'tradeFinance')
-      .order('created_at', { ascending: false });
+      const { data, error } = await supabase
+        .from('loans')
+        .select('*, members(full_name, country)')
+        .eq('loan_type', 'tradeFinance')
+        .order('created_at', { ascending: false });
 
-    if (!error && data) {
-      setLoans(data as unknown as LoanRow[]);
+      if (!error && data) {
+        setLoans(data as unknown as LoanRow[]);
+      }
+    } catch (err) {
+      console.error("[trade-finance/page.tsx] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
   useEffect(() => {

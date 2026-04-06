@@ -74,18 +74,23 @@ export default function SupplierVerificationConfig() {
 
   const fetchData = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('site_config')
-      .select('value')
-      .eq('key', CONFIG_KEY)
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('site_config')
+        .select('value')
+        .eq('key', CONFIG_KEY)
+        .single();
 
-    if (error || !data) {
-      setRequirements(SEED_DATA);
-    } else {
-      setRequirements(data.value as VerificationRequirement[]);
+      if (error || !data) {
+        setRequirements(SEED_DATA);
+      } else {
+        setRequirements(data.value as VerificationRequirement[]);
+      }
+    } catch (err) {
+      console.error("[supplier-verification/page.tsx] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
   useEffect(() => { fetchData(); }, [fetchData]);

@@ -61,22 +61,27 @@ export function useSuppliers() {
 
   const fetchSuppliers = useCallback(async () => {
     setLoading(true);
-    setError(null);
+    try {
+      setError(null);
 
-    const { data, error: fetchError } = await supabase
-      .from('suppliers')
-      .select('*')
-      .order('company_name');
+      const { data, error: fetchError } = await supabase
+        .from('suppliers')
+        .select('*')
+        .order('company_name');
 
-    if (fetchError) {
-      setError(fetchError.message);
-      // Fall back to empty array
-      setSuppliers([]);
-    } else {
-      setSuppliers((data as SupplierRow[]) || []);
+      if (fetchError) {
+        setError(fetchError.message);
+        // Fall back to empty array
+        setSuppliers([]);
+      } else {
+        setSuppliers((data as SupplierRow[]) || []);
+      }
+
+    } catch (err) {
+      console.error("[use-suppliers.ts] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   }, [supabase]);
 
   useEffect(() => {

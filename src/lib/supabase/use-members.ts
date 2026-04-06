@@ -41,18 +41,25 @@ export function useMembers() {
 
   const fetchMembers = useCallback(async () => {
     setLoading(true);
-    const { data, error: fetchError } = await supabase
-      .from('members')
-      .select('*, profile:profiles(full_name, email, phone, avatar_url, country, region)')
-      .order('created_at', { ascending: false });
+    try {
+      const { data, error: fetchError } = await supabase
+        .from('members')
+        .select('*, profile:profiles(full_name, email, phone, avatar_url, country, region)')
+        .order('created_at', { ascending: false });
 
-    if (fetchError) {
-      setError(fetchError.message);
+      if (fetchError) {
+        setError(fetchError.message);
+        setMembers([]);
+      } else {
+        setMembers((data as MemberRow[]) || []);
+      }
+    } catch (err) {
+      console.error('Failed to fetch members:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error');
       setMembers([]);
-    } else {
-      setMembers((data as MemberRow[]) || []);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [supabase]);
 
   useEffect(() => { fetchMembers(); }, [fetchMembers]);

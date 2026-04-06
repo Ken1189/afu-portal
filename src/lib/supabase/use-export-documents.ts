@@ -25,12 +25,17 @@ export function useExportDocuments(memberId?: string) {
 
   const fetchDocuments = useCallback(async () => {
     setLoading(true);
-    let query = supabase.from('export_documents').select('*').order('created_at', { ascending: false });
-    if (memberId) query = query.eq('member_id', memberId);
-    const { data, error: fetchError } = await query;
-    if (fetchError) { setError(fetchError.message); setDocuments([]); }
-    else { setDocuments((data as ExportDocumentRow[]) || []); }
-    setLoading(false);
+    try {
+      let query = supabase.from('export_documents').select('*').order('created_at', { ascending: false });
+      if (memberId) query = query.eq('member_id', memberId);
+      const { data, error: fetchError } = await query;
+      if (fetchError) { setError(fetchError.message); setDocuments([]); }
+      else { setDocuments((data as ExportDocumentRow[]) || []); }
+    } catch (err) {
+      console.error("[use-export-documents.ts] fetch error:", err);
+    } finally {
+      setLoading(false);
+    }
   }, [supabase, memberId]);
 
   useEffect(() => { fetchDocuments(); }, [fetchDocuments]);

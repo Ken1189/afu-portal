@@ -123,16 +123,21 @@ export default function FreshTiersConfig() {
 
   const fetchData = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('site_config')
-      .select('value')
-      .eq('key', CONFIG_KEY)
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('site_config')
+        .select('value')
+        .eq('key', CONFIG_KEY)
+        .single();
 
-    if (!error && data?.value && Array.isArray(data.value)) {
-      setTiers(data.value as FreshTier[]);
+      if (!error && data?.value && Array.isArray(data.value)) {
+        setTiers(data.value as FreshTier[]);
+      }
+    } catch (err) {
+      console.error("[fresh-tiers/page.tsx] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

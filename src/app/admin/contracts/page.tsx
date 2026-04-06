@@ -98,9 +98,14 @@ export default function AdminContractsPage() {
 
   const fetchContracts = useCallback(async () => {
     setLoading(true);
-    const { data } = await supabase.from('contracts').select('*').order('created_at', { ascending: false });
-    setContracts((data || []) as Contract[]);
-    setLoading(false);
+    try {
+      const { data } = await supabase.from('contracts').select('*').order('created_at', { ascending: false });
+      setContracts((data || []) as Contract[]);
+    } catch (err) {
+      console.error("[contracts/page.tsx] fetch error:", err);
+    } finally {
+      setLoading(false);
+    }
   }, [supabase]);
 
   useEffect(() => { fetchContracts(); }, [fetchContracts]);

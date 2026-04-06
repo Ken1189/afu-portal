@@ -71,16 +71,21 @@ export default function AdminResearchPage() {
 
   const fetchCentres = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('research_centres')
-      .select('*')
-      .order('created_at', { ascending: false });
-    if (error) {
-      showToast('Failed to load research centres', 'error');
-    } else {
-      setCentres(data || []);
+    try {
+      const { data, error } = await supabase
+        .from('research_centres')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error) {
+        showToast('Failed to load research centres', 'error');
+      } else {
+        setCentres(data || []);
+      }
+    } catch (err) {
+      console.error("[research/page.tsx] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [supabase, showToast]);
 
   useEffect(() => {

@@ -25,12 +25,17 @@ export function useFarmActivities(memberId?: string) {
 
   const fetchActivities = useCallback(async () => {
     setLoading(true);
-    let query = supabase.from('farm_activities').select('*').order('date', { ascending: false });
-    if (memberId) query = query.eq('member_id', memberId);
-    const { data, error: fetchError } = await query;
-    if (fetchError) { setError(fetchError.message); setActivities([]); }
-    else { setActivities((data as FarmActivityRow[]) || []); }
-    setLoading(false);
+    try {
+      let query = supabase.from('farm_activities').select('*').order('date', { ascending: false });
+      if (memberId) query = query.eq('member_id', memberId);
+      const { data, error: fetchError } = await query;
+      if (fetchError) { setError(fetchError.message); setActivities([]); }
+      else { setActivities((data as FarmActivityRow[]) || []); }
+    } catch (err) {
+      console.error("[use-farm-activities.ts] fetch error:", err);
+    } finally {
+      setLoading(false);
+    }
   }, [supabase, memberId]);
 
   useEffect(() => { fetchActivities(); }, [fetchActivities]);

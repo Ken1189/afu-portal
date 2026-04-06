@@ -86,20 +86,25 @@ export default function InsurancePricingConfig() {
 
   const fetchData = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('site_config')
-      .select('value')
-      .eq('key', CONFIG_KEY)
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('site_config')
+        .select('value')
+        .eq('key', CONFIG_KEY)
+        .single();
 
-    if (!error && data?.value) {
-      const val = data.value as InsuranceConfig;
-      setConfig({
-        products: val.products ?? DEFAULT_CONFIG.products,
-        stats: val.stats ?? DEFAULT_CONFIG.stats,
-      });
+      if (!error && data?.value) {
+        const val = data.value as InsuranceConfig;
+        setConfig({
+          products: val.products ?? DEFAULT_CONFIG.products,
+          stats: val.stats ?? DEFAULT_CONFIG.stats,
+        });
+      }
+    } catch (err) {
+      console.error("[insurance-pricing/page.tsx] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

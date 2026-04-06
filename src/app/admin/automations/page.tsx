@@ -188,9 +188,14 @@ export default function AdminAutomationsPage() {
 
   const fetchRules = useCallback(async () => {
     setLoading(true);
-    const { data } = await supabase.from('automation_rules').select('*').order('created_at', { ascending: false });
-    setRules((data || []) as AutomationRule[]);
-    setLoading(false);
+    try {
+      const { data } = await supabase.from('automation_rules').select('*').order('created_at', { ascending: false });
+      setRules((data || []) as AutomationRule[]);
+    } catch (err) {
+      console.error("[automations/page.tsx] fetch error:", err);
+    } finally {
+      setLoading(false);
+    }
   }, [supabase]);
 
   useEffect(() => { fetchRules(); }, [fetchRules]);

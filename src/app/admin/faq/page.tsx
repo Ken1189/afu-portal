@@ -86,20 +86,25 @@ export default function FaqAdmin() {
 
   const fetchItems = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('faq_items')
-      .select('*')
-      .order('display_order', { ascending: true });
-    if (error) {
-      setToast({ message: 'Failed to load FAQ items', type: 'error' });
-    } else {
-      setItems(data || []);
-      // Auto-expand all categories
-      const cats: Record<string, boolean> = {};
-      (data || []).forEach((d) => { cats[d.category] = true; });
-      setExpandedCats(cats);
+    try {
+      const { data, error } = await supabase
+        .from('faq_items')
+        .select('*')
+        .order('display_order', { ascending: true });
+      if (error) {
+        setToast({ message: 'Failed to load FAQ items', type: 'error' });
+      } else {
+        setItems(data || []);
+        // Auto-expand all categories
+        const cats: Record<string, boolean> = {};
+        (data || []).forEach((d) => { cats[d.category] = true; });
+        setExpandedCats(cats);
+      }
+    } catch (err) {
+      console.error("[faq/page.tsx] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
   useEffect(() => { fetchItems(); }, [fetchItems]);

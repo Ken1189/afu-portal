@@ -61,23 +61,28 @@ export function useKyc() {
 
   const fetchKyc = useCallback(async () => {
     setLoading(true);
+    try {
 
-    const [docsRes, verRes] = await Promise.all([
-      supabase.from('kyc_documents').select('*').order('created_at', { ascending: false }),
-      supabase.from('kyc_verifications').select('*').order('created_at', { ascending: false }).limit(1),
-    ]);
+      const [docsRes, verRes] = await Promise.all([
+        supabase.from('kyc_documents').select('*').order('created_at', { ascending: false }),
+        supabase.from('kyc_verifications').select('*').order('created_at', { ascending: false }).limit(1),
+      ]);
 
-    if (docsRes.error) {
-      setError(docsRes.error.message);
-    } else {
-      setDocuments((docsRes.data as KycDocumentRow[]) || []);
+      if (docsRes.error) {
+        setError(docsRes.error.message);
+      } else {
+        setDocuments((docsRes.data as KycDocumentRow[]) || []);
+      }
+
+      if (verRes.data && verRes.data.length > 0) {
+        setVerification(verRes.data[0] as KycVerificationRow);
+      }
+
+    } catch (err) {
+      console.error("[use-kyc.ts] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-
-    if (verRes.data && verRes.data.length > 0) {
-      setVerification(verRes.data[0] as KycVerificationRow);
-    }
-
-    setLoading(false);
   }, [supabase]);
 
   useEffect(() => { fetchKyc(); }, [fetchKyc]);
@@ -112,14 +117,19 @@ export function useCreditScore() {
 
   const fetchScore = useCallback(async () => {
     setLoading(true);
-    const { data } = await supabase
-      .from('credit_scores')
-      .select('*')
-      .limit(1)
-      .single();
+    try {
+      const { data } = await supabase
+        .from('credit_scores')
+        .select('*')
+        .limit(1)
+        .single();
 
-    if (data) setCreditScore(data as CreditScoreRow);
-    setLoading(false);
+      if (data) setCreditScore(data as CreditScoreRow);
+    } catch (err) {
+      console.error("[use-kyc.ts] fetch error:", err);
+    } finally {
+      setLoading(false);
+    }
   }, [supabase]);
 
   useEffect(() => { fetchScore(); }, [fetchScore]);

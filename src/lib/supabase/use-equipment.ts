@@ -50,18 +50,23 @@ export function useEquipment(country?: string) {
 
   const fetchEquipment = useCallback(async () => {
     setLoading(true);
-    let query = supabase.from('equipment').select('*').order('name');
-    if (country) query = query.eq('country', country);
+    try {
+      let query = supabase.from('equipment').select('*').order('name');
+      if (country) query = query.eq('country', country);
 
-    const { data, error: fetchError } = await query;
+      const { data, error: fetchError } = await query;
 
-    if (fetchError) {
-      setError(fetchError.message);
-      setEquipment([]);
-    } else {
-      setEquipment((data as EquipmentRow[]) || []);
+      if (fetchError) {
+        setError(fetchError.message);
+        setEquipment([]);
+      } else {
+        setEquipment((data as EquipmentRow[]) || []);
+      }
+    } catch (err) {
+      console.error("[use-equipment.ts] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [supabase, country]);
 
   useEffect(() => {
@@ -99,22 +104,27 @@ export function useEquipmentBookings(memberId?: string) {
 
   const fetchBookings = useCallback(async () => {
     setLoading(true);
-    let query = supabase
-      .from('equipment_bookings')
-      .select('*, equipment:equipment(*)')
-      .order('created_at', { ascending: false });
+    try {
+      let query = supabase
+        .from('equipment_bookings')
+        .select('*, equipment:equipment(*)')
+        .order('created_at', { ascending: false });
 
-    if (memberId) query = query.eq('member_id', memberId);
+      if (memberId) query = query.eq('member_id', memberId);
 
-    const { data, error: fetchError } = await query;
+      const { data, error: fetchError } = await query;
 
-    if (fetchError) {
-      setError(fetchError.message);
-      setBookings([]);
-    } else {
-      setBookings((data as EquipmentBookingRow[]) || []);
+      if (fetchError) {
+        setError(fetchError.message);
+        setBookings([]);
+      } else {
+        setBookings((data as EquipmentBookingRow[]) || []);
+      }
+    } catch (err) {
+      console.error("[use-equipment.ts] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [supabase, memberId]);
 
   useEffect(() => {

@@ -70,13 +70,18 @@ export default function AdminContactsPage() {
 
   const fetchContacts = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase.from('conversations').select('*').order('last_message_at', { ascending: false });
-    if (error) {
-      console.error('[contacts] fetchContacts failed', error);
-      showToast(`Failed to load contacts: ${error.message || 'unknown error'}`, 'error');
+    try {
+      const { data, error } = await supabase.from('conversations').select('*').order('last_message_at', { ascending: false });
+      if (error) {
+        console.error('[contacts] fetchContacts failed', error);
+        showToast(`Failed to load contacts: ${error.message || 'unknown error'}`, 'error');
+      }
+      setContacts((data || []) as Contact[]);
+    } catch (err) {
+      console.error("[contacts/page.tsx] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setContacts((data || []) as Contact[]);
-    setLoading(false);
   }, [supabase, showToast]);
 
   useEffect(() => { fetchContacts(); }, [fetchContacts]);

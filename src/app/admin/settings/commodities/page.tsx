@@ -80,18 +80,23 @@ export default function CommoditiesPage() {
   // ── Load ────────────────────────────────────────────────────────────────
   const loadData = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('site_config')
-      .select('*')
-      .eq('key', 'trading_commodities')
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('site_config')
+        .select('*')
+        .eq('key', 'trading_commodities')
+        .single();
 
-    if (error && error.code !== 'PGRST116') {
-      setToast({ message: 'Failed to load commodities', type: 'error' });
+      if (error && error.code !== 'PGRST116') {
+        setToast({ message: 'Failed to load commodities', type: 'error' });
+      }
+
+      setCommodities(data?.value ? (data.value as TradingCommodity[]) : DEFAULT_COMMODITIES);
+    } catch (err) {
+      console.error("[commodities/page.tsx] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-
-    setCommodities(data?.value ? (data.value as TradingCommodity[]) : DEFAULT_COMMODITIES);
-    setLoading(false);
   }, []);
 
   useEffect(() => { loadData(); }, [loadData]);

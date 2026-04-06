@@ -60,19 +60,24 @@ export function useCourses() {
 
   const fetchCourses = useCallback(async () => {
     setLoading(true);
-    const { data, error: fetchError } = await supabase
-      .from('courses')
-      .select('*')
-      .eq('is_published', true)
-      .order('created_at', { ascending: false });
+    try {
+      const { data, error: fetchError } = await supabase
+        .from('courses')
+        .select('*')
+        .eq('is_published', true)
+        .order('created_at', { ascending: false });
 
-    if (fetchError) {
-      setError(fetchError.message);
-      setCourses([]);
-    } else {
-      setCourses((data as CourseRow[]) || []);
+      if (fetchError) {
+        setError(fetchError.message);
+        setCourses([]);
+      } else {
+        setCourses((data as CourseRow[]) || []);
+      }
+    } catch (err) {
+      console.error("[use-courses.ts] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [supabase]);
 
   useEffect(() => {
@@ -108,19 +113,24 @@ export function useCourseModules(courseId: string) {
 
   const fetchModules = useCallback(async () => {
     setLoading(true);
-    const { data, error: fetchError } = await supabase
-      .from('course_modules')
-      .select('*')
-      .eq('course_id', courseId)
-      .order('order_index', { ascending: true });
+    try {
+      const { data, error: fetchError } = await supabase
+        .from('course_modules')
+        .select('*')
+        .eq('course_id', courseId)
+        .order('order_index', { ascending: true });
 
-    if (fetchError) {
-      setError(fetchError.message);
-      setModules([]);
-    } else {
-      setModules((data as CourseModuleRow[]) || []);
+      if (fetchError) {
+        setError(fetchError.message);
+        setModules([]);
+      } else {
+        setModules((data as CourseModuleRow[]) || []);
+      }
+    } catch (err) {
+      console.error("[use-courses.ts] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [supabase, courseId]);
 
   useEffect(() => {
@@ -142,22 +152,27 @@ export function useCourseEnrollments(memberId?: string) {
 
   const fetchEnrollments = useCallback(async () => {
     setLoading(true);
-    let query = supabase
-      .from('course_enrollments')
-      .select('*, course:courses(*)')
-      .order('enrolled_at', { ascending: false });
+    try {
+      let query = supabase
+        .from('course_enrollments')
+        .select('*, course:courses(*)')
+        .order('enrolled_at', { ascending: false });
 
-    if (memberId) query = query.eq('member_id', memberId);
+      if (memberId) query = query.eq('member_id', memberId);
 
-    const { data, error: fetchError } = await query;
+      const { data, error: fetchError } = await query;
 
-    if (fetchError) {
-      setError(fetchError.message);
-      setEnrollments([]);
-    } else {
-      setEnrollments((data as CourseEnrollmentRow[]) || []);
+      if (fetchError) {
+        setError(fetchError.message);
+        setEnrollments([]);
+      } else {
+        setEnrollments((data as CourseEnrollmentRow[]) || []);
+      }
+    } catch (err) {
+      console.error("[use-courses.ts] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [supabase, memberId]);
 
   useEffect(() => {

@@ -91,16 +91,21 @@ export default function LegalAdmin() {
 
   const fetchPages = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('legal_pages')
-      .select('*')
-      .order('slug', { ascending: true });
-    if (error) {
-      setToast({ message: 'Failed to load legal pages', type: 'error' });
-    } else {
-      setPages(data || []);
+    try {
+      const { data, error } = await supabase
+        .from('legal_pages')
+        .select('*')
+        .order('slug', { ascending: true });
+      if (error) {
+        setToast({ message: 'Failed to load legal pages', type: 'error' });
+      } else {
+        setPages(data || []);
+      }
+    } catch (err) {
+      console.error("[legal/page.tsx] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
   useEffect(() => { fetchPages(); }, [fetchPages]);

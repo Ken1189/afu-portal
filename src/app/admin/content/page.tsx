@@ -297,18 +297,23 @@ function SiteContentTab({ showToast }: { showToast: (m: string, t?: 'success' | 
 
   async function loadContent() {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('site_content')
-      .select('*')
-      .order('page')
-      .order('section')
-      .order('key');
-    if (error) {
-      showToast('Failed to load content', 'error');
-    } else {
-      setContent(data || []);
+    try {
+      const { data, error } = await supabase
+        .from('site_content')
+        .select('*')
+        .order('page')
+        .order('section')
+        .order('key');
+      if (error) {
+        showToast('Failed to load content', 'error');
+      } else {
+        setContent(data || []);
+      }
+    } catch (err) {
+      console.error("[content/page.tsx] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -485,17 +490,22 @@ function FeatureFlagsTab({ showToast }: { showToast: (m: string, t?: 'success' |
 
   async function loadFlags() {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('feature_flags')
-      .select('*')
-      .order('category')
-      .order('name');
-    if (error) {
-      showToast('Failed to load feature flags', 'error');
-    } else {
-      setFlags(data || []);
+    try {
+      const { data, error } = await supabase
+        .from('feature_flags')
+        .select('*')
+        .order('category')
+        .order('name');
+      if (error) {
+        showToast('Failed to load feature flags', 'error');
+      } else {
+        setFlags(data || []);
+      }
+    } catch (err) {
+      console.error("[content/page.tsx] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -755,17 +765,22 @@ function SiteConfigTab({ showToast }: { showToast: (m: string, t?: 'success' | '
 
   async function loadConfigs() {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('site_config')
-      .select('*')
-      .order('category')
-      .order('label');
-    if (error) {
-      showToast('Failed to load config', 'error');
-    } else {
-      setConfigs(data || []);
+    try {
+      const { data, error } = await supabase
+        .from('site_config')
+        .select('*')
+        .order('category')
+        .order('label');
+      if (error) {
+        showToast('Failed to load config', 'error');
+      } else {
+        setConfigs(data || []);
+      }
+    } catch (err) {
+      console.error("[content/page.tsx] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -918,17 +933,22 @@ function NotificationTemplatesTab({ showToast }: { showToast: (m: string, t?: 's
 
   async function loadTemplates() {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('notification_templates')
-      .select('*')
-      .order('channel')
-      .order('name');
-    if (error) {
-      showToast('Failed to load templates', 'error');
-    } else {
-      setTemplates(data || []);
+    try {
+      const { data, error } = await supabase
+        .from('notification_templates')
+        .select('*')
+        .order('channel')
+        .order('name');
+      if (error) {
+        showToast('Failed to load templates', 'error');
+      } else {
+        setTemplates(data || []);
+      }
+    } catch (err) {
+      console.error("[content/page.tsx] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1194,16 +1214,21 @@ function BroadcastsTab({ showToast }: { showToast: (m: string, t?: 'success' | '
 
   async function loadBroadcasts() {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('broadcasts')
-      .select('*')
-      .order('created_at', { ascending: false });
-    if (error) {
-      showToast('Failed to load broadcasts', 'error');
-    } else {
-      setBroadcasts(data || []);
+    try {
+      const { data, error } = await supabase
+        .from('broadcasts')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error) {
+        showToast('Failed to load broadcasts', 'error');
+      } else {
+        setBroadcasts(data || []);
+      }
+    } catch (err) {
+      console.error("[content/page.tsx] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1451,27 +1476,32 @@ function CountryTeamsTab({ showToast }: { showToast: (m: string, t?: 'success' |
   // Load all country team data from site_content
   async function loadAllTeams() {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('site_content')
-      .select('*')
-      .eq('section', 'country_teams');
+    try {
+      const { data, error } = await supabase
+        .from('site_content')
+        .select('*')
+        .eq('section', 'country_teams');
 
-    if (error) {
-      showToast('Failed to load country teams', 'error');
-      setLoading(false);
-      return;
-    }
-
-    const teams: Record<string, CountryTeamData> = {};
-    for (const row of data || []) {
-      try {
-        teams[row.key] = JSON.parse(row.value);
-      } catch {
-        // skip invalid JSON
+      if (error) {
+        showToast('Failed to load country teams', 'error');
+        setLoading(false);
+        return;
       }
+
+      const teams: Record<string, CountryTeamData> = {};
+      for (const row of data || []) {
+        try {
+          teams[row.key] = JSON.parse(row.value);
+        } catch {
+          // skip invalid JSON
+        }
+      }
+      setAllTeams(teams);
+    } catch (err) {
+      console.error("[content/page.tsx] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setAllTeams(teams);
-    setLoading(false);
   }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps

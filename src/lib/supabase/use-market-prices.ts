@@ -32,24 +32,29 @@ export function useMarketPrices(country?: string, commodity?: string) {
 
   const fetchPrices = useCallback(async () => {
     setLoading(true);
-    let query = supabase
-      .from('market_prices')
-      .select('*')
-      .order('date', { ascending: false })
-      .limit(200);
+    try {
+      let query = supabase
+        .from('market_prices')
+        .select('*')
+        .order('date', { ascending: false })
+        .limit(200);
 
-    if (country) query = query.eq('country', country);
-    if (commodity) query = query.eq('commodity', commodity);
+      if (country) query = query.eq('country', country);
+      if (commodity) query = query.eq('commodity', commodity);
 
-    const { data, error: fetchError } = await query;
+      const { data, error: fetchError } = await query;
 
-    if (fetchError) {
-      setError(fetchError.message);
-      setPrices([]);
-    } else {
-      setPrices((data as MarketPriceRow[]) || []);
+      if (fetchError) {
+        setError(fetchError.message);
+        setPrices([]);
+      } else {
+        setPrices((data as MarketPriceRow[]) || []);
+      }
+    } catch (err) {
+      console.error("[use-market-prices.ts] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [supabase, country, commodity]);
 
   useEffect(() => {

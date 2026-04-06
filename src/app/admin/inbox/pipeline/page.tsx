@@ -72,13 +72,18 @@ export default function PipelinePage() {
 
   const fetchConversations = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase.from('conversations').select('*').order('last_message_at', { ascending: false });
-    if (error) {
-      console.error('[pipeline] fetchConversations failed', error);
-      showToast(`Failed to load conversations: ${error.message || 'unknown error'}`, 'error');
+    try {
+      const { data, error } = await supabase.from('conversations').select('*').order('last_message_at', { ascending: false });
+      if (error) {
+        console.error('[pipeline] fetchConversations failed', error);
+        showToast(`Failed to load conversations: ${error.message || 'unknown error'}`, 'error');
+      }
+      setConversations((data || []) as Conversation[]);
+    } catch (err) {
+      console.error("[pipeline/page.tsx] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setConversations((data || []) as Conversation[]);
-    setLoading(false);
   }, [supabase, showToast]);
 
   useEffect(() => { fetchConversations(); }, [fetchConversations]);

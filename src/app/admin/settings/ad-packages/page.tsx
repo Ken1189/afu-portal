@@ -84,17 +84,22 @@ export default function AdPackagesConfig() {
 
   const fetchData = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('ad_packages')
-      .select('*')
-      .order('price', { ascending: true });
+    try {
+      const { data, error } = await supabase
+        .from('ad_packages')
+        .select('*')
+        .order('price', { ascending: true });
 
-    if (error) {
-      setToast({ message: 'Failed to load ad packages', type: 'error' });
-    } else {
-      setPackages(data || []);
+      if (error) {
+        setToast({ message: 'Failed to load ad packages', type: 'error' });
+      } else {
+        setPackages(data || []);
+      }
+    } catch (err) {
+      console.error("[ad-packages/page.tsx] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
   useEffect(() => { fetchData(); }, [fetchData]);

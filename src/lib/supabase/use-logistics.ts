@@ -30,12 +30,17 @@ export function useShipments(memberId?: string) {
 
   const fetchShipments = useCallback(async () => {
     setLoading(true);
-    let query = supabase.from('shipments').select('*').order('created_at', { ascending: false });
-    if (memberId) query = query.eq('member_id', memberId);
-    const { data, error: fetchError } = await query;
-    if (fetchError) { setError(fetchError.message); setShipments([]); }
-    else { setShipments((data as ShipmentRow[]) || []); }
-    setLoading(false);
+    try {
+      let query = supabase.from('shipments').select('*').order('created_at', { ascending: false });
+      if (memberId) query = query.eq('member_id', memberId);
+      const { data, error: fetchError } = await query;
+      if (fetchError) { setError(fetchError.message); setShipments([]); }
+      else { setShipments((data as ShipmentRow[]) || []); }
+    } catch (err) {
+      console.error("[use-logistics.ts] fetch error:", err);
+    } finally {
+      setLoading(false);
+    }
   }, [supabase, memberId]);
 
   useEffect(() => { fetchShipments(); }, [fetchShipments]);

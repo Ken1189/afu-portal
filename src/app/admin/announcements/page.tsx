@@ -70,13 +70,18 @@ export default function AdminAnnouncementsPage() {
 
   const fetchAnnouncements = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase.from('announcements').select('*').order('display_order', { ascending: true });
-    if (error) {
-      setAnnouncements([]);
-    } else {
-      setAnnouncements((data || []) as Announcement[]);
+    try {
+      const { data, error } = await supabase.from('announcements').select('*').order('display_order', { ascending: true });
+      if (error) {
+        setAnnouncements([]);
+      } else {
+        setAnnouncements((data || []) as Announcement[]);
+      }
+    } catch (err) {
+      console.error("[announcements/page.tsx] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

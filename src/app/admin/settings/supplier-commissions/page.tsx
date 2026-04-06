@@ -66,18 +66,23 @@ export default function SupplierCommissionsConfig() {
 
   const fetchData = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('site_config')
-      .select('value')
-      .eq('key', CONFIG_KEY)
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('site_config')
+        .select('value')
+        .eq('key', CONFIG_KEY)
+        .single();
 
-    if (error || !data) {
-      setRates(SEED_DATA);
-    } else {
-      setRates(data.value as CommissionRate[]);
+      if (error || !data) {
+        setRates(SEED_DATA);
+      } else {
+        setRates(data.value as CommissionRate[]);
+      }
+    } catch (err) {
+      console.error("[supplier-commissions/page.tsx] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
   useEffect(() => { fetchData(); }, [fetchData]);

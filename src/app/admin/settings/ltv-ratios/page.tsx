@@ -63,18 +63,23 @@ export default function LtvRatiosPage() {
   // ── Load ────────────────────────────────────────────────────────────────
   const loadData = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('site_config')
-      .select('*')
-      .eq('key', 'receipt_ltv_ratios')
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('site_config')
+        .select('*')
+        .eq('key', 'receipt_ltv_ratios')
+        .single();
 
-    if (error && error.code !== 'PGRST116') {
-      setToast({ message: 'Failed to load LTV ratios', type: 'error' });
+      if (error && error.code !== 'PGRST116') {
+        setToast({ message: 'Failed to load LTV ratios', type: 'error' });
+      }
+
+      setRatios(data?.value ? (data.value as LtvRatio[]) : DEFAULT_LTV);
+    } catch (err) {
+      console.error("[ltv-ratios/page.tsx] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-
-    setRatios(data?.value ? (data.value as LtvRatio[]) : DEFAULT_LTV);
-    setLoading(false);
   }, []);
 
   useEffect(() => { loadData(); }, [loadData]);

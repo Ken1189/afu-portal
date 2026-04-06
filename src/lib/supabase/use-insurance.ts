@@ -55,14 +55,19 @@ export function useInsuranceProducts() {
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
-    const { data, error: fetchError } = await supabase
-      .from('insurance_products')
-      .select('*')
-      .eq('active', true)
-      .order('name');
-    if (fetchError) { setError(fetchError.message); setProducts([]); }
-    else { setProducts((data as InsuranceProductRow[]) || []); }
-    setLoading(false);
+    try {
+      const { data, error: fetchError } = await supabase
+        .from('insurance_products')
+        .select('*')
+        .eq('active', true)
+        .order('name');
+      if (fetchError) { setError(fetchError.message); setProducts([]); }
+      else { setProducts((data as InsuranceProductRow[]) || []); }
+    } catch (err) {
+      console.error("[use-insurance.ts] fetch error:", err);
+    } finally {
+      setLoading(false);
+    }
   }, [supabase]);
 
   useEffect(() => { fetchProducts(); }, [fetchProducts]);
@@ -78,14 +83,19 @@ export function useInsurancePolicies(memberId?: string) {
 
   const fetchPolicies = useCallback(async () => {
     setLoading(true);
-    let query = supabase.from('insurance_policies')
-      .select('*, product:insurance_products(*)')
-      .order('created_at', { ascending: false });
-    if (memberId) query = query.eq('member_id', memberId);
-    const { data, error: fetchError } = await query;
-    if (fetchError) { setError(fetchError.message); setPolicies([]); }
-    else { setPolicies((data as InsurancePolicyRow[]) || []); }
-    setLoading(false);
+    try {
+      let query = supabase.from('insurance_policies')
+        .select('*, product:insurance_products(*)')
+        .order('created_at', { ascending: false });
+      if (memberId) query = query.eq('member_id', memberId);
+      const { data, error: fetchError } = await query;
+      if (fetchError) { setError(fetchError.message); setPolicies([]); }
+      else { setPolicies((data as InsurancePolicyRow[]) || []); }
+    } catch (err) {
+      console.error("[use-insurance.ts] fetch error:", err);
+    } finally {
+      setLoading(false);
+    }
   }, [supabase, memberId]);
 
   useEffect(() => { fetchPolicies(); }, [fetchPolicies]);
@@ -108,12 +118,17 @@ export function useInsuranceClaims(memberId?: string) {
 
   const fetchClaims = useCallback(async () => {
     setLoading(true);
-    let query = supabase.from('insurance_claims').select('*').order('submitted_at', { ascending: false });
-    if (memberId) query = query.eq('member_id', memberId);
-    const { data, error: fetchError } = await query;
-    if (fetchError) { setError(fetchError.message); setClaims([]); }
-    else { setClaims((data as InsuranceClaimRow[]) || []); }
-    setLoading(false);
+    try {
+      let query = supabase.from('insurance_claims').select('*').order('submitted_at', { ascending: false });
+      if (memberId) query = query.eq('member_id', memberId);
+      const { data, error: fetchError } = await query;
+      if (fetchError) { setError(fetchError.message); setClaims([]); }
+      else { setClaims((data as InsuranceClaimRow[]) || []); }
+    } catch (err) {
+      console.error("[use-insurance.ts] fetch error:", err);
+    } finally {
+      setLoading(false);
+    }
   }, [supabase, memberId]);
 
   useEffect(() => { fetchClaims(); }, [fetchClaims]);

@@ -146,6 +146,20 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  // Auth-loading safety timeout — auto-show content even if profile not loaded
+  const [authTimedOut, setAuthTimedOut] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setAuthTimedOut(true), 5000);
+    return () => clearTimeout(t);
+  }, []);
+
+  // Redirect to login if auth finished and no user
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push('/login?redirect=/farm');
+    }
+  }, [authLoading, user, router]);
+
   const handleTourComplete = useCallback(() => {
     setShowTour(false);
   }, []);
@@ -153,7 +167,16 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
   const supabase = createClient();
 
   // Auth loading state — show spinner with timeout
-  if (authLoading || !user) {
+  // Only block when auth is genuinely still loading AND we haven't timed out.
+  // If !user we still render shell so the redirect effect can fire without an infinite spinner.
+  if (authLoading && !authTimedOut) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#5DB347]" />
+      </div>
+    );
+  }
+  if (!user && !authTimedOut) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#5DB347]" />

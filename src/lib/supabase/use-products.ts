@@ -61,24 +61,29 @@ export function useProducts(supplierId?: string) {
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
-    let query = supabase
-      .from('products')
-      .select('*, supplier:suppliers(company_name, logo_url, country, verified)')
-      .order('created_at', { ascending: false });
+    try {
+      let query = supabase
+        .from('products')
+        .select('*, supplier:suppliers(company_name, logo_url, country, verified)')
+        .order('created_at', { ascending: false });
 
-    if (supplierId) {
-      query = query.eq('supplier_id', supplierId);
+      if (supplierId) {
+        query = query.eq('supplier_id', supplierId);
+      }
+
+      const { data, error: fetchError } = await query;
+
+      if (fetchError) {
+        setError(fetchError.message);
+        setProducts([]);
+      } else {
+        setProducts((data as ProductRow[]) || []);
+      }
+    } catch (err) {
+      console.error("[use-products.ts] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-
-    const { data, error: fetchError } = await query;
-
-    if (fetchError) {
-      setError(fetchError.message);
-      setProducts([]);
-    } else {
-      setProducts((data as ProductRow[]) || []);
-    }
-    setLoading(false);
   }, [supabase, supplierId]);
 
   useEffect(() => { fetchProducts(); }, [fetchProducts]);

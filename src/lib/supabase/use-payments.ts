@@ -57,23 +57,28 @@ export function usePayments(filters?: { status?: string; purpose?: string }) {
 
   const fetchPayments = useCallback(async () => {
     setLoading(true);
-    let query = supabase
-      .from('payments')
-      .select('*')
-      .order('created_at', { ascending: false });
+    try {
+      let query = supabase
+        .from('payments')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-    if (filters?.status) query = query.eq('status', filters.status);
-    if (filters?.purpose) query = query.eq('purpose', filters.purpose);
+      if (filters?.status) query = query.eq('status', filters.status);
+      if (filters?.purpose) query = query.eq('purpose', filters.purpose);
 
-    const { data, error: fetchError } = await query;
+      const { data, error: fetchError } = await query;
 
-    if (fetchError) {
-      setError(fetchError.message);
-      setPayments([]);
-    } else {
-      setPayments((data as PaymentRow[]) || []);
+      if (fetchError) {
+        setError(fetchError.message);
+        setPayments([]);
+      } else {
+        setPayments((data as PaymentRow[]) || []);
+      }
+    } catch (err) {
+      console.error("[use-payments.ts] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [supabase, filters?.status, filters?.purpose]);
 
   useEffect(() => { fetchPayments(); }, [fetchPayments]);
@@ -90,15 +95,20 @@ export function usePaymentDetail(paymentId: string | null) {
   const fetchDetail = useCallback(async () => {
     if (!paymentId) { setLoading(false); return; }
     setLoading(true);
+    try {
 
-    const [paymentRes, attemptsRes] = await Promise.all([
-      supabase.from('payments').select('*').eq('id', paymentId).single(),
-      supabase.from('payment_attempts').select('*').eq('payment_id', paymentId).order('created_at', { ascending: false }),
-    ]);
+      const [paymentRes, attemptsRes] = await Promise.all([
+        supabase.from('payments').select('*').eq('id', paymentId).single(),
+        supabase.from('payment_attempts').select('*').eq('payment_id', paymentId).order('created_at', { ascending: false }),
+      ]);
 
-    if (paymentRes.data) setPayment(paymentRes.data as PaymentRow);
-    if (attemptsRes.data) setAttempts((attemptsRes.data as PaymentAttemptRow[]) || []);
-    setLoading(false);
+      if (paymentRes.data) setPayment(paymentRes.data as PaymentRow);
+      if (attemptsRes.data) setAttempts((attemptsRes.data as PaymentAttemptRow[]) || []);
+    } catch (err) {
+      console.error("[use-payments.ts] fetch error:", err);
+    } finally {
+      setLoading(false);
+    }
   }, [supabase, paymentId]);
 
   useEffect(() => { fetchDetail(); }, [fetchDetail]);
@@ -113,17 +123,22 @@ export function usePaymentGateways(country?: string) {
 
   const fetchGateways = useCallback(async () => {
     setLoading(true);
-    let query = supabase
-      .from('payment_gateways')
-      .select('*')
-      .eq('is_active', true)
-      .order('name');
+    try {
+      let query = supabase
+        .from('payment_gateways')
+        .select('*')
+        .eq('is_active', true)
+        .order('name');
 
-    if (country) query = query.eq('country', country);
+      if (country) query = query.eq('country', country);
 
-    const { data, error } = await query;
-    if (!error && data) setGateways(data as PaymentGatewayRow[]);
-    setLoading(false);
+      const { data, error } = await query;
+      if (!error && data) setGateways(data as PaymentGatewayRow[]);
+    } catch (err) {
+      console.error("[use-payments.ts] fetch error:", err);
+    } finally {
+      setLoading(false);
+    }
   }, [supabase, country]);
 
   useEffect(() => { fetchGateways(); }, [fetchGateways]);

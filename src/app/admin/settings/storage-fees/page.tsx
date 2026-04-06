@@ -67,18 +67,23 @@ export default function StorageFeesPage() {
   // ── Load ────────────────────────────────────────────────────────────────
   const loadData = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('site_config')
-      .select('*')
-      .eq('key', 'storage_fee_schedules')
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('site_config')
+        .select('*')
+        .eq('key', 'storage_fee_schedules')
+        .single();
 
-    if (error && error.code !== 'PGRST116') {
-      setToast({ message: 'Failed to load storage fees', type: 'error' });
+      if (error && error.code !== 'PGRST116') {
+        setToast({ message: 'Failed to load storage fees', type: 'error' });
+      }
+
+      setFees(data?.value ? (data.value as StorageFee[]) : DEFAULT_FEES);
+    } catch (err) {
+      console.error("[storage-fees/page.tsx] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-
-    setFees(data?.value ? (data.value as StorageFee[]) : DEFAULT_FEES);
-    setLoading(false);
   }, []);
 
   useEffect(() => { loadData(); }, [loadData]);

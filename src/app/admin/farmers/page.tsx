@@ -224,42 +224,47 @@ function AllFarmersTab() {
 
   const fetchFarmers = useCallback(async () => {
     setLoading(true);
-    const failures: string[] = [];
-
-    // Each query is independent — if one table is missing, others still load
     try {
-      const { data: profileData, error: profileErr } = await supabase
-        .from('profiles')
-        .select('*')
-        .in('role', ['member', 'farmer'])
-        .order('created_at', { ascending: false });
-      if (profileErr) { console.error('[farmers] profiles', profileErr); failures.push('farmers'); }
-      setFarmers(profileData || []);
-    } catch (err) { console.error('[farmers] profiles exception', err); setFarmers([]); }
+      const failures: string[] = [];
 
-    try {
-      const { data: plotData, error: plotErr } = await supabase.from('farm_plots').select('*');
-      if (plotErr) { console.error('[farmers] farm_plots', plotErr); }
-      setFarmPlots(plotData || []);
-    } catch { setFarmPlots([]); }
+      // Each query is independent — if one table is missing, others still load
+      try {
+        const { data: profileData, error: profileErr } = await supabase
+          .from('profiles')
+          .select('*')
+          .in('role', ['member', 'farmer'])
+          .order('created_at', { ascending: false });
+        if (profileErr) { console.error('[farmers] profiles', profileErr); failures.push('farmers'); }
+        setFarmers(profileData || []);
+      } catch (err) { console.error('[farmers] profiles exception', err); setFarmers([]); }
 
-    try {
-      const { data: loanData, error: loanErr } = await supabase.from('loans').select('*');
-      if (loanErr) { console.error('[farmers] loans', loanErr); }
-      setLoans(loanData || []);
-    } catch { setLoans([]); }
+      try {
+        const { data: plotData, error: plotErr } = await supabase.from('farm_plots').select('*');
+        if (plotErr) { console.error('[farmers] farm_plots', plotErr); }
+        setFarmPlots(plotData || []);
+      } catch { setFarmPlots([]); }
 
-    try {
-      const { data: insData, error: insErr } = await supabase.from('insurance_policies').select('*');
-      if (insErr) { console.error('[farmers] insurance', insErr); }
-      setInsurance(insData || []);
-    } catch { setInsurance([]); }
+      try {
+        const { data: loanData, error: loanErr } = await supabase.from('loans').select('*');
+        if (loanErr) { console.error('[farmers] loans', loanErr); }
+        setLoans(loanData || []);
+      } catch { setLoans([]); }
 
-    // Only toast on failure for the critical farmers query
-    if (failures.length > 0) {
-      showToast(`Failed to load farmers — check console`, 'error');
+      try {
+        const { data: insData, error: insErr } = await supabase.from('insurance_policies').select('*');
+        if (insErr) { console.error('[farmers] insurance', insErr); }
+        setInsurance(insData || []);
+      } catch { setInsurance([]); }
+
+      // Only toast on failure for the critical farmers query
+      if (failures.length > 0) {
+        showToast(`Failed to load farmers — check console`, 'error');
+      }
+    } catch (err) {
+      console.error("[farmers/page.tsx] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [supabase]);
 
   useEffect(() => { fetchFarmers(); }, [fetchFarmers]);

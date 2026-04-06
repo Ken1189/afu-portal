@@ -22,14 +22,19 @@ export function useAuditLog(limit = 100) {
 
   const fetchLogs = useCallback(async () => {
     setLoading(true);
-    const { data, error: fetchError } = await supabase
-      .from('audit_log')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(limit);
-    if (fetchError) { setError(fetchError.message); setLogs([]); }
-    else { setLogs((data as AuditLogRow[]) || []); }
-    setLoading(false);
+    try {
+      const { data, error: fetchError } = await supabase
+        .from('audit_log')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(limit);
+      if (fetchError) { setError(fetchError.message); setLogs([]); }
+      else { setLogs((data as AuditLogRow[]) || []); }
+    } catch (err) {
+      console.error("[use-audit-log.ts] fetch error:", err);
+    } finally {
+      setLoading(false);
+    }
   }, [supabase, limit]);
 
   useEffect(() => { fetchLogs(); }, [fetchLogs]);

@@ -37,13 +37,18 @@ export function useOrders(memberId?: string) {
   const fetchOrders = useCallback(async () => {
     if (!memberId) { setLoading(false); return; }
     setLoading(true);
-    const { data } = await supabase
-      .from('orders')
-      .select('*')
-      .eq('member_id', memberId)
-      .order('created_at', { ascending: false });
-    setOrders((data as OrderRow[]) || []);
-    setLoading(false);
+    try {
+      const { data } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('member_id', memberId)
+        .order('created_at', { ascending: false });
+      setOrders((data as OrderRow[]) || []);
+    } catch (err) {
+      console.error("[use-orders.ts] fetch error:", err);
+    } finally {
+      setLoading(false);
+    }
   }, [supabase, memberId]);
 
   useEffect(() => { fetchOrders(); }, [fetchOrders]);

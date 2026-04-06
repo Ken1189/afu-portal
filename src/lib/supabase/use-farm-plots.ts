@@ -65,22 +65,27 @@ export function useFarmPlots(memberId?: string) {
 
   const fetchPlots = useCallback(async () => {
     setLoading(true);
-    let query = supabase
-      .from('farm_plots')
-      .select('*')
-      .order('created_at', { ascending: false });
+    try {
+      let query = supabase
+        .from('farm_plots')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-    if (memberId) query = query.eq('member_id', memberId);
+      if (memberId) query = query.eq('member_id', memberId);
 
-    const { data, error: fetchError } = await query;
+      const { data, error: fetchError } = await query;
 
-    if (fetchError) {
-      setError(fetchError.message);
-      setPlots([]);
-    } else {
-      setPlots((data as FarmPlotRow[]) || []);
+      if (fetchError) {
+        setError(fetchError.message);
+        setPlots([]);
+      } else {
+        setPlots((data as FarmPlotRow[]) || []);
+      }
+    } catch (err) {
+      console.error("[use-farm-plots.ts] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [supabase, memberId]);
 
   useEffect(() => {
@@ -156,22 +161,27 @@ export function useFarmActivities(plotId?: string) {
 
   const fetchActivities = useCallback(async () => {
     setLoading(true);
-    let query = supabase
-      .from('farm_activities')
-      .select('*')
-      .order('date', { ascending: false });
+    try {
+      let query = supabase
+        .from('farm_activities')
+        .select('*')
+        .order('date', { ascending: false });
 
-    if (plotId) query = query.eq('plot_id', plotId);
+      if (plotId) query = query.eq('plot_id', plotId);
 
-    const { data, error: fetchError } = await query;
+      const { data, error: fetchError } = await query;
 
-    if (fetchError) {
-      setError(fetchError.message);
-      setActivities([]);
-    } else {
-      setActivities((data as FarmActivityRow[]) || []);
+      if (fetchError) {
+        setError(fetchError.message);
+        setActivities([]);
+      } else {
+        setActivities((data as FarmActivityRow[]) || []);
+      }
+    } catch (err) {
+      console.error("[use-farm-plots.ts] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [supabase, plotId]);
 
   useEffect(() => {
@@ -224,22 +234,27 @@ export function useFarmTransactions(memberId?: string) {
 
   const fetchTransactions = useCallback(async () => {
     setLoading(true);
-    let query = supabase
-      .from('farm_transactions')
-      .select('*')
-      .order('date', { ascending: false });
+    try {
+      let query = supabase
+        .from('farm_transactions')
+        .select('*')
+        .order('date', { ascending: false });
 
-    if (memberId) query = query.eq('member_id', memberId);
+      if (memberId) query = query.eq('member_id', memberId);
 
-    const { data, error: fetchError } = await query;
+      const { data, error: fetchError } = await query;
 
-    if (fetchError) {
-      setError(fetchError.message);
-      setTransactions([]);
-    } else {
-      setTransactions((data as FarmTransactionRow[]) || []);
+      if (fetchError) {
+        setError(fetchError.message);
+        setTransactions([]);
+      } else {
+        setTransactions((data as FarmTransactionRow[]) || []);
+      }
+    } catch (err) {
+      console.error("[use-farm-plots.ts] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [supabase, memberId]);
 
   useEffect(() => {

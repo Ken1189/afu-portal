@@ -44,18 +44,23 @@ export function useApplications() {
 
   const fetchApplications = useCallback(async () => {
     setLoading(true);
-    const { data, error: fetchError } = await supabase
-      .from('membership_applications')
-      .select('*')
-      .order('created_at', { ascending: false });
+    try {
+      const { data, error: fetchError } = await supabase
+        .from('membership_applications')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-    if (fetchError) {
-      setError(fetchError.message);
-      setApplications([]);
-    } else {
-      setApplications((data as ApplicationRow[]) || []);
+      if (fetchError) {
+        setError(fetchError.message);
+        setApplications([]);
+      } else {
+        setApplications((data as ApplicationRow[]) || []);
+      }
+    } catch (err) {
+      console.error("[use-applications.ts] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [supabase]);
 
   useEffect(() => { fetchApplications(); }, [fetchApplications]);

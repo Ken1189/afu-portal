@@ -109,16 +109,21 @@ export default function PartnershipsAdmin() {
 
   const fetchPartners = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('managed_partners')
-      .select('*')
-      .order('display_order', { ascending: true });
-    if (error) {
-      setToast({ message: 'Failed to load partners', type: 'error' });
-    } else {
-      setPartners(data || []);
+    try {
+      const { data, error } = await supabase
+        .from('managed_partners')
+        .select('*')
+        .order('display_order', { ascending: true });
+      if (error) {
+        setToast({ message: 'Failed to load partners', type: 'error' });
+      } else {
+        setPartners(data || []);
+      }
+    } catch (err) {
+      console.error("[partnerships/page.tsx] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
   useEffect(() => { fetchPartners(); }, [fetchPartners]);

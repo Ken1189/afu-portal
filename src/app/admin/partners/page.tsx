@@ -72,18 +72,23 @@ export default function AdminPartnersPage() {
 
   const fetchPartners = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('managed_partners')
-      .select('*')
-      .order('display_order', { ascending: true });
-    if (error) {
-      console.error('[partners] fetch failed', error);
-      setToast({ message: `Failed to load partners: ${error.message || 'unknown error'}`, type: 'error' });
-      setPartners([]);
-    } else {
-      setPartners((data || []) as Partner[]);
+    try {
+      const { data, error } = await supabase
+        .from('managed_partners')
+        .select('*')
+        .order('display_order', { ascending: true });
+      if (error) {
+        console.error('[partners] fetch failed', error);
+        setToast({ message: `Failed to load partners: ${error.message || 'unknown error'}`, type: 'error' });
+        setPartners([]);
+      } else {
+        setPartners((data || []) as Partner[]);
+      }
+    } catch (err) {
+      console.error("[partners/page.tsx] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

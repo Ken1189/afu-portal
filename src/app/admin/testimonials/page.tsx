@@ -123,17 +123,22 @@ export default function TestimonialsAdmin() {
 
   const fetchTestimonials = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('testimonials')
-      .select('*')
-      .order('display_order', { ascending: true });
+    try {
+      const { data, error } = await supabase
+        .from('testimonials')
+        .select('*')
+        .order('display_order', { ascending: true });
 
-    if (error) {
-      setToast({ message: 'Failed to load testimonials', type: 'error' });
-    } else {
-      setTestimonials(data || []);
+      if (error) {
+        setToast({ message: 'Failed to load testimonials', type: 'error' });
+      } else {
+        setTestimonials(data || []);
+      }
+    } catch (err) {
+      console.error("[testimonials/page.tsx] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
   useEffect(() => { fetchTestimonials(); }, [fetchTestimonials]);

@@ -121,22 +121,27 @@ export default function GradingStandardsPage() {
   // ── Load ──────────────────────────────────────────────────────────────────
   const loadData = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('site_config')
-      .select('*')
-      .eq('key', 'grading_standards')
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('site_config')
+        .select('*')
+        .eq('key', 'grading_standards')
+        .single();
 
-    if (error && error.code !== 'PGRST116') {
-      setToast({ message: 'Failed to load grading standards', type: 'error' });
-    }
+      if (error && error.code !== 'PGRST116') {
+        setToast({ message: 'Failed to load grading standards', type: 'error' });
+      }
 
-    if (data?.value) {
-      setStandards(data.value as CommodityGrading[]);
-    } else {
-      setStandards(DEFAULT_STANDARDS);
+      if (data?.value) {
+        setStandards(data.value as CommodityGrading[]);
+      } else {
+        setStandards(DEFAULT_STANDARDS);
+      }
+    } catch (err) {
+      console.error("[grading-standards/page.tsx] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
   useEffect(() => { loadData(); }, [loadData]);

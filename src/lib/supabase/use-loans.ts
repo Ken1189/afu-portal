@@ -32,19 +32,24 @@ export function useLoans() {
   const fetchLoans = useCallback(async () => {
     if (!user) return;
     setLoading(true);
-    const supabase = createClient();
+    try {
+      const supabase = createClient();
 
-    // Fetch loans — for members, filter by their member record
-    // For admins, this would fetch all (handled by RLS or separate admin hook)
-    const { data, error } = await supabase
-      .from('loans')
-      .select('*')
-      .order('created_at', { ascending: false });
+      // Fetch loans — for members, filter by their member record
+      // For admins, this would fetch all (handled by RLS or separate admin hook)
+      const { data, error } = await supabase
+        .from('loans')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-    if (!error && data) {
-      setLoans(data as LoanRow[]);
+      if (!error && data) {
+        setLoans(data as LoanRow[]);
+      }
+    } catch (err) {
+      console.error("[use-loans.ts] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [user]);
 
   useEffect(() => {

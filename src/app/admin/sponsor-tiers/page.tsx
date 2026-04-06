@@ -88,16 +88,21 @@ export default function SponsorTiersAdmin() {
 
   const fetchTiers = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('sponsor_tiers')
-      .select('*')
-      .order('display_order', { ascending: true });
-    if (error) {
-      setToast({ message: 'Failed to load sponsor tiers', type: 'error' });
-    } else {
-      setTiers(data || []);
+    try {
+      const { data, error } = await supabase
+        .from('sponsor_tiers')
+        .select('*')
+        .order('display_order', { ascending: true });
+      if (error) {
+        setToast({ message: 'Failed to load sponsor tiers', type: 'error' });
+      } else {
+        setTiers(data || []);
+      }
+    } catch (err) {
+      console.error("[sponsor-tiers/page.tsx] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
   useEffect(() => { fetchTiers(); }, [fetchTiers]);

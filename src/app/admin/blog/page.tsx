@@ -127,32 +127,37 @@ export default function AdminBlogPage() {
 
   const fetchPosts = useCallback(async () => {
     setLoading(true);
-    // Try blog_posts table first, fall back to site_content
-    const { data: blogData, error: blogErr } = await supabase
-      .from('blog_posts')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (!blogErr && blogData && blogData.length > 0) {
-      setPosts(blogData.map((p: Record<string, unknown>) => ({
-        id: String(p.id), title: String(p.title || ''), slug: String(p.slug || ''),
-        excerpt: String(p.excerpt || ''), body: String(p.content || ''),
-        category: String(p.category || 'news'), featured_image: String(p.cover_image || ''),
-        author: String(p.author_name || 'AFU Editorial'),
-        published: p.status === 'published', featured: false,
-        created_at: String(p.created_at), updated_at: String(p.updated_at || p.created_at),
-      })));
-    } else {
-      // Fallback to site_content
-      const { data, error } = await supabase
-        .from('site_content')
+    try {
+      // Try blog_posts table first, fall back to site_content
+      const { data: blogData, error: blogErr } = await supabase
+        .from('blog_posts')
         .select('*')
-        .eq('content_type', 'blog_post')
-        .order('updated_at', { ascending: false });
-      if (error) { setPosts([]); }
-      else { setPosts((data || []).map(parsePost)); }
+        .order('created_at', { ascending: false });
+
+      if (!blogErr && blogData && blogData.length > 0) {
+        setPosts(blogData.map((p: Record<string, unknown>) => ({
+          id: String(p.id), title: String(p.title || ''), slug: String(p.slug || ''),
+          excerpt: String(p.excerpt || ''), body: String(p.content || ''),
+          category: String(p.category || 'news'), featured_image: String(p.cover_image || ''),
+          author: String(p.author_name || 'AFU Editorial'),
+          published: p.status === 'published', featured: false,
+          created_at: String(p.created_at), updated_at: String(p.updated_at || p.created_at),
+        })));
+      } else {
+        // Fallback to site_content
+        const { data, error } = await supabase
+          .from('site_content')
+          .select('*')
+          .eq('content_type', 'blog_post')
+          .order('updated_at', { ascending: false });
+        if (error) { setPosts([]); }
+        else { setPosts((data || []).map(parsePost)); }
+      }
+    } catch (err) {
+      console.error("[blog/page.tsx] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

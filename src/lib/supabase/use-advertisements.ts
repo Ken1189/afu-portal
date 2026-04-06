@@ -29,12 +29,17 @@ export function useAdvertisements(supplierId?: string) {
 
   const fetchAds = useCallback(async () => {
     setLoading(true);
-    let query = supabase.from('advertisements').select('*').order('created_at', { ascending: false });
-    if (supplierId) query = query.eq('supplier_id', supplierId);
-    const { data, error: fetchError } = await query;
-    if (fetchError) { setError(fetchError.message); setAds([]); }
-    else { setAds((data as AdvertisementRow[]) || []); }
-    setLoading(false);
+    try {
+      let query = supabase.from('advertisements').select('*').order('created_at', { ascending: false });
+      if (supplierId) query = query.eq('supplier_id', supplierId);
+      const { data, error: fetchError } = await query;
+      if (fetchError) { setError(fetchError.message); setAds([]); }
+      else { setAds((data as AdvertisementRow[]) || []); }
+    } catch (err) {
+      console.error("[use-advertisements.ts] fetch error:", err);
+    } finally {
+      setLoading(false);
+    }
   }, [supabase, supplierId]);
 
   useEffect(() => { fetchAds(); }, [fetchAds]);

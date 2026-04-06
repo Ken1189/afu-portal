@@ -48,22 +48,27 @@ export function useLivestock(memberId?: string) {
 
   const fetchLivestock = useCallback(async () => {
     setLoading(true);
-    let query = supabase
-      .from('livestock')
-      .select('*')
-      .order('created_at', { ascending: false });
+    try {
+      let query = supabase
+        .from('livestock')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-    if (memberId) query = query.eq('member_id', memberId);
+      if (memberId) query = query.eq('member_id', memberId);
 
-    const { data, error: fetchError } = await query;
+      const { data, error: fetchError } = await query;
 
-    if (fetchError) {
-      setError(fetchError.message);
-      setLivestock([]);
-    } else {
-      setLivestock((data as LivestockRow[]) || []);
+      if (fetchError) {
+        setError(fetchError.message);
+        setLivestock([]);
+      } else {
+        setLivestock((data as LivestockRow[]) || []);
+      }
+    } catch (err) {
+      console.error("[use-livestock.ts] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [supabase, memberId]);
 
   useEffect(() => {
@@ -134,19 +139,24 @@ export function useLivestockHealthRecords(livestockId: string) {
 
   const fetchRecords = useCallback(async () => {
     setLoading(true);
-    const { data, error: fetchError } = await supabase
-      .from('livestock_health_records')
-      .select('*')
-      .eq('livestock_id', livestockId)
-      .order('date', { ascending: false });
+    try {
+      const { data, error: fetchError } = await supabase
+        .from('livestock_health_records')
+        .select('*')
+        .eq('livestock_id', livestockId)
+        .order('date', { ascending: false });
 
-    if (fetchError) {
-      setError(fetchError.message);
-      setRecords([]);
-    } else {
-      setRecords((data as LivestockHealthRecordRow[]) || []);
+      if (fetchError) {
+        setError(fetchError.message);
+        setRecords([]);
+      } else {
+        setRecords((data as LivestockHealthRecordRow[]) || []);
+      }
+    } catch (err) {
+      console.error("[use-livestock.ts] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [supabase, livestockId]);
 
   useEffect(() => {

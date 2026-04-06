@@ -95,28 +95,33 @@ export default function OnboardingOptionsConfig() {
 
   const fetchData = useCallback(async () => {
     setLoading(true);
-    const keys = Object.values(CONFIG_KEYS);
-    const { data: rows } = await supabase
-      .from('site_config')
-      .select('key, value')
-      .in('key', keys);
+    try {
+      const keys = Object.values(CONFIG_KEYS);
+      const { data: rows } = await supabase
+        .from('site_config')
+        .select('key, value')
+        .in('key', keys);
 
-    if (rows) {
-      const loaded = { ...DEFAULT_OPTIONS };
-      for (const row of rows) {
-        const val = row.value;
-        if (!val || !Array.isArray(val) || val.length === 0) continue;
-        switch (row.key) {
-          case CONFIG_KEYS.countries: loaded.countries = val as CountryItem[]; break;
-          case CONFIG_KEYS.crops: loaded.crops = val as string[]; break;
-          case CONFIG_KEYS.supplier_categories: loaded.supplier_categories = val as string[]; break;
-          case CONFIG_KEYS.languages: loaded.languages = val as string[]; break;
-          case CONFIG_KEYS.partnership_types: loaded.partnership_types = val as string[]; break;
+      if (rows) {
+        const loaded = { ...DEFAULT_OPTIONS };
+        for (const row of rows) {
+          const val = row.value;
+          if (!val || !Array.isArray(val) || val.length === 0) continue;
+          switch (row.key) {
+            case CONFIG_KEYS.countries: loaded.countries = val as CountryItem[]; break;
+            case CONFIG_KEYS.crops: loaded.crops = val as string[]; break;
+            case CONFIG_KEYS.supplier_categories: loaded.supplier_categories = val as string[]; break;
+            case CONFIG_KEYS.languages: loaded.languages = val as string[]; break;
+            case CONFIG_KEYS.partnership_types: loaded.partnership_types = val as string[]; break;
+          }
         }
+        setOptions(loaded);
       }
-      setOptions(loaded);
+    } catch (err) {
+      console.error("[onboarding-options/page.tsx] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

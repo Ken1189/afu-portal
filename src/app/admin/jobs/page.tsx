@@ -503,28 +503,33 @@ export default function AdminJobsPage() {
 
   const fetchJobs = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('job_listings')
-      .select('*')
-      .order('created_at', { ascending: false });
+    try {
+      const { data, error } = await supabase
+        .from('job_listings')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-    if (error) {
-      setToast({ message: 'Failed to load job listings', type: 'error' });
-      setJobs([]);
-    } else {
-      setJobs(
-        (data || []).map((j: Record<string, unknown>) => ({
-          ...j,
-          is_approved: (j.is_approved as boolean) ?? false,
-          is_featured: (j.is_featured as boolean) ?? false,
-          applications_count:
-            typeof j.applications_count === 'number'
-              ? j.applications_count
-              : 0,
-        })) as JobListing[]
-      );
+      if (error) {
+        setToast({ message: 'Failed to load job listings', type: 'error' });
+        setJobs([]);
+      } else {
+        setJobs(
+          (data || []).map((j: Record<string, unknown>) => ({
+            ...j,
+            is_approved: (j.is_approved as boolean) ?? false,
+            is_featured: (j.is_featured as boolean) ?? false,
+            applications_count:
+              typeof j.applications_count === 'number'
+                ? j.applications_count
+                : 0,
+          })) as JobListing[]
+        );
+      }
+    } catch (err) {
+      console.error("[jobs/page.tsx] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

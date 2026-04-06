@@ -568,79 +568,84 @@ export default function AdminInvestmentOpportunitiesPage() {
 
   const fetchOpportunities = useCallback(async () => {
     setLoading(true);
-
-    // Try dedicated table first
-    const { data, error } = await supabase
-      .from('investment_opportunities')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (!error && data && data.length > 0) {
-      setOpportunities(
-        data.map((row: Record<string, unknown>) => ({
-          id: String(row.id),
-          name: String(row.name || ''),
-          type: String(row.type || 'Debt'),
-          description: String(row.description || ''),
-          target: Number(row.target || 0),
-          min_investment: Number(row.min_investment || 0),
-          target_irr: String(row.target_irr || ''),
-          term: String(row.term || ''),
-          subscribed_percent: Number(row.subscribed_percent || 0),
-          subscribed_amount: Number(row.subscribed_amount || 0),
-          status: String(row.status || 'Open'),
-          sector: String(row.sector || ''),
-          country: String(row.country || ''),
-          risk_level: String(row.risk_level || 'Medium'),
-          created_at: String(row.created_at || ''),
-        })) as Opportunity[]
-      );
-      setLoading(false);
-      return;
-    }
-
-    // Fallback: try site_content JSON
     try {
-      const { data: scData } = await supabase
-        .from('site_content')
+
+      // Try dedicated table first
+      const { data, error } = await supabase
+        .from('investment_opportunities')
         .select('*')
-        .eq('section', 'investment_opportunities')
-        .single();
+        .order('created_at', { ascending: false });
 
-      if (scData) {
-        const raw = scData.content || scData.value;
-        const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setOpportunities(
-            parsed.map((row: Record<string, unknown>) => ({
-              id: String(row.id || crypto.randomUUID()),
-              name: String(row.name || row.title || ''),
-              type: String(row.type || row.fund_type || 'Debt'),
-              description: String(row.description || ''),
-              target: Number(row.target || 0),
-              min_investment: Number(row.min_investment || row.minInvestment || 0),
-              target_irr: String(row.target_irr || row.targetIRR || ''),
-              term: String(row.term || ''),
-              subscribed_percent: Number(row.subscribed_percent || row.subscribed || 0),
-              subscribed_amount: Number(row.subscribed_amount || row.subscribedAmount || 0),
-              status: String(row.status || 'Open'),
-              sector: String(row.sector || ''),
-              country: String(row.country || ''),
-              risk_level: String(row.risk_level || 'Medium'),
-              created_at: String(row.created_at || new Date().toISOString()),
-            }))
-          );
-          setLoading(false);
-          return;
-        }
+      if (!error && data && data.length > 0) {
+        setOpportunities(
+          data.map((row: Record<string, unknown>) => ({
+            id: String(row.id),
+            name: String(row.name || ''),
+            type: String(row.type || 'Debt'),
+            description: String(row.description || ''),
+            target: Number(row.target || 0),
+            min_investment: Number(row.min_investment || 0),
+            target_irr: String(row.target_irr || ''),
+            term: String(row.term || ''),
+            subscribed_percent: Number(row.subscribed_percent || 0),
+            subscribed_amount: Number(row.subscribed_amount || 0),
+            status: String(row.status || 'Open'),
+            sector: String(row.sector || ''),
+            country: String(row.country || ''),
+            risk_level: String(row.risk_level || 'Medium'),
+            created_at: String(row.created_at || ''),
+          })) as Opportunity[]
+        );
+        setLoading(false);
+        return;
       }
-    } catch {
-      /* use fallback */
-    }
 
-    // Final fallback: hardcoded demo data
-    setOpportunities(FALLBACK_OPPORTUNITIES);
-    setLoading(false);
+      // Fallback: try site_content JSON
+      try {
+        const { data: scData } = await supabase
+          .from('site_content')
+          .select('*')
+          .eq('section', 'investment_opportunities')
+          .single();
+
+        if (scData) {
+          const raw = scData.content || scData.value;
+          const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setOpportunities(
+              parsed.map((row: Record<string, unknown>) => ({
+                id: String(row.id || crypto.randomUUID()),
+                name: String(row.name || row.title || ''),
+                type: String(row.type || row.fund_type || 'Debt'),
+                description: String(row.description || ''),
+                target: Number(row.target || 0),
+                min_investment: Number(row.min_investment || row.minInvestment || 0),
+                target_irr: String(row.target_irr || row.targetIRR || ''),
+                term: String(row.term || ''),
+                subscribed_percent: Number(row.subscribed_percent || row.subscribed || 0),
+                subscribed_amount: Number(row.subscribed_amount || row.subscribedAmount || 0),
+                status: String(row.status || 'Open'),
+                sector: String(row.sector || ''),
+                country: String(row.country || ''),
+                risk_level: String(row.risk_level || 'Medium'),
+                created_at: String(row.created_at || new Date().toISOString()),
+              }))
+            );
+            setLoading(false);
+            return;
+          }
+        }
+      } catch {
+        /* use fallback */
+      }
+
+      // Final fallback: hardcoded demo data
+      setOpportunities(FALLBACK_OPPORTUNITIES);
+    } catch (err) {
+      console.error("[opportunities/page.tsx] fetch error:", err);
+    } finally {
+      setLoading(false);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

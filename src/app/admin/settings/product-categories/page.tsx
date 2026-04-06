@@ -85,18 +85,23 @@ export default function ProductCategoriesConfig() {
 
   const fetchData = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('site_config')
-      .select('value')
-      .eq('key', CONFIG_KEY)
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('site_config')
+        .select('value')
+        .eq('key', CONFIG_KEY)
+        .single();
 
-    if (error || !data) {
-      setCategories(SEED_DATA);
-    } else {
-      setCategories(data.value as ProductCategory[]);
+      if (error || !data) {
+        setCategories(SEED_DATA);
+      } else {
+        setCategories(data.value as ProductCategory[]);
+      }
+    } catch (err) {
+      console.error("[product-categories/page.tsx] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
   useEffect(() => { fetchData(); }, [fetchData]);

@@ -24,12 +24,17 @@ export function useCarbonCredits(memberId?: string) {
 
   const fetchCredits = useCallback(async () => {
     setLoading(true);
-    let query = supabase.from('carbon_credits').select('*').order('created_at', { ascending: false });
-    if (memberId) query = query.eq('member_id', memberId);
-    const { data, error: fetchError } = await query;
-    if (fetchError) { setError(fetchError.message); setCredits([]); }
-    else { setCredits((data as CarbonCreditRow[]) || []); }
-    setLoading(false);
+    try {
+      let query = supabase.from('carbon_credits').select('*').order('created_at', { ascending: false });
+      if (memberId) query = query.eq('member_id', memberId);
+      const { data, error: fetchError } = await query;
+      if (fetchError) { setError(fetchError.message); setCredits([]); }
+      else { setCredits((data as CarbonCreditRow[]) || []); }
+    } catch (err) {
+      console.error("[use-sustainability.ts] fetch error:", err);
+    } finally {
+      setLoading(false);
+    }
   }, [supabase, memberId]);
 
   useEffect(() => { fetchCredits(); }, [fetchCredits]);

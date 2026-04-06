@@ -55,14 +55,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const supabase = createClient();
 
-  // Fetch profile from DB — retry on failure
+  // Fetch profile from DB — retry on failure (with 5s timeout to prevent hanging)
   const fetchProfile = useCallback(async (userId: string) => {
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
+      const result = await Promise.race([
+        supabase.from('profiles').select('*').eq('id', userId).single(),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Profile fetch timeout')), 5000)
+        ),
+      ]) as { data: unknown; error: { message?: string; code?: string } | null };
+
+      const { data, error } = result;
 
       if (!error && data) {
         const profileData = data as Profile;
@@ -91,7 +94,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setProfile(profileData);
         setIsImpersonating(false);
       } else if (error) {
-        console.warn('[Auth] Profile fetch failed:', error.message, '— retrying...');
+        console.warn('[Auth] Profile fetch failed:', error?.message, '— retrying...');
         // Retry once after 1s
         setTimeout(async () => {
           const { data: retryData } = await supabase.from('profiles').select('*').eq('id', userId).single();
@@ -127,32 +130,55 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Listen to auth state changes
   useEffect(() => {
+    // Hard safety timeout: ensure isLoading always resolves to false within 8s
+    const safetyTimeout = setTimeout(() => {
+      setIsLoading(false);
+      console.warn('[Auth] Safety timeout: forcing isLoading=false after 8s');
+    }, 8000);
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, newSession) => {
         setSession(newSession);
         setUser(newSession?.user ?? null);
 
-        if (newSession?.user) {
-          await fetchProfile(newSession.user.id);
-        } else {
-          setProfile(null);
+        try {
+          if (newSession?.user) {
+            await fetchProfile(newSession.user.id);
+          } else {
+            setProfile(null);
+          }
+        } catch (err) {
+          console.error('[Auth] onAuthStateChange profile fetch failed:', err);
+        } finally {
+          setIsLoading(false);
         }
-
-        setIsLoading(false);
       }
     );
 
     // Initial session check
-    supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
-      setSession(initialSession);
-      setUser(initialSession?.user ?? null);
-      if (initialSession?.user) {
-        fetchProfile(initialSession.user.id);
-      }
-      setIsLoading(false);
-    });
+    supabase.auth.getSession()
+      .then(async ({ data: { session: initialSession } }) => {
+        setSession(initialSession);
+        setUser(initialSession?.user ?? null);
+        try {
+          if (initialSession?.user) {
+            await fetchProfile(initialSession.user.id);
+          }
+        } catch (err) {
+          console.error('[Auth] Initial profile fetch failed:', err);
+        }
+      })
+      .catch((err) => {
+        console.error('[Auth] getSession failed:', err);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      clearTimeout(safetyTimeout);
+      subscription.unsubscribe();
+    };
   }, [supabase, fetchProfile]);
 
   // ── Auth methods ──────────────────────────────────────────────────────

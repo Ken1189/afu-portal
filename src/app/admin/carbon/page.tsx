@@ -71,83 +71,88 @@ export default function AdminCarbonDashboard() {
   useEffect(() => {
     const fetchDashboardData = async () => {
       setLoading(true);
-      setFetchError(null);
       try {
-        // ── KPIs from carbon_credits table ──
-        const { data: creditsData, error: creditsErr } = await supabase
-          .from('carbon_credits')
-          .select('id, credits_earned, verification_status, value_usd, project_type, member_id, created_at, vintage_year');
+        setFetchError(null);
+        try {
+          // ── KPIs from carbon_credits table ──
+          const { data: creditsData, error: creditsErr } = await supabase
+            .from('carbon_credits')
+            .select('id, credits_earned, verification_status, value_usd, project_type, member_id, created_at, vintage_year');
 
-        if (creditsErr) {
-          console.error('[carbon] credits fetch failed', creditsErr);
-          setFetchError(`Failed to load carbon credits: ${creditsErr.message || 'unknown error'}`);
-        } else {
-          const list = creditsData || [];
-          const uniqueProjects = new Set(list.map((c: any) => c.project_type));
-          const uniqueMembers = new Set(list.map((c: any) => c.member_id));
-          const totalIssued = list
-            .filter((c: any) => c.verification_status === 'verified')
-            .reduce((s: number, c: any) => s + (Number(c.credits_earned) || 0), 0);
-          const totalCredits = list.reduce((s: number, c: any) => s + (Number(c.credits_earned) || 0), 0);
-          const totalRevenue = list
-            .filter((c: any) => c.verification_status === 'verified')
-            .reduce((s: number, c: any) => s + (Number(c.value_usd) || 0), 0);
+          if (creditsErr) {
+            console.error('[carbon] credits fetch failed', creditsErr);
+            setFetchError(`Failed to load carbon credits: ${creditsErr.message || 'unknown error'}`);
+          } else {
+            const list = creditsData || [];
+            const uniqueProjects = new Set(list.map((c: any) => c.project_type));
+            const uniqueMembers = new Set(list.map((c: any) => c.member_id));
+            const totalIssued = list
+              .filter((c: any) => c.verification_status === 'verified')
+              .reduce((s: number, c: any) => s + (Number(c.credits_earned) || 0), 0);
+            const totalCredits = list.reduce((s: number, c: any) => s + (Number(c.credits_earned) || 0), 0);
+            const totalRevenue = list
+              .filter((c: any) => c.verification_status === 'verified')
+              .reduce((s: number, c: any) => s + (Number(c.value_usd) || 0), 0);
 
-          setKPIs({
-            totalProjects: uniqueProjects.size,
-            activeEnrollments: uniqueMembers.size,
-            creditsIssued: Math.round(totalIssued),
-            creditsSold: Math.round(totalCredits - totalIssued),
-            totalRevenue: Math.round(totalRevenue),
-            bufferPool: Math.round(totalRevenue * 0.1),
-          });
-
-          const now = new Date();
-          const monthlyEnrollments: { month: string; enrollments: number }[] = [];
-          const monthlyRevenue: { month: string; revenue: number }[] = [];
-          for (let i = 8; i >= 0; i--) {
-            const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-            const monthLabel = MONTH_NAMES[d.getMonth()];
-            const yearMonth = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-            const inMonth = list.filter((c: any) => c.created_at?.startsWith(yearMonth));
-            monthlyEnrollments.push({ month: monthLabel, enrollments: inMonth.length });
-            monthlyRevenue.push({
-              month: monthLabel,
-              revenue: inMonth.reduce((s: number, c: any) => s + (Number(c.value_usd) || 0), 0),
+            setKPIs({
+              totalProjects: uniqueProjects.size,
+              activeEnrollments: uniqueMembers.size,
+              creditsIssued: Math.round(totalIssued),
+              creditsSold: Math.round(totalCredits - totalIssued),
+              totalRevenue: Math.round(totalRevenue),
+              bufferPool: Math.round(totalRevenue * 0.1),
             });
+
+            const now = new Date();
+            const monthlyEnrollments: { month: string; enrollments: number }[] = [];
+            const monthlyRevenue: { month: string; revenue: number }[] = [];
+            for (let i = 8; i >= 0; i--) {
+              const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+              const monthLabel = MONTH_NAMES[d.getMonth()];
+              const yearMonth = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+              const inMonth = list.filter((c: any) => c.created_at?.startsWith(yearMonth));
+              monthlyEnrollments.push({ month: monthLabel, enrollments: inMonth.length });
+              monthlyRevenue.push({
+                month: monthLabel,
+                revenue: inMonth.reduce((s: number, c: any) => s + (Number(c.value_usd) || 0), 0),
+              });
+            }
+            setEnrollmentTrend(monthlyEnrollments);
+            setRevenueTrend(monthlyRevenue);
           }
-          setEnrollmentTrend(monthlyEnrollments);
-          setRevenueTrend(monthlyRevenue);
-        }
 
-        // ── Recent activity from audit_log ──
-        const { data: auditData, error: auditErr } = await supabase
-          .from('audit_log')
-          .select('id, action, entity_type, details, created_at')
-          .order('created_at', { ascending: false })
-          .limit(10);
+          // ── Recent activity from audit_log ──
+          const { data: auditData, error: auditErr } = await supabase
+            .from('audit_log')
+            .select('id, action, entity_type, details, created_at')
+            .order('created_at', { ascending: false })
+            .limit(10);
 
-        if (auditErr) {
-          console.error('[carbon] audit fetch failed', auditErr);
+          if (auditErr) {
+            console.error('[carbon] audit fetch failed', auditErr);
+          }
+          const mapped = (auditData || []).map((row: any) => {
+            let type = 'practice';
+            if (row.entity_type === 'carbon_credit' || row.action?.includes('credit')) type = 'credit';
+            else if (row.action?.includes('enroll') || row.entity_type === 'member') type = 'enrollment';
+            else if (row.action?.includes('purchase') || row.action?.includes('payment')) type = 'purchase';
+            const detail = typeof row.details === 'string' ? row.details : (row.details?.message || row.details?.description || '');
+            return {
+              type,
+              text: detail || `${row.action} on ${row.entity_type || 'record'}`,
+              time: timeAgo(row.created_at),
+            };
+          });
+          setActivity(mapped);
+        } catch (err) {
+          console.error('[carbon] fetch exception', err);
+          setFetchError(`Failed to load dashboard: ${(err as Error)?.message || 'unknown error'}`);
         }
-        const mapped = (auditData || []).map((row: any) => {
-          let type = 'practice';
-          if (row.entity_type === 'carbon_credit' || row.action?.includes('credit')) type = 'credit';
-          else if (row.action?.includes('enroll') || row.entity_type === 'member') type = 'enrollment';
-          else if (row.action?.includes('purchase') || row.action?.includes('payment')) type = 'purchase';
-          const detail = typeof row.details === 'string' ? row.details : (row.details?.message || row.details?.description || '');
-          return {
-            type,
-            text: detail || `${row.action} on ${row.entity_type || 'record'}`,
-            time: timeAgo(row.created_at),
-          };
-        });
-        setActivity(mapped);
       } catch (err) {
-        console.error('[carbon] fetch exception', err);
-        setFetchError(`Failed to load dashboard: ${(err as Error)?.message || 'unknown error'}`);
+        console.error("[carbon/page.tsx] fetch error:", err);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
     fetchDashboardData();
   }, [supabase]);

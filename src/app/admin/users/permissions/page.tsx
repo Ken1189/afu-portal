@@ -276,17 +276,22 @@ export default function PermissionsPage() {
   // Fetch admin users
   const fetchAdminUsers = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('id, full_name, email, role')
-      .in('role', ['admin', 'super_admin'])
-      .order('role', { ascending: false })
-      .order('full_name', { ascending: true });
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, full_name, email, role')
+        .in('role', ['admin', 'super_admin'])
+        .order('role', { ascending: false })
+        .order('full_name', { ascending: true });
 
-    if (!error && data) {
-      setAdminUsers(data as AdminUser[]);
+      if (!error && data) {
+        setAdminUsers(data as AdminUser[]);
+      }
+    } catch (err) {
+      console.error("[permissions/page.tsx] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [supabase]);
 
   useEffect(() => {

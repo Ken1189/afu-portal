@@ -67,49 +67,54 @@ export default function AdminAnalyticsPage() {
   // Fetch all data
   const fetchData = useCallback(async () => {
     setLoading(true);
-    const dateFrom = getDateFrom(dateRange);
-    const failures: string[] = [];
-    const wrap = (label: string, p: PromiseLike<unknown>) =>
-      Promise.resolve(p).catch((err) => {
-        console.error(`[analytics] ${label} failed`, err);
-        failures.push(label);
-        return { data: null };
-      });
+    try {
+      const dateFrom = getDateFrom(dateRange);
+      const failures: string[] = [];
+      const wrap = (label: string, p: PromiseLike<unknown>) =>
+        Promise.resolve(p).catch((err) => {
+          console.error(`[analytics] ${label} failed`, err);
+          failures.push(label);
+          return { data: null };
+        });
 
-    const [memRes, appRes, payRes, trdRes, ambRes, profRes] = await Promise.all([
-      wrap('members', supabase.from('members').select('id, profile_id, tier, status, created_at').order('created_at', { ascending: false })),
-      wrap('membership_applications', dateFrom
-        ? supabase.from('membership_applications').select('id, full_name, email, country, requested_tier, status, phone, created_at').gte('created_at', dateFrom).order('created_at', { ascending: false })
-        : supabase.from('membership_applications').select('id, full_name, email, country, requested_tier, status, phone, created_at').order('created_at', { ascending: false })
-      ),
-      wrap('payments', supabase.from('payments').select('id, amount, currency, status, type, created_at').order('created_at', { ascending: false }).limit(500)),
-      wrap('trade_orders', supabase.from('trade_orders').select('id, order_number, order_type, commodity, quantity, target_price, country, status, created_at').order('created_at', { ascending: false }).limit(500)),
-      wrap('ambassadors', supabase.from('ambassadors').select('id, full_name, country, status, created_at').order('created_at', { ascending: false })),
-      wrap('profiles', supabase.from('profiles').select('id, country, role, created_at').order('created_at', { ascending: false })),
-    ]) as { data: unknown }[];
+      const [memRes, appRes, payRes, trdRes, ambRes, profRes] = await Promise.all([
+        wrap('members', supabase.from('members').select('id, profile_id, tier, status, created_at').order('created_at', { ascending: false })),
+        wrap('membership_applications', dateFrom
+          ? supabase.from('membership_applications').select('id, full_name, email, country, requested_tier, status, phone, created_at').gte('created_at', dateFrom).order('created_at', { ascending: false })
+          : supabase.from('membership_applications').select('id, full_name, email, country, requested_tier, status, phone, created_at').order('created_at', { ascending: false })
+        ),
+        wrap('payments', supabase.from('payments').select('id, amount, currency, status, type, created_at').order('created_at', { ascending: false }).limit(500)),
+        wrap('trade_orders', supabase.from('trade_orders').select('id, order_number, order_type, commodity, quantity, target_price, country, status, created_at').order('created_at', { ascending: false }).limit(500)),
+        wrap('ambassadors', supabase.from('ambassadors').select('id, full_name, country, status, created_at').order('created_at', { ascending: false })),
+        wrap('profiles', supabase.from('profiles').select('id, country, role, created_at').order('created_at', { ascending: false })),
+      ]) as { data: unknown }[];
 
-    if (failures.length > 0) {
-      showToast(`Failed to load: ${failures.join(', ')}`, 'error');
+      if (failures.length > 0) {
+        showToast(`Failed to load: ${failures.join(', ')}`, 'error');
+      }
+
+      setMembers((memRes.data || []) as MemberRow[]);
+      setApplications((appRes.data || []) as AppRow[]);
+      setPayments((payRes.data || []) as PaymentRow[]);
+      setTrades((trdRes.data || []) as TradeRow[]);
+      setAmbassadors((ambRes.data || []) as AmbassadorRow[]);
+      setProfiles((profRes.data || []) as typeof profiles);
+
+      // Extract unique countries from ALL data sources
+      const allCountries = new Set<string>();
+      ((appRes.data || []) as AppRow[]).forEach(a => { if (a.country) allCountries.add(a.country); });
+      ((trdRes.data || []) as TradeRow[]).forEach(t => { if (t.country) allCountries.add(t.country); });
+      ((profRes.data || []) as typeof profiles).forEach(p => { if (p.country) allCountries.add(p.country); });
+      ((ambRes.data || []) as AmbassadorRow[]).forEach(a => { if (a.country) allCountries.add(a.country); });
+      // Also add the AFU core countries in case data is sparse
+      ['Botswana', 'Ghana', 'Kenya', 'Mozambique', 'Nigeria', 'Sierra Leone', 'South Africa', 'Tanzania', 'Uganda', 'Zambia', 'Zimbabwe'].forEach(c => allCountries.add(c));
+      setCountries([...allCountries].sort());
+
+    } catch (err) {
+      console.error("[analytics/page.tsx] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-
-    setMembers((memRes.data || []) as MemberRow[]);
-    setApplications((appRes.data || []) as AppRow[]);
-    setPayments((payRes.data || []) as PaymentRow[]);
-    setTrades((trdRes.data || []) as TradeRow[]);
-    setAmbassadors((ambRes.data || []) as AmbassadorRow[]);
-    setProfiles((profRes.data || []) as typeof profiles);
-
-    // Extract unique countries from ALL data sources
-    const allCountries = new Set<string>();
-    ((appRes.data || []) as AppRow[]).forEach(a => { if (a.country) allCountries.add(a.country); });
-    ((trdRes.data || []) as TradeRow[]).forEach(t => { if (t.country) allCountries.add(t.country); });
-    ((profRes.data || []) as typeof profiles).forEach(p => { if (p.country) allCountries.add(p.country); });
-    ((ambRes.data || []) as AmbassadorRow[]).forEach(a => { if (a.country) allCountries.add(a.country); });
-    // Also add the AFU core countries in case data is sparse
-    ['Botswana', 'Ghana', 'Kenya', 'Mozambique', 'Nigeria', 'Sierra Leone', 'South Africa', 'Tanzania', 'Uganda', 'Zambia', 'Zimbabwe'].forEach(c => allCountries.add(c));
-    setCountries([...allCountries].sort());
-
-    setLoading(false);
   }, [supabase, dateRange, showToast]);
 
   useEffect(() => { fetchData(); }, [fetchData]);

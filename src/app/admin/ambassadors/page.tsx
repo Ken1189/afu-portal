@@ -340,34 +340,39 @@ export default function AdminAmbassadorsPage() {
 
   const fetchAmbassadors = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('ambassadors')
-      .select('*')
-      .order('sort_order', { ascending: true });
+    try {
+      const { data, error } = await supabase
+        .from('ambassadors')
+        .select('*')
+        .order('sort_order', { ascending: true });
 
-    if (error) {
-      setToast({ message: 'Failed to load ambassadors', type: 'error' });
-      setAmbassadors([]);
-    } else {
-      setAmbassadors(
-        (data || []).map((a: Record<string, unknown>) => ({
-          ...a,
-          is_featured: (a.is_featured as boolean) ?? false,
-          is_active: (a.is_active as boolean) ?? true,
-          sort_order: typeof a.sort_order === 'number' ? a.sort_order : 0,
-          achievements: Array.isArray(a.achievements) ? a.achievements : [],
-          crops_or_products: Array.isArray(a.crops_or_products)
-            ? a.crops_or_products
-            : [],
-          status: (a.status as string) || 'pending',
-          tier: (a.tier as string) || null,
-          total_earned: typeof a.total_earned === 'number' ? a.total_earned : 0,
-          total_referrals:
-            typeof a.total_referrals === 'number' ? a.total_referrals : 0,
-        })) as Ambassador[]
-      );
+      if (error) {
+        setToast({ message: 'Failed to load ambassadors', type: 'error' });
+        setAmbassadors([]);
+      } else {
+        setAmbassadors(
+          (data || []).map((a: Record<string, unknown>) => ({
+            ...a,
+            is_featured: (a.is_featured as boolean) ?? false,
+            is_active: (a.is_active as boolean) ?? true,
+            sort_order: typeof a.sort_order === 'number' ? a.sort_order : 0,
+            achievements: Array.isArray(a.achievements) ? a.achievements : [],
+            crops_or_products: Array.isArray(a.crops_or_products)
+              ? a.crops_or_products
+              : [],
+            status: (a.status as string) || 'pending',
+            tier: (a.tier as string) || null,
+            total_earned: typeof a.total_earned === 'number' ? a.total_earned : 0,
+            total_referrals:
+              typeof a.total_referrals === 'number' ? a.total_referrals : 0,
+          })) as Ambassador[]
+        );
+      }
+    } catch (err) {
+      console.error("[ambassadors/page.tsx] fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
