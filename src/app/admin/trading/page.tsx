@@ -504,7 +504,7 @@ export default function AdminTradingPage() {
           </div>
 
           {ordersLoading ? (
-            <div className="flex items-center justify-center py-16"><Loader2 className="w-6 h-6 animate-spin text-[#5DB347]" /></div>
+            <div className="flex flex-col items-center justify-center py-16 gap-3"><Loader2 className="w-8 h-8 animate-spin text-[#5DB347]" /><p className="text-sm text-gray-400">Loading...</p></div>
           ) : filteredOrders.length === 0 ? (
             <div className="text-center py-16"><ArrowLeftRight className="w-10 h-10 text-gray-300 mx-auto mb-3" /><p className="text-gray-500 text-sm">No orders found.</p></div>
           ) : (
@@ -621,7 +621,7 @@ export default function AdminTradingPage() {
             <button onClick={fetchPrices} className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 transition-colors"><RefreshCw className="w-4 h-4" /></button>
           </div>
           {pricesLoading ? (
-            <div className="flex items-center justify-center py-16"><Loader2 className="w-6 h-6 animate-spin text-[#5DB347]" /></div>
+            <div className="flex flex-col items-center justify-center py-16 gap-3"><Loader2 className="w-8 h-8 animate-spin text-[#5DB347]" /><p className="text-sm text-gray-400">Loading...</p></div>
           ) : prices.length === 0 ? (
             <div className="text-center py-16"><BarChart3 className="w-10 h-10 text-gray-300 mx-auto mb-3" /><p className="text-gray-500 text-sm">No commodity prices configured.</p></div>
           ) : (
@@ -691,7 +691,7 @@ export default function AdminTradingPage() {
             </div>
           </div>
           {inventoryLoading ? (
-            <div className="flex items-center justify-center py-16"><Loader2 className="w-6 h-6 animate-spin text-[#5DB347]" /></div>
+            <div className="flex flex-col items-center justify-center py-16 gap-3"><Loader2 className="w-8 h-8 animate-spin text-[#5DB347]" /><p className="text-sm text-gray-400">Loading...</p></div>
           ) : inventory.length === 0 ? (
             <div className="text-center py-16"><Boxes className="w-10 h-10 text-gray-300 mx-auto mb-3" /><p className="text-gray-500 text-sm">No inventory positions recorded.</p></div>
           ) : (
