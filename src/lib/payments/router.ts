@@ -1,7 +1,7 @@
 /**
  * Payment Router
  * Smart routing of payments by country and payment method.
- * Maps each of the 20 AFU countries to their available payment providers.
+ * Maps each AFU country to their available payment providers.
  */
 
 import {

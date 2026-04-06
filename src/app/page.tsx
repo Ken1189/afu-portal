@@ -268,7 +268,7 @@ const FALLBACK_PROGRAMS = [
     name: 'Maize & Soya Staples Program',
     countries: 'Multi-country',
     crop: 'Maize & Soya',
-    desc: 'Food security crops cultivated across all 20 AFU countries. Building reliable staple supply chains from smallholder to market.',
+    desc: 'Food security crops cultivated across all 9 AFU countries. Building reliable staple supply chains from smallholder to market.',
     icon: Leaf,
   },
   {
@@ -525,7 +525,7 @@ export default function Home() {
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 bg-[#5DB347]/20 backdrop-blur-sm border border-[#5DB347]/30 text-[#EBF7E5] px-4 py-1.5 rounded-full text-sm font-medium mb-6">
               <span className="w-2 h-2 bg-[#5DB347] rounded-full animate-pulse-soft" />
-              Phase 1: Zimbabwe &bull; Botswana &bull; Tanzania
+              Active across 9 African countries
             </div>
 
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] text-white mb-6">
@@ -568,12 +568,8 @@ export default function Home() {
             {/* Trust badges */}
             <div className="mt-12 flex flex-wrap items-center gap-4 text-sm">
               <div className="flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/10 px-4 py-2 rounded-full text-white/70">
-                <ShieldPlus className="w-4 h-4 text-[#5DB347]" />
-                <span>Licensed & Regulated</span>
-              </div>
-              <div className="flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/10 px-4 py-2 rounded-full text-white/70">
                 <Globe2 className="w-4 h-4 text-[#5DB347]" />
-                <span>20 Countries Active</span>
+                <span>9 Countries Active</span>
               </div>
               <div className="flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/10 px-4 py-2 rounded-full text-white/70">
                 <Users className="w-4 h-4 text-[#5DB347]" />
@@ -1083,69 +1079,68 @@ export default function Home() {
           <StaggerChildren className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5">
             {[
               {
+                tier: 'Free',
+                name: 'Free',
+                price: '$0',
+                period: '',
+                features: [
+                  'Basic crop tracking',
+                  '1 free training course',
+                  'Browse marketplace',
+                  'Limited AI assistant',
+                ],
+                cta: 'Get Started Free',
+                highlight: false,
+              },
+              {
                 tier: 'Smallholder',
                 name: 'Smallholder',
                 price: '$4.99',
-                period: '/month',
+                period: '/mo',
                 features: [
-                  'Platform access & AI chatbot',
-                  'Training & certification',
-                  'Market prices & weather',
-                  'Seasonal working capital',
-                  'Input bundles access',
+                  'Full crop tracking',
+                  'Financing up to $5K',
+                  'Basic insurance',
+                  'Marketplace access',
+                  'AI assistant',
                 ],
                 cta: 'Join as Smallholder',
                 highlight: false,
               },
               {
-                tier: 'Bronze',
-                name: 'Commercial Bronze',
+                tier: 'Commercial',
+                name: 'Commercial',
                 price: '$49',
-                period: '/month',
+                period: '/mo',
                 features: [
-                  'Everything in Smallholder',
+                  'Advanced crop tracking',
+                  'Financing up to $50K',
+                  'Full insurance',
                   'Discounted inputs',
-                  'Market access & off-take',
-                  'Equipment rental priority',
                   'Basic trade finance',
                 ],
-                cta: 'Join Bronze',
+                cta: 'Join Commercial',
                 highlight: false,
               },
               {
-                tier: 'Gold',
-                name: 'Commercial Gold',
+                tier: 'Enterprise',
+                name: 'Enterprise',
                 price: '$499',
-                period: '/month',
+                period: '/mo',
                 features: [
-                  'Everything in Bronze',
-                  'Equipment leasing priority',
-                  '15% insurance discounts',
+                  'Financing up to $250K',
+                  'Comprehensive insurance',
                   'Dedicated advisor',
-                  'Full trade finance access',
+                  'Full trade finance',
+                  'Legal support & VIP events',
                 ],
-                cta: 'Join Gold',
+                cta: 'Join Enterprise',
                 highlight: true,
-              },
-              {
-                tier: 'Platinum',
-                name: 'Commercial Platinum',
-                price: '$999',
-                period: '/month',
-                features: [
-                  'Everything in Gold',
-                  'Legal support',
-                  'Off-take priority',
-                  'Farm manager visits',
-                  'VIP events & networking',
-                ],
-                cta: 'Join Platinum',
-                highlight: false,
               },
               {
                 tier: 'Partner',
                 name: 'Partner / Vendor',
-                price: 'Apply',
+                price: 'On Request',
                 period: '',
                 features: [
                   'Directory listing',

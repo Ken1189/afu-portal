@@ -35,7 +35,7 @@ export const metadata = {
 /* ─── FALLBACK DATA ─── */
 
 const FALLBACK_HERO_STATS = [
-  { value: '10+', label: 'Countries' },
+  { value: '9', label: 'Countries' },
   { value: 'Growing', label: 'Farmer Community' },
   { value: '$50B+', label: 'Market Opportunity' },
 ];

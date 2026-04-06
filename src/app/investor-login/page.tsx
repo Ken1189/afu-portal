@@ -33,7 +33,7 @@ const highlights = [
   {
     icon: Globe,
     label: 'Deployment',
-    value: '20 Countries',
+    value: '9 Countries',
     desc: 'Diversified across Sub-Saharan African markets',
   },
   {

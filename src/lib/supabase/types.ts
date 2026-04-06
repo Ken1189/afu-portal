@@ -3,7 +3,7 @@
 // Generated from our schema. Update when schema changes.
 // ============================================================================
 
-export type MembershipTier = 'student' | 'new_enterprise' | 'smallholder' | 'farmer_grower' | 'commercial';
+export type MembershipTier = 'free' | 'smallholder' | 'commercial' | 'enterprise' | 'partner';
 export type MemberStatus = 'pending' | 'active' | 'suspended' | 'expired';
 export type SupplierStatus = 'pending' | 'active' | 'suspended' | 'rejected';
 export type SupplierCategory = 'input-supplier' | 'equipment' | 'logistics' | 'processing' | 'technology' | 'financial-services';

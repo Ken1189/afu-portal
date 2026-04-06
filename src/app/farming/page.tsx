@@ -65,7 +65,7 @@ const sectors = [
     image:
       "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&h=400&fit=crop",
     description:
-      "From staple grains to high-value export crops, AFU supports farmers cultivating over 50 crop types across 10+ African countries. Access premium seeds, modern techniques, and guaranteed market channels.",
+      "From staple grains to high-value export crops, AFU supports farmers cultivating over 50 crop types across 9 African countries. Access premium seeds, modern techniques, and guaranteed market channels.",
   },
   {
     title: "Livestock",
@@ -221,7 +221,7 @@ const services = [
 /* ─── Stats ─── */
 
 const stats = [
-  { value: "10+", label: "Countries Active", icon: Globe },
+  { value: "9", label: "Countries Active", icon: Globe },
   { value: "50+", label: "Crop Types Supported", icon: Sprout },
   { value: "15+", label: "Livestock Species", icon: Beef },
   { value: "5,000+", label: "Farmers in Network", icon: Users },

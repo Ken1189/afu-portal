@@ -74,8 +74,18 @@ const TIER_FEATURES: Record<TierName, FeatureKey[]> = {
   ],
 };
 
+// Map legacy / alternate DB tier names to canonical tier names
+const TIER_ALIASES: Record<string, TierName> = {
+  'student': 'free',
+  'new_enterprise': 'enterprise',
+  'farmer_grower': 'smallholder',
+  'bronze': 'commercial',
+  'gold': 'enterprise',
+  'platinum': 'enterprise',
+};
+
 export function hasFeatureAccess(tier: string | null | undefined, feature: FeatureKey): boolean {
-  const normalizedTier = (tier || 'free').toLowerCase() as TierName;
+  const normalizedTier = TIER_ALIASES[tier?.toLowerCase() || ''] || (tier || 'free').toLowerCase() as TierName;
   const features = TIER_FEATURES[normalizedTier] || TIER_FEATURES.free;
   return features.includes(feature);
 }
@@ -88,13 +98,14 @@ export function getTierName(tier: string | null | undefined): string {
     enterprise: 'Enterprise',
     partner: 'Partner',
   };
-  return map[(tier || 'free').toLowerCase()] || 'Free';
+  const normalized = TIER_ALIASES[tier?.toLowerCase() || ''] || (tier || 'free').toLowerCase();
+  return map[normalized] || 'Free';
 }
 
 export function getUpgradeTier(currentTier: string | null | undefined): TierName | null {
   const order: TierName[] = ['free', 'smallholder', 'commercial', 'enterprise'];
-  const current = (currentTier || 'free').toLowerCase() as TierName;
-  const idx = order.indexOf(current);
+  const normalized = TIER_ALIASES[currentTier?.toLowerCase() || ''] || (currentTier || 'free').toLowerCase() as TierName;
+  const idx = order.indexOf(normalized);
   if (idx < 0 || idx >= order.length - 1) return null;
   return order[idx + 1];
 }

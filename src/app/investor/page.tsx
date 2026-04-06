@@ -96,15 +96,15 @@ const FALLBACK_UPDATES: InvestorUpdate[] = [
 
 const FALLBACK_KEY_METRICS = [
   {
-    label: 'Total AUM',
+    label: 'Target AUM',
     value: '$12.5M',
-    badge: '+15%',
-    badgeColor: 'bg-emerald-100 text-emerald-700',
+    badge: 'Projected',
+    badgeColor: 'bg-amber-100 text-amber-700',
     icon: DollarSign,
     iconBg: 'bg-[#5DB347]',
   },
   {
-    label: 'Capital Deployed',
+    label: 'Target Deployment',
     value: '$8.2M',
     badge: '65.6% of AUM',
     badgeColor: 'bg-blue-100 text-blue-700',
@@ -112,31 +112,31 @@ const FALLBACK_KEY_METRICS = [
     iconBg: 'bg-[#1B2A4A]',
   },
   {
-    label: 'Net IRR',
+    label: 'Projected IRR',
     value: '14.2%',
     badge: 'Target: 12-16%',
-    badgeColor: 'bg-emerald-100 text-emerald-700',
+    badgeColor: 'bg-amber-100 text-amber-700',
     icon: TrendingUp,
     iconBg: 'bg-emerald-600',
   },
   {
-    label: 'Repayment Rate',
+    label: 'Target Repayment',
     value: '94.2%',
-    badge: null,
-    badgeColor: '',
+    badge: 'Projected',
+    badgeColor: 'bg-amber-100 text-amber-700',
     icon: ShieldCheck,
     iconBg: 'bg-sky-600',
   },
   {
-    label: 'Active Farmers',
+    label: 'Target Farmers',
     value: '4,200+',
-    badge: null,
-    badgeColor: '',
+    badge: 'Projected',
+    badgeColor: 'bg-amber-100 text-amber-700',
     icon: Users,
     iconBg: 'bg-amber-500',
   },
   {
-    label: 'Countries Live',
+    label: 'Countries Planned',
     value: '3',
     badge: 'of 20 planned',
     badgeColor: 'bg-gray-100 text-gray-600',
@@ -544,6 +544,9 @@ export default function InvestorDashboard() {
   // Total deployed for the mini legend
   const totalDeployedByCountry = countryDeployment.reduce((s, c) => s + c.value, 0);
 
+  // True when we have no real investor data and are showing fallback projections
+  const hasRealData = !!investorProfile;
+
   return (
     <div className="space-y-8">
       {/* ── Header ────────────────────────────────────────────────────────── */}
@@ -559,6 +562,13 @@ export default function InvestorDashboard() {
           Institutional investor dashboard &mdash; AFU Fund I overview and real-time activity.
         </p>
       </motion.div>
+
+      {/* ── Illustrative Data Banner ─────────────────────────────────────── */}
+      {!hasRealData && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-6 text-sm text-amber-800">
+          <strong>Illustrative Data</strong> — These figures represent projected targets. Actual portfolio data will appear here once investments are active.
+        </div>
+      )}
 
       {/* ── Top Row: 6 Key Metrics ────────────────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">

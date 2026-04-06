@@ -29,7 +29,7 @@ const programs = [
     impact: [
       '5,000+ women trained in agricultural techniques',
       '1,200 micro-loans disbursed to women-led farms',
-      'Legal support for land ownership in 12 countries',
+      'Legal support for land ownership across Africa',
       'Childcare cooperatives enabling women to farm',
     ],
     amounts: [25, 50, 100, 250, 500, 1000],
@@ -44,7 +44,7 @@ const programs = [
     impact: [
       '50,000+ meals served to children monthly',
       '120 schools connected to local farms',
-      'Nutrition programmes in 8 countries',
+      'Nutrition programmes across Africa',
       'Zero food miles — sourced from local farmers',
     ],
     amounts: [10, 25, 50, 100, 250, 500],
@@ -58,7 +58,7 @@ const programs = [
     description: 'Investing in the next generation of African farmers. We provide agricultural education, starter seed kits, mentorship, and micro-financing to young people aged 18-30 to start and grow their own farms.',
     impact: [
       '3,000+ young farmers enrolled',
-      'Starter kits distributed in 15 countries',
+      'Starter kits distributed across Africa',
       'Mentorship pairing with experienced farmers',
       '85% of graduates still farming after 2 years',
     ],

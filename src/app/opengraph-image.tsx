@@ -156,7 +156,7 @@ export default async function Image() {
                 letterSpacing: '1px',
               }}
             >
-              20 Countries &nbsp;•&nbsp; 1M+ Farmers &nbsp;•&nbsp; By Farmers, For Farmers
+              9 Countries &nbsp;•&nbsp; Growing Community &nbsp;•&nbsp; By Farmers, For Farmers
             </span>
           </div>
 
