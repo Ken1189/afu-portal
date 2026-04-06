@@ -196,10 +196,9 @@ export default function AdminCooperativesPage() {
 
   // ── Delete cooperative ───────────────────────────────────────────────────
   const handleDelete = async (id: string) => {
-    if (!confirm('Delete this cooperative? This cannot be undone.')) return;
+    if (!window.confirm('Delete this cooperative? This cannot be undone.')) return;
     setActionLoading(id);
     try {
-    if (!window.confirm('Are you sure you want to delete this?')) return;
       const { error: delErr } = await supabase.from('cooperatives').delete().eq('id', id);
       if (delErr) throw delErr;
       setSuccess('Cooperative deleted.');

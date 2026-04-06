@@ -490,8 +490,19 @@ export default function LoansPage() {
         body: JSON.stringify({ loanId, action }),
       });
       if (res.ok) {
-        // Refresh the list
         await fetchLoans();
+        showToast(`Loan ${action === 'approve' ? 'approved' : 'rejected'} successfully.`);
+      } else {
+        // Fallback: update directly via Supabase
+        const supabase = createClient();
+        const newStatus = action === 'approve' ? 'approved' : 'rejected';
+        const { error } = await supabase.from('loans').update({ status: newStatus }).eq('id', loanId);
+        if (!error) {
+          await fetchLoans();
+          showToast(`Loan ${action === 'approve' ? 'approved' : 'rejected'} successfully.`);
+        } else {
+          showToast(`Failed to ${action} loan: ${error.message}`, 'error');
+        }
       }
     } catch {
       showToast(`Failed to ${action} loan. Please try again.`, 'error');
