@@ -40,6 +40,7 @@ import {
   Leaf,
   HelpCircle,
   Newspaper,
+  Wheat,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useAuth } from "@/lib/supabase/auth-context";
@@ -100,6 +101,7 @@ const communityLinks: { label: string; href: string; desc: string; icon: LucideI
 ];
 
 const exploreLinks: { label: string; href: string; desc: string; icon: LucideIcon }[] = [
+  { label: "Farming Sectors", href: "/farming", desc: "Crops, livestock, forestry & more", icon: Wheat },
   { label: "Projects", href: "/projects", desc: "Investment opportunities", icon: FolderKanban },
   { label: "AFU Fresh", href: "/fresh", desc: "Farm to fork marketplace", icon: ShoppingBag },
   { label: "Exchange", href: "/exchange", desc: "Trade with fellow farmers", icon: ArrowLeftRight },
