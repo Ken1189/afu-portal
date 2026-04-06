@@ -48,16 +48,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const supabase = createClient();
 
-  // Fetch profile from DB
+  // Fetch profile from DB — retry on failure
   const fetchProfile = useCallback(async (userId: string) => {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
 
-    if (!error && data) {
-      setProfile(data as Profile);
+      if (!error && data) {
+        setProfile(data as Profile);
+      } else if (error) {
+        console.warn('[Auth] Profile fetch failed:', error.message, '— retrying...');
+        // Retry once after 1s
+        setTimeout(async () => {
+          const { data: retryData } = await supabase.from('profiles').select('*').eq('id', userId).single();
+          if (retryData) setProfile(retryData as Profile);
+        }, 1000);
+      }
+    } catch (err) {
+      console.error('[Auth] Profile fetch error:', err);
     }
   }, [supabase]);
 

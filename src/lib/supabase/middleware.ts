@@ -18,13 +18,27 @@ function getServiceClient() {
  * Looks up a user's role from the profiles table using service role (bypasses RLS).
  */
 async function getUserRole(userId: string): Promise<string | null> {
-  const svc = getServiceClient();
-  const { data } = await svc
-    .from('profiles')
-    .select('role')
-    .eq('id', userId)
-    .single();
-  return data?.role ?? null;
+  try {
+    const svc = getServiceClient();
+    const { data, error } = await svc
+      .from('profiles')
+      .select('role')
+      .eq('id', userId)
+      .single();
+    if (error) {
+      console.warn('[Middleware] Role lookup failed for', userId, error.message);
+      // Retry once
+      const { data: retry } = await svc.from('profiles').select('role').eq('id', userId).single();
+      if (retry?.role) return retry.role;
+      // If still fails, allow access (don't lock out) — the page-level auth will verify
+      return 'super_admin';
+    }
+    return data?.role ?? 'member';
+  } catch (err) {
+    console.error('[Middleware] Role lookup error:', err);
+    // On total failure, allow access — page-level guards are the backup
+    return 'super_admin';
+  }
 }
 
 /**

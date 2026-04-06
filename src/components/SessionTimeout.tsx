@@ -6,8 +6,8 @@ import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/supabase/auth-context';
 import { Clock } from 'lucide-react';
 
-const TIMEOUT_MS = 2 * 60 * 60 * 1000; // 2 hours
-const WARNING_MS = 5 * 60 * 1000; // 5 minute warning before logout
+const TIMEOUT_MS = 8 * 60 * 60 * 1000; // 8 hours (full workday)
+const WARNING_MS = 10 * 60 * 1000; // 10 minute warning before logout
 const CHECK_INTERVAL_MS = 60 * 1000; // Check every 60 seconds
 
 export default function SessionTimeout() {
