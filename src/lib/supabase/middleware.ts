@@ -15,6 +15,24 @@ function getServiceClient() {
 }
 
 /**
+ * Checks whether a user has a members record (i.e. completed membership setup).
+ */
+async function hasMemberRecord(userId: string): Promise<boolean> {
+  try {
+    const svc = getServiceClient();
+    const { data, error } = await svc
+      .from('members')
+      .select('id')
+      .eq('profile_id', userId)
+      .maybeSingle();
+    if (error) return true; // on error, assume they have one (avoid redirect loop)
+    return !!data;
+  } catch {
+    return true; // safe default
+  }
+}
+
+/**
  * Looks up a user's role from the profiles table using service role (bypasses RLS).
  */
 async function getUserRole(userId: string): Promise<string | null> {
@@ -87,7 +105,7 @@ export async function updateSession(request: NextRequest) {
   const publicExceptions = ['/farmers', '/farms', '/investors', '/investor-login', '/supplier/apply', '/ambassador/apply', '/ambassadors'];
   const isPublicException = publicExceptions.some((p) => pathname.startsWith(p));
 
-  const protectedPaths = ['/dashboard', '/farm', '/supplier', '/admin', '/investor', '/ambassador', '/warehouse'];
+  const protectedPaths = ['/dashboard', '/farm', '/supplier', '/admin', '/investor', '/ambassador', '/warehouse', '/onboarding'];
   const isProtected = !isPublicException && protectedPaths.some((p) => pathname.startsWith(p));
 
   // If accessing a protected route without a session → redirect to login
@@ -128,6 +146,19 @@ export async function updateSession(request: NextRequest) {
         dest.pathname = '/dashboard';
     }
     return NextResponse.redirect(dest);
+  }
+
+  // ── Onboarding redirect for users without a member record ──────────
+  // Only check on protected member paths (not /onboarding itself, not admin/supplier/etc.)
+  const memberPaths = ['/dashboard', '/farm'];
+  const needsMemberCheck = user && role === 'member' && memberPaths.some((p) => pathname.startsWith(p));
+  if (needsMemberCheck && pathname !== '/onboarding') {
+    const hasMember = await hasMemberRecord(user.id);
+    if (!hasMember) {
+      const onboardingUrl = request.nextUrl.clone();
+      onboardingUrl.pathname = '/onboarding';
+      return NextResponse.redirect(onboardingUrl);
+    }
   }
 
   // ── Role-based access (single role lookup reused) ─────────────────

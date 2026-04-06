@@ -12,6 +12,7 @@ import { WebVitals } from "@/components/WebVitals";
 import { Analytics } from "@vercel/analytics/next";
 import { ToastProvider } from "@/components/ui/Toast";
 import ChatWidget from "@/components/chat/ChatWidget";
+import ImpersonationBanner from "@/components/ui/ImpersonationBanner";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -97,6 +98,7 @@ export default function RootLayout({
       <body className={`${inter.variable} font-sans antialiased`}>
         <AuthProvider>
           <ToastProvider>
+          <ImpersonationBanner />
           <WebVitals />
           <ServiceWorkerRegister />
           <AnnouncementBanner />

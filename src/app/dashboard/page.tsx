@@ -63,15 +63,15 @@ import OnboardingChecklist from '@/components/dashboard/OnboardingChecklist';
 // Static data (inlined to remove @/lib/data/ mock imports)
 // ---------------------------------------------------------------------------
 
-const WEATHER_DATA = {
+const DEFAULT_WEATHER = {
   location: 'Harare, Zimbabwe',
   current: { temp: 28, condition: 'Sunny', humidity: 45, wind: 12 },
   forecast: [
-    { day: 'Today', temp: 28, condition: 'Sunny', icon: '\u2600\uFE0F' },
-    { day: 'Tomorrow', temp: 26, condition: 'Partly Cloudy', icon: '\uD83C\uDF24' },
-    { day: 'Thursday', temp: 22, condition: 'Rain', icon: '\uD83C\uDF27' },
-    { day: 'Friday', temp: 25, condition: 'Sunny', icon: '\u2600\uFE0F' },
-    { day: 'Saturday', temp: 27, condition: 'Sunny', icon: '\u2600\uFE0F' },
+    { day: 'Today', temp: 28, condition: 'Sunny', icon: '☀' },
+    { day: 'Tomorrow', temp: 26, condition: 'Partly Cloudy', icon: '⛅' },
+    { day: 'Thursday', temp: 22, condition: 'Rain', icon: '🌧' },
+    { day: 'Friday', temp: 25, condition: 'Sunny', icon: '☀' },
+    { day: 'Saturday', temp: 27, condition: 'Sunny', icon: '☀' },
   ],
 };
 
@@ -346,6 +346,7 @@ export default function DashboardPage() {
   // Market prices (DB format lacks sparkline/change data needed for UI)
   const marketPrices = MARKET_PRICES;
   const [alertDismissed, setAlertDismissed] = useState(false);
+  const [liveWeather, setLiveWeather] = useState(DEFAULT_WEATHER);
   const [dashData, setDashData] = useState<DashboardData | null>(null);
   const [showProgramBanner, setShowProgramBanner] = useState(true);
   const [availablePrograms, setAvailablePrograms] = useState<{ id: string; country: string; status: string; [key: string]: unknown }[]>([]);
@@ -367,6 +368,48 @@ export default function DashboardPage() {
       .then(data => { setAvailablePrograms(data.programs || []); })
       .catch(() => { /* silent — banner just won't show */ });
   }, []);
+
+  // Fetch live weather based on user's country
+  useEffect(() => {
+    const country = profile?.country || 'Zimbabwe';
+    const COORDS: Record<string, { lat: number; lon: number; city: string }> = {
+      'Zimbabwe': { lat: -17.83, lon: 31.05, city: 'Harare' },
+      'Botswana': { lat: -24.65, lon: 25.91, city: 'Gaborone' },
+      'Kenya': { lat: -1.29, lon: 36.82, city: 'Nairobi' },
+      'Tanzania': { lat: -6.79, lon: 39.28, city: 'Dar es Salaam' },
+      'South Africa': { lat: -26.20, lon: 28.04, city: 'Johannesburg' },
+      'Nigeria': { lat: 6.52, lon: 3.38, city: 'Lagos' },
+      'Ghana': { lat: 5.60, lon: -0.19, city: 'Accra' },
+      'Uganda': { lat: 0.35, lon: 32.58, city: 'Kampala' },
+      'Zambia': { lat: -15.39, lon: 28.32, city: 'Lusaka' },
+      'Mozambique': { lat: -25.97, lon: 32.59, city: 'Maputo' },
+    };
+    const loc = COORDS[country] || COORDS['Zimbabwe'];
+    const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    (async () => {
+      try {
+        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&daily=temperature_2m_max,weather_code&timezone=auto&forecast_days=5`);
+        const d = await res.json();
+        const codeToCondition = (c: number) => c <= 1 ? 'Sunny' : c <= 3 ? 'Partly Cloudy' : c <= 55 ? 'Cloudy' : c <= 67 ? 'Rain' : 'Stormy';
+        const codeToIcon = (c: number) => c <= 1 ? '☀' : c <= 3 ? '⛅' : c <= 55 ? '☁' : c <= 67 ? '🌧' : '⛈';
+        setLiveWeather({
+          location: `${loc.city}, ${country}`,
+          current: {
+            temp: Math.round(d.current?.temperature_2m || 25),
+            condition: codeToCondition(d.current?.weather_code || 0),
+            humidity: Math.round(d.current?.relative_humidity_2m || 50),
+            wind: Math.round(d.current?.wind_speed_10m || 10),
+          },
+          forecast: (d.daily?.time || []).slice(0, 5).map((t: string, i: number) => ({
+            day: i === 0 ? 'Today' : days[new Date(t).getDay()],
+            temp: Math.round(d.daily.temperature_2m_max[i]),
+            condition: codeToCondition(d.daily.weather_code[i]),
+            icon: codeToIcon(d.daily.weather_code[i]),
+          })),
+        });
+      } catch { /* keep fallback */ }
+    })();
+  }, [profile?.country]);
 
   // Fetch training stats directly from Supabase
   const [trainingStats, setTrainingStats] = useState<{ completed: number; total: number }>({ completed: 0, total: 0 });
@@ -846,24 +889,24 @@ export default function DashboardPage() {
             </div>
             <div className="flex items-center gap-4 mb-4">
               <div className="text-4xl">
-                {WEATHER_DATA.forecast[0].icon}
+                {liveWeather.forecast[0].icon}
               </div>
               <div>
-                <p className="text-3xl font-bold text-navy">{WEATHER_DATA.current.temp}&deg;C</p>
-                <p className="text-sm text-gray-500">{WEATHER_DATA.location}</p>
+                <p className="text-3xl font-bold text-navy">{liveWeather.current.temp}&deg;C</p>
+                <p className="text-sm text-gray-500">{liveWeather.location}</p>
               </div>
             </div>
             <div className="flex items-center gap-4 text-xs text-gray-500 mb-4">
               <span className="flex items-center gap-1">
-                <Droplets className="w-3.5 h-3.5" /> {WEATHER_DATA.current.humidity}%
+                <Droplets className="w-3.5 h-3.5" /> {liveWeather.current.humidity}%
               </span>
               <span className="flex items-center gap-1">
-                <Wind className="w-3.5 h-3.5" /> {WEATHER_DATA.current.wind} km/h
+                <Wind className="w-3.5 h-3.5" /> {liveWeather.current.wind} km/h
               </span>
             </div>
             <div className="border-t border-gray-100 pt-3">
               <div className="grid grid-cols-5 gap-1">
-                {WEATHER_DATA.forecast.map((day) => (
+                {liveWeather.forecast.map((day) => (
                   <div key={day.day} className="text-center">
                     <p className="text-[10px] text-gray-400 mb-1">{day.day.slice(0, 3)}</p>
                     <p className="text-lg leading-none mb-1">{day.icon}</p>

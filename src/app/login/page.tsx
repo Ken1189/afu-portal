@@ -214,8 +214,9 @@ export default function LoginPage() {
         if (signUpError) {
           setError(signUpError.message);
         } else {
-          setSuccess('Account created! Check your email to confirm, or sign in now.');
-          setIsSignUp(false);
+          // Free membership created automatically — send to onboarding
+          router.push('/onboarding');
+          return;
         }
       } else {
         const { error: signInError } = await signIn(email, password);

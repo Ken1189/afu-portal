@@ -3,6 +3,8 @@
 import { useState, useMemo, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useParams, useRouter } from 'next/navigation';
+import { useAuth } from '@/lib/supabase/auth-context';
+import { startImpersonation } from '@/components/ui/ImpersonationBanner';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -46,6 +48,7 @@ import {
   CreditCard,
   Loader2,
   Save,
+  LogIn,
 } from 'lucide-react';
 // ── Inline types & fallback data (formerly from @/lib/data/members & @/lib/data/loans) ─
 
@@ -350,8 +353,11 @@ function CreditScoreGauge({ score }: { score: number }) {
 export default function MemberDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const { isSuperAdmin, user: authUser } = useAuth();
+  const [impersonateLoading, setImpersonateLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<TabId>('profile');
   const [dbMember, setDbMember] = useState<Member | null>(null);
+  const [dbProfileId, setDbProfileId] = useState<string | null>(null);
   const [dbLoans, setDbLoans] = useState<Loan[]>([]);
   const [dbLoading, setDbLoading] = useState(true);
   const [editMode, setEditMode] = useState(false);
@@ -366,6 +372,43 @@ export default function MemberDetailPage() {
 
   const showSuccess = (msg: string) => { setSuccessMsg(msg); setTimeout(() => setSuccessMsg(null), 3000); };
   const showError = (msg: string) => { setErrorMsg(msg); setTimeout(() => setErrorMsg(null), 3000); };
+
+  const handleImpersonate = async () => {
+    if (!dbProfileId) {
+      showError('Cannot impersonate — profile ID not found');
+      return;
+    }
+    setImpersonateLoading(true);
+    try {
+      const res = await fetch('/api/admin/impersonate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'start', targetUserId: dbProfileId }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showError(data.error || 'Impersonation failed');
+        return;
+      }
+      // Store impersonation data in localStorage
+      startImpersonation(data.impersonation);
+
+      // Redirect based on the target user's role
+      const role = data.impersonation.role;
+      const redirectMap: Record<string, string> = {
+        member: '/dashboard',
+        supplier: '/supplier',
+        admin: '/admin',
+        super_admin: '/admin',
+        warehouse_operator: '/warehouse',
+      };
+      router.push(redirectMap[role] || '/dashboard');
+    } catch (err) {
+      showError('Impersonation request failed');
+    } finally {
+      setImpersonateLoading(false);
+    }
+  };
 
   const memberId = params.id as string;
 
@@ -383,6 +426,7 @@ export default function MemberDetailPage() {
           const profile = memberData.profiles as Record<string, unknown> | null;
           const fullName = (profile?.full_name as string) || '';
           const [firstName = '', ...lastParts] = fullName.split(' ');
+          setDbProfileId(memberData.profile_id || null);
           setDbMember({
             id: memberData.member_id,
             firstName,
@@ -606,6 +650,17 @@ export default function MemberDetailPage() {
               <RefreshCw className="w-3.5 h-3.5" />
               Change Tier
             </button>
+            {isSuperAdmin && dbProfileId && dbProfileId !== authUser?.id && (
+              <button
+                onClick={handleImpersonate}
+                disabled={impersonateLoading}
+                className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-purple-700 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors disabled:opacity-50"
+                title="View platform as this user"
+              >
+                {impersonateLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <LogIn className="w-3.5 h-3.5" />}
+                Login As
+              </button>
+            )}
             {member.status === 'active' ? (
               <button
                 onClick={() => setConfirmSuspend(true)}

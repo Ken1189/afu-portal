@@ -10,10 +10,10 @@ type Tier = "free" | "smallholder" | "commercial" | "enterprise" | "partner";
 
 const FALLBACK_TIERS: Record<Tier, { name: string; price: string; priceNote: string; desc: string }> = {
   free: { name: "Free", price: "Free", priceNote: "forever", desc: "Explore the platform — no payment required" },
-  smallholder: { name: "Smallholder", price: "$48/year", priceNote: "or $5/mo", desc: "For farms under 10 hectares" },
-  commercial: { name: "Commercial", price: "$240/year", priceNote: "or $25/mo", desc: "For farms 10-500 hectares" },
-  enterprise: { name: "Enterprise", price: "$950/year", priceNote: "or $99/mo", desc: "For large-scale operations + cooperatives" },
-  partner: { name: "Partner", price: "On Request", priceNote: "by application", desc: "Suppliers, offtakers, investors" },
+  smallholder: { name: "Smallholder", price: "$49/year", priceNote: "or $4.99/mo", desc: "For farms under 10 hectares" },
+  commercial: { name: "Commercial", price: "$490/year", priceNote: "or $49/mo", desc: "Growing commercial farms" },
+  enterprise: { name: "Enterprise", price: "$4,990/year", priceNote: "or $499/mo", desc: "Established commercial operations" },
+  partner: { name: "Partner", price: "On Request", priceNote: "by application", desc: "Suppliers, offtakers, service providers" },
 };
 
 export default function ApplyPage() {
@@ -59,10 +59,14 @@ export default function ApplyPage() {
             const mapped: Record<string, { name: string; price: string; priceNote: string; desc: string }> = {};
             for (const t of parsed) {
               const slug = (t.slug || t.name?.toLowerCase().replace(/\s+/g, '-')) as string;
-              const tierKey = slug === 'smallholder' ? 'smallholder'
+              // Map legacy slugs (bronze/gold/platinum) to new tier names
+              const tierKey = slug === 'free' ? 'free'
+                : slug === 'smallholder' ? 'smallholder'
                 : slug === 'commercial' || slug === 'bronze' ? 'commercial'
                 : slug === 'enterprise' || slug === 'gold' || slug === 'platinum' ? 'enterprise'
-                : 'partner';
+                : slug === 'partner' ? 'partner'
+                : null;
+              if (!tierKey || tierKey === 'free') continue; // skip free (always fallback) and unknown slugs
               if (!mapped[tierKey]) {
                 mapped[tierKey] = {
                   name: t.name || FALLBACK_TIERS[tierKey as Tier].name,

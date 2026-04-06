@@ -6,6 +6,8 @@ import {
   Zap, Plus, X, Loader2, CheckCircle2, XCircle, Clock, Mail,
   MessageSquare, Phone, Tag, Users, Bell, ArrowRight, Edit3,
   Trash2, Power, Search, RefreshCw, AlertTriangle, ChevronRight,
+  UserX, UserCheck, FileX, TrendingUp, CreditCard, BookOpen,
+  Award, Sparkles, LayoutTemplate,
 } from 'lucide-react';
 
 /* ─── Types ─── */
@@ -24,14 +26,24 @@ interface AutomationRule {
   created_at: string;
 }
 
-const TRIGGER_TYPES: { value: string; label: string; desc: string; icon: React.ReactNode }[] = [
-  { value: 'new_application', label: 'New Application', desc: 'When someone submits a membership application', icon: <Users className="w-4 h-4" /> },
-  { value: 'member_approved', label: 'Member Approved', desc: 'When a membership application is approved', icon: <CheckCircle2 className="w-4 h-4" /> },
-  { value: 'ambassador_approved', label: 'Ambassador Approved', desc: 'When an ambassador application is approved', icon: <CheckCircle2 className="w-4 h-4" /> },
-  { value: 'supplier_approved', label: 'Supplier Approved', desc: 'When a supplier is approved', icon: <CheckCircle2 className="w-4 h-4" /> },
-  { value: 'form_submitted', label: 'Contact Form', desc: 'When someone submits the contact form', icon: <Mail className="w-4 h-4" /> },
-  { value: 'inactivity', label: 'Inactivity', desc: 'When a member has no activity for X days', icon: <Clock className="w-4 h-4" /> },
-  { value: 'anniversary', label: 'Anniversary', desc: 'On member signup anniversary (30d, 90d, 365d)', icon: <Bell className="w-4 h-4" /> },
+const TRIGGER_TYPES: { value: string; label: string; desc: string; icon: React.ReactNode; category: 'event' | 'lifecycle' }[] = [
+  // Event-based triggers
+  { value: 'new_application', label: 'New Application', desc: 'When someone submits a membership application', icon: <Users className="w-4 h-4" />, category: 'event' },
+  { value: 'member_approved', label: 'Member Approved', desc: 'When a membership application is approved', icon: <CheckCircle2 className="w-4 h-4" />, category: 'event' },
+  { value: 'ambassador_approved', label: 'Ambassador Approved', desc: 'When an ambassador application is approved', icon: <CheckCircle2 className="w-4 h-4" />, category: 'event' },
+  { value: 'supplier_approved', label: 'Supplier Approved', desc: 'When a supplier is approved', icon: <CheckCircle2 className="w-4 h-4" />, category: 'event' },
+  { value: 'form_submitted', label: 'Contact Form', desc: 'When someone submits the contact form', icon: <Mail className="w-4 h-4" />, category: 'event' },
+  { value: 'inactivity', label: 'Inactivity', desc: 'When a member has no activity for X days', icon: <Clock className="w-4 h-4" />, category: 'event' },
+  { value: 'anniversary', label: 'Anniversary', desc: 'On member signup anniversary (30d, 90d, 365d)', icon: <Bell className="w-4 h-4" />, category: 'event' },
+  // Lifecycle triggers (evaluated by cron)
+  { value: 'incomplete_profile', label: 'Incomplete Profile', desc: 'User hasn\'t completed profile within X hours of signup', icon: <UserX className="w-4 h-4" />, category: 'lifecycle' },
+  { value: 'inactive_user', label: 'Inactive User', desc: 'User hasn\'t logged in for X days', icon: <Clock className="w-4 h-4" />, category: 'lifecycle' },
+  { value: 'abandoned_application', label: 'Abandoned Application', desc: 'Application started but not submitted within X hours', icon: <FileX className="w-4 h-4" />, category: 'lifecycle' },
+  { value: 'new_member_welcome', label: 'New Member Welcome', desc: 'Fires immediately when a new member is approved', icon: <UserCheck className="w-4 h-4" />, category: 'lifecycle' },
+  { value: 'tier_upgrade_eligible', label: 'Tier Upgrade Eligible', desc: 'User meets criteria for a tier upgrade', icon: <TrendingUp className="w-4 h-4" />, category: 'lifecycle' },
+  { value: 'payment_overdue', label: 'Payment Overdue', desc: 'Membership payment is overdue by X days', icon: <CreditCard className="w-4 h-4" />, category: 'lifecycle' },
+  { value: 'course_incomplete', label: 'Course Incomplete', desc: 'User started a course but hasn\'t finished within X days', icon: <BookOpen className="w-4 h-4" />, category: 'lifecycle' },
+  { value: 'referral_milestone', label: 'Referral Milestone', desc: 'Ambassador hits a referral milestone (5, 10, 25, 50)', icon: <Award className="w-4 h-4" />, category: 'lifecycle' },
 ];
 
 const ACTION_TYPES: { value: string; label: string; icon: React.ReactNode }[] = [
@@ -40,6 +52,7 @@ const ACTION_TYPES: { value: string; label: string; icon: React.ReactNode }[] = 
   { value: 'send_whatsapp', label: 'Send WhatsApp', icon: <Phone className="w-4 h-4" /> },
   { value: 'add_tag', label: 'Add Tag', icon: <Tag className="w-4 h-4" /> },
   { value: 'create_notification', label: 'In-App Notification', icon: <Bell className="w-4 h-4" /> },
+  { value: 'update_status', label: 'Update Status', icon: <RefreshCw className="w-4 h-4" /> },
 ];
 
 function formatDelay(mins: number): string {
@@ -49,12 +62,114 @@ function formatDelay(mins: number): string {
   return `${Math.round(mins / 1440)} days`;
 }
 
+/* ─── Automation Templates ─── */
+interface AutomationTemplate {
+  id: string;
+  name: string;
+  description: string;
+  color: string;
+  rules: {
+    name: string;
+    trigger_type: string;
+    trigger_config: Record<string, string>;
+    action_type: string;
+    action_config: Record<string, string>;
+    delay_minutes: number;
+  }[];
+}
+
+const AUTOMATION_TEMPLATES: AutomationTemplate[] = [
+  {
+    id: 'welcome_series',
+    name: 'Welcome Series',
+    description: '3 emails over 7 days after a new member is approved',
+    color: 'bg-green-50 border-green-200 text-green-800',
+    rules: [
+      {
+        name: 'Welcome Series — Email 1: Welcome',
+        trigger_type: 'new_member_welcome',
+        trigger_config: {},
+        action_type: 'send_email',
+        action_config: { subject: 'Welcome to AFU, {{name}}!', body: 'Hi {{name}},\n\nWelcome to the Africa Farmers Union! We are thrilled to have you join our community.\n\nHere is what you can do next:\n- Complete your profile\n- Browse the marketplace\n- Connect with other farmers\n\nWe are here to support you every step of the way.' },
+        delay_minutes: 0,
+      },
+      {
+        name: 'Welcome Series — Email 2: Getting Started',
+        trigger_type: 'new_member_welcome',
+        trigger_config: {},
+        action_type: 'send_email',
+        action_config: { subject: 'Getting started with AFU, {{name}}', body: 'Hi {{name}},\n\nHave you had a chance to explore your AFU dashboard yet?\n\nHere are a few things other members found helpful in their first week:\n- Setting up your farm profile\n- Browsing training courses\n- Checking the marketplace for opportunities\n\nLet us know if you need any help!' },
+        delay_minutes: 2880, // 2 days
+      },
+      {
+        name: 'Welcome Series — Email 3: Next Steps',
+        trigger_type: 'new_member_welcome',
+        trigger_config: {},
+        action_type: 'send_email',
+        action_config: { subject: 'Your first week with AFU', body: 'Hi {{name}},\n\nYou have been a member for a week now. We hope you are enjoying AFU!\n\nDid you know you can:\n- Refer other farmers and earn rewards\n- Access exclusive training content\n- Upgrade your membership for more features\n\nKeep growing with AFU!' },
+        delay_minutes: 10080, // 7 days
+      },
+    ],
+  },
+  {
+    id: 'complete_profile',
+    name: 'Complete Your Profile',
+    description: 'Reminder after 24 hours if profile is still incomplete',
+    color: 'bg-amber-50 border-amber-200 text-amber-800',
+    rules: [
+      {
+        name: 'Profile Reminder — 24hr',
+        trigger_type: 'incomplete_profile',
+        trigger_config: { hours: '24' },
+        action_type: 'send_email',
+        action_config: { subject: 'Complete your AFU profile, {{name}}', body: 'Hi {{name}},\n\nWe noticed your profile is not yet complete. A complete profile helps you:\n- Get matched with relevant opportunities\n- Connect with the right partners\n- Access personalized recommendations\n\nIt only takes a few minutes. Log in now to finish!' },
+        delay_minutes: 0,
+      },
+    ],
+  },
+  {
+    id: 'we_miss_you',
+    name: 'We Miss You',
+    description: 'Re-engagement email after 14 days of inactivity',
+    color: 'bg-blue-50 border-blue-200 text-blue-800',
+    rules: [
+      {
+        name: 'Re-engagement — 14 day inactive',
+        trigger_type: 'inactive_user',
+        trigger_config: { days: '14' },
+        action_type: 'send_email',
+        action_config: { subject: 'We miss you, {{name}}!', body: 'Hi {{name}},\n\nWe have not seen you on AFU in a while and we miss you!\n\nHere is what has been happening since your last visit:\n- New training courses available\n- Marketplace updates in your region\n- Community discussions you might enjoy\n\nCome back and see what is new!' },
+        delay_minutes: 0,
+      },
+    ],
+  },
+  {
+    id: 'upgrade_plan',
+    name: 'Upgrade Your Plan',
+    description: 'Suggest upgrade after 30 days on the free tier',
+    color: 'bg-purple-50 border-purple-200 text-purple-800',
+    rules: [
+      {
+        name: 'Upgrade Suggestion — 30 days on free tier',
+        trigger_type: 'tier_upgrade_eligible',
+        trigger_config: { current_tier: 'free', min_days: '30' },
+        action_type: 'send_email',
+        action_config: { subject: 'Unlock more with AFU, {{name}}', body: 'Hi {{name}},\n\nYou have been using AFU for over 30 days now — great to have you!\n\nDid you know that upgrading your membership gives you:\n- Full marketplace access\n- Premium training content\n- Priority support\n- Advanced analytics\n\nUpgrade today and take your farming business to the next level.' },
+        delay_minutes: 0,
+      },
+    ],
+  },
+];
+
 /* ─── Component ─── */
 export default function AdminAutomationsPage() {
   const supabase = useMemo(() => createClient(), []);
   const [rules, setRules] = useState<AutomationRule[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+
+  const [showTemplates, setShowTemplates] = useState(false);
+  const [applyingTemplate, setApplyingTemplate] = useState<string | null>(null);
 
   // Modal
   const [showModal, setShowModal] = useState(false);
@@ -152,6 +267,23 @@ export default function AdminAutomationsPage() {
     fetchRules();
   };
 
+  // ── Apply template ──
+  const applyTemplate = async (template: AutomationTemplate) => {
+    setApplyingTemplate(template.id);
+    try {
+      for (const rule of template.rules) {
+        await fetch('/api/admin/automations', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...rule, is_active: true }),
+        });
+      }
+      await fetchRules();
+    } finally {
+      setApplyingTemplate(null);
+    }
+  };
+
   // ── Stats ──
   const activeCount = rules.filter(r => r.is_active).length;
   const totalRuns = rules.reduce((s, r) => s + (r.run_count || 0), 0);
@@ -189,6 +321,49 @@ export default function AdminAutomationsPage() {
       <div className="relative max-w-md">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
         <input type="text" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} placeholder="Search automations..." className="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#5DB347]" />
+      </div>
+
+      {/* Templates */}
+      <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+        <button
+          onClick={() => setShowTemplates(p => !p)}
+          className="w-full flex items-center justify-between px-5 py-4 hover:bg-gray-50 transition-colors"
+        >
+          <div className="flex items-center gap-3">
+            <LayoutTemplate className="w-5 h-5 text-[#5DB347]" />
+            <div className="text-left">
+              <h3 className="text-sm font-semibold text-[#1B2A4A]">Quick Templates</h3>
+              <p className="text-[10px] text-gray-400">One-click setup for common automation workflows</p>
+            </div>
+          </div>
+          <ChevronRight className={`w-4 h-4 text-gray-400 transition-transform ${showTemplates ? 'rotate-90' : ''}`} />
+        </button>
+        {showTemplates && (
+          <div className="px-5 pb-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {AUTOMATION_TEMPLATES.map(tpl => (
+              <div key={tpl.id} className={`rounded-xl border p-4 ${tpl.color}`}>
+                <div className="flex items-start justify-between gap-2 mb-1">
+                  <h4 className="text-sm font-semibold">{tpl.name}</h4>
+                  <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-white/60">
+                    {tpl.rules.length} rule{tpl.rules.length > 1 ? 's' : ''}
+                  </span>
+                </div>
+                <p className="text-xs opacity-80 mb-3">{tpl.description}</p>
+                <button
+                  onClick={() => applyTemplate(tpl)}
+                  disabled={applyingTemplate === tpl.id}
+                  className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg bg-white/80 hover:bg-white transition-colors disabled:opacity-50"
+                >
+                  {applyingTemplate === tpl.id ? (
+                    <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Applying...</>
+                  ) : (
+                    <><Sparkles className="w-3.5 h-3.5" /> Apply Template</>
+                  )}
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Rules list */}
@@ -277,12 +452,30 @@ export default function AdminAutomationsPage() {
               {/* Trigger */}
               <div>
                 <label className="block text-xs font-semibold text-gray-500 uppercase mb-2">When this happens (Trigger)</label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {TRIGGER_TYPES.map(t => (
+                <p className="text-[10px] text-gray-400 mb-2 font-medium uppercase tracking-wide">Event-based</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
+                  {TRIGGER_TYPES.filter(t => t.category === 'event').map(t => (
                     <button
                       key={t.value}
                       type="button"
-                      onClick={() => setForm(p => ({ ...p, trigger_type: t.value }))}
+                      onClick={() => setForm(p => ({ ...p, trigger_type: t.value, trigger_config: {} }))}
+                      className={`text-left p-3 rounded-xl border-2 transition-all ${form.trigger_type === t.value ? 'border-[#5DB347] bg-[#5DB347]/5' : 'border-gray-100 hover:border-gray-200'}`}
+                    >
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span className={form.trigger_type === t.value ? 'text-[#5DB347]' : 'text-gray-400'}>{t.icon}</span>
+                        <span className="text-sm font-medium text-[#1B2A4A]">{t.label}</span>
+                      </div>
+                      <p className="text-[10px] text-gray-400">{t.desc}</p>
+                    </button>
+                  ))}
+                </div>
+                <p className="text-[10px] text-gray-400 mb-2 font-medium uppercase tracking-wide">Lifecycle (evaluated by scheduled job)</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {TRIGGER_TYPES.filter(t => t.category === 'lifecycle').map(t => (
+                    <button
+                      key={t.value}
+                      type="button"
+                      onClick={() => setForm(p => ({ ...p, trigger_type: t.value, trigger_config: {} }))}
                       className={`text-left p-3 rounded-xl border-2 transition-all ${form.trigger_type === t.value ? 'border-[#5DB347] bg-[#5DB347]/5' : 'border-gray-100 hover:border-gray-200'}`}
                     >
                       <div className="flex items-center gap-2 mb-0.5">
@@ -326,6 +519,72 @@ export default function AdminAutomationsPage() {
                     <option value="90">90 days (3 months)</option>
                     <option value="180">180 days (6 months)</option>
                     <option value="365">365 days (1 year)</option>
+                  </select>
+                </div>
+              )}
+
+              {form.trigger_type === 'incomplete_profile' && (
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">Hours after signup before triggering</label>
+                  <input type="number" value={form.trigger_config.hours || ''} onChange={e => setForm(p => ({ ...p, trigger_config: { ...p.trigger_config, hours: e.target.value } }))} placeholder="24" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
+                  <p className="text-[10px] text-gray-400 mt-1">Fires if the user still has missing profile fields after this many hours</p>
+                </div>
+              )}
+
+              {form.trigger_type === 'inactive_user' && (
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">Days since last login</label>
+                  <input type="number" value={form.trigger_config.days || ''} onChange={e => setForm(p => ({ ...p, trigger_config: { ...p.trigger_config, days: e.target.value } }))} placeholder="14" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
+                </div>
+              )}
+
+              {form.trigger_type === 'abandoned_application' && (
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">Hours since application started without submitting</label>
+                  <input type="number" value={form.trigger_config.hours || ''} onChange={e => setForm(p => ({ ...p, trigger_config: { ...p.trigger_config, hours: e.target.value } }))} placeholder="48" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
+                </div>
+              )}
+
+              {form.trigger_type === 'tier_upgrade_eligible' && (
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 mb-1">Current tier</label>
+                    <select value={form.trigger_config.current_tier || ''} onChange={e => setForm(p => ({ ...p, trigger_config: { ...p.trigger_config, current_tier: e.target.value } }))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
+                      <option value="">Any tier</option>
+                      <option value="free">Free</option>
+                      <option value="smallholder">Smallholder</option>
+                      <option value="commercial">Commercial</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 mb-1">Minimum days on current tier</label>
+                    <input type="number" value={form.trigger_config.min_days || ''} onChange={e => setForm(p => ({ ...p, trigger_config: { ...p.trigger_config, min_days: e.target.value } }))} placeholder="30" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
+                  </div>
+                </div>
+              )}
+
+              {form.trigger_type === 'payment_overdue' && (
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">Days overdue before triggering</label>
+                  <input type="number" value={form.trigger_config.days || ''} onChange={e => setForm(p => ({ ...p, trigger_config: { ...p.trigger_config, days: e.target.value } }))} placeholder="7" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
+                </div>
+              )}
+
+              {form.trigger_type === 'course_incomplete' && (
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">Days since course started without completion</label>
+                  <input type="number" value={form.trigger_config.days || ''} onChange={e => setForm(p => ({ ...p, trigger_config: { ...p.trigger_config, days: e.target.value } }))} placeholder="14" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
+                </div>
+              )}
+
+              {form.trigger_type === 'referral_milestone' && (
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">Milestone count</label>
+                  <select value={form.trigger_config.milestone || ''} onChange={e => setForm(p => ({ ...p, trigger_config: { ...p.trigger_config, milestone: e.target.value } }))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
+                    <option value="5">5 referrals</option>
+                    <option value="10">10 referrals</option>
+                    <option value="25">25 referrals</option>
+                    <option value="50">50 referrals</option>
                   </select>
                 </div>
               )}
@@ -397,6 +656,19 @@ export default function AdminAutomationsPage() {
                       <label className="block text-xs font-medium text-gray-500 mb-1">Message</label>
                       <textarea value={form.action_config.body || ''} onChange={e => setForm(p => ({ ...p, action_config: { ...p.action_config, body: e.target.value } }))} rows={2} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm resize-none" />
                     </div>
+                  </div>
+                )}
+
+                {form.action_type === 'update_status' && (
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 mb-1">New status value</label>
+                    <select value={form.action_config.status || ''} onChange={e => setForm(p => ({ ...p, action_config: { ...p.action_config, status: e.target.value } }))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
+                      <option value="">Select status...</option>
+                      <option value="active">Active</option>
+                      <option value="inactive">Inactive</option>
+                      <option value="suspended">Suspended</option>
+                      <option value="pending_review">Pending Review</option>
+                    </select>
                   </div>
                 )}
               </div>

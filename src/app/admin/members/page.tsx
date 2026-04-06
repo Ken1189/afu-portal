@@ -2,12 +2,15 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
   Search, Users, CheckCircle2, Clock, Ban, Eye, UserPlus,
-  MapPin, CreditCard, Loader2, Download,
+  MapPin, CreditCard, Loader2, Download, LogIn,
 } from 'lucide-react';
 import { useMembers } from '@/lib/supabase/use-members';
+import { useAuth } from '@/lib/supabase/auth-context';
+import { startImpersonation } from '@/components/ui/ImpersonationBanner';
 
 const tierColors: Record<string, string> = {
   student: 'bg-gray-100 text-gray-600',
@@ -34,14 +37,50 @@ const statusColors: Record<string, string> = {
 
 export default function AdminMembersPage() {
   const { members, loading, stats, suspendMember, activateMember } = useMembers();
+  const { isSuperAdmin, user: authUser } = useAuth();
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [tierFilter, setTierFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [countryFilter, setCountryFilter] = useState('all');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [impersonateLoading, setImpersonateLoading] = useState<string | null>(null);
   const [confirmAction, setConfirmAction] = useState<{ id: string; action: 'suspend' | 'activate' } | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const handleImpersonate = async (profileId: string) => {
+    if (!profileId || profileId === authUser?.id) return;
+    setImpersonateLoading(profileId);
+    try {
+      const res = await fetch('/api/admin/impersonate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'start', targetUserId: profileId }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setErrorMsg(data.error || 'Impersonation failed');
+        setTimeout(() => setErrorMsg(null), 3000);
+        return;
+      }
+      startImpersonation(data.impersonation);
+      const role = data.impersonation.role;
+      const redirectMap: Record<string, string> = {
+        member: '/dashboard',
+        supplier: '/supplier',
+        admin: '/admin',
+        super_admin: '/admin',
+        warehouse_operator: '/warehouse',
+      };
+      router.push(redirectMap[role] || '/dashboard');
+    } catch {
+      setErrorMsg('Impersonation request failed');
+      setTimeout(() => setErrorMsg(null), 3000);
+    } finally {
+      setImpersonateLoading(null);
+    }
+  };
 
   const filtered = useMemo(() => {
     let result = [...members];
@@ -241,9 +280,19 @@ export default function AdminMembersPage() {
                     </td>
                     <td className="py-3 px-4">
                       <div className="flex items-center justify-end gap-1">
-                        <Link href={`/admin/members/${m.id}`} className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-navy transition-colors">
+                        <Link href={`/admin/members/${m.id}`} className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-navy transition-colors" title="View details">
                           <Eye className="w-4 h-4" />
                         </Link>
+                        {isSuperAdmin && m.profile_id && m.profile_id !== authUser?.id && (
+                          <button
+                            onClick={() => handleImpersonate(m.profile_id)}
+                            disabled={impersonateLoading === m.profile_id}
+                            className="p-2 rounded-lg hover:bg-purple-50 text-gray-400 hover:text-purple-600 transition-colors disabled:opacity-50"
+                            title="Login as this user"
+                          >
+                            {impersonateLoading === m.profile_id ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogIn className="w-4 h-4" />}
+                          </button>
+                        )}
                         {m.status === 'active' && (
                           <button
                             onClick={() => setConfirmAction({ id: m.id, action: 'suspend' })}

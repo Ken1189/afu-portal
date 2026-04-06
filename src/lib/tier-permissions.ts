@@ -12,7 +12,8 @@ export type FeatureKey =
   | 'exports' | 'exchange' | 'trade'
   | 'ai_tools' | 'carbon_credits'
   | 'warehouse' | 'market_prices'
-  | 'money' | 'payments';
+  | 'money' | 'payments'
+  | 'agriculture' | 'forestry' | 'game_farming';
 
 export type TierName = 'free' | 'smallholder' | 'commercial' | 'enterprise' | 'partner';
 
@@ -21,6 +22,7 @@ const TIER_FEATURES: Record<TierName, FeatureKey[]> = {
     'crops', 'livestock', 'weather', 'journal',
     'marketplace', 'training', 'market_prices',
     'cooperatives', 'money', 'payments',
+    'agriculture',
   ],
   smallholder: [
     // Everything in free, plus:
@@ -29,6 +31,7 @@ const TIER_FEATURES: Record<TierName, FeatureKey[]> = {
     'insurance', 'financing', 'equipment',
     'cooperatives', 'market_prices',
     'money', 'payments', 'ai_tools',
+    'agriculture', 'forestry', 'game_farming',
   ],
   commercial: [
     // Everything in smallholder, plus:
@@ -41,6 +44,7 @@ const TIER_FEATURES: Record<TierName, FeatureKey[]> = {
     'ai_tools', 'carbon_credits',
     'warehouse', 'market_prices',
     'money', 'payments',
+    'agriculture', 'forestry', 'game_farming',
   ],
   enterprise: [
     // Everything — full access
@@ -53,6 +57,7 @@ const TIER_FEATURES: Record<TierName, FeatureKey[]> = {
     'ai_tools', 'carbon_credits',
     'warehouse', 'market_prices',
     'money', 'payments',
+    'agriculture', 'forestry', 'game_farming',
   ],
   partner: [
     // Full access (suppliers/partners)
@@ -65,6 +70,7 @@ const TIER_FEATURES: Record<TierName, FeatureKey[]> = {
     'ai_tools', 'carbon_credits',
     'warehouse', 'market_prices',
     'money', 'payments',
+    'agriculture', 'forestry', 'game_farming',
   ],
 };
 

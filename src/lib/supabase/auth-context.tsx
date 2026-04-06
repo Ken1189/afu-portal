@@ -27,6 +27,8 @@ interface AuthContextType {
   isSuperAdmin: boolean;
   isSupplier: boolean;
   isMember: boolean;
+  isImpersonating: boolean;
+  realProfile: Profile | null;
   signUp: (email: string, password: string, fullName: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signInWithMagicLink: (email: string) => Promise<{ error: Error | null }>;
@@ -44,6 +46,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [realProfile, setRealProfile] = useState<Profile | null>(null);
+  const [isImpersonating, setIsImpersonating] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   const supabase = createClient();
@@ -58,13 +62,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .single();
 
       if (!error && data) {
-        setProfile(data as Profile);
+        const profileData = data as Profile;
+        setRealProfile(profileData);
+
+        // Check if impersonating — override profile with target user's profile
+        const impersonationData = localStorage.getItem('afu_impersonation');
+        if (impersonationData && profileData.role === 'super_admin') {
+          try {
+            const imp = JSON.parse(impersonationData);
+            const { data: targetProfile } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', imp.userId)
+              .single();
+            if (targetProfile) {
+              setProfile(targetProfile as Profile);
+              setIsImpersonating(true);
+              return;
+            }
+          } catch {
+            // Invalid impersonation data, fall through
+          }
+        }
+
+        setProfile(profileData);
+        setIsImpersonating(false);
       } else if (error) {
         console.warn('[Auth] Profile fetch failed:', error.message, '— retrying...');
         // Retry once after 1s
         setTimeout(async () => {
           const { data: retryData } = await supabase.from('profiles').select('*').eq('id', userId).single();
-          if (retryData) setProfile(retryData as Profile);
+          if (retryData) {
+            setProfile(retryData as Profile);
+            setRealProfile(retryData as Profile);
+          }
         }, 1000);
       }
     } catch (err) {
@@ -75,6 +106,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Refresh profile
   const refreshProfile = useCallback(async () => {
     if (user) await fetchProfile(user.id);
+  }, [user, fetchProfile]);
+
+  // Listen for impersonation changes (same-tab custom event + cross-tab storage event)
+  useEffect(() => {
+    const handleImpersonationChange = () => {
+      if (user) fetchProfile(user.id);
+    };
+    window.addEventListener('impersonation-changed', handleImpersonationChange);
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'afu_impersonation') handleImpersonationChange();
+    });
+    return () => {
+      window.removeEventListener('impersonation-changed', handleImpersonationChange);
+    };
   }, [user, fetchProfile]);
 
   // Listen to auth state changes
@@ -109,32 +154,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // ── Auth methods ──────────────────────────────────────────────────────
 
-  // S1.3: Self-signup creates pending profile — requires admin approval to activate
+  // Self-signup auto-approves a free membership so every user gets immediate access
   const signUp = async (email: string, password: string, fullName: string) => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: { full_name: fullName, role: 'pending' },
+        data: { full_name: fullName, role: 'member' },
       },
     });
 
-    // Create profile with pending status — user cannot access protected portals until approved
     if (!error && data?.user) {
+      const userId = data.user.id;
+
+      // Create profile with member role — immediate access to dashboard
       await supabase.from('profiles').upsert({
-        id: data.user.id,
+        id: userId,
         email,
         full_name: fullName,
-        role: 'pending',
+        role: 'member',
       });
 
-      // Also create a membership application for admin review
+      // Create an auto-approved membership application for record-keeping
       await supabase.from('membership_applications').insert({
         email,
         full_name: fullName,
-        status: 'pending',
+        status: 'auto_approved',
+        requested_tier: 'free',
         application_type: 'member',
-        profile_id: data.user.id,
+        profile_id: userId,
+      });
+
+      // Create a members record with free tier so user is not orphaned
+      const memberId = `AFU-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 99999)).padStart(5, '0')}`;
+      await supabase.from('members').insert({
+        profile_id: userId,
+        member_id: memberId,
+        tier: 'free',
+        status: 'active',
       });
     }
 
@@ -160,10 +217,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = async () => {
+    // Clear impersonation on sign out
+    localStorage.removeItem('afu_impersonation');
+    setIsImpersonating(false);
     await supabase.auth.signOut();
     setUser(null);
     setSession(null);
     setProfile(null);
+    setRealProfile(null);
   };
 
   // ── Role helpers ──────────────────────────────────────────────────────
@@ -184,6 +245,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isSuperAdmin,
         isSupplier,
         isMember,
+        isImpersonating,
+        realProfile,
         signUp,
         signIn,
         signInWithMagicLink,
