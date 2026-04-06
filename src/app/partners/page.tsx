@@ -168,7 +168,7 @@ const CATEGORY_TO_TAB: Record<string, PartnerTab> = {
 };
 
 export default function PartnersPage() {
-  const [activeTab, setActiveTab] = useState<PartnerTab>("unions");
+  const [activeTab, setActiveTab] = useState<PartnerTab>("business");
   const [partners, setPartners] = useState<Record<PartnerTab, Partner[]>>(FALLBACK_PARTNERS);
 
   useEffect(() => {
