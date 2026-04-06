@@ -14,6 +14,20 @@ const ICON_MAP: Record<string, LucideIcon> = {
   DollarSign, Sprout, Factory, Handshake, Globe, GraduationCap, Scale, Stethoscope,
 };
 
+// Services not yet fully operational get a "Coming Soon" badge
+const COMING_SOON_SERVICES = new Set([
+  'Processing Hubs',
+  'Energy',
+  'Machinery',
+  'Security',
+  'Technology',
+]);
+
+// Partially live — badge reads "Expanding"
+const PARTIAL_SERVICES = new Set([
+  'Guaranteed Offtake',
+]);
+
 const FALLBACK_SERVICES: { title: string; desc: string; features: string[]; link: string; icon: LucideIcon }[] = [
   {
     title: "Financing",
@@ -132,6 +146,12 @@ export default async function ServicesPage() {
                     {String(i + 1).padStart(2, '0')}
                   </div>
                   <h3 className="text-xl font-bold text-[#1B2A4A] group-hover:text-[#5DB347] transition-colors duration-300">{svc.title}</h3>
+                  {COMING_SOON_SERVICES.has(svc.title) && (
+                    <span className="inline-block bg-amber-100 text-amber-700 text-[10px] font-semibold px-2 py-0.5 rounded-full">Coming Soon</span>
+                  )}
+                  {PARTIAL_SERVICES.has(svc.title) && (
+                    <span className="inline-block bg-blue-100 text-blue-700 text-[10px] font-semibold px-2 py-0.5 rounded-full">Expanding</span>
+                  )}
                 </div>
                 <p className="text-gray-500 text-sm mb-5 leading-relaxed">{svc.desc}</p>
                 <div className="flex flex-wrap gap-2 mb-4">

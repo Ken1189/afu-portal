@@ -76,6 +76,7 @@ export default function AmbassadorApplyPage() {
     bio: '',
     socialLinks: '',
   });
+  const [honeypot, setHoneypot] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
@@ -133,6 +134,10 @@ export default function AmbassadorApplyPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Honeypot — bots that fill the hidden field get silently rejected
+    if (honeypot) return;
+
     setError('');
 
     if (!form.fullName || !form.email || !form.country || !form.sector) {
@@ -304,6 +309,11 @@ export default function AmbassadorApplyPage() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Honeypot - hidden from real users, bots fill it */}
+            <div className="absolute opacity-0 h-0 overflow-hidden" aria-hidden="true">
+              <input type="text" name="website" tabIndex={-1} autoComplete="off" value={honeypot} onChange={e => setHoneypot(e.target.value)} />
+            </div>
+
             {/* Full Name */}
             <div>
               <label htmlFor="fullName" className="block text-sm font-medium text-[#1B2A4A] mb-2">

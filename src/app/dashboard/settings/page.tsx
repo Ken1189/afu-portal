@@ -1088,7 +1088,7 @@ export default function SettingsPage() {
                   </div>
                   <div className="flex-1">
                     <h3 className="font-semibold text-red-600">
-                      Delete Account
+                      Delete My Account
                     </h3>
                     <p className="text-gray-500 text-sm mt-1 mb-4 leading-relaxed">
                       Permanently delete your account and all associated data.
@@ -1096,9 +1096,27 @@ export default function SettingsPage() {
                       offtake contracts, and outstanding balances must be
                       resolved before account deletion.
                     </p>
-                    <button className="inline-flex items-center gap-2 bg-red-50 hover:bg-red-100 text-red-600 text-sm font-semibold px-5 py-2.5 rounded-lg border border-red-200 transition-colors">
+                    <button
+                      onClick={async () => {
+                        if (!confirm('Are you sure you want to permanently delete your account? This action cannot be undone. All your data will be removed.')) return;
+                        if (!confirm('This is your FINAL confirmation. Type OK in the next dialog to proceed.')) return;
+                        try {
+                          const res = await fetch('/api/account/delete', { method: 'DELETE' });
+                          const data = await res.json();
+                          if (res.ok) {
+                            alert('Your account has been deleted. You will now be logged out.');
+                            window.location.href = '/';
+                          } else {
+                            alert(data.error || 'Something went wrong. Please contact support.');
+                          }
+                        } catch {
+                          alert('Failed to delete account. Please try again or contact support.');
+                        }
+                      }}
+                      className="inline-flex items-center gap-2 bg-red-50 hover:bg-red-100 text-red-600 text-sm font-semibold px-5 py-2.5 rounded-lg border border-red-200 transition-colors"
+                    >
                       <Trash2 size={16} />
-                      Request Account Deletion
+                      Delete My Account
                     </button>
                   </div>
                 </div>

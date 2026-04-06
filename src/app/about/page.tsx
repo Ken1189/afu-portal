@@ -3,7 +3,6 @@ import Image from "next/image";
 import { Sprout, Tractor, Building2, ShieldCheck, Settings, Globe, BarChart3, Lock, HeartHandshake, UtensilsCrossed, Heart, type LucideIcon } from "lucide-react";
 import LeadershipSection from "@/components/LeadershipSection";
 // CountryTeams removed — will be added when real team members are confirmed
-import VideoCard from "@/components/VideoCard";
 import { createClient } from "@supabase/supabase-js";
 
 export const metadata = {
@@ -225,23 +224,6 @@ export default async function AboutPage() {
               ))}
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* ─── OUR STORY VIDEO ─── */}
-      <section className="py-16 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8">
-            <span className="text-sm font-semibold uppercase tracking-wider text-green">
-              Our Story
-            </span>
-          </div>
-          <VideoCard
-            title="The AFU Story — From Vision to Platform"
-            duration="6 min"
-            thumbnailUrl="https://images.unsplash.com/photo-1589923188651-268a9765e432?w=1200&h=675&fit=crop"
-            size="large"
-          />
         </div>
       </section>
 

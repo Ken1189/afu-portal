@@ -30,22 +30,22 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const supplierLinks = [
-  { href: '/supplier', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/supplier/products', label: 'Products', icon: Package },
-  { href: '/supplier/orders', label: 'Orders', icon: ShoppingCart },
-  { href: '/supplier/advertising', label: 'Advertising', icon: Megaphone },
-  { href: '/supplier/commissions', label: 'Commissions', icon: Coins },
-  { href: '/supplier/discounts', label: 'Discounts', icon: BadgePercent },
-  { href: '/supplier/sponsorship', label: 'Sponsorship', icon: Award },
-  { href: '/supplier/analytics', label: 'Analytics', icon: BarChart3 },
-  { href: '/supplier/reviews', label: 'Reviews', icon: Star },
-  { href: '/supplier/estimates', label: 'Estimates', icon: FileText },
-  { href: '/supplier/inventory', label: 'Inventory', icon: Package },
-  { href: '/supplier/trade', label: 'Trade Marketplace', icon: ArrowLeftRight },
-  { href: '/supplier/exchange', label: 'Exchange', icon: ArrowLeftRight },
-  { href: '/supplier/marketplace', label: 'Marketplace', icon: Store },
-  { href: '/supplier/profile', label: 'Profile', icon: Building2 },
-  { href: '/supplier/settings', label: 'Settings', icon: Settings },
+  { href: '/supplier', label: 'Dashboard', icon: LayoutDashboard, section: 'Overview' },
+  { href: '/supplier/products', label: 'Products', icon: Package, section: 'Products & Sales' },
+  { href: '/supplier/orders', label: 'Orders', icon: ShoppingCart, section: 'Products & Sales' },
+  { href: '/supplier/marketplace', label: 'Marketplace', icon: Store, section: 'Products & Sales' },
+  { href: '/supplier/exchange', label: 'Exchange', icon: ArrowLeftRight, section: 'Products & Sales' },
+  { href: '/supplier/commissions', label: 'Commissions', icon: Coins, section: 'Finance' },
+  { href: '/supplier/estimates', label: 'Estimates', icon: FileText, section: 'Finance' },
+  { href: '/supplier/discounts', label: 'Discounts', icon: BadgePercent, section: 'Finance' },
+  { href: '/supplier/sponsorship', label: 'Sponsorship', icon: Award, section: 'Finance' },
+  { href: '/supplier/advertising', label: 'Advertising', icon: Megaphone, section: 'Marketing' },
+  { href: '/supplier/analytics', label: 'Analytics', icon: BarChart3, section: 'Marketing' },
+  { href: '/supplier/reviews', label: 'Reviews', icon: Star, section: 'Marketing' },
+  { href: '/supplier/inventory', label: 'Inventory', icon: Package, section: 'Account' },
+  { href: '/supplier/profile', label: 'Profile', icon: Building2, section: 'Account' },
+  { href: '/supplier/settings', label: 'Settings', icon: Settings, section: 'Account' },
+  { href: '/supplier/trade', label: 'Trade Marketplace', icon: ArrowLeftRight, section: 'Account' },
 ];
 
 export default function SupplierLayout({ children }: { children: React.ReactNode }) {
@@ -201,24 +201,35 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
 
         {/* Sidebar Nav */}
         <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
-          {supplierLinks.map((link) => {
-            const Icon = link.icon;
-            const active = isActive(link.href);
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                  active
-                    ? 'bg-white/15 text-white'
-                    : 'text-white/70 hover:bg-white/10 hover:text-white'
-                }`}
-              >
-                <Icon className="w-5 h-5" />
-                {link.label}
-              </Link>
-            );
-          })}
+          {(() => {
+            let lastSection = '';
+            return supplierLinks.map((link) => {
+              const Icon = link.icon;
+              const active = isActive(link.href);
+              const showHeader = link.section !== lastSection;
+              if (showHeader) lastSection = link.section;
+              return (
+                <div key={link.href}>
+                  {showHeader && (
+                    <div className="text-[10px] font-semibold uppercase tracking-wider text-white/40 px-4 pt-4 pb-1">
+                      {link.section}
+                    </div>
+                  )}
+                  <Link
+                    href={link.href}
+                    className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                      active
+                        ? 'bg-white/15 text-white'
+                        : 'text-white/70 hover:bg-white/10 hover:text-white'
+                    }`}
+                  >
+                    <Icon className="w-5 h-5" />
+                    {link.label}
+                  </Link>
+                </div>
+              );
+            });
+          })()}
         </nav>
 
         {/* Sidebar Footer */}
@@ -322,25 +333,36 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
 
                 {/* Drawer Nav */}
                 <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
-                  {supplierLinks.map((link) => {
-                    const active = isActive(link.href);
-                    const Icon = link.icon;
-                    return (
-                      <Link
-                        key={link.href}
-                        href={link.href}
-                        onClick={() => setDrawerOpen(false)}
-                        className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
-                          active
-                            ? 'bg-white/15 text-white'
-                            : 'text-white/70 active:bg-white/10'
-                        }`}
-                      >
-                        <Icon className="w-5 h-5" />
-                        {link.label}
-                      </Link>
-                    );
-                  })}
+                  {(() => {
+                    let lastSection = '';
+                    return supplierLinks.map((link) => {
+                      const active = isActive(link.href);
+                      const Icon = link.icon;
+                      const showHeader = link.section !== lastSection;
+                      if (showHeader) lastSection = link.section;
+                      return (
+                        <div key={link.href}>
+                          {showHeader && (
+                            <div className="text-[10px] font-semibold uppercase tracking-wider text-white/40 px-4 pt-4 pb-1">
+                              {link.section}
+                            </div>
+                          )}
+                          <Link
+                            href={link.href}
+                            onClick={() => setDrawerOpen(false)}
+                            className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+                              active
+                                ? 'bg-white/15 text-white'
+                                : 'text-white/70 active:bg-white/10'
+                            }`}
+                          >
+                            <Icon className="w-5 h-5" />
+                            {link.label}
+                          </Link>
+                        </div>
+                      );
+                    });
+                  })()}
                 </nav>
 
                 {/* Drawer Footer */}

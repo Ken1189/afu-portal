@@ -98,12 +98,44 @@ export default function BlogPage() {
             <p className="text-gray-500 text-sm">Loading posts...</p>
           </div>
         ) : posts.length === 0 ? (
-          <div className="text-center py-20">
-            <BookOpen className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <h2 className="text-xl font-semibold text-[#1B2A4A] mb-2">Coming Soon</h2>
-            <p className="text-gray-500">
-              We are preparing our first posts. Check back soon for stories from the field.
+          <div className="text-center py-20 max-w-md mx-auto">
+            <BookOpen className="w-12 h-12 text-[#5DB347]/40 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-[#1B2A4A] mb-2">Coming Soon</h2>
+            <p className="text-gray-500 mb-8">
+              We&apos;re working on great content. Check back soon!
             </p>
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <p className="text-sm font-semibold text-[#1B2A4A] mb-3">Get notified when we publish</p>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const form = e.target as HTMLFormElement;
+                  const email = (form.elements.namedItem('newsletter_email') as HTMLInputElement)?.value;
+                  if (email) {
+                    const supabase = createClient();
+                    supabase.from('newsletter_subscribers').insert({ email }).then(() => {
+                      form.reset();
+                      alert('Thanks! We will notify you when new posts are published.');
+                    });
+                  }
+                }}
+                className="flex gap-2"
+              >
+                <input
+                  type="email"
+                  name="newsletter_email"
+                  required
+                  placeholder="your@email.com"
+                  className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#5DB347]/50 focus:border-[#5DB347]"
+                />
+                <button
+                  type="submit"
+                  className="bg-[#5DB347] hover:bg-[#449933] text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors whitespace-nowrap"
+                >
+                  Notify Me
+                </button>
+              </form>
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

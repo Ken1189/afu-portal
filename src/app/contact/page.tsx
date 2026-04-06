@@ -5,8 +5,8 @@ import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 const FALLBACK_CONTACT = {
-  primary_email: "peterw@africanfarmingunion.org",
-  support_email: "devonk@africanfarmingunion.org",
+  primary_email: "info@africanfarmingunion.org",
+  support_email: "support@africanfarmingunion.org",
   phone: "",
   hq_address: "",
   hq_city: "Gaborone",
@@ -41,6 +41,7 @@ export default function ContactPage() {
     fetchContactInfo();
   }, []);
 
+  const [honeypot, setHoneypot] = useState("");
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -65,6 +66,10 @@ export default function ContactPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Honeypot — bots that fill the hidden field get silently rejected
+    if (honeypot) return;
+
     setError(null);
 
     // Client-side validation
@@ -229,6 +234,11 @@ export default function ContactPage() {
               ) : (
                 <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 md:p-10 shadow-lg shadow-[#5DB347]/5 border border-white/60">
                   <form onSubmit={handleSubmit} className="space-y-6">
+                    {/* Honeypot - hidden from real users, bots fill it */}
+                    <div className="absolute opacity-0 h-0 overflow-hidden" aria-hidden="true">
+                      <input type="text" name="website" tabIndex={-1} autoComplete="off" value={honeypot} onChange={e => setHoneypot(e.target.value)} />
+                    </div>
+
                     {error && (
                       <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
                         {error}

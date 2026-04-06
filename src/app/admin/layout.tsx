@@ -92,6 +92,8 @@ interface NavLink {
   icon: React.ReactNode;
   superAdminOnly?: boolean;
   badge?: number;
+  /** Optional sub-section label rendered as a divider above this link */
+  section?: string;
 }
 
 interface NavGroup {
@@ -223,42 +225,52 @@ const navGroups: NavGroup[] = [
     defaultOpen: false,
     superAdminOnly: true,
     links: [
-      { href: '/admin/users', label: 'Users & Roles', icon: <UserCog className={ICON_CLS} /> },
-      { href: '/admin/users/permissions', label: 'Permissions', icon: <ShieldCheck className={ICON_CLS} />, superAdminOnly: true },
+      // — General —
+      { href: '/admin/settings', label: 'Settings', icon: <Settings className={ICON_CLS} />, section: 'General' },
       { href: '/admin/settings/branding', label: 'Branding', icon: <Palette className={ICON_CLS} /> },
       { href: '/admin/settings/navigation', label: 'Navigation', icon: <LayoutDashboard className={ICON_CLS} /> },
       { href: '/admin/settings/contact-info', label: 'Contact Info', icon: <Mail className={ICON_CLS} /> },
-      { href: '/admin/system', label: 'System Health', icon: <Activity className={ICON_CLS} /> },
+      // — Access —
+      { href: '/admin/users', label: 'Users & Roles', icon: <UserCog className={ICON_CLS} />, section: 'Access' },
+      { href: '/admin/users/permissions', label: 'Permissions', icon: <ShieldCheck className={ICON_CLS} />, superAdminOnly: true },
       { href: '/admin/audit', label: 'Audit Trail', icon: <ScrollText className={ICON_CLS} /> },
+      { href: '/admin/system', label: 'System Health', icon: <Activity className={ICON_CLS} /> },
       { href: '/admin/compliance', label: 'Compliance', icon: <Shield className={ICON_CLS} /> },
       { href: '/admin/events', label: 'Event Monitor', icon: <Zap className={ICON_CLS} /> },
-      { href: '/admin/blockchain', label: 'Blockchain', icon: <Database className={ICON_CLS} /> },
-      { href: '/admin/notifications', label: 'Notifications', icon: <Bell className={ICON_CLS} /> },
-      { href: '/admin/settings', label: 'Settings', icon: <Settings className={ICON_CLS} /> },
-      { href: '/admin/run-migration', label: 'Run Migrations', icon: <Database className={ICON_CLS} /> },
-      { href: '/admin/settings/membership-tiers', label: 'Membership Tiers', icon: <Crown className={ICON_CLS} /> },
-      { href: '/admin/settings/loan-products', label: 'Loan Products', icon: <Banknote className={ICON_CLS} /> },
+      // — Membership —
+      { href: '/admin/settings/membership-tiers', label: 'Membership Tiers', icon: <Crown className={ICON_CLS} />, section: 'Membership' },
+      { href: '/admin/settings/onboarding-options', label: 'Onboarding Options', icon: <Settings className={ICON_CLS} /> },
+      { href: '/admin/settings/fresh-tiers', label: 'Fresh Tiers', icon: <Store className={ICON_CLS} /> },
+      // — Finance —
+      { href: '/admin/settings/loan-products', label: 'Loan Products', icon: <Banknote className={ICON_CLS} />, section: 'Finance' },
+      { href: '/admin/settings/insurance-pricing', label: 'Insurance Pricing', icon: <ShieldCheck className={ICON_CLS} /> },
+      { href: '/admin/settings/ltv-ratios', label: 'LTV Ratios', icon: <Scale className={ICON_CLS} /> },
+      { href: '/admin/settings/trading-commissions', label: 'Trading Commissions', icon: <Percent className={ICON_CLS} /> },
+      { href: '/admin/settings/trading-rules', label: 'Trading Rules', icon: <Globe className={ICON_CLS} /> },
+      { href: '/admin/settings/storage-fees', label: 'Storage Fees', icon: <Warehouse className={ICON_CLS} /> },
+      // — Operations —
+      { href: '/admin/settings/commodities', label: 'Commodities', icon: <Wheat className={ICON_CLS} />, section: 'Operations' },
       { href: '/admin/settings/product-categories', label: 'Product Categories', icon: <Tags className={ICON_CLS} /> },
-      { href: '/admin/settings/commodities', label: 'Commodities', icon: <Wheat className={ICON_CLS} /> },
-      { href: '/admin/settings/marketplace-rules', label: 'Marketplace Rules', icon: <ScrollText className={ICON_CLS} /> },
-      { href: '/admin/settings/ad-packages', label: 'Ad Packages', icon: <Megaphone className={ICON_CLS} /> },
-      { href: '/admin/settings/impact-metrics', label: 'Impact Metrics', icon: <Target className={ICON_CLS} /> },
-      { href: '/admin/settings/fund-documents', label: 'Fund Documents', icon: <FileText className={ICON_CLS} /> },
       { href: '/admin/settings/equipment-catalog', label: 'Equipment Catalog', icon: <Wrench className={ICON_CLS} /> },
-      { href: '/admin/settings/market-prices', label: 'Market Price Sources', icon: <TrendingUp className={ICON_CLS} /> },
+      { href: '/admin/settings/marketplace-rules', label: 'Marketplace Rules', icon: <ScrollText className={ICON_CLS} /> },
+      { href: '/admin/settings/grading-standards', label: 'Grading Standards', icon: <Star className={ICON_CLS} /> },
+      { href: '/admin/settings/supplier-verification', label: 'Supplier Settings', icon: <ShieldCheck className={ICON_CLS} /> },
+      { href: '/admin/settings/supplier-commissions', label: 'Supplier Commissions', icon: <Percent className={ICON_CLS} /> },
       { href: '/admin/settings/cooperative-rules', label: 'Cooperative Rules', icon: <Users className={ICON_CLS} /> },
       { href: '/admin/settings/crop-recommendations', label: 'Crop Recommendations', icon: <Sprout className={ICON_CLS} /> },
       { href: '/admin/settings/weather-alerts', label: 'Weather Alerts', icon: <Cloud className={ICON_CLS} /> },
-      { href: '/admin/settings/insurance-pricing', label: 'Insurance Pricing', icon: <ShieldCheck className={ICON_CLS} /> },
-      { href: '/admin/settings/supplier-verification', label: 'Supplier Settings', icon: <ShieldCheck className={ICON_CLS} /> },
-      { href: '/admin/settings/supplier-commissions', label: 'Supplier Commissions', icon: <Percent className={ICON_CLS} /> },
-      { href: '/admin/settings/grading-standards', label: 'Grading Standards', icon: <Star className={ICON_CLS} /> },
-      { href: '/admin/settings/ltv-ratios', label: 'LTV Ratios', icon: <Scale className={ICON_CLS} /> },
-      { href: '/admin/settings/storage-fees', label: 'Storage Fees', icon: <Warehouse className={ICON_CLS} /> },
-      { href: '/admin/settings/trading-commissions', label: 'Trading Commissions', icon: <Percent className={ICON_CLS} /> },
-      { href: '/admin/settings/trading-rules', label: 'Trading Rules', icon: <Globe className={ICON_CLS} /> },
-      { href: '/admin/settings/fresh-tiers', label: 'Fresh Tiers', icon: <Store className={ICON_CLS} /> },
-      { href: '/admin/settings/onboarding-options', label: 'Onboarding Options', icon: <Settings className={ICON_CLS} /> },
+      { href: '/admin/settings/market-prices', label: 'Market Price Sources', icon: <TrendingUp className={ICON_CLS} /> },
+      // — Content —
+      { href: '/admin/settings/homepage-sections', label: 'Homepage Sections', icon: <Layers className={ICON_CLS} />, section: 'Content' },
+      { href: '/admin/settings/homepage-images', label: 'Homepage Images', icon: <Image className={ICON_CLS} /> },
+      { href: '/admin/settings/videos', label: 'Videos', icon: <Play className={ICON_CLS} /> },
+      { href: '/admin/settings/ad-packages', label: 'Ad Packages', icon: <Megaphone className={ICON_CLS} /> },
+      { href: '/admin/settings/impact-metrics', label: 'Impact Metrics', icon: <Target className={ICON_CLS} /> },
+      { href: '/admin/settings/fund-documents', label: 'Fund Documents', icon: <FileText className={ICON_CLS} /> },
+      // — System —
+      { href: '/admin/notifications', label: 'Notifications', icon: <Bell className={ICON_CLS} />, section: 'System' },
+      { href: '/admin/blockchain', label: 'Blockchain', icon: <Database className={ICON_CLS} /> },
+      { href: '/admin/run-migration', label: 'Run Migrations', icon: <Database className={ICON_CLS} /> },
     ],
   },
   // ── 8. Switch Portal ──
@@ -408,7 +420,14 @@ function NavSection({
             const isActive = isLinkActive(link.href, pathname);
             const isFav = favorites.includes(link.href);
             return (
-              <div key={link.href} className="group/link relative">
+              <div key={link.href}>
+                {/* Sub-section label (e.g. "General", "Finance" inside Settings) */}
+                {link.section && !searchQuery && (
+                  <div className="px-3 pt-3 pb-1">
+                    <span className="text-[9px] font-bold uppercase tracking-widest text-gray-500">{link.section}</span>
+                  </div>
+                )}
+              <div className="group/link relative">
                 <Link
                   href={link.href}
                   className={`relative flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium transition-all duration-150 ${
@@ -444,6 +463,7 @@ function NavSection({
                 >
                   <Star className="w-3 h-3" fill={isFav ? 'currentColor' : 'none'} />
                 </button>
+              </div>
               </div>
             );
           })}

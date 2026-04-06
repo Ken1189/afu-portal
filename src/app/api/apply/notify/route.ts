@@ -1,9 +1,7 @@
 import { NextResponse } from 'next/server';
-import { Resend } from 'resend';
+import { sendEmail } from '@/lib/email';
 import { createInboxConversation } from '@/lib/inbox/create-conversation';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-const FROM = 'African Farming Union <noreply@mail.africanfarmingunion.org>';
 const NOTIFY_TO = ['peterw@africanfarmingunion.org', 'devonk@africanfarmingunion.org'];
 
 export async function POST(req: Request) {
@@ -16,12 +14,12 @@ export async function POST(req: Request) {
 
     const firstName = name.split(' ')[0];
 
-    // Notify Devon + Peter
-    await resend.emails.send({
-      from: FROM,
-      to: NOTIFY_TO,
-      subject: `New Membership Application from ${name} — ${tier} tier — ${country}`,
-      html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
+    // Notify Devon + Peter — uses centralized sendEmail from @/lib/email
+    for (const recipient of NOTIFY_TO) {
+      await sendEmail(
+        recipient,
+        `New Membership Application from ${name} — ${tier} tier — ${country}`,
+        `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
         <div style="background:#1B2A4A;padding:24px;text-align:center">
           <h2 style="color:#5DB347;margin:0;font-size:20px">New Membership Application</h2>
           <p style="color:#8CB89C;margin:6px 0 0;font-size:13px">AFU Portal</p>
@@ -47,14 +45,13 @@ export async function POST(req: Request) {
         </div>
         <div style="padding:16px;text-align:center;color:#999;font-size:12px">African Farming Union | africanfarmingunion.org</div>
       </div>`,
-    });
+      );
+    }
 
     // Auto-reply to applicant
-    await resend.emails.send({
-      from: FROM,
-      to: email,
-      subject: 'Welcome to the African Farming Union!',
-      html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
+    await sendEmail(
+      email,
+      'Welcome to the African Farming Union!', `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
         <div style="background:#1B2A4A;padding:30px;text-align:center">
           <h1 style="color:#5DB347;margin:0;font-size:24px">African Farming Union</h1>
           <p style="color:#8CB89C;margin:8px 0 0;font-size:14px">Farmers for Farmers</p>
@@ -76,7 +73,7 @@ export async function POST(req: Request) {
         </div>
         <div style="padding:20px;text-align:center;color:#999;font-size:12px">African Farming Union | Gaborone, Botswana<br>africanfarmingunion.org</div>
       </div>`,
-    });
+    );
 
     // Create inbox conversation
     createInboxConversation({

@@ -205,15 +205,36 @@ const AFRICAN_REGIONS = [
 ];
 
 const AFU_COUNTRIES = [
-  'Algeria', 'Angola', 'Benin', 'Botswana', 'Burkina Faso', 'Burundi',
+  // AFU Operating Countries (top of list)
+  'Zimbabwe', 'Botswana', 'Kenya', 'Tanzania', 'South Africa',
+  'Nigeria', 'Ghana', 'Uganda', 'Zambia', 'Mozambique',
+  // Rest of Africa
+  'Algeria', 'Angola', 'Benin', 'Burkina Faso', 'Burundi',
   'Cabo Verde', 'Cameroon', 'Central African Republic', 'Chad', 'Comoros',
   'Congo (Brazzaville)', 'Congo (DRC)', 'Djibouti', 'Egypt', 'Equatorial Guinea',
-  'Eritrea', 'Eswatini', 'Ethiopia', 'Gabon', 'Gambia', 'Ghana', 'Guinea',
-  'Guinea-Bissau', 'Ivory Coast', 'Kenya', 'Lesotho', 'Liberia', 'Libya',
+  'Eritrea', 'Eswatini', 'Ethiopia', 'Gabon', 'Gambia', 'Guinea',
+  'Guinea-Bissau', 'Ivory Coast', 'Lesotho', 'Liberia', 'Libya',
   'Madagascar', 'Malawi', 'Mali', 'Mauritania', 'Mauritius', 'Morocco',
-  'Mozambique', 'Namibia', 'Niger', 'Nigeria', 'Rwanda', 'Senegal',
-  'Seychelles', 'Sierra Leone', 'Somalia', 'South Africa', 'South Sudan',
-  'Sudan', 'Tanzania', 'Togo', 'Tunisia', 'Uganda', 'Zambia', 'Zimbabwe',
+  'Namibia', 'Niger', 'Rwanda', 'Senegal',
+  'Seychelles', 'Sierra Leone', 'Somalia', 'South Sudan',
+  'Sudan', 'Togo', 'Tunisia',
+  // Europe
+  'United Kingdom', 'Germany', 'France', 'Netherlands', 'Belgium',
+  'Switzerland', 'Ireland', 'Portugal', 'Spain', 'Italy',
+  'Sweden', 'Norway', 'Denmark', 'Finland', 'Austria',
+  'Poland', 'Czech Republic', 'Greece', 'Romania', 'Hungary',
+  // Americas
+  'United States', 'Canada', 'Brazil', 'Mexico', 'Argentina',
+  'Colombia', 'Chile', 'Peru', 'Jamaica', 'Trinidad and Tobago',
+  // Middle East
+  'United Arab Emirates', 'Saudi Arabia', 'Qatar', 'Kuwait', 'Bahrain',
+  'Oman', 'Israel', 'Jordan', 'Lebanon', 'Turkey',
+  // Asia Pacific
+  'India', 'China', 'Japan', 'South Korea', 'Singapore',
+  'Malaysia', 'Thailand', 'Indonesia', 'Philippines', 'Vietnam',
+  'Australia', 'New Zealand',
+  // Other
+  'Other',
 ];
 
 const DEFAULT_COMMISSION_RATES: CommissionRate[] = [

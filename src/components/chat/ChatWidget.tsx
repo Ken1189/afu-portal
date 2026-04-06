@@ -8,6 +8,7 @@ import TypingIndicator from './TypingIndicator';
 import QuickActions from './QuickActions';
 import { getChatResponse, getInitialGreeting, generateMessageId } from '@/lib/chatbot';
 import type { ChatMessage as ChatMessageType } from '@/lib/chatbot';
+import { createClient } from '@/lib/supabase/client';
 
 export default function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
@@ -32,6 +33,15 @@ export default function ChatWidget() {
     }
   }, [isOpen]);
 
+  // ── Talk to Human — collect details then save to inbox ──
+  const [humanRequested, setHumanRequested] = useState(false);
+  const [showHumanForm, setShowHumanForm] = useState(false);
+  const [humanForm, setHumanForm] = useState({ name: '', email: '', phone: '', message: '' });
+  const [humanSending, setHumanSending] = useState(false);
+  const [conversationId, setConversationId] = useState<string | null>(null);
+  const [agentJoined, setAgentJoined] = useState(false);
+  const channelRef = useRef<ReturnType<ReturnType<typeof createClient>['channel']> | null>(null);
+
   const openChat = () => {
     setIsOpen(true);
     if (!hasOpened) {
@@ -53,6 +63,27 @@ export default function ChatWidget() {
 
     setMessages((prev) => [...prev, userMessage]);
     setInput('');
+
+    // If we have an active human conversation, send follow-up to inbox
+    if (conversationId) {
+      try {
+        await fetch('/api/chat/human', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            conversationId,
+            message: text.trim(),
+            name: humanForm.name,
+            email: humanForm.email,
+          }),
+        });
+      } catch {
+        // Silently fail — message is still shown locally
+      }
+      // Don't call AI when in human mode — just send to inbox
+      return;
+    }
+
     setIsTyping(true);
 
     try {
@@ -76,7 +107,7 @@ export default function ChatWidget() {
     } finally {
       setIsTyping(false);
     }
-  }, []);
+  }, [conversationId, humanForm.name, humanForm.email]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -91,11 +122,51 @@ export default function ChatWidget() {
     sendMessage(label);
   };
 
-  // ── Talk to Human — collect details then save to inbox ──
-  const [humanRequested, setHumanRequested] = useState(false);
-  const [showHumanForm, setShowHumanForm] = useState(false);
-  const [humanForm, setHumanForm] = useState({ name: '', email: '', phone: '', message: '' });
-  const [humanSending, setHumanSending] = useState(false);
+  // Subscribe to Supabase Realtime for admin replies
+  useEffect(() => {
+    if (!conversationId) return;
+
+    const supabase = createClient();
+    const channel = supabase
+      .channel(`chat-${conversationId}`)
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'conversation_messages',
+        filter: `conversation_id=eq.${conversationId}`,
+      }, (payload) => {
+        const msg = payload.new as Record<string, unknown>;
+        if (msg.direction === 'outbound') {
+          // Show "agent joined" indicator on first admin reply
+          if (!agentJoined) {
+            setAgentJoined(true);
+            setMessages(prev => [...prev, {
+              id: generateMessageId(),
+              role: 'system' as const,
+              text: 'An agent has joined the chat',
+              timestamp: new Date(),
+            }]);
+          }
+          // Add the admin reply to the chat
+          const senderName = (msg.sender_name as string) || 'AFU Team';
+          setMessages(prev => [...prev, {
+            id: (msg.id as string) || generateMessageId(),
+            role: 'bot' as const,
+            text: `**${senderName}:** ${msg.body as string}`,
+            timestamp: new Date(msg.created_at as string),
+          }]);
+        }
+      })
+      .subscribe();
+
+    channelRef.current = channel;
+
+    return () => {
+      supabase.removeChannel(channel);
+      channelRef.current = null;
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conversationId]);
 
   const talkToHuman = () => {
     setShowHumanForm(true);
@@ -128,9 +199,16 @@ export default function ChatWidget() {
       });
 
       if (!res.ok) throw new Error('Request failed');
+      const data = await res.json();
 
       setHumanRequested(true);
       setShowHumanForm(false);
+
+      // Store conversationId to enable real-time replies
+      if (data.conversationId) {
+        setConversationId(data.conversationId);
+      }
+
       const confirmMsg: ChatMessageType = {
         id: generateMessageId(),
         role: 'bot',
@@ -203,7 +281,9 @@ export default function ChatWidget() {
                 </div>
                 <div>
                   <h3 className="text-white font-semibold text-sm">Amara</h3>
-                  <p className="text-teal-light text-xs">Your AFU Assistant</p>
+                  <p className="text-teal-light text-xs">
+                    {agentJoined ? 'Connected to agent' : conversationId ? 'Waiting for agent...' : 'Your AFU Assistant'}
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-1">
@@ -288,7 +368,7 @@ export default function ChatWidget() {
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Ask Amara anything..."
+                  placeholder={conversationId ? 'Type a message to the team...' : 'Ask Amara anything...'}
                   className="flex-1 bg-transparent text-sm text-navy placeholder:text-gray-400 focus:outline-none"
                   disabled={isTyping}
                 />

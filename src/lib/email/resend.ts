@@ -1,3 +1,22 @@
+// ---------------------------------------------------------------------------
+// Centralized email module — ALL API routes should use sendEmail() or
+// sendTemplatedEmail() from this file instead of creating their own
+// `new Resend()` instances.
+//
+// Usage:
+//   import { sendEmail } from '@/lib/email';
+//   await sendEmail('user@example.com', 'Subject', '<p>Body</p>');
+//
+// TODO: Migrate remaining API routes that still instantiate Resend directly:
+//   - /api/ambassador/notify
+//   - /api/insurance/*
+//   - /api/loans/*
+//   - /api/messaging/*
+//   - /api/orders/*
+//   - /api/kyc/*
+//   - /api/cron/*
+// ---------------------------------------------------------------------------
+
 import { Resend } from 'resend';
 import { createClient } from '@supabase/supabase-js';
 

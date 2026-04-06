@@ -24,6 +24,7 @@ export default function ApplyPage() {
   const [submitted, setSubmitted] = useState(false);
   const [referredBy, setReferredBy] = useState<string | null>(null);
   const [referralInput, setReferralInput] = useState("");
+  const [honeypot, setHoneypot] = useState("");
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -113,6 +114,10 @@ export default function ApplyPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Honeypot — bots that fill the hidden field get silently rejected
+    if (honeypot) return;
+
     setSubmitting(true);
     setSubmitError(null);
 
@@ -324,6 +329,11 @@ export default function ApplyPage() {
               )}
 
               <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Honeypot - hidden from real users, bots fill it */}
+                <div className="absolute opacity-0 h-0 overflow-hidden" aria-hidden="true">
+                  <input type="text" name="website" tabIndex={-1} autoComplete="off" value={honeypot} onChange={e => setHoneypot(e.target.value)} />
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-[#1B2A4A] mb-2">Your First Name *</label>

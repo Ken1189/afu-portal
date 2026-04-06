@@ -59,37 +59,37 @@ export const FARM_SIDEBAR_ITEMS = [
   { href: '/farm/training', label: 'Training Hub', icon: 'GraduationCap', tier: 'seedling' as FarmerTier },
 
   // Sprout tier
-  { href: '/farm/journal', label: 'Farm Journal', icon: 'BookOpen', tier: 'sprout' as FarmerTier },
-  { href: '/farm/crops', label: 'My Crops', icon: 'Sprout', tier: 'sprout' as FarmerTier },
-  { href: '/farm/agriculture', label: 'Agriculture', icon: 'Wheat', tier: 'sprout' as FarmerTier, section: 'Farming Sectors' },
-  { href: '/farm/forestry', label: 'Forestry', icon: 'TreePine', tier: 'sprout' as FarmerTier, section: 'Farming Sectors' },
-  { href: '/farm/game-farming', label: 'Game Farming', icon: 'Rabbit', tier: 'sprout' as FarmerTier, section: 'Farming Sectors' },
-  { href: '/farm/cooperatives', label: 'Cooperatives', icon: 'UsersRound', tier: 'sprout' as FarmerTier },
-  { href: '/farm/cooperatives/dashboard', label: 'My Cooperative', icon: 'UsersRound', tier: 'sprout' as FarmerTier },
+  { href: '/farm/agriculture', label: 'Agriculture', icon: 'Wheat', tier: 'sprout' as FarmerTier, section: 'Farming Sectors', group: 'Farming Sectors' },
+  { href: '/farm/forestry', label: 'Forestry', icon: 'TreePine', tier: 'sprout' as FarmerTier, section: 'Farming Sectors', group: 'Farming Sectors' },
+  { href: '/farm/game-farming', label: 'Game Farming', icon: 'Rabbit', tier: 'sprout' as FarmerTier, section: 'Farming Sectors', group: 'Farming Sectors' },
+  { href: '/farm/journal', label: 'Farm Journal', icon: 'BookOpen', tier: 'sprout' as FarmerTier, group: 'Farm Management' },
+  { href: '/farm/crops', label: 'My Crops', icon: 'Sprout', tier: 'sprout' as FarmerTier, group: 'Farm Management' },
+  { href: '/farm/cooperatives', label: 'Cooperatives', icon: 'UsersRound', tier: 'sprout' as FarmerTier, group: 'Farm Management' },
+  { href: '/farm/cooperatives/dashboard', label: 'My Cooperative', icon: 'UsersRound', tier: 'sprout' as FarmerTier, group: 'Farm Management' },
 
   // Growth tier
-  { href: '/farm/warehouse', label: 'Warehouse', icon: 'Warehouse', tier: 'growth' as FarmerTier },
-  { href: '/farm/financing', label: 'Financing', icon: 'Wallet', tier: 'growth' as FarmerTier },
-  { href: '/farm/insurance', label: 'Insurance', icon: 'Shield', tier: 'growth' as FarmerTier },
-  { href: '/farm/insurance/parametric', label: 'Parametric', icon: 'Zap', tier: 'growth' as FarmerTier },
-  { href: '/farm/payments', label: 'Payments', icon: 'CreditCard', tier: 'growth' as FarmerTier },
-  { href: '/farm/trade-finance', label: 'Trade Finance', icon: 'Ship', tier: 'growth' as FarmerTier },
-  { href: '/farm/legal', label: 'Legal Help', icon: 'Scale', tier: 'growth' as FarmerTier },
-  { href: '/farm/vet', label: 'Vet Services', icon: 'Stethoscope', tier: 'growth' as FarmerTier },
+  { href: '/farm/financing', label: 'Financing', icon: 'Wallet', tier: 'growth' as FarmerTier, group: 'Finance' },
+  { href: '/farm/insurance', label: 'Insurance', icon: 'Shield', tier: 'growth' as FarmerTier, group: 'Finance' },
+  { href: '/farm/insurance/parametric', label: 'Parametric', icon: 'Zap', tier: 'growth' as FarmerTier, group: 'Finance' },
+  { href: '/farm/payments', label: 'Payments', icon: 'CreditCard', tier: 'growth' as FarmerTier, group: 'Finance' },
+  { href: '/farm/trade-finance', label: 'Trade Finance', icon: 'Ship', tier: 'growth' as FarmerTier, group: 'Finance' },
+  { href: '/farm/legal', label: 'Legal Help', icon: 'Scale', tier: 'growth' as FarmerTier, group: 'Support' },
+  { href: '/farm/vet', label: 'Vet Services', icon: 'Stethoscope', tier: 'growth' as FarmerTier, group: 'Support' },
+  { href: '/farm/warehouse', label: 'Warehouse', icon: 'Warehouse', tier: 'growth' as FarmerTier, group: 'Support' },
 
   // Harvest tier
-  { href: '/farm/ai-tools', label: 'AI Tools', icon: 'Brain', tier: 'harvest' as FarmerTier },
-  { href: '/farm/doctor', label: 'Crop Doctor', icon: 'Camera', tier: 'harvest' as FarmerTier },
-  { href: '/farm/sustainability', label: 'Sustainability', icon: 'Leaf', tier: 'harvest' as FarmerTier },
-  { href: '/farm/sustainability/credits', label: 'Carbon Credits', icon: 'Leaf', tier: 'harvest' as FarmerTier },
-  { href: '/farm/exports', label: 'Exports', icon: 'Ship', tier: 'harvest' as FarmerTier },
+  { href: '/farm/ai-tools', label: 'AI Tools', icon: 'Brain', tier: 'harvest' as FarmerTier, group: 'Advanced' },
+  { href: '/farm/doctor', label: 'Crop Doctor', icon: 'Camera', tier: 'harvest' as FarmerTier, group: 'Advanced' },
+  { href: '/farm/sustainability', label: 'Sustainability', icon: 'Leaf', tier: 'harvest' as FarmerTier, group: 'Advanced' },
+  { href: '/farm/sustainability/credits', label: 'Carbon Credits', icon: 'Leaf', tier: 'harvest' as FarmerTier, group: 'Advanced' },
+  { href: '/farm/exports', label: 'Exports', icon: 'Ship', tier: 'harvest' as FarmerTier, group: 'Advanced' },
 
   // Pioneer tier
-  { href: '/farm/trade', label: 'Trading', icon: 'ArrowLeftRight', tier: 'pioneer' as FarmerTier },
-  { href: '/farm/marketplace', label: 'Marketplace', icon: 'ShoppingBag', tier: 'pioneer' as FarmerTier },
-  { href: '/farm/exchange', label: 'Exchange', icon: 'Coins', tier: 'pioneer' as FarmerTier },
-  { href: '/farm/logistics', label: 'Logistics', icon: 'Truck', tier: 'pioneer' as FarmerTier },
-  { href: '/farm/tokenize', label: 'Tokenize', icon: 'Coins', tier: 'pioneer' as FarmerTier },
+  { href: '/farm/trade', label: 'Trading', icon: 'ArrowLeftRight', tier: 'pioneer' as FarmerTier, group: 'Trading' },
+  { href: '/farm/marketplace', label: 'Marketplace', icon: 'ShoppingBag', tier: 'pioneer' as FarmerTier, group: 'Trading' },
+  { href: '/farm/exchange', label: 'Exchange', icon: 'Coins', tier: 'pioneer' as FarmerTier, group: 'Trading' },
+  { href: '/farm/logistics', label: 'Logistics', icon: 'Truck', tier: 'pioneer' as FarmerTier, group: 'Trading' },
+  { href: '/farm/tokenize', label: 'Tokenize', icon: 'Coins', tier: 'pioneer' as FarmerTier, group: 'Trading' },
 ];
 
 /** Check if a required tier is unlocked given the user's current tier */

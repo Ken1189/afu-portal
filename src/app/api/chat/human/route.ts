@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createInboxConversation } from '@/lib/inbox/create-conversation';
-import { Resend } from 'resend';
+import { sendEmail } from '@/lib/email';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-const FROM = 'African Farming Union <noreply@mail.africanfarmingunion.org>';
 const ADMIN_EMAILS = ['peterw@africanfarmingunion.org', 'devonk@africanfarmingunion.org'];
 
 /**
@@ -14,7 +12,35 @@ const ADMIN_EMAILS = ['peterw@africanfarmingunion.org', 'devonk@africanfarmingun
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { name, email, phone, message, chatHistory } = body;
+    const { name, email, phone, message, chatHistory, conversationId } = body;
+
+    // ── Follow-up message to an existing conversation ──
+    if (conversationId && message) {
+      const { createClient } = await import('@supabase/supabase-js');
+      const db = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+      );
+
+      await db.from('conversation_messages').insert({
+        conversation_id: conversationId,
+        direction: 'inbound',
+        channel: 'chat',
+        sender_name: name || 'Visitor',
+        sender_email: email || null,
+        body: message,
+        status: 'delivered',
+      });
+
+      // Bump conversation timestamp + unread count
+      await db.from('conversations').update({
+        last_message_at: new Date().toISOString(),
+        unread_count: 1,
+        updated_at: new Date().toISOString(),
+      }).eq('id', conversationId);
+
+      return NextResponse.json({ success: true, conversationId });
+    }
 
     if (!name || !email) {
       return NextResponse.json({ error: 'Name and email are required' }, { status: 400 });
@@ -40,14 +66,9 @@ export async function POST(req: NextRequest) {
       tags: ['chatbot', 'talk-to-human'],
     });
 
-    // Send email notification to admins
+    // Send email notification to admins — uses centralized sendEmail from @/lib/email
     try {
-      const firstName = name.split(' ')[0];
-      await resend.emails.send({
-        from: FROM,
-        to: ADMIN_EMAILS,
-        subject: `[AFU Chat] Talk to Human request from ${name}`,
-        html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
+      const adminHtml = `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
           <div style="background:#1B2A4A;padding:20px;text-align:center">
             <h2 style="color:#5DB347;margin:0">New Chat Request</h2>
             <p style="color:#8CB89C;margin:4px 0 0;font-size:13px">Someone wants to talk to a human</p>
@@ -67,8 +88,10 @@ export async function POST(req: NextRequest) {
           <div style="padding:12px;text-align:center;color:#999;font-size:11px">
             African Farming Union | africanfarmingunion.org
           </div>
-        </div>`,
-      });
+        </div>`;
+      for (const recipient of ADMIN_EMAILS) {
+        await sendEmail(recipient, `[AFU Chat] Talk to Human request from ${name}`, adminHtml);
+      }
     } catch (emailErr) {
       console.error('Chat human email notification error:', emailErr);
       // Don't fail the request if email notification fails
@@ -77,11 +100,10 @@ export async function POST(req: NextRequest) {
     // Send auto-reply to the visitor
     try {
       const firstName = name.split(' ')[0];
-      await resend.emails.send({
-        from: FROM,
-        to: email,
-        subject: 'We received your message - African Farming Union',
-        html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
+      await sendEmail(
+        email,
+        'We received your message - African Farming Union',
+        `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
           <div style="background:#1B2A4A;padding:24px;text-align:center">
             <h1 style="color:#5DB347;margin:0;font-size:22px">African Farming Union</h1>
             <p style="color:#8CB89C;margin:6px 0 0;font-size:13px">Farmers for Farmers</p>
@@ -101,7 +123,7 @@ export async function POST(req: NextRequest) {
             African Farming Union | Gaborone, Botswana<br>africanfarmingunion.org
           </div>
         </div>`,
-      });
+      );
     } catch (autoReplyErr) {
       console.error('Chat human auto-reply error:', autoReplyErr);
     }
