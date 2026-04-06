@@ -567,10 +567,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const sidebarRef = useRef<HTMLElement>(null);
 
   // ── Section nav (two-tier) ──
-  type SectionKey = 'dashboard' | 'crm' | 'finance' | 'operations' | 'marketplace' | 'content' | 'system';
+  type SectionKey = 'all' | 'dashboard' | 'crm' | 'finance' | 'operations' | 'marketplace' | 'content' | 'system';
   const SECTIONS: { key: SectionKey; label: string; icon: React.ReactNode; groups: string[] }[] = [
+    { key: 'all', label: 'All', icon: <Layers className="w-4 h-4" />, groups: ['Dashboard', 'People', 'Finance', 'Operations', 'Content', 'Marketing', 'Settings', 'Switch Portal'] },
     { key: 'dashboard', label: 'Home', icon: <LayoutDashboard className="w-4 h-4" />, groups: ['Dashboard'] },
-    { key: 'crm', label: 'CRM', icon: <Inbox className="w-4 h-4" />, groups: ['Dashboard', 'People', 'Marketing'] },
+    { key: 'crm', label: 'CRM', icon: <Inbox className="w-4 h-4" />, groups: ['People', 'Marketing'] },
     { key: 'finance', label: 'Finance', icon: <Landmark className="w-4 h-4" />, groups: ['Finance'] },
     { key: 'operations', label: 'Ops', icon: <Sprout className="w-4 h-4" />, groups: ['Operations'] },
     { key: 'marketplace', label: 'Portals', icon: <Store className="w-4 h-4" />, groups: ['Switch Portal'] },
@@ -587,10 +588,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     if (p.startsWith('/admin/ambassadors')) return 'marketplace';
     if (p.startsWith('/admin/content') || p.startsWith('/admin/blog') || p.startsWith('/admin/announcements') || p.startsWith('/admin/partners') || p.startsWith('/admin/media') || p.startsWith('/admin/research') || p.startsWith('/admin/faq') || p.startsWith('/admin/legal') || p.startsWith('/admin/countries')) return 'content';
     if (p.startsWith('/admin/users') || p.startsWith('/admin/audit') || p.startsWith('/admin/compliance') || p.startsWith('/admin/settings') || p.startsWith('/admin/system') || p.startsWith('/admin/events') || p.startsWith('/admin/blockchain') || p.startsWith('/admin/reports') || p.startsWith('/admin/notifications') || p.startsWith('/admin/run-migration')) return 'system';
+    if (p === '/admin' || p === '/admin/') return 'all';
     return 'dashboard';
   }, [pathname]);
 
-  const [activeSection, setActiveSection] = useState<SectionKey>('dashboard');
+  const [activeSection, setActiveSection] = useState<SectionKey>('all');
   useEffect(() => { setActiveSection(detectSection()); }, [detectSection]);
 
   // ── Search state ──
