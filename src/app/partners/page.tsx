@@ -36,68 +36,7 @@ const tabs: { key: PartnerTab; label: string; icon: typeof Wheat }[] = [
 ];
 
 const FALLBACK_PARTNERS: Record<PartnerTab, Partner[]> = {
-  unions: [
-    {
-      name: "Zimbabwe National Farmers Union",
-      initials: "ZN",
-      color: "bg-green-600",
-      type: "National Farmers Union",
-      country: "Zimbabwe",
-      description:
-        "Represents over 300,000 communal and resettlement farmers across Zimbabwe. Advocates for farmer rights, land reform, and market access.",
-      focus: "Farmer advocacy & market linkage",
-    },
-    {
-      name: "Botswana Agricultural Union",
-      initials: "BA",
-      color: "bg-blue-600",
-      type: "National Agricultural Union",
-      country: "Botswana",
-      description:
-        "The umbrella body for Botswana's commercial and emerging farmers. Focused on livestock, horticulture, and grain production.",
-      focus: "Commercial farming & livestock development",
-    },
-    {
-      name: "Tanzania Farmers Association",
-      initials: "TF",
-      color: "bg-yellow-600",
-      type: "National Farmers Association",
-      country: "Tanzania",
-      description:
-        "Connecting smallholder and medium-scale farmers across Tanzania. Strong focus on cooperative development and export readiness.",
-      focus: "Cooperative development & exports",
-    },
-    {
-      name: "Commercial Farmers Union of Zimbabwe",
-      initials: "CF",
-      color: "bg-[#5DB347]",
-      type: "Commercial Farmers Union",
-      country: "Zimbabwe",
-      description:
-        "Supporting commercial agriculture operations with technical expertise, policy advocacy, and market intelligence across Zimbabwe.",
-      focus: "Commercial agriculture & policy",
-    },
-    {
-      name: "Botswana Livestock Producers Association",
-      initials: "BL",
-      color: "bg-red-600",
-      type: "Livestock Association",
-      country: "Botswana",
-      description:
-        "Represents cattle and small stock producers. Supports the beef value chain from rangeland management to export-standard abattoirs.",
-      focus: "Livestock production & beef exports",
-    },
-    {
-      name: "Tanzania Horticultural Association",
-      initials: "TH",
-      color: "bg-emerald-600",
-      type: "Horticultural Association",
-      country: "Tanzania",
-      description:
-        "Promoting high-value horticulture including flowers, fruits, and vegetables for local and European export markets.",
-      focus: "Horticulture & high-value crops",
-    },
-  ],
+  unions: [],
   business: [
     {
       name: "African Development Bank (AfDB)",
@@ -200,120 +139,8 @@ const FALLBACK_PARTNERS: Record<PartnerTab, Partner[]> = {
       focus: "Agriscience innovation & digital advisory",
     },
   ],
-  governments: [
-    {
-      name: "Ministry of Lands, Agriculture, Fisheries, Water & Rural Development",
-      initials: "ZW",
-      color: "bg-green-700",
-      type: "Ministry of Agriculture",
-      country: "Zimbabwe",
-      description:
-        "Strategic partnership for farmer registration, extension services, and agricultural policy alignment. Co-designing digital agriculture programmes.",
-      focus: "Policy alignment & farmer registration",
-    },
-    {
-      name: "Ministry of Agriculture, Food Security and Cooperatives",
-      initials: "TZ",
-      color: "bg-yellow-600",
-      type: "Ministry of Agriculture",
-      country: "Tanzania",
-      description:
-        "Collaboration on food security initiatives, cooperative strengthening, and market information systems across Tanzania.",
-      focus: "Food security & cooperative development",
-    },
-    {
-      name: "Ministry of Agriculture, Botswana",
-      initials: "BW",
-      color: "bg-blue-600",
-      type: "Ministry of Agriculture",
-      country: "Botswana",
-      description:
-        "Partnership on the Integrated Support Programme for Arable Agriculture Development (ISPAAD) and livestock sector modernisation.",
-      focus: "Arable development & livestock modernisation",
-    },
-    {
-      name: "African Continental Free Trade Area (AfCFTA)",
-      initials: "AU",
-      color: "bg-emerald-700",
-      type: "Continental Trade Agreement",
-      country: "Pan-African",
-      description:
-        "Engagement with AfCFTA secretariat on reducing trade barriers for agricultural products across the continent.",
-      focus: "Intra-African agricultural trade",
-    },
-    {
-      name: "African Union - CAADP",
-      initials: "AU",
-      color: "bg-green-800",
-      type: "Continental Body",
-      country: "Pan-African",
-      description:
-        "Aligned with the Comprehensive Africa Agriculture Development Programme (CAADP) framework for agricultural transformation.",
-      focus: "Agricultural transformation framework",
-    },
-  ],
-  universities: [
-    {
-      name: "University of Zimbabwe",
-      initials: "UZ",
-      color: "bg-red-700",
-      type: "Research University",
-      country: "Zimbabwe",
-      description:
-        "Faculty of Agriculture research partnerships in soil science, crop breeding, and agricultural economics.",
-      focus: "Soil science & crop breeding research",
-    },
-    {
-      name: "University of Botswana",
-      initials: "UB",
-      color: "bg-blue-700",
-      type: "Research University",
-      country: "Botswana",
-      description:
-        "Collaborative research on dryland farming systems, water harvesting, and climate-resilient agriculture in semi-arid environments.",
-      focus: "Dryland farming & climate resilience",
-    },
-    {
-      name: "Sokoine University of Agriculture",
-      initials: "SU",
-      color: "bg-green-600",
-      type: "Agricultural University",
-      country: "Tanzania",
-      description:
-        "Tanzania's premier agricultural university. Joint programmes in agribusiness, food science, and agricultural extension methodologies.",
-      focus: "Agribusiness & extension methodology",
-    },
-    {
-      name: "Chinhoyi University of Technology",
-      initials: "CU",
-      color: "bg-navy",
-      type: "Technology University",
-      country: "Zimbabwe",
-      description:
-        "Partnering on agricultural technology innovation, including IoT sensor development, drone technology, and precision farming tools.",
-      focus: "AgTech innovation & IoT development",
-    },
-    {
-      name: "Botswana University of Agriculture",
-      initials: "BA",
-      color: "bg-[#5DB347]",
-      type: "Agricultural University",
-      country: "Botswana",
-      description:
-        "Focused on livestock science, range management, and veterinary research relevant to Botswana's pastoral farming systems.",
-      focus: "Livestock science & range management",
-    },
-    {
-      name: "Nelson Mandela African Institution of Science and Technology",
-      initials: "NM",
-      color: "bg-amber-700",
-      type: "Science & Technology Institute",
-      country: "Tanzania",
-      description:
-        "Post-graduate research in agricultural biotechnology, food processing technology, and sustainable farming systems.",
-      focus: "Biotechnology & food processing",
-    },
-  ],
+  governments: [],
+  universities: [],
 };
 
 /* Map managed_partners categories to tab keys */
@@ -408,10 +235,10 @@ export default function PartnersPage() {
               Our Partners &amp; Network
             </h1>
             <p className="text-xl text-gray-300 leading-relaxed">
-              AFU&apos;s strength lies in its partnerships. We connect farming
-              unions, businesses, governments, and universities into a single
-              ecosystem that de-risks agriculture and unlocks growth across
-              Africa.
+              AFU is building a network of partners across Africa &mdash; from
+              business networks and technology providers to farming unions,
+              governments, and research institutions. Together, we are creating
+              an ecosystem that de-risks agriculture and unlocks growth.
             </p>
           </div>
         </div>
@@ -441,7 +268,7 @@ export default function PartnersPage() {
             })}
           </div>
 
-          {/* Partner Cards */}
+          {/* Partner Cards or Coming Soon */}
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}
@@ -449,8 +276,41 @@ export default function PartnersPage() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -12 }}
               transition={{ duration: 0.25 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
             >
+              {partners[activeTab].length === 0 ? (
+                <div className="text-center py-20 px-4">
+                  <div className="w-20 h-20 rounded-3xl bg-[#EBF7E5] flex items-center justify-center mx-auto mb-6">
+                    {activeTab === 'unions' && <Wheat className="w-10 h-10 text-[#5DB347]" />}
+                    {activeTab === 'governments' && <Landmark className="w-10 h-10 text-[#5DB347]" />}
+                    {activeTab === 'universities' && <GraduationCap className="w-10 h-10 text-[#5DB347]" />}
+                  </div>
+                  <h3 className="text-2xl font-bold text-[#1B2A4A] mb-3">
+                    {activeTab === 'unions' && 'Seeking Farming Union Partners'}
+                    {activeTab === 'governments' && 'Seeking Government Partnerships'}
+                    {activeTab === 'universities' && 'Seeking University & Research Partners'}
+                  </h3>
+                  <p className="text-gray-500 max-w-lg mx-auto mb-8 leading-relaxed">
+                    {activeTab === 'unions' && 'We are actively seeking partnerships with national and regional farming unions across Africa. If your organisation represents farmers and would like to explore collaboration with AFU, we would love to hear from you.'}
+                    {activeTab === 'governments' && 'AFU is engaging with ministries of agriculture and development agencies across our operating countries. If you represent a government body interested in digital agriculture transformation, let us connect.'}
+                    {activeTab === 'universities' && 'We are building research partnerships with agricultural universities and institutes across Africa. If your institution is interested in collaborative research, student placements, or technology transfer, get in touch.'}
+                  </p>
+                  <div className="flex items-center justify-center gap-4">
+                    <Link
+                      href="/contact"
+                      className="inline-flex items-center gap-2 bg-gradient-to-r from-[#5DB347] to-[#449933] text-white px-8 py-3 rounded-full font-semibold hover:scale-105 transition-all duration-300 shadow-lg shadow-[#5DB347]/20"
+                    >
+                      Get in Touch <ArrowRight className="w-4 h-4" />
+                    </Link>
+                    <Link
+                      href="/apply?tier=partner"
+                      className="inline-flex items-center gap-2 border-2 border-[#5DB347] text-[#5DB347] px-8 py-3 rounded-full font-semibold hover:bg-[#EBF7E5] transition-all duration-300"
+                    >
+                      Apply as Partner
+                    </Link>
+                  </div>
+                </div>
+              ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {partners[activeTab].map((partner, i) => (
                 <div
                   key={i}
@@ -505,6 +365,8 @@ export default function PartnersPage() {
                   </div>
                 </div>
               ))}
+              </div>
+              )}
             </motion.div>
           </AnimatePresence>
         </div>
