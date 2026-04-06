@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   Settings,
@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/lib/supabase/auth-context';
 import { createClient } from '@/lib/supabase/client';
+import ImageUploader from '@/components/ui/ImageUploader';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -46,8 +47,6 @@ export default function SettingsPage() {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
-  const [uploadingAvatar, setUploadingAvatar] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Ambassador-specific fields (stored in site_config)
   const [bio, setBio] = useState('');
@@ -141,39 +140,17 @@ export default function SettingsPage() {
     fetchSettings();
   }, [user, profile]);
 
-  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !user) return;
-
-    setUploadingAvatar(true);
+  const handleAvatarChange = async (url: string) => {
+    if (!user) return;
+    setAvatarUrl(url);
     try {
       const supabase = createClient();
-      const ext = file.name.split('.').pop();
-      const filePath = `avatars/${user.id}.${ext}`;
-
-      // Upload to Supabase Storage
-      const { error: uploadError } = await supabase.storage
-        .from('public-assets')
-        .upload(filePath, file, { upsert: true });
-
-      if (uploadError) throw uploadError;
-
-      const { data: urlData } = supabase.storage
-        .from('public-assets')
-        .getPublicUrl(filePath);
-
-      if (urlData?.publicUrl) {
-        setAvatarUrl(urlData.publicUrl);
-        // Save to profile immediately
-        await supabase
-          .from('profiles')
-          .update({ avatar_url: urlData.publicUrl })
-          .eq('id', user.id);
-      }
+      await supabase
+        .from('profiles')
+        .update({ avatar_url: url })
+        .eq('id', user.id);
     } catch {
-      // If storage fails, user can still paste a URL
-    } finally {
-      setUploadingAvatar(false);
+      // ignore - user can still save via main Save button
     }
   };
 
@@ -322,49 +299,15 @@ export default function SettingsPage() {
               <Camera className="w-5 h-5 text-[#5DB347]" />
               <h2 className="text-lg font-semibold text-[#1B2A4A]">Profile Picture</h2>
             </div>
-            <div className="flex items-center gap-6">
-              <div className="relative">
-                <div className="w-24 h-24 rounded-full bg-[#1B2A4A]/5 border-2 border-gray-200 overflow-hidden flex items-center justify-center">
-                  {avatarUrl ? (
-                    <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
-                  ) : (
-                    <User className="w-10 h-10 text-gray-300" />
-                  )}
-                </div>
-                {uploadingAvatar && (
-                  <div className="absolute inset-0 bg-white/70 rounded-full flex items-center justify-center">
-                    <Loader2 className="w-6 h-6 animate-spin text-[#5DB347]" />
-                  </div>
-                )}
-              </div>
-              <div className="flex-1 space-y-3">
-                <div>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleAvatarUpload}
-                    className="hidden"
-                  />
-                  <button
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={uploadingAvatar}
-                    className="px-4 py-2 rounded-lg bg-[#5DB347]/10 text-[#5DB347] text-sm font-medium hover:bg-[#5DB347]/20 transition-colors disabled:opacity-50"
-                  >
-                    Upload Photo
-                  </button>
-                </div>
-                <div>
-                  <label className="block text-xs text-gray-400 mb-1">Or paste image URL</label>
-                  <input
-                    type="url"
-                    value={avatarUrl}
-                    onChange={(e) => setAvatarUrl(e.target.value)}
-                    placeholder="https://example.com/photo.jpg"
-                    className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347]"
-                  />
-                </div>
-              </div>
+            <div className="flex-1">
+              <ImageUploader
+                bucket="avatars"
+                folder={user?.id || ''}
+                value={avatarUrl}
+                onChange={handleAvatarChange}
+                round
+                label=""
+              />
             </div>
           </motion.div>
 

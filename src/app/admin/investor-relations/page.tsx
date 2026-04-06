@@ -39,9 +39,9 @@ interface Expression {
   notes: string;
 }
 
-// ── Demo Data ─────────────────────────────────────────────────────────────────
+// ── Demo Data (unused — kept for type reference) ──────────────────────────────
 
-const expressions: Expression[] = [
+const _expressions: Expression[] = [
   {
     id: '1',
     date: '2026-03-25',
@@ -158,14 +158,7 @@ const statusStyles: Record<ExpressionStatus, string> = {
   Declined: 'bg-red-100 text-red-700',
 };
 
-const defaultStatusCounts = {
-  total: expressions.length,
-  pending: expressions.filter((e) => e.status === 'Pending').length,
-  inDiscussion: expressions.filter((e) => e.status === 'In Discussion').length,
-  committed: expressions.filter((e) => e.status === 'Committed').length,
-};
-
-const defaultPipelineValue = expressions.reduce((sum, e) => sum + e.amount, 0);
+void _expressions;
 
 // ── Animation Variants ────────────────────────────────────────────────────────
 
@@ -233,19 +226,17 @@ export default function InvestorRelationsPage() {
     fetchInterests();
   }, []);
 
-  // Use DB data if available, otherwise fallback
-  const activeExpressions = dbExpressions.length > 0 ? dbExpressions : expressions;
+  // Use DB data only — no mock fallback
+  const activeExpressions = dbExpressions;
 
-  const statusCounts = dbExpressions.length > 0 ? {
+  const statusCounts = {
     total: activeExpressions.length,
     pending: activeExpressions.filter((e) => e.status === 'Pending').length,
     inDiscussion: activeExpressions.filter((e) => e.status === 'In Discussion').length,
     committed: activeExpressions.filter((e) => e.status === 'Committed').length,
-  } : defaultStatusCounts;
+  };
 
-  const totalPipelineValue = dbExpressions.length > 0
-    ? activeExpressions.reduce((sum, e) => sum + e.amount, 0)
-    : defaultPipelineValue;
+  const totalPipelineValue = activeExpressions.reduce((sum, e) => sum + e.amount, 0);
 
   const uniqueOpportunities = Array.from(new Set(activeExpressions.map((e) => e.opportunity)));
 

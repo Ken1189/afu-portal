@@ -23,7 +23,7 @@ interface VetAppointment {
   priority: AppointmentPriority; notes: string;
 }
 
-const fallback_vetAppointments: VetAppointment[] = [
+const _UNUSED_fallback_vetAppointments: VetAppointment[] = [
   { id: 'VET-001', farmerName: 'Kwame Asante', farmLocation: 'Ghana', animalType: 'Cattle', animalCount: 35, serviceType: 'Vaccination', description: 'Annual FMD and brucellosis vaccination for dairy herd.', status: 'Scheduled', assignedVet: 'Dr. Abena Mensah', dateScheduled: '2026-03-28', priority: 'Normal', notes: 'Farmer has cold chain storage on-site. Vaccines to be delivered day before.' },
   { id: 'VET-002', farmerName: 'Blessing Okoro', farmLocation: 'Nigeria', animalType: 'Poultry', animalCount: 2000, serviceType: 'Emergency', description: 'Suspected Newcastle disease outbreak in layer flock. High mortality reported.', status: 'Emergency', assignedVet: 'Dr. Chinedu Eze', dateScheduled: '2026-03-26', priority: 'Urgent', notes: 'Quarantine measures initiated. Lab samples collected and en route to diagnostic center.' },
   { id: 'VET-003', farmerName: 'Jean-Pierre Habimana', farmLocation: 'Rwanda', animalType: 'Cattle', animalCount: 12, serviceType: 'Routine Check', description: 'Quarterly health check and deworming for dairy cows.', status: 'Completed', assignedVet: 'Dr. Claire Uwimana', dateScheduled: '2026-03-18', priority: 'Low', notes: 'All animals in good health. Deworming completed. Next check scheduled for June.' },
@@ -42,7 +42,7 @@ const statusStyles: Record<AppointmentStatus, string> = { Scheduled: 'bg-blue-10
 const priorityStyles: Record<AppointmentPriority, string> = { Urgent: 'bg-red-100 text-red-700', Normal: 'bg-amber-100 text-amber-700', Low: 'bg-gray-100 text-gray-500' };
 const serviceTypeIcons: Record<ServiceType, React.ReactNode> = { 'Routine Check': <Activity className="w-3.5 h-3.5" />, Vaccination: <Syringe className="w-3.5 h-3.5" />, Emergency: <AlertTriangle className="w-3.5 h-3.5" />, Breeding: <Heart className="w-3.5 h-3.5" />, 'Lab Test': <FlaskConical className="w-3.5 h-3.5" /> };
 
-const fallback_statCounts = { total: 156, upcoming: 23, completed: 121, emergencyActive: 3 };
+const _UNUSED_fallback_statCounts = { total: 156, upcoming: 23, completed: 121, emergencyActive: 3 };
 
 const containerVariants = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.06, delayChildren: 0.1 } } };
 const cardVariants = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' as const } } };
@@ -58,8 +58,8 @@ export default function VeterinaryPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<AppointmentStatus | 'All'>('All');
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [vetAppointments, setVetAppointments] = useState<VetAppointment[]>(fallback_vetAppointments);
-  const [statCounts, setStatCounts] = useState(fallback_statCounts);
+  const [vetAppointments, setVetAppointments] = useState<VetAppointment[]>([]);
+  const [statCounts, setStatCounts] = useState({ total: 0, upcoming: 0, completed: 0, emergencyActive: 0 });
   const [isLoading, setIsLoading] = useState(true);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -72,26 +72,29 @@ export default function VeterinaryPage() {
   const supabase = createClient();
 
   const fetchData = useCallback(async () => {
-    try {
-      const { data, error } = await supabase.from('vet_appointments').select('*').order('date_scheduled', { ascending: false });
-      if (!error && data && data.length > 0) {
-        const mapped = data.map((row: Record<string, unknown>) => ({
-          id: (row.id as string) || '', farmerName: (row.farmer_name as string) || 'Unknown',
-          farmLocation: (row.farm_location as string) || (row.country as string) || '',
-          animalType: ((row.animal_type as string) || 'Cattle') as AnimalType,
-          animalCount: (row.animal_count as number) || 0,
-          serviceType: ((row.service_type as string) || 'Routine Check') as ServiceType,
-          description: (row.description as string) || '',
-          status: ((row.status as string) || 'Scheduled') as AppointmentStatus,
-          assignedVet: (row.assigned_vet as string) || 'Unassigned',
-          dateScheduled: ((row.date_scheduled as string) || '')?.split('T')[0] || '',
-          priority: ((row.priority as string) || 'Normal') as AppointmentPriority,
-          notes: (row.notes as string) || '',
-        }));
-        setVetAppointments(mapped);
-        setStatCounts({ total: mapped.length, upcoming: mapped.filter(a => a.status === 'Scheduled').length, completed: mapped.filter(a => a.status === 'Completed').length, emergencyActive: mapped.filter(a => a.status === 'Emergency').length });
-      }
-    } catch { /* fallback */ }
+    const { data, error } = await supabase.from('vet_appointments').select('*').order('date_scheduled', { ascending: false });
+    if (error) {
+      console.error('[veterinary] fetch failed', error);
+      setToast({ message: `Failed to load appointments: ${error.message || 'unknown error'}`, type: 'error' });
+      setVetAppointments([]);
+      setStatCounts({ total: 0, upcoming: 0, completed: 0, emergencyActive: 0 });
+    } else {
+      const mapped = (data || []).map((row: Record<string, unknown>) => ({
+        id: (row.id as string) || '', farmerName: (row.farmer_name as string) || 'Unknown',
+        farmLocation: (row.farm_location as string) || (row.country as string) || '',
+        animalType: ((row.animal_type as string) || 'Cattle') as AnimalType,
+        animalCount: (row.animal_count as number) || 0,
+        serviceType: ((row.service_type as string) || 'Routine Check') as ServiceType,
+        description: (row.description as string) || '',
+        status: ((row.status as string) || 'Scheduled') as AppointmentStatus,
+        assignedVet: (row.assigned_vet as string) || 'Unassigned',
+        dateScheduled: ((row.date_scheduled as string) || '')?.split('T')[0] || '',
+        priority: ((row.priority as string) || 'Normal') as AppointmentPriority,
+        notes: (row.notes as string) || '',
+      }));
+      setVetAppointments(mapped);
+      setStatCounts({ total: mapped.length, upcoming: mapped.filter(a => a.status === 'Scheduled').length, completed: mapped.filter(a => a.status === 'Completed').length, emergencyActive: mapped.filter(a => a.status === 'Emergency').length });
+    }
     setIsLoading(false);
   }, [supabase]);
 
@@ -109,19 +112,27 @@ export default function VeterinaryPage() {
     if (!editVet.trim()) return;
     setActionLoading(id + '-vet');
     const { error } = await supabase.from('vet_appointments').update({ assigned_vet: editVet.trim() }).eq('id', id);
-    if (error) { setVetAppointments(prev => prev.map(a => a.id === id ? { ...a, assignedVet: editVet.trim() } : a)); }
-    else { await fetchData(); }
-    setToast({ message: 'Veterinarian assigned', type: 'success' });
     setActionLoading(null);
+    if (error) {
+      console.error('[veterinary] assignVet failed', error);
+      setToast({ message: `Failed to assign vet: ${error.message || 'unknown error'}`, type: 'error' });
+      return;
+    }
+    setToast({ message: 'Veterinarian assigned', type: 'success' });
+    await fetchData();
   };
 
   const handleUpdateStatus = async (id: string) => {
     setActionLoading(id + '-status');
     const { error } = await supabase.from('vet_appointments').update({ status: editStatus }).eq('id', id);
-    if (error) { setVetAppointments(prev => prev.map(a => a.id === id ? { ...a, status: editStatus } : a)); }
-    else { await fetchData(); }
-    setToast({ message: `Status updated to ${editStatus}`, type: 'success' });
     setActionLoading(null);
+    if (error) {
+      console.error('[veterinary] updateStatus failed', error);
+      setToast({ message: `Failed to update status: ${error.message || 'unknown error'}`, type: 'error' });
+      return;
+    }
+    setToast({ message: `Status updated to ${editStatus}`, type: 'success' });
+    await fetchData();
   };
 
   const handleAddDiagnosis = async (id: string) => {
@@ -130,11 +141,15 @@ export default function VeterinaryPage() {
     const current = vetAppointments.find(a => a.id === id);
     const updatedNotes = current?.notes ? `${current.notes}\n[Diagnosis ${new Date().toLocaleDateString()}] ${diagnosis.trim()}` : `[Diagnosis ${new Date().toLocaleDateString()}] ${diagnosis.trim()}`;
     const { error } = await supabase.from('vet_appointments').update({ notes: updatedNotes }).eq('id', id);
-    if (error) { setVetAppointments(prev => prev.map(a => a.id === id ? { ...a, notes: updatedNotes } : a)); }
-    else { await fetchData(); }
+    setActionLoading(null);
+    if (error) {
+      console.error('[veterinary] addDiagnosis failed', error);
+      setToast({ message: `Failed to add diagnosis: ${error.message || 'unknown error'}`, type: 'error' });
+      return;
+    }
     setDiagnosis('');
     setToast({ message: 'Diagnosis/treatment added', type: 'success' });
-    setActionLoading(null);
+    await fetchData();
   };
 
   const statusFilters: (AppointmentStatus | 'All')[] = ['All', 'Scheduled', 'In Progress', 'Completed', 'Emergency'];

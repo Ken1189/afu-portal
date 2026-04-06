@@ -78,7 +78,7 @@ type PolicyStatusFilter = 'all' | 'active' | 'pending-claim' | 'expired';
 
 // ── Placeholder Data ─────────────────────────────────────────────────────────
 
-const FALLBACK_POLICIES: InsurancePolicy[] = [
+const _UNUSED_FALLBACK_POLICIES: InsurancePolicy[] = [
   { id: 'INS-001', policyNumber: 'POL-2026-0041', memberName: 'Grace Moyo', productType: 'Crop Insurance', coverageAmount: 120000, premium: 3600, status: 'active', expiryDate: '2026-12-31' },
   { id: 'INS-002', policyNumber: 'POL-2026-0042', memberName: 'Tendai Chirwa', productType: 'Livestock Insurance', coverageAmount: 85000, premium: 2550, status: 'active', expiryDate: '2026-09-15' },
   { id: 'INS-003', policyNumber: 'POL-2026-0043', memberName: 'Amina Salim', productType: 'Crop Insurance', coverageAmount: 200000, premium: 6000, status: 'pending-claim', expiryDate: '2026-11-30' },
@@ -87,7 +87,7 @@ const FALLBACK_POLICIES: InsurancePolicy[] = [
   { id: 'INS-006', policyNumber: 'POL-2026-0045', memberName: 'Kago Setshedi', productType: 'Crop Insurance', coverageAmount: 95000, premium: 2850, status: 'active', expiryDate: '2026-10-20' },
 ];
 
-const FALLBACK_CLAIMS: InsuranceClaim[] = [
+const _UNUSED_FALLBACK_CLAIMS: InsuranceClaim[] = [
   { id: 'CLM-001', claim_type: 'Crop Damage', amount: 45000, status: 'pending', created_at: '2026-03-10', farmer_name: 'Grace Moyo' },
   { id: 'CLM-002', claim_type: 'Livestock Loss', amount: 28000, status: 'pending', created_at: '2026-03-08', farmer_name: 'Tendai Chirwa' },
   { id: 'CLM-003', claim_type: 'Weather Damage', amount: 62000, status: 'approved', created_at: '2026-02-20', farmer_name: 'Amina Salim' },
@@ -169,6 +169,13 @@ export default function InsuranceOverviewPage() {
   // View toggle
   const [activeView, setActiveView] = useState<'claims' | 'policies'>('claims');
 
+  // Toast
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const showToast = useCallback((message: string, type: 'success' | 'error' = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 4000);
+  }, []);
+
   // Fetch claims
   const fetchClaims = useCallback(async () => {
     setClaimsLoading(true);
@@ -180,30 +187,28 @@ export default function InsuranceOverviewPage() {
 
       if (error) throw error;
 
-      if (data && data.length > 0) {
-        setClaims(
-          data.map((row: Record<string, unknown>) => {
-            const membersData = row.members as Record<string, unknown> | null;
-            const profilesData = membersData?.profiles as Record<string, unknown> | null;
-            const statusVal = (row.status as string) || 'submitted';
-            return {
-              id: row.id as string,
-              claim_type: (row.description as string) || 'Unknown',
-              amount: (row.claim_amount as number) || 0,
-              status: statusVal === 'submitted' ? 'pending' : statusVal,
-              created_at: (row.submitted_at as string) || '',
-              farmer_name: (profilesData?.full_name as string) || 'Unknown Farmer',
-            };
-          })
-        );
-      } else {
-        setClaims(FALLBACK_CLAIMS);
-      }
-    } catch {
-      setClaims(FALLBACK_CLAIMS);
+      setClaims(
+        (data || []).map((row: Record<string, unknown>) => {
+          const membersData = row.members as Record<string, unknown> | null;
+          const profilesData = membersData?.profiles as Record<string, unknown> | null;
+          const statusVal = (row.status as string) || 'submitted';
+          return {
+            id: row.id as string,
+            claim_type: (row.description as string) || 'Unknown',
+            amount: (row.claim_amount as number) || 0,
+            status: statusVal === 'submitted' ? 'pending' : statusVal,
+            created_at: (row.submitted_at as string) || '',
+            farmer_name: (profilesData?.full_name as string) || 'Unknown Farmer',
+          };
+        })
+      );
+    } catch (err) {
+      console.error('[insurance] fetchClaims failed', err);
+      showToast(`Failed to load claims: ${(err as Error)?.message || 'unknown error'}`, 'error');
+      setClaims([]);
     }
     setClaimsLoading(false);
-  }, [supabase]);
+  }, [supabase, showToast]);
 
   // Fetch policies
   const fetchPolicies = useCallback(async () => {
@@ -216,32 +221,30 @@ export default function InsuranceOverviewPage() {
 
       if (error) throw error;
 
-      if (data && data.length > 0) {
-        setPolicies(
-          data.map((row: Record<string, unknown>) => {
-            const membersData = row.members as Record<string, unknown> | null;
-            const profilesData = membersData?.profiles as Record<string, unknown> | null;
-            const productData = row.insurance_products as Record<string, unknown> | null;
-            return {
-              id: row.id as string,
-              policyNumber: (row.policy_number as string) || (row.id as string),
-              memberName: (profilesData?.full_name as string) || 'Unknown',
-              productType: (productData?.name as string) || 'General',
-              coverageAmount: (row.coverage_amount as number) || 0,
-              premium: (row.premium as number) || 0,
-              status: ((row.status as string) || 'active') as InsurancePolicy['status'],
-              expiryDate: ((row.end_date as string) || '')?.split('T')[0] || '',
-            };
-          })
-        );
-      } else {
-        setPolicies(FALLBACK_POLICIES);
-      }
-    } catch {
-      setPolicies(FALLBACK_POLICIES);
+      setPolicies(
+        (data || []).map((row: Record<string, unknown>) => {
+          const membersData = row.members as Record<string, unknown> | null;
+          const profilesData = membersData?.profiles as Record<string, unknown> | null;
+          const productData = row.insurance_products as Record<string, unknown> | null;
+          return {
+            id: row.id as string,
+            policyNumber: (row.policy_number as string) || (row.id as string),
+            memberName: (profilesData?.full_name as string) || 'Unknown',
+            productType: (productData?.name as string) || 'General',
+            coverageAmount: (row.coverage_amount as number) || 0,
+            premium: (row.premium as number) || 0,
+            status: ((row.status as string) || 'active') as InsurancePolicy['status'],
+            expiryDate: ((row.end_date as string) || '')?.split('T')[0] || '',
+          };
+        })
+      );
+    } catch (err) {
+      console.error('[insurance] fetchPolicies failed', err);
+      showToast(`Failed to load policies: ${(err as Error)?.message || 'unknown error'}`, 'error');
+      setPolicies([]);
     }
     setPoliciesLoading(false);
-  }, [supabase]);
+  }, [supabase, showToast]);
 
   // Fetch members for dropdown
   const fetchMembers = useCallback(async () => {
@@ -500,6 +503,11 @@ export default function InsuranceOverviewPage() {
 
   return (
     <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-6">
+      {toast && (
+        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg text-sm font-medium ${toast.type === 'error' ? 'bg-red-500 text-white' : 'bg-green-500 text-white'}`}>
+          {toast.message}
+        </div>
+      )}
       {/* Header */}
       <motion.div variants={cardVariants}>
         <h1 className="text-2xl font-bold text-navy">Insurance Overview</h1>

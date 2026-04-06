@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
+import ImageUploader from '@/components/ui/ImageUploader';
 
 // ── Toast ─────────────────────────────────────────────────
 
@@ -144,23 +145,13 @@ export default function HomepageImagesPage() {
           <div key={field.key} className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
             <label className="block text-sm font-semibold text-[#1B2A4A] mb-0.5">{field.label}</label>
             <p className="text-xs text-gray-500 mb-3">{field.description}</p>
-            <input
-              type="text"
+            <ImageUploader
+              bucket="media"
+              folder={`homepage/${field.key}`}
               value={images[field.key]}
-              onChange={(e) => setImages({ ...images, [field.key]: e.target.value })}
-              placeholder="https://example.com/image.jpg"
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#5DB347]/20 focus:border-[#5DB347] outline-none"
+              onChange={(url) => setImages({ ...images, [field.key]: url })}
+              label=""
             />
-            {images[field.key] && (
-              <div className="mt-3 rounded-lg overflow-hidden border border-gray-100">
-                <img
-                  src={images[field.key]}
-                  alt={field.label}
-                  className="w-full h-40 object-cover"
-                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                />
-              </div>
-            )}
           </div>
         ))}
       </div>

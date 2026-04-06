@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -13,7 +13,6 @@ import {
   Edit3,
   Save,
   X,
-  Camera,
   Award,
   Sprout,
   Ruler,
@@ -38,6 +37,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/lib/supabase/auth-context';
 import { createClient } from '@/lib/supabase/client';
+import ImageUploader from '@/components/ui/ImageUploader';
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -171,11 +171,10 @@ export default function ProfilePage() {
   // Save feedback
   const [saveSuccess, setSaveSuccess] = useState(false);
 
-  // Avatar upload
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  // Avatar
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const [avatarUploading, setAvatarUploading] = useState(false);
   const [avatarError, setAvatarError] = useState<string | null>(null);
+  const [avatarSuccess, setAvatarSuccess] = useState(false);
 
   // Extra data from members + kyc tables
   const [member, setMember] = useState<MemberRecord | null>(null);
@@ -233,63 +232,25 @@ export default function ProfilePage() {
     }
   }, [member, editing]);
 
-  // ── Avatar upload handler ──
-  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !user) return;
-
-    // Validate file type
-    const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
-    if (!validTypes.includes(file.type)) {
-      setAvatarError('Please select a JPG, PNG, or WebP image.');
-      setTimeout(() => setAvatarError(null), 4000);
-      return;
-    }
-
-    // Validate file size (max 2MB)
-    if (file.size > 2 * 1024 * 1024) {
-      setAvatarError('Image must be under 2MB.');
-      setTimeout(() => setAvatarError(null), 4000);
-      return;
-    }
-
-    setAvatarUploading(true);
+  // ── Avatar change handler (called by ImageUploader) ──
+  const handleAvatarChange = async (url: string) => {
+    if (!user) return;
     setAvatarError(null);
-
     try {
-      const ext = file.name.split('.').pop() || 'jpg';
-      const filePath = `${user.id}.${ext}`;
-
-      const { data, error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, file, { upsert: true });
-
-      if (uploadError) throw uploadError;
-
-      if (data) {
-        const { data: { publicUrl } } = supabase.storage
-          .from('avatars')
-          .getPublicUrl(data.path);
-
-        // Add cache-buster to force reload
-        const urlWithBuster = `${publicUrl}?t=${Date.now()}`;
-
-        await supabase
-          .from('profiles')
-          .update({ avatar_url: publicUrl })
-          .eq('id', user.id);
-
-        setAvatarUrl(urlWithBuster);
-        await refreshProfile();
-      }
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: url })
+        .eq('id', user.id);
+      if (updateError) throw updateError;
+      // Cache-bust for immediate UI refresh
+      setAvatarUrl(url ? `${url}?t=${Date.now()}` : null);
+      await refreshProfile();
+      setAvatarSuccess(true);
+      setTimeout(() => setAvatarSuccess(false), 3000);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Upload failed. Please try again.';
+      const message = err instanceof Error ? err.message : 'Failed to save avatar.';
       setAvatarError(message);
       setTimeout(() => setAvatarError(null), 4000);
-    } finally {
-      setAvatarUploading(false);
-      // Reset file input so same file can be re-selected
-      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
@@ -467,42 +428,18 @@ export default function ProfilePage() {
             <div className="relative z-10">
               {/* Avatar */}
               <div className="flex items-center gap-4 mb-6">
-                <div className="relative">
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp"
-                    onChange={handleAvatarUpload}
-                    className="hidden"
-                  />
-                  <button
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={avatarUploading}
-                    className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border-2 border-white/30 overflow-hidden cursor-pointer hover:border-white/60 transition-colors group relative"
-                    title="Click to upload avatar"
-                  >
-                    {avatarUploading ? (
-                      <Loader2 className="w-6 h-6 text-white animate-spin" />
-                    ) : avatarUrl ? (
-                      <>
-                        <Image
-                          src={avatarUrl}
-                          alt={displayName}
-                          width={64}
-                          height={64}
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-full">
-                          <Camera className="w-4 h-4 text-white" />
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <span className="text-white text-xl font-bold group-hover:hidden">{initials}</span>
-                        <Camera className="w-5 h-5 text-white hidden group-hover:block" />
-                      </>
-                    )}
-                  </button>
+                <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border-2 border-white/30 overflow-hidden">
+                  {avatarUrl ? (
+                    <Image
+                      src={avatarUrl}
+                      alt={displayName}
+                      width={64}
+                      height={64}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-white text-xl font-bold">{initials}</span>
+                  )}
                 </div>
                 <div>
                   <h2 className="text-lg font-bold">{displayName}</h2>
@@ -510,11 +447,29 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              {/* Avatar error toast */}
+              {/* Avatar uploader */}
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 mb-4">
+                <ImageUploader
+                  bucket="avatars"
+                  folder={user?.id || ''}
+                  value={avatarUrl}
+                  onChange={handleAvatarChange}
+                  round
+                  label=""
+                />
+              </div>
+
+              {/* Avatar feedback */}
               {avatarError && (
                 <div className="bg-red-500/20 backdrop-blur-sm border border-red-400/30 rounded-lg p-2 mb-2 flex items-center gap-2 text-sm text-white">
                   <AlertCircle className="w-4 h-4 flex-shrink-0" />
                   {avatarError}
+                </div>
+              )}
+              {avatarSuccess && (
+                <div className="bg-green-500/20 backdrop-blur-sm border border-green-400/30 rounded-lg p-2 mb-2 flex items-center gap-2 text-sm text-white">
+                  <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+                  Profile photo updated
                 </div>
               )}
 

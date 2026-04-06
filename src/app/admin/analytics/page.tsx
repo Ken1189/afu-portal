@@ -57,24 +57,40 @@ export default function AdminAnalyticsPage() {
   const [ambassadors, setAmbassadors] = useState<AmbassadorRow[]>([]);
   const [countries, setCountries] = useState<string[]>([]);
   const [profiles, setProfiles] = useState<{ id: string; country: string | null; role: string; created_at: string }[]>([]);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
+  const showToast = useCallback((message: string, type: 'success' | 'error' = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 4000);
+  }, []);
 
   // Fetch all data
   const fetchData = useCallback(async () => {
     setLoading(true);
     const dateFrom = getDateFrom(dateRange);
-    const wrap = (p: PromiseLike<unknown>) => Promise.resolve(p).catch(() => ({ data: null }));
+    const failures: string[] = [];
+    const wrap = (label: string, p: PromiseLike<unknown>) =>
+      Promise.resolve(p).catch((err) => {
+        console.error(`[analytics] ${label} failed`, err);
+        failures.push(label);
+        return { data: null };
+      });
 
     const [memRes, appRes, payRes, trdRes, ambRes, profRes] = await Promise.all([
-      wrap(supabase.from('members').select('id, profile_id, tier, status, created_at').order('created_at', { ascending: false })),
-      wrap(dateFrom
+      wrap('members', supabase.from('members').select('id, profile_id, tier, status, created_at').order('created_at', { ascending: false })),
+      wrap('membership_applications', dateFrom
         ? supabase.from('membership_applications').select('id, full_name, email, country, requested_tier, status, phone, created_at').gte('created_at', dateFrom).order('created_at', { ascending: false })
         : supabase.from('membership_applications').select('id, full_name, email, country, requested_tier, status, phone, created_at').order('created_at', { ascending: false })
       ),
-      wrap(supabase.from('payments').select('id, amount, currency, status, type, created_at').order('created_at', { ascending: false }).limit(500)),
-      wrap(supabase.from('trade_orders').select('id, order_number, order_type, commodity, quantity, target_price, country, status, created_at').order('created_at', { ascending: false }).limit(500)),
-      wrap(supabase.from('ambassadors').select('id, full_name, country, status, created_at').order('created_at', { ascending: false })),
-      wrap(supabase.from('profiles').select('id, country, role, created_at').order('created_at', { ascending: false })),
+      wrap('payments', supabase.from('payments').select('id, amount, currency, status, type, created_at').order('created_at', { ascending: false }).limit(500)),
+      wrap('trade_orders', supabase.from('trade_orders').select('id, order_number, order_type, commodity, quantity, target_price, country, status, created_at').order('created_at', { ascending: false }).limit(500)),
+      wrap('ambassadors', supabase.from('ambassadors').select('id, full_name, country, status, created_at').order('created_at', { ascending: false })),
+      wrap('profiles', supabase.from('profiles').select('id, country, role, created_at').order('created_at', { ascending: false })),
     ]) as { data: unknown }[];
+
+    if (failures.length > 0) {
+      showToast(`Failed to load: ${failures.join(', ')}`, 'error');
+    }
 
     setMembers((memRes.data || []) as MemberRow[]);
     setApplications((appRes.data || []) as AppRow[]);
@@ -94,7 +110,7 @@ export default function AdminAnalyticsPage() {
     setCountries([...allCountries].sort());
 
     setLoading(false);
-  }, [supabase, dateRange]);
+  }, [supabase, dateRange, showToast]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
@@ -217,6 +233,11 @@ export default function AdminAnalyticsPage() {
 
   return (
     <div className="space-y-6">
+      {toast && (
+        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg text-sm font-medium ${toast.type === 'error' ? 'bg-red-500 text-white' : 'bg-green-500 text-white'}`}>
+          {toast.message}
+        </div>
+      )}
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>

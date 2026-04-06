@@ -103,7 +103,7 @@ interface RecentActivity {
 
 // ── Mock data ──────────────────────────────────────────────────────────────
 
-const FALLBACK_APPLICATIONS: LoanApplication[] = [
+const _UNUSED_FALLBACK_APPLICATIONS: LoanApplication[] = [
   {
     id: 'APP-2026-001',
     memberName: 'Amara Diallo',
@@ -254,7 +254,7 @@ const FALLBACK_RECENT_ACTIVITY: RecentActivity[] = [
 
 // ── Pipeline data ──────────────────────────────────────────────────────────
 
-const FALLBACK_PIPELINE = [
+const _UNUSED_FALLBACK_PIPELINE = [
   { label: 'Applied', count: 12, color: 'bg-blue-500', lightColor: 'bg-blue-50', textColor: 'text-blue-700' },
   { label: 'Under Review', count: 5, color: 'bg-amber-500', lightColor: 'bg-amber-50', textColor: 'text-amber-700' },
   { label: 'Approved', count: 3, color: 'bg-[#8CB89C]', lightColor: 'bg-[#EDF4EF]', textColor: 'text-teal-700' },
@@ -359,8 +359,12 @@ export default function LoansPage() {
       .select('*, members!inner(id, profile_id, profiles!inner(full_name, email))')
       .order('created_at', { ascending: false });
 
-    if (!error && data && data.length > 0) {
-      setRealLoans(data.map((loan: Record<string, unknown>) => {
+    if (error) {
+      console.error('[loans] fetch failed', error);
+      showToast(`Failed to load loans: ${error.message || 'unknown error'}`, 'error');
+      setRealLoans([]);
+    } else {
+      setRealLoans((data || []).map((loan: Record<string, unknown>) => {
         const members = loan.members as Record<string, unknown> | null;
         const profiles = members?.profiles as Record<string, unknown> | null;
         return {
@@ -380,8 +384,8 @@ export default function LoansPage() {
 
   useEffect(() => { fetchLoans(); }, [fetchLoans]);
 
-  // Use real data if available, fall back to mock for demo
-  const applications = realLoans.length > 0 ? realLoans : FALLBACK_APPLICATIONS;
+  // Use real data only — empty state shown if no loans exist.
+  const applications = realLoans;
 
   // ── Computed Stats ─────────────────────────────────────────────────────
   const totalPortfolio = applications
@@ -401,14 +405,12 @@ export default function LoansPage() {
   const underReviewCount = applications.filter((a) => a.status === 'under_review').length;
   const appliedCount = applications.filter((a) => a.status === 'pending' || a.status === 'submitted').length;
 
-  const pipelineColumns = realLoans.length > 0
-    ? [
-        { label: 'Applied', count: appliedCount, color: 'bg-blue-500', lightColor: 'bg-blue-50', textColor: 'text-blue-700' },
-        { label: 'Under Review', count: underReviewCount, color: 'bg-amber-500', lightColor: 'bg-amber-50', textColor: 'text-amber-700' },
-        { label: 'Approved', count: approvedNotDisbursed, color: 'bg-[#8CB89C]', lightColor: 'bg-[#EDF4EF]', textColor: 'text-teal-700' },
-        { label: 'Disbursed', count: activeLoansCount, color: 'bg-navy', lightColor: 'bg-navy/5', textColor: 'text-navy' },
-      ]
-    : FALLBACK_PIPELINE;
+  const pipelineColumns = [
+    { label: 'Applied', count: appliedCount, color: 'bg-blue-500', lightColor: 'bg-blue-50', textColor: 'text-blue-700' },
+    { label: 'Under Review', count: underReviewCount, color: 'bg-amber-500', lightColor: 'bg-amber-50', textColor: 'text-amber-700' },
+    { label: 'Approved', count: approvedNotDisbursed, color: 'bg-[#8CB89C]', lightColor: 'bg-[#EDF4EF]', textColor: 'text-teal-700' },
+    { label: 'Disbursed', count: activeLoansCount, color: 'bg-navy', lightColor: 'bg-navy/5', textColor: 'text-navy' },
+  ];
 
   const tabs: { key: 'all' | ApplicationStatus; label: string }[] = [
     { key: 'all', label: 'All' },

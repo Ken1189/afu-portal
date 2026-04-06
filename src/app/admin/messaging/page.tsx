@@ -45,33 +45,9 @@ const cardVariants = {
 
 // ── Demo data ──
 
-const DEMO_VOLUME_DATA = Array.from({ length: 30 }, (_, i) => {
-  const date = new Date();
-  date.setDate(date.getDate() - (29 - i));
-  return {
-    date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-    sms: Math.floor(Math.random() * 80 + 20),
-    whatsapp: Math.floor(Math.random() * 50 + 10),
-    ussd: Math.floor(Math.random() * 120 + 30),
-  };
-});
+const DEMO_VOLUME_DATA: { date: string; sms: number; whatsapp: number; ussd: number }[] = [];
 
-const DEMO_DELIVERY_DATA = [
-  { name: 'Delivered', value: 892, color: '#5DB347' },
-  { name: 'Failed', value: 48, color: '#EF4444' },
-  { name: 'Pending', value: 60, color: '#F59E0B' },
-];
-
-const DEMO_RECENT_MESSAGES = [
-  { id: 1, channel: 'sms', phone: '+263771234567', body: 'Your loan application LON-4521 has been approved.', status: 'delivered', direction: 'outbound', created_at: '2026-03-28T10:15:00Z' },
-  { id: 2, channel: 'whatsapp', phone: '+254712345678', body: 'Welcome to AFU! Your membership is confirmed.', status: 'delivered', direction: 'outbound', created_at: '2026-03-28T09:45:00Z' },
-  { id: 3, channel: 'ussd', phone: '+263781234567', body: 'Check Prices > Maize', status: 'completed', direction: 'inbound', created_at: '2026-03-28T09:30:00Z' },
-  { id: 4, channel: 'sms', phone: '+255768901234', body: 'BALANCE', status: 'received', direction: 'inbound', created_at: '2026-03-28T09:15:00Z' },
-  { id: 5, channel: 'whatsapp', phone: '+263771234567', body: 'Your harvest HRV-3421 has been recorded.', status: 'sent', direction: 'outbound', created_at: '2026-03-28T08:50:00Z' },
-  { id: 6, channel: 'sms', phone: '+254723456789', body: 'Payment of $1,200 received. Ref: PAY-0892', status: 'delivered', direction: 'outbound', created_at: '2026-03-28T08:30:00Z' },
-  { id: 7, channel: 'ussd', phone: '+258841234567', body: 'Apply for Loan > Equipment', status: 'completed', direction: 'inbound', created_at: '2026-03-28T08:15:00Z' },
-  { id: 8, channel: 'sms', phone: '+263771234567', body: 'Weather alert: Heavy rain expected in Mashonaland.', status: 'failed', direction: 'outbound', created_at: '2026-03-28T07:45:00Z' },
-];
+const DEMO_DELIVERY_DATA: { name: string; value: number; color: string }[] = [];
 
 // ── Types ──
 
@@ -103,7 +79,7 @@ export default function MessagingDashboard() {
   });
   const [volumeData, setVolumeData] = useState(DEMO_VOLUME_DATA);
   const [deliveryData, setDeliveryData] = useState(DEMO_DELIVERY_DATA);
-  const [recentMessages, setRecentMessages] = useState<RecentMessage[]>(DEMO_RECENT_MESSAGES);
+  const [recentMessages, setRecentMessages] = useState<RecentMessage[]>([]);
 
   // Quick send state
   const [sendChannel, setSendChannel] = useState<'sms' | 'whatsapp'>('sms');
@@ -143,11 +119,11 @@ export default function MessagingDashboard() {
       const rate = totalSms > 0 ? Math.round((delivered / totalSms) * 100) : 0;
 
       setKpi({
-        totalSms: totalSms || 1247,
-        deliveredRate: rate || 94,
-        totalWhatsApp: waCount || 523,
-        ussdSessions: ussdCount || 3891,
-        monthlyCost: ((totalSms || 1247) * 0.02) + ((waCount || 523) * 0.05),
+        totalSms,
+        deliveredRate: rate,
+        totalWhatsApp: waCount || 0,
+        ussdSessions: ussdCount || 0,
+        monthlyCost: (totalSms * 0.02) + ((waCount || 0) * 0.05),
       });
 
       // Fetch recent messages from all channels
@@ -210,9 +186,32 @@ export default function MessagingDashboard() {
       // Sort by date and take latest 50
       combined.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
-      if (combined.length > 0) {
-        setRecentMessages(combined.slice(0, 50));
+      setRecentMessages(combined.slice(0, 50));
+
+      // Build volume data: group last 30 days by date
+      const volMap: Record<string, { sms: number; whatsapp: number; ussd: number }> = {};
+      const today = new Date();
+      for (let i = 29; i >= 0; i--) {
+        const d = new Date(today);
+        d.setDate(d.getDate() - i);
+        const key = d.toISOString().slice(0, 10);
+        volMap[key] = { sms: 0, whatsapp: 0, ussd: 0 };
       }
+      combined.forEach((m) => {
+        const key = (m.created_at || '').slice(0, 10);
+        if (volMap[key]) {
+          if (m.channel === 'sms') volMap[key].sms += 1;
+          else if (m.channel === 'whatsapp') volMap[key].whatsapp += 1;
+          else if (m.channel === 'ussd') volMap[key].ussd += 1;
+        }
+      });
+      const volArr = Object.entries(volMap).map(([key, v]) => ({
+        date: new Date(key).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        sms: v.sms,
+        whatsapp: v.whatsapp,
+        ussd: v.ussd,
+      }));
+      setVolumeData(volArr);
 
       // If we got real delivery data, update pie chart
       if (totalSms > 0) {

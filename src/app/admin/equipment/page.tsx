@@ -18,20 +18,7 @@ interface EquipmentRecord {
 
 type StatusFilter = 'all' | 'available' | 'in-use' | 'maintenance';
 
-const fallback_equipment: EquipmentRecord[] = [
-  { id: 'EQ-001', name: 'John Deere 5055E', type: 'Tractor', ownerName: 'Grace Moyo', farmName: 'Moyo Farm', status: 'available', dailyRate: 120, location: 'Zimbabwe' },
-  { id: 'EQ-002', name: 'Kubota L3901', type: 'Tractor', ownerName: 'Baraka Mushi', farmName: 'Mushi Agri', status: 'in-use', dailyRate: 95, location: 'Tanzania' },
-  { id: 'EQ-003', name: 'Netafim Drip System', type: 'Irrigation', ownerName: 'Tendai Chirwa', farmName: 'Chirwa Orchards', status: 'available', dailyRate: 45, location: 'Zimbabwe' },
-  { id: 'EQ-004', name: 'Massey Ferguson Combine', type: 'Harvester', ownerName: 'John Maseko', farmName: 'Maseko Fields', status: 'maintenance', dailyRate: 280, location: 'Zimbabwe' },
-  { id: 'EQ-005', name: 'DJI Agras T30', type: 'Drone', ownerName: 'Farai Ndlovu', farmName: 'Ndlovu Estate', status: 'available', dailyRate: 65, location: 'Zimbabwe' },
-  { id: 'EQ-006', name: 'Amazone ZA-TS', type: 'Spreader', ownerName: 'Kago Setshedi', farmName: 'Setshedi Farms', status: 'in-use', dailyRate: 55, location: 'Botswana' },
-  { id: 'EQ-007', name: 'Isuzu NPR Truck', type: 'Transport', ownerName: 'Halima Mwanga', farmName: 'Mwanga Farm', status: 'available', dailyRate: 150, location: 'Tanzania' },
-  { id: 'EQ-008', name: 'Honda WB30 Pump', type: 'Irrigation', ownerName: 'Amina Salim', farmName: 'Salim Holdings', status: 'in-use', dailyRate: 25, location: 'Tanzania' },
-  { id: 'EQ-009', name: 'New Holland TC5.30', type: 'Harvester', ownerName: 'Grace Moyo', farmName: 'Moyo Farm', status: 'available', dailyRate: 250, location: 'Zimbabwe' },
-  { id: 'EQ-010', name: 'Stihl MS 261', type: 'Chainsaw', ownerName: 'Nyasha Mutasa', farmName: 'Mutasa Growers', status: 'maintenance', dailyRate: 18, location: 'Zimbabwe' },
-  { id: 'EQ-011', name: 'Toyota Hilux 4x4', type: 'Transport', ownerName: 'Tinashe Gumbo', farmName: 'Gumbo Orchards', status: 'in-use', dailyRate: 85, location: 'Botswana' },
-  { id: 'EQ-012', name: 'Jacto Uniport', type: 'Sprayer', ownerName: 'Rumbidzai Chikore', farmName: 'Chikore Ag', status: 'available', dailyRate: 70, location: 'Zimbabwe' },
-];
+// fallback_equipment removed — show empty state if DB returns no rows.
 
 const containerVariants = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.06, delayChildren: 0.1 } } };
 const cardVariants = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 260, damping: 24 } } };
@@ -54,7 +41,7 @@ export default function EquipmentRegistryPage() {
   const { locale: _locale } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
-  const [equipment, setEquipment] = useState<EquipmentRecord[]>(fallback_equipment);
+  const [equipment, setEquipment] = useState<EquipmentRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -68,23 +55,25 @@ export default function EquipmentRegistryPage() {
   const supabase = createClient();
 
   const fetchData = useCallback(async () => {
-    try {
-      const { data, error } = await supabase.from('equipment').select('*').order('created_at', { ascending: false });
-      if (!error && data && data.length > 0) {
-        setEquipment(data.map((row: Record<string, unknown>) => {
-          const desc = (row.description as string) || '';
-          const ownerMatch = desc.match(/Owner:\s*([^|]+)/);
-          const farmMatch = desc.match(/Farm:\s*(.+)/);
-          return {
-            id: (row.id as string) || '', name: (row.name as string) || 'Unknown',
-            type: (row.type as string) || 'Other',
-            ownerName: ownerMatch ? ownerMatch[1].trim() : 'Unknown', farmName: farmMatch ? farmMatch[1].trim() : '',
-            status: ((row.status as string) || 'available') as EquipmentRecord['status'],
-            dailyRate: (row.daily_rate as number) || 0, location: (row.location as string) || (row.country as string) || '',
-          };
-        }));
-      }
-    } catch { /* fallback */ }
+    const { data, error } = await supabase.from('equipment').select('*').order('created_at', { ascending: false });
+    if (error) {
+      console.error('[equipment] fetch failed', error);
+      setToast({ message: `Failed to load equipment: ${error.message || 'unknown error'}`, type: 'error' });
+      setEquipment([]);
+    } else {
+      setEquipment((data || []).map((row: Record<string, unknown>) => {
+        const desc = (row.description as string) || '';
+        const ownerMatch = desc.match(/Owner:\s*([^|]+)/);
+        const farmMatch = desc.match(/Farm:\s*(.+)/);
+        return {
+          id: (row.id as string) || '', name: (row.name as string) || 'Unknown',
+          type: (row.type as string) || 'Other',
+          ownerName: ownerMatch ? ownerMatch[1].trim() : 'Unknown', farmName: farmMatch ? farmMatch[1].trim() : '',
+          status: ((row.status as string) || 'available') as EquipmentRecord['status'],
+          dailyRate: (row.daily_rate as number) || 0, location: (row.location as string) || (row.country as string) || '',
+        };
+      }));
+    }
     setIsLoading(false);
   }, [supabase]);
 
@@ -127,20 +116,29 @@ export default function EquipmentRegistryPage() {
     let error;
     if (editingId) { ({ error } = await supabase.from('equipment').update(payload).eq('id', editingId)); }
     else { ({ error } = await supabase.from('equipment').insert(payload)); }
+    setSaving(false);
     if (error) {
-      if (editingId) { setEquipment(prev => prev.map(e => e.id === editingId ? { ...e, name: form.name, type: form.type, ownerName: form.ownerName, farmName: form.farmName, status: form.status, dailyRate: parseFloat(form.dailyRate) || 0, location: form.location } : e)); }
-      else { setEquipment(prev => [{ id: `EQ-${String(prev.length + 1).padStart(3, '0')}`, name: form.name, type: form.type, ownerName: form.ownerName, farmName: form.farmName, status: form.status, dailyRate: parseFloat(form.dailyRate) || 0, location: form.location }, ...prev]); }
-      setToast({ message: `Equipment ${editingId ? 'updated' : 'added'} (local)`, type: 'success' });
-    } else { setToast({ message: `Equipment ${editingId ? 'updated' : 'added'} successfully`, type: 'success' }); await fetchData(); }
-    setModalOpen(false); setSaving(false);
+      console.error('[equipment] save failed', error);
+      setToast({ message: `Failed to ${editingId ? 'update' : 'add'} equipment: ${error.message || 'unknown error'}`, type: 'error' });
+      return;
+    }
+    setToast({ message: `Equipment ${editingId ? 'updated' : 'added'} successfully`, type: 'success' });
+    setModalOpen(false);
+    await fetchData();
   };
 
   const handleDelete = async (id: string) => {
     setDeleting(true);
     const { error } = await supabase.from('equipment').delete().eq('id', id);
-    if (error) { setEquipment(prev => prev.filter(e => e.id !== id)); setToast({ message: 'Equipment removed (local)', type: 'success' }); }
-    else { setToast({ message: 'Equipment deleted successfully', type: 'success' }); await fetchData(); }
-    setDeleteConfirmId(null); setDeleting(false);
+    setDeleting(false);
+    if (error) {
+      console.error('[equipment] delete failed', error);
+      setToast({ message: `Failed to delete equipment: ${error.message || 'unknown error'}`, type: 'error' });
+      return;
+    }
+    setToast({ message: 'Equipment deleted successfully', type: 'success' });
+    setDeleteConfirmId(null);
+    await fetchData();
   };
 
   const cycleStatus = async (eq: EquipmentRecord) => {
@@ -148,10 +146,14 @@ export default function EquipmentRegistryPage() {
     const next = order[(order.indexOf(eq.status) + 1) % order.length];
     setTogglingId(eq.id);
     const { error } = await supabase.from('equipment').update({ status: next }).eq('id', eq.id);
-    if (error) { setEquipment(prev => prev.map(e => e.id === eq.id ? { ...e, status: next } : e)); }
-    else { await fetchData(); }
-    setToast({ message: `Status changed to ${statusLabels[next]}`, type: 'success' });
     setTogglingId(null);
+    if (error) {
+      console.error('[equipment] cycleStatus failed', error);
+      setToast({ message: `Failed to change status: ${error.message || 'unknown error'}`, type: 'error' });
+      return;
+    }
+    setToast({ message: `Status changed to ${statusLabels[next]}`, type: 'success' });
+    await fetchData();
   };
 
   return (
@@ -217,7 +219,15 @@ export default function EquipmentRegistryPage() {
             </tbody>
           </table>
         </div>
-        {filtered.length === 0 && (<div className="py-16 text-center"><Wrench className="w-10 h-10 text-gray-300 mx-auto mb-3" /><p className="text-sm text-gray-500">No equipment matches your filters</p></div>)}
+        {filtered.length === 0 && (
+          <div className="py-16 text-center">
+            <Wrench className="w-10 h-10 text-gray-300 mx-auto mb-3" />
+            <p className="text-sm text-gray-500">{equipment.length === 0 ? 'No equipment registered yet' : 'No equipment matches your filters'}</p>
+            {equipment.length === 0 && (
+              <button onClick={openAdd} className="mt-4 inline-flex items-center gap-2 bg-teal text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-teal/90"><Plus className="w-4 h-4" /> Add your first equipment</button>
+            )}
+          </div>
+        )}
       </motion.div>
 
       {modalOpen && (

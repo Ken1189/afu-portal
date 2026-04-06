@@ -57,6 +57,7 @@ const staticProducts: SupplierProduct[] = [
 import { createClient } from '@/lib/supabase/client';
 import { useProducts, type ProductRow } from '@/lib/supabase/use-products';
 import { useAuth } from '@/lib/supabase/auth-context';
+import ImageUploader from '@/components/ui/ImageUploader';
 
 // ── Animation variants ──────────────────────────────────────────────────────
 
@@ -144,6 +145,7 @@ interface ProductFormData {
   stock_quantity: string;
   category: string;
   unit: string;
+  image_url: string;
 }
 
 const emptyForm: ProductFormData = {
@@ -154,6 +156,7 @@ const emptyForm: ProductFormData = {
   stock_quantity: '',
   category: 'seeds',
   unit: 'kg',
+  image_url: '',
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -293,6 +296,7 @@ export default function SupplierProductsPage() {
       stock_quantity: String((product as any).stockQuantity || 0),
       category: product.category,
       unit: product.unit,
+      image_url: (product as any).image_url || product.image || '',
     });
     setFormError('');
     setShowModal(true);
@@ -322,6 +326,7 @@ export default function SupplierProductsPage() {
           category: formData.category as any,
           unit: formData.unit,
           in_stock: Number(formData.stock_quantity) > 0,
+          image_url: formData.image_url || null,
         } as any);
         if (error) { setFormError(error); return; }
       } else {
@@ -335,7 +340,8 @@ export default function SupplierProductsPage() {
           unit: formData.unit,
           stock_quantity: Number(formData.stock_quantity) || 0,
           in_stock: Number(formData.stock_quantity) > 0,
-        });
+          image_url: formData.image_url || undefined,
+        } as any);
         if (error) { setFormError(error); return; }
       }
 
@@ -834,6 +840,16 @@ export default function SupplierProductsPage() {
                       <option key={cat} value={cat}>{categoryLabels[cat]}</option>
                     ))}
                   </select>
+                </div>
+
+                <div>
+                  <ImageUploader
+                    bucket="media"
+                    folder="products"
+                    value={formData.image_url}
+                    onChange={(url) => handleFormChange('image_url', url)}
+                    label="Product Image"
+                  />
                 </div>
               </div>
 

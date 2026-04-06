@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 import { useAuth } from '@/lib/supabase/auth-context';
 import { createClient } from '@/lib/supabase/client';
+import ImageUploader from '@/components/ui/ImageUploader';
 import {
   Sprout,
   Droplets,
@@ -524,7 +525,7 @@ function PhotoGallery({
 
 function NewEntryForm({ onClose, onSave }: { onClose: () => void; onSave: (entry: JournalEntry) => void }) {
   const { t } = useLanguage();
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { user } = useAuth();
   const [activityType, setActivityType] = useState<ActivityType | null>(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -532,15 +533,6 @@ function NewEntryForm({ onClose, onSave }: { onClose: () => void; onSave: (entry
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [mood, setMood] = useState<JournalEntry['mood']>(undefined);
   const [cost, setCost] = useState('');
-
-  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => setPhotoPreview(reader.result as string);
-      reader.readAsDataURL(file);
-    }
-  };
 
   const handleSubmit = () => {
     if (!activityType || !title.trim()) return;
@@ -682,42 +674,15 @@ function NewEntryForm({ onClose, onSave }: { onClose: () => void; onSave: (entry
             </div>
           </div>
 
-          {/* Photo Button */}
+          {/* Photo Upload */}
           <div>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              capture="environment"
-              onChange={handlePhotoChange}
-              className="hidden"
+            <ImageUploader
+              bucket="media"
+              folder={`journal/${user?.id || 'anonymous'}`}
+              value={photoPreview}
+              onChange={(url) => setPhotoPreview(url || null)}
+              label={t.farmJournal.addPhoto}
             />
-            {photoPreview ? (
-              <div className="relative">
-                <img
-                  src={photoPreview}
-                  alt="Preview"
-                  className="w-full max-h-[180px] object-cover rounded-xl"
-                />
-                <button
-                  onClick={() => {
-                    setPhotoPreview(null);
-                    if (fileInputRef.current) fileInputRef.current.value = '';
-                  }}
-                  className="absolute top-2 right-2 w-7 h-7 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center"
-                >
-                  <X className="w-4 h-4 text-white" />
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className="w-full flex items-center justify-center gap-2 bg-gray-50 border-2 border-dashed border-gray-200 rounded-xl py-3 text-sm font-medium text-gray-500 active:bg-gray-100 transition-colors min-h-[48px]"
-              >
-                <Camera className="w-5 h-5" />
-                {t.farmJournal.addPhoto}
-              </button>
-            )}
           </div>
 
           {/* Mood Selector */}

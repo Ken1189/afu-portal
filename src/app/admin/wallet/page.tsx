@@ -84,7 +84,7 @@ interface VolumeData {
 
 // ─── Demo Data ────────────────────────────────────────────────────────────
 
-const demoWallets: AdminWallet[] = [
+const _UNUSED_demoWallets: AdminWallet[] = [
   { id: 'w-001', user_id: 'u-001', account_number: 'AFU-2026-00471', account_type: 'savings', currency: 'USD', display_name: 'Main Wallet', status: 'active', balance: 2847.50, created_at: '2025-09-15T10:00:00Z', user_name: 'Grace Banda', user_email: 'grace@example.com' },
   { id: 'w-002', user_id: 'u-002', account_number: 'AFU-2026-00472', account_type: 'savings', currency: 'USD', display_name: 'Farm Account', status: 'active', balance: 5230.00, created_at: '2025-10-01T08:00:00Z', user_name: 'John Mutua', user_email: 'john@example.com' },
   { id: 'w-003', user_id: 'u-003', account_number: 'AFU-2026-00473', account_type: 'savings', currency: 'KES', display_name: null, status: 'active', balance: 185400, created_at: '2025-11-20T14:00:00Z', user_name: 'Mary Njeri', user_email: 'mary@example.com' },
@@ -93,7 +93,7 @@ const demoWallets: AdminWallet[] = [
   { id: 'w-006', user_id: 'u-006', account_number: 'AFU-2026-00476', account_type: 'savings', currency: 'USD', display_name: 'Primary', status: 'active', balance: 890.25, created_at: '2026-02-01T07:30:00Z', user_name: 'Aisha Ibrahim', user_email: 'aisha@example.com' },
 ];
 
-const demoAdminTxns: AdminTransaction[] = [
+const _UNUSED_demoAdminTxns: AdminTransaction[] = [
   { id: 'at-001', wallet_id: 'w-001', type: 'deposit', amount: 500, currency: 'USD', balance_after: 2847.50, description: 'M-Pesa deposit', reference: 'MPE-001', counterparty: null, status: 'completed', created_at: '2026-03-25T14:30:00Z', user_name: 'Grace Banda', user_email: 'grace@example.com' },
   { id: 'at-002', wallet_id: 'w-002', type: 'withdrawal', amount: 200, currency: 'USD', balance_after: 5030.00, description: 'Bank withdrawal', reference: 'WDR-002', counterparty: null, status: 'completed', created_at: '2026-03-25T11:15:00Z', user_name: 'John Mutua', user_email: 'john@example.com' },
   { id: 'at-003', wallet_id: 'w-003', type: 'transfer', amount: 15000, currency: 'KES', balance_after: 170400, description: 'P2P transfer', reference: 'TRF-003', counterparty: 'James Otieno', status: 'completed', created_at: '2026-03-24T16:45:00Z', user_name: 'Mary Njeri', user_email: 'mary@example.com' },
@@ -104,7 +104,7 @@ const demoAdminTxns: AdminTransaction[] = [
   { id: 'at-008', wallet_id: 'w-002', type: 'deposit', amount: 1200, currency: 'USD', balance_after: 5230, description: 'Contract payment', reference: 'DEP-008', counterparty: 'SesaMe Trading', status: 'completed', created_at: '2026-03-20T08:00:00Z', user_name: 'John Mutua', user_email: 'john@example.com' },
 ];
 
-const demoFlags: TransactionFlag[] = [
+const _UNUSED_demoFlags: TransactionFlag[] = [
   { id: 'f-001', transaction_id: null, wallet_txn_id: 'at-004', user_id: 'u-004', flag_type: 'amount_threshold', severity: 'medium', details: { reason: 'Deposit exceeds $2,500 threshold' }, status: 'pending', created_at: '2026-03-24T09:01:00Z' },
   { id: 'f-002', transaction_id: null, wallet_txn_id: 'at-003', user_id: 'u-003', flag_type: 'velocity', severity: 'low', details: { reason: '5 transfers in 24 hours' }, status: 'investigating', created_at: '2026-03-24T17:00:00Z' },
   { id: 'f-003', transaction_id: null, wallet_txn_id: null, user_id: 'u-004', flag_type: 'unusual_pattern', severity: 'high', details: { reason: 'Account frozen — multiple failed withdrawal attempts' }, status: 'escalated', created_at: '2026-03-23T12:00:00Z' },
@@ -159,57 +159,52 @@ export default function AdminWalletPage() {
   // ── Fetch Data ────────────────────────────────────────────────────────
   const fetchData = useCallback(async () => {
     setLoading(true);
+    const failures: string[] = [];
     try {
       // Fetch all wallets
-      const { data: walletData } = await supabase
+      const { data: walletData, error: walletErr } = await supabase
         .from('wallet_accounts')
         .select('*, ledger_accounts!wallet_accounts_ledger_account_id_fkey(balance), profiles!wallet_accounts_user_id_fkey(full_name, email)')
         .order('created_at', { ascending: false });
-
-      if (walletData && walletData.length > 0) {
-        setWallets(walletData.map((w: any) => ({
-          ...w,
-          balance: w.ledger_accounts?.balance ?? 0,
-          user_name: w.profiles?.full_name || 'Unknown',
-          user_email: w.profiles?.email || '',
-        })));
-      } else {
-        setWallets(demoWallets);
-      }
+      if (walletErr) { console.error('[wallet] wallets', walletErr); failures.push('wallets'); }
+      setWallets((walletData || []).map((w: any) => ({
+        ...w,
+        balance: w.ledger_accounts?.balance ?? 0,
+        user_name: w.profiles?.full_name || 'Unknown',
+        user_email: w.profiles?.email || '',
+      })));
 
       // Fetch recent transactions
-      const { data: txnData } = await supabase
+      const { data: txnData, error: txnErr } = await supabase
         .from('wallet_transactions')
         .select('*, wallet_accounts!wallet_transactions_wallet_id_fkey(user_id, profiles!wallet_accounts_user_id_fkey(full_name, email))')
         .order('created_at', { ascending: false })
         .limit(100);
-
-      if (txnData && txnData.length > 0) {
-        setTransactions(txnData.map((t: any) => ({
-          ...t,
-          user_name: t.wallet_accounts?.profiles?.full_name || 'Unknown',
-          user_email: t.wallet_accounts?.profiles?.email || '',
-        })));
-      } else {
-        setTransactions(demoAdminTxns);
-      }
+      if (txnErr) { console.error('[wallet] transactions', txnErr); failures.push('transactions'); }
+      setTransactions((txnData || []).map((t: any) => ({
+        ...t,
+        user_name: t.wallet_accounts?.profiles?.full_name || 'Unknown',
+        user_email: t.wallet_accounts?.profiles?.email || '',
+      })));
 
       // Fetch flags
-      const { data: flagData } = await supabase
+      const { data: flagData, error: flagErr } = await supabase
         .from('transaction_flags')
         .select('*')
         .order('created_at', { ascending: false })
         .limit(20);
+      if (flagErr) { console.error('[wallet] flags', flagErr); failures.push('flags'); }
+      setFlags(flagData || []);
 
-      if (flagData && flagData.length > 0) {
-        setFlags(flagData);
-      } else {
-        setFlags(demoFlags);
+      if (failures.length > 0) {
+        setToast({ message: `Failed to load: ${failures.join(', ')}`, type: 'error' });
       }
-    } catch {
-      setWallets(demoWallets);
-      setTransactions(demoAdminTxns);
-      setFlags(demoFlags);
+    } catch (err) {
+      console.error('[wallet] fetch exception', err);
+      setToast({ message: `Failed to load wallet data: ${(err as Error)?.message || 'unknown error'}`, type: 'error' });
+      setWallets([]);
+      setTransactions([]);
+      setFlags([]);
     } finally {
       setLoading(false);
     }

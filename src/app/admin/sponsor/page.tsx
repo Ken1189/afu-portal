@@ -60,7 +60,7 @@ interface FarmerProfile {
 }
 
 // ── Mock data ──
-const mockSponsorships: Sponsorship[] = [
+const _UNUSED_mockSponsorships: Sponsorship[] = [
   { id: '1', sponsor_name: 'James Okonkwo', sponsor_email: 'james@example.com', tier: 'gold', farmer_name: 'Amara Diallo', amount: 500, billing_cycle: 'monthly', status: 'active', started_at: '2025-11-01' },
   { id: '2', sponsor_name: 'Sarah Chen', sponsor_email: 'sarah@example.com', tier: 'silver', farmer_name: 'Bongani Mokoena', amount: 100, billing_cycle: 'monthly', status: 'active', started_at: '2025-12-15' },
   { id: '3', sponsor_name: 'GreenImpact Corp', sponsor_email: 'impact@greenco.com', tier: 'corporate', farmer_name: 'Fatou Camara', amount: 2000, billing_cycle: 'monthly', status: 'active', started_at: '2026-01-01' },
@@ -68,7 +68,7 @@ const mockSponsorships: Sponsorship[] = [
   { id: '5', sponsor_name: 'David Levi', sponsor_email: 'david@example.com', tier: 'silver', farmer_name: 'Nkechi Obi', amount: 100, billing_cycle: 'monthly', status: 'paused', started_at: '2025-10-05' },
 ];
 
-const mockFarmerProfiles: FarmerProfile[] = [
+const _UNUSED_mockFarmerProfiles: FarmerProfile[] = [
   { id: '1', display_name: 'Amara Diallo', country: '🇹🇿 Tanzania', crops: 'Coffee, Cassava', active_sponsors: 3, monthly_funding_received: 650, monthly_funding_needed: 500, is_featured: true, slug: 'amara-diallo-f2a1' },
   { id: '2', display_name: 'Bongani Mokoena', country: '🇿🇼 Zimbabwe', crops: 'Blueberries, Maize', active_sponsors: 1, monthly_funding_received: 100, monthly_funding_needed: 200, is_featured: false, slug: 'bongani-mokoena-e8c3' },
   { id: '3', display_name: 'Fatou Camara', country: '🇧🇼 Botswana', crops: 'Groundnuts, Sesame', active_sponsors: 2, monthly_funding_received: 2100, monthly_funding_needed: 1500, is_featured: true, slug: 'fatou-camara-d5b7' },
@@ -92,8 +92,8 @@ const statusConfig: Record<SponsorshipStatus, { label: string; color: string; bg
 
 export default function AdminSponsorPage() {
   const [activeTab, setActiveTab] = useState<TabKey>('sponsorships');
-  const [sponsorships, setSponsorships] = useState<Sponsorship[]>(mockSponsorships);
-  const [farmers, setFarmers] = useState<FarmerProfile[]>(mockFarmerProfiles);
+  const [sponsorships, setSponsorships] = useState<Sponsorship[]>([]);
+  const [farmers, setFarmers] = useState<FarmerProfile[]>([]);
   const [tierFilter, setTierFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -108,8 +108,12 @@ export default function AdminSponsorPage() {
     async function fetchSponsorships() {
       setLoading(true);
       const { data, error } = await supabase.from('sponsorships').select('*').order('created_at', { ascending: false });
-      if (!error && data && data.length > 0) {
-        setSponsorships(data.map((row: Record<string, unknown>) => ({
+      if (error) {
+        console.error('[sponsor] fetch failed', error);
+        setToast({ message: `Failed to load sponsorships: ${error.message || 'unknown error'}`, type: 'error' });
+        setSponsorships([]);
+      } else {
+        setSponsorships((data || []).map((row: Record<string, unknown>) => ({
           id: (row.id as string) || '', sponsor_name: (row.sponsor_name as string) || 'Unknown',
           sponsor_email: (row.sponsor_email as string) || '', tier: ((row.tier as string) || 'bronze') as SponsorshipTier,
           farmer_name: (row.farmer_name as string) || '', amount: (row.amount as number) || 0,
@@ -142,19 +146,30 @@ export default function AdminSponsorPage() {
 
   // ── Toggle featured ──
   const toggleFeatured = useCallback(async (farmerId: string, currentValue: boolean) => {
+    const previous = currentValue;
     setFarmers((prev) => prev.map((f) => (f.id === farmerId ? { ...f, is_featured: !currentValue } : f)));
     const { error } = await supabase.from('farmer_public_profiles').update({ is_featured: !currentValue }).eq('id', farmerId);
-    if (!error) { setToast({ message: !currentValue ? 'Farmer featured' : 'Farmer unfeatured', type: 'success' }); }
+    if (error) {
+      console.error('[sponsor] toggleFeatured failed', error);
+      setFarmers((prev) => prev.map((f) => (f.id === farmerId ? { ...f, is_featured: previous } : f)));
+      setToast({ message: `Failed to update: ${error.message || 'unknown error'}`, type: 'error' });
+      return;
+    }
+    setToast({ message: !currentValue ? 'Farmer featured' : 'Farmer unfeatured', type: 'success' });
   }, [supabase]);
 
   // ── Approve/Reject sponsorship ──
   const handleSponsorshipAction = async (id: string, newStatus: SponsorshipStatus) => {
     setActionLoading(id);
     const { error } = await supabase.from('sponsorships').update({ status: newStatus }).eq('id', id);
-    if (error) { setSponsorships(prev => prev.map(s => s.id === id ? { ...s, status: newStatus } : s)); }
-    else { setSponsorships(prev => prev.map(s => s.id === id ? { ...s, status: newStatus } : s)); }
-    setToast({ message: `Sponsorship ${newStatus}`, type: 'success' });
     setActionLoading(null);
+    if (error) {
+      console.error('[sponsor] sponsorshipAction failed', error);
+      setToast({ message: `Failed to ${newStatus} sponsorship: ${error.message || 'unknown error'}`, type: 'error' });
+      return;
+    }
+    setSponsorships(prev => prev.map(s => s.id === id ? { ...s, status: newStatus } : s));
+    setToast({ message: `Sponsorship ${newStatus}`, type: 'success' });
   };
 
   return (

@@ -1161,18 +1161,30 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
             </Link>
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-navy rounded-full flex items-center justify-center">
-                <span className="text-white text-xs font-bold">{initials}</span>
-              </div>
-              <div className="hidden sm:block">
-                <p className="text-sm font-medium text-navy leading-tight">{displayName}</p>
-                <p className="text-[10px] text-gray-400 leading-tight">
-                  {effectiveSuperAdmin ? 'Super Admin' : 'Admin'}
-                </p>
-              </div>
+              <Link href="/admin/profile" className="flex items-center gap-2 hover:bg-gray-50 rounded-lg px-2 py-1 transition-colors" title="My Profile">
+                <div className="w-8 h-8 bg-navy rounded-full flex items-center justify-center overflow-hidden">
+                  {profile?.avatar_url ? (
+                    <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-white text-xs font-bold">{initials}</span>
+                  )}
+                </div>
+                <div className="hidden sm:block text-left">
+                  <p className="text-sm font-medium text-navy leading-tight">{displayName}</p>
+                  <p className="text-[10px] text-gray-400 leading-tight">
+                    {effectiveSuperAdmin ? 'Super Admin' : 'Admin'}
+                  </p>
+                </div>
+              </Link>
+              <Link
+                href="/admin/profile"
+                className="ml-1 text-xs text-gray-400 hover:text-[#1B2A4A] transition-colors font-medium px-2 py-1 rounded hover:bg-gray-100"
+              >
+                My Profile
+              </Link>
               <button
                 onClick={handleSignOut}
-                className="ml-2 text-xs text-gray-400 hover:text-red-600 transition-colors font-medium"
+                className="ml-1 text-xs text-gray-400 hover:text-red-600 transition-colors font-medium"
               >
                 Sign Out
               </button>

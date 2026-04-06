@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import ImageUploader from '@/components/ui/ImageUploader';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import {
@@ -53,6 +54,7 @@ interface Country {
   key_crops?: string;
   key_programs?: string;
   contact_email?: string;
+  country_image_url?: string;
 }
 
 interface CountryFormData {
@@ -65,6 +67,7 @@ interface CountryFormData {
   key_crops: string;
   key_programs: string;
   contact_email: string;
+  country_image_url: string;
 }
 
 const EMPTY_FORM: CountryFormData = {
@@ -77,6 +80,7 @@ const EMPTY_FORM: CountryFormData = {
   key_crops: '',
   key_programs: '',
   contact_email: '',
+  country_image_url: '',
 };
 
 // ── Mock Data ──
@@ -215,6 +219,16 @@ function CountryModal({
             <input type="email" value={form.contact_email} onChange={(e) => onChange({ ...form, contact_email: e.target.value })} placeholder="admin@africanfarmingunion.org"
               className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm placeholder:text-slate-500 focus:border-[#8CB89C]/50 focus:outline-none" />
           </div>
+
+          <div>
+            <ImageUploader
+              bucket="media"
+              folder="countries"
+              value={form.country_image_url}
+              onChange={(url) => onChange({ ...form, country_image_url: url })}
+              label="Country Image"
+            />
+          </div>
         </div>
 
         <div className="flex justify-end gap-3 pt-2 border-t border-white/10">
@@ -258,10 +272,15 @@ export default function CountriesPage() {
             if (setting) {
               return {
                 ...c,
+                flag: (setting.flag as string) || c.flag,
+                currency: (setting.currency as string) || c.currency,
+                paymentProviders: (setting.payment_providers as string[]) || c.paymentProviders,
+                languages: (setting.languages as string[]) || c.languages,
                 description: (setting.description as string) || c.description,
                 key_crops: (setting.key_crops as string) || c.key_crops,
                 key_programs: (setting.key_programs as string) || c.key_programs,
                 contact_email: (setting.contact_email as string) || c.contact_email,
+                country_image_url: (setting.country_image_url as string) || c.country_image_url,
                 status: (setting.status as CountryStatus) || c.status,
               };
             }
@@ -338,6 +357,7 @@ export default function CountriesPage() {
       key_crops: country.key_crops || '',
       key_programs: country.key_programs || '',
       contact_email: country.contact_email || '',
+      country_image_url: country.country_image_url || '',
     });
     setShowModal(true);
   };
@@ -355,14 +375,20 @@ export default function CountriesPage() {
     }
     setFormSaving(true);
 
+    const existing = editingIso ? countries.find((c) => c.iso === editingIso) : null;
     const payload = {
       iso: formData.iso || editingIso,
       name: formData.name,
+      flag: formData.flag || null,
+      currency: formData.currency || null,
       status: formData.status,
       description: formData.description || null,
       key_crops: formData.key_crops || null,
       key_programs: formData.key_programs || null,
       contact_email: formData.contact_email || null,
+      country_image_url: formData.country_image_url || null,
+      payment_providers: existing?.paymentProviders || [],
+      languages: existing?.languages || [],
     };
 
     try {
@@ -377,7 +403,7 @@ export default function CountriesPage() {
         setCountries((prev) =>
           prev.map((c) =>
             c.iso === editingIso
-              ? { ...c, status: formData.status, description: formData.description, key_crops: formData.key_crops, key_programs: formData.key_programs, contact_email: formData.contact_email }
+              ? { ...c, flag: formData.flag || c.flag, currency: formData.currency || c.currency, status: formData.status, description: formData.description, key_crops: formData.key_crops, key_programs: formData.key_programs, contact_email: formData.contact_email, country_image_url: formData.country_image_url }
               : c
           )
         );
@@ -401,6 +427,7 @@ export default function CountriesPage() {
             key_crops: formData.key_crops,
             key_programs: formData.key_programs,
             contact_email: formData.contact_email,
+            country_image_url: formData.country_image_url,
           },
         ]);
         setToast({ message: 'Country added', type: 'success' });

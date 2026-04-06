@@ -13,6 +13,7 @@ import {
   Search,
   Warehouse,
   Truck,
+  User,
   Menu,
   X,
   Home,
@@ -28,6 +29,7 @@ const navLinks = [
   { href: '/warehouse/inspections', label: 'Inspections', icon: ClipboardCheck },
   { href: '/warehouse/inventory', label: 'Inventory', icon: Warehouse },
   { href: '/warehouse/dispatch', label: 'Dispatch', icon: Truck },
+  { href: '/warehouse/profile', label: 'Profile', icon: User },
 ];
 
 export default function WarehouseLayout({ children }: { children: React.ReactNode }) {

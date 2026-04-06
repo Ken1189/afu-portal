@@ -63,13 +63,23 @@ export default function PipelinePage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
   const [dragging, setDragging] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
+  const showToast = useCallback((message: string, type: 'success' | 'error' = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 4000);
+  }, []);
 
   const fetchConversations = useCallback(async () => {
     setLoading(true);
-    const { data } = await supabase.from('conversations').select('*').order('last_message_at', { ascending: false });
+    const { data, error } = await supabase.from('conversations').select('*').order('last_message_at', { ascending: false });
+    if (error) {
+      console.error('[pipeline] fetchConversations failed', error);
+      showToast(`Failed to load conversations: ${error.message || 'unknown error'}`, 'error');
+    }
     setConversations((data || []) as Conversation[]);
     setLoading(false);
-  }, [supabase]);
+  }, [supabase, showToast]);
 
   useEffect(() => { fetchConversations(); }, [fetchConversations]);
 
@@ -86,8 +96,18 @@ export default function PipelinePage() {
   const stageConversations = (stageKey: string) => filtered.filter(c => c.status === stageKey);
 
   const moveToStage = async (convId: string, newStatus: string) => {
-    await supabase.from('conversations').update({ status: newStatus, updated_at: new Date().toISOString() }).eq('id', convId);
+    // Optimistic update — capture previous state for revert.
+    const previous = conversations;
     setConversations(prev => prev.map(c => c.id === convId ? { ...c, status: newStatus } : c));
+    const { error } = await supabase
+      .from('conversations')
+      .update({ status: newStatus, updated_at: new Date().toISOString() })
+      .eq('id', convId);
+    if (error) {
+      console.error('[pipeline] moveToStage failed', error);
+      setConversations(previous);
+      showToast(`Failed to move card: ${error.message || 'unknown error'}`, 'error');
+    }
   };
 
   // Drag handlers
@@ -108,6 +128,11 @@ export default function PipelinePage() {
 
   return (
     <div className="space-y-6">
+      {toast && (
+        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg text-sm font-medium ${toast.type === 'error' ? 'bg-red-500 text-white' : 'bg-green-500 text-white'}`}>
+          {toast.message}
+        </div>
+      )}
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>

@@ -6,6 +6,7 @@ import {
   Eye, Calendar, User, Tag, Star,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import ImageUploader from '@/components/ui/ImageUploader';
 
 interface BlogPost {
   id: string;
@@ -352,12 +353,17 @@ export default function AdminBlogPage() {
                 <textarea value={formData.body} onChange={(e) => setFormData({ ...formData, body: e.target.value })} rows={12} placeholder="Write your post content here... Supports **bold**, *italic*, # headings"
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm font-mono focus:ring-2 focus:ring-[#5DB347]/20 focus:border-[#5DB347] resize-y" />
               </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Featured Image</label>
+                <ImageUploader
+                  bucket="media"
+                  folder="blog"
+                  value={formData.featured_image}
+                  onChange={(url) => setFormData({ ...formData, featured_image: url })}
+                  label=""
+                />
+              </div>
               <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Featured Image URL</label>
-                  <input value={formData.featured_image} onChange={(e) => setFormData({ ...formData, featured_image: e.target.value })} placeholder="https://..."
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#5DB347]/20 focus:border-[#5DB347]" />
-                </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Author</label>
                   <input value={formData.author} onChange={(e) => setFormData({ ...formData, author: e.target.value })} placeholder="Author name"

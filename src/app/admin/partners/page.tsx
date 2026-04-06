@@ -6,6 +6,7 @@ import {
   Loader2, X, CheckCircle2, AlertCircle, Globe,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import ImageUploader from '@/components/ui/ImageUploader';
 
 interface Partner {
   id: string;
@@ -40,7 +41,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   NGO: 'bg-emerald-100 text-emerald-700',
 };
 
-const DEMO_PARTNERS: Partner[] = [
+const _UNUSED_DEMO_PARTNERS: Partner[] = [
   { id: 'demo-1', name: 'AfDB', logo_url: null, website: 'https://afdb.org', category: 'DFI', featured: true, display_order: 1, created_at: new Date().toISOString() },
   { id: 'demo-2', name: 'World Bank', logo_url: null, website: 'https://worldbank.org', category: 'DFI', featured: true, display_order: 2, created_at: new Date().toISOString() },
   { id: 'demo-3', name: 'Standard Bank', logo_url: null, website: 'https://standardbank.com', category: 'Bank', featured: false, display_order: 3, created_at: new Date().toISOString() },
@@ -76,9 +77,11 @@ export default function AdminPartnersPage() {
       .select('*')
       .order('display_order', { ascending: true });
     if (error) {
-      setPartners(DEMO_PARTNERS);
+      console.error('[partners] fetch failed', error);
+      setToast({ message: `Failed to load partners: ${error.message || 'unknown error'}`, type: 'error' });
+      setPartners([]);
     } else {
-      setPartners(data && data.length > 0 ? (data as Partner[]) : DEMO_PARTNERS);
+      setPartners((data || []) as Partner[]);
     }
     setLoading(false);
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -236,14 +239,13 @@ export default function AdminPartnersPage() {
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#5DB347]/20 focus:border-[#5DB347]" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Logo URL</label>
-                <input value={formData.logo_url} onChange={(e) => setFormData({ ...formData, logo_url: e.target.value })} placeholder="https://example.com/logo.png"
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#5DB347]/20 focus:border-[#5DB347]" />
-                {formData.logo_url && (
-                  <div className="mt-2 p-2 bg-gray-50 rounded-lg inline-block">
-                    <img src={formData.logo_url} alt="Preview" className="h-10 object-contain" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                  </div>
-                )}
+                <ImageUploader
+                  bucket="media"
+                  folder="partners"
+                  value={formData.logo_url}
+                  onChange={(url) => setFormData({ ...formData, logo_url: url })}
+                  label="Partner Logo"
+                />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Website</label>

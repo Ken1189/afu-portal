@@ -332,21 +332,39 @@ function SiteContentTab({ showToast }: { showToast: (m: string, t?: 'success' | 
     let hasError = false;
     let updateCount = 0;
 
+    let lastErrorMsg = '';
     for (const item of items) {
       const newValue = editedValues[item.id];
       if (newValue !== undefined && newValue !== item.value) {
         updateCount++;
+        // UPSERT — creates row if it doesn't exist, updates if it does.
         const { data, error } = await supabase
           .from('site_content')
-          .update({ value: newValue, updated_at: new Date().toISOString() })
-          .eq('id', item.id)
+          .upsert(
+            {
+              page: item.page,
+              section: item.section,
+              key: item.key,
+              value: newValue,
+              content_type: item.content_type,
+              updated_at: new Date().toISOString(),
+            },
+            { onConflict: 'page,section,key' }
+          )
           .select();
-        if (error || !data || data.length === 0) hasError = true;
+        if (error || !data || data.length === 0) {
+          hasError = true;
+          if (error) {
+            console.error('[content] upsert failed', error);
+            lastErrorMsg = error.message || lastErrorMsg;
+          }
+        }
       }
     }
 
     if (hasError) {
-      showToast(updateCount > 1 ? 'Some content failed to save' : 'Failed to save — check permissions', 'error');
+      const baseMsg = updateCount > 1 ? 'Some content failed to save' : 'Failed to save';
+      showToast(lastErrorMsg ? `${baseMsg}: ${lastErrorMsg}` : `${baseMsg} — check permissions`, 'error');
     } else if (updateCount === 0) {
       showToast('No changes to save', 'error');
     } else {

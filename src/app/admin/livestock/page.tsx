@@ -37,7 +37,7 @@ type TypeFilter = 'all' | 'cattle' | 'poultry' | 'goats' | 'sheep' | 'pigs';
 
 // ── Placeholder Data ─────────────────────────────────────────────────────────
 
-const fallback_livestockRecords: LivestockRecord[] = [
+const _fallback_livestockRecords: LivestockRecord[] = [
   { id: 'LS-001', animalType: 'Cattle', breed: 'Brahman', memberName: 'Grace Moyo', farmName: 'Moyo Farm', count: 120, healthStatus: 'healthy', location: 'Zimbabwe', valueEstimate: 180000 },
   { id: 'LS-002', animalType: 'Poultry', breed: 'Rhode Island Red', memberName: 'Tendai Chirwa', farmName: 'Chirwa Orchards', count: 2500, healthStatus: 'healthy', location: 'Zimbabwe', valueEstimate: 25000 },
   { id: 'LS-003', animalType: 'Goats', breed: 'Boer', memberName: 'Amina Salim', farmName: 'Salim Holdings', count: 85, healthStatus: 'fair', location: 'Tanzania', valueEstimate: 12750 },
@@ -91,7 +91,7 @@ export default function LivestockManagementPage() {
   const { locale: _locale } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all');
-  const [livestockRecords, setLivestockRecords] = useState<LivestockRecord[]>(fallback_livestockRecords);
+  const [livestockRecords, setLivestockRecords] = useState<LivestockRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -106,7 +106,7 @@ export default function LivestockManagementPage() {
   const fetchData = useCallback(async () => {
     try {
       const { data, error } = await supabase.from('livestock').select('*').order('created_at', { ascending: false });
-      if (!error && data && data.length > 0) {
+      if (!error && data) {
         setLivestockRecords(data.map((row: Record<string, unknown>) => {
           const notes = (row.notes as string) || '';
           const memberMatch = notes.match(/Member:\s*([^|]+)/);

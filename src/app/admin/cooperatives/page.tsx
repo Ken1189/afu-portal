@@ -47,7 +47,7 @@ interface CoopMember {
 }
 
 // ── Fallback Data ─────────────────────────────────────────────────────────
-const FALLBACK_COOPERATIVES: Cooperative[] = [
+const _UNUSED_FALLBACK_COOPERATIVES: Cooperative[] = [
   { id: 'c1', name: 'Kilimanjaro Farmers Coop', country: 'Tanzania', region: 'Kilimanjaro', member_count: 48, description: 'Smallholder farmers in Kilimanjaro region', contact_email: 'info@kilifarmers.co.tz', contact_phone: '+255 700 111 222', status: 'active', created_at: '2023-06-15' },
   { id: 'c2', name: 'Lake Victoria Growers', country: 'Kenya', region: 'Kisumu', member_count: 72, description: 'Fish and crop farmers around Lake Victoria', contact_email: 'lvg@farmers.co.ke', contact_phone: '+254 700 333 444', status: 'active', created_at: '2023-03-10' },
   { id: 'c3', name: 'Savanna Agri Alliance', country: 'Nigeria', region: 'Kano', member_count: 120, description: 'Large cooperative of grain and pulse farmers', contact_email: 'info@savanna-agri.ng', contact_phone: '+234 800 555 666', status: 'active', created_at: '2022-11-01' },
@@ -92,12 +92,12 @@ export default function AdminCooperativesPage() {
         .select('*, cooperative_members(id)')
         .order('created_at', { ascending: false });
 
-      if (fetchErr || !data || data.length === 0) {
-        setCooperatives(FALLBACK_COOPERATIVES);
+      if (fetchErr) {
+        console.error('[cooperatives] fetch failed', fetchErr);
+        setError(`Failed to load cooperatives: ${fetchErr.message || 'unknown error'}`);
+        setCooperatives([]);
       } else {
-        // Map the joined data: use length of cooperative_members array as member_count
-        // if the stored member_count is 0 or null
-        const mapped: Cooperative[] = data.map((row: any) => ({
+        const mapped: Cooperative[] = (data || []).map((row: any) => ({
           id: row.id,
           name: row.name,
           country: row.country,
@@ -111,8 +111,10 @@ export default function AdminCooperativesPage() {
         }));
         setCooperatives(mapped);
       }
-    } catch {
-      setCooperatives(FALLBACK_COOPERATIVES);
+    } catch (err) {
+      console.error('[cooperatives] fetch exception', err);
+      setError(`Failed to load cooperatives: ${(err as Error)?.message || 'unknown error'}`);
+      setCooperatives([]);
     }
     setLoading(false);
   }, [supabase]);

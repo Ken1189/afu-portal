@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/supabase/auth-context';
+import ImageUploader from '@/components/ui/ImageUploader';
 import {
   Building2,
   User,
@@ -16,7 +17,6 @@ import {
   Shield,
   Star,
   CheckCircle2,
-  Upload,
   Plus,
   X,
   Edit3,
@@ -136,26 +136,30 @@ export default function SupplierProfilePage() {
 
   // -- Logo/photo upload
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
-  const [logoUploading, setLogoUploading] = useState(false);
+  const [logoError, setLogoError] = useState<string | null>(null);
 
-  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !user) return;
-    setLogoUploading(true);
+  const handleLogoChange = async (url: string) => {
+    if (!user) return;
+    setLogoError(null);
     try {
-      const ext = file.name.split('.').pop();
-      const fileName = `supplier-${user.id}-${Date.now()}.${ext}`;
-      const { error: upErr } = await supabase.storage.from('avatars').upload(fileName, file, { cacheControl: '3600', upsert: true });
-      if (!upErr) {
-        const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(fileName);
-        if (urlData?.publicUrl) {
-          setLogoUrl(urlData.publicUrl);
-          await supabase.from('profiles').update({ avatar_url: urlData.publicUrl }).eq('id', user.id);
-          if (supplierId) await supabase.from('suppliers').update({ logo_url: urlData.publicUrl }).eq('id', supplierId);
-        }
+      setLogoUrl(url);
+      const { error: profileErr } = await supabase
+        .from('profiles')
+        .update({ avatar_url: url })
+        .eq('id', user.id);
+      if (profileErr) throw profileErr;
+      if (supplierId) {
+        const { error: supplierErr } = await supabase
+          .from('suppliers')
+          .update({ logo_url: url })
+          .eq('id', supplierId);
+        if (supplierErr) throw supplierErr;
       }
-    } catch { /* silent */ }
-    setLogoUploading(false);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to save logo.';
+      setLogoError(message);
+      setTimeout(() => setLogoError(null), 4000);
+    }
   };
 
   // -- Display-only from DB
@@ -506,7 +510,7 @@ export default function SupplierProfilePage() {
         className="bg-white rounded-xl border border-gray-100 p-6"
       >
         <div className="flex flex-col sm:flex-row items-start gap-6">
-          <div className="relative group">
+          <div className="flex flex-col items-start gap-2">
             <div className="w-24 h-24 rounded-2xl bg-[#5DB347] flex items-center justify-center text-white text-3xl font-bold shadow-lg overflow-hidden">
               {logoUrl || profile?.avatar_url ? (
                 <img src={logoUrl || profile?.avatar_url || ''} alt="Logo" className="w-full h-full object-cover" />
@@ -515,10 +519,19 @@ export default function SupplierProfilePage() {
               )}
             </div>
             {editing && (
-              <label className="absolute inset-0 w-24 h-24 rounded-2xl bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white cursor-pointer">
-                {logoUploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Upload className="w-5 h-5" />}
-                <input type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" />
-              </label>
+              <div className="w-full">
+                <ImageUploader
+                  bucket="avatars"
+                  folder={user?.id || ''}
+                  value={logoUrl}
+                  onChange={handleLogoChange}
+                  round
+                  label=""
+                />
+                {logoError && (
+                  <p className="text-xs text-red-500 mt-1">{logoError}</p>
+                )}
+              </div>
             )}
           </div>
 

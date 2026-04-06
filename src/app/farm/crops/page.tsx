@@ -34,6 +34,7 @@ import { useFarmPlots, useCreateFarmPlot, useUpdateFarmPlot, useCreateFarmActivi
 import { useFarmActivities } from '@/lib/supabase/use-farm-activities';
 import { useAuth } from '@/lib/supabase/auth-context';
 import { createClient } from '@/lib/supabase/client';
+import ImageUploader from '@/components/ui/ImageUploader';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 // ---------------------------------------------------------------------------
@@ -719,35 +720,6 @@ function AddPlotModal({
   const [saveError, setSaveError] = useState<string | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
-  const [uploading, setUploading] = useState(false);
-
-  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !user) return;
-    if (file.size > 5 * 1024 * 1024) {
-      setSaveError('Photo must be under 5 MB');
-      return;
-    }
-    setUploading(true);
-    setSaveError(null);
-    // Show local preview immediately
-    const localUrl = URL.createObjectURL(file);
-    setPhotoPreview(localUrl);
-
-    const supabase = createClient();
-    const ext = file.name.split('.').pop() || 'jpg';
-    const path = `crops/${user.id}/${Date.now()}.${ext}`;
-    const { error } = await supabase.storage.from('media').upload(path, file, { upsert: true });
-    if (error) {
-      setSaveError('Photo upload failed: ' + error.message);
-      setPhotoPreview(null);
-      setUploading(false);
-      return;
-    }
-    const { data: urlData } = supabase.storage.from('media').getPublicUrl(path);
-    setPhotoUrl(urlData.publicUrl);
-    setUploading(false);
-  };
 
   // Pre-fill when editing
   useState(() => {
@@ -1011,31 +983,13 @@ function AddPlotModal({
 
               {/* Photo Upload */}
               <div>
-                <label className="text-xs font-semibold text-navy block mb-1">Crop Photo</label>
-                <div className="flex items-center gap-3">
-                  <label className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-dashed border-gray-300 cursor-pointer hover:border-[#5DB347] hover:bg-green-50/50 transition-colors text-sm text-gray-500">
-                    {uploading ? (
-                      <Loader2 className="w-4 h-4 animate-spin text-[#5DB347]" />
-                    ) : (
-                      <Camera className="w-4 h-4" />
-                    )}
-                    {uploading ? 'Uploading...' : 'Upload Photo'}
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handlePhotoUpload}
-                      disabled={uploading}
-                    />
-                  </label>
-                  {photoPreview && (
-                    <div className="relative w-14 h-14 rounded-xl overflow-hidden border border-gray-200">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
-                    </div>
-                  )}
-                </div>
-                <p className="text-[10px] text-gray-400 mt-1">Max 5 MB. JPG, PNG, or WebP.</p>
+                <ImageUploader
+                  bucket="media"
+                  folder={`crops/${user?.id || 'anonymous'}`}
+                  value={photoUrl}
+                  onChange={(url) => { setPhotoUrl(url); setPhotoPreview(url); }}
+                  label="Crop Photo"
+                />
               </div>
 
               {/* Error message */}

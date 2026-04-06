@@ -18,6 +18,7 @@ import {
   GripVertical,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import ImageUploader from '@/components/ui/ImageUploader';
 
 // ── Types ─────────────────────────────────────────────────
 
@@ -450,14 +451,16 @@ export default function TestimonialsAdmin() {
                 />
               </div>
 
-              {/* Photo URL */}
+              {/* Photo */}
               <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-1">Photo URL</label>
-                <input
+                <label className="block text-xs font-semibold text-gray-600 mb-1">Photo</label>
+                <ImageUploader
+                  bucket="media"
+                  folder="testimonials"
                   value={form.photo_url}
-                  onChange={(e) => setForm({ ...form, photo_url: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-green-200 focus:border-green-400 outline-none"
-                  placeholder="https://..."
+                  onChange={(url) => setForm({ ...form, photo_url: url })}
+                  round
+                  label=""
                 />
               </div>
 

@@ -34,6 +34,7 @@ import {
 import { useLivestock, useCreateLivestock, useUpdateLivestock, type LivestockRow } from '@/lib/supabase/use-livestock';
 import { useAuth } from '@/lib/supabase/auth-context';
 import { createClient } from '@/lib/supabase/client';
+import ImageUploader from '@/components/ui/ImageUploader';
 
 // ---------------------------------------------------------------------------
 // Inlined types & data (previously from @/lib/data/livestock)
@@ -721,31 +722,6 @@ export default function LivestockPage() {
   });
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
-  const [photoUploading, setPhotoUploading] = useState(false);
-
-  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !user) return;
-    if (file.size > 5 * 1024 * 1024) {
-      return; // silently reject oversized files
-    }
-    setPhotoUploading(true);
-    const localUrl = URL.createObjectURL(file);
-    setPhotoPreview(localUrl);
-
-    const supabase = createClient();
-    const ext = file.name.split('.').pop() || 'jpg';
-    const path = `livestock/${user.id}/${Date.now()}.${ext}`;
-    const { error } = await supabase.storage.from('media').upload(path, file, { upsert: true });
-    if (error) {
-      setPhotoPreview(null);
-      setPhotoUploading(false);
-      return;
-    }
-    const { data: urlData } = supabase.storage.from('media').getPublicUrl(path);
-    setPhotoUrl(urlData.publicUrl);
-    setPhotoUploading(false);
-  };
 
   const openEditForm = (row: LivestockRow) => {
     setEditingLivestockId(row.id);
@@ -1579,31 +1555,13 @@ export default function LivestockPage() {
 
               {/* Photo Upload */}
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">Animal Photo</label>
-                <div className="flex items-center gap-3">
-                  <label className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-dashed border-gray-300 cursor-pointer hover:border-[#8CB89C] hover:bg-green-50/50 transition-colors text-sm text-gray-500">
-                    {photoUploading ? (
-                      <Loader2 className="w-4 h-4 animate-spin text-[#8CB89C]" />
-                    ) : (
-                      <Camera className="w-4 h-4" />
-                    )}
-                    {photoUploading ? 'Uploading...' : 'Upload Photo'}
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handlePhotoUpload}
-                      disabled={photoUploading}
-                    />
-                  </label>
-                  {photoPreview && (
-                    <div className="relative w-14 h-14 rounded-xl overflow-hidden border border-gray-200">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
-                    </div>
-                  )}
-                </div>
-                <p className="text-[10px] text-gray-400 mt-1">Max 5 MB. JPG, PNG, or WebP.</p>
+                <ImageUploader
+                  bucket="media"
+                  folder={`livestock/${user?.id || 'anonymous'}`}
+                  value={photoUrl}
+                  onChange={(url) => { setPhotoUrl(url); setPhotoPreview(url); }}
+                  label="Animal Photo"
+                />
               </div>
 
               {/* Submit */}

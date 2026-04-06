@@ -38,13 +38,13 @@ interface CountryProduction {
 // ── Placeholder Data ─────────────────────────────────────────────────────────
 
 const FALLBACK_SUMMARY = {
-  totalPlots: 1_284,
-  totalHectares: 18_740,
-  activeCrops: 24,
-  totalLivestock: 42_380,
+  totalPlots: 0,
+  totalHectares: 0,
+  activeCrops: 0,
+  totalLivestock: 0,
 };
 
-const fallback_crops: CropBreakdown[] = [
+const _fallback_crops: CropBreakdown[] = [
   { name: 'Maize', totalHectares: 4200, farmerCount: 186, avgYield: 5.2, yieldUnit: 't/ha' },
   { name: 'Cassava', totalHectares: 3100, farmerCount: 142, avgYield: 12.8, yieldUnit: 't/ha' },
   { name: 'Blueberries', totalHectares: 980, farmerCount: 48, avgYield: 6.4, yieldUnit: 't/ha' },
@@ -56,7 +56,7 @@ const fallback_crops: CropBreakdown[] = [
   { name: 'Tobacco', totalHectares: 1200, farmerCount: 41, avgYield: 2.4, yieldUnit: 't/ha' },
 ];
 
-const fallback_livestock: LivestockSummary[] = [
+const _fallback_livestock: LivestockSummary[] = [
   { type: 'Cattle', totalCount: 18_400, avgHealthScore: 87 },
   { type: 'Poultry', totalCount: 12_600, avgHealthScore: 91 },
   { type: 'Goats', totalCount: 6_200, avgHealthScore: 84 },
@@ -64,7 +64,7 @@ const fallback_livestock: LivestockSummary[] = [
   { type: 'Pigs', totalCount: 2_080, avgHealthScore: 89 },
 ];
 
-const fallback_countryProduction: CountryProduction[] = [
+const _fallback_countryProduction: CountryProduction[] = [
   { country: 'Zimbabwe', flag: 'ZW', tonnes: 48_200 },
   { country: 'Tanzania', flag: 'TZ', tonnes: 36_800 },
   { country: 'Botswana', flag: 'BW', tonnes: 22_400 },
@@ -111,9 +111,9 @@ function healthColor(score: number): string {
 export default function FarmOverviewPage() {
   const { locale: _locale } = useLanguage();
   const [cropSearch, setCropSearch] = useState('');
-  const [crops, setCrops] = useState<CropBreakdown[]>(fallback_crops);
-  const [livestock, setLivestock] = useState<LivestockSummary[]>(fallback_livestock);
-  const [countryProduction, setCountryProduction] = useState<CountryProduction[]>(fallback_countryProduction);
+  const [crops, setCrops] = useState<CropBreakdown[]>([]);
+  const [livestock, setLivestock] = useState<LivestockSummary[]>([]);
+  const [countryProduction, setCountryProduction] = useState<CountryProduction[]>([]);
   const [summary, setSummary] = useState(FALLBACK_SUMMARY);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -125,8 +125,8 @@ export default function FarmOverviewPage() {
         const { data: plotData } = await supabase
           .from('farm_plots')
           .select('*');
-        if (plotData && plotData.length > 0) {
-          setSummary(prev => ({ ...prev, totalPlots: plotData.length, totalHectares: plotData.reduce((s: number, p: Record<string, unknown>) => s + ((p.size_hectares as number) || 0), 0) }));
+        if (plotData) {
+          setSummary(prev => ({ ...prev, totalPlots: plotData.length, totalHectares: plotData.reduce((s: number, p: Record<string, unknown>) => s + ((p.size_hectares as number) || 0), 0), activeCrops: new Set(plotData.map((p: Record<string, unknown>) => p.crop_type as string).filter(Boolean)).size }));
           // Group by crop
           const cropMap: Record<string, { hectares: number; farmers: Set<string>; yields: number[] }> = {};
           plotData.forEach((p: Record<string, unknown>) => {
@@ -143,14 +143,14 @@ export default function FarmOverviewPage() {
             avgYield: d.yields.length > 0 ? Math.round((d.yields.reduce((a, b) => a + b, 0) / d.yields.length) * 10) / 10 : 0,
             yieldUnit: 't/ha',
           }));
-          if (cropArr.length > 0) setCrops(cropArr);
+          setCrops(cropArr);
         }
 
         // Fetch livestock
         const { data: lsData } = await supabase
           .from('livestock')
           .select('*');
-        if (lsData && lsData.length > 0) {
+        if (lsData) {
           const lsMap: Record<string, { count: number; healthScores: number[] }> = {};
           lsData.forEach((l: Record<string, unknown>) => {
             const type = (l.animal_type as string) || 'Other';
@@ -163,10 +163,26 @@ export default function FarmOverviewPage() {
             totalCount: d.count,
             avgHealthScore: d.healthScores.length > 0 ? Math.round(d.healthScores.reduce((a, b) => a + b, 0) / d.healthScores.length) : 85,
           }));
-          if (lsArr.length > 0) {
-            setLivestock(lsArr);
-            setSummary(prev => ({ ...prev, totalLivestock: lsArr.reduce((s, l) => s + l.totalCount, 0) }));
-          }
+          setLivestock(lsArr);
+          setSummary(prev => ({ ...prev, totalLivestock: lsArr.reduce((s, l) => s + l.totalCount, 0) }));
+        }
+
+        // Country production from members aggregated by country
+        const { data: memberData } = await supabase
+          .from('profiles')
+          .select('country');
+        if (memberData) {
+          const countryMap: Record<string, number> = {};
+          memberData.forEach((m: Record<string, unknown>) => {
+            const c = (m.country as string) || '';
+            if (c) countryMap[c] = (countryMap[c] || 0) + 1;
+          });
+          const cpArr = Object.entries(countryMap).map(([country, tonnes]) => ({
+            country,
+            flag: country.slice(0, 2).toUpperCase(),
+            tonnes,
+          })).sort((a, b) => b.tonnes - a.tonnes);
+          setCountryProduction(cpArr);
         }
       } catch {
         // fallback data already set

@@ -72,52 +72,8 @@ interface InsurancePolicy {
 }
 
 /* ------------------------------------------------------------------ */
-/* Demo Data                                                            */
+/* Demo Data — REMOVED. Show empty state when DB returns no rows.       */
 /* ------------------------------------------------------------------ */
-
-const demoFarmers: FarmerProfile[] = [
-  { id: 'f-1', full_name: 'John Okello', email: 'john@example.com', role: 'farmer', country: 'Uganda', created_at: '2025-06-15', membership_tier: 'smallholder', status: 'active', phone: '+256-700-111222', region: 'Central' },
-  { id: 'f-2', full_name: 'Mary Wanjiku', email: 'mary@example.com', role: 'farmer', country: 'Kenya', created_at: '2025-07-20', membership_tier: 'commercial', status: 'active', phone: '+254-700-222333', region: 'Nairobi', tier_upgrade_requested: true },
-  { id: 'f-3', full_name: 'Hassan Mwanga', email: 'hassan@example.com', role: 'farmer', country: 'Tanzania', created_at: '2025-08-10', membership_tier: 'smallholder', status: 'active', phone: '+255-700-333444', region: 'Dar es Salaam' },
-  { id: 'f-4', full_name: 'Claire Uwimana', email: 'claire@example.com', role: 'farmer', country: 'Rwanda', created_at: '2025-09-05', membership_tier: 'commercial', status: 'active', phone: '+250-700-444555', region: 'Kigali' },
-  { id: 'f-5', full_name: 'David Banda', email: 'david@example.com', role: 'farmer', country: 'Zambia', created_at: '2025-10-12', membership_tier: 'smallholder', status: 'active', phone: '+260-700-555666', region: 'Lusaka' },
-  { id: 'f-6', full_name: 'Kofi Asante', email: 'kofi@example.com', role: 'farmer', country: 'Ghana', created_at: '2025-11-08', membership_tier: 'cooperative', status: 'active', phone: '+233-700-666777', region: 'Accra', tier_upgrade_requested: true },
-  { id: 'f-7', full_name: 'Amina Diallo', email: 'amina@example.com', role: 'farmer', country: 'Senegal', created_at: '2025-12-01', membership_tier: 'smallholder', status: 'pending', phone: '+221-700-777888', region: 'Dakar' },
-  { id: 'f-8', full_name: 'Tendai Moyo', email: 'tendai@example.com', role: 'farmer', country: 'Zimbabwe', created_at: '2026-01-15', membership_tier: 'smallholder', status: 'active', phone: '+263-700-888999', region: 'Mashonaland East' },
-  { id: 'f-9', full_name: 'Grace Chirwa', email: 'grace@example.com', role: 'farmer', country: 'Zimbabwe', created_at: '2026-02-10', membership_tier: 'commercial', status: 'active', phone: '+263-700-999000', region: 'Manicaland' },
-  { id: 'f-10', full_name: 'Peter Odhiambo', email: 'peter@example.com', role: 'farmer', country: 'Kenya', created_at: '2026-03-01', membership_tier: 'cooperative', status: 'active', phone: '+254-700-000111', region: 'Kisumu' },
-];
-
-const demoFarmPlots: FarmPlot[] = [
-  { id: 'fp-1', member_id: 'f-1', name: 'Main Plot', crop_type: 'Maize', size_hectares: 5.2, health_score: 85 },
-  { id: 'fp-2', member_id: 'f-1', name: 'River Field', crop_type: 'Rice', size_hectares: 2.0, health_score: 78 },
-  { id: 'fp-3', member_id: 'f-2', name: 'Highland Farm', crop_type: 'Coffee (Arabica)', size_hectares: 12.5, health_score: 92 },
-  { id: 'fp-4', member_id: 'f-3', name: 'Coastal Plot', crop_type: 'Cashew', size_hectares: 3.0, health_score: 70 },
-  { id: 'fp-5', member_id: 'f-4', name: 'Hillside Plot', crop_type: 'Rice', size_hectares: 8.0, health_score: 88 },
-  { id: 'fp-6', member_id: 'f-5', name: 'Valley Farm', crop_type: 'Groundnuts', size_hectares: 4.5, health_score: 75 },
-  { id: 'fp-7', member_id: 'f-6', name: 'Cocoa Estate', crop_type: 'Cocoa', size_hectares: 15.0, health_score: 90 },
-  { id: 'fp-8', member_id: 'f-7', name: 'Peanut Field', crop_type: 'Groundnuts', size_hectares: 2.5, health_score: 65 },
-  { id: 'fp-9', member_id: 'f-8', name: 'Tobacco Field', crop_type: 'Tobacco', size_hectares: 6.0, health_score: 80 },
-  { id: 'fp-10', member_id: 'f-9', name: 'Cotton Farm', crop_type: 'Cotton', size_hectares: 10.0, health_score: 82 },
-  { id: 'fp-11', member_id: 'f-10', name: 'Sugar Cane Plot', crop_type: 'Sugarcane', size_hectares: 7.0, health_score: 77 },
-];
-
-const demoLoans: Loan[] = [
-  { id: 'l-1', member_id: 'f-1', amount: 500, status: 'active' },
-  { id: 'l-2', member_id: 'f-2', amount: 2000, status: 'active' },
-  { id: 'l-3', member_id: 'f-4', amount: 1500, status: 'repaid' },
-  { id: 'l-4', member_id: 'f-6', amount: 3000, status: 'active' },
-  { id: 'l-5', member_id: 'f-9', amount: 800, status: 'pending' },
-];
-
-const demoInsurance: InsurancePolicy[] = [
-  { id: 'ins-1', member_id: 'f-1', status: 'active' },
-  { id: 'ins-2', member_id: 'f-2', status: 'active' },
-  { id: 'ins-3', member_id: 'f-3', status: 'expired' },
-  { id: 'ins-4', member_id: 'f-4', status: 'active' },
-  { id: 'ins-5', member_id: 'f-6', status: 'active' },
-  { id: 'ins-6', member_id: 'f-8', status: 'pending' },
-];
 
 /* ------------------------------------------------------------------ */
 /* CSV Parser (preserved from original)                                 */
@@ -268,39 +224,30 @@ function AllFarmersTab() {
 
   const fetchFarmers = useCallback(async () => {
     setLoading(true);
-    try {
-      // Fetch farmers from profiles (role is 'member' in DB, not 'farmer')
-      const { data: profileData } = await supabase
-        .from('profiles')
-        .select('*')
-        .in('role', ['member', 'farmer'])
-        .order('created_at', { ascending: false });
+    const failures: string[] = [];
 
-      if (profileData && profileData.length > 0) {
-        setFarmers(profileData);
-      } else {
-        setFarmers(demoFarmers);
-      }
+    const { data: profileData, error: profileErr } = await supabase
+      .from('profiles')
+      .select('*')
+      .in('role', ['member', 'farmer'])
+      .order('created_at', { ascending: false });
+    if (profileErr) { console.error('[farmers] profiles', profileErr); failures.push('farmers'); }
+    setFarmers(profileData || []);
 
-      // Fetch farm plots
-      const { data: plotData } = await supabase.from('farm_plots').select('*');
-      if (plotData && plotData.length > 0) setFarmPlots(plotData);
-      else setFarmPlots(demoFarmPlots);
+    const { data: plotData, error: plotErr } = await supabase.from('farm_plots').select('*');
+    if (plotErr) { console.error('[farmers] farm_plots', plotErr); failures.push('plots'); }
+    setFarmPlots(plotData || []);
 
-      // Fetch loans
-      const { data: loanData } = await supabase.from('loans').select('*');
-      if (loanData && loanData.length > 0) setLoans(loanData);
-      else setLoans(demoLoans);
+    const { data: loanData, error: loanErr } = await supabase.from('loans').select('*');
+    if (loanErr) { console.error('[farmers] loans', loanErr); failures.push('loans'); }
+    setLoans(loanData || []);
 
-      // Fetch insurance
-      const { data: insData } = await supabase.from('insurance_policies').select('*');
-      if (insData && insData.length > 0) setInsurance(insData);
-      else setInsurance(demoInsurance);
-    } catch {
-      setFarmers(demoFarmers);
-      setFarmPlots(demoFarmPlots);
-      setLoans(demoLoans);
-      setInsurance(demoInsurance);
+    const { data: insData, error: insErr } = await supabase.from('insurance_policies').select('*');
+    if (insErr) { console.error('[farmers] insurance', insErr); failures.push('insurance'); }
+    setInsurance(insData || []);
+
+    if (failures.length > 0) {
+      showToast(`Failed to load: ${failures.join(', ')}`, 'error');
     }
     setLoading(false);
   }, [supabase]);
@@ -346,25 +293,27 @@ function AllFarmersTab() {
           .eq('id', farmerId);
         if (!error) {
           showToast('Tier upgrade approved');
+          await fetchFarmers();
         } else {
-          // Demo fallback
-          setFarmers(prev => prev.map(f => f.id === farmerId ? { ...f, membership_tier: newTier, tier_upgrade_requested: false } : f));
-          showToast('Tier upgrade approved (demo)');
+          console.error('[farmers] tier approve failed', error);
+          showToast(`Failed to approve: ${error.message || 'unknown error'}`, 'error');
         }
       } else {
         const { error } = await supabase
           .from('profiles')
           .update({ tier_upgrade_requested: false })
           .eq('id', farmerId);
-        if (!error) showToast('Tier upgrade rejected');
-        else {
-          setFarmers(prev => prev.map(f => f.id === farmerId ? { ...f, tier_upgrade_requested: false } : f));
-          showToast('Tier upgrade rejected (demo)');
+        if (!error) {
+          showToast('Tier upgrade rejected');
+          await fetchFarmers();
+        } else {
+          console.error('[farmers] tier reject failed', error);
+          showToast(`Failed to reject: ${error.message || 'unknown error'}`, 'error');
         }
       }
-    } catch {
-      setFarmers(prev => prev.map(f => f.id === farmerId ? { ...f, tier_upgrade_requested: false } : f));
-      showToast(`Tier ${approve ? 'approved' : 'rejected'} (demo)`);
+    } catch (err) {
+      console.error('[farmers] tier action exception', err);
+      showToast(`Tier ${approve ? 'approval' : 'rejection'} failed`, 'error');
     }
   };
 

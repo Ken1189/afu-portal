@@ -61,13 +61,23 @@ export default function AdminContactsPage() {
   // Bulk
   const [bulkAction, setBulkAction] = useState('');
   const [bulkTag, setBulkTag] = useState('');
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
+  const showToast = useCallback((message: string, type: 'success' | 'error' = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 4000);
+  }, []);
 
   const fetchContacts = useCallback(async () => {
     setLoading(true);
-    const { data } = await supabase.from('conversations').select('*').order('last_message_at', { ascending: false });
+    const { data, error } = await supabase.from('conversations').select('*').order('last_message_at', { ascending: false });
+    if (error) {
+      console.error('[contacts] fetchContacts failed', error);
+      showToast(`Failed to load contacts: ${error.message || 'unknown error'}`, 'error');
+    }
     setContacts((data || []) as Contact[]);
     setLoading(false);
-  }, [supabase]);
+  }, [supabase, showToast]);
 
   useEffect(() => { fetchContacts(); }, [fetchContacts]);
 
@@ -130,27 +140,57 @@ export default function AdminContactsPage() {
   const executeBulk = async () => {
     if (!bulkAction || selectedIds.size === 0) return;
     const ids = [...selectedIds];
+    let firstError: { message?: string } | null = null;
     if (bulkAction === 'tag' && bulkTag) {
-      for (const id of ids) { const c = contacts.find(x => x.id === id); if (c) await supabase.from('conversations').update({ tags: [...new Set([...(c.tags || []), bulkTag])] }).eq('id', id); }
-    } else if (bulkAction === 'close') { await supabase.from('conversations').update({ status: 'closed' }).in('id', ids); }
-    else if (bulkAction === 'assign-devon') { await supabase.from('conversations').update({ assigned_to: '0ebabea8-bb9d-43e8-b5f3-fe7866bdeed2', owner_name: 'Devon K' }).in('id', ids); }
-    else if (bulkAction === 'assign-peter') { await supabase.from('conversations').update({ assigned_to: 'c7f6fe4f-d1fb-46ba-8cf8-7de6e3d113bd', owner_name: 'Peter W' }).in('id', ids); }
-    else if (bulkAction === 'dnd') { await supabase.from('conversations').update({ dnd: true }).in('id', ids); }
+      for (const id of ids) {
+        const c = contacts.find(x => x.id === id);
+        if (c) {
+          const { error } = await supabase.from('conversations').update({ tags: [...new Set([...(c.tags || []), bulkTag])] }).eq('id', id);
+          if (error && !firstError) firstError = error;
+        }
+      }
+    } else if (bulkAction === 'close') {
+      const { error } = await supabase.from('conversations').update({ status: 'closed' }).in('id', ids);
+      if (error) firstError = error;
+    } else if (bulkAction === 'assign-devon') {
+      const { error } = await supabase.from('conversations').update({ assigned_to: '0ebabea8-bb9d-43e8-b5f3-fe7866bdeed2', owner_name: 'Devon K' }).in('id', ids);
+      if (error) firstError = error;
+    } else if (bulkAction === 'assign-peter') {
+      const { error } = await supabase.from('conversations').update({ assigned_to: 'c7f6fe4f-d1fb-46ba-8cf8-7de6e3d113bd', owner_name: 'Peter W' }).in('id', ids);
+      if (error) firstError = error;
+    } else if (bulkAction === 'dnd') {
+      const { error } = await supabase.from('conversations').update({ dnd: true }).in('id', ids);
+      if (error) firstError = error;
+    }
+    if (firstError) {
+      console.error('[contacts] executeBulk failed', firstError);
+      showToast(`Bulk action failed: ${firstError.message || 'unknown error'}`, 'error');
+    } else {
+      showToast(`Applied to ${ids.length} contact${ids.length === 1 ? '' : 's'}`);
+    }
     setSelectedIds(new Set()); setBulkAction(''); setBulkTag(''); fetchContacts();
   };
 
   const addContact = async () => {
     if (!newContact.name && !newContact.email) return;
     setSaving(true);
-    await supabase.from('conversations').insert({
+    const { error } = await supabase.from('conversations').insert({
       contact_name: newContact.name || null, contact_email: newContact.email || null,
       contact_phone: newContact.phone || null, business_name: newContact.business || null,
       contact_type: newContact.type, country: newContact.country || null,
       tags: newContact.tags ? newContact.tags.split(',').map(t => t.trim()).filter(Boolean) : [],
       status: 'open', priority: 'normal', source: 'manual',
     });
-    setShowAddContact(false); setNewContact({ name: '', email: '', phone: '', business: '', type: 'lead', country: '', tags: '' });
-    setSaving(false); fetchContacts();
+    setSaving(false);
+    if (error) {
+      console.error('[contacts] addContact failed', error);
+      showToast(`Failed to add contact: ${error.message || 'unknown error'}`, 'error');
+      return;
+    }
+    showToast('Contact added');
+    setShowAddContact(false);
+    setNewContact({ name: '', email: '', phone: '', business: '', type: 'lead', country: '', tags: '' });
+    fetchContacts();
   };
 
   const exportCSV = () => {
@@ -165,6 +205,11 @@ export default function AdminContactsPage() {
 
   return (
     <div className="flex h-[calc(100vh-80px)] -m-4 -mt-2">
+      {toast && (
+        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg text-sm font-medium ${toast.type === 'error' ? 'bg-red-500 text-white' : 'bg-green-500 text-white'}`}>
+          {toast.message}
+        </div>
+      )}
       {/* ═══ SMART LISTS SIDEBAR ═══ */}
       <div className="w-52 flex-shrink-0 bg-white border-r border-gray-200 flex flex-col">
         <div className="p-3 border-b border-gray-100 flex items-center justify-between">

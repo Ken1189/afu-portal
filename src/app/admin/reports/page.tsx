@@ -70,33 +70,19 @@ interface ScheduledReport {
   active: boolean;
 }
 
-// ── Mock Data ──
+// ── Quick Report Definitions (no mock data) ──
 const fallback_quickReports: QuickReport[] = [
-  { id: 1, name: 'Monthly Summary', icon: <BarChart3 className="w-5 h-5" />, lastGenerated: 'Mar 1, 2026', color: 'text-[#1B2A4A]', bgColor: 'bg-[#1B2A4A]/10' },
-  { id: 2, name: 'Financial Overview', icon: <TrendingUp className="w-5 h-5" />, lastGenerated: 'Mar 5, 2026', color: 'text-[#8CB89C]', bgColor: 'bg-[#8CB89C]/10' },
-  { id: 3, name: 'Member Growth', icon: <Users className="w-5 h-5" />, lastGenerated: 'Mar 3, 2026', color: 'text-blue-600', bgColor: 'bg-blue-50' },
-  { id: 4, name: 'Export Performance', icon: <Ship className="w-5 h-5" />, lastGenerated: 'Feb 28, 2026', color: 'text-[#D4A843]', bgColor: 'bg-[#D4A843]/10' },
-  { id: 5, name: 'Compliance Status', icon: <Shield className="w-5 h-5" />, lastGenerated: 'Mar 10, 2026', color: 'text-red-600', bgColor: 'bg-red-50' },
-  { id: 6, name: 'Supplier Activity', icon: <Store className="w-5 h-5" />, lastGenerated: 'Mar 8, 2026', color: 'text-purple-600', bgColor: 'bg-purple-50' },
+  { id: 1, name: 'Monthly Summary', icon: <BarChart3 className="w-5 h-5" />, lastGenerated: '—', color: 'text-[#1B2A4A]', bgColor: 'bg-[#1B2A4A]/10' },
+  { id: 2, name: 'Financial Overview', icon: <TrendingUp className="w-5 h-5" />, lastGenerated: '—', color: 'text-[#8CB89C]', bgColor: 'bg-[#8CB89C]/10' },
+  { id: 3, name: 'Member Growth', icon: <Users className="w-5 h-5" />, lastGenerated: '—', color: 'text-blue-600', bgColor: 'bg-blue-50' },
+  { id: 4, name: 'Export Performance', icon: <Ship className="w-5 h-5" />, lastGenerated: '—', color: 'text-[#D4A843]', bgColor: 'bg-[#D4A843]/10' },
+  { id: 5, name: 'Compliance Status', icon: <Shield className="w-5 h-5" />, lastGenerated: '—', color: 'text-red-600', bgColor: 'bg-red-50' },
+  { id: 6, name: 'Supplier Activity', icon: <Store className="w-5 h-5" />, lastGenerated: '—', color: 'text-purple-600', bgColor: 'bg-purple-50' },
 ];
 
-const fallback_savedReports: SavedReport[] = [
-  { id: 1, name: 'Q1 2026 Financial Summary', type: 'Financial', date: 'Mar 14, 2026', size: '2.4 MB', format: 'pdf' },
-  { id: 2, name: 'February Member Growth Report', type: 'Membership', date: 'Mar 3, 2026', size: '1.8 MB', format: 'excel' },
-  { id: 3, name: 'Export Shipments - Feb 2026', type: 'Export', date: 'Mar 2, 2026', size: '856 KB', format: 'csv' },
-  { id: 4, name: 'Loan Portfolio Analysis', type: 'Financial', date: 'Feb 28, 2026', size: '3.1 MB', format: 'pdf' },
-  { id: 5, name: 'Training Completion Report', type: 'Training', date: 'Feb 25, 2026', size: '1.2 MB', format: 'pdf' },
-  { id: 6, name: 'Compliance Audit Trail - Q4 2025', type: 'Compliance', date: 'Feb 15, 2026', size: '4.7 MB', format: 'excel' },
-  { id: 7, name: 'Marketplace Transaction Summary', type: 'Marketplace', date: 'Feb 10, 2026', size: '2.0 MB', format: 'csv' },
-  { id: 8, name: 'Annual Report 2025', type: 'Summary', date: 'Jan 31, 2026', size: '8.5 MB', format: 'pdf' },
-];
+const fallback_savedReports: SavedReport[] = [];
 
-const fallback_scheduledReports: ScheduledReport[] = [
-  { id: 1, name: 'Daily Collections Report', frequency: 'daily', nextRun: 'Mar 17, 2026 06:00', recipients: 'Finance Team (8)', active: true },
-  { id: 2, name: 'Weekly Member Summary', frequency: 'weekly', nextRun: 'Mar 23, 2026 08:00', recipients: 'Management (5)', active: true },
-  { id: 3, name: 'Monthly Financial Overview', frequency: 'monthly', nextRun: 'Apr 1, 2026 07:00', recipients: 'Board Members (12)', active: true },
-  { id: 4, name: 'Weekly Compliance Check', frequency: 'weekly', nextRun: 'Mar 23, 2026 09:00', recipients: 'Compliance Team (4)', active: false },
-];
+const fallback_scheduledReports: ScheduledReport[] = [];
 
 const reportTypes = [
   'Monthly Summary', 'Financial Overview', 'Member Growth', 'Export Performance',
@@ -123,16 +109,30 @@ export default function AdminReportsPage() {
   const [savedReports] = useState(fallback_savedReports);
   const [scheduledState, setScheduledState] = useState(fallback_scheduledReports);
   const [isLoading, setIsLoading] = useState(true);
+  const [kpis, setKpis] = useState({ members: 0, payments: 0, applications: 0, loans: 0 });
 
   useEffect(() => {
     const supabase = createClient();
     async function fetchData() {
       try {
-        // Reports page pulls from various tables for stats
-        // The report generation itself is client-side
-        // This fetch validates the connection is active
-        await supabase.from('profiles').select('id', { count: 'exact', head: true });
-      } catch { /* fallback */ }
+        const [
+          { count: memberCount },
+          { count: paymentCount },
+          { count: appCount },
+          { count: loanCount },
+        ] = await Promise.all([
+          supabase.from('members').select('*', { count: 'exact', head: true }),
+          supabase.from('payments').select('*', { count: 'exact', head: true }),
+          supabase.from('membership_applications').select('*', { count: 'exact', head: true }),
+          supabase.from('loans').select('*', { count: 'exact', head: true }),
+        ]);
+        setKpis({
+          members: memberCount ?? 0,
+          payments: paymentCount ?? 0,
+          applications: appCount ?? 0,
+          loans: loanCount ?? 0,
+        });
+      } catch { /* empty */ }
       setIsLoading(false);
     }
     fetchData();
@@ -261,6 +261,24 @@ export default function AdminReportsPage() {
             <p className="text-gray-500 text-sm mt-0.5">Generate, manage, and schedule reports</p>
           </div>
         </div>
+      </motion.div>
+
+      {/* ── KPI Strip (real DB counts) ── */}
+      <motion.div variants={cardVariants} className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {[
+          { label: 'Members', value: kpis.members, icon: <Users className="w-4 h-4" />, color: 'text-[#1B2A4A]', bg: 'bg-[#1B2A4A]/10' },
+          { label: 'Applications', value: kpis.applications, icon: <FileText className="w-4 h-4" />, color: 'text-blue-600', bg: 'bg-blue-50' },
+          { label: 'Loans', value: kpis.loans, icon: <TrendingUp className="w-4 h-4" />, color: 'text-[#8CB89C]', bg: 'bg-[#8CB89C]/10' },
+          { label: 'Payments', value: kpis.payments, icon: <BarChart3 className="w-4 h-4" />, color: 'text-[#D4A843]', bg: 'bg-[#D4A843]/10' },
+        ].map((k) => (
+          <div key={k.label} className="bg-white rounded-xl border border-gray-100 p-4 flex items-center gap-3">
+            <div className={`w-9 h-9 rounded-lg ${k.bg} ${k.color} flex items-center justify-center`}>{k.icon}</div>
+            <div>
+              <p className="text-xl font-bold text-[#1B2A4A]">{isLoading ? '—' : k.value.toLocaleString()}</p>
+              <p className="text-xs text-gray-500">{k.label}</p>
+            </div>
+          </div>
+        ))}
       </motion.div>
 
       {/* ── Quick Reports ── */}
@@ -458,7 +476,13 @@ export default function AdminReportsPage() {
       )}
 
       {/* ===== SAVED REPORTS TAB ===== */}
-      {activeTab === 'saved' && (
+      {activeTab === 'saved' && savedReports.length === 0 && (
+        <motion.div variants={cardVariants} className="bg-white rounded-xl border border-gray-100 p-12 text-center">
+          <FileText className="w-10 h-10 text-gray-300 mx-auto mb-3" />
+          <p className="text-sm text-gray-500">No saved reports yet. Generate one to get started.</p>
+        </motion.div>
+      )}
+      {activeTab === 'saved' && savedReports.length > 0 && (
         <motion.div variants={containerVariants} initial="hidden" animate="show" className="space-y-4">
           <motion.div variants={cardVariants} className="bg-white rounded-xl border border-gray-100 overflow-hidden">
             <div className="overflow-x-auto">
@@ -511,7 +535,19 @@ export default function AdminReportsPage() {
       )}
 
       {/* ===== SCHEDULED TAB ===== */}
-      {activeTab === 'scheduled' && (
+      {activeTab === 'scheduled' && scheduledState.length === 0 && (
+        <motion.div variants={cardVariants} className="bg-white rounded-xl border border-gray-100 p-12 text-center">
+          <Clock className="w-10 h-10 text-gray-300 mx-auto mb-3" />
+          <p className="text-sm text-gray-500 mb-3">No scheduled reports yet.</p>
+          <button
+            onClick={() => alert('Scheduling — Coming soon')}
+            className="text-xs px-3 py-1.5 bg-[#8CB89C]/10 text-[#8CB89C] rounded-lg font-medium"
+          >
+            Schedule a Report
+          </button>
+        </motion.div>
+      )}
+      {activeTab === 'scheduled' && scheduledState.length > 0 && (
         <motion.div variants={containerVariants} initial="hidden" animate="show" className="space-y-4">
           {scheduledState.map((sched) => (
             <motion.div key={sched.id} variants={cardVariants} className="bg-white rounded-xl border border-gray-100 p-5">
