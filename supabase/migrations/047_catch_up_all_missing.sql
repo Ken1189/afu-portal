@@ -466,6 +466,183 @@ CREATE TABLE IF NOT EXISTS site_config (
 );
 
 -- ───────────────────────────────────────────────────────────
+-- Messaging templates + campaigns + outbound
+-- ───────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS message_templates (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  channel TEXT DEFAULT 'email',
+  subject TEXT,
+  body TEXT NOT NULL,
+  variables TEXT[],
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS campaigns (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  template_id UUID,
+  audience TEXT,
+  status TEXT DEFAULT 'draft',
+  scheduled_at TIMESTAMPTZ,
+  sent_at TIMESTAMPTZ,
+  recipients_count INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS sms_messages (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  to_number TEXT,
+  from_number TEXT,
+  body TEXT,
+  status TEXT DEFAULT 'sent',
+  provider TEXT,
+  cost DECIMAL(10,4),
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS whatsapp_messages (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  to_number TEXT,
+  from_number TEXT,
+  body TEXT,
+  status TEXT DEFAULT 'sent',
+  cost DECIMAL(10,4),
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS ussd_sessions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  session_id TEXT,
+  phone TEXT,
+  service_code TEXT,
+  status TEXT DEFAULT 'active',
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS notifications (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID,
+  type TEXT,
+  title TEXT,
+  body TEXT,
+  read BOOLEAN DEFAULT false,
+  link TEXT,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS broadcasts (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title TEXT,
+  body TEXT,
+  audience TEXT,
+  sent_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS notification_templates (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  channel TEXT,
+  subject TEXT,
+  body TEXT,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- ───────────────────────────────────────────────────────────
+-- Conversations + messages (for inbox + chatbot)
+-- ───────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS conversations (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  type TEXT DEFAULT 'lead',
+  channel TEXT,
+  subject TEXT,
+  sender_name TEXT,
+  sender_email TEXT,
+  sender_phone TEXT,
+  status TEXT DEFAULT 'open',
+  stage TEXT DEFAULT 'new',
+  assigned_to UUID,
+  unread_count INTEGER DEFAULT 0,
+  last_message_at TIMESTAMPTZ DEFAULT now(),
+  tags TEXT[],
+  notes TEXT,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS conversation_messages (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  conversation_id UUID,
+  direction TEXT,
+  channel TEXT,
+  sender_name TEXT,
+  sender_email TEXT,
+  body TEXT,
+  status TEXT DEFAULT 'delivered',
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- ───────────────────────────────────────────────────────────
+-- Other commonly-queried tables
+-- ───────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS testimonials (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  role TEXT,
+  country TEXT,
+  quote TEXT,
+  photo_url TEXT,
+  is_featured BOOLEAN DEFAULT false,
+  display_order INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS faq_items (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  question TEXT NOT NULL,
+  answer TEXT,
+  category TEXT DEFAULT 'general',
+  display_order INTEGER DEFAULT 0,
+  is_published BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS announcements (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title TEXT NOT NULL,
+  body TEXT,
+  type TEXT DEFAULT 'info',
+  is_active BOOLEAN DEFAULT true,
+  start_date TIMESTAMPTZ DEFAULT now(),
+  end_date TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS legal_pages (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  slug TEXT UNIQUE NOT NULL,
+  title TEXT NOT NULL,
+  content TEXT,
+  is_published BOOLEAN DEFAULT true,
+  updated_at TIMESTAMPTZ DEFAULT now(),
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS audit_log (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID,
+  action TEXT,
+  entity_type TEXT,
+  entity_id UUID,
+  details JSONB,
+  ip_address TEXT,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- ───────────────────────────────────────────────────────────
 -- Disable RLS on all (you said RLS is off platform-wide)
 -- ───────────────────────────────────────────────────────────
 DO $$
@@ -481,7 +658,11 @@ BEGIN
     'cooperatives', 'cooperative_members', 'cooperative_activities',
     'equipment', 'equipment_bookings',
     'carbon_projects', 'carbon_credits', 'carbon_verifications', 'carbon_enrollments',
-    'site_content', 'site_config'
+    'site_content', 'site_config',
+    'message_templates', 'campaigns', 'sms_messages', 'whatsapp_messages',
+    'ussd_sessions', 'notifications', 'broadcasts', 'notification_templates',
+    'conversations', 'conversation_messages',
+    'testimonials', 'faq_items', 'announcements', 'legal_pages', 'audit_log'
   ])
   LOOP
     BEGIN
