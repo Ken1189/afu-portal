@@ -50,7 +50,7 @@ const FALLBACK_PROGRAMS: { iconName: string; title: string; description: string;
 ];
 
 const FALLBACK_STATS = [
-  { value: "500+", label: "Young farmers enrolled" },
+  { value: "Growing", label: "Young farmers community" },
   { value: "45", label: "Partner schools" },
   { value: "9", label: "Countries active" },
   { value: "$120K", label: "Seed funding awarded" },
@@ -220,7 +220,7 @@ export default async function YoungFarmersPage() {
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
             <Link
-              href="/contact?subject=young-farmers"
+              href="/apply?tier=free"
               className="bg-[#5DB347] hover:bg-[#449933] text-white px-8 py-3 rounded-lg font-semibold transition-colors"
             >
               Apply as a Young Farmer
