@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   ImageIcon, Upload, Trash2, Copy, Loader2, X, CheckCircle2, AlertCircle,
   File, FileImage, FileText, Grid, List, Search, Info, FolderOpen, FolderPlus,
-  ChevronRight, Home, Layers,
+  ChevronRight, Home, Layers, Camera,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
@@ -65,6 +65,7 @@ export default function AdminMediaPage() {
   const [showNewFolderInput, setShowNewFolderInput] = useState(false);
   const [creatingDefaults, setCreatingDefaults] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
+  const cameraInput = useRef<HTMLInputElement>(null);
 
   const supabase = createClient();
 
@@ -274,9 +275,14 @@ export default function AdminMediaPage() {
         </div>
         <div className="flex gap-2">
           <input ref={fileInput} type="file" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" onChange={handleUpload} className="hidden" />
+          <input ref={cameraInput} type="file" accept="image/*" capture="environment" onChange={handleUpload} className="hidden" />
           <button onClick={() => setShowNewFolderInput(true)}
             className="flex items-center gap-2 px-4 py-2.5 bg-white text-[#1B2A4A] text-sm font-medium rounded-lg border border-gray-200 hover:bg-gray-50 shadow-sm transition-all">
             <FolderPlus className="w-4 h-4" /> New Folder
+          </button>
+          <button onClick={() => cameraInput.current?.click()} disabled={uploading}
+            className="flex items-center gap-2 px-4 py-2.5 bg-white text-[#1B2A4A] text-sm font-medium rounded-lg border border-gray-200 hover:bg-gray-50 shadow-sm transition-all disabled:opacity-50">
+            <Camera className="w-4 h-4" /> Take Photo
           </button>
           <button onClick={() => fileInput.current?.click()} disabled={uploading}
             className="flex items-center gap-2 px-4 py-2.5 bg-[#5DB347] text-white text-sm font-medium rounded-lg hover:bg-[#4a9a38] shadow-sm transition-all disabled:opacity-50">

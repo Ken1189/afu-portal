@@ -804,22 +804,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return () => clearTimeout(timeout);
   }, [user, authLoading, profileIsAdmin, profile, router]);
 
-  // Show loading while checking auth — but NEVER for more than 2s
-  // If profile already confirms admin, skip loading entirely
-  if (authLoading || (!roleChecked && !profileIsAdmin) || (!authorized && !profileIsAdmin)) {
+  // Middleware already guards /admin — if user reached this layout, they're authorized.
+  // Only show loading if auth context is still initializing AND no user data exists yet.
+  if (authLoading && !user) {
     return (
       <div className="min-h-screen bg-cream flex items-center justify-center">
         <div className="text-center">
-          <svg
-            className="animate-spin h-8 w-8 text-teal mx-auto mb-3"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
+          <svg className="animate-spin h-8 w-8 text-teal mx-auto mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
           </svg>
-          <p className="text-sm text-gray-500">Verifying access...</p>
+          <p className="text-sm text-gray-500">Loading...</p>
         </div>
       </div>
     );
@@ -934,17 +929,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           )}
         </div>
 
-        {/* Section tabs */}
-        {showLabels && (
-          <div className="border-b border-white/10 px-2 py-2 flex flex-wrap gap-1">
-            {SECTIONS.map(s => (
-              <button key={s.key} onClick={() => setActiveSection(s.key)} className={`flex items-center gap-1 px-2 py-1.5 rounded-lg text-[10px] font-medium transition-colors ${activeSection === s.key ? 'bg-[#5DB347] text-white' : 'text-gray-400 hover:text-white hover:bg-white/10'}`}>
-                {s.icon}
-                <span>{s.label}</span>
-              </button>
-            ))}
-          </div>
-        )}
+        {/* Section tabs removed — sidebar shows all groups directly */}
 
         {/* Nav content */}
         <nav className="flex-1 overflow-y-auto scrollbar-hide" style={{ padding: showLabels ? '8px 12px' : '4px 0' }}>
@@ -961,7 +946,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           )}
 
           {/* Nav groups — filtered by active section */}
-          {visibleGroups.filter(g => searchQuery || SECTIONS.find(s => s.key === activeSection)?.groups.includes(g.label)).map((group) => (
+          {visibleGroups.map((group) => (
             <NavSection
               key={group.label}
               group={group}
