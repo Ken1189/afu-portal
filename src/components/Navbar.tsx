@@ -33,6 +33,9 @@ import {
   HelpCircle,
   Newspaper,
   Wheat,
+  Sprout,
+  ArrowLeftRight,
+  Megaphone,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useAuth } from "@/lib/supabase/auth-context";
@@ -41,15 +44,36 @@ import { localeNames, type Locale } from "@/lib/i18n/translations";
 
 /* ─── Data ─── */
 
-const servicesLinks: { label: string; href: string; icon: LucideIcon }[] = [
-  { label: "Financing", href: "/services/finance", icon: Landmark },
-  { label: "Insurance", href: "/services/insurance", icon: ShieldCheck },
+const financeLinks = [
+  { label: "AFU Bank", href: "/services/finance/afu-bank" },
+  { label: "Asset Finance", href: "/services/finance/asset-finance" },
+  { label: "Crop Dev Loan", href: "/services/finance/crop-dev-loan" },
+  { label: "Mortgages", href: "/services/finance/mortgages" },
+  { label: "Input Finance", href: "/services/finance/input-finance" },
+  { label: "Harvest Finance", href: "/services/finance/harvest-finance" },
+  { label: "Trade Finance", href: "/services/finance/trade-finance" },
+];
+
+const insuranceLinks = [
+  { label: "Asset Insurance", href: "/services/insurance/asset" },
+  { label: "Crop Insurance", href: "/services/insurance/crop" },
+  { label: "Medical Insurance", href: "/services/insurance/medical" },
+  { label: "Farm Insurance", href: "/services/insurance/farm" },
+  { label: "Trade Insurance", href: "/services/insurance/trade" },
+  { label: "Livestock Insurance", href: "/services/insurance/livestock" },
+  { label: "Life & Personal", href: "/services/insurance/life" },
+  { label: "Equipment Insurance", href: "/services/insurance/equipment" },
+  { label: "Pension & Retirement", href: "/services/insurance/pension" },
+  { label: "Vehicle Insurance", href: "/services/insurance/vehicle" },
+];
+
+const moreServicesLinks: { label: string; href: string; icon: LucideIcon }[] = [
   { label: "Training", href: "/services/training", icon: GraduationCap },
-  { label: "Marketplace", href: "/marketplace", icon: ShoppingCart },
   { label: "Inputs & Equipment", href: "/services/inputs", icon: Wrench },
+  { label: "Processing & Offtake", href: "/services/processing", icon: ShoppingBag },
   { label: "Legal Assistance", href: "/services/legal-assistance", icon: Scale },
   { label: "Veterinary", href: "/services/veterinary", icon: Stethoscope },
-  { label: "Processing & Offtake", href: "/services/processing", icon: ShoppingBag },
+  { label: "Advertise with Us", href: "/services/advertising", icon: Megaphone },
 ];
 
 const educationLinks = [
@@ -61,15 +85,18 @@ const educationLinks = [
 const communityLinks: { label: string; href: string; desc: string; icon: LucideIcon }[] = [
   { label: "Jobs Board", href: "/jobs", desc: "Agricultural positions", icon: Briefcase },
   { label: "Ambassadors", href: "/ambassadors", desc: "Join our ambassador program", icon: Award },
+  { label: "Marketplace", href: "/marketplace", desc: "Buy & sell agricultural products", icon: ShoppingCart },
+  { label: "Partner Farms", href: "/farms", desc: "Showcase farms", icon: Sprout },
   { label: "Partners", href: "/partners", desc: "Our network", icon: Handshake },
   { label: "Programs", href: "/programs", desc: "Active farming programs", icon: Target },
-  { label: "Sponsor a Farmer", href: "/sponsor", desc: "Change a life today", icon: Handshake },
   { label: "Young Farmers", href: "/young-farmers", desc: "Next generation", icon: GraduationCap },
+  { label: "Sponsor a Farmer", href: "/sponsor", desc: "Change a life today", icon: Handshake },
 ];
 
 const exploreLinks: { label: string; href: string; desc: string; icon: LucideIcon }[] = [
   { label: "Farming Sectors", href: "/farming", desc: "Crops, livestock, forestry & more", icon: Wheat },
   { label: "Countries", href: "/countries", desc: "Explore by country", icon: FolderKanban },
+  { label: "Exchange", href: "/exchange", desc: "Trade with fellow farmers", icon: ArrowLeftRight },
   { label: "Carbon Credits", href: "/carbon", desc: "Offset your footprint", icon: Leaf },
   { label: "Blog", href: "/blog", desc: "News & insights", icon: Newspaper },
   { label: "FAQ", href: "/faq", desc: "Common questions", icon: HelpCircle },
@@ -184,19 +211,44 @@ function DesktopServicesDropdown({ openDropdown, handleMouseEnter, handleMouseLe
             animate="visible"
             exit="exit"
             transition={{ duration: 0.15 }}
-            className="absolute top-full left-0 mt-1 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+            className="absolute top-full left-0 mt-1 bg-white rounded-xl shadow-xl border border-gray-100 py-4 px-2 z-50"
+            style={{ width: '680px' }}
             onMouseEnter={() => handleMouseEnter?.("services")}
             onMouseLeave={handleMouseLeave}
           >
-            {servicesLinks.map((link) => {
-              const Icon = link.icon;
-              return (
-                <Link key={link.href} href={link.href} className="flex items-center gap-3 px-4 py-2.5 text-sm text-navy hover:bg-[#EBF7E5] hover:text-[#5DB347] transition-colors" onClick={() => setOpenDropdown(null)}>
-                  <Icon className="w-4 h-4 text-gray-400" />
-                  {link.label}
-                </Link>
-              );
-            })}
+            <div className="grid grid-cols-3 gap-1">
+              {/* Column 1: Finance */}
+              <div>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-3 pb-2">Finance</p>
+                {financeLinks.map((link) => (
+                  <Link key={link.href} href={link.href} className="block px-3 py-1.5 text-sm text-navy hover:bg-[#EBF7E5] hover:text-[#5DB347] rounded-lg transition-colors" onClick={() => setOpenDropdown(null)}>
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
+              {/* Column 2: Insurance */}
+              <div>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-3 pb-2">Insurance</p>
+                {insuranceLinks.map((link) => (
+                  <Link key={link.href} href={link.href} className="block px-3 py-1.5 text-sm text-navy hover:bg-[#EBF7E5] hover:text-[#5DB347] rounded-lg transition-colors" onClick={() => setOpenDropdown(null)}>
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
+              {/* Column 3: More Services */}
+              <div>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-3 pb-2">More Services</p>
+                {moreServicesLinks.map((link) => {
+                  const Icon = link.icon;
+                  return (
+                    <Link key={link.href} href={link.href} className="flex items-center gap-2 px-3 py-1.5 text-sm text-navy hover:bg-[#EBF7E5] hover:text-[#5DB347] rounded-lg transition-colors" onClick={() => setOpenDropdown(null)}>
+                      <Icon className="w-4 h-4 text-gray-400" />
+                      {link.label}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -329,10 +381,19 @@ function MobileServicesSection({ mobileServicesOpen, setMobileServicesOpen, clos
         {mobileServicesOpen && (
           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }} className="overflow-hidden">
             <div className="pl-4 py-1 space-y-0.5">
-              {servicesLinks.map((link) => {
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-3 pt-2 pb-1">Finance</p>
+              {financeLinks.map((link) => (
+                <Link key={link.href} href={link.href} className="block text-navy/70 hover:text-[#5DB347] text-sm py-2 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors" onClick={closeMobile}>{link.label}</Link>
+              ))}
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-3 pt-3 pb-1">Insurance</p>
+              {insuranceLinks.map((link) => (
+                <Link key={link.href} href={link.href} className="block text-navy/70 hover:text-[#5DB347] text-sm py-2 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors" onClick={closeMobile}>{link.label}</Link>
+              ))}
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-3 pt-3 pb-1">More Services</p>
+              {moreServicesLinks.map((link) => {
                 const Icon = link.icon;
                 return (
-                  <Link key={link.href} href={link.href} className="flex items-center gap-3 text-navy/70 hover:text-[#5DB347] text-sm py-2.5 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors" onClick={closeMobile}>
+                  <Link key={link.href} href={link.href} className="flex items-center gap-3 text-navy/70 hover:text-[#5DB347] text-sm py-2 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors" onClick={closeMobile}>
                     <Icon className="w-4 h-4" />
                     {link.label}
                   </Link>
@@ -654,7 +715,7 @@ export default function Navbar() {
                     onMouseEnter={() => handleMouseEnter("services")}
                     onMouseLeave={handleMouseLeave}
                   >
-                    {servicesLinks.map((link) => {
+                    {moreServicesLinks.map((link) => {
                       const Icon = link.icon;
                       return (
                         <Link
@@ -1087,7 +1148,7 @@ export default function Navbar() {
                         className="overflow-hidden"
                       >
                         <div className="pl-4 py-1 space-y-0.5">
-                          {servicesLinks.map((link) => {
+                          {moreServicesLinks.map((link) => {
                             const Icon = link.icon;
                             return (
                               <Link

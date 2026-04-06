@@ -173,17 +173,8 @@ export async function updateSession(request: NextRequest) {
 
   // ── Onboarding redirect for users without a member record ──────────
   // Only check on protected member paths (not /onboarding itself, not admin/supplier/etc.)
-  const memberPaths = ['/dashboard', '/farm'];
-  const adminRoles = ['admin', 'super_admin', 'supplier', 'ambassador', 'investor', 'warehouse_operator'];
-  const needsMemberCheck = user && role && !adminRoles.includes(role) && memberPaths.some((p) => pathname.startsWith(p));
-  if (needsMemberCheck && pathname !== '/onboarding') {
-    const hasMember = await hasMemberRecord(user.id);
-    if (!hasMember) {
-      const onboardingUrl = request.nextUrl.clone();
-      onboardingUrl.pathname = '/onboarding';
-      return NextResponse.redirect(onboardingUrl);
-    }
-  }
+  // Onboarding is now OPTIONAL — accessible via /onboarding but never forced
+  // Users without a member record can still browse their portal freely
 
   // ── Role-based access (checks both primary role AND roles[] array) ──
   if (user && roleData && pathname.startsWith('/admin')) {
