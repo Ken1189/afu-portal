@@ -702,8 +702,9 @@ export function generateStaticParams() {
 
 /* ─── Dynamic metadata ─── */
 
-export function generateMetadata({ params }: { params: { slug: string } }) {
-  const country = FALLBACK_COUNTRIES.find((c) => c.slug === params.slug);
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const country = FALLBACK_COUNTRIES.find((c) => c.slug === slug);
   if (!country) return { title: "Country Not Found - AFU" };
 
   return {
@@ -718,8 +719,9 @@ export function generateMetadata({ params }: { params: { slug: string } }) {
 
 /* ─── Page Component ─── */
 
-export default async function CountryPage({ params }: { params: { slug: string } }) {
-  const fallback = FALLBACK_COUNTRIES.find((c) => c.slug === params.slug);
+export default async function CountryPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const fallback = FALLBACK_COUNTRIES.find((c) => c.slug === slug);
 
   if (!fallback) {
     notFound();
@@ -740,7 +742,7 @@ export default async function CountryPage({ params }: { params: { slug: string }
       .single();
     if (configData?.value && Array.isArray(configData.value)) {
       const match = configData.value.find((c: Record<string, unknown>) =>
-        String(c.slug || c.name || '').toLowerCase().replace(/\s+/g, '-') === params.slug
+        String(c.slug || c.name || '').toLowerCase().replace(/\s+/g, '-') === slug
       );
       if (match) {
         if (match.description) country.description = String(match.description);
@@ -755,7 +757,7 @@ export default async function CountryPage({ params }: { params: { slug: string }
     const { data } = await svc
       .from('country_settings')
       .select('*')
-      .eq('country_code', params.slug)
+      .eq('country_code', slug)
       .single();
     if (data) {
       if (data.description) country.description = data.description;
