@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { createClient } from '@/lib/supabase/client';
 
 const categories = [
   {
@@ -103,6 +104,29 @@ const popularTopics = [
 
 export default function KnowledgebasePage() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [articleCounts, setArticleCounts] = useState<Record<string, number>>({});
+
+  // Fetch real article counts from blog_posts by category
+  useEffect(() => {
+    const supabase = createClient();
+    async function fetchCounts() {
+      const { data } = await supabase.from('blog_posts').select('category').eq('status', 'published');
+      if (data) {
+        const counts: Record<string, number> = {};
+        data.forEach((p: { category: string | null }) => {
+          const cat = p.category || 'general';
+          counts[cat] = (counts[cat] || 0) + 1;
+        });
+        setArticleCounts(counts);
+        // Update categories with real counts
+        categories.forEach(c => {
+          const catKey = c.title.toLowerCase().replace(' husbandry', '');
+          c.articles = counts[catKey] || 0;
+        });
+      }
+    }
+    fetchCounts();
+  }, []);
 
   const filteredCategories = searchQuery
     ? categories.filter(
