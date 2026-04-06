@@ -8,42 +8,42 @@ const categories = [
   {
     title: 'Agronomy',
     desc: 'Crop science, soil management, irrigation techniques, and integrated pest control strategies for African farming conditions.',
-    articles: 280,
+    articles: 0,
     link: '/education/knowledgebase/agronomy',
     icon: 'M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25',
   },
   {
     title: 'Animal Husbandry',
     desc: 'Livestock management, veterinary care, breeding programmes, and animal nutrition for cattle, goats, poultry, and more.',
-    articles: 195,
+    articles: 0,
     link: '/education/knowledgebase/animal',
     icon: 'M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418',
   },
   {
     title: 'Finance',
     desc: 'Farm financial management, market analysis, access to credit, budgeting, and investment planning for agricultural enterprises.',
-    articles: 145,
+    articles: 0,
     link: '/education/knowledgebase/finance',
     icon: 'M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z',
   },
   {
     title: 'Technology',
     desc: 'AgTech innovations, precision farming, drone applications, farm management software, and digital extension services.',
-    articles: 120,
+    articles: 0,
     link: '/education/knowledgebase/technology',
     icon: 'M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5',
   },
   {
     title: 'Climate',
     desc: 'Climate-smart agriculture, weather adaptation strategies, carbon markets, and sustainable farming practices for a changing climate.',
-    articles: 98,
+    articles: 0,
     link: '/education/knowledgebase/climate',
     icon: 'M2.25 15a4.5 4.5 0 004.5 4.5H18a3.75 3.75 0 001.332-7.257 3 3 0 00-3.758-3.848 5.25 5.25 0 00-10.233 2.33A4.502 4.502 0 002.25 15z',
   },
   {
     title: 'Business',
     desc: 'Farm business planning, cooperative management, marketing strategies, export readiness, and value chain development.',
-    articles: 162,
+    articles: 0,
     link: '/education/knowledgebase/business',
     icon: 'M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21',
   },
@@ -200,7 +200,7 @@ export default function KnowledgebasePage() {
                         {cat.title}
                       </h3>
                       <span className="text-xs text-[#5DB347] font-medium">
-                        {cat.articles} articles
+                        {cat.articles > 0 ? `${cat.articles} articles` : 'Coming Soon'}
                       </span>
                     </div>
                   </div>

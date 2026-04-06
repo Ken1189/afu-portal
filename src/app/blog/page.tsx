@@ -28,27 +28,37 @@ export default function BlogPage() {
     async function fetchPosts() {
       try {
         const supabase = createClient();
-        const { data } = await supabase
-          .from('site_content')
+        // Try blog_posts table first (proper table)
+        const { data: blogData } = await supabase
+          .from('blog_posts')
           .select('*')
-          .eq('content_type', 'blog_post')
-          .eq('published', true)
+          .eq('status', 'published')
           .order('published_at', { ascending: false });
-        if (data && data.length > 0) {
-          setPosts(
-            data.map((p: Record<string, unknown>) => ({
-              id: p.id as string,
-              title: (p.title as string) || '',
-              slug: (p.slug as string) || (p.id as string),
-              excerpt: (p.excerpt as string) || (p.meta_description as string) || null,
-              content: (p.content as string) || null,
-              author_name: (p.author_name as string) || (p.author as string) || null,
-              category: (p.category as string) || null,
+        if (blogData && blogData.length > 0) {
+          setPosts(blogData.map((p: Record<string, unknown>) => ({
+            id: p.id as string,
+            title: (p.title as string) || '',
+            slug: (p.slug as string) || (p.id as string),
+            excerpt: (p.excerpt as string) || ((p.body || p.content) as string)?.substring(0, 160) || null,
+            content: (p.content as string) || (p.body as string) || null,
+            author_name: (p.author_name as string) || 'AFU Editorial',
+            category: (p.category as string) || null,
+            published_at: (p.published_at as string) || (p.created_at as string) || null,
+            created_at: (p.created_at as string) || '',
+            featured_image_url: (p.cover_image as string) || null,
+          })));
+        } else {
+          // Fallback to site_content
+          const { data } = await supabase.from('site_content').select('*').eq('content_type', 'blog_post').order('updated_at', { ascending: false });
+          if (data && data.length > 0) {
+            setPosts(data.map((p: Record<string, unknown>) => ({
+              id: p.id as string, title: (p.title as string) || '', slug: (p.slug as string) || (p.id as string),
+              excerpt: (p.excerpt as string) || null, content: (p.content as string) || null,
+              author_name: (p.author_name as string) || null, category: (p.category as string) || null,
               published_at: (p.published_at as string) || (p.created_at as string) || null,
-              created_at: (p.created_at as string) || '',
-              featured_image_url: (p.featured_image_url as string) || (p.image_url as string) || null,
-            }))
-          );
+              created_at: (p.created_at as string) || '', featured_image_url: (p.featured_image_url as string) || null,
+            })));
+          }
         }
       } catch {
         // keep fallback (empty)
@@ -98,9 +108,9 @@ export default function BlogPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {posts.map((post) => (
+              <Link key={post.id} href={`/blog/${post.slug}`} className="block">
               <article
-                key={post.id}
-                className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow flex flex-col"
+                className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow flex flex-col h-full"
               >
                 {post.featured_image_url && (
                   <div className="h-48 overflow-hidden">
@@ -148,6 +158,7 @@ export default function BlogPage() {
                   </div>
                 </div>
               </article>
+              </Link>
             ))}
           </div>
         )}

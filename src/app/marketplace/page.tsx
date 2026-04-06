@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+import { createClient } from '@/lib/supabase/client';
 import {
   Search,
   ShoppingCart,
@@ -91,9 +92,33 @@ export default function PublicMarketplacePage() {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
+  const [products, setProducts] = useState<Product[]>(PRODUCTS);
+
+  // Fetch real products from DB
+  useEffect(() => {
+    const supabase = createClient();
+    async function fetch() {
+      const { data } = await supabase.from('products').select('*').eq('status', 'active').order('name');
+      if (data && data.length > 0) {
+        setProducts(data.map((p: Record<string, unknown>) => ({
+          id: String(p.id), supplierName: String(p.supplier_name || p.brand || 'AFU Supplier'),
+          name: String(p.name), description: String(p.description || ''),
+          category: String(p.category || 'seeds'), price: Number(p.price || 0),
+          memberPrice: Number(p.member_price || (Number(p.price || 0) * 0.9)),
+          currency: 'USD', unit: String(p.unit || 'per unit'),
+          image: String(p.image_url || p.image || 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400&h=300&fit=crop'),
+          availability: (p.status === 'active' ? 'in-stock' : 'out-of-stock') as Product['availability'],
+          rating: Number(p.rating || 4.5), reviewCount: Number(p.review_count || 0),
+          tags: Array.isArray(p.tags) ? p.tags as string[] : [], featured: Boolean(p.featured),
+        })));
+      }
+      // If no DB products, keep PRODUCTS fallback
+    }
+    fetch();
+  }, []);
 
   const filtered = useMemo(() => {
-    let list = PRODUCTS;
+    let list = products;
     if (category !== 'all') list = list.filter((p) => p.category === category);
     if (search.trim()) {
       const q = search.toLowerCase();
