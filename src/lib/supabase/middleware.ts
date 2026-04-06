@@ -39,19 +39,31 @@ async function getUserRoleData(userId: string): Promise<{ role: string; roles: s
   const defaultResult = { role: 'member', roles: [] as string[] };
   try {
     const svc = getServiceClient();
+    // Try with roles column first, fall back to role only if roles column doesn't exist
     const { data, error } = await svc
       .from('profiles')
-      .select('role, roles')
+      .select('role')
       .eq('id', userId)
       .single();
     if (error) {
       console.warn('[Middleware] Role lookup failed for', userId, error.message);
-      // Retry once
-      const { data: retry } = await svc.from('profiles').select('role, roles').eq('id', userId).single();
-      if (retry?.role) return { role: retry.role, roles: (retry.roles as string[]) || [] };
+      // Retry once with just role
+      const { data: retry } = await svc.from('profiles').select('role').eq('id', userId).single();
+      if (retry?.role) return { role: retry.role, roles: [] };
       return defaultResult;
     }
-    return { role: data?.role ?? 'member', roles: (data?.roles as string[]) || [] };
+    const role = data?.role ?? 'member';
+    // Try to get roles array separately (column may not exist yet)
+    let roles: string[] = [];
+    try {
+      const { data: rolesData } = await svc.from('profiles').select('roles').eq('id', userId).single();
+      if (rolesData?.roles && Array.isArray(rolesData.roles)) {
+        roles = rolesData.roles;
+      }
+    } catch {
+      // roles column doesn't exist yet — that's fine
+    }
+    return { role, roles };
   } catch (err) {
     console.error('[Middleware] Role lookup error:', err);
     return defaultResult;
@@ -162,7 +174,8 @@ export async function updateSession(request: NextRequest) {
   // ── Onboarding redirect for users without a member record ──────────
   // Only check on protected member paths (not /onboarding itself, not admin/supplier/etc.)
   const memberPaths = ['/dashboard', '/farm'];
-  const needsMemberCheck = user && role === 'member' && memberPaths.some((p) => pathname.startsWith(p));
+  const adminRoles = ['admin', 'super_admin', 'supplier', 'ambassador', 'investor', 'warehouse_operator'];
+  const needsMemberCheck = user && role && !adminRoles.includes(role) && memberPaths.some((p) => pathname.startsWith(p));
   if (needsMemberCheck && pathname !== '/onboarding') {
     const hasMember = await hasMemberRecord(user.id);
     if (!hasMember) {
