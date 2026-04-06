@@ -33,30 +33,39 @@ async function hasMemberRecord(userId: string): Promise<boolean> {
 }
 
 /**
- * Looks up a user's role from the profiles table using service role (bypasses RLS).
+ * Looks up a user's role and roles array from the profiles table using service role (bypasses RLS).
  */
-async function getUserRole(userId: string): Promise<string | null> {
+async function getUserRoleData(userId: string): Promise<{ role: string; roles: string[] }> {
+  const defaultResult = { role: 'member', roles: [] as string[] };
   try {
     const svc = getServiceClient();
     const { data, error } = await svc
       .from('profiles')
-      .select('role')
+      .select('role, roles')
       .eq('id', userId)
       .single();
     if (error) {
       console.warn('[Middleware] Role lookup failed for', userId, error.message);
       // Retry once
-      const { data: retry } = await svc.from('profiles').select('role').eq('id', userId).single();
-      if (retry?.role) return retry.role;
-      // If still fails, return member (safe default — page-level guards handle admin access)
-      return 'member';
+      const { data: retry } = await svc.from('profiles').select('role, roles').eq('id', userId).single();
+      if (retry?.role) return { role: retry.role, roles: (retry.roles as string[]) || [] };
+      return defaultResult;
     }
-    return data?.role ?? 'member';
+    return { role: data?.role ?? 'member', roles: (data?.roles as string[]) || [] };
   } catch (err) {
     console.error('[Middleware] Role lookup error:', err);
-    // On total failure, return member (safe default — never grant admin on error)
-    return 'member';
+    return defaultResult;
   }
+}
+
+/** Check if user has a given role via primary role OR roles array */
+function userHasRole(roleData: { role: string; roles: string[] }, target: string): boolean {
+  return roleData.role === target || roleData.roles.includes(target);
+}
+
+/** Check if user has any of the given roles */
+function userHasAnyRole(roleData: { role: string; roles: string[] }, targets: string[]): boolean {
+  return targets.some((t) => userHasRole(roleData, t));
 }
 
 /**
@@ -117,9 +126,11 @@ export async function updateSession(request: NextRequest) {
   }
 
   // S1.16: Fetch role ONCE and reuse for all checks (was 5 redundant DB calls)
-  const role = user ? await getUserRole(user.id) : null;
+  // Now also fetches roles[] array to support dual-role users
+  const roleData = user ? await getUserRoleData(user.id) : null;
+  const role = roleData?.role ?? null;
 
-  // If logged in and visiting /login → redirect based on role
+  // If logged in and visiting /login → redirect based on primary role
   if (pathname === '/login' && user) {
     const dest = request.nextUrl.clone();
     switch (role) {
@@ -161,41 +172,41 @@ export async function updateSession(request: NextRequest) {
     }
   }
 
-  // ── Role-based access (single role lookup reused) ─────────────────
-  if (user && pathname.startsWith('/admin')) {
-    if (!role || !['admin', 'super_admin'].includes(role)) {
+  // ── Role-based access (checks both primary role AND roles[] array) ──
+  if (user && roleData && pathname.startsWith('/admin')) {
+    if (!userHasAnyRole(roleData, ['admin', 'super_admin'])) {
       const forbiddenUrl = request.nextUrl.clone();
       forbiddenUrl.pathname = '/dashboard';
       return NextResponse.redirect(forbiddenUrl);
     }
   }
 
-  if (user && pathname.startsWith('/supplier')) {
-    if (!role || !['supplier', 'admin', 'super_admin'].includes(role)) {
+  if (user && roleData && pathname.startsWith('/supplier')) {
+    if (!userHasAnyRole(roleData, ['supplier', 'admin', 'super_admin'])) {
       const forbiddenUrl = request.nextUrl.clone();
       forbiddenUrl.pathname = '/dashboard';
       return NextResponse.redirect(forbiddenUrl);
     }
   }
 
-  if (user && pathname.startsWith('/investor')) {
-    if (!role || !['investor', 'admin', 'super_admin'].includes(role)) {
+  if (user && roleData && pathname.startsWith('/investor')) {
+    if (!userHasAnyRole(roleData, ['investor', 'admin', 'super_admin'])) {
       const forbiddenUrl = request.nextUrl.clone();
       forbiddenUrl.pathname = '/dashboard';
       return NextResponse.redirect(forbiddenUrl);
     }
   }
 
-  if (user && pathname.startsWith('/ambassador')) {
-    if (!role || !['ambassador', 'admin', 'super_admin'].includes(role)) {
+  if (user && roleData && pathname.startsWith('/ambassador')) {
+    if (!userHasAnyRole(roleData, ['ambassador', 'admin', 'super_admin'])) {
       const forbiddenUrl = request.nextUrl.clone();
       forbiddenUrl.pathname = '/dashboard';
       return NextResponse.redirect(forbiddenUrl);
     }
   }
 
-  if (user && pathname.startsWith('/warehouse')) {
-    if (!role || !['warehouse_operator', 'admin', 'super_admin'].includes(role)) {
+  if (user && roleData && pathname.startsWith('/warehouse')) {
+    if (!userHasAnyRole(roleData, ['warehouse_operator', 'admin', 'super_admin'])) {
       const forbiddenUrl = request.nextUrl.clone();
       forbiddenUrl.pathname = '/dashboard';
       return NextResponse.redirect(forbiddenUrl);

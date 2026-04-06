@@ -188,44 +188,7 @@ const flywheelSteps = [
   { step: 7, label: 'Cash Recycle', icon: TrendingUp, bg: 'linear-gradient(135deg, #5DB347, #8CB89C)' },
 ];
 
-/* ─── Testimonials (fallback) ─── */
-const fallbackTestimonials = [
-  {
-    name: 'Tendai Moyo',
-    role: 'Blueberry Farmer, Zimbabwe',
-    quote: 'Before AFU, I was selling blueberries at the farm gate for next to nothing. Now I have a direct EU export contract, cold chain financing, and my revenue has tripled. The platform changed my family\'s life.',
-    img: 'https://images.unsplash.com/photo-1590682680695-43b964a3ae17?w=200&h=200&fit=crop&crop=face',
-    rating: 5,
-  },
-  {
-    name: 'Amina Bakari',
-    role: 'Cassava Processor, Tanzania',
-    quote: 'I went from processing cassava in my backyard to running a proper drying operation. AFU helped me access the processing hub, get certified, and now I export dried chips to three countries.',
-    img: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=200&h=200&fit=crop&crop=face',
-    rating: 5,
-  },
-  {
-    name: 'Kabo Mothibi',
-    role: 'Sesame Grower, Botswana',
-    quote: 'As a first-time farmer, I had no idea where to start. AFU gave me seeds on credit, taught me modern techniques, and guaranteed a buyer before I even planted. That security is everything.',
-    img: 'https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?w=200&h=200&fit=crop&crop=face',
-    rating: 5,
-  },
-  {
-    name: 'Farai Ndlovu',
-    role: 'Maize Cooperative Leader, Zambia',
-    quote: 'Our cooperative of 45 farmers was struggling with middlemen. Through AFU we negotiate directly with millers, access bulk inputs at 30% less, and every member now has crop insurance.',
-    img: 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=200&h=200&fit=crop&crop=face',
-    rating: 5,
-  },
-  {
-    name: 'Sarah Kimani',
-    role: 'Tea Farmer, Kenya',
-    quote: 'The mobile app lets me check market prices, track my shipments, and manage my finances from my phone. I don\'t need to travel to town anymore. AFU brought the market to my farm.',
-    img: 'https://images.unsplash.com/photo-1580477667995-2b94f01c9516?w=200&h=200&fit=crop&crop=face',
-    rating: 5,
-  },
-];
+/* ─── Testimonials — only shown when real testimonials exist in DB ─── */
 
 /* ─── Partner logos — real partners, fallback if DB empty ─── */
 const FALLBACK_PARTNERS = [
@@ -300,7 +263,7 @@ const PROGRAM_ICON_MAP: Record<string, typeof Sprout> = {
 };
 
 export default function Home() {
-  const [testimonials, setTestimonials] = useState(fallbackTestimonials);
+  const [testimonials, setTestimonials] = useState<{ name: string; role: string; quote: string; img: string; rating: number }[]>([]);
   const [partners, setPartners] = useState<{ name: string; initials: string; color: string; logo_url?: string }[]>(FALLBACK_PARTNERS);
   const [hero, setHero] = useState(HERO_DEFAULTS);
   const [services, setServices] = useState(FALLBACK_SERVICES);
@@ -377,24 +340,18 @@ export default function Home() {
           .limit(6);
         if (data && data.length > 0) {
           setTestimonials(
-            data.map((t: Record<string, unknown>, i: number) => ({
+            data.map((t: Record<string, unknown>) => ({
               name: (t.name as string) || (t.author_name as string) || '',
               role: (t.role as string) || (t.author_role as string) || '',
               quote: (t.quote as string) || (t.content as string) || '',
-              img: (t.img as string) || (t.avatar_url as string) || (t.photo_url as string) || [
-                'https://images.unsplash.com/photo-1590682680695-43b964a3ae17?w=200&h=200&fit=crop&crop=face',
-                'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=200&h=200&fit=crop&crop=face',
-                'https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?w=200&h=200&fit=crop&crop=face',
-                'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=200&h=200&fit=crop&crop=face',
-                'https://images.unsplash.com/photo-1580477667995-2b94f01c9516?w=200&h=200&fit=crop&crop=face',
-                'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face',
-              ][i % 6],
+              img: (t.img as string) || (t.avatar_url as string) || (t.photo_url as string) || '',
               rating: (t.rating as number) || 5,
             }))
           );
         }
+        // If no real testimonials in DB, keep empty array — section stays hidden
       } catch {
-        // keep fallback
+        // On error, keep empty array — no fake testimonials shown
       }
     }
     fetchTestimonials();
@@ -966,8 +923,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── TESTIMONIALS ─── */}
-      {showSection('testimonials') && <section className="py-16 bg-white relative">
+      {/* ─── TESTIMONIALS — only shown when real testimonials exist in DB ─── */}
+      {showSection('testimonials') && testimonials.length > 0 && <section className="py-16 bg-white relative">
         <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#5DB347]/20 to-transparent" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeInWhenVisible>

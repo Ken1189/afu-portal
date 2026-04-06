@@ -434,6 +434,22 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
           )}
         </div>
 
+        {/* Upgrade Badge — only for free/smallholder tiers */}
+        {(membershipTier === 'free' || membershipTier === 'smallholder') && (
+          <div className="px-3 py-2 border-t border-gray-100">
+            <Link
+              href={`/memberships?upgrade=${membershipTier === 'free' ? 'smallholder' : 'commercial'}`}
+              className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-medium bg-gradient-to-r from-[#5DB347]/10 to-[#449933]/10 text-[#5DB347] hover:from-[#5DB347]/20 hover:to-[#449933]/20 transition-all"
+            >
+              <Zap className="w-4 h-4" />
+              <span>Upgrade Plan</span>
+              <span className="ml-auto text-[10px] font-bold bg-[#5DB347] text-white px-2 py-0.5 rounded-full">
+                {membershipTier === 'free' ? 'PRO' : 'PLUS'}
+              </span>
+            </Link>
+          </div>
+        )}
+
         {/* Sidebar Footer */}
         <div className="p-3 border-t border-gray-100 space-y-0.5">
           <Link
@@ -671,6 +687,23 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
                     ))}
                   </div>
                 </div>
+
+                {/* Upgrade Badge — only for free/smallholder tiers */}
+                {(membershipTier === 'free' || membershipTier === 'smallholder') && (
+                  <div className="px-3 py-2 border-t border-gray-100">
+                    <Link
+                      href={`/memberships?upgrade=${membershipTier === 'free' ? 'smallholder' : 'commercial'}`}
+                      onClick={() => setDrawerOpen(false)}
+                      className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-medium bg-gradient-to-r from-[#5DB347]/10 to-[#449933]/10 text-[#5DB347] active:from-[#5DB347]/20 active:to-[#449933]/20 transition-all"
+                    >
+                      <Zap className="w-4 h-4" />
+                      <span>Upgrade Plan</span>
+                      <span className="ml-auto text-[10px] font-bold bg-[#5DB347] text-white px-2 py-0.5 rounded-full">
+                        {membershipTier === 'free' ? 'PRO' : 'PLUS'}
+                      </span>
+                    </Link>
+                  </div>
+                )}
 
                 <div className="p-3 border-t border-gray-100 space-y-0.5">
                   <Link

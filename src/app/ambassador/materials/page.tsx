@@ -102,7 +102,7 @@ const FALLBACK_SOCIAL_TEMPLATES = [
   {
     id: '2',
     platform: 'Twitter / X',
-    text: `Join 50K+ farmers transforming African agriculture with @AFU_Official. Access markets, training & financing. Sign up: [REFERRAL_LINK] #AFU #Agriculture`,
+    text: `Join 50K+ farmers transforming African agriculture with @UnionAfric82069. Access markets, training & financing. Sign up: [REFERRAL_LINK] #AFU #Agriculture`,
   },
   {
     id: '3',

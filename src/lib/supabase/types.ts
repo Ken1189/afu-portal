@@ -26,6 +26,7 @@ export interface Database {
           phone: string | null;
           avatar_url: string | null;
           role: UserRole;
+          roles: UserRole[] | null; // TEXT[] column — supports dual-role (e.g. farmer + supplier)
           country: string | null;
           region: string | null;
           address: string | null;

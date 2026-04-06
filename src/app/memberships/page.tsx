@@ -36,7 +36,7 @@ const FALLBACK_TIERS = [
     audience: 'Farms under 10 hectares',
     accent: 'border-[#5DB347] bg-[#EBF7E5]',
     accentBadge: 'bg-[#5DB347]/10 text-[#5DB347]',
-    popular: false,
+    popular: true,
     features: {
       'Crop Tracking': true,
       'Financing Access': 'Up to $5K',
@@ -92,7 +92,7 @@ const FALLBACK_TIERS = [
     audience: 'Established commercial operations',
     accent: 'border-yellow-500 bg-yellow-50',
     accentBadge: 'bg-yellow-100 text-yellow-700',
-    popular: true,
+    popular: false,
     features: {
       'Crop Tracking': 'Advanced',
       'Financing Access': 'Up to $250K',

@@ -27,6 +27,7 @@ import {
   Landmark,
   DollarSign,
   TrendingUp,
+  Globe,
   FileText,
   ShieldAlert,
   ArrowUpRight,
@@ -272,7 +273,7 @@ export default function AdminDashboard() {
   const [live, setLive] = useState<LiveStats | null>(null);
   const [realApplications, setRealApplications] = useState<FallbackApplication[] | null>(null);
   const [liveRevenue, setLiveRevenue] = useState<{ name: string; value: number }[] | null>(null);
-  // liveKpis removed — stats now fetched directly from Supabase above
+  const [liveKpis, setLiveKpis] = useState<{ signupsThisMonth: number; distinctCountries: number; realRevenue: number; totalPaymentsCount: number } | null>(null);
   const [livePortfolio, setLivePortfolio] = useState<{ month: string; disbursed: number; repaid: number }[] | null>(null);
 
   // Fetch live stats directly from Supabase in parallel
@@ -289,7 +290,11 @@ export default function AdminDashboard() {
           if (r?.error?.message) console.warn('[Dashboard query error]', r.error.message);
           return result;
         }).catch((err) => { console.warn('[Dashboard query failed]', err); return empty; });
-        const [membersRes, activeMembersRes, loansRes, loansDeployedRes, pendingAppsRes, totalAppsRes, approvedAppsRes, rejectedAppsRes, suppliersRes, ordersRes, productsRes, auditRes, ambassadorsRes] = await Promise.all([
+        // Build start-of-month timestamp for "signups this month" query
+        const now = new Date();
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+
+        const [membersRes, activeMembersRes, loansRes, loansDeployedRes, pendingAppsRes, totalAppsRes, approvedAppsRes, rejectedAppsRes, suppliersRes, ordersRes, productsRes, auditRes, ambassadorsRes, paymentsRes, signupsThisMonthRes, distinctCountriesRes] = await Promise.all([
           // Total members from members table (not profiles)
           wrap(supabase.from('members').select('id', { count: 'exact', head: true })),
           // Active members
@@ -305,6 +310,12 @@ export default function AdminDashboard() {
           wrap(supabase.from('products').select('id, status', { count: 'exact' })),
           wrap(supabase.from('audit_log').select('id, action, entity_type, details, created_at').order('created_at', { ascending: false }).limit(10)),
           wrap(supabase.from('ambassadors').select('id', { count: 'exact', head: true }).eq('status', 'active')),
+          // Real payments data
+          wrap(supabase.from('payments').select('id, amount, status', { count: 'exact' })),
+          // Signups this month (profiles created this month)
+          wrap(supabase.from('profiles').select('id', { count: 'exact', head: true }).gte('created_at', startOfMonth)),
+          // Distinct countries from profiles
+          wrap(supabase.from('profiles').select('country')),
         ]) as { data: unknown; count: number | null; error: unknown }[];
 
         const loansData = (loansDeployedRes.data || []) as { amount: number }[];
@@ -322,6 +333,20 @@ export default function AdminDashboard() {
         const productsTotal = productsRes.count ?? 0;
         const productsData = (productsRes.data || []) as { status: string }[];
         const productsInStock = productsData.filter((p) => p.status === 'active' || p.status === 'in_stock').length;
+
+        // Real payments revenue (sum of completed payments)
+        const paymentsData = (paymentsRes.data || []) as { amount: number; status: string }[];
+        const realRevenue = paymentsData
+          .filter((p) => p.status === 'completed' || p.status === 'paid' || p.status === 'succeeded')
+          .reduce((sum: number, p) => sum + (p.amount || 0), 0);
+        const totalPaymentsCount = paymentsRes.count ?? 0;
+
+        // Signups this month
+        const signupsThisMonth = signupsThisMonthRes.count ?? 0;
+
+        // Distinct countries
+        const countriesData = (distinctCountriesRes.data || []) as { country: string | null }[];
+        const distinctCountries = new Set(countriesData.map((p) => p.country).filter(Boolean)).size;
 
         setLive({
           members: {
@@ -363,21 +388,27 @@ export default function AdminDashboard() {
           },
           recentActivity: (auditRes.data || []) as LiveStats['recentActivity'],
         });
-        // Populate revenue breakdown from real data
-        setLiveRevenue([
-          { name: 'Memberships', value: (approvedAppsRes.count || 0) * 50 },
-          { name: 'Trading', value: Math.round(ordersRevenue * 0.025) },
-          { name: 'Marketplace', value: Math.round(ordersRevenue * 0.1) },
-          { name: 'Other', value: 0 },
-        ]);
+        // Revenue breakdown: only show REAL payment data
+        if (realRevenue > 0) {
+          setLiveRevenue([
+            { name: 'Payments Received', value: realRevenue },
+          ]);
+        } else {
+          // No revenue yet — show empty state marker
+          setLiveRevenue([]);
+        }
 
-        // Populate loan portfolio trend
-        setLivePortfolio([
-          { month: 'Jan', disbursed: totalLoansDeployed * 0.6, repaid: totalLoansDeployed * 0.3 },
-          { month: 'Feb', disbursed: totalLoansDeployed * 0.7, repaid: totalLoansDeployed * 0.4 },
-          { month: 'Mar', disbursed: totalLoansDeployed * 0.8, repaid: totalLoansDeployed * 0.5 },
-          { month: 'Apr', disbursed: totalLoansDeployed, repaid: totalLoansDeployed * 0.6 },
-        ]);
+        // Loan portfolio: only show if real loan data exists
+        if (totalLoansDeployed > 0) {
+          setLivePortfolio([
+            { month: 'Deployed', disbursed: totalLoansDeployed, repaid: 0 },
+          ]);
+        } else {
+          setLivePortfolio([]);
+        }
+
+        // Store honest KPI data for stat cards
+        setLiveKpis({ signupsThisMonth, distinctCountries, realRevenue, totalPaymentsCount });
       } catch (err) {
         console.error('[Dashboard] Failed to load stats:', err);
       }
@@ -439,47 +470,20 @@ export default function AdminDashboard() {
   const maxCountryCount = Math.max(...countryData.map((c) => c.count), 1);
   const totalMemberCount = live?.members.total ?? FALLBACK_STATS.totalMembers;
 
-  // ── Top-level stat cards data — real with mock fallback ───────────────
-  const statCards = [
+  // ── Top-level stat cards — honest pre-revenue KPIs ───────────────
+  const statCards: { label: string; value: string; change: string | null; changeType: 'up' | 'down' | 'neutral'; icon: React.ReactNode; color: string; bgColor: string }[] = [
     {
-      label: 'Total Members',
-      value: (live?.members.total ?? FALLBACK_STATS.totalMembers).toString(),
-      change: live ? `${live.members.active} active` : null,
-      changeType: 'up' as const,
+      label: 'Signups This Month',
+      value: (liveKpis?.signupsThisMonth ?? 0).toString(),
+      change: null,
+      changeType: 'neutral' as const,
       icon: <Users className="w-5 h-5" />,
       color: 'text-teal',
       bgColor: 'bg-teal-light',
     },
     {
-      label: 'Active Loans',
-      value: (live?.loans.active ?? FALLBACK_STATS.activeLoans).toString(),
-      change: live ? `${live.loans.pending} pending` : null,
-      changeType: 'neutral' as const,
-      icon: <Landmark className="w-5 h-5" />,
-      color: 'text-navy',
-      bgColor: 'bg-blue-50',
-    },
-    {
-      label: 'Total Deployed',
-      value: formatCurrency(live?.loans.totalAmount ?? FALLBACK_STATS.totalLoansDeployed),
-      change: live ? `${live.suppliers.total} suppliers` : null,
-      changeType: 'neutral' as const,
-      icon: <DollarSign className="w-5 h-5" />,
-      color: 'text-green-600',
-      bgColor: 'bg-green-50',
-    },
-    {
-      label: 'Revenue',
-      value: formatCurrency(live?.orders.revenue ?? FALLBACK_STATS.monthlyRevenue),
-      change: live ? `${live.orders.total} orders` : `+${FALLBACK_STATS.revenueGrowth}%`,
-      changeType: 'up' as const,
-      icon: <TrendingUp className="w-5 h-5" />,
-      color: 'text-teal',
-      bgColor: 'bg-teal-light',
-    },
-    {
-      label: 'Pending Applications',
-      value: (live?.applications.pending ?? FALLBACK_STATS.pendingApplications).toString(),
+      label: 'Applications Pending',
+      value: (live?.applications.pending ?? 0).toString(),
       change: live ? `${live.applications.total} total` : null,
       changeType: 'neutral' as const,
       icon: <FileText className="w-5 h-5" />,
@@ -487,10 +491,37 @@ export default function AdminDashboard() {
       bgColor: 'bg-amber-50',
     },
     {
+      label: 'Active Members',
+      value: (live?.members.active ?? 0).toString(),
+      change: live ? `${live.members.total} total` : null,
+      changeType: 'up' as const,
+      icon: <CheckCircle2 className="w-5 h-5" />,
+      color: 'text-green-600',
+      bgColor: 'bg-green-50',
+    },
+    {
+      label: 'Countries Active',
+      value: (liveKpis?.distinctCountries ?? 0).toString(),
+      change: null,
+      changeType: 'neutral' as const,
+      icon: <Globe className="w-5 h-5" />,
+      color: 'text-navy',
+      bgColor: 'bg-blue-50',
+    },
+    {
+      label: 'Revenue',
+      value: liveKpis ? (liveKpis.realRevenue > 0 ? formatCurrency(liveKpis.realRevenue) : '$0') : '$0',
+      change: liveKpis?.realRevenue === 0 ? 'No revenue yet' : liveKpis ? `${liveKpis.totalPaymentsCount} payments` : null,
+      changeType: 'neutral' as const,
+      icon: <DollarSign className="w-5 h-5" />,
+      color: 'text-teal',
+      bgColor: 'bg-teal-light',
+    },
+    {
       label: 'Products',
-      value: live ? `${live.products.total}` : `${FALLBACK_STATS.defaultRate}%`,
-      change: live ? `${live.products.inStock} in stock` : 'Low',
-      changeType: 'down' as const,
+      value: live ? `${live.products.total}` : '0',
+      change: live ? `${live.products.inStock} in stock` : null,
+      changeType: 'neutral' as const,
       icon: <ShieldAlert className="w-5 h-5" />,
       color: 'text-green-600',
       bgColor: 'bg-green-50',
@@ -585,13 +616,25 @@ export default function AdminDashboard() {
       {/* ══════════════════════════════════════════════════════════════════
           2. CHARTS ROW (3 columns) — lazy loaded
       ═════════════════════════════════════════════════════════════════ */}
-      <AdminDashboardCharts
-        memberGrowthData={memberGrowthData}
-        revenueData={(liveRevenue || FALLBACK_STATS.revenueBreakdown) as Record<string, unknown>[]}
-        revenueDataKey={liveRevenue ? 'value' : 'amount'}
-        revenueNameKey={liveRevenue ? 'name' : 'source'}
-        loanPortfolioData={(livePortfolio || loanPortfolioLast6) as Record<string, unknown>[]}
-      />
+      {/* Charts: show real data or empty state */}
+      {liveRevenue !== null && liveRevenue.length === 0 && livePortfolio !== null && livePortfolio.length === 0 ? (
+        <motion.div variants={fadeUp} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {['Member Growth', 'Revenue Breakdown', 'Loan Portfolio'].map((title) => (
+            <div key={title} className="bg-white rounded-xl border border-gray-100 p-5 h-72 flex flex-col items-center justify-center">
+              <p className="text-sm font-medium text-navy mb-2">{title}</p>
+              <p className="text-xs text-gray-400">Data will appear as members join</p>
+            </div>
+          ))}
+        </motion.div>
+      ) : (
+        <AdminDashboardCharts
+          memberGrowthData={memberGrowthData}
+          revenueData={(liveRevenue && liveRevenue.length > 0 ? liveRevenue : FALLBACK_STATS.revenueBreakdown) as Record<string, unknown>[]}
+          revenueDataKey={liveRevenue && liveRevenue.length > 0 ? 'value' : 'amount'}
+          revenueNameKey={liveRevenue && liveRevenue.length > 0 ? 'name' : 'source'}
+          loanPortfolioData={(livePortfolio && livePortfolio.length > 0 ? livePortfolio : loanPortfolioLast6) as Record<string, unknown>[]}
+        />
+      )}
 
       {/* ══════════════════════════════════════════════════════════════════
           3. APPLICATION PIPELINE

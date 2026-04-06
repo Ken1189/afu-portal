@@ -219,7 +219,7 @@ I'm proud to be an AFU Ambassador. If you know anyone in agriculture, supply cha
               <h3 className="text-lg font-semibold mt-6" style={{ color: '#1B2A4A' }}>Twitter / X</h3>
               <ContentCard
                 title="Tweet 1"
-                content={`Africa's $50B agriculture market is largely untapped. @AFU_Official is changing that with our growing community of farmers across Africa. Financing, insurance, inputs, markets, all in one platform. [Your Referral Link] #AfricanAgriculture #AgriTech`}
+                content={`Africa's $50B agriculture market is largely untapped. @UnionAfric82069 is changing that with our growing community of farmers across Africa. Financing, insurance, inputs, markets, all in one platform. [Your Referral Link] #AfricanAgriculture #AgriTech`}
               />
               <ContentCard
                 title="Tweet 2"

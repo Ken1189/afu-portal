@@ -134,15 +134,13 @@ const pulseRing = {
 /* ------------------------------------------------------------------ */
 export default function LoginPage() {
   const router = useRouter();
-  const { signIn, signUp, user, isLoading: authLoading } = useAuth();
+  const { signIn, user, isLoading: authLoading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isSignUp, setIsSignUp] = useState(false);
-  const [fullName, setFullName] = useState('');
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [resetSent, setResetSent] = useState(false);
 
@@ -190,7 +188,7 @@ export default function LoginPage() {
     return () => clearInterval(interval);
   }, [nextTestimonial]);
 
-  // Login / Signup handler
+  // Login handler (signup removed — all new users go through /apply)
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -201,31 +199,15 @@ export default function LoginPage() {
       return;
     }
 
-    if (isSignUp && !fullName) {
-      setError('Please enter your full name.');
-      return;
-    }
-
     setIsLoading(true);
 
     try {
-      if (isSignUp) {
-        const { error: signUpError } = await signUp(email, password, fullName);
-        if (signUpError) {
-          setError(signUpError.message);
-        } else {
-          // Free membership created automatically — send to onboarding
-          router.push('/onboarding');
-          return;
-        }
+      const { error: signInError } = await signIn(email, password);
+      if (signInError) {
+        setError(signInError.message);
       } else {
-        const { error: signInError } = await signIn(email, password);
-        if (signInError) {
-          setError(signInError.message);
-        } else {
-          // Fetch role from server API (bypasses RLS) and redirect
-          await fetchRoleAndRedirect();
-        }
+        // Fetch role from server API (bypasses RLS) and redirect
+        await fetchRoleAndRedirect();
       }
     } catch (err) {
       setError('An unexpected error occurred. Please try again.');
@@ -397,12 +379,8 @@ export default function LoginPage() {
 
           {/* Heading */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-navy">
-              {isSignUp ? 'Create your account' : 'Welcome back'}
-            </h1>
-            <p className="text-gray-500 mt-2">
-              {isSignUp ? 'Join the African Farming Union' : 'Sign in to your portal'}
-            </p>
+            <h1 className="text-3xl font-bold text-navy">Welcome back</h1>
+            <p className="text-gray-500 mt-2">Sign in to your portal</p>
           </div>
 
           {/* Success message */}
@@ -444,35 +422,6 @@ export default function LoginPage() {
             </AnimatePresence>
 
             <form onSubmit={handleLogin} className="space-y-5">
-              {/* Full Name (sign-up only) */}
-              <AnimatePresence>
-                {isSignUp && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="overflow-hidden"
-                  >
-                    <div className="pb-1">
-                      <label htmlFor="fullName" className="block text-sm font-medium text-navy mb-2">
-                        Full name
-                      </label>
-                      <div className="relative">
-                        <Users className="absolute left-4 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400 pointer-events-none" />
-                        <input
-                          id="fullName"
-                          type="text"
-                          className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl bg-white text-navy placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#5DB347]/40 focus:border-[#5DB347] transition-shadow"
-                          placeholder="e.g. Thabo Mokoena"
-                          value={fullName}
-                          onChange={(e) => setFullName(e.target.value)}
-                        />
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
               {/* Email */}
               <div>
                 <label
@@ -604,11 +553,11 @@ export default function LoginPage() {
                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
                       />
                     </svg>
-                    <span>{isSignUp ? 'Creating account...' : 'Signing in...'}</span>
+                    <span>Signing in...</span>
                   </div>
                 ) : (
                   <>
-                    <span>{isSignUp ? 'Create Account' : 'Sign In'}</span>
+                    <span>Sign In</span>
                     <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                   </>
                 )}
@@ -639,39 +588,17 @@ export default function LoginPage() {
             </motion.button>
           </div>
 
-          {/* Toggle sign-in / sign-up */}
-          <p className="text-center text-gray-500 text-sm mt-6">
-            {isSignUp ? (
-              <>
-                Already have an account?{' '}
-                <button
-                  type="button"
-                  onClick={() => { setIsSignUp(false); setError(''); setSuccess(''); }}
-                  className="text-[#5DB347] hover:text-[#449933] font-medium transition-colors"
-                >
-                  Sign in
-                </button>
-              </>
-            ) : (
-              <>
-                Don&apos;t have an account?{' '}
-                <button
-                  type="button"
-                  onClick={() => { setIsSignUp(true); setError(''); setSuccess(''); }}
-                  className="text-[#5DB347] hover:text-[#449933] font-medium transition-colors"
-                >
-                  Create one
-                </button>
-                <span className="mx-1.5 text-gray-300">|</span>
-                <Link
-                  href="/apply"
-                  className="text-[#5DB347] hover:text-[#449933] font-medium transition-colors"
-                >
-                  Apply for membership
-                </Link>
-              </>
-            )}
-          </p>
+          {/* Apply for membership CTA */}
+          <div className="text-center mt-6">
+            <p className="text-gray-500 text-sm mb-3">New here?</p>
+            <Link
+              href="/apply"
+              className="inline-flex items-center gap-2 text-[#5DB347] hover:text-[#449933] font-semibold text-sm transition-colors"
+            >
+              Apply for membership
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
 
           {/* Security footer */}
           <div className="flex items-center justify-center gap-1.5 mt-4 text-gray-400 text-xs">

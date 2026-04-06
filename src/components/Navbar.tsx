@@ -12,8 +12,6 @@ import {
   Landmark,
   ShieldCheck,
   ShoppingCart,
-  Cpu,
-  Zap,
   Wrench,
   BookOpen,
   FlaskConical,
@@ -22,21 +20,15 @@ import {
   LayoutDashboard,
   User,
   Settings,
-  Shield,
   Briefcase,
   Award,
-  Sprout,
   Handshake,
   Target,
   GraduationCap,
   ShoppingBag,
-  ArrowLeftRight,
-  Blocks,
-  Headphones,
   Mail,
   Scale,
   Stethoscope,
-  Megaphone,
   Leaf,
   HelpCircle,
   Newspaper,
@@ -49,38 +41,15 @@ import { localeNames, type Locale } from "@/lib/i18n/translations";
 
 /* ─── Data ─── */
 
-const financeLinks = [
-  { label: "AFU Bank", href: "/services/finance/afu-bank" },
-  { label: "Asset Finance", href: "/services/finance/asset-finance" },
-  { label: "Crop Dev Loan", href: "/services/finance/crop-dev-loan" },
-  { label: "Mortgages", href: "/services/finance/mortgages" },
-  { label: "Input Finance", href: "/services/finance/input-finance" },
-  { label: "Harvest Finance", href: "/services/finance/harvest-finance" },
-  { label: "Trade Finance", href: "/services/finance/trade-finance" },
-];
-
-const insuranceLinks = [
-  { label: "Asset Insurance", href: "/services/insurance/asset" },
-  { label: "Crop Insurance", href: "/services/insurance/crop" },
-  { label: "Medical Insurance", href: "/services/insurance/medical" },
-  { label: "Farm Insurance", href: "/services/insurance/farm" },
-  { label: "Trade Insurance", href: "/services/insurance/trade" },
-  { label: "Livestock Insurance", href: "/services/insurance/livestock" },
-  { label: "Life & Personal Insurance", href: "/services/insurance/life" },
-  { label: "Equipment Insurance", href: "/services/insurance/equipment" },
-  { label: "Pension & Retirement", href: "/services/insurance/pension" },
-  { label: "Vehicle Insurance", href: "/services/insurance/vehicle" },
-];
-
-const moreServicesLinks = [
+const servicesLinks: { label: string; href: string; icon: LucideIcon }[] = [
+  { label: "Financing", href: "/services/finance", icon: Landmark },
   { label: "Insurance", href: "/services/insurance", icon: ShieldCheck },
-  { label: "Technology", href: "/services/technology", icon: Cpu },
-  { label: "Energy", href: "/services/energy", icon: Zap },
-  { label: "Machinery", href: "/services/machinery", icon: Wrench },
-  { label: "Farm Security", href: "/services/security", icon: Shield },
+  { label: "Training", href: "/services/training", icon: GraduationCap },
+  { label: "Marketplace", href: "/marketplace", icon: ShoppingCart },
+  { label: "Inputs & Equipment", href: "/services/inputs", icon: Wrench },
   { label: "Legal Assistance", href: "/services/legal-assistance", icon: Scale },
   { label: "Veterinary", href: "/services/veterinary", icon: Stethoscope },
-  { label: "Advertise with Us", href: "/services/advertising", icon: Megaphone },
+  { label: "Processing & Offtake", href: "/services/processing", icon: ShoppingBag },
 ];
 
 const educationLinks = [
@@ -92,25 +61,19 @@ const educationLinks = [
 const communityLinks: { label: string; href: string; desc: string; icon: LucideIcon }[] = [
   { label: "Jobs Board", href: "/jobs", desc: "Agricultural positions", icon: Briefcase },
   { label: "Ambassadors", href: "/ambassadors", desc: "Join our ambassador program", icon: Award },
-  { label: "Partner Farms", href: "/farms", desc: "Showcase farms", icon: Sprout },
-  { label: "Marketplace", href: "/marketplace", desc: "Buy & sell agricultural products", icon: ShoppingCart },
   { label: "Partners", href: "/partners", desc: "Our network", icon: Handshake },
   { label: "Programs", href: "/programs", desc: "Active farming programs", icon: Target },
-  { label: "Young Farmers", href: "/young-farmers", desc: "Next generation", icon: GraduationCap },
   { label: "Sponsor a Farmer", href: "/sponsor", desc: "Change a life today", icon: Handshake },
+  { label: "Young Farmers", href: "/young-farmers", desc: "Next generation", icon: GraduationCap },
 ];
 
 const exploreLinks: { label: string; href: string; desc: string; icon: LucideIcon }[] = [
   { label: "Farming Sectors", href: "/farming", desc: "Crops, livestock, forestry & more", icon: Wheat },
-  { label: "Projects", href: "/projects", desc: "Investment opportunities", icon: FolderKanban },
-  { label: "AFU Fresh", href: "/fresh", desc: "Farm to fork marketplace", icon: ShoppingBag },
-  { label: "Exchange", href: "/exchange", desc: "Trade with fellow farmers", icon: ArrowLeftRight },
-  { label: "Blockchain", href: "/blockchain", desc: "EDMA technology roadmap", icon: Blocks },
-  { label: "Podcasts", href: "/podcasts", desc: "Listen & learn", icon: Headphones },
-  { label: "Newsletter", href: "/newsletter", desc: "Weekly intelligence", icon: Mail },
+  { label: "Countries", href: "/countries", desc: "Explore by country", icon: FolderKanban },
   { label: "Carbon Credits", href: "/carbon", desc: "Offset your footprint", icon: Leaf },
   { label: "Blog", href: "/blog", desc: "News & insights", icon: Newspaper },
   { label: "FAQ", href: "/faq", desc: "Common questions", icon: HelpCircle },
+  { label: "Newsletter", href: "/newsletter", desc: "Weekly intelligence", icon: Mail },
 ];
 
 /* ─── Navbar config types (from site_config DB) ─── */
@@ -221,56 +184,19 @@ function DesktopServicesDropdown({ openDropdown, handleMouseEnter, handleMouseLe
             animate="visible"
             exit="exit"
             transition={{ duration: 0.15 }}
-            className="absolute top-full -left-40 mt-1 bg-white rounded-xl shadow-xl border border-gray-100 z-50 w-[700px] max-w-[calc(100vw-2rem)]"
+            className="absolute top-full left-0 mt-1 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
             onMouseEnter={() => handleMouseEnter?.("services")}
             onMouseLeave={handleMouseLeave}
           >
-            <div className="p-6">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-8">
-                <div>
-                  <div className="flex items-center gap-2 mb-3">
-                    <Landmark className="w-4 h-4 text-[#5DB347]" />
-                    <span className="text-xs font-semibold text-[#5DB347] uppercase tracking-wider">Finance</span>
-                  </div>
-                  <div className="space-y-0.5">
-                    {financeLinks.map((link) => (
-                      <Link key={link.href} href={link.href} className="block px-3 py-2 text-sm text-navy hover:bg-[#EBF7E5] hover:text-[#5DB347] rounded-lg transition-all hover:translate-x-0.5 border-l-2 border-transparent hover:border-[#5DB347]" onClick={() => setOpenDropdown(null)}>
-                        {link.label}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <div className="flex items-center gap-2 mb-3">
-                    <ShieldCheck className="w-4 h-4 text-[#5DB347]" />
-                    <span className="text-xs font-semibold text-[#5DB347] uppercase tracking-wider">Insurance</span>
-                  </div>
-                  <div className="space-y-0.5">
-                    {insuranceLinks.map((link) => (
-                      <Link key={link.href} href={link.href} className="block px-3 py-2 text-sm text-navy hover:bg-[#EBF7E5] hover:text-[#5DB347] rounded-lg transition-all hover:translate-x-0.5 border-l-2 border-transparent hover:border-[#5DB347]" onClick={() => setOpenDropdown(null)}>
-                        {link.label}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="text-xs font-semibold text-[#5DB347] uppercase tracking-wider">More</span>
-                  </div>
-                  <div className="space-y-0.5">
-                    {moreServicesLinks.map((link) => {
-                      const Icon = link.icon;
-                      return (
-                        <Link key={link.href} href={link.href} className="flex items-center gap-3 px-3 py-2 text-sm text-navy hover:bg-[#EBF7E5] hover:text-[#5DB347] rounded-lg transition-all hover:translate-x-0.5 border-l-2 border-transparent hover:border-[#5DB347]" onClick={() => setOpenDropdown(null)}>
-                          <Icon className="w-4 h-4 text-gray-400" />
-                          {link.label}
-                        </Link>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-            </div>
+            {servicesLinks.map((link) => {
+              const Icon = link.icon;
+              return (
+                <Link key={link.href} href={link.href} className="flex items-center gap-3 px-4 py-2.5 text-sm text-navy hover:bg-[#EBF7E5] hover:text-[#5DB347] transition-colors" onClick={() => setOpenDropdown(null)}>
+                  <Icon className="w-4 h-4 text-gray-400" />
+                  {link.label}
+                </Link>
+              );
+            })}
           </motion.div>
         )}
       </AnimatePresence>
@@ -392,7 +318,7 @@ function MobileEducationSection({ mobileEducationOpen, setMobileEducationOpen, c
   );
 }
 
-function MobileServicesSection({ mobileServicesOpen, setMobileServicesOpen, mobileFinanceOpen, setMobileFinanceOpen, mobileInsuranceOpen, setMobileInsuranceOpen, mobileMoreOpen, setMobileMoreOpen, closeMobile }: { mobileServicesOpen: boolean; setMobileServicesOpen: (v: boolean) => void; mobileFinanceOpen: boolean; setMobileFinanceOpen: (v: boolean) => void; mobileInsuranceOpen: boolean; setMobileInsuranceOpen: (v: boolean) => void; mobileMoreOpen: boolean; setMobileMoreOpen: (v: boolean) => void; closeMobile: () => void }) {
+function MobileServicesSection({ mobileServicesOpen, setMobileServicesOpen, closeMobile }: { mobileServicesOpen: boolean; setMobileServicesOpen: (v: boolean) => void; closeMobile: () => void }) {
   return (
     <div>
       <button className="flex items-center justify-between w-full text-navy text-base font-medium py-3 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors" onClick={() => setMobileServicesOpen(!mobileServicesOpen)}>
@@ -402,60 +328,16 @@ function MobileServicesSection({ mobileServicesOpen, setMobileServicesOpen, mobi
       <AnimatePresence>
         {mobileServicesOpen && (
           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }} className="overflow-hidden">
-            <div className="pl-4 py-1 space-y-1">
-              {/* Finance sub-accordion */}
-              <button className="flex items-center justify-between w-full text-navy/80 text-sm font-semibold py-2.5 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors" onClick={() => setMobileFinanceOpen(!mobileFinanceOpen)}>
-                <span className="flex items-center gap-2"><Landmark className="w-4 h-4 text-[#5DB347]" />Finance</span>
-                <ChevronDown className={`w-4 h-4 transition-transform ${mobileFinanceOpen ? "rotate-180" : ""}`} />
-              </button>
-              <AnimatePresence>
-                {mobileFinanceOpen && (
-                  <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.15 }} className="overflow-hidden">
-                    <div className="pl-4 space-y-0.5">
-                      {financeLinks.map((link) => (
-                        <Link key={link.href} href={link.href} className="block text-navy/60 hover:text-[#5DB347] text-sm py-2 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors" onClick={closeMobile}>{link.label}</Link>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-              {/* Insurance sub-accordion */}
-              <button className="flex items-center justify-between w-full text-navy/80 text-sm font-semibold py-2.5 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors" onClick={() => setMobileInsuranceOpen(!mobileInsuranceOpen)}>
-                <span className="flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-[#5DB347]" />Insurance</span>
-                <ChevronDown className={`w-4 h-4 transition-transform ${mobileInsuranceOpen ? "rotate-180" : ""}`} />
-              </button>
-              <AnimatePresence>
-                {mobileInsuranceOpen && (
-                  <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.15 }} className="overflow-hidden">
-                    <div className="pl-4 space-y-0.5">
-                      {insuranceLinks.map((link) => (
-                        <Link key={link.href} href={link.href} className="block text-navy/60 hover:text-[#5DB347] text-sm py-2 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors" onClick={closeMobile}>{link.label}</Link>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-              {/* More sub-accordion */}
-              <button className="flex items-center justify-between w-full text-navy/80 text-sm font-semibold py-2.5 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors" onClick={() => setMobileMoreOpen(!mobileMoreOpen)}>
-                <span>More Services</span>
-                <ChevronDown className={`w-4 h-4 transition-transform ${mobileMoreOpen ? "rotate-180" : ""}`} />
-              </button>
-              <AnimatePresence>
-                {mobileMoreOpen && (
-                  <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.15 }} className="overflow-hidden">
-                    <div className="pl-4 space-y-0.5">
-                      {moreServicesLinks.map((link) => {
-                        const Icon = link.icon;
-                        return (
-                          <Link key={link.href} href={link.href} className="flex items-center gap-3 text-navy/60 hover:text-[#5DB347] text-sm py-2 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors" onClick={closeMobile}>
-                            <Icon className="w-4 h-4" />{link.label}
-                          </Link>
-                        );
-                      })}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+            <div className="pl-4 py-1 space-y-0.5">
+              {servicesLinks.map((link) => {
+                const Icon = link.icon;
+                return (
+                  <Link key={link.href} href={link.href} className="flex items-center gap-3 text-navy/70 hover:text-[#5DB347] text-sm py-2.5 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors" onClick={closeMobile}>
+                    <Icon className="w-4 h-4" />
+                    {link.label}
+                  </Link>
+                );
+              })}
             </div>
           </motion.div>
         )}
@@ -496,9 +378,6 @@ export default function Navbar() {
   const [openDropdown, setOpenDropdown] = useState<OpenDropdown>(null);
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
   const [mobileEducationOpen, setMobileEducationOpen] = useState(false);
-  const [mobileFinanceOpen, setMobileFinanceOpen] = useState(false);
-  const [mobileInsuranceOpen, setMobileInsuranceOpen] = useState(false);
-  const [mobileMoreOpen, setMobileMoreOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [langMenuOpen, setLangMenuOpen] = useState(false);
   const { locale, setLocale } = useLanguage();
@@ -575,12 +454,9 @@ export default function Navbar() {
     setMobileOpen(false);
     setMobileServicesOpen(false);
     setMobileEducationOpen(false);
-    setMobileFinanceOpen(false);
     // Force clear on Android
     document.body.style.overflow = "";
     document.documentElement.style.overflow = "";
-    setMobileInsuranceOpen(false);
-    setMobileMoreOpen(false);
   }, []);
 
   /* Hover handlers with debounce to prevent flicker */
@@ -774,82 +650,24 @@ export default function Navbar() {
                     animate="visible"
                     exit="exit"
                     transition={{ duration: 0.15 }}
-                    className="absolute top-full -left-40 mt-1 bg-white rounded-xl shadow-xl border border-gray-100 z-50 w-[700px] max-w-[calc(100vw-2rem)]"
+                    className="absolute top-full left-0 mt-1 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
                     onMouseEnter={() => handleMouseEnter("services")}
                     onMouseLeave={handleMouseLeave}
                   >
-                    <div className="p-6">
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-8">
-                        {/* Finance Column */}
-                        <div>
-                          <div className="flex items-center gap-2 mb-3">
-                            <Landmark className="w-4 h-4 text-[#5DB347]" />
-                            <span className="text-xs font-semibold text-[#5DB347] uppercase tracking-wider">
-                              Finance
-                            </span>
-                          </div>
-                          <div className="space-y-0.5">
-                            {financeLinks.map((link) => (
-                              <Link
-                                key={link.href}
-                                href={link.href}
-                                className="block px-3 py-2 text-sm text-navy hover:bg-[#EBF7E5] hover:text-[#5DB347] rounded-lg transition-all hover:translate-x-0.5 border-l-2 border-transparent hover:border-[#5DB347]"
-                                onClick={() => setOpenDropdown(null)}
-                              >
-                                {link.label}
-                              </Link>
-                            ))}
-                          </div>
-                        </div>
-
-                        {/* Insurance Column */}
-                        <div>
-                          <div className="flex items-center gap-2 mb-3">
-                            <ShieldCheck className="w-4 h-4 text-[#5DB347]" />
-                            <span className="text-xs font-semibold text-[#5DB347] uppercase tracking-wider">
-                              Insurance
-                            </span>
-                          </div>
-                          <div className="space-y-0.5">
-                            {insuranceLinks.map((link) => (
-                              <Link
-                                key={link.href}
-                                href={link.href}
-                                className="block px-3 py-2 text-sm text-navy hover:bg-[#EBF7E5] hover:text-[#5DB347] rounded-lg transition-all hover:translate-x-0.5 border-l-2 border-transparent hover:border-[#5DB347]"
-                                onClick={() => setOpenDropdown(null)}
-                              >
-                                {link.label}
-                              </Link>
-                            ))}
-                          </div>
-                        </div>
-
-                        {/* More Column */}
-                        <div>
-                          <div className="flex items-center gap-2 mb-3">
-                            <span className="text-xs font-semibold text-[#5DB347] uppercase tracking-wider">
-                              More
-                            </span>
-                          </div>
-                          <div className="space-y-0.5">
-                            {moreServicesLinks.map((link) => {
-                              const Icon = link.icon;
-                              return (
-                                <Link
-                                  key={link.href}
-                                  href={link.href}
-                                  className="flex items-center gap-3 px-3 py-2 text-sm text-navy hover:bg-[#EBF7E5] hover:text-[#5DB347] rounded-lg transition-all hover:translate-x-0.5 border-l-2 border-transparent hover:border-[#5DB347]"
-                                  onClick={() => setOpenDropdown(null)}
-                                >
-                                  <Icon className="w-4 h-4 text-gray-400" />
-                                  {link.label}
-                                </Link>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                    {servicesLinks.map((link) => {
+                      const Icon = link.icon;
+                      return (
+                        <Link
+                          key={link.href}
+                          href={link.href}
+                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-navy hover:bg-[#EBF7E5] hover:text-[#5DB347] transition-colors"
+                          onClick={() => setOpenDropdown(null)}
+                        >
+                          <Icon className="w-4 h-4 text-gray-400" />
+                          {link.label}
+                        </Link>
+                      );
+                    })}
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -1161,7 +979,7 @@ export default function Navbar() {
                       <MobileEducationSection mobileEducationOpen={mobileEducationOpen} setMobileEducationOpen={setMobileEducationOpen} closeMobile={closeMobile} />
                     )}
                     {dbNavItems.some((i) => i.label.toLowerCase() === "services") && (
-                      <MobileServicesSection mobileServicesOpen={mobileServicesOpen} setMobileServicesOpen={setMobileServicesOpen} mobileFinanceOpen={mobileFinanceOpen} setMobileFinanceOpen={setMobileFinanceOpen} mobileInsuranceOpen={mobileInsuranceOpen} setMobileInsuranceOpen={setMobileInsuranceOpen} mobileMoreOpen={mobileMoreOpen} setMobileMoreOpen={setMobileMoreOpen} closeMobile={closeMobile} />
+                      <MobileServicesSection mobileServicesOpen={mobileServicesOpen} setMobileServicesOpen={setMobileServicesOpen} closeMobile={closeMobile} />
                     )}
                     {dbNavItems.some((i) => i.label.toLowerCase() === "community") && (
                       <div className="pt-2 mt-2 border-t border-gray-100">
@@ -1246,7 +1064,7 @@ export default function Navbar() {
                   </AnimatePresence>
                 </div>
 
-                {/* Services Accordion */}
+                {/* Services Accordion (fallback) */}
                 <div>
                   <button
                     className="flex items-center justify-between w-full text-navy text-base font-medium py-3 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors"
@@ -1268,131 +1086,21 @@ export default function Navbar() {
                         transition={{ duration: 0.2 }}
                         className="overflow-hidden"
                       >
-                        <div className="pl-4 py-1 space-y-1">
-                          {/* Finance sub-accordion */}
-                          <button
-                            className="flex items-center justify-between w-full text-navy/80 text-sm font-semibold py-2.5 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors"
-                            onClick={() =>
-                              setMobileFinanceOpen(!mobileFinanceOpen)
-                            }
-                          >
-                            <span className="flex items-center gap-2">
-                              <Landmark className="w-4 h-4 text-[#5DB347]" />
-                              Finance
-                            </span>
-                            <ChevronDown
-                              className={`w-4 h-4 transition-transform ${
-                                mobileFinanceOpen ? "rotate-180" : ""
-                              }`}
-                            />
-                          </button>
-                          <AnimatePresence>
-                            {mobileFinanceOpen && (
-                              <motion.div
-                                initial={{ height: 0, opacity: 0 }}
-                                animate={{ height: "auto", opacity: 1 }}
-                                exit={{ height: 0, opacity: 0 }}
-                                transition={{ duration: 0.15 }}
-                                className="overflow-hidden"
+                        <div className="pl-4 py-1 space-y-0.5">
+                          {servicesLinks.map((link) => {
+                            const Icon = link.icon;
+                            return (
+                              <Link
+                                key={link.href}
+                                href={link.href}
+                                className="flex items-center gap-3 text-navy/70 hover:text-[#5DB347] text-sm py-2.5 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors"
+                                onClick={closeMobile}
                               >
-                                <div className="pl-4 space-y-0.5">
-                                  {financeLinks.map((link) => (
-                                    <Link
-                                      key={link.href}
-                                      href={link.href}
-                                      className="block text-navy/60 hover:text-[#5DB347] text-sm py-2 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors"
-                                      onClick={closeMobile}
-                                    >
-                                      {link.label}
-                                    </Link>
-                                  ))}
-                                </div>
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
-
-                          {/* Insurance sub-accordion */}
-                          <button
-                            className="flex items-center justify-between w-full text-navy/80 text-sm font-semibold py-2.5 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors"
-                            onClick={() =>
-                              setMobileInsuranceOpen(!mobileInsuranceOpen)
-                            }
-                          >
-                            <span className="flex items-center gap-2">
-                              <ShieldCheck className="w-4 h-4 text-[#5DB347]" />
-                              Insurance
-                            </span>
-                            <ChevronDown
-                              className={`w-4 h-4 transition-transform ${
-                                mobileInsuranceOpen ? "rotate-180" : ""
-                              }`}
-                            />
-                          </button>
-                          <AnimatePresence>
-                            {mobileInsuranceOpen && (
-                              <motion.div
-                                initial={{ height: 0, opacity: 0 }}
-                                animate={{ height: "auto", opacity: 1 }}
-                                exit={{ height: 0, opacity: 0 }}
-                                transition={{ duration: 0.15 }}
-                                className="overflow-hidden"
-                              >
-                                <div className="pl-4 space-y-0.5">
-                                  {insuranceLinks.map((link) => (
-                                    <Link
-                                      key={link.href}
-                                      href={link.href}
-                                      className="block text-navy/60 hover:text-[#5DB347] text-sm py-2 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors"
-                                      onClick={closeMobile}
-                                    >
-                                      {link.label}
-                                    </Link>
-                                  ))}
-                                </div>
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
-
-                          {/* More sub-accordion */}
-                          <button
-                            className="flex items-center justify-between w-full text-navy/80 text-sm font-semibold py-2.5 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors"
-                            onClick={() => setMobileMoreOpen(!mobileMoreOpen)}
-                          >
-                            <span>More Services</span>
-                            <ChevronDown
-                              className={`w-4 h-4 transition-transform ${
-                                mobileMoreOpen ? "rotate-180" : ""
-                              }`}
-                            />
-                          </button>
-                          <AnimatePresence>
-                            {mobileMoreOpen && (
-                              <motion.div
-                                initial={{ height: 0, opacity: 0 }}
-                                animate={{ height: "auto", opacity: 1 }}
-                                exit={{ height: 0, opacity: 0 }}
-                                transition={{ duration: 0.15 }}
-                                className="overflow-hidden"
-                              >
-                                <div className="pl-4 space-y-0.5">
-                                  {moreServicesLinks.map((link) => {
-                                    const Icon = link.icon;
-                                    return (
-                                      <Link
-                                        key={link.href}
-                                        href={link.href}
-                                        className="flex items-center gap-3 text-navy/60 hover:text-[#5DB347] text-sm py-2 px-3 rounded-lg hover:bg-[#EBF7E5]/50 transition-colors"
-                                        onClick={closeMobile}
-                                      >
-                                        <Icon className="w-4 h-4" />
-                                        {link.label}
-                                      </Link>
-                                    );
-                                  })}
-                                </div>
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
+                                <Icon className="w-4 h-4" />
+                                {link.label}
+                              </Link>
+                            );
+                          })}
                         </div>
                       </motion.div>
                     )}

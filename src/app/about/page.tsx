@@ -208,9 +208,9 @@ export default async function AboutPage() {
             </p>
             <p className="text-xl text-white/80 leading-relaxed mb-10">
               The African Farming Union is a vertically integrated agriculture development platform —
-              <strong className="text-white"> By Farmers, For Farmers</strong> — functioning as a specialized agri dev bank
+              <strong className="text-white"> By Farmers, For Farmers</strong> — building toward becoming a specialized agri development platform
               and full-stack execution engine for African farmers.
-              We finance the trade with SBLCs, Letters of Credit, and export pre-financing that unlock international markets.
+              Our model includes trade finance instruments such as SBLCs, Letters of Credit, and export pre-financing designed to unlock international markets.
             </p>
             {/* 3 stat pills — glassmorphism */}
             <div className="flex flex-wrap gap-4">

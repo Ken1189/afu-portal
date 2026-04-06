@@ -14,6 +14,7 @@ interface Profile {
   phone: string | null;
   avatar_url: string | null;
   role: UserRole;
+  roles?: UserRole[]; // TEXT[] column — supports dual-role (e.g. member + supplier)
   country: string | null;
   region: string | null;
 }
@@ -29,6 +30,8 @@ interface AuthContextType {
   isMember: boolean;
   isImpersonating: boolean;
   realProfile: Profile | null;
+  roles: string[];
+  hasRole: (role: string) => boolean;
   signUp: (email: string, password: string, fullName: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signInWithMagicLink: (email: string) => Promise<{ error: Error | null }>;
@@ -229,10 +232,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // ── Role helpers ──────────────────────────────────────────────────────
 
-  const isSuperAdmin = profile?.role === 'super_admin';
-  const isAdmin = profile?.role === 'admin' || profile?.role === 'super_admin';
-  const isSupplier = profile?.role === 'supplier' || isAdmin;
-  const isMember = profile?.role === 'member' || isAdmin;
+  // Build unified roles array: combine primary role + roles[] column (deduped)
+  const roles: string[] = (() => {
+    const set = new Set<string>();
+    if (profile?.role) set.add(profile.role);
+    if (profile?.roles) profile.roles.forEach((r) => set.add(r));
+    return Array.from(set);
+  })();
+
+  const hasRole = (role: string): boolean => roles.includes(role);
+
+  const isSuperAdmin = hasRole('super_admin');
+  const isAdmin = hasRole('admin') || hasRole('super_admin');
+  const isSupplier = hasRole('supplier') || isAdmin;
+  const isMember = hasRole('member') || isAdmin;
 
   return (
     <AuthContext.Provider
@@ -247,6 +260,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isMember,
         isImpersonating,
         realProfile,
+        roles,
+        hasRole,
         signUp,
         signIn,
         signInWithMagicLink,

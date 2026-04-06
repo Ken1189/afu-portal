@@ -78,24 +78,13 @@ interface DashboardStats {
 
 // ── Fallback (Demo) Data ────────────────────────────────────────────────────
 
-const FALLBACK_COMMISSIONS: CommissionEntry[] = [
-  { id: '1', commission_type: 'membership', commission_amount: 25, status: 'paid', created_at: '2026-03-25T10:00:00Z', description: 'John Doe membership signup' },
-  { id: '2', commission_type: 'fundraising', commission_amount: 250, status: 'paid', created_at: '2026-03-22T14:00:00Z', description: 'Community fundraiser - Kampala' },
-  { id: '3', commission_type: 'advertising', commission_amount: 120, status: 'pending', created_at: '2026-03-20T09:00:00Z', description: 'AgriTech Co. ad placement' },
-  { id: '4', commission_type: 'membership', commission_amount: 25, status: 'paid', created_at: '2026-03-18T16:00:00Z', description: 'Sarah Kimani membership signup' },
-  { id: '5', commission_type: 'membership', commission_amount: 50, status: 'pending', created_at: '2026-03-15T11:00:00Z', description: 'Cooperative Premium membership' },
-  { id: '6', commission_type: 'fundraising', commission_amount: 100, status: 'paid', created_at: '2026-03-12T08:00:00Z', description: 'Water project fundraiser' },
-  { id: '7', commission_type: 'advertising', commission_amount: 80, status: 'paid', created_at: '2026-03-10T13:00:00Z', description: 'Farm Supplies Ltd. ad' },
-  { id: '8', commission_type: 'membership', commission_amount: 25, status: 'pending', created_at: '2026-03-08T15:00:00Z', description: 'Peter Obi membership signup' },
-  { id: '9', commission_type: 'fundraising', commission_amount: 700, status: 'paid', created_at: '2026-03-05T10:00:00Z', description: 'Large-scale irrigation fundraiser' },
-  { id: '10', commission_type: 'membership', commission_amount: 25, status: 'paid', created_at: '2026-03-01T09:00:00Z', description: 'Grace Achieng membership signup' },
-];
+const FALLBACK_COMMISSIONS: CommissionEntry[] = [];
 
 const FALLBACK_STATS: DashboardStats = {
-  totalReferrals: 34,
-  activeReferrals: 28,
-  totalEarnings: 4250,
-  pendingEarnings: 475,
+  totalReferrals: 0,
+  activeReferrals: 0,
+  totalEarnings: 0,
+  pendingEarnings: 0,
 };
 
 // ── Component ────────────────────────────────────────────────────────────────
@@ -127,7 +116,9 @@ export default function AmbassadorDashboard() {
           .single();
 
         if (ambError || !ambassador) {
-          // No ambassador record — keep fallback data
+          // No ambassador record — show zeros (new user)
+          setStats(FALLBACK_STATS);
+          setCommissions([]);
           setLoading(false);
           return;
         }
@@ -173,10 +164,7 @@ export default function AmbassadorDashboard() {
 
         // 3. Process commission entries for the activity list
         const entries = commissionsResult.data as CommissionEntry[] | null;
-        if (entries && entries.length > 0) {
-          setCommissions(entries);
-        }
-        // If DB returns empty, FALLBACK_COMMISSIONS remain
+        setCommissions(entries && entries.length > 0 ? entries : []);
 
         // 4. Compute stats from real data
         const allCommissions = allCommissionsStatsResult.data || [];
@@ -205,17 +193,19 @@ export default function AmbassadorDashboard() {
           0
         );
 
-        // Also check the ambassador record's stored totals as a cross-reference
+        // Use real data; fall back to ambassador record totals if available, otherwise 0
         const computedStats: DashboardStats = {
-          totalReferrals: totalReferrals || (ambassador.total_referrals ?? FALLBACK_STATS.totalReferrals),
-          activeReferrals: activeReferrals || FALLBACK_STATS.activeReferrals,
-          totalEarnings: totalEarnings || (ambassador.total_earned ?? FALLBACK_STATS.totalEarnings),
-          pendingEarnings: pendingCommissions || FALLBACK_STATS.pendingEarnings,
+          totalReferrals: totalReferrals > 0 ? totalReferrals : (ambassador.total_referrals ?? 0),
+          activeReferrals,
+          totalEarnings: totalEarnings > 0 ? totalEarnings : (ambassador.total_earned ?? 0),
+          pendingEarnings: pendingCommissions,
         };
 
         setStats(computedStats);
       } catch {
-        // On any error, keep fallback demo data
+        // On any error, show zeros rather than fake data
+        setStats(FALLBACK_STATS);
+        setCommissions([]);
       } finally {
         setLoading(false);
       }
@@ -452,23 +442,33 @@ export default function AmbassadorDashboard() {
           </a>
         </div>
         <div className="space-y-3">
-          {commissions.slice(0, 10).map((entry) => (
-            <div key={entry.id} className="flex items-center justify-between py-2.5 border-b border-gray-50 last:border-0">
-              <div className="flex items-center gap-3">
-                <div className={`w-2 h-2 rounded-full ${entry.status === 'paid' ? 'bg-green-400' : 'bg-amber-400'}`} />
-                <div>
-                  <p className="text-sm font-medium text-[#1B2A4A]">{entry.description || 'Commission'}</p>
-                  <p className="text-xs text-gray-400">{formatDate(entry.created_at)} &middot; {entry.commission_type}</p>
+          {commissions.length === 0 ? (
+            <div className="text-center py-8">
+              <div className="w-12 h-12 rounded-full bg-[#EBF7E5] flex items-center justify-center mx-auto mb-3">
+                <Zap className="w-6 h-6 text-[#5DB347]" />
+              </div>
+              <p className="text-sm text-gray-600 font-medium">Welcome! Share your referral link to start earning commissions.</p>
+              <p className="text-xs text-gray-400 mt-1">Your commission activity will appear here once you make your first referral.</p>
+            </div>
+          ) : (
+            commissions.slice(0, 10).map((entry) => (
+              <div key={entry.id} className="flex items-center justify-between py-2.5 border-b border-gray-50 last:border-0">
+                <div className="flex items-center gap-3">
+                  <div className={`w-2 h-2 rounded-full ${entry.status === 'paid' ? 'bg-green-400' : 'bg-amber-400'}`} />
+                  <div>
+                    <p className="text-sm font-medium text-[#1B2A4A]">{entry.description || 'Commission'}</p>
+                    <p className="text-xs text-gray-400">{formatDate(entry.created_at)} &middot; {entry.commission_type}</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm font-bold text-[#1B2A4A]">{formatCurrency(entry.commission_amount)}</p>
+                  <p className={`text-xs ${entry.status === 'paid' ? 'text-green-500' : 'text-amber-500'}`}>
+                    {entry.status}
+                  </p>
                 </div>
               </div>
-              <div className="text-right">
-                <p className="text-sm font-bold text-[#1B2A4A]">{formatCurrency(entry.commission_amount)}</p>
-                <p className={`text-xs ${entry.status === 'paid' ? 'text-green-500' : 'text-amber-500'}`}>
-                  {entry.status}
-                </p>
-              </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </motion.div>
     </div>
