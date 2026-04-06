@@ -43,7 +43,8 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
         .from('blog_posts')
         .select('*')
         .eq('slug', slug)
-        .single();
+        .limit(1)
+        .maybeSingle();
 
       if (data) {
         setPost(data as BlogPost);
