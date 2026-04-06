@@ -87,7 +87,7 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
     );
   }
 
-  const articleContent = post.content || post.body || '';
+  const articleContent = post.body || post.content || '';
   const minutes = readingTime(articleContent);
 
   return (

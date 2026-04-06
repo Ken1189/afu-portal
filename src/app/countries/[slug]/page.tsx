@@ -1064,7 +1064,7 @@ export default async function CountryPage({ params }: { params: Promise<{ slug: 
                 key={crop.name}
                 className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-lg shadow-[#5DB347]/5 border border-[#EBF7E5] hover:-translate-y-1 hover:shadow-xl transition-all duration-300 text-center min-w-[140px]"
               >
-                <span className="text-5xl mb-3 block">{crop.icon}</span>
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#5DB347] to-[#449933] flex items-center justify-center mx-auto mb-3 text-white text-xl font-bold shadow-md">{crop.name.charAt(0)}</div>
                 <div
                   className="text-sm font-semibold"
                   style={{ color: "#1B2A4A" }}

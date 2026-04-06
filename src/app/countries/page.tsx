@@ -231,7 +231,7 @@ export default async function CountriesPage() {
           <div className="flex flex-wrap gap-3 mt-8">
             {countries.map((c) => (
               <span key={c.country} className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/15 px-4 py-2 rounded-full text-sm hover:bg-white/15 transition-all duration-300">
-                <span className="text-lg">{c.flag}</span> {c.country}
+                <span className="w-6 h-6 rounded-full bg-[#5DB347] flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0">{c.country.substring(0, 2).toUpperCase()}</span> {c.country}
               </span>
             ))}
           </div>
@@ -258,7 +258,7 @@ export default async function CountriesPage() {
                 className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-lg shadow-[#5DB347]/5 border-l-4 border-[#5DB347] hover:-translate-y-1 hover:shadow-xl transition-all duration-300 group"
               >
                 <div className="flex items-start justify-between mb-4">
-                  <span className="text-6xl drop-shadow-md">{c.flag}</span>
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#1B2A4A] to-[#2A3F6A] flex items-center justify-center text-white text-xl font-bold shadow-lg">{c.country.substring(0, 2).toUpperCase()}</div>
                   <span className="text-sm font-bold px-3 py-1 rounded-full bg-[#EBF7E5]" style={{ color: '#5DB347' }}>
                     {c.stat}
                   </span>
