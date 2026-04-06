@@ -122,10 +122,18 @@ export default function ApplyPage() {
     setSubmitError(null);
 
     // Validate farm size is numeric if provided
-    if (formData.farmSize && isNaN(parseFloat(formData.farmSize))) {
-      setSubmitError('Please enter a valid number for farm size.');
-      setSubmitting(false);
-      return;
+    if (formData.farmSize) {
+      const size = parseFloat(formData.farmSize);
+      if (isNaN(size)) {
+        setSubmitError('Please enter a valid number for farm size.');
+        setSubmitting(false);
+        return;
+      }
+      if (size < 0 || size > 100000) {
+        setSubmitError('Farm size must be between 0 and 100,000 hectares.');
+        setSubmitting(false);
+        return;
+      }
     }
 
     const storedRef = referredBy || referralInput || sessionStorage.getItem("afu_referral_code") || undefined;
@@ -383,7 +391,7 @@ export default function ApplyPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-sm font-medium text-[#1B2A4A] mb-2">Farm Size (hectares)</label>
-                      <input type="text" className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5DB347]/50 focus:border-[#5DB347] transition-shadow" placeholder="e.g., 5, 50, 500" value={formData.farmSize} onChange={(e) => setFormData({ ...formData, farmSize: e.target.value })} />
+                      <input type="number" min="0" max="100000" step="0.1" className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5DB347]/50 focus:border-[#5DB347] transition-shadow" placeholder="e.g., 5, 50, 500 (max 100,000)" value={formData.farmSize} onChange={(e) => setFormData({ ...formData, farmSize: e.target.value })} />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-[#1B2A4A] mb-2">What Do You Grow?</label>

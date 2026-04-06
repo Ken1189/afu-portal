@@ -934,9 +934,10 @@ function AddPlotModal({
                     type="number"
                     value={size}
                     onChange={(e) => setSize(e.target.value)}
-                    placeholder="0.5"
+                    placeholder="0.5 (max 100,000)"
                     step="0.1"
                     min="0"
+                    max="100000"
                     className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-navy placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#5DB347]/40 focus:border-[#5DB347]"
                   />
                 </div>
