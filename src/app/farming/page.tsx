@@ -44,7 +44,7 @@ export const metadata: Metadata = {
     url: "https://africanfarmersunion.org/farming",
     images: [
       {
-        url: "https://images.unsplash.com/photo-1500595046743-cd271d694d30?w=1200&h=630&fit=crop",
+        url: "https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=1200&h=630&fit=crop",
         width: 1200,
         height: 630,
         alt: "African farming landscape",
@@ -63,7 +63,7 @@ const sectors = [
     accent: "#5DB347",
     accentBg: "rgba(93,179,71,0.1)",
     image:
-      "https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=600&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&h=400&fit=crop",
     description:
       "From staple grains to high-value export crops, AFU supports farmers cultivating over 50 crop types across 10+ African countries. Access premium seeds, modern techniques, and guaranteed market channels.",
   },
@@ -74,7 +74,7 @@ const sectors = [
     accent: "#8B6F47",
     accentBg: "rgba(139,111,71,0.1)",
     image:
-      "https://images.unsplash.com/photo-1500595046743-cd271d694d30?w=600&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1516467508483-a7212febe31a?w=600&h=400&fit=crop",
     description:
       "Cattle, poultry, goats, sheep, and aquaculture — AFU connects livestock farmers with veterinary services, feed suppliers, breeding programmes, and direct-to-market sales channels.",
   },
@@ -85,7 +85,7 @@ const sectors = [
     accent: "#2D6A4F",
     accentBg: "rgba(45,106,79,0.1)",
     image:
-      "https://images.unsplash.com/photo-1448375240586-882707db888b?w=600&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=600&h=400&fit=crop",
     description:
       "Sustainable timber, agroforestry, and reforestation projects that balance economic returns with environmental stewardship. Earn carbon credits while growing valuable timber species.",
   },
@@ -96,7 +96,7 @@ const sectors = [
     accent: "#D4920B",
     accentBg: "rgba(212,146,11,0.1)",
     image:
-      "https://images.unsplash.com/photo-1516426122078-c23e76319801?w=600&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?w=600&h=400&fit=crop",
     description:
       "Wildlife ranching, ecotourism, and sustainable game meat production. AFU supports game farmers with conservation compliance, hunting concessions, and premium venison markets.",
   },
@@ -109,21 +109,21 @@ const featuredCrops = [
     name: "Coffee",
     slug: "coffee",
     image:
-      "https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=300&h=200&fit=crop",
+      "https://images.unsplash.com/photo-1447933601403-56dc2df1ed5a?w=300&h=200&fit=crop",
     countries: ["Ethiopia", "Kenya", "Tanzania"],
   },
   {
     name: "Maize",
     slug: "maize",
     image:
-      "https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=300&h=200&fit=crop",
+      "https://images.unsplash.com/photo-1601648764658-cf37e8c89b70?w=300&h=200&fit=crop",
     countries: ["Zambia", "Zimbabwe", "Mozambique"],
   },
   {
     name: "Cashew Nuts",
     slug: "cashew-nuts",
     image:
-      "https://images.unsplash.com/photo-1563292769-4e05b684851a?w=300&h=200&fit=crop",
+      "https://images.unsplash.com/photo-1590165482129-1b8b27698780?w=300&h=200&fit=crop",
     countries: ["Mozambique", "Tanzania"],
   },
   {
@@ -144,35 +144,35 @@ const featuredCrops = [
     name: "Macadamia",
     slug: "macadamia",
     image:
-      "https://images.unsplash.com/photo-1604514628550-37477afdf4e3?w=300&h=200&fit=crop",
+      "https://images.unsplash.com/photo-1604068549290-dea0e4a305ca?w=300&h=200&fit=crop",
     countries: ["South Africa", "Kenya", "Malawi"],
   },
   {
     name: "Soya",
     slug: "soya",
     image:
-      "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=300&h=200&fit=crop",
+      "https://images.unsplash.com/photo-1593113630400-ea4288922497?w=300&h=200&fit=crop",
     countries: ["Zambia", "Zimbabwe", "Malawi"],
   },
   {
     name: "Cotton",
     slug: "cotton",
     image:
-      "https://images.unsplash.com/photo-1594897030264-ab7d87efc473?w=300&h=200&fit=crop",
+      "https://images.unsplash.com/photo-1605000797499-95a51c5269ae?w=300&h=200&fit=crop",
     countries: ["Zimbabwe", "Mozambique", "Tanzania"],
   },
   {
     name: "Tea",
     slug: "tea",
     image:
-      "https://images.unsplash.com/photo-1556881286-fc6915169721?w=300&h=200&fit=crop",
+      "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=300&h=200&fit=crop",
     countries: ["Kenya", "Malawi", "Tanzania"],
   },
   {
     name: "Tobacco",
     slug: "tobacco",
     image:
-      "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=300&h=200&fit=crop",
+      "https://images.unsplash.com/photo-1587049016823-69ef9d68f0b3?w=300&h=200&fit=crop",
     countries: ["Zimbabwe", "Malawi", "Mozambique"],
   },
 ];
@@ -572,7 +572,7 @@ export default function FarmingPage() {
           </div>
           <div className="relative">
             <img
-              src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&h=500&fit=crop"
+              src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&h=500&fit=crop"
               alt="Sustainable farming in Africa"
               className="rounded-2xl shadow-lg w-full object-cover"
             />

@@ -34,7 +34,7 @@ const species = [
   {
     name: "Cattle (Beef & Dairy)",
     image:
-      "https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?w=600&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?w=800&h=500&fit=crop",
     description:
       "The backbone of African livestock farming. Beef cattle thrive on natural rangelands while dairy operations supply growing urban demand for milk, cheese, and yoghurt. Breeds range from indigenous Nguni and Ankole to improved Brahman and Holstein crosses.",
     countries: ["South Africa", "Botswana", "Tanzania", "Kenya"],
@@ -43,7 +43,7 @@ const species = [
   {
     name: "Goats",
     image:
-      "https://images.unsplash.com/photo-1524024973431-2ad916746264?w=600&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1524024973431-2ad916746264?w=800&h=500&fit=crop",
     description:
       "Hardy and adaptable, goats are Africa's most versatile livestock. Boer goats lead meat production while dairy breeds like Saanen and Alpine cross well with indigenous stock. Goat farming requires minimal land and start-up capital.",
     countries: ["South Africa", "Kenya", "Nigeria", "Tanzania"],
@@ -52,7 +52,7 @@ const species = [
   {
     name: "Sheep",
     image:
-      "https://images.unsplash.com/photo-1484557985045-edf25e08da73?w=600&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1484557985045-edf25e08da73?w=800&h=500&fit=crop",
     description:
       "Wool, meat, and skins make sheep a triple-income livestock option. Dorper sheep excel in African conditions, producing quality meat without shearing. Merino wool remains a premium export product from Southern African flocks.",
     countries: ["South Africa", "Namibia", "Botswana", "Kenya"],
@@ -61,7 +61,7 @@ const species = [
   {
     name: "Poultry (Broilers & Layers)",
     image:
-      "https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?w=600&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?w=800&h=500&fit=crop",
     description:
       "The fastest-growing livestock sector in Africa. Broiler chickens reach market weight in 35-42 days, while layer hens produce 280+ eggs per year. Indigenous free-range and Kuroiler birds serve growing organic markets.",
     countries: ["South Africa", "Nigeria", "Kenya", "Tanzania", "Zimbabwe"],
@@ -70,7 +70,7 @@ const species = [
   {
     name: "Pigs",
     image:
-      "https://images.unsplash.com/photo-1516467508483-a7212febe31a?w=600&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1516467508483-a7212febe31a?w=800&h=500&fit=crop",
     description:
       "Pig farming delivers fast returns with high feed-conversion efficiency. Large White and Landrace breeds dominate commercial production. Smallholder pig farming is expanding rapidly in East and Southern Africa with strong local pork demand.",
     countries: ["South Africa", "Kenya", "Uganda", "Nigeria"],
@@ -79,7 +79,7 @@ const species = [
   {
     name: "Rabbits",
     image:
-      "https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?w=600&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?w=800&h=500&fit=crop",
     description:
       "A low-investment, high-return entry point into livestock farming. Rabbits reproduce quickly, require little space, and produce lean, healthy meat. New Zealand White and Californian breeds perform well across African climates.",
     countries: ["Kenya", "Nigeria", "South Africa", "Ghana"],
@@ -88,7 +88,7 @@ const species = [
   {
     name: "Bees (Apiculture)",
     image:
-      "https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?w=600&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?w=800&h=500&fit=crop",
     description:
       "African honeybees produce premium organic honey with strong export demand. Beyond honey, beeswax, propolis, and pollination services generate multiple revenue streams. Beekeeping supports biodiversity and is ideal alongside crop farming.",
     countries: ["Tanzania", "Kenya", "Ethiopia", "South Africa"],
@@ -97,7 +97,7 @@ const species = [
   {
     name: "Fish (Aquaculture)",
     image:
-      "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=600&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&h=500&fit=crop",
     description:
       "Tilapia and catfish farming is Africa's fastest-growing food production sector. Pond, cage, and recirculating aquaculture systems suit different scales. Fish farming addresses the massive protein gap while creating rural employment.",
     countries: ["Nigeria", "Kenya", "Uganda", "Tanzania", "South Africa"],
@@ -193,7 +193,7 @@ export default function LivestockFarmingPage() {
           className="absolute inset-0 bg-cover bg-center"
           style={{
             backgroundImage:
-              "url('https://images.unsplash.com/photo-1500595046743-cd271d694d30?w=1920&h=1080&fit=crop')",
+              "url('https://images.unsplash.com/photo-1500595046743-cd271d694d30?w=1600&h=800&fit=crop')",
           }}
         />
         <div

@@ -36,7 +36,7 @@ const treeSpecies = [
   {
     name: "Eucalyptus",
     image:
-      "https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=600&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=500&fit=crop",
     description:
       "The fastest commercial timber species in Africa, reaching harvestable size in 5-8 years. Eucalyptus grandis and E. camaldulensis are widely planted for poles, pulpwood, and biomass energy. Coppices well for multiple harvests from a single planting.",
     rotation: "5-8 years",
@@ -45,7 +45,7 @@ const treeSpecies = [
   {
     name: "Pine",
     image:
-      "https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?w=600&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1476231682828-37e571bc172f?w=800&h=500&fit=crop",
     description:
       "Pinus patula and P. elliottii are the primary commercial pine species across Southern and East Africa. Pine produces quality sawn timber, plywood, and paper pulp. Longer rotation but higher-value timber than eucalyptus.",
     rotation: "15-25 years",
@@ -54,7 +54,7 @@ const treeSpecies = [
   {
     name: "Teak",
     image:
-      "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=600&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1448375240586-882707db888b?w=800&h=500&fit=crop",
     description:
       "Premium hardwood with exceptional durability, rot resistance, and aesthetic appeal. Teak plantations in Tanzania, Ghana, and Nigeria produce timber valued at $500-2,000 per cubic metre. A long-term investment with outstanding returns.",
     rotation: "20-30 years",
@@ -63,7 +63,7 @@ const treeSpecies = [
   {
     name: "Mahogany",
     image:
-      "https://images.unsplash.com/photo-1448375240586-882707db888b?w=600&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=800&h=500&fit=crop",
     description:
       "African mahogany (Khaya and Entandrophragma species) is among the world's most sought-after timbers. CITES-regulated, plantation-grown mahogany commands premium prices in international markets. Excellent for agroforestry intercropping systems.",
     rotation: "25-40 years",
@@ -72,7 +72,7 @@ const treeSpecies = [
   {
     name: "Bamboo",
     image:
-      "https://images.unsplash.com/photo-1567331711402-509c12c41959?w=600&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=800&h=500&fit=crop",
     description:
       "The fastest-growing plant on earth, bamboo reaches harvestable maturity in 3-5 years and continues producing for decades without replanting. Used in construction, furniture, textiles, and activated charcoal. A powerhouse for carbon sequestration.",
     rotation: "3-5 years (continuous)",
@@ -81,7 +81,7 @@ const treeSpecies = [
   {
     name: "Indigenous Species",
     image:
-      "https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=600&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&h=500&fit=crop",
     description:
       "Species like Mzimbeet (Millettia), Mukwa (Pterocarpus), African Blackwood, and Yellowwood support biodiversity while producing high-value timber. Indigenous tree farming qualifies for premium carbon credits and conservation finance.",
     rotation: "30-60 years",
@@ -168,7 +168,7 @@ export default function ForestryPage() {
           className="absolute inset-0 bg-cover bg-center"
           style={{
             backgroundImage:
-              "url('https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?w=1920&h=1080&fit=crop')",
+              "url('https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=1600&h=800&fit=crop')",
           }}
         />
         <div

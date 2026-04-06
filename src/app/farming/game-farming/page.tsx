@@ -38,7 +38,7 @@ const gameSpecies = [
   {
     name: "Impala",
     image:
-      "https://images.unsplash.com/photo-1516426122078-c23e76319801?w=600&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1535338454528-1b13d320c4c7?w=800&h=500&fit=crop",
     description:
       "The most common and commercially accessible game species. Impala adapt to diverse habitats, breed prolifically, and provide affordable entry into game farming. Valued for venison, biltong production, and plains game hunting.",
     value: "Entry-level",
@@ -46,7 +46,7 @@ const gameSpecies = [
   {
     name: "Kudu",
     image:
-      "https://images.unsplash.com/photo-1535338454528-1b5505e4db4d?w=600&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1504208434550-5a56f2463084?w=800&h=500&fit=crop",
     description:
       "The iconic spiral-horned antelope commands premium trophy fees and is a prized species for safari hunting operations. Greater kudu bulls with horns exceeding 55 inches are among Africa's most valuable trophy animals.",
     value: "Premium trophy",
@@ -54,7 +54,7 @@ const gameSpecies = [
   {
     name: "Springbok",
     image:
-      "https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?w=600&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=800&h=500&fit=crop",
     description:
       "South Africa's national animal thrives in arid and semi-arid conditions. Springbok venison is a premium product with growing international demand. Colour variants including black, white, and copper command high breeding prices.",
     value: "Venison & breeding",
@@ -62,7 +62,7 @@ const gameSpecies = [
   {
     name: "Ostrich",
     image:
-      "https://images.unsplash.com/photo-1590164896228-6f51fcc0ae4e?w=600&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1527006880730-2f1130a4dd26?w=800&h=500&fit=crop",
     description:
       "A unique game farming enterprise producing leather, feathers, meat, and eggs. Ostrich leather is the most expensive commercial leather in the world. South Africa leads global ostrich production, with AFU members active in Oudtshoorn and the Karoo.",
     value: "Multi-product",
@@ -70,7 +70,7 @@ const gameSpecies = [
   {
     name: "Crocodile",
     image:
-      "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?w=600&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1574068468668-a05a11f871da?w=800&h=500&fit=crop",
     description:
       "Nile crocodile farming produces luxury leather for fashion houses and quality meat for restaurants and export. Highly regulated but extremely profitable, with premium skins fetching $300-1,500 each depending on size and quality.",
     value: "Luxury leather",
@@ -78,7 +78,7 @@ const gameSpecies = [
   {
     name: "Buffalo",
     image:
-      "https://images.unsplash.com/photo-1557050543-4d5f4e07ef46?w=600&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1557050543-4d5f4e07ef46?w=800&h=500&fit=crop",
     description:
       "Cape buffalo are among Africa's most valuable game animals. Disease-free buffalo can sell for $15,000-100,000+ per animal. Trophy hunting fees are substantial, and buffalo breeding is a high-value, specialised sector of game farming.",
     value: "Ultra-premium",
@@ -86,7 +86,7 @@ const gameSpecies = [
   {
     name: "Sable Antelope",
     image:
-      "https://images.unsplash.com/photo-1504472478235-9bc48ba4d60f?w=600&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1516426122078-c23e76319801?w=800&h=500&fit=crop",
     description:
       "One of Africa's most valuable antelope species. Top-quality sable bulls command breeding prices of $50,000-200,000. The majestic curved horns and striking black-and-white colouration make sable a flagship species for premium game farms.",
     value: "Elite breeding",
@@ -94,7 +94,7 @@ const gameSpecies = [
   {
     name: "Nyala",
     image:
-      "https://images.unsplash.com/photo-1474511320723-9a56873571b7?w=600&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1474511320723-9a56873571b7?w=800&h=500&fit=crop",
     description:
       "A sought-after trophy species native to Southern Africa. Nyala bulls with their distinctive spiral horns and shaggy coats are popular with international hunters. Well-suited to bushveld conditions with moderate stocking densities.",
     value: "Trophy hunting",
@@ -102,7 +102,7 @@ const gameSpecies = [
   {
     name: "Eland",
     image:
-      "https://images.unsplash.com/photo-1518709766631-a6a7f45921c3?w=600&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1518709766631-a6a7f45921c3?w=800&h=500&fit=crop",
     description:
       "The largest antelope species, eland produce quality venison comparable to beef and are increasingly farmed commercially for meat. Docile and easy to manage, eland adapt well to farming conditions and can be mustered and handled like cattle.",
     value: "Venison production",
@@ -110,7 +110,7 @@ const gameSpecies = [
   {
     name: "Wildebeest",
     image:
-      "https://images.unsplash.com/photo-1549366021-9f761d450615?w=600&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1535083783855-76ae62b2914e?w=800&h=500&fit=crop",
     description:
       "Blue wildebeest and black wildebeest are popular game farm species for hunting, venison, and wildlife tourism. Golden wildebeest and king wildebeest colour variants have created a lucrative breeding niche with animals selling for $10,000-80,000.",
     value: "Variant breeding",
@@ -235,7 +235,7 @@ export default function GameFarmingPage() {
           className="absolute inset-0 bg-cover bg-center"
           style={{
             backgroundImage:
-              "url('https://images.unsplash.com/photo-1516426122078-c23e76319801?w=1920&h=1080&fit=crop')",
+              "url('https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?w=1600&h=800&fit=crop')",
           }}
         />
         <div

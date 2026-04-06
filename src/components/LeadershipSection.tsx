@@ -65,8 +65,8 @@ const boardOfDirectors: BoardMember[] = [
     title: 'Co-Founder',
     org: 'African Farming Union',
     bio: 'Technology leader and platform architect driving AFU\u2019s digital infrastructure. Built the full-stack agriculture operating system from the ground up \u2014 AI integration, 5 payment gateways, and real-time farm intelligence across Africa.',
-    country: 'Canada',
-    flag: 'CA',
+    country: 'Zimbabwe',
+    flag: 'ZW',
     linkedin: '#',
   },
 ];
