@@ -3,7 +3,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   ImageIcon, Upload, Trash2, Copy, Loader2, X, CheckCircle2, AlertCircle,
-  File, FileImage, FileText, Grid, List, Search, Info,
+  File, FileImage, FileText, Grid, List, Search, Info, FolderOpen, FolderPlus,
+  ChevronRight, Home, Layers,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
@@ -57,6 +58,12 @@ export default function AdminMediaPage() {
   const [typeFilter, setTypeFilter] = useState<'all' | 'images' | 'documents'>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [bucketExists, setBucketExists] = useState(true);
+  const [currentPath, setCurrentPath] = useState('');
+  const [folders, setFolders] = useState<string[]>([]);
+  const [creatingFolder, setCreatingFolder] = useState(false);
+  const [newFolderName, setNewFolderName] = useState('');
+  const [showNewFolderInput, setShowNewFolderInput] = useState(false);
+  const [creatingDefaults, setCreatingDefaults] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
 
   const supabase = createClient();
@@ -64,9 +71,8 @@ export default function AdminMediaPage() {
   const fetchFiles = useCallback(async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase.storage.from(BUCKET).list('', {
+      const { data, error } = await supabase.storage.from(BUCKET).list(currentPath, {
         limit: 200,
-        offset: 0,
         sortBy: { column: 'created_at', order: 'desc' },
       });
 
@@ -75,33 +81,103 @@ export default function AdminMediaPage() {
           setBucketExists(false);
         }
         setFiles([]);
+        setFolders([]);
         setLoading(false);
         return;
       }
 
-      const mediaFiles: MediaFile[] = (data || [])
-        .filter((f) => f.name !== '.emptyFolderPlaceholder')
-        .map((f) => {
-          const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(f.name);
-          return {
+      // Separate folders from files
+      const folderItems: string[] = [];
+      const fileItems: MediaFile[] = [];
+
+      (data || []).forEach((f) => {
+        if (f.name === '.emptyFolderPlaceholder' || f.name === '.keep') return;
+        // Folders have id === null and no metadata
+        if (f.id === null || (f.metadata === null && !f.created_at)) {
+          folderItems.push(f.name);
+        } else {
+          const fullPath = currentPath ? `${currentPath}/${f.name}` : f.name;
+          const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(fullPath);
+          fileItems.push({
             id: f.id || f.name,
             name: f.name,
             url: urlData.publicUrl,
             size: f.metadata?.size || 0,
             type: f.metadata?.mimetype || f.name.split('.').pop() || 'unknown',
             created_at: f.created_at || new Date().toISOString(),
-          };
-        });
-      setFiles(mediaFiles);
+          });
+        }
+      });
+
+      setFolders(folderItems);
+      setFiles(fileItems);
     } catch {
       setBucketExists(false);
       setFiles([]);
+      setFolders([]);
     }
     setLoading(false);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [currentPath]);
 
   useEffect(() => { fetchFiles(); }, [fetchFiles]);
+
+  // Navigate into a folder
+  const navigateToFolder = (folderName: string) => {
+    setCurrentPath((prev) => prev ? `${prev}/${folderName}` : folderName);
+  };
+
+  // Navigate via breadcrumb
+  const navigateToBreadcrumb = (index: number) => {
+    if (index < 0) {
+      setCurrentPath('');
+    } else {
+      const segments = currentPath.split('/');
+      setCurrentPath(segments.slice(0, index + 1).join('/'));
+    }
+  };
+
+  // Create a new folder
+  const handleCreateFolder = async () => {
+    if (!newFolderName.trim()) return;
+    setCreatingFolder(true);
+    try {
+      const folderPath = currentPath
+        ? `${currentPath}/${newFolderName.trim()}/.keep`
+        : `${newFolderName.trim()}/.keep`;
+      const { error } = await supabase.storage.from(BUCKET).upload(folderPath, new Blob([''], { type: 'text/plain' }), { upsert: true });
+      if (error) throw error;
+      setNewFolderName('');
+      setShowNewFolderInput(false);
+      await fetchFiles();
+    } catch {
+      setToast({ message: 'Failed to create folder', type: 'error' });
+    }
+    setCreatingFolder(false);
+  };
+
+  // Create default folder structure
+  const DEFAULT_FOLDERS = [
+    'profiles/farmers', 'profiles/suppliers', 'profiles/ambassadors', 'profiles/investors',
+    'farms/crops', 'farms/livestock', 'farms/journal',
+    'content/blog', 'content/pages', 'content/general',
+    'documents/contracts', 'documents/certificates', 'documents/invoices',
+  ];
+
+  const handleCreateDefaultFolders = async () => {
+    setCreatingDefaults(true);
+    let count = 0;
+    for (const folder of DEFAULT_FOLDERS) {
+      try {
+        const { error } = await supabase.storage.from(BUCKET).upload(`${folder}/.keep`, new Blob([''], { type: 'text/plain' }), { upsert: true });
+        if (!error) count++;
+      } catch { /* skip failures */ }
+    }
+    setToast({ message: `Created ${count} default folders`, type: 'success' });
+    setCreatingDefaults(false);
+    setCurrentPath('');
+    await fetchFiles();
+  };
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const fileList = e.target.files;
@@ -112,7 +188,8 @@ export default function AdminMediaPage() {
     for (let i = 0; i < fileList.length; i++) {
       const file = fileList[i];
       const ext = file.name.split('.').pop();
-      const fileName = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+      const baseName = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+      const fileName = currentPath ? `${currentPath}/${baseName}` : baseName;
 
       const { error } = await supabase.storage.from(BUCKET).upload(fileName, file, {
         cacheControl: '3600',
@@ -135,7 +212,8 @@ export default function AdminMediaPage() {
   const handleDelete = async () => {
     if (!deleteTarget) return;
     setDeleting(true);
-    const { error } = await supabase.storage.from(BUCKET).remove([deleteTarget.name]);
+    const fullPath = currentPath ? `${currentPath}/${deleteTarget.name}` : deleteTarget.name;
+    const { error } = await supabase.storage.from(BUCKET).remove([fullPath]);
     if (error) { setToast({ message: 'Failed to delete', type: 'error' }); }
     else { setToast({ message: 'File deleted', type: 'success' }); setFiles((p) => p.filter((f) => f.id !== deleteTarget.id)); }
     setDeleteTarget(null); setDeleting(false);
@@ -196,6 +274,10 @@ export default function AdminMediaPage() {
         </div>
         <div className="flex gap-2">
           <input ref={fileInput} type="file" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" onChange={handleUpload} className="hidden" />
+          <button onClick={() => setShowNewFolderInput(true)}
+            className="flex items-center gap-2 px-4 py-2.5 bg-white text-[#1B2A4A] text-sm font-medium rounded-lg border border-gray-200 hover:bg-gray-50 shadow-sm transition-all">
+            <FolderPlus className="w-4 h-4" /> New Folder
+          </button>
           <button onClick={() => fileInput.current?.click()} disabled={uploading}
             className="flex items-center gap-2 px-4 py-2.5 bg-[#5DB347] text-white text-sm font-medium rounded-lg hover:bg-[#4a9a38] shadow-sm transition-all disabled:opacity-50">
             {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
@@ -223,15 +305,69 @@ export default function AdminMediaPage() {
           <button onClick={() => setViewMode('grid')} className={`p-1.5 rounded ${viewMode === 'grid' ? 'bg-[#5DB347] text-white' : 'text-gray-400'}`}><Grid className="w-4 h-4" /></button>
           <button onClick={() => setViewMode('list')} className={`p-1.5 rounded ${viewMode === 'list' ? 'bg-[#5DB347] text-white' : 'text-gray-400'}`}><List className="w-4 h-4" /></button>
         </div>
-        <span className="text-xs text-gray-500">{filtered.length} files</span>
+        <span className="text-xs text-gray-500">{folders.length > 0 ? `${folders.length} folders, ` : ''}{filtered.length} files</span>
       </div>
+
+      {/* Breadcrumb Navigation */}
+      <div className="flex items-center gap-1 flex-wrap bg-white rounded-lg border border-gray-100 px-4 py-2.5">
+        <button onClick={() => navigateToBreadcrumb(-1)} className={`flex items-center gap-1 text-sm font-medium transition-colors ${!currentPath ? 'text-[#1B2A4A]' : 'text-blue-600 hover:text-blue-800'}`}>
+          <Home className="w-4 h-4" /> Root
+        </button>
+        {currentPath && currentPath.split('/').map((segment, idx) => (
+          <span key={idx} className="flex items-center gap-1">
+            <ChevronRight className="w-3.5 h-3.5 text-gray-400" />
+            <button
+              onClick={() => navigateToBreadcrumb(idx)}
+              className={`text-sm font-medium transition-colors ${idx === currentPath.split('/').length - 1 ? 'text-[#1B2A4A]' : 'text-blue-600 hover:text-blue-800'}`}
+            >
+              {segment}
+            </button>
+          </span>
+        ))}
+      </div>
+
+      {/* New Folder Input */}
+      {showNewFolderInput && (
+        <div className="flex items-center gap-2 bg-white rounded-lg border border-gray-100 px-4 py-3">
+          <FolderPlus className="w-5 h-5 text-gray-400" />
+          <input
+            type="text" autoFocus placeholder="Folder name..."
+            value={newFolderName}
+            onChange={(e) => setNewFolderName(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') handleCreateFolder(); if (e.key === 'Escape') { setShowNewFolderInput(false); setNewFolderName(''); } }}
+            className="flex-1 px-3 py-1.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#5DB347]/20 focus:border-[#5DB347]"
+          />
+          <button onClick={handleCreateFolder} disabled={creatingFolder || !newFolderName.trim()}
+            className="px-3 py-1.5 bg-[#5DB347] text-white text-sm font-medium rounded-lg hover:bg-[#4a9a38] disabled:opacity-50">
+            {creatingFolder ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Create'}
+          </button>
+          <button onClick={() => { setShowNewFolderInput(false); setNewFolderName(''); }} className="p-1.5 rounded-lg hover:bg-gray-100">
+            <X className="w-4 h-4 text-gray-400" />
+          </button>
+        </div>
+      )}
+
+      {/* Create Default Folders */}
+      {!currentPath && folders.length === 0 && !loading && (
+        <div className="flex items-center justify-between bg-blue-50 rounded-lg border border-blue-100 px-4 py-3">
+          <div className="flex items-center gap-2">
+            <Layers className="w-5 h-5 text-blue-500" />
+            <span className="text-sm text-blue-700">Set up the default folder structure for profiles, farms, content, and documents.</span>
+          </div>
+          <button onClick={handleCreateDefaultFolders} disabled={creatingDefaults}
+            className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 shrink-0">
+            {creatingDefaults ? <Loader2 className="w-4 h-4 animate-spin" /> : <FolderPlus className="w-4 h-4" />}
+            Create Default Folders
+          </button>
+        </div>
+      )}
 
       {loading ? (
         <div className="bg-white rounded-xl border border-gray-100 p-12 text-center">
           <Loader2 className="w-8 h-8 animate-spin text-[#5DB347] mx-auto mb-3" />
           <p className="text-sm text-gray-500">Loading media...</p>
         </div>
-      ) : filtered.length === 0 ? (
+      ) : filtered.length === 0 && folders.length === 0 ? (
         <div className="bg-white rounded-xl border border-gray-100 p-12 text-center">
           <ImageIcon className="w-12 h-12 text-gray-300 mx-auto mb-3" />
           <h3 className="text-lg font-semibold text-[#1B2A4A]">No files</h3>
@@ -239,6 +375,23 @@ export default function AdminMediaPage() {
         </div>
       ) : viewMode === 'grid' ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          {/* Folder cards first */}
+          {folders.map((folder) => (
+            <button
+              key={`folder-${folder}`}
+              onClick={() => navigateToFolder(folder)}
+              className="bg-white rounded-xl border border-gray-100 overflow-hidden group hover:shadow-md transition-shadow text-left"
+            >
+              <div className="aspect-square bg-amber-50 flex flex-col items-center justify-center gap-2">
+                <FolderOpen className="w-12 h-12 text-amber-500" />
+              </div>
+              <div className="p-3">
+                <p className="text-xs font-medium text-[#1B2A4A] truncate">{folder}</p>
+                <p className="text-[10px] text-gray-400 mt-0.5">Folder</p>
+              </div>
+            </button>
+          ))}
+          {/* File cards */}
           {filtered.map((f) => (
             <div key={f.id} className="bg-white rounded-xl border border-gray-100 overflow-hidden group hover:shadow-md transition-shadow">
               <div className="aspect-square bg-gray-50 flex items-center justify-center overflow-hidden">
@@ -276,6 +429,20 @@ export default function AdminMediaPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
+              {folders.map((folder) => (
+                <tr key={`folder-${folder}`} className="hover:bg-gray-50/50 cursor-pointer" onClick={() => navigateToFolder(folder)}>
+                  <td className="py-3 px-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 flex items-center justify-center"><FolderOpen className="w-6 h-6 text-amber-500" /></div>
+                      <span className="font-medium text-[#1B2A4A]">{folder}</span>
+                    </div>
+                  </td>
+                  <td className="py-3 px-4 text-gray-500">Folder</td>
+                  <td className="py-3 px-4 text-gray-500">--</td>
+                  <td className="py-3 px-4 text-gray-500">--</td>
+                  <td className="py-3 px-4"></td>
+                </tr>
+              ))}
               {filtered.map((f) => (
                 <tr key={f.id} className="hover:bg-gray-50/50">
                   <td className="py-3 px-4">

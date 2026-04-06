@@ -82,7 +82,10 @@ export default function ContactInfoAdminPage() {
     try {
       const { error } = await supabase.from('site_config').upsert({
         key: 'contact_info',
+        category: 'general',
+        label: 'Contact Information',
         value: JSON.stringify(form),
+        value_type: 'json',
         description: 'Contact information displayed on /contact page',
         updated_at: new Date().toISOString(),
       }, { onConflict: 'key' });

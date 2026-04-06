@@ -274,25 +274,32 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
           </div>
         )}
 
-        {items.map((item) => {
+        {items.map((item, idx) => {
           const IconComp = ICON_MAP[item.icon] || Home;
           const active = isActive(item.href);
+          const prevSection = idx > 0 ? (items[idx - 1] as any).section : undefined;
+          const currentSection = (item as any).section as string | undefined;
+          const showSectionLabel = currentSection && currentSection !== prevSection;
 
           if (!unlocked) {
             // Locked item — visible but grayed out
             return (
-              <div
-                key={item.href}
-                className="group relative flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-300 cursor-not-allowed"
-                title={`Complete "${config.requiredCourse?.replace(/-/g, ' ')}" to unlock`}
-              >
-                <IconComp className="w-5 h-5 opacity-40" />
-                <span className="opacity-40">{item.label}</span>
-                <Lock className="w-3.5 h-3.5 ml-auto opacity-30" />
-                {/* Tooltip on hover */}
-                <div className="absolute left-full ml-2 top-1/2 -translate-y-1/2 hidden group-hover:block z-50 pointer-events-none">
-                  <div className="bg-gray-800 text-white text-[11px] px-3 py-2 rounded-lg shadow-lg whitespace-nowrap">
-                    Complete &quot;{config.requiredCourse?.replace(/-/g, ' ')}&quot; to unlock
+              <div key={item.href}>
+                {showSectionLabel && (
+                  <p className="text-[9px] uppercase tracking-widest text-gray-400 font-semibold px-3 mt-3 mb-1">{currentSection}</p>
+                )}
+                <div
+                  className="group relative flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-300 cursor-not-allowed"
+                  title={`Complete "${config.requiredCourse?.replace(/-/g, ' ')}" to unlock`}
+                >
+                  <IconComp className="w-5 h-5 opacity-40" />
+                  <span className="opacity-40">{item.label}</span>
+                  <Lock className="w-3.5 h-3.5 ml-auto opacity-30" />
+                  {/* Tooltip on hover */}
+                  <div className="absolute left-full ml-2 top-1/2 -translate-y-1/2 hidden group-hover:block z-50 pointer-events-none">
+                    <div className="bg-gray-800 text-white text-[11px] px-3 py-2 rounded-lg shadow-lg whitespace-nowrap">
+                      Complete &quot;{config.requiredCourse?.replace(/-/g, ' ')}&quot; to unlock
+                    </div>
                   </div>
                 </div>
               </div>
@@ -300,19 +307,23 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
           }
 
           return (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={closeFn}
-              className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                active
-                  ? 'bg-[#5DB347] text-white shadow-sm'
-                  : 'text-gray-600 hover:bg-[#EBF7E5] hover:text-navy'
-              }`}
-            >
-              <IconComp className="w-5 h-5" />
-              {item.label}
-            </Link>
+            <div key={item.href}>
+              {showSectionLabel && (
+                <p className="text-[9px] uppercase tracking-widest text-gray-400 font-semibold px-3 mt-3 mb-1">{currentSection}</p>
+              )}
+              <Link
+                href={item.href}
+                onClick={closeFn}
+                className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                  active
+                    ? 'bg-[#5DB347] text-white shadow-sm'
+                    : 'text-gray-600 hover:bg-[#EBF7E5] hover:text-navy'
+                }`}
+              >
+                <IconComp className="w-5 h-5" />
+                {item.label}
+              </Link>
+            </div>
           );
         })}
       </div>

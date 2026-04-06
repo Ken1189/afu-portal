@@ -68,16 +68,13 @@ export type Permission = (typeof ALL_PERMISSIONS)[number];
 // If the array is empty, everyone sees that group.
 
 export const SIDEBAR_PERMISSION_MAP: Record<string, string[]> = {
-  'Overview': [], // everyone sees this
-  'Members & Applications': ['view_members', 'edit_members', 'approve_applications', 'manage_kyc'],
-  'Finance & Loans': ['view_loans', 'approve_loans', 'disburse_loans', 'view_payments', 'manage_collections'],
-  'Investor Management': ['view_investors', 'manage_investments', 'investor_relations'],
-  'Farm Operations': ['view_farms', 'manage_crops', 'manage_livestock', 'manage_equipment', 'manage_insurance', 'manage_legal', 'manage_veterinary'],
-  'Programs & Training': ['view_programs', 'create_programs', 'manage_training', 'manage_sponsors', 'manage_jobs'],
-  'Marketplace & Partners': ['manage_suppliers', 'manage_exchange', 'manage_advertising', 'manage_partnerships'],
-  'Trading': ['view_trades', 'execute_trades', 'manage_pricing', 'manage_inventory'],
-  'Content & CMS': ['edit_content', 'manage_ambassadors', 'manage_faq', 'manage_countries', 'manage_research', 'manage_testimonials'],
-  'System & Security': ['manage_users', 'manage_roles', 'view_audit', 'manage_settings', 'manage_compliance', 'run_migrations'],
+  'Dashboard': [], // everyone sees this
+  'People': ['view_members', 'edit_members', 'approve_applications', 'manage_kyc', 'manage_ambassadors', 'view_investors', 'manage_suppliers', 'manage_partnerships'],
+  'Finance': ['view_loans', 'approve_loans', 'disburse_loans', 'view_payments', 'manage_collections', 'view_investors', 'manage_investments', 'investor_relations'],
+  'Operations': ['view_farms', 'manage_crops', 'manage_livestock', 'manage_equipment', 'manage_insurance', 'manage_legal', 'manage_veterinary', 'view_trades', 'execute_trades', 'manage_pricing', 'manage_inventory', 'view_programs', 'create_programs'],
+  'Content': ['edit_content', 'manage_faq', 'manage_countries', 'manage_research', 'manage_testimonials', 'manage_training'],
+  'Marketing': ['manage_advertising', 'manage_sponsors', 'manage_jobs', 'manage_ambassadors', 'manage_partnerships'],
+  'Settings': ['manage_users', 'manage_roles', 'view_audit', 'manage_settings', 'manage_compliance', 'run_migrations'],
   'Switch Portal': [], // super_admin only — handled separately via superAdminOnly flag
 };
 

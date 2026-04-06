@@ -330,20 +330,25 @@ function SiteContentTab({ showToast }: { showToast: (m: string, t?: 'success' | 
     const sectionKey = `${page}/${section}`;
     setSaving(sectionKey);
     let hasError = false;
+    let updateCount = 0;
 
     for (const item of items) {
       const newValue = editedValues[item.id];
       if (newValue !== undefined && newValue !== item.value) {
-        const { error } = await supabase
+        updateCount++;
+        const { data, error } = await supabase
           .from('site_content')
-          .update({ value: newValue })
-          .eq('id', item.id);
-        if (error) hasError = true;
+          .update({ value: newValue, updated_at: new Date().toISOString() })
+          .eq('id', item.id)
+          .select();
+        if (error || !data || data.length === 0) hasError = true;
       }
     }
 
     if (hasError) {
-      showToast('Some content failed to save', 'error');
+      showToast(updateCount > 1 ? 'Some content failed to save' : 'Failed to save — check permissions', 'error');
+    } else if (updateCount === 0) {
+      showToast('No changes to save', 'error');
     } else {
       showToast('Content saved successfully');
       setEditedValues({});
@@ -363,6 +368,7 @@ function SiteContentTab({ showToast }: { showToast: (m: string, t?: 'success' | 
   if (loading) return <LoadingState />;
 
   const pageNames: Record<string, string> = {
+    global: 'Global',
     homepage: 'Homepage',
     about: 'About',
     sponsor: 'Sponsor a Farmer',
@@ -760,20 +766,25 @@ function SiteConfigTab({ showToast }: { showToast: (m: string, t?: 'success' | '
   async function saveCategory(category: string, items: SiteConfig[]) {
     setSaving(category);
     let hasError = false;
+    let updateCount = 0;
 
     for (const item of items) {
       const newValue = editedValues[item.id];
       if (newValue !== undefined && newValue !== item.value) {
-        const { error } = await supabase
+        updateCount++;
+        const { data, error } = await supabase
           .from('site_config')
-          .update({ value: newValue })
-          .eq('id', item.id);
-        if (error) hasError = true;
+          .update({ value: newValue, updated_at: new Date().toISOString() })
+          .eq('id', item.id)
+          .select();
+        if (error || !data || data.length === 0) hasError = true;
       }
     }
 
     if (hasError) {
-      showToast('Some settings failed to save', 'error');
+      showToast(updateCount > 1 ? 'Some settings failed to save' : 'Failed to save — check permissions', 'error');
+    } else if (updateCount === 0) {
+      showToast('No changes to save', 'error');
     } else {
       showToast('Settings saved');
       setEditedValues({});
