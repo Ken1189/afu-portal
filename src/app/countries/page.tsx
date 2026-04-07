@@ -9,10 +9,10 @@ export const metadata = {
     title: "Our Countries - AFU",
     description:
       "Strategic markets across Africa, each serving a distinct purpose in the AFU agricultural development platform.",
-    url: "https://afu-portal.vercel.app/countries",
+    url: "https://africanfarmingunion.org/countries",
     images: [
       {
-        url: "https://afu-portal.vercel.app/og-image.png",
+        url: "https://africanfarmingunion.org/og-image.png",
         width: 1200,
         height: 630,
         alt: "AFU Countries - African Nations",

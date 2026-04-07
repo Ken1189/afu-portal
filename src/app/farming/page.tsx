@@ -41,7 +41,7 @@ export const metadata: Metadata = {
     description:
       "Explore AFU's diverse farming sectors across Africa — crops & agriculture, livestock, forestry, and game farming.",
     type: "website",
-    url: "https://africanfarmersunion.org/farming",
+    url: "https://africanfarmingunion.org/farming",
     images: [
       {
         url: "https://images.unsplash.com/photo-1516467508483-a7212febe31a?w=1200&h=630&fit=crop",

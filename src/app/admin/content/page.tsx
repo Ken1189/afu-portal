@@ -112,7 +112,7 @@ interface CountryTeamData {
   members: CountryTeamMember[];
 }
 
-type TabId = 'content' | 'flags' | 'config' | 'templates' | 'broadcasts' | 'country_teams' | 'branding' | 'hero';
+type TabId = 'content' | 'flags' | 'config' | 'templates' | 'broadcasts' | 'country_teams' | 'branding' | 'hero' | 'homepage_stats' | 'membership_tiers' | 'footer_extras' | 'seo';
 
 // ═══════════════════════════════════════════════════════
 //  CONSTANTS
@@ -127,6 +127,10 @@ const TABS: { id: TabId; label: string; icon: React.ReactNode }[] = [
   { id: 'country_teams', label: 'Country Teams', icon: <Users className="w-4 h-4" /> },
   { id: 'branding', label: 'Branding', icon: <ImageIcon className="w-4 h-4" /> },
   { id: 'hero', label: 'Hero Banner', icon: <Globe className="w-4 h-4" /> },
+  { id: 'homepage_stats', label: 'Homepage Stats', icon: <Zap className="w-4 h-4" /> },
+  { id: 'membership_tiers', label: 'Membership Tiers', icon: <CreditCard className="w-4 h-4" /> },
+  { id: 'footer_extras', label: 'Footer', icon: <FileText className="w-4 h-4" /> },
+  { id: 'seo', label: 'SEO', icon: <Search className="w-4 h-4" /> },
 ];
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -276,6 +280,10 @@ export default function AdminContentPage() {
       {activeTab === 'country_teams' && <CountryTeamsTab showToast={showToast} />}
       {activeTab === 'branding' && <BrandingTab showToast={showToast} />}
       {activeTab === 'hero' && <HeroBannerTab showToast={showToast} />}
+      {activeTab === 'homepage_stats' && <HomepageStatsTab showToast={showToast} />}
+      {activeTab === 'membership_tiers' && <MembershipTiersTab showToast={showToast} />}
+      {activeTab === 'footer_extras' && <FooterExtrasTab showToast={showToast} />}
+      {activeTab === 'seo' && <SEOTab showToast={showToast} />}
 
       {/* Toast */}
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
@@ -2111,6 +2119,369 @@ function HeroBannerTab({ showToast }: { showToast: (msg: string, type?: 'success
           Save Hero Banner
         </button>
       </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════
+//  HOMEPAGE STATS TAB (site_config key: homepage_stats)
+// ═══════════════════════════════════════════════════════
+
+interface HomepageStatRow { value: string; label: string; source?: string }
+
+function HomepageStatsTab({ showToast }: { showToast: (msg: string, type?: 'success' | 'error') => void }) {
+  const supabase = createClient();
+  const [stats, setStats] = useState<HomepageStatRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data } = await supabase.from('site_config').select('value').eq('key', 'homepage_stats').single();
+        if (data?.value) {
+          const parsed = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
+          if (Array.isArray(parsed)) setStats(parsed);
+        }
+      } catch { /* empty */ }
+      setLoading(false);
+    })();
+  }, [supabase]);
+
+  const updateStat = (i: number, field: keyof HomepageStatRow, val: string) => {
+    setStats((prev) => prev.map((s, idx) => idx === i ? { ...s, [field]: val } : s));
+  };
+  const addStat = () => setStats((prev) => [...prev, { value: '', label: '', source: '' }]);
+  const removeStat = (i: number) => setStats((prev) => prev.filter((_, idx) => idx !== i));
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const { error } = await supabase.from('site_config').upsert(
+        { category: 'homepage', key: 'homepage_stats', value: JSON.stringify(stats), value_type: 'json', label: 'Homepage Stats', description: 'Stat cards on homepage impact section' },
+        { onConflict: 'key' }
+      );
+      if (error) throw error;
+      showToast('Homepage stats saved');
+    } catch {
+      showToast('Failed to save stats', 'error');
+    }
+    setSaving(false);
+  };
+
+  if (loading) return <div className="flex items-center justify-center py-20"><Loader2 className="w-8 h-8 text-[#5DB347] animate-spin" /></div>;
+
+  return (
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+      <h3 className="text-lg font-semibold text-[#1B2A4A] mb-1">Homepage Stats</h3>
+      <p className="text-sm text-gray-500 mb-6">Edit the macro-stat cards shown in the &quot;Africa Agriculture Paradox&quot; section.</p>
+
+      <div className="space-y-4">
+        {stats.map((s, i) => (
+          <div key={i} className="grid grid-cols-1 md:grid-cols-12 gap-3 items-start p-4 rounded-xl border border-gray-200 bg-gray-50">
+            <div className="md:col-span-2">
+              <label className="block text-xs font-medium text-gray-600 mb-1">Value</label>
+              <input value={s.value} onChange={(e) => updateStat(i, 'value', e.target.value)} placeholder="60%" className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-[#5DB347]" />
+            </div>
+            <div className="md:col-span-5">
+              <label className="block text-xs font-medium text-gray-600 mb-1">Label</label>
+              <input value={s.label} onChange={(e) => updateStat(i, 'label', e.target.value)} placeholder="Of arable land in Africa" className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-[#5DB347]" />
+            </div>
+            <div className="md:col-span-4">
+              <label className="block text-xs font-medium text-gray-600 mb-1">Source</label>
+              <input value={s.source || ''} onChange={(e) => updateStat(i, 'source', e.target.value)} placeholder="World Bank" className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-[#5DB347]" />
+            </div>
+            <div className="md:col-span-1 flex justify-end pt-5">
+              <button onClick={() => removeStat(i)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg" aria-label="Remove stat"><Trash2 className="w-4 h-4" /></button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="flex items-center gap-3 mt-6">
+        <button onClick={addStat} className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 text-sm font-medium hover:bg-gray-50"><Plus className="w-4 h-4" /> Add Stat</button>
+        <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#5DB347] text-white text-sm font-medium hover:bg-[#4ea03c] disabled:opacity-50">
+          {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Save Stats
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════
+//  MEMBERSHIP TIERS TAB (site_config key: membership_tiers_homepage)
+// ═══════════════════════════════════════════════════════
+
+interface MembershipTierRow { tier: string; name: string; price: string; period?: string; features: string[]; cta: string; highlight?: boolean; link?: string }
+
+function MembershipTiersTab({ showToast }: { showToast: (msg: string, type?: 'success' | 'error') => void }) {
+  const supabase = createClient();
+  const [tiers, setTiers] = useState<MembershipTierRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data } = await supabase.from('site_config').select('value').eq('key', 'membership_tiers_homepage').single();
+        if (data?.value) {
+          const parsed = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
+          if (Array.isArray(parsed)) setTiers(parsed);
+        }
+      } catch { /* empty */ }
+      setLoading(false);
+    })();
+  }, [supabase]);
+
+  const updateTier = <K extends keyof MembershipTierRow>(i: number, field: K, val: MembershipTierRow[K]) => {
+    setTiers((prev) => prev.map((t, idx) => idx === i ? { ...t, [field]: val } : t));
+  };
+  const addTier = () => setTiers((prev) => [...prev, { tier: '', name: '', price: '', period: '/mo', features: [], cta: 'Join', highlight: false, link: '/apply' }]);
+  const removeTier = (i: number) => setTiers((prev) => prev.filter((_, idx) => idx !== i));
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const { error } = await supabase.from('site_config').upsert(
+        { category: 'homepage', key: 'membership_tiers_homepage', value: JSON.stringify(tiers), value_type: 'json', label: 'Homepage Membership Tiers', description: 'Membership tier cards shown on homepage' },
+        { onConflict: 'key' }
+      );
+      if (error) throw error;
+      showToast('Membership tiers saved');
+    } catch {
+      showToast('Failed to save tiers', 'error');
+    }
+    setSaving(false);
+  };
+
+  if (loading) return <div className="flex items-center justify-center py-20"><Loader2 className="w-8 h-8 text-[#5DB347] animate-spin" /></div>;
+
+  return (
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+      <h3 className="text-lg font-semibold text-[#1B2A4A] mb-1">Membership Tiers (Homepage)</h3>
+      <p className="text-sm text-gray-500 mb-6">Edit the membership tier cards displayed on the homepage. Features go one per line.</p>
+
+      <div className="space-y-4">
+        {tiers.map((t, i) => (
+          <div key={i} className="p-4 rounded-xl border border-gray-200 bg-gray-50 space-y-3">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
+              <div className="md:col-span-3"><label className="block text-xs font-medium text-gray-600 mb-1">Tier slug</label><input value={t.tier} onChange={(e) => updateTier(i, 'tier', e.target.value)} className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm" placeholder="Smallholder" /></div>
+              <div className="md:col-span-4"><label className="block text-xs font-medium text-gray-600 mb-1">Display name</label><input value={t.name} onChange={(e) => updateTier(i, 'name', e.target.value)} className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm" placeholder="Smallholder" /></div>
+              <div className="md:col-span-2"><label className="block text-xs font-medium text-gray-600 mb-1">Price</label><input value={t.price} onChange={(e) => updateTier(i, 'price', e.target.value)} className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm" placeholder="$4.99" /></div>
+              <div className="md:col-span-2"><label className="block text-xs font-medium text-gray-600 mb-1">Period</label><input value={t.period || ''} onChange={(e) => updateTier(i, 'period', e.target.value)} className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm" placeholder="/mo" /></div>
+              <div className="md:col-span-1 flex justify-end pt-5"><button onClick={() => removeTier(i)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg"><Trash2 className="w-4 h-4" /></button></div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
+              <div className="md:col-span-4"><label className="block text-xs font-medium text-gray-600 mb-1">CTA text</label><input value={t.cta} onChange={(e) => updateTier(i, 'cta', e.target.value)} className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm" placeholder="Join now" /></div>
+              <div className="md:col-span-5"><label className="block text-xs font-medium text-gray-600 mb-1">CTA link</label><input value={t.link || ''} onChange={(e) => updateTier(i, 'link', e.target.value)} className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm" placeholder="/apply" /></div>
+              <div className="md:col-span-3 flex items-center gap-2 pt-5"><input type="checkbox" checked={!!t.highlight} onChange={(e) => updateTier(i, 'highlight', e.target.checked)} className="w-4 h-4" /><span className="text-sm text-gray-700">Most popular</span></div>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Features (one per line)</label>
+              <textarea value={t.features.join('\n')} onChange={(e) => updateTier(i, 'features', e.target.value.split('\n').filter(Boolean))} rows={4} className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm" />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="flex items-center gap-3 mt-6">
+        <button onClick={addTier} className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 text-sm font-medium hover:bg-gray-50"><Plus className="w-4 h-4" /> Add Tier</button>
+        <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#5DB347] text-white text-sm font-medium hover:bg-[#4ea03c] disabled:opacity-50">
+          {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Save Tiers
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════
+//  FOOTER EXTRAS TAB (site_config key: footer_config — extends existing)
+// ═══════════════════════════════════════════════════════
+
+interface FooterCountryRow { flag: string; name: string }
+interface FooterConfigShape { columns?: unknown; social_links?: unknown; mission?: string; countries?: FooterCountryRow[] }
+
+function FooterExtrasTab({ showToast }: { showToast: (msg: string, type?: 'success' | 'error') => void }) {
+  const supabase = createClient();
+  const [mission, setMission] = useState('');
+  const [countries, setCountries] = useState<FooterCountryRow[]>([]);
+  const [existing, setExisting] = useState<FooterConfigShape>({});
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data } = await supabase.from('site_config').select('value').eq('key', 'footer_config').single();
+        if (data?.value) {
+          const parsed = (typeof data.value === 'string' ? JSON.parse(data.value) : data.value) as FooterConfigShape;
+          setExisting(parsed || {});
+          setMission(parsed?.mission || '');
+          setCountries(Array.isArray(parsed?.countries) ? parsed.countries : []);
+        }
+      } catch { /* empty */ }
+      setLoading(false);
+    })();
+  }, [supabase]);
+
+  const updateCountry = (i: number, field: keyof FooterCountryRow, val: string) => {
+    setCountries((prev) => prev.map((c, idx) => idx === i ? { ...c, [field]: val } : c));
+  };
+  const addCountry = () => setCountries((prev) => [...prev, { flag: '', name: '' }]);
+  const removeCountry = (i: number) => setCountries((prev) => prev.filter((_, idx) => idx !== i));
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const merged: FooterConfigShape = { ...existing, mission, countries };
+      const { error } = await supabase.from('site_config').upsert(
+        { category: 'footer', key: 'footer_config', value: JSON.stringify(merged), value_type: 'json', label: 'Footer Config', description: 'Footer mission, countries, columns, social links' },
+        { onConflict: 'key' }
+      );
+      if (error) throw error;
+      showToast('Footer saved');
+    } catch {
+      showToast('Failed to save footer', 'error');
+    }
+    setSaving(false);
+  };
+
+  if (loading) return <div className="flex items-center justify-center py-20"><Loader2 className="w-8 h-8 text-[#5DB347] animate-spin" /></div>;
+
+  return (
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-6">
+      <div>
+        <h3 className="text-lg font-semibold text-[#1B2A4A] mb-1">Footer</h3>
+        <p className="text-sm text-gray-500">Edit the footer mission paragraph and Phase 1 countries list. (Columns and social links use the existing footer_config schema.)</p>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1.5">Mission paragraph</label>
+        <textarea value={mission} onChange={(e) => setMission(e.target.value)} rows={3} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#5DB347]" placeholder="Africa's Agriculture Development Bank..." />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1.5">Phase 1 countries</label>
+        <div className="space-y-2">
+          {countries.map((c, i) => (
+            <div key={i} className="flex gap-2 items-center">
+              <input value={c.flag} onChange={(e) => updateCountry(i, 'flag', e.target.value)} placeholder="🇿🇼" className="w-20 px-3 py-2 rounded-lg border border-gray-200 text-sm" />
+              <input value={c.name} onChange={(e) => updateCountry(i, 'name', e.target.value)} placeholder="Zimbabwe (Export Lane)" className="flex-1 px-3 py-2 rounded-lg border border-gray-200 text-sm" />
+              <button onClick={() => removeCountry(i)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg"><Trash2 className="w-4 h-4" /></button>
+            </div>
+          ))}
+        </div>
+        <button onClick={addCountry} className="mt-3 flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 text-sm font-medium hover:bg-gray-50"><Plus className="w-4 h-4" /> Add Country</button>
+      </div>
+
+      <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#5DB347] text-white text-sm font-medium hover:bg-[#4ea03c] disabled:opacity-50">
+        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Save Footer
+      </button>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════
+//  SEO TAB (site_config key: page_metadata)
+// ═══════════════════════════════════════════════════════
+
+interface SEOEntry { title: string; description: string; og_image: string }
+
+function SEOTab({ showToast }: { showToast: (msg: string, type?: 'success' | 'error') => void }) {
+  const supabase = createClient();
+  const [pages, setPages] = useState<Record<string, SEOEntry>>({});
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [newRoute, setNewRoute] = useState('');
+
+  const DEFAULT_ROUTES = ['/', '/about', '/services', '/countries', '/blog', '/contact', '/apply'];
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data } = await supabase.from('site_config').select('value').eq('key', 'page_metadata').single();
+        if (data?.value) {
+          const parsed = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
+          if (parsed && typeof parsed === 'object') setPages(parsed);
+        }
+      } catch { /* empty */ }
+      setLoading(false);
+    })();
+  }, [supabase]);
+
+  const ensureRoute = (route: string): SEOEntry => pages[route] || { title: '', description: '', og_image: '' };
+  const updatePage = (route: string, field: keyof SEOEntry, val: string) => {
+    setPages((prev) => ({ ...prev, [route]: { ...ensureRoute(route), [field]: val } }));
+  };
+  const addRoute = () => {
+    const r = newRoute.trim();
+    if (!r) return;
+    setPages((prev) => ({ ...prev, [r]: ensureRoute(r) }));
+    setNewRoute('');
+  };
+  const removeRoute = (route: string) => {
+    setPages((prev) => {
+      const next = { ...prev };
+      delete next[route];
+      return next;
+    });
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const { error } = await supabase.from('site_config').upsert(
+        { category: 'seo', key: 'page_metadata', value: JSON.stringify(pages), value_type: 'json', label: 'Page Metadata', description: 'SEO titles, descriptions, OG images per route' },
+        { onConflict: 'key' }
+      );
+      if (error) throw error;
+      showToast('SEO metadata saved');
+    } catch {
+      showToast('Failed to save SEO', 'error');
+    }
+    setSaving(false);
+  };
+
+  if (loading) return <div className="flex items-center justify-center py-20"><Loader2 className="w-8 h-8 text-[#5DB347] animate-spin" /></div>;
+
+  const allRoutes = Array.from(new Set([...DEFAULT_ROUTES, ...Object.keys(pages)]));
+
+  return (
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-6">
+      <div>
+        <h3 className="text-lg font-semibold text-[#1B2A4A] mb-1">SEO &amp; Page Metadata</h3>
+        <p className="text-sm text-gray-500">Set page titles, meta descriptions, and OG images per route. Stored in <code className="text-xs bg-gray-100 px-1 rounded">site_config.page_metadata</code> for future Next.js metadata wiring.</p>
+      </div>
+
+      <div className="space-y-4">
+        {allRoutes.map((route) => {
+          const entry = ensureRoute(route);
+          return (
+            <div key={route} className="p-4 rounded-xl border border-gray-200 bg-gray-50">
+              <div className="flex items-center justify-between mb-3">
+                <code className="text-sm font-semibold text-[#1B2A4A] bg-white px-2 py-0.5 rounded border">{route}</code>
+                {!DEFAULT_ROUTES.includes(route) && (
+                  <button onClick={() => removeRoute(route)} className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg"><Trash2 className="w-4 h-4" /></button>
+                )}
+              </div>
+              <div className="grid grid-cols-1 gap-3">
+                <input value={entry.title} onChange={(e) => updatePage(route, 'title', e.target.value)} placeholder="Page title" className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm" />
+                <textarea value={entry.description} onChange={(e) => updatePage(route, 'description', e.target.value)} placeholder="Meta description" rows={2} className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm" />
+                <input value={entry.og_image} onChange={(e) => updatePage(route, 'og_image', e.target.value)} placeholder="OG image URL" className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm" />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="flex gap-2 items-center">
+        <input value={newRoute} onChange={(e) => setNewRoute(e.target.value)} placeholder="/new-route" className="flex-1 px-3 py-2 rounded-lg border border-gray-200 text-sm" />
+        <button onClick={addRoute} className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 text-sm font-medium hover:bg-gray-50"><Plus className="w-4 h-4" /> Add Route</button>
+      </div>
+
+      <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#5DB347] text-white text-sm font-medium hover:bg-[#4ea03c] disabled:opacity-50">
+        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Save SEO
+      </button>
     </div>
   );
 }

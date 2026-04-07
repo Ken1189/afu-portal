@@ -96,6 +96,9 @@ export default function RootLayout({
         />
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>
+        <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:bg-[#5DB347] focus:text-white focus:px-4 focus:py-2 focus:rounded-lg">
+          Skip to main content
+        </a>
         <AuthProvider>
           <ToastProvider>
           <ImpersonationBanner />
@@ -103,7 +106,7 @@ export default function RootLayout({
           <ServiceWorkerRegister />
           <AnnouncementBanner />
           <SiteNavbar />
-          <main className="min-h-screen">{children}</main>
+          <main id="main-content" className="min-h-screen">{children}</main>
           <SiteFooter />
           <ChatWidget />
           <CookieConsent />

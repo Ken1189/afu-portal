@@ -62,6 +62,7 @@ export const FARM_SIDEBAR_ITEMS = [
   { href: '/farm/agriculture', label: 'Agriculture', icon: 'Wheat', tier: 'sprout' as FarmerTier, section: 'Farming Sectors', group: 'Farming Sectors' },
   { href: '/farm/forestry', label: 'Forestry', icon: 'TreePine', tier: 'sprout' as FarmerTier, section: 'Farming Sectors', group: 'Farming Sectors' },
   { href: '/farm/game-farming', label: 'Game Farming', icon: 'Rabbit', tier: 'sprout' as FarmerTier, section: 'Farming Sectors', group: 'Farming Sectors' },
+  { href: '/farm/farms', label: 'My Farms', icon: 'Tractor', tier: 'sprout' as FarmerTier, group: 'Farm Management' },
   { href: '/farm/journal', label: 'Farm Journal', icon: 'BookOpen', tier: 'sprout' as FarmerTier, group: 'Farm Management' },
   { href: '/farm/crops', label: 'My Crops', icon: 'Sprout', tier: 'sprout' as FarmerTier, group: 'Farm Management' },
   { href: '/farm/cooperatives', label: 'Cooperatives', icon: 'UsersRound', tier: 'sprout' as FarmerTier, group: 'Farm Management' },

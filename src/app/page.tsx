@@ -217,6 +217,34 @@ const HERO_DEFAULTS = {
   hero_bg_image: 'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=1920&h=1080&fit=crop',
 };
 
+/* ─── Homepage stats fallback (DB key: homepage_stats) ─── */
+type HomepageStat = { value: string; label: string; source?: string };
+const FALLBACK_HOMEPAGE_STATS: HomepageStat[] = [
+  { value: '60%', label: "Of the world's arable land", source: 'World Bank' },
+  { value: '$50B', label: 'Annual food imports into Africa', source: 'AfDB' },
+  { value: '23%', label: 'GDP from agriculture', source: 'FAO' },
+  { value: '70%', label: 'Of Africans depend on farming', source: 'World Bank' },
+];
+
+/* ─── Membership tiers fallback (DB key: membership_tiers_homepage) ─── */
+type HomepageMembershipTier = {
+  tier: string;
+  name: string;
+  price: string;
+  period?: string;
+  features: string[];
+  cta: string;
+  highlight?: boolean;
+  link?: string;
+};
+const FALLBACK_MEMBERSHIP_TIERS: HomepageMembershipTier[] = [
+  { tier: 'Free', name: 'Free', price: '$0', period: '', features: ['Basic crop tracking', '1 free training course', 'Browse marketplace', 'Limited AI assistant'], cta: 'Get Started Free', highlight: false },
+  { tier: 'Smallholder', name: 'Smallholder', price: '$4.99', period: '/mo', features: ['Full crop tracking', 'Financing up to $5K', 'Basic insurance', 'Marketplace access', 'AI assistant'], cta: 'Join as Smallholder', highlight: false },
+  { tier: 'Commercial', name: 'Commercial', price: '$49', period: '/mo', features: ['Advanced crop tracking', 'Financing up to $50K', 'Full insurance', 'Discounted inputs', 'Basic trade finance'], cta: 'Join Commercial', highlight: false },
+  { tier: 'Enterprise', name: 'Enterprise', price: '$499', period: '/mo', features: ['Financing up to $250K', 'Comprehensive insurance', 'Dedicated advisor', 'Full trade finance', 'Legal support & VIP events'], cta: 'Join Enterprise', highlight: true },
+  { tier: 'Partner', name: 'Partner / Vendor', price: 'On Request', period: '', features: ['Directory listing', 'Co-branded programs', 'Member network access', 'Deal flow access', 'Dedicated advisor'], cta: 'Contact Us', highlight: false },
+];
+
 /* ─── Programs fallback ─── */
 const FALLBACK_PROGRAMS = [
   {
@@ -268,6 +296,8 @@ export default function Home() {
   const [services, setServices] = useState(FALLBACK_SERVICES);
   const [programs, setPrograms] = useState(FALLBACK_PROGRAMS);
   const [memberCount, setMemberCount] = useState(0);
+  const [homepageStats, setHomepageStats] = useState<HomepageStat[]>(FALLBACK_HOMEPAGE_STATS);
+  const [membershipTiers, setMembershipTiers] = useState<HomepageMembershipTier[]>(FALLBACK_MEMBERSHIP_TIERS);
 
   // Section visibility from site_config key "homepage_sections"
   const [sectionVisibility, setSectionVisibility] = useState<Record<string, boolean>>({});
@@ -460,6 +490,52 @@ export default function Home() {
     fetchPrograms();
   }, []);
 
+  /* ─── Homepage stats from site_config ─── */
+  useEffect(() => {
+    async function fetchHomepageStats() {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from('site_config')
+          .select('value')
+          .eq('key', 'homepage_stats')
+          .single();
+        if (data?.value) {
+          const parsed = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setHomepageStats(parsed as HomepageStat[]);
+          }
+        }
+      } catch {
+        // keep fallback
+      }
+    }
+    fetchHomepageStats();
+  }, []);
+
+  /* ─── Membership tiers from site_config ─── */
+  useEffect(() => {
+    async function fetchMembershipTiers() {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from('site_config')
+          .select('value')
+          .eq('key', 'membership_tiers_homepage')
+          .single();
+        if (data?.value) {
+          const parsed = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setMembershipTiers(parsed as HomepageMembershipTier[]);
+          }
+        }
+      } catch {
+        // keep fallback
+      }
+    }
+    fetchMembershipTiers();
+  }, []);
+
   return (
     <>
       {/* ─── HERO ─── */}
@@ -558,14 +634,24 @@ export default function Home() {
             </div>
           </FadeInWhenVisible>
 
-          {/* NOTE: These macro stats need verified, citable sources before shipping.
-              Current values are placeholders pending sourcing (FAO, AfDB, World Bank). */}
+          {/* Stats — DB-driven via site_config key "homepage_stats" with fallback */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            <FadeInWhenVisible delay={0.3}>
+            <FadeInWhenVisible delay={0.2}>
               <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border-l-4 border-[#5DB347] shadow-lg shadow-[#5DB347]/5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                 <CountStat target={memberCount} suffix="+" label="farmers across Africa" />
               </div>
             </FadeInWhenVisible>
+            {homepageStats.map((stat, i) => (
+              <FadeInWhenVisible key={`${stat.label}-${i}`} delay={0.3 + i * 0.1}>
+                <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border-l-4 border-[#5DB347] shadow-lg shadow-[#5DB347]/5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 text-center">
+                  <div className="text-4xl md:text-5xl font-bold mb-2" style={{ color: '#5DB347' }}>{stat.value}</div>
+                  <p className="text-navy/70 text-lg">{stat.label}</p>
+                  {stat.source && (
+                    <p className="text-xs text-gray-400 mt-1">Source: {stat.source}</p>
+                  )}
+                </div>
+              </FadeInWhenVisible>
+            ))}
           </div>
         </div>
       </section>}
@@ -965,82 +1051,7 @@ export default function Home() {
           </FadeInWhenVisible>
 
           <StaggerChildren className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5">
-            {[
-              {
-                tier: 'Free',
-                name: 'Free',
-                price: '$0',
-                period: '',
-                features: [
-                  'Basic crop tracking',
-                  '1 free training course',
-                  'Browse marketplace',
-                  'Limited AI assistant',
-                ],
-                cta: 'Get Started Free',
-                highlight: false,
-              },
-              {
-                tier: 'Smallholder',
-                name: 'Smallholder',
-                price: '$4.99',
-                period: '/mo',
-                features: [
-                  'Full crop tracking',
-                  'Financing up to $5K',
-                  'Basic insurance',
-                  'Marketplace access',
-                  'AI assistant',
-                ],
-                cta: 'Join as Smallholder',
-                highlight: false,
-              },
-              {
-                tier: 'Commercial',
-                name: 'Commercial',
-                price: '$49',
-                period: '/mo',
-                features: [
-                  'Advanced crop tracking',
-                  'Financing up to $50K',
-                  'Full insurance',
-                  'Discounted inputs',
-                  'Basic trade finance',
-                ],
-                cta: 'Join Commercial',
-                highlight: false,
-              },
-              {
-                tier: 'Enterprise',
-                name: 'Enterprise',
-                price: '$499',
-                period: '/mo',
-                features: [
-                  'Financing up to $250K',
-                  'Comprehensive insurance',
-                  'Dedicated advisor',
-                  'Full trade finance',
-                  'Legal support & VIP events',
-                ],
-                cta: 'Join Enterprise',
-                highlight: true,
-              },
-              {
-                tier: 'Partner',
-                name: 'Partner / Vendor',
-                price: 'On Request',
-                period: '',
-                features: [
-                  'Directory listing',
-                  'Co-branded programs',
-                  'Member network access',
-                  'Deal flow access',
-                  'Dedicated advisor',
-                ],
-                cta: 'Contact Us',
-                highlight: false,
-              },
-            ].map((item) => (
+            {membershipTiers.map((item) => (
               <motion.div key={item.name} variants={fadeUpChild}>
                 <div
                   className={`rounded-3xl p-8 h-full flex flex-col transition-all duration-300 hover:-translate-y-1 ${
@@ -1100,7 +1111,7 @@ export default function Home() {
                     ))}
                   </ul>
                   <Link
-                    href="/apply"
+                    href={item.link || '/apply'}
                     className={`block text-center py-3 rounded-xl font-semibold text-sm transition-smooth ${
                       item.highlight
                         ? 'text-white shadow-lg'

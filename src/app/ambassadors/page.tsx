@@ -38,6 +38,7 @@ import {
   Trophy,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { WORLD_COUNTRIES } from '@/lib/countries';
 
 /* ─── Types ─── */
 
@@ -204,38 +205,7 @@ const AFRICAN_REGIONS = [
   'North Africa',
 ];
 
-const AFU_COUNTRIES = [
-  // AFU Operating Countries (top of list)
-  'Zimbabwe', 'Botswana', 'Kenya', 'Tanzania', 'South Africa',
-  'Nigeria', 'Ghana', 'Uganda', 'Zambia', 'Mozambique',
-  // Rest of Africa
-  'Algeria', 'Angola', 'Benin', 'Burkina Faso', 'Burundi',
-  'Cabo Verde', 'Cameroon', 'Central African Republic', 'Chad', 'Comoros',
-  'Congo (Brazzaville)', 'Congo (DRC)', 'Djibouti', 'Egypt', 'Equatorial Guinea',
-  'Eritrea', 'Eswatini', 'Ethiopia', 'Gabon', 'Gambia', 'Guinea',
-  'Guinea-Bissau', 'Ivory Coast', 'Lesotho', 'Liberia', 'Libya',
-  'Madagascar', 'Malawi', 'Mali', 'Mauritania', 'Mauritius', 'Morocco',
-  'Namibia', 'Niger', 'Rwanda', 'Senegal',
-  'Seychelles', 'Sierra Leone', 'Somalia', 'South Sudan',
-  'Sudan', 'Togo', 'Tunisia',
-  // Europe
-  'United Kingdom', 'Germany', 'France', 'Netherlands', 'Belgium',
-  'Switzerland', 'Ireland', 'Portugal', 'Spain', 'Italy',
-  'Sweden', 'Norway', 'Denmark', 'Finland', 'Austria',
-  'Poland', 'Czech Republic', 'Greece', 'Romania', 'Hungary',
-  // Americas
-  'United States', 'Canada', 'Brazil', 'Mexico', 'Argentina',
-  'Colombia', 'Chile', 'Peru', 'Jamaica', 'Trinidad and Tobago',
-  // Middle East
-  'United Arab Emirates', 'Saudi Arabia', 'Qatar', 'Kuwait', 'Bahrain',
-  'Oman', 'Israel', 'Jordan', 'Lebanon', 'Turkey',
-  // Asia Pacific
-  'India', 'China', 'Japan', 'South Korea', 'Singapore',
-  'Malaysia', 'Thailand', 'Indonesia', 'Philippines', 'Vietnam',
-  'Australia', 'New Zealand',
-  // Other
-  'Other',
-];
+const AFU_COUNTRIES = [...WORLD_COUNTRIES, 'Other'];
 
 const DEFAULT_COMMISSION_RATES: CommissionRate[] = [
   { label: 'Membership Fees', amount: '10% recurring', description: 'Earn 10% of every membership fee your referrals pay — every month, for life', icon: Repeat, gradient: 'from-[#5DB347] to-[#449933]' },

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -725,6 +725,22 @@ export default function LivestockPage() {
   });
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+  const [farmId, setFarmId] = useState<string>('');
+  const [farms, setFarms] = useState<Array<{ id: string; name: string }>>([]);
+
+  // Fetch user's farms from the new farms table
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      const supabase = createClient();
+      const { data } = await supabase
+        .from('farms')
+        .select('id, name')
+        .eq('member_id', user.id)
+        .order('name');
+      if (data) setFarms(data as Array<{ id: string; name: string }>);
+    })();
+  }, [user]);
 
   const openEditForm = (row: LivestockRow) => {
     setEditingLivestockId(row.id);
@@ -781,7 +797,8 @@ export default function LivestockPage() {
           date_acquired: new Date().toISOString().split('T')[0],
           notes: addFormData.notes || null,
           photo_url: photoUrl || null,
-        });
+          ...(farmId ? { farm_id: farmId } : {}),
+        } as Omit<LivestockRow, 'id' | 'created_at' | 'updated_at'> & { farm_id?: string });
       }
       handleCloseAddForm();
       fetchLivestock();
@@ -1463,6 +1480,23 @@ export default function LivestockPage() {
                   <X size={16} />
                 </button>
               </div>
+
+              {/* Farm (optional, from farms table) */}
+              {farms.length > 0 && (
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Farm</label>
+                  <select
+                    value={farmId}
+                    onChange={(e) => setFarmId(e.target.value)}
+                    className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C]"
+                  >
+                    <option value="">— Select farm —</option>
+                    {farms.map((f) => (
+                      <option key={f.id} value={f.id}>{f.name}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
               {/* Type */}
               <div>

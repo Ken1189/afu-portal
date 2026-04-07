@@ -1,53 +1,104 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
 import {
-  Search, Users, CheckCircle2, Clock, Ban, Eye, UserPlus,
-  MapPin, CreditCard, Loader2, Download, LogIn,
+  Search, Users, Eye, MapPin, Loader2, Download, LogIn,
 } from 'lucide-react';
-import { useMembers } from '@/lib/supabase/use-members';
+import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/supabase/auth-context';
 import { startImpersonation } from '@/components/ui/ImpersonationBanner';
 
+interface ProfileRow {
+  id: string;
+  full_name: string | null;
+  email: string | null;
+  role: string | null;
+  country: string | null;
+  region: string | null;
+  created_at: string;
+  members?: { tier: string | null }[] | { tier: string | null } | null;
+}
+
+const roleColors: Record<string, string> = {
+  farmer: 'bg-green-100 text-green-700',
+  member: 'bg-green-100 text-green-700',
+  supplier: 'bg-orange-100 text-orange-700',
+  ambassador: 'bg-purple-100 text-purple-700',
+  investor: 'bg-blue-100 text-blue-700',
+  partner: 'bg-amber-100 text-amber-700',
+  admin: 'bg-red-100 text-red-700',
+  super_admin: 'bg-red-100 text-red-700',
+};
+
+const roleLabels: Record<string, string> = {
+  farmer: 'Farmer',
+  member: 'Farmer',
+  supplier: 'Supplier',
+  ambassador: 'Ambassador',
+  investor: 'Investor',
+  partner: 'Partner',
+  admin: 'Admin',
+  super_admin: 'Admin',
+};
+
 const tierColors: Record<string, string> = {
-  student: 'bg-gray-100 text-gray-600',
-  new_enterprise: 'bg-blue-100 text-blue-700',
+  free: 'bg-gray-100 text-gray-600',
   smallholder: 'bg-teal/10 text-teal',
-  farmer_grower: 'bg-green-100 text-green-700',
   commercial: 'bg-navy/10 text-navy',
+  enterprise: 'bg-purple-100 text-purple-700',
 };
 
 const tierLabels: Record<string, string> = {
-  student: 'Student',
-  new_enterprise: 'New Enterprise',
+  free: 'Free',
   smallholder: 'Smallholder',
-  farmer_grower: 'Farmer Grower',
   commercial: 'Commercial',
-};
-
-const statusColors: Record<string, string> = {
-  active: 'bg-green-100 text-green-700',
-  pending: 'bg-amber-100 text-amber-700',
-  suspended: 'bg-red-100 text-red-700',
-  expired: 'bg-gray-100 text-gray-500',
+  enterprise: 'Enterprise',
 };
 
 export default function AdminMembersPage() {
-  const { members, loading, stats, suspendMember, activateMember } = useMembers();
+  const supabase = useMemo(() => createClient(), []);
   const { isSuperAdmin, user: authUser } = useAuth();
   const router = useRouter();
+  const [profiles, setProfiles] = useState<ProfileRow[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [tierFilter, setTierFilter] = useState('all');
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [roleFilter, setRoleFilter] = useState('all');
   const [countryFilter, setCountryFilter] = useState('all');
-  const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [impersonateLoading, setImpersonateLoading] = useState<string | null>(null);
-  const [confirmAction, setConfirmAction] = useState<{ id: string; action: 'suspend' | 'activate' } | null>(null);
-  const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const fetchProfiles = useCallback(async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, full_name, email, role, country, region, created_at, members(tier)')
+        .order('created_at', { ascending: false });
+      if (error) {
+        console.error('[admin/members] fetch error', error);
+        setErrorMsg(error.message);
+        setTimeout(() => setErrorMsg(null), 4000);
+        setProfiles([]);
+      } else {
+        setProfiles((data || []) as ProfileRow[]);
+      }
+    } catch (err) {
+      console.error('[admin/members] exception', err);
+      setProfiles([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [supabase]);
+
+  useEffect(() => { fetchProfiles(); }, [fetchProfiles]);
+
+  const getTier = (p: ProfileRow): string | null => {
+    if (!p.members) return null;
+    if (Array.isArray(p.members)) return p.members[0]?.tier ?? null;
+    return p.members.tier ?? null;
+  };
 
   const handleImpersonate = async (profileId: string) => {
     if (!profileId || profileId === authUser?.id) return;
@@ -68,7 +119,11 @@ export default function AdminMembersPage() {
       const role = data.impersonation.role;
       const redirectMap: Record<string, string> = {
         member: '/dashboard',
+        farmer: '/dashboard',
         supplier: '/supplier',
+        ambassador: '/ambassador',
+        investor: '/investor',
+        partner: '/supplier',
         admin: '/admin',
         super_admin: '/admin',
         warehouse_operator: '/warehouse',
@@ -82,65 +137,63 @@ export default function AdminMembersPage() {
     }
   };
 
-  const filtered = useMemo(() => {
-    let result = [...members];
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      result = result.filter(m =>
-        m.member_id.toLowerCase().includes(q) ||
-        m.profile?.full_name?.toLowerCase().includes(q) ||
-        m.profile?.email?.toLowerCase().includes(q) ||
-        m.farm_name?.toLowerCase().includes(q)
-      );
-    }
-    if (tierFilter !== 'all') result = result.filter(m => m.tier === tierFilter);
-    if (statusFilter !== 'all') result = result.filter(m => m.status === statusFilter);
-    if (countryFilter !== 'all') result = result.filter(m => m.profile?.country === countryFilter);
-    return result;
-  }, [members, searchQuery, tierFilter, statusFilter, countryFilter]);
-
-  const handleAction = async (id: string, action: 'suspend' | 'activate') => {
-    setActionLoading(id);
-    const result = action === 'suspend' ? await suspendMember(id) : await activateMember(id);
-    setActionLoading(null);
-    setConfirmAction(null);
-    if (result.error) {
-      setErrorMsg(`Error: ${result.error}`);
-      setTimeout(() => setErrorMsg(null), 3000);
-    } else {
-      const name = members.find(m => m.id === id)?.profile?.full_name || 'Member';
-      setSuccessMsg(`${name} has been ${action === 'suspend' ? 'suspended' : 'activated'} successfully.`);
-      setTimeout(() => setSuccessMsg(null), 3000);
-    }
+  const normalizedRole = (r: string | null): string => {
+    if (!r) return 'member';
+    if (r === 'super_admin') return 'admin';
+    if (r === 'member') return 'farmer';
+    return r;
   };
 
+  const filtered = useMemo(() => {
+    let result = [...profiles];
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      result = result.filter(p =>
+        p.full_name?.toLowerCase().includes(q) ||
+        p.email?.toLowerCase().includes(q)
+      );
+    }
+    if (roleFilter !== 'all') {
+      result = result.filter(p => normalizedRole(p.role) === roleFilter);
+    }
+    if (countryFilter !== 'all') result = result.filter(p => p.country === countryFilter);
+    return result;
+  }, [profiles, searchQuery, roleFilter, countryFilter]);
+
+  const stats = useMemo(() => {
+    const counts: Record<string, number> = { all: profiles.length, farmer: 0, supplier: 0, ambassador: 0, investor: 0, partner: 0, admin: 0 };
+    profiles.forEach(p => {
+      const r = normalizedRole(p.role);
+      counts[r] = (counts[r] || 0) + 1;
+    });
+    return counts;
+  }, [profiles]);
+
   const handleExportCSV = () => {
-    const headers = ['Member ID', 'Name', 'Email', 'Tier', 'Country', 'Farm', 'Status', 'Join Date'];
-    const rows = filtered.map(m => [
-      m.member_id,
-      m.profile?.full_name || '',
-      m.profile?.email || '',
-      m.tier,
-      m.profile?.country || '',
-      m.farm_name || '',
-      m.status,
-      m.join_date,
+    const headers = ['Name', 'Email', 'Role', 'Tier', 'Country', 'Joined'];
+    const rows = filtered.map(p => [
+      p.full_name || '',
+      p.email || '',
+      roleLabels[normalizedRole(p.role)] || p.role || '',
+      getTier(p) || '',
+      p.country || '',
+      p.created_at,
     ]);
     const csv = [headers, ...rows].map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `afu-members-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = `afu-people-${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };
 
   const summaryCards = [
-    { label: 'Total Members', value: stats.total, icon: <Users className="w-5 h-5" />, color: 'text-teal', bg: 'bg-teal/10' },
-    { label: 'Active', value: stats.active, icon: <CheckCircle2 className="w-5 h-5" />, color: 'text-green-600', bg: 'bg-green-50' },
-    { label: 'Pending', value: stats.pending, icon: <Clock className="w-5 h-5" />, color: 'text-amber-600', bg: 'bg-amber-50' },
-    { label: 'Suspended', value: stats.suspended, icon: <Ban className="w-5 h-5" />, color: 'text-red-600', bg: 'bg-red-50' },
+    { label: 'Total People', value: stats.all || 0, color: 'text-navy', bg: 'bg-navy/10' },
+    { label: 'Farmers', value: stats.farmer || 0, color: 'text-green-700', bg: 'bg-green-50' },
+    { label: 'Suppliers', value: stats.supplier || 0, color: 'text-orange-700', bg: 'bg-orange-50' },
+    { label: 'Ambassadors', value: stats.ambassador || 0, color: 'text-purple-700', bg: 'bg-purple-50' },
   ];
 
   return (
@@ -148,8 +201,8 @@ export default function AdminMembersPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-navy">Members</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Manage all AFU members</p>
+          <h1 className="text-2xl font-bold text-navy">People Directory</h1>
+          <p className="text-sm text-gray-500 mt-0.5">All members, suppliers, ambassadors, investors, partners, and admins</p>
         </div>
         <button
           onClick={handleExportCSV}
@@ -166,7 +219,7 @@ export default function AdminMembersPage() {
           <div key={i} className="bg-white rounded-xl p-4 border border-gray-100">
             <div className="flex items-center gap-3">
               <div className={`w-10 h-10 rounded-lg ${card.bg} flex items-center justify-center ${card.color}`}>
-                {card.icon}
+                <Users className="w-5 h-5" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-navy">{card.value}</p>
@@ -184,26 +237,21 @@ export default function AdminMembersPage() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
-              placeholder="Search by name, ID, email, or farm..."
+              placeholder="Search by name or email..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal/50"
             />
           </div>
           <div className="flex flex-wrap gap-2">
-            <select value={tierFilter} onChange={(e) => setTierFilter(e.target.value)} className="px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white">
-              <option value="all">All Tiers</option>
-              <option value="student">Student</option>
-              <option value="new_enterprise">New Enterprise</option>
-              <option value="smallholder">Smallholder</option>
-              <option value="farmer_grower">Farmer Grower</option>
-              <option value="commercial">Commercial</option>
-            </select>
-            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white">
-              <option value="all">All Statuses</option>
-              <option value="active">Active</option>
-              <option value="pending">Pending</option>
-              <option value="suspended">Suspended</option>
+            <select value={roleFilter} onChange={(e) => setRoleFilter(e.target.value)} className="px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white">
+              <option value="all">All Roles</option>
+              <option value="farmer">Farmers</option>
+              <option value="supplier">Suppliers</option>
+              <option value="ambassador">Ambassadors</option>
+              <option value="investor">Investors</option>
+              <option value="partner">Partners</option>
+              <option value="admin">Admins</option>
             </select>
             <select value={countryFilter} onChange={(e) => setCountryFilter(e.target.value)} className="px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white">
               <option value="all">All Countries</option>
@@ -221,7 +269,7 @@ export default function AdminMembersPage() {
           </div>
         </div>
         <p className="text-xs text-gray-400 mt-3">
-          Showing {filtered.length} of {stats.total} members
+          Showing {filtered.length} of {profiles.length} people
         </p>
       </div>
 
@@ -229,7 +277,7 @@ export default function AdminMembersPage() {
       {loading && (
         <div className="text-center py-8">
           <Loader2 className="w-6 h-6 text-teal animate-spin mx-auto mb-2" />
-          <p className="text-sm text-gray-500">Loading members...</p>
+          <p className="text-sm text-gray-500">Loading directory...</p>
         </div>
       )}
 
@@ -240,83 +288,64 @@ export default function AdminMembersPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-100 bg-cream/50">
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Member ID</th>
                   <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Name</th>
                   <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Email</th>
+                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Role</th>
                   <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Tier</th>
                   <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Country</th>
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Farm</th>
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Status</th>
                   <th className="text-right py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
-                {filtered.map((m) => (
-                  <tr key={m.id} className="hover:bg-cream/50 transition-colors">
-                    <td className="py-3 px-4 font-mono text-xs text-gray-500">{m.member_id}</td>
-                    <td className="py-3 px-4">
-                      <p className="font-medium text-navy">{m.profile?.full_name || '—'}</p>
-                    </td>
-                    <td className="py-3 px-4 text-gray-500">{m.profile?.email || '—'}</td>
-                    <td className="py-3 px-4">
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${tierColors[m.tier] || 'bg-gray-100 text-gray-600'}`}>
-                        {tierLabels[m.tier] || m.tier}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="flex items-center gap-1 text-gray-500">
-                        <MapPin className="w-3 h-3" />
-                        {m.profile?.country || '—'}
-                      </div>
-                    </td>
-                    <td className="py-3 px-4 text-gray-500">{m.farm_name || '—'}</td>
-                    <td className="py-3 px-4">
-                      <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${statusColors[m.status]}`}>
-                        {m.status === 'active' && <CheckCircle2 className="w-3 h-3" />}
-                        {m.status === 'pending' && <Clock className="w-3 h-3" />}
-                        {m.status === 'suspended' && <Ban className="w-3 h-3" />}
-                        {m.status.charAt(0).toUpperCase() + m.status.slice(1)}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="flex items-center justify-end gap-1">
-                        <Link href={`/admin/members/${m.id}`} className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-navy transition-colors" title="View details">
-                          <Eye className="w-4 h-4" />
-                        </Link>
-                        {isSuperAdmin && m.profile_id && m.profile_id !== authUser?.id && (
-                          <button
-                            onClick={() => handleImpersonate(m.profile_id)}
-                            disabled={impersonateLoading === m.profile_id}
-                            className="p-2 rounded-lg hover:bg-purple-50 text-gray-400 hover:text-purple-600 transition-colors disabled:opacity-50"
-                            title="Login as this user"
-                          >
-                            {impersonateLoading === m.profile_id ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogIn className="w-4 h-4" />}
-                          </button>
+                {filtered.map((p) => {
+                  const role = normalizedRole(p.role);
+                  const tier = getTier(p);
+                  return (
+                    <tr key={p.id} className="hover:bg-cream/50 transition-colors">
+                      <td className="py-3 px-4">
+                        <p className="font-medium text-navy">{p.full_name || '—'}</p>
+                      </td>
+                      <td className="py-3 px-4 text-gray-500">{p.email || '—'}</td>
+                      <td className="py-3 px-4">
+                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${roleColors[role] || 'bg-gray-100 text-gray-600'}`}>
+                          {roleLabels[role] || role}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4">
+                        {role === 'farmer' && tier ? (
+                          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${tierColors[tier] || 'bg-gray-100 text-gray-600'}`}>
+                            {tierLabels[tier] || tier}
+                          </span>
+                        ) : (
+                          <span className="text-xs text-gray-300">—</span>
                         )}
-                        {m.status === 'active' && (
-                          <button
-                            onClick={() => setConfirmAction({ id: m.id, action: 'suspend' })}
-                            disabled={actionLoading === m.id}
-                            className="p-2 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-600 transition-colors disabled:opacity-50"
-                            title="Suspend"
-                          >
-                            {actionLoading === m.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Ban className="w-4 h-4" />}
-                          </button>
-                        )}
-                        {m.status === 'suspended' && (
-                          <button
-                            onClick={() => setConfirmAction({ id: m.id, action: 'activate' })}
-                            disabled={actionLoading === m.id}
-                            className="p-2 rounded-lg hover:bg-green-50 text-gray-400 hover:text-green-600 transition-colors disabled:opacity-50"
-                            title="Activate"
-                          >
-                            {actionLoading === m.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="flex items-center gap-1 text-gray-500">
+                          <MapPin className="w-3 h-3" />
+                          {p.country || '—'}
+                        </div>
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="flex items-center justify-end gap-1">
+                          <Link href={`/admin/members/${p.id}`} className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-navy transition-colors" title="View details">
+                            <Eye className="w-4 h-4" />
+                          </Link>
+                          {isSuperAdmin && p.id !== authUser?.id && (
+                            <button
+                              onClick={() => handleImpersonate(p.id)}
+                              disabled={impersonateLoading === p.id}
+                              className="p-2 rounded-lg hover:bg-purple-50 text-gray-400 hover:text-purple-600 transition-colors disabled:opacity-50"
+                              title="Login as this user"
+                            >
+                              {impersonateLoading === p.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogIn className="w-4 h-4" />}
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -324,55 +353,14 @@ export default function AdminMembersPage() {
             <div className="py-16 text-center">
               <Users className="w-10 h-10 text-gray-300 mx-auto mb-3" />
               <p className="text-sm text-gray-500">
-                {stats.total === 0 ? 'No members yet. Members are created when applications are approved.' : 'No members match your filters'}
+                {profiles.length === 0 ? 'No people in the directory yet.' : 'No people match your filters'}
               </p>
             </div>
           )}
         </div>
       )}
 
-      {/* Confirmation Dialog */}
-      {confirmAction && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white rounded-xl p-6 max-w-sm w-full mx-4 shadow-2xl">
-            <h3 className="text-lg font-bold text-navy mb-2">
-              {confirmAction.action === 'suspend' ? 'Suspend Member?' : 'Activate Member?'}
-            </h3>
-            <p className="text-sm text-gray-500 mb-4">
-              {confirmAction.action === 'suspend'
-                ? 'This member will be suspended and lose access to the platform. You can reactivate them later.'
-                : 'This member will be reactivated and regain full access to the platform.'}
-            </p>
-            <div className="flex items-center justify-end gap-2">
-              <button
-                onClick={() => setConfirmAction(null)}
-                className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => handleAction(confirmAction.id, confirmAction.action)}
-                disabled={!!actionLoading}
-                className={`px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2 ${
-                  confirmAction.action === 'suspend'
-                    ? 'bg-red-600 hover:bg-red-700'
-                    : 'bg-green-600 hover:bg-green-700'
-                }`}
-              >
-                {actionLoading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-                {confirmAction.action === 'suspend' ? 'Suspend' : 'Activate'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Toast */}
-      {successMsg && (
-        <div className="fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-lg text-white text-sm font-medium bg-green-600">
-          {successMsg}
-        </div>
-      )}
       {errorMsg && (
         <div className="fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-lg text-white text-sm font-medium bg-red-600">
           {errorMsg}

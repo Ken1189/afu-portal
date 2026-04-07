@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { Wallet, CheckCircle2, Clock, Building, DollarSign, RefreshCw } from 'lucide-react';
+import { useToast } from '@/components/ui/Toast';
 
 interface Payout {
   id: string;
@@ -26,6 +27,7 @@ interface SupplierTotal {
 
 export default function AdminPayoutsPage() {
   const supabase = createClient();
+  const toast = useToast();
   const [payouts, setPayouts] = useState<Payout[]>([]);
   const [totals, setTotals] = useState<SupplierTotal[]>([]);
   const [loading, setLoading] = useState(true);
@@ -75,8 +77,9 @@ export default function AdminPayoutsPage() {
       });
       if (!res.ok) {
         const j = await res.json().catch(() => ({}));
-        alert(j.error || 'Failed to mark paid');
+        toast.error(j.error || 'Failed to mark paid');
       } else {
+        toast.success('Payout marked as paid');
         await load();
       }
     } finally {

@@ -146,7 +146,7 @@ export async function POST(request: Request) {
                   ` : ''}
                 </table>
                 <div style="margin-top: 24px; text-align: center;">
-                  <a href="https://portal.africanfarmersunion.org/admin/investor-relations" style="display: inline-block; background: #5DB347; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">
+                  <a href="https://portal.africanfarmingunion.org/admin/investor-relations" style="display: inline-block; background: #5DB347; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px;">
                     View in Admin Portal
                   </a>
                 </div>

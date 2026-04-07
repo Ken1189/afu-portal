@@ -13,10 +13,10 @@ export const metadata = {
     title: "About AFU - African Farming Union",
     description:
       "Learn about AFU's mission to transform African agriculture through integrated financing, inputs, processing, and offtake across Africa.",
-    url: "https://afu-portal.vercel.app/about",
+    url: "https://africanfarmingunion.org/about",
     images: [
       {
-        url: "https://afu-portal.vercel.app/og-image.png",
+        url: "https://africanfarmingunion.org/og-image.png",
         width: 1200,
         height: 630,
         alt: "About the African Farming Union",

@@ -350,24 +350,12 @@ export async function POST(request: NextRequest) {
             stripe_subscription_id: (session.subscription as string) || null,
           });
 
-          // Increment farmer's sponsor count
+          // Increment farmer's sponsor count atomically
           if (farmerId) {
-            const { data: farmer } = await adminClient
-              .from('farmer_public_profiles')
-              .select('total_sponsors, monthly_funding_received')
-              .eq('id', farmerId)
-              .maybeSingle();
-
-            if (farmer) {
-              await adminClient
-                .from('farmer_public_profiles')
-                .update({
-                  total_sponsors: (farmer.total_sponsors ?? 0) + 1,
-                  monthly_funding_received:
-                    (farmer.monthly_funding_received ?? 0) + (session.amount_total || 0) / 100,
-                })
-                .eq('id', farmerId);
-            }
+            await adminClient.rpc('increment_farmer_sponsors', {
+              p_farmer_id: farmerId,
+              p_amount: (session.amount_total || 0) / 100,
+            });
           }
         }
 

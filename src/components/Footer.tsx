@@ -27,7 +27,16 @@ interface FooterSocialLink {
 interface FooterConfig {
   columns?: FooterColumn[];
   social_links?: FooterSocialLink[];
+  mission?: string;
+  countries?: { flag: string; name: string }[];
 }
+
+const FALLBACK_MISSION = "Africa's Agriculture Development Bank + Operating Platform. Financing, Inputs, Processing, Offtake, Trade Finance & Training.";
+const FALLBACK_COUNTRIES = [
+  { flag: '\ud83c\uddff\ud83c\uddfc', name: 'Zimbabwe (Export Lane)' },
+  { flag: '\ud83c\udde7\ud83c\uddfc', name: 'Botswana (Bank Base)' },
+  { flag: '\ud83c\uddf9\ud83c\uddff', name: 'Tanzania (Scale Lane)' },
+];
 
 /* ─── Hardcoded fallback data ─── */
 
@@ -82,6 +91,8 @@ export default function Footer() {
   /* ─── DB-driven footer config ─── */
   const [footerColumns, setFooterColumns] = useState<FooterColumn[]>(FALLBACK_FOOTER_COLUMNS);
   const [socialLinks, setSocialLinks] = useState(FALLBACK_SOCIAL_LINKS);
+  const [mission, setMission] = useState(FALLBACK_MISSION);
+  const [countries, setCountries] = useState(FALLBACK_COUNTRIES);
 
   useEffect(() => {
     const supabase = createClient();
@@ -105,6 +116,12 @@ export default function Footer() {
                 viewBox: s.viewBox || "0 0 24 24",
               }))
             );
+          }
+          if (config.mission && typeof config.mission === 'string') {
+            setMission(config.mission);
+          }
+          if (config.countries && Array.isArray(config.countries) && config.countries.length > 0) {
+            setCountries(config.countries);
           }
         }
         // On error or empty, keep fallback values
@@ -182,8 +199,7 @@ export default function Footer() {
               </div>
             </div>
             <p className="text-gray-400 text-sm leading-relaxed mb-6 max-w-sm">
-              Africa&apos;s Agriculture Development Bank + Operating Platform.
-              Financing, Inputs, Processing, Offtake, Trade Finance &amp; Training.
+              {mission}
             </p>
             {/* Social icons — DB-driven with fallback */}
             <div className="flex gap-3">
@@ -263,9 +279,9 @@ export default function Footer() {
               Phase 1 Countries
             </h4>
             <div className="flex flex-col gap-1.5 text-gray-400 text-sm">
-              <span>&#x1F1FF;&#x1F1FC; Zimbabwe (Export Lane)</span>
-              <span>&#x1F1E7;&#x1F1FC; Botswana (Bank Base)</span>
-              <span>&#x1F1F9;&#x1F1FF; Tanzania (Scale Lane)</span>
+              {countries.map((c, i) => (
+                <span key={i}>{c.flag} {c.name}</span>
+              ))}
             </div>
           </div>
         </div>

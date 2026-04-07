@@ -697,6 +697,21 @@ export default function AdminAmbassadorsPage() {
     setDeleteConfirm(null);
   };
 
+  /* ─── CSV Export ─── */
+  const handleExport = () => {
+    const csv = [
+      'Name,Country,Sector,Tier,Status,Featured,Total Earned,Total Referrals,Created',
+      ...ambassadors.map(a => `"${(a.full_name || '').replace(/"/g, '""')}","${(a.country || '').replace(/"/g, '""')}","${(a.sector || '').replace(/"/g, '""')}","${a.tier || ''}","${a.status || ''}","${a.is_featured ? 'Yes' : 'No'}","${a.total_earned || 0}","${a.total_referrals || 0}","${a.created_at}"`)
+    ].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `ambassadors-${Date.now()}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   /* ─── Tab config ─── */
 
   const tabs: { id: TabId; label: string; icon: React.ReactNode }[] = [
@@ -745,14 +760,22 @@ export default function AdminAmbassadorsPage() {
           </p>
         </div>
         {activeTab === 'ambassadors' && (
-          <button
-            onClick={openAdd}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white shadow-sm hover:opacity-90 transition-opacity"
-            style={{ background: '#5DB347' }}
-          >
-            <Plus className="w-4 h-4" />
-            Add New Ambassador
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleExport}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-[#1B2A4A] bg-gray-100 hover:bg-gray-200 transition-colors"
+            >
+              Download CSV
+            </button>
+            <button
+              onClick={openAdd}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white shadow-sm hover:opacity-90 transition-opacity"
+              style={{ background: '#5DB347' }}
+            >
+              <Plus className="w-4 h-4" />
+              Add New Ambassador
+            </button>
+          </div>
         )}
       </div>
 

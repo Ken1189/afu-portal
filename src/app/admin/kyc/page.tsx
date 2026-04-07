@@ -160,9 +160,48 @@ export default function KycManagementPage() {
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkLoading, setBulkLoading] = useState(false);
 
   const showSuccess = (msg: string) => { setSuccessMsg(msg); setTimeout(() => setSuccessMsg(null), 3000); };
   const showError = (msg: string) => { setErrorMsg(msg); setTimeout(() => setErrorMsg(null), 5000); };
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const handleBulkKyc = async (status: 'approved' | 'rejected') => {
+    if (selectedIds.size === 0) return;
+    if (!confirm(`${status === 'approved' ? 'Approve' : 'Reject'} ${selectedIds.size} KYC verification${selectedIds.size > 1 ? 's' : ''}?`)) return;
+    setBulkLoading(true);
+    try {
+      const res = await fetch('/api/admin/bulk/approve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ids: Array.from(selectedIds),
+          action: status === 'approved' ? 'approve' : 'reject',
+          entity: 'kyc_verifications',
+        }),
+      });
+      if (res.ok) {
+        const newStatus: KycStatus = status === 'approved' ? 'verified' : 'rejected';
+        setRecords(prev => prev.map(r => selectedIds.has(r.id) ? { ...r, status: newStatus } : r));
+        showSuccess(`${selectedIds.size} verification${selectedIds.size > 1 ? 's' : ''} ${status}.`);
+        setSelectedIds(new Set());
+      } else {
+        showError('Bulk action failed');
+      }
+    } catch {
+      showError('Network error during bulk action');
+    }
+    setBulkLoading(false);
+  };
 
   // Fetch real KYC data from Supabase — try kyc_verifications first, then kyc_documents, fallback to hardcoded
   const fetchKycRecords = useCallback(async () => {
@@ -537,6 +576,34 @@ export default function KycManagementPage() {
                 </div>
               </div>
 
+              {/* Bulk Action Toolbar */}
+              {selectedIds.size > 0 && (
+                <div className="mt-3 flex items-center gap-2 p-2 bg-teal-50 rounded-lg">
+                  <span className="text-xs font-semibold text-[#1B2A4A]">{selectedIds.size} selected</span>
+                  <span className="text-gray-300">|</span>
+                  <button
+                    onClick={() => handleBulkKyc('approved')}
+                    disabled={bulkLoading}
+                    className="px-2.5 py-1 bg-emerald-600 text-white rounded text-xs font-semibold hover:bg-emerald-700 disabled:opacity-50"
+                  >
+                    {bulkLoading ? 'Working...' : 'Approve All'}
+                  </button>
+                  <button
+                    onClick={() => handleBulkKyc('rejected')}
+                    disabled={bulkLoading}
+                    className="px-2.5 py-1 bg-red-600 text-white rounded text-xs font-semibold hover:bg-red-700 disabled:opacity-50"
+                  >
+                    Reject All
+                  </button>
+                  <button
+                    onClick={() => setSelectedIds(new Set())}
+                    className="px-2.5 py-1 border border-gray-200 text-gray-600 rounded text-xs font-medium hover:bg-white"
+                  >
+                    Clear
+                  </button>
+                </div>
+              )}
+
               {/* Filter tabs */}
               <div className="flex gap-1 mt-3">
                 {TABS.map((tab) => (
@@ -565,6 +632,19 @@ export default function KycManagementPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-gray-50">
+                    <th className="w-10 px-2 py-2.5 text-center">
+                      <input
+                        type="checkbox"
+                        checked={filtered.length > 0 && filtered.every(f => selectedIds.has(f.id))}
+                        onChange={() => {
+                          const allIds = filtered.map(f => f.id);
+                          const allSelected = allIds.every(id => selectedIds.has(id)) && allIds.length > 0;
+                          setSelectedIds(allSelected ? new Set() : new Set(allIds));
+                        }}
+                        className="rounded border-gray-300"
+                        aria-label="Select all"
+                      />
+                    </th>
                     <th className="text-left px-4 py-2.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Member</th>
                     <th className="text-left px-4 py-2.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Document</th>
                     <th className="text-left px-4 py-2.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">Submitted</th>
@@ -577,7 +657,7 @@ export default function KycManagementPage() {
                   <AnimatePresence mode="popLayout">
                     {filtered.length === 0 ? (
                       <tr>
-                        <td colSpan={6} className="text-center py-10 text-gray-400 text-sm">
+                        <td colSpan={7} className="text-center py-10 text-gray-400 text-sm">
                           No records match the current filter.
                         </td>
                       </tr>
@@ -594,6 +674,15 @@ export default function KycManagementPage() {
                             selectedRecord?.id === record.id ? 'bg-teal-50/60' : ''
                           }`}
                         >
+                          <td className="px-2 py-3 text-center" onClick={(e) => e.stopPropagation()}>
+                            <input
+                              type="checkbox"
+                              checked={selectedIds.has(record.id)}
+                              onChange={() => toggleSelect(record.id)}
+                              className="rounded border-gray-300"
+                              aria-label={`Select ${record.name}`}
+                            />
+                          </td>
                           <td className="px-4 py-3">
                             <div className="flex items-center gap-2.5">
                               <div className="w-7 h-7 rounded-full bg-[#1B2A4A] flex items-center justify-center text-white text-xs font-semibold shrink-0">

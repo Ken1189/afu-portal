@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useApplications } from "@/lib/supabase/use-applications";
 import { createClient } from "@/lib/supabase/client";
+import { ALL_AFRICAN_COUNTRIES } from "@/lib/countries";
 
 type Tier = "free" | "smallholder" | "commercial" | "enterprise" | "partner";
 
@@ -129,8 +130,8 @@ export default function ApplyPage() {
         setSubmitting(false);
         return;
       }
-      if (size < 0 || size > 100000) {
-        setSubmitError('Farm size must be between 0 and 100,000 hectares.');
+      if (size < 0 || size > 1000000) {
+        setSubmitError('Farm size must be between 0 and 1,000,000 hectares.');
         setSubmitting(false);
         return;
       }
@@ -368,17 +369,9 @@ export default function ApplyPage() {
                     <label className="block text-sm font-medium text-[#1B2A4A] mb-2">Country *</label>
                     <select required className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5DB347]/50 focus:border-[#5DB347] transition-shadow" value={formData.country} onChange={(e) => setFormData({ ...formData, country: e.target.value })}>
                       <option value="">Select country</option>
-                      <option value="Botswana">Botswana</option>
-                      <option value="Ghana">Ghana</option>
-                      <option value="Kenya">Kenya</option>
-                      <option value="Mozambique">Mozambique</option>
-                      <option value="Nigeria">Nigeria</option>
-                      <option value="Sierra Leone">Sierra Leone</option>
-                      <option value="South Africa">South Africa</option>
-                      <option value="Tanzania">Tanzania</option>
-                      <option value="Uganda">Uganda</option>
-                      <option value="Zambia">Zambia</option>
-                      <option value="Zimbabwe">Zimbabwe</option>
+                      {ALL_AFRICAN_COUNTRIES.map((c) => (
+                        <option key={c} value={c}>{c}</option>
+                      ))}
                       <option value="Other">Other</option>
                     </select>
                   </div>
@@ -392,7 +385,7 @@ export default function ApplyPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-sm font-medium text-[#1B2A4A] mb-2">Farm Size (hectares)</label>
-                      <input type="number" min="0" max="100000" step="0.1" className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5DB347]/50 focus:border-[#5DB347] transition-shadow" placeholder="e.g., 5, 50, 500 (max 100,000)" value={formData.farmSize} onChange={(e) => setFormData({ ...formData, farmSize: e.target.value })} />
+                      <input type="number" min="0" max="1000000" step="0.1" className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5DB347]/50 focus:border-[#5DB347] transition-shadow" placeholder="e.g., 5, 50, 500 (max 1,000,000)" value={formData.farmSize} onChange={(e) => setFormData({ ...formData, farmSize: e.target.value })} />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-[#1B2A4A] mb-2">What Do You Grow?</label>

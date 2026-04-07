@@ -646,6 +646,21 @@ export default function AdminSuppliersPage() {
     { label: 'Suspended', value: suspendedCount, icon: <Ban className="w-5 h-5" />, color: 'text-red-600', bgColor: 'bg-red-50' },
   ];
 
+  // CSV Export
+  const handleExport = () => {
+    const csv = [
+      'Company,Contact,Email,Country,Category,Status,Tier,Created',
+      ...filtered.map(s => `"${(s.company_name || '').replace(/"/g, '""')}","${(s.contact_name || '').replace(/"/g, '""')}","${(s.email || '').replace(/"/g, '""')}","${(s.country || '').replace(/"/g, '""')}","${s.category || ''}","${s.status || ''}","${s.sponsorship_tier || ''}","${s.created_at || ''}"`)
+    ].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `suppliers-${Date.now()}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   function toggleSort(field: SortField) {
     if (sortField === field) {
       setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
@@ -783,6 +798,12 @@ export default function AdminSuppliersPage() {
             <Award className="w-4 h-4" />
             Sponsorship Tiers
           </Link>
+          <button
+            onClick={handleExport}
+            className="inline-flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-[#1B2A4A] px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors"
+          >
+            Download CSV
+          </button>
         </div>
       </motion.div>
 

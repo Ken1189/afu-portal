@@ -41,6 +41,7 @@ import {
   Wheat,
   TreePine,
   Rabbit,
+  Tractor,
 } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
@@ -95,6 +96,7 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   Wheat,
   TreePine,
   Rabbit,
+  Tractor,
 };
 
 // Bottom nav keys — always show core items regardless of tier

@@ -76,33 +76,44 @@ export function useOrders(memberId?: string) {
       const tax = Math.round(subtotal * 0.05 * 100) / 100; // 5% tax
       const total = subtotal - discount + shipping + tax;
 
-      const { data: order, error: orderError } = await supabase
+      // Group items by supplier (orders are per-supplier in atomic RPC)
+      const primarySupplierId = items[0]?.supplier_id;
+      if (!primarySupplierId) {
+        return { data: null, error: 'No supplier in order items' };
+      }
+
+      // Atomic order + items creation via RPC (prevents orphaned rows)
+      const { data: newOrderId, error: rpcError } = await supabase.rpc('create_order_atomic', {
+        p_member_id: memberId,
+        p_supplier_id: primarySupplierId,
+        p_total: total,
+        p_status: 'pending',
+        p_items: items,
+      });
+
+      if (rpcError) return { data: null, error: rpcError.message };
+
+      // Fetch the created order for return value
+      const { data: order, error: fetchErr } = await supabase
         .from('orders')
-        .insert({
-          member_id: memberId,
+        .select('*')
+        .eq('id', newOrderId)
+        .single();
+
+      if (fetchErr || !order) return { data: null, error: fetchErr?.message || 'Order fetch failed' };
+
+      // Apply non-RPC fields (subtotal, discount, shipping, tax, address, notes)
+      await supabase
+        .from('orders')
+        .update({
           subtotal,
           discount,
           shipping,
           tax,
-          total,
           shipping_address: shippingAddress || null,
           notes: notes || null,
         })
-        .select()
-        .single();
-
-      if (orderError) return { data: null, error: orderError.message };
-
-      const orderItems = items.map(item => ({
-        order_id: order.id,
-        ...item,
-      }));
-
-      const { error: itemsError } = await supabase
-        .from('order_items')
-        .insert(orderItems);
-
-      if (itemsError) return { data: order as OrderRow, error: itemsError.message };
+        .eq('id', newOrderId);
 
       await supabase.from('payments').insert({
         order_id: order.id,

@@ -104,9 +104,10 @@ export function useProducts(supplierId?: string) {
 
       await fetchProducts();
       try {
-        await supabase.from('suppliers').update({
-          products_count: (await supabase.from('products').select('id', { count: 'exact', head: true }).eq('supplier_id', product.supplier_id)).count || 0
-        }).eq('id', product.supplier_id);
+        await supabase.rpc('increment_supplier_products', {
+          p_supplier_id: product.supplier_id,
+          p_delta: 1,
+        });
       } catch { /* non-critical */ }
       return { data: data as ProductRow, error: null };
     } catch (err) {

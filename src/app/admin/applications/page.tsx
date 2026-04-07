@@ -97,6 +97,78 @@ export default function AdminApplicationsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkLoading, setBulkLoading] = useState(false);
+
+  // Bulk action handler
+  const handleBulkAction = async (status: 'approved' | 'rejected') => {
+    if (selectedIds.size === 0) return;
+    const action = status === 'approved' ? 'approve' : 'reject';
+    if (!confirm(`${action === 'approve' ? 'Approve' : 'Reject'} ${selectedIds.size} application${selectedIds.size > 1 ? 's' : ''}? This cannot be undone.`)) return;
+    setBulkLoading(true);
+    try {
+      const res = await fetch('/api/admin/bulk/approve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ids: Array.from(selectedIds),
+          action: status === 'approved' ? 'approve' : 'reject',
+          entity: 'membership_applications',
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        showToast(`${selectedIds.size} application${selectedIds.size > 1 ? 's' : ''} ${status}.`, 'success');
+        // Refresh local state for each by approving/rejecting individually as a safe fallback
+        for (const id of selectedIds) {
+          const app = applications.find(a => a.id === id);
+          if (!app) continue;
+          if (status === 'approved') await approveApplication(id, app.profile_id || '');
+          else await rejectApplication(id);
+        }
+        setSelectedIds(new Set());
+      } else {
+        showToast(data.error || 'Bulk action failed', 'error');
+      }
+    } catch {
+      showToast('Network error during bulk action', 'error');
+    }
+    setBulkLoading(false);
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    setSelectedIds(prev => {
+      // If all currently filtered are selected, clear; else select all filtered
+      const allIds = filtered.map(f => f.id);
+      const allSelected = allIds.every(id => prev.has(id)) && allIds.length > 0;
+      if (allSelected) return new Set();
+      return new Set(allIds);
+    });
+  };
+
+  // CSV Export
+  const handleExport = () => {
+    const csv = [
+      'Name,Email,Phone,Country,Tier,Status,Created',
+      ...filtered.map(row => `"${(row.full_name || '').replace(/"/g, '""')}","${(row.email || '').replace(/"/g, '""')}","${(row.phone || '').replace(/"/g, '""')}","${(row.country || '').replace(/"/g, '""')}","${row.requested_tier || ''}","${row.status}","${row.created_at}"`)
+    ].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `applications-${Date.now()}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
   const [toast, setToast] = useState<{message: string, type: 'success'|'error'}|null>(null);
   const showToast = (message: string, type: 'success'|'error' = 'success') => { setToast({message, type}); setTimeout(() => setToast(null), 3000); };
   const [tempPasswordModal, setTempPasswordModal] = useState<{
@@ -284,6 +356,48 @@ export default function AdminApplicationsPage() {
         </div>
       )}
 
+      {/* ── Bulk Action Toolbar ── */}
+      {!loading && (
+        <div className="bg-white rounded-xl border border-gray-100 px-4 py-3 flex items-center justify-between gap-3 flex-wrap">
+          <div className="flex items-center gap-3 text-sm">
+            {selectedIds.size > 0 ? (
+              <>
+                <span className="font-semibold text-navy">{selectedIds.size} selected</span>
+                <span className="text-gray-300">|</span>
+                <button
+                  onClick={() => handleBulkAction('approved')}
+                  disabled={bulkLoading}
+                  className="px-3 py-1.5 bg-green-600 text-white rounded-lg text-xs font-semibold hover:bg-green-700 disabled:opacity-50"
+                >
+                  {bulkLoading ? 'Working...' : 'Approve All'}
+                </button>
+                <button
+                  onClick={() => handleBulkAction('rejected')}
+                  disabled={bulkLoading}
+                  className="px-3 py-1.5 bg-red-600 text-white rounded-lg text-xs font-semibold hover:bg-red-700 disabled:opacity-50"
+                >
+                  Reject All
+                </button>
+                <button
+                  onClick={() => setSelectedIds(new Set())}
+                  className="px-3 py-1.5 border border-gray-200 text-gray-600 rounded-lg text-xs font-medium hover:bg-gray-50"
+                >
+                  Clear
+                </button>
+              </>
+            ) : (
+              <span className="text-gray-400 text-xs">Select applications to bulk approve/reject</span>
+            )}
+          </div>
+          <button
+            onClick={handleExport}
+            className="px-3 py-1.5 bg-navy text-white rounded-lg text-xs font-semibold hover:bg-navy/90"
+          >
+            Download CSV
+          </button>
+        </div>
+      )}
+
       {/* ── Applications Table ── */}
       {!loading && (
         <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
@@ -291,6 +405,15 @@ export default function AdminApplicationsPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-100 bg-cream/50">
+                  <th className="w-10 py-3 px-2 text-center">
+                    <input
+                      type="checkbox"
+                      checked={filtered.length > 0 && filtered.every(f => selectedIds.has(f.id))}
+                      onChange={toggleSelectAll}
+                      className="rounded border-gray-300"
+                      aria-label="Select all"
+                    />
+                  </th>
                   <th className="w-8 py-3 px-2"></th>
                   <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Name</th>
                   <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Email</th>
@@ -309,6 +432,15 @@ export default function AdminApplicationsPage() {
                       className="hover:bg-cream/50 transition-colors cursor-pointer"
                       onClick={() => setExpandedId(expandedId === app.id ? null : app.id)}
                     >
+                      <td className="py-3 px-2 text-center" onClick={(e) => e.stopPropagation()}>
+                        <input
+                          type="checkbox"
+                          checked={selectedIds.has(app.id)}
+                          onChange={() => toggleSelect(app.id)}
+                          className="rounded border-gray-300"
+                          aria-label={`Select ${app.full_name}`}
+                        />
+                      </td>
                       <td className="py-3 px-2">
                         <ChevronRight className={`w-4 h-4 text-gray-400 transition-transform ${expandedId === app.id ? 'rotate-90' : ''}`} />
                       </td>
@@ -375,7 +507,7 @@ export default function AdminApplicationsPage() {
                     {/* ── Expanded Detail Row ── */}
                     {expandedId === app.id && (
                       <tr>
-                        <td colSpan={9} className="bg-gray-50 px-6 py-4">
+                        <td colSpan={10} className="bg-gray-50 px-6 py-4">
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                             <div className="space-y-2">
                               <p className="text-xs font-semibold text-gray-500 uppercase">Contact</p>

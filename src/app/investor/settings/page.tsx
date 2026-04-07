@@ -24,6 +24,7 @@ import {
 import { useAuth } from '@/lib/supabase/auth-context';
 import { createClient } from '@/lib/supabase/client';
 import ImageUploader from '@/components/ui/ImageUploader';
+import { useToast } from '@/components/ui/Toast';
 
 // ── Animation ────────────────────────────────────────────────────────────────
 
@@ -127,6 +128,7 @@ function ChannelToggle({
 
 export default function InvestorSettingsPage() {
   const { user, profile, isLoading: authLoading } = useAuth();
+  const toast = useToast();
   const [loading, setLoading] = useState(true);
 
   // Editable fields
@@ -291,10 +293,11 @@ export default function InvestorSettingsPage() {
         }, { onConflict: 'user_id' });
 
       setSaved(true);
+      toast.success('Settings saved');
       setTimeout(() => setSaved(false), 2500);
     } catch {
       // S2.15: Show error instead of silently failing
-      alert('Failed to save settings. Please try again.');
+      toast.error('Failed to save settings. Please try again.');
     }
     setSaving(false);
   };
@@ -498,7 +501,7 @@ export default function InvestorSettingsPage() {
             <button
               onClick={async () => {
                 if (!user?.email) {
-                  alert('No email associated with this account.');
+                  toast.error('No email associated with this account.');
                   return;
                 }
                 try {
@@ -507,12 +510,12 @@ export default function InvestorSettingsPage() {
                     redirectTo: `${window.location.origin}/auth/reset-password`,
                   });
                   if (error) {
-                    alert('Failed to send password reset email. Please try again.');
+                    toast.error('Failed to send password reset email. Please try again.');
                   } else {
-                    alert('Password reset email sent. Please check your inbox.');
+                    toast.success('Password reset email sent. Please check your inbox.');
                   }
                 } catch {
-                  alert('Failed to send password reset email. Please try again.');
+                  toast.error('Failed to send password reset email. Please try again.');
                 }
               }}
               className="px-4 py-1.5 text-xs font-medium text-[#1B2A4A] border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"

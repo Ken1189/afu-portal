@@ -39,10 +39,10 @@ export const metadata = {
     title: "Invest in AFU - $500M Seed Round",
     description:
       "Africa's agriculture is a $1T market by 2030. AFU is the execution layer — financing, inputs, processing, offtake, trade finance, and training in one integrated platform.",
-    url: "https://afu-portal.vercel.app/investors",
+    url: "https://africanfarmingunion.org/investors",
     images: [
       {
-        url: "https://afu-portal.vercel.app/og-image.png",
+        url: "https://africanfarmingunion.org/og-image.png",
         width: 1200,
         height: 630,
         alt: "Invest in AFU - $500M Seed Round",

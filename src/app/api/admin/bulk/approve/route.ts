@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase/server';
 import { notifyUser } from '@/lib/events/notifications';
 
-const ALLOWED_ENTITIES = ['membership_applications', 'loans', 'claims'] as const;
+const ALLOWED_ENTITIES = ['membership_applications', 'loans', 'claims', 'kyc_verifications', 'kyc_documents'] as const;
 type ApproveEntity = (typeof ALLOWED_ENTITIES)[number];
 
 const ALLOWED_ACTIONS = ['approve', 'reject'] as const;

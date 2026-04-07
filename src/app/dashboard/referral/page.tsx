@@ -76,7 +76,7 @@ export default function ReferralPage() {
     }
   }, [user]);
 
-  const referralLink = data ? `https://afu-portal.vercel.app/apply?ref=${data.referralCode}` : '';
+  const referralLink = data ? `https://africanfarmingunion.org/apply?ref=${data.referralCode}` : '';
   const edmaReferralLink = `${BUY_EDM_URL}&afuRef=${data?.referralCode || ''}`;
 
   const copyCode = () => {

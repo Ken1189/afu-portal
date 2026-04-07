@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -717,6 +717,22 @@ function AddPlotModal({
   const [saveError, setSaveError] = useState<string | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+  const [farmId, setFarmId] = useState<string>('');
+  const [farms, setFarms] = useState<Array<{ id: string; name: string }>>([]);
+
+  // Fetch user's farms from the new farms table
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      const supabase = createClient();
+      const { data } = await supabase
+        .from('farms')
+        .select('id, name')
+        .eq('member_id', user.id)
+        .order('name');
+      if (data) setFarms(data as Array<{ id: string; name: string }>);
+    })();
+  }, [user]);
 
   // Pre-fill when editing
   useState(() => {
@@ -806,7 +822,8 @@ function AddPlotModal({
         location: locationStr,
         notes: null,
         photo_url: photoUrl || null,
-      });
+        ...(farmId ? { farm_id: farmId } : {}),
+      } as Omit<FarmPlotRow, 'id' | 'created_at' | 'updated_at' | 'health_score'> & { farm_id?: string });
       setSaving(false);
       if (error) { setSaveError(error); return; }
     }
@@ -884,6 +901,23 @@ function AddPlotModal({
                 />
               </div>
 
+              {/* Farm (optional, from farms table) */}
+              {farms.length > 0 && (
+                <div>
+                  <label className="text-xs font-semibold text-navy block mb-1">Farm</label>
+                  <select
+                    value={farmId}
+                    onChange={(e) => setFarmId(e.target.value)}
+                    className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-navy focus:outline-none focus:ring-2 focus:ring-[#5DB347]/40 focus:border-[#5DB347]"
+                  >
+                    <option value="">— Select farm —</option>
+                    {farms.map((f) => (
+                      <option key={f.id} value={f.id}>{f.name}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
               {/* Crop Type (dropdown) */}
               <div>
                 <label className="text-xs font-semibold text-navy block mb-1">{t.cropTracker.crop} *</label>
@@ -931,10 +965,10 @@ function AddPlotModal({
                     type="number"
                     value={size}
                     onChange={(e) => setSize(e.target.value)}
-                    placeholder="0.5 (max 100,000)"
+                    placeholder="0.5 (max 1,000,000)"
                     step="0.1"
                     min="0"
-                    max="100000"
+                    max="1000000"
                     className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-navy placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#5DB347]/40 focus:border-[#5DB347]"
                   />
                 </div>

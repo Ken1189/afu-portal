@@ -141,7 +141,7 @@ export async function POST(request: NextRequest) {
         description: description || '',
         phoneNumber: phoneNumber as string | undefined,
         metadata: metadata as Record<string, string> | undefined,
-        returnUrl: `${process.env.NEXT_PUBLIC_APP_URL || 'https://afu-portal.vercel.app'}/farm/payments`,
+        returnUrl: `${process.env.NEXT_PUBLIC_APP_URL || 'https://africanfarmingunion.org'}/farm/payments`,
       }
     );
 

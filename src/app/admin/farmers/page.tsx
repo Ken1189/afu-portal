@@ -142,8 +142,10 @@ Tapiwa Mugabe,tapiwa@example.com,+263775678901,Zimbabwe,Mashonaland West,8.0,Sor
 /* ------------------------------------------------------------------ */
 
 const tierColors: Record<string, string> = {
+  free: 'bg-gray-100 text-gray-700',
   smallholder: 'bg-green-100 text-green-700',
   commercial: 'bg-blue-100 text-blue-700',
+  enterprise: 'bg-purple-100 text-purple-700',
   cooperative: 'bg-purple-100 text-purple-700',
 };
 
@@ -351,6 +353,21 @@ function AllFarmersTab() {
     setMessageText('');
   };
 
+  // CSV Export
+  const handleExport = () => {
+    const csv = [
+      'Name,Email,Phone,Country,Region,Tier,Status,Created',
+      ...filtered.map(row => `"${(row.full_name || '').replace(/"/g, '""')}","${(row.email || '').replace(/"/g, '""')}","${(row.phone || '').replace(/"/g, '""')}","${(row.country || '').replace(/"/g, '""')}","${(row.region || '').replace(/"/g, '""')}","${row.membership_tier || ''}","${row.status || ''}","${row.created_at}"`)
+    ].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `farmers-${Date.now()}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   // Per-farmer data lookups
   const farmerPlots = (id: string) => farmPlots.filter(p => p.member_id === id);
   const farmerLoans = (id: string) => loans.filter(l => l.member_id === id);
@@ -459,12 +476,20 @@ function AllFarmersTab() {
           <option value="all">All Countries</option>
           {countries.map(([country]) => <option key={country} value={country}>{country}</option>)}
         </select>
+        <button
+          onClick={handleExport}
+          className="px-4 py-2.5 bg-[#1B2A4A] text-white rounded-xl text-sm font-semibold hover:bg-[#1B2A4A]/90 flex items-center gap-2"
+        >
+          <Download className="w-4 h-4" />
+          Download CSV
+        </button>
         <select value={filterTier} onChange={(e) => setFilterTier(e.target.value)}
           className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30">
           <option value="all">All Tiers</option>
+          <option value="free">Free</option>
           <option value="smallholder">Smallholder</option>
           <option value="commercial">Commercial</option>
-          <option value="cooperative">Cooperative</option>
+          <option value="enterprise">Enterprise</option>
         </select>
       </div>
 
