@@ -60,11 +60,19 @@ DELETE FROM products WHERE supplier_id NOT IN (SELECT id FROM suppliers);
 -- Ambassador commissions/referrals tied to deleted ambassadors
 DO $$
 BEGIN
+  -- ambassador_referrals cleanup (if table exists)
   IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'ambassador_referrals') THEN
     EXECUTE 'DELETE FROM ambassador_referrals WHERE ambassador_id NOT IN (SELECT id FROM ambassadors)';
   END IF;
+
+  -- ambassador_commissions cleanup (the dedicated table, not generic commissions)
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'ambassador_commissions') THEN
+    EXECUTE 'DELETE FROM ambassador_commissions WHERE ambassador_id NOT IN (SELECT id FROM ambassadors)';
+  END IF;
+
+  -- commissions table uses supplier_id only — clean up orphans from deleted suppliers
   IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'commissions') THEN
-    EXECUTE 'DELETE FROM commissions WHERE ambassador_id IS NOT NULL AND ambassador_id NOT IN (SELECT id FROM ambassadors)';
+    EXECUTE 'DELETE FROM commissions WHERE supplier_id NOT IN (SELECT id FROM suppliers)';
   END IF;
 END$$;
 
