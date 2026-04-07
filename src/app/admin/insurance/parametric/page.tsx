@@ -27,7 +27,15 @@ import {
   Cloud,
   MapPin,
 } from 'lucide-react';
+import { Package } from 'lucide-react';
+import { SectionTabs } from '@/components/admin/SectionTabs';
 import { useAuth } from '@/lib/supabase/auth-context';
+
+const INSURANCE_TABS = [
+  { href: '/admin/insurance', label: 'Overview', Icon: Shield },
+  { href: '/admin/insurance/products', label: 'Products', Icon: Package },
+  { href: '/admin/insurance/parametric', label: 'Parametric', Icon: Zap },
+];
 import { createClient } from '@/lib/supabase/client';
 import { describeTriggerCondition } from '@/lib/insurance/weather';
 
@@ -389,6 +397,7 @@ export default function AdminParametricPage() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
+      <SectionTabs tabs={INSURANCE_TABS} />
       {/* Toast */}
       <AnimatePresence>
         {toast && (

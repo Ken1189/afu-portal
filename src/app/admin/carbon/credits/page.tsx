@@ -5,7 +5,16 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Coins, Plus, Loader2, X, Search, BadgeCheck, DollarSign,
   ShoppingCart, Archive, TrendingUp, Users, TreePine,
+  Leaf, Sprout, ShieldCheck,
 } from 'lucide-react';
+import { SectionTabs } from '@/components/admin/SectionTabs';
+
+const CARBON_TABS = [
+  { href: '/admin/carbon', label: 'Overview', Icon: Leaf },
+  { href: '/admin/carbon/projects', label: 'Projects', Icon: Sprout },
+  { href: '/admin/carbon/credits', label: 'Credits', Icon: Coins },
+  { href: '/admin/carbon/verifications', label: 'Verifications', Icon: ShieldCheck },
+];
 import { useAuth } from '@/lib/supabase/auth-context';
 import { createClient } from '@/lib/supabase/client';
 
@@ -223,6 +232,7 @@ export default function AdminCarbonCreditsPage() {
 
   return (
     <div className="space-y-6">
+      <SectionTabs tabs={CARBON_TABS} />
       {/* Toast */}
       <AnimatePresence>
         {toast && (

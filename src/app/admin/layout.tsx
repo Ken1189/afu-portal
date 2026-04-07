@@ -114,7 +114,6 @@ const navGroups: NavGroup[] = [
     links: [
       { href: '/admin', label: 'Overview', icon: <LayoutDashboard className={ICON_CLS} /> },
       { href: '/admin/analytics', label: 'Analytics & Reports', icon: <TrendingUp className={ICON_CLS} /> },
-      { href: '/admin/reports', label: 'Reports', icon: <BarChart3 className={ICON_CLS} /> },
       { href: '/admin/map', label: 'Map View', icon: <MapPin className={ICON_CLS} /> },
     ],
   },

@@ -5,8 +5,16 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import {
   TreePine, Users, Award, DollarSign, ShieldCheck, Loader2,
-  TrendingUp, Clock, Leaf, ArrowRight, BarChart3,
+  TrendingUp, Clock, Leaf, ArrowRight, BarChart3, Sprout, Coins,
 } from 'lucide-react';
+import { SectionTabs } from '@/components/admin/SectionTabs';
+
+const CARBON_TABS = [
+  { href: '/admin/carbon', label: 'Overview', Icon: Leaf },
+  { href: '/admin/carbon/projects', label: 'Projects', Icon: Sprout },
+  { href: '/admin/carbon/credits', label: 'Credits', Icon: Coins },
+  { href: '/admin/carbon/verifications', label: 'Verifications', Icon: ShieldCheck },
+];
 import { useAuth } from '@/lib/supabase/auth-context';
 import { createClient } from '@/lib/supabase/client';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, Area, AreaChart } from 'recharts';
@@ -172,6 +180,7 @@ export default function AdminCarbonDashboard() {
 
   return (
     <div className="space-y-6">
+      <SectionTabs tabs={CARBON_TABS} />
       {fetchError && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700">
           {fetchError}

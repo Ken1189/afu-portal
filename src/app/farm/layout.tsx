@@ -181,11 +181,42 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
     }
   }, [authLoading, user, profile?.role, router]);
 
+
   const handleTourComplete = useCallback(() => {
     setShowTour(false);
   }, []);
 
   const supabase = useMemo(() => createClient(), []);
+
+  // Onboarding gate — redirect new farmers to wizard until profiles.onboarded_at is set.
+  // Gracefully no-ops if the column doesn't exist yet (migration not applied).
+  useEffect(() => {
+    if (authLoading || !user || !profile?.role) return;
+    if (pathname === '/farm/onboarding') return;
+    const role = profile.role as string;
+    if (role !== 'farmer' && role !== 'member') return;
+
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('onboarded_at')
+          .eq('id', user.id)
+          .single();
+        if (cancelled) return;
+        if (error) return; // column missing — fail open
+        if (data && data.onboarded_at == null) {
+          router.replace('/farm/onboarding');
+        }
+      } catch {
+        // ignore — fail open
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [authLoading, user, profile?.role, pathname, supabase, router]);
 
   // Fetch membership tier from members table
   useEffect(() => {

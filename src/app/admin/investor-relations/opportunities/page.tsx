@@ -21,6 +21,12 @@ import FilterBar, {
   type FilterConfig,
   type FilterValues,
 } from '@/components/admin/FilterBar';
+import { SectionTabs } from '@/components/admin/SectionTabs';
+
+const IR_TABS = [
+  { href: '/admin/investor-relations', label: 'Investors', Icon: TrendingUp },
+  { href: '/admin/investor-relations/opportunities', label: 'Opportunities', Icon: Target },
+];
 import { createClient } from '@/lib/supabase/client';
 import { ALL_AFRICAN_COUNTRIES } from '@/lib/countries';
 
@@ -846,6 +852,7 @@ export default function AdminInvestmentOpportunitiesPage() {
 
   return (
     <div className="space-y-6">
+      <SectionTabs tabs={IR_TABS} />
       {toast && (
         <Toast
           message={toast.message}

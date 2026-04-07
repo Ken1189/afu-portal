@@ -15,7 +15,16 @@ import {
   Pencil,
   Trash2,
   X,
+  Package,
+  Zap,
 } from 'lucide-react';
+import { SectionTabs } from '@/components/admin/SectionTabs';
+
+const INSURANCE_TABS = [
+  { href: '/admin/insurance', label: 'Overview', Icon: Shield },
+  { href: '/admin/insurance/products', label: 'Products', Icon: Package },
+  { href: '/admin/insurance/parametric', label: 'Parametric', Icon: Zap },
+];
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 import { createClient } from '@/lib/supabase/client';
 
@@ -503,6 +512,7 @@ export default function InsuranceOverviewPage() {
 
   return (
     <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-6">
+      <SectionTabs tabs={INSURANCE_TABS} />
       {toast && (
         <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg text-sm font-medium ${toast.type === 'error' ? 'bg-red-500 text-white' : 'bg-green-500 text-white'}`}>
           {toast.message}

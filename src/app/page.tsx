@@ -355,6 +355,57 @@ export default function Home() {
   const [homepageStats, setHomepageStats] = useState<HomepageStat[]>(FALLBACK_HOMEPAGE_STATS);
   const [membershipTiers, setMembershipTiers] = useState<HomepageMembershipTier[]>(FALLBACK_MEMBERSHIP_TIERS);
 
+  /* ─── Sponsor-a-Farmer preview row (DB with hardcoded fallback) ─── */
+  type FarmerPreview = { name: string; country: string; flag: string; crop: string; img: string };
+  const FALLBACK_FARMER_PREVIEW: FarmerPreview[] = [
+    { name: 'Grace M.', country: 'Zimbabwe', flag: '🇿🇼', crop: 'Maize', img: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=300&h=300&q=80&auto=format&fit=crop' },
+    { name: 'Joseph O.', country: 'Tanzania', flag: '🇹🇿', crop: 'Coffee', img: 'https://images.unsplash.com/photo-1605000797499-95a51c5269ae?w=300&h=300&q=80&auto=format&fit=crop' },
+    { name: 'Amina H.', country: 'Kenya', flag: '🇰🇪', crop: 'Rice', img: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=300&h=300&q=80&auto=format&fit=crop' },
+    { name: 'Sipho D.', country: 'Botswana', flag: '🇧🇼', crop: 'Cattle', img: 'https://images.unsplash.com/photo-1500595046743-cd271d694d30?w=300&h=300&q=80&auto=format&fit=crop' },
+    { name: 'Fatima D.', country: 'Ghana', flag: '🇬🇭', crop: 'Tomatoes', img: 'https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=300&h=300&q=80&auto=format&fit=crop' },
+    { name: 'Peter K.', country: 'Ethiopia', flag: '🇪🇹', crop: 'Teff', img: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=300&h=300&q=80&auto=format&fit=crop' },
+  ];
+  const COUNTRY_FLAGS: Record<string, string> = {
+    Zimbabwe: '🇿🇼', Tanzania: '🇹🇿', Kenya: '🇰🇪', Botswana: '🇧🇼',
+    Ghana: '🇬🇭', Ethiopia: '🇪🇹', Senegal: '🇸🇳', Zambia: '🇿🇲',
+    Uganda: '🇺🇬', Nigeria: '🇳🇬', Malawi: '🇲🇼',
+  };
+  const [farmerPreview, setFarmerPreview] = useState<FarmerPreview[]>(FALLBACK_FARMER_PREVIEW);
+
+  useEffect(() => {
+    async function fetchFarmerPreview() {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from('farmer_public_profiles')
+          .select('display_name, country, crops, hero_photo_url, photo_urls, is_featured')
+          .eq('is_active', true)
+          .order('is_featured', { ascending: false })
+          .limit(6);
+        if (data && data.length > 0) {
+          const mapped: FarmerPreview[] = data.map((row: { display_name: string; country: string | null; crops: string[] | null; hero_photo_url: string | null; photo_urls: string[] | null }) => {
+            const parts = row.display_name.split(' ');
+            const shortName = parts.length > 1 ? `${parts[0]} ${parts[parts.length - 1][0]}.` : row.display_name;
+            const country = row.country || '';
+            const img = row.hero_photo_url || (row.photo_urls && row.photo_urls[0]) || '';
+            return {
+              name: shortName,
+              country,
+              flag: COUNTRY_FLAGS[country] || '🌍',
+              crop: (row.crops && row.crops[0]) || 'Mixed',
+              img,
+            };
+          });
+          setFarmerPreview(mapped);
+        }
+      } catch {
+        // keep fallback
+      }
+    }
+    fetchFarmerPreview();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   /* ─── Unified editable content blob (with draft preview) ─── */
   const searchParams = useSearchParams();
   const isPreview = searchParams?.get('preview') === 'draft' || searchParams?.get('preview') === 'true';
@@ -1575,14 +1626,7 @@ export default function Home() {
           {/* Farmer profile preview row */}
           <div className="mb-10">
             <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-4 max-w-5xl mx-auto">
-              {[
-                { name: 'Grace M.', country: 'Zimbabwe', flag: '🇿🇼', crop: 'Maize', img: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=300&h=300&q=80&auto=format&fit=crop' },
-                { name: 'Joseph O.', country: 'Tanzania', flag: '🇹🇿', crop: 'Coffee', img: 'https://images.unsplash.com/photo-1605000797499-95a51c5269ae?w=300&h=300&q=80&auto=format&fit=crop' },
-                { name: 'Amina H.', country: 'Kenya', flag: '🇰🇪', crop: 'Teff', img: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=300&h=300&q=80&auto=format&fit=crop' },
-                { name: 'Sipho D.', country: 'Botswana', flag: '🇧🇼', crop: 'Beef Cattle', img: 'https://images.unsplash.com/photo-1500595046743-cd271d694d30?w=300&h=300&q=80&auto=format&fit=crop' },
-                { name: 'Fatima D.', country: 'Senegal', flag: '🇸🇳', crop: 'Groundnuts', img: 'https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=300&h=300&q=80&auto=format&fit=crop' },
-                { name: 'Peter K.', country: 'Ethiopia', flag: '🇪🇹', crop: 'Sorghum', img: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=300&h=300&q=80&auto=format&fit=crop' },
-              ].map((f) => (
+              {farmerPreview.map((f) => (
                 <div key={f.name} className="text-center group">
                   <div className="relative w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-3 rounded-full overflow-hidden border-4 border-white shadow-lg ring-2 ring-[#5DB347]/20 group-hover:ring-[#5DB347] transition-all">
                     <Image src={f.img} alt={f.name} fill sizes="96px" className="object-cover" />

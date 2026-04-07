@@ -20,7 +20,14 @@ import {
   Eye,
   Send,
   X,
+  Target,
 } from 'lucide-react';
+import { SectionTabs } from '@/components/admin/SectionTabs';
+
+const IR_TABS = [
+  { href: '/admin/investor-relations', label: 'Investors', Icon: TrendingUp },
+  { href: '/admin/investor-relations/opportunities', label: 'Opportunities', Icon: Target },
+];
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -267,6 +274,7 @@ export default function InvestorRelationsPage() {
       variants={containerVariants}
       className="space-y-6"
     >
+      <SectionTabs tabs={IR_TABS} />
       {/* ── Header ──────────────────────────────────────────────────────────── */}
       <motion.div variants={cardVariants}>
         <div className="flex items-center gap-3 mb-1">
