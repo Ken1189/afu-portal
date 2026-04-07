@@ -423,7 +423,7 @@ export default function Navbar() {
       .from("site_config")
       .select("value")
       .eq("key", "navbar_config")
-      .single()
+      .maybeSingle()
       .then(({ data, error }) => {
         if (!error && data?.value && Array.isArray(data.value) && data.value.length > 0) {
           const items = (data.value as NavConfigItem[])

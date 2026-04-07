@@ -407,7 +407,7 @@ export default function Home() {
           .from('site_config')
           .select('value')
           .eq('key', 'homepage_sections')
-          .single();
+          .maybeSingle();
         if (data?.value) {
           const parsed = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
           if (Array.isArray(parsed)) {
@@ -596,7 +596,7 @@ export default function Home() {
           .from('site_config')
           .select('value')
           .eq('key', 'homepage_stats')
-          .single();
+          .maybeSingle();
         if (data?.value) {
           const parsed = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
           if (Array.isArray(parsed) && parsed.length > 0) {
@@ -619,7 +619,7 @@ export default function Home() {
           .from('site_config')
           .select('value')
           .eq('key', 'membership_tiers_homepage')
-          .single();
+          .maybeSingle();
         if (data?.value) {
           const parsed = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
           if (Array.isArray(parsed) && parsed.length > 0) {

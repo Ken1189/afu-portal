@@ -202,7 +202,7 @@ async function getCountries() {
       .from('site_config')
       .select('value')
       .eq('key', 'countries_data')
-      .single();
+      .maybeSingle();
     if (data?.value && Array.isArray(data.value) && data.value.length > 0) {
       return data.value as typeof FALLBACK_COUNTRIES;
     }
@@ -220,7 +220,7 @@ async function getChrome(): Promise<Record<string, string> | null> {
       .from('site_config')
       .select('value')
       .eq('key', 'page_chrome_countries')
-      .single();
+      .maybeSingle();
     if (data?.value) {
       const parsed = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
       if (parsed && typeof parsed === 'object') return parsed as Record<string, string>;

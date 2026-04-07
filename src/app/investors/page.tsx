@@ -453,7 +453,7 @@ export default function InvestorsPage() {
           .from('site_config')
           .select('value')
           .eq('key', 'page_investors')
-          .single();
+          .maybeSingle();
         if (data && data.value) {
           let parsed: Partial<InvestorsContent> | null = null;
           try {

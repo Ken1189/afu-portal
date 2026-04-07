@@ -28,7 +28,7 @@ export default function ContactPage() {
           .from('site_config')
           .select('value')
           .eq('key', 'contact_info')
-          .single();
+          .maybeSingle();
         if (data?.value) {
           const parsed = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
           if (parsed && typeof parsed === 'object') {
@@ -48,7 +48,7 @@ export default function ContactPage() {
           .from('site_config')
           .select('value')
           .eq('key', 'page_chrome_contact')
-          .single();
+          .maybeSingle();
         if (data?.value) {
           const parsed = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
           if (parsed && typeof parsed === 'object') setChrome(parsed);

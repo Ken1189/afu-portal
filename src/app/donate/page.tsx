@@ -191,7 +191,7 @@ export default function DonatePage() {
           .from('site_config')
           .select('value')
           .eq('key', 'page_donate')
-          .single();
+          .maybeSingle();
         if (data && data.value) {
           let parsed: Partial<DonateContent> | null = null;
           try {

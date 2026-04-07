@@ -113,7 +113,7 @@ export default function FaqPage() {
           .from('site_config')
           .select('value')
           .eq('key', 'page_chrome_faq')
-          .single();
+          .maybeSingle();
         if (data?.value) {
           const parsed = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
           if (parsed && typeof parsed === 'object') setChrome(parsed);

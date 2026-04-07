@@ -274,7 +274,7 @@ export default function AmbassadorsPage() {
             .from('profiles')
             .select('full_name, phone')
             .eq('id', user.id)
-            .single();
+            .maybeSingle();
           setAuthUser({
             id: user.id,
             full_name: profile?.full_name || '',
@@ -315,7 +315,7 @@ export default function AmbassadorsPage() {
           .from('site_config')
           .select('value')
           .eq('key', 'commission_rates')
-          .single();
+          .maybeSingle();
         if (configData?.value) {
           const parsed = typeof configData.value === 'string' ? JSON.parse(configData.value) : configData.value;
           if (Array.isArray(parsed) && parsed.length > 0) {
@@ -332,7 +332,7 @@ export default function AmbassadorsPage() {
           .from('site_config')
           .select('value')
           .eq('key', 'page_chrome_ambassadors')
-          .single();
+          .maybeSingle();
         if (chromeData?.value) {
           const parsed = typeof chromeData.value === 'string' ? JSON.parse(chromeData.value) : chromeData.value;
           if (parsed && typeof parsed === 'object') setChrome(parsed);

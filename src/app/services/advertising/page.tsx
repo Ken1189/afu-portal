@@ -244,7 +244,7 @@ export default function AdvertisingPage() {
           .from('site_config')
           .select('value')
           .eq('key', 'page_advertising')
-          .single();
+          .maybeSingle();
         if (data && data.value) {
           let parsed: Partial<AdvertisingContent> | null = null;
           try {
