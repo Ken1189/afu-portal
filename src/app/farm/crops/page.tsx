@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -755,11 +755,11 @@ function AddPlotModal({
   });
 
   // Reset form when editPlot changes
-  const prevEditRef = useState<string | null>(null);
+  const prevEditRef = useRef<string | null>(null);
   if (open) {
     const editId = editPlot?.id ?? null;
-    if (editId !== prevEditRef[0]) {
-      prevEditRef[0] = editId;
+    if (editId !== prevEditRef.current) {
+      prevEditRef.current = editId;
       if (editPlot) {
         setPlotName(editPlot.name || '');
         setCrop(editPlot.crop || '');
@@ -995,7 +995,7 @@ function AddPlotModal({
                     className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-navy focus:outline-none focus:ring-2 focus:ring-[#5DB347]/40 focus:border-[#5DB347]"
                   >
                     <option value="">Select country</option>
-                    {['Botswana', 'Ghana', 'Kenya', 'Mozambique', 'Nigeria', 'Sierra Leone', 'South Africa', 'Tanzania', 'Uganda', 'Zambia', 'Zimbabwe'].map(c => (
+                    {['Botswana', 'Ethiopia', 'Ghana', 'Kenya', 'Mozambique', 'Nigeria', 'Sierra Leone', 'South Africa', 'Tanzania', 'Uganda', 'Zambia', 'Zimbabwe'].map(c => (
                       <option key={c} value={c}>{c}</option>
                     ))}
                     <option value="Other">Other</option>

@@ -878,7 +878,7 @@ export default function AdminTradingPage() {
                 <div>
                   <label className="block text-xs font-medium text-gray-500 mb-1">Country</label>
                   <select value={newOrder.country} onChange={e => setNewOrder(p => ({ ...p, country: e.target.value }))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
-                    {['Kenya', 'Tanzania', 'Uganda', 'Ghana', 'Nigeria', 'South Africa', 'Zambia', 'Zimbabwe', 'Mozambique', 'Sierra Leone', 'Botswana'].map(c => <option key={c} value={c}>{c}</option>)}
+                    {['Kenya', 'Tanzania', 'Uganda', 'Ghana', 'Nigeria', 'South Africa', 'Zambia', 'Zimbabwe', 'Mozambique', 'Sierra Leone', 'Botswana', 'Ethiopia'].map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </div>
                 <div>

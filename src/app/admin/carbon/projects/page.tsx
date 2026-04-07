@@ -65,7 +65,7 @@ const _UNUSED_demoEnrollments: Record<string, Enrollment[]> = {
   ],
 };
 
-const COUNTRIES = ['Botswana', 'Zimbabwe', 'Tanzania', 'Kenya', 'Uganda', 'Mozambique', 'Zambia', 'Malawi', 'South Africa'];
+const COUNTRIES = ['Botswana', 'Ethiopia', 'Zimbabwe', 'Tanzania', 'Kenya', 'Uganda', 'Mozambique', 'Zambia', 'Malawi', 'South Africa'];
 const PRACTICES = ['Agroforestry', 'No-Till', 'Cover Cropping', 'Composting', 'Crop Rotation', 'Mulching', 'Biogas Installation', 'Manure Management', 'Shade Trees', 'Intercropping', 'Biochar Production', 'Minimum Tillage', 'Waste Reduction'];
 
 const emptyForm = {

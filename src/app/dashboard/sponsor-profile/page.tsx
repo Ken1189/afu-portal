@@ -32,6 +32,7 @@ const AFU_COUNTRIES = [
   'Mozambique',
   'Sierra Leone',
   'Uganda',
+  'Ethiopia',
 ];
 
 // ── Slug generator ──

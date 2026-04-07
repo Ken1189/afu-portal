@@ -128,10 +128,10 @@ const FALLBACK_COUNTRIES = [
   {
     flag: "🇪🇹",
     country: "Ethiopia",
-    role: "Coffee Origin & Highland Agriculture",
-    desc: "Birthplace of coffee and Africa's second most populous nation. Massive smallholder farming base with growing commercial agriculture sector.",
-    highlights: ["World's #5 coffee producer", "100M+ population market", "Highland grain production", "Flower export industry"],
-    stat: "Planned",
+    role: "Strategic East Africa Lane",
+    desc: "Africa's coffee origin and second-most populous country, with vast highland farming and major export crops including coffee, teff, and oilseeds.",
+    highlights: ["Coffee origin (world's 5th largest producer)", "Major teff & cereals exporter", "Highland & rift valley agroecology", "Growing horticulture sector", "60+ million in agriculture"],
+    stat: "East Africa",
   },
   {
     flag: "🇲🇼",

@@ -107,7 +107,7 @@ export default function AdminAnalyticsPage() {
       ((profRes.data || []) as typeof profiles).forEach(p => { if (p.country) allCountries.add(p.country); });
       ((ambRes.data || []) as AmbassadorRow[]).forEach(a => { if (a.country) allCountries.add(a.country); });
       // Also add the AFU core countries in case data is sparse
-      ['Botswana', 'Ghana', 'Kenya', 'Mozambique', 'Nigeria', 'Sierra Leone', 'South Africa', 'Tanzania', 'Uganda', 'Zambia', 'Zimbabwe'].forEach(c => allCountries.add(c));
+      ['Botswana', 'Ethiopia', 'Ghana', 'Kenya', 'Mozambique', 'Nigeria', 'Sierra Leone', 'South Africa', 'Tanzania', 'Uganda', 'Zambia', 'Zimbabwe'].forEach(c => allCountries.add(c));
       setCountries([...allCountries].sort());
 
     } catch (err) {

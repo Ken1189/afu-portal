@@ -436,8 +436,8 @@ const FALLBACK_COUNTRIES: CountryData[] = [
   {
     name: "Ethiopia",
     slug: "ethiopia",
-    flag: "",
-    role: "Coffee Origin & Highland Agriculture",
+    flag: "\uD83C\uDDEA\uD83C\uDDF9",
+    role: "Strategic East Africa Lane",
     heroImage: "https://images.unsplash.com/photo-1447933601403-56dc2df1ed5a?w=1600&q=80",
     description:
       "Ethiopia is the birthplace of coffee and Africa's second most populous nation. With a massive smallholder farming base and growing commercial agriculture sector, Ethiopia offers enormous scale potential for AFU's integrated platform.",

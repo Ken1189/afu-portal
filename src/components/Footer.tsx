@@ -36,6 +36,7 @@ const FALLBACK_COUNTRIES = [
   { flag: '\ud83c\uddff\ud83c\uddfc', name: 'Zimbabwe (Export Lane)' },
   { flag: '\ud83c\udde7\ud83c\uddfc', name: 'Botswana (Bank Base)' },
   { flag: '\ud83c\uddf9\ud83c\uddff', name: 'Tanzania (Scale Lane)' },
+  { flag: '\ud83c\uddea\ud83c\uddf9', name: 'Ethiopia (East Africa Lane)' },
 ];
 
 /* ─── Hardcoded fallback data ─── */

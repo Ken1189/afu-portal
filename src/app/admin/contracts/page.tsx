@@ -60,7 +60,7 @@ const PAYMENT_TERMS = [
   { value: 'net_90', label: 'Net 90 Days' },
 ];
 
-const COUNTRIES = ['Botswana', 'Ghana', 'Kenya', 'Mozambique', 'Nigeria', 'Sierra Leone', 'South Africa', 'Tanzania', 'Uganda', 'Zambia', 'Zimbabwe'];
+const COUNTRIES = ['Botswana', 'Ethiopia', 'Ghana', 'Kenya', 'Mozambique', 'Nigeria', 'Sierra Leone', 'South Africa', 'Tanzania', 'Uganda', 'Zambia', 'Zimbabwe'];
 
 export default function AdminContractsPage() {
   const supabase = useMemo(() => createClient(), []);

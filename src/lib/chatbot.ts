@@ -116,9 +116,9 @@ export async function getChatResponse(
   }
 
   // --- Countries ---
-  if (/countr|where|africa|zimbabwe|uganda|kenya|nigeria|ghana|tanzania|zambia|mozambique|botswana|south\s*africa/.test(lowerMessage)) {
+  if (/countr|where|africa|zimbabwe|uganda|kenya|nigeria|ghana|tanzania|zambia|mozambique|botswana|south\s*africa|ethiopia/.test(lowerMessage)) {
     return {
-      text: "AFU operates across 9 African countries:\n\nZimbabwe, Botswana, Kenya, Tanzania, South Africa, Nigeria, Ghana, Uganda, Zambia, and Mozambique.\n\nWe're building local infrastructure and partnerships in each market. Visit /countries to learn more.",
+      text: "AFU operates across 11 African countries:\n\nZimbabwe, Botswana, Kenya, Tanzania, South Africa, Nigeria, Ghana, Uganda, Zambia, Mozambique, and Ethiopia.\n\nWe're building local infrastructure and partnerships in each market. Visit /countries to learn more.",
       suggestions: ['Our services', 'Membership options', 'Contact us'],
     };
   }

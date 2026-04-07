@@ -452,7 +452,7 @@ export default function AdminDashboard() {
         const countryFlags: Record<string, string> = {
           'Zimbabwe': 'ZW', 'Tanzania': 'TZ', 'Botswana': 'BW',
           'Kenya': 'KE', 'South Africa': 'ZA', 'Zambia': 'ZM',
-          'Mozambique': 'MZ', 'Malawi': 'MW', 'Namibia': 'NA',
+          'Mozambique': 'MZ', 'Malawi': 'MW', 'Namibia': 'NA', 'Ethiopia': 'ET',
         };
         const counts: Record<string, number> = {};
         data.forEach((p: { country: string | null }) => {

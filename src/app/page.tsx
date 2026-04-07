@@ -1451,7 +1451,7 @@ export default function Home() {
                   Expanding Across Africa
                 </h2>
                 <p className="text-gray-500 mb-8 leading-relaxed">
-                  Starting with three high-potential markets, AFU is building the playbook to scale
+                  Starting with high-potential markets, AFU is building the playbook to scale
                   the integrated agriculture platform across the continent.
                 </p>
                 <div className="space-y-6">
@@ -1473,6 +1473,12 @@ export default function Home() {
                       name: 'Tanzania',
                       crops: 'Cassava, Sesame, Cashew',
                       members: 67,
+                    },
+                    {
+                      flag: '🇪🇹',
+                      name: 'Ethiopia',
+                      crops: 'Coffee, Teff, Oilseeds',
+                      members: 54,
                     },
                   ].map((c) => (
                     <div

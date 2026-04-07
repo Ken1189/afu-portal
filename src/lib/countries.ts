@@ -1,7 +1,7 @@
 // AFU operating countries (real)
 export const AFU_COUNTRIES = [
   'Zimbabwe', 'Botswana', 'Kenya', 'Tanzania', 'South Africa',
-  'Nigeria', 'Ghana', 'Uganda', 'Zambia', 'Mozambique',
+  'Nigeria', 'Ghana', 'Uganda', 'Zambia', 'Mozambique', 'Ethiopia',
 ];
 
 // Full Africa list (for forms that allow any African country)
@@ -10,7 +10,7 @@ export const ALL_AFRICAN_COUNTRIES = [
   'Algeria', 'Angola', 'Benin', 'Burkina Faso', 'Burundi',
   'Cameroon', 'Cape Verde', 'Central African Republic', 'Chad', 'Comoros',
   'Congo (Brazzaville)', 'Congo (DRC)', 'Djibouti', 'Egypt', 'Equatorial Guinea',
-  'Eritrea', 'Eswatini', 'Ethiopia', 'Gabon', 'Gambia', 'Guinea',
+  'Eritrea', 'Eswatini', 'Gabon', 'Gambia', 'Guinea',
   'Guinea-Bissau', 'Ivory Coast', 'Lesotho', 'Liberia', 'Libya',
   'Madagascar', 'Malawi', 'Mali', 'Mauritania', 'Mauritius', 'Morocco',
   'Namibia', 'Niger', 'Rwanda', 'Senegal',
