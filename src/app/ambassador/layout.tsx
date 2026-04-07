@@ -199,7 +199,7 @@ export default function AmbassadorLayout({ children }: { children: React.ReactNo
         </nav>
 
         <div className="p-3 border-t border-white/10 space-y-2">
-          <PortalSwitcherDropdown variant="dark" />
+          <PortalSwitcherDropdown variant="dark" position="up" />
           <button
             onClick={async () => {
               const { createBrowserClient } = await import('@supabase/ssr');
@@ -249,7 +249,7 @@ export default function AmbassadorLayout({ children }: { children: React.ReactNo
                 {renderNavLinks(() => setMobileOpen(false))}
               </nav>
               <div className="p-3 border-t border-white/10 space-y-2">
-                <PortalSwitcherDropdown variant="dark" />
+                <PortalSwitcherDropdown variant="dark" position="up" />
                 <button
                   onClick={async () => {
                     const { createBrowserClient } = await import('@supabase/ssr');

@@ -263,7 +263,7 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
 
         {/* Sidebar Footer */}
         <div className="p-3 border-t border-white/10">
-          <PortalSwitcherDropdown variant="dark" />
+          <PortalSwitcherDropdown variant="dark" position="up" />
         </div>
       </aside>
 
@@ -379,7 +379,7 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
 
                 {/* Drawer Footer */}
                 <div className="p-3 border-t border-white/10">
-                  <PortalSwitcherDropdown variant="dark" />
+                  <PortalSwitcherDropdown variant="dark" position="up" />
                 </div>
               </motion.aside>
             </>

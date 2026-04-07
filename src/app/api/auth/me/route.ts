@@ -6,15 +6,25 @@ import { cookies } from 'next/headers';
 /**
  * GET /api/auth/me
  *
- * Returns the current user's role from the profiles table.
- * Uses the service role key to bypass RLS — safe because
- * we only return the role of the authenticated user.
+ * Returns the current user's role data: primary `role`, `roles[]` array,
+ * and `capabilities[]`. Uses the service role to bypass RLS — safe because
+ * we only return data for the authenticated user.
+ *
+ * Response shape:
+ * {
+ *   userId: string,
+ *   email: string,
+ *   role: string,             // primary role
+ *   roles: string[],          // unified roles (primary + roles[] column)
+ *   capabilities: string[],
+ *   isAdmin: boolean,
+ *   error: null
+ * }
  */
 export async function GET() {
   try {
     const cookieStore = await cookies();
 
-    // Create a server client to read the session from cookies
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -33,27 +43,60 @@ export async function GET() {
     const { data: { user }, error: userError } = await supabase.auth.getUser();
 
     if (userError || !user) {
-      return NextResponse.json({ role: null, error: 'Not authenticated' }, { status: 401 });
+      return NextResponse.json(
+        { role: null, roles: [], capabilities: [], error: 'Not authenticated' },
+        { status: 401 }
+      );
     }
 
-    // Use service role to bypass RLS and get the profile
     const svc = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
+    // Fetch role first (always present)
     const { data: profile, error: profileError } = await svc
       .from('profiles')
       .select('role')
       .eq('id', user.id)
       .single();
 
-    if (profileError || !profile) {
-      return NextResponse.json({ role: 'member', error: null });
+    const role = profileError || !profile ? 'member' : (profile.role || 'member');
+
+    // Try to fetch roles[] and capabilities[] (columns may not exist on older schemas)
+    let rolesArr: string[] = [];
+    let capabilities: string[] = [];
+    try {
+      const { data: extra } = await svc
+        .from('profiles')
+        .select('roles, capabilities')
+        .eq('id', user.id)
+        .single();
+      if (extra?.roles && Array.isArray(extra.roles)) rolesArr = extra.roles;
+      if (extra?.capabilities && Array.isArray(extra.capabilities))
+        capabilities = extra.capabilities;
+    } catch {
+      // columns don't exist — fine
     }
 
-    return NextResponse.json({ role: profile.role, error: null });
+    // Unified roles set (primary role + roles[] column)
+    const rolesSet = new Set<string>([role, ...rolesArr]);
+    const roles = Array.from(rolesSet);
+    const isAdmin = roles.includes('admin') || roles.includes('super_admin');
+
+    return NextResponse.json({
+      userId: user.id,
+      email: user.email,
+      role,
+      roles,
+      capabilities,
+      isAdmin,
+      error: null,
+    });
   } catch {
-    return NextResponse.json({ role: null, error: 'Server error' }, { status: 500 });
+    return NextResponse.json(
+      { role: null, roles: [], capabilities: [], error: 'Server error' },
+      { status: 500 }
+    );
   }
 }

@@ -972,7 +972,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="border-t border-white/10">
           {showLabels && (
             <div className="p-3 border-b border-white/10">
-              <PortalSwitcherDropdown variant="dark" />
+              <PortalSwitcherDropdown variant="dark" position="up" />
             </div>
           )}
           {/* User info */}
@@ -1123,7 +1123,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
               {/* Mobile user section */}
               <div className="border-t border-white/10 p-3 space-y-3">
-                <PortalSwitcherDropdown variant="dark" />
+                <PortalSwitcherDropdown variant="dark" position="up" />
                 <div className="flex items-center gap-2.5">
                   <div className="w-8 h-8 bg-[#5DB347] rounded-full flex items-center justify-center flex-shrink-0">
                     <span className="text-white text-xs font-bold">{initials}</span>

@@ -359,9 +359,10 @@ export default function PublicMarketplacePage() {
             {filtered.map((product) => {
               const avail = AVAILABILITY_LABELS[product.availability] || AVAILABILITY_LABELS['in-stock'];
               return (
-                <div
+                <Link
                   key={product.id}
-                  className="bg-white rounded-xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-lg transition-all hover:-translate-y-1 group"
+                  href={`/marketplace/${product.id}`}
+                  className="block bg-white rounded-xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-lg transition-all hover:-translate-y-1 group"
                 >
                   {/* Image */}
                   <div className="relative h-48 overflow-hidden bg-gray-100">
@@ -405,7 +406,7 @@ export default function PublicMarketplacePage() {
                         </p>
                       </div>
                       <button
-                        onClick={() => handleBuyClick(product)}
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleBuyClick(product); }}
                         disabled={product.availability === 'out-of-stock'}
                         className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#5DB347] text-white text-xs font-bold hover:bg-[#449933] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
                       >
@@ -414,7 +415,7 @@ export default function PublicMarketplacePage() {
                       </button>
                     </div>
                   </div>
-                </div>
+                </Link>
               );
             })}
           </div>

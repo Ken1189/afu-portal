@@ -195,7 +195,7 @@ export default function WarehouseLayout({ children }: { children: React.ReactNod
         </nav>
 
         <div className="p-3 border-t border-white/10 space-y-2">
-          <PortalSwitcherDropdown variant="dark" />
+          <PortalSwitcherDropdown variant="dark" position="up" />
           <button
             onClick={async () => {
               const { createBrowserClient } = await import('@supabase/ssr');
@@ -245,7 +245,7 @@ export default function WarehouseLayout({ children }: { children: React.ReactNod
                 {renderNavLinks(() => setMobileOpen(false))}
               </nav>
               <div className="p-3 border-t border-white/10 space-y-2">
-                <PortalSwitcherDropdown variant="dark" />
+                <PortalSwitcherDropdown variant="dark" position="up" />
                 <button
                   onClick={async () => {
                     const { createBrowserClient } = await import('@supabase/ssr');

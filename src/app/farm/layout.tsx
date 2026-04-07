@@ -497,7 +497,7 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
 
         {/* Sidebar Footer */}
         <div className="p-3 border-t border-gray-100">
-          <PortalSwitcherDropdown variant="light" />
+          <PortalSwitcherDropdown variant="light" position="up" />
         </div>
       </aside>
 
@@ -738,7 +738,7 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
                 )}
 
                 <div className="p-3 border-t border-gray-100">
-                  <PortalSwitcherDropdown variant="light" />
+                  <PortalSwitcherDropdown variant="light" position="up" />
                 </div>
               </motion.aside>
             </>
