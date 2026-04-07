@@ -26,9 +26,11 @@ export const ADMIN_RECIPIENTS = [
   'devon@africanfarmingunion.org',
 ] as const;
 
+// Resend verified domain is mail.africanfarmingunion.org
+// Recipients above are real inboxes; From must be on the verified subdomain
 export const ADMIN_FROM =
   process.env.EMAIL_FROM ??
-  'African Farming Union <info@africanfarmingunion.org>';
+  'African Farming Union <info@mail.africanfarmingunion.org>';
 
 export type NotifyType =
   | 'contact'
@@ -196,7 +198,7 @@ export async function notifyAdmins(
   await Promise.all(
     ADMIN_RECIPIENTS.map(async (recipient) => {
       try {
-        await sendEmail(recipient, params.subject, html, ADMIN_FROM);
+        await sendEmail(recipient, params.subject, html, ADMIN_FROM, params.reply_to);
         result.emailSent = true;
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);

@@ -3,7 +3,7 @@ import { Resend } from 'resend';
 import { notifyAdmins } from '@/lib/email';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const FROM = 'African Farming Union <info@africanfarmingunion.org>';
+const FROM = 'African Farming Union <info@mail.africanfarmingunion.org>';
 
 export async function POST(req: Request) {
   try {

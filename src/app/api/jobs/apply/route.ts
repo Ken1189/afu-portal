@@ -4,7 +4,7 @@ import { Resend } from 'resend';
 import { notifyAdmins } from '@/lib/email';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const FROM = 'African Farming Union <info@africanfarmingunion.org>';
+const FROM = 'African Farming Union <info@mail.africanfarmingunion.org>';
 
 // Brand colors
 const NAVY = '#1B2A4A';

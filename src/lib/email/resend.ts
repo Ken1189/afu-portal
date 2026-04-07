@@ -71,8 +71,10 @@ export interface DirectEmailParams {
 // Default sender — change when a verified domain is set up in Resend.
 // ---------------------------------------------------------------------------
 
+// Resend verified domain is mail.africanfarmingunion.org
+// Replies still route to info@africanfarmingunion.org via Reply-To header
 const DEFAULT_FROM =
-  process.env.EMAIL_FROM ?? 'African Farming Union <info@africanfarmingunion.org>';
+  process.env.EMAIL_FROM ?? 'African Farming Union <info@mail.africanfarmingunion.org>';
 
 // ---------------------------------------------------------------------------
 // Template variable substitution
@@ -133,6 +135,7 @@ export async function sendEmail(
   subject: string,
   html: string,
   from: string = DEFAULT_FROM,
+  replyTo?: string,
 ): Promise<SendEmailResult> {
   const resend = getResendClient();
 
@@ -141,6 +144,7 @@ export async function sendEmail(
     to,
     subject,
     html,
+    ...(replyTo ? { replyTo } : {}),
   });
 
   if (error) {

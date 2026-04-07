@@ -112,7 +112,7 @@ export async function POST(request: Request) {
         });
 
         if (false) await resend.emails.send({
-          from: 'AFU Investor Relations <info@africanfarmingunion.org>',
+          from: 'AFU Investor Relations <info@mail.africanfarmingunion.org>',
           to: 'placeholder@example.com',
           subject: `New Investment Interest: ${expression.opportunityName} — ${expression.entityName}`,
           html: `
@@ -183,7 +183,7 @@ export async function POST(request: Request) {
         // Auto-reply to investor
         const investorFirstName = (expression.investorName || expression.entityName).split(' ')[0];
         await resend.emails.send({
-          from: 'African Farming Union <info@africanfarmingunion.org>',
+          from: 'African Farming Union <info@mail.africanfarmingunion.org>',
           to: expression.email,
           subject: `Thank you for your interest in ${expression.opportunityName}`,
           html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
