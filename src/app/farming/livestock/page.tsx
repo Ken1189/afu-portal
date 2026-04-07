@@ -43,7 +43,7 @@ const species = [
   {
     name: "Goats",
     image:
-      "https://images.unsplash.com/photo-1561601989-86acd2cdd2cd?w=800&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1604866830893-c13cafa515d5?w=800&q=80&auto=format&fit=crop",
     description:
       "Hardy and adaptable, goats are Africa's most versatile livestock. Boer goats lead meat production while dairy breeds like Saanen and Alpine cross well with indigenous stock. Goat farming requires minimal land and start-up capital.",
     countries: ["South Africa", "Kenya", "Nigeria", "Tanzania"],

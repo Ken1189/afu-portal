@@ -70,7 +70,7 @@ const gameSpecies = [
   {
     name: "Crocodile",
     image:
-      "https://images.unsplash.com/photo-1599577180589-0a1e4c6dec97?w=800&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1572276596237-5db2c3e16c5d?w=800&q=80&auto=format&fit=crop",
     description:
       "Nile crocodile farming produces luxury leather for fashion houses and quality meat for restaurants and export. Highly regulated but extremely profitable, with premium skins fetching $300-1,500 each depending on size and quality.",
     value: "Luxury leather",

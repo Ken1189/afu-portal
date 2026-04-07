@@ -36,7 +36,7 @@ const treeSpecies = [
   {
     name: "Eucalyptus",
     image:
-      "https://images.unsplash.com/photo-1574874296748-a2dafdfc7ec3?w=800&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?w=800&q=80&auto=format&fit=crop",
     description:
       "The fastest commercial timber species in Africa, reaching harvestable size in 5-8 years. Eucalyptus grandis and E. camaldulensis are widely planted for poles, pulpwood, and biomass energy. Coppices well for multiple harvests from a single planting.",
     rotation: "5-8 years",
@@ -72,7 +72,7 @@ const treeSpecies = [
   {
     name: "Bamboo",
     image:
-      "https://images.unsplash.com/photo-1473148584683-08e9be4d2dd2?w=800&q=80&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&q=80&auto=format&fit=crop",
     description:
       "The fastest-growing plant on earth, bamboo reaches harvestable maturity in 3-5 years and continues producing for decades without replanting. Used in construction, furniture, textiles, and activated charcoal. A powerhouse for carbon sequestration.",
     rotation: "3-5 years (continuous)",
