@@ -298,7 +298,7 @@ const FALLBACK_MEMBERSHIP_TIERS: HomepageMembershipTier[] = [
   { tier: 'Smallholder', name: 'Smallholder', price: '$4.99', period: '/mo', features: ['Full crop tracking', 'Financing up to $5K', 'Basic insurance', 'Marketplace access', 'AI assistant'], cta: 'Join as Smallholder', highlight: false },
   { tier: 'Commercial', name: 'Commercial', price: '$49', period: '/mo', features: ['Advanced crop tracking', 'Financing up to $50K', 'Full insurance', 'Discounted inputs', 'Basic trade finance'], cta: 'Join Commercial', highlight: false },
   { tier: 'Enterprise', name: 'Enterprise', price: '$499', period: '/mo', features: ['Financing up to $250K', 'Comprehensive insurance', 'Dedicated advisor', 'Full trade finance', 'Legal support & VIP events'], cta: 'Join Enterprise', highlight: true },
-  { tier: 'Partner', name: 'Partner / Vendor', price: 'On Request', period: '', features: ['Directory listing', 'Co-branded programs', 'Member network access', 'Deal flow access', 'Dedicated advisor'], cta: 'Contact Us', highlight: false },
+  { tier: 'Partner', name: 'Partner / Vendor', price: '', period: '', features: ['Directory listing', 'Co-branded programs', 'Member network access', 'Deal flow access', 'Dedicated advisor'], cta: 'Contact Us', highlight: false },
 ];
 
 /* ─── Programs fallback ─── */
@@ -1202,32 +1202,34 @@ export default function Home() {
                   >
                     {item.name}
                   </h3>
-                  <div className="mb-6">
-                    {(() => {
-                      // Numeric prices render big; text prices (e.g. "On Request") render small
-                      const isNumeric = /^\$?\d/.test(item.price.trim());
-                      return (
-                        <>
-                          <span
-                            className={`${
-                              isNumeric ? 'text-4xl md:text-5xl font-extrabold' : 'text-xl md:text-2xl font-bold'
-                            } ${item.highlight ? 'text-white' : 'text-navy'}`}
-                          >
-                            {item.price}
-                          </span>
-                          {item.period && (
+                  {item.price && (
+                    <div className="mb-6">
+                      {(() => {
+                        // Numeric prices render big; text prices render small
+                        const isNumeric = /^\$?\d/.test(item.price.trim());
+                        return (
+                          <>
                             <span
-                              className={`text-sm ${
-                                item.highlight ? 'text-gray-300' : 'text-gray-500'
-                              }`}
+                              className={`${
+                                isNumeric ? 'text-4xl md:text-5xl font-extrabold' : 'text-xl md:text-2xl font-bold'
+                              } ${item.highlight ? 'text-white' : 'text-navy'}`}
                             >
-                              {item.period}
+                              {item.price}
                             </span>
-                          )}
-                        </>
-                      );
-                    })()}
-                  </div>
+                            {item.period && (
+                              <span
+                                className={`text-sm ${
+                                  item.highlight ? 'text-gray-300' : 'text-gray-500'
+                                }`}
+                              >
+                                {item.period}
+                              </span>
+                            )}
+                          </>
+                        );
+                      })()}
+                    </div>
+                  )}
                   <ul className="space-y-3 mb-8 flex-1">
                     {item.features.map((f, j) => (
                       <li
