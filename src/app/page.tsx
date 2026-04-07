@@ -139,7 +139,7 @@ const FALLBACK_SERVICES = [
     title: 'Financing',
     desc: 'Working capital, invoice finance, and crop financing from smallholder to commercial scale.',
     link: '/services/financing',
-    img: 'https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=800&h=500&fit=crop',
+    img: 'https://images.unsplash.com/photo-1605000797499-95a51c5269ae?w=800&h=500&q=80&auto=format&fit=crop',
   },
   {
     icon: Cog,
@@ -1007,7 +1007,7 @@ export default function Home() {
             <FadeInWhenVisible direction="right">
               <div className="relative rounded-3xl overflow-hidden shadow-2xl">
                 <Image
-                  src={c('ai_image', 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&h=600&fit=crop')}
+                  src={c('ai_image', 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80&auto=format&fit=crop')}
                   alt="African farmer inspecting crops"
                   width={800}
                   height={600}
@@ -1511,7 +1511,7 @@ export default function Home() {
             <FadeInWhenVisible direction="left">
               <div className="relative rounded-3xl overflow-hidden shadow-2xl">
                 <Image
-                  src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&h=600&fit=crop"
+                  src="https://images.unsplash.com/photo-1605000797499-95a51c5269ae?w=800&q=80&auto=format&fit=crop"
                   alt="African farmer in field"
                   width={800}
                   height={600}
@@ -1677,7 +1677,7 @@ export default function Home() {
       {showSection('cta') && <section className="relative py-32 overflow-hidden">
         <div className="absolute inset-0">
           <Image
-            src="https://images.unsplash.com/photo-1495107334309-fcf20504a5ab?w=1920&h=1080&fit=crop"
+            src="https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=1920&q=80&auto=format&fit=crop"
             alt="Green crop field"
             fill
             className="object-cover"
