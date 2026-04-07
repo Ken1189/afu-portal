@@ -357,3 +357,77 @@ Given the scope, here's the recommended attack order. We can't fix all 220 in on
 After that, we tackle Sprint 4-8 in subsequent sessions in a more controlled way.
 
 **Tell me: shall I execute Sprints 1, 2, and 3 right now?**
+
+---
+
+## SPRINT — ADMIN PORTAL CONSOLIDATION (Added April 2026)
+
+**Problem:** Admin sidebar has 5+ groups with overlapping responsibilities. Pete and Devon are confused about where things live.
+
+**Symptoms:**
+- "Marketing" group has tabs that look like "Content" tabs
+- "Content & CMS" has tabs that look like "Configuration" tabs
+- "Settings" has tabs that look like "Content" tabs
+- "Notifications" has tabs that look like "Marketing" tabs (campaigns, automations, templates)
+- Some tabs do the same thing twice
+- Some tabs contradict each other (e.g. two ways to edit homepage stats)
+- Many buttons exist but aren't wired to DB
+- Some tabs are labeled correctly but the page is stale or shows seed data
+- Cross-wiring is broken: changes in one place don't reflect in the public site / other portals
+
+### Phase 1 — AUDIT (1-2 hrs, no code changes)
+1. Read every page in src/app/admin/** and document:
+   - Tab name
+   - Current sidebar group
+   - What it actually does (DB writes, file paths, table names)
+   - Whether buttons work end-to-end
+   - Whether changes propagate to public site / supplier portal / farm portal
+   - Whether it duplicates/contradicts another page
+2. Build a spreadsheet: Tab | Group | Function | Wired? | Duplicate of? | Recommended action
+3. Categorize each tab into: KEEP, MERGE, DELETE, REWIRE
+
+### Phase 2 — REORGANIZE (1 day)
+Collapse 5+ groups into 7 clean ones:
+- **Dashboard** — analytics, reports, pipeline
+- **People** — members, applications, farmers, suppliers, ambassadors, investors, KYC, contacts
+- **Finance** — loans, payments, trade finance, wallet, payouts, subscriptions, refunds
+- **Operations** — farm ops, equipment, insurance, crops, livestock, warehouse, programs, trading, carbon, exchange
+- **Content** — site content (replaces Content & CMS + half of Settings + half of Configuration). Single source of truth: every editable string lives in /admin/content-editor or one settings page, never both.
+- **Marketing** — inbox, messaging, campaigns, automations, templates, advertising. Notifications gets ABSORBED here (campaigns ARE notifications).
+- **Settings** — roles, permissions, branding, system, audit. Pure technical config only — no content, no marketing.
+
+### Phase 3 — CROSS-WIRING AUDIT (1 day)
+For every admin write action, verify the change propagates correctly:
+- Edit homepage hero in /admin/content-editor → visible on public homepage within 5s ✓
+- Approve a supplier application → supplier row created → email sent → supplier can log in ✓
+- Update commission rate → next order uses new rate ✓
+- Edit FAQ item → appears on /faq immediately ✓
+- Add a country → appears in /countries dropdown ✓
+- Change membership tier price → /apply form shows new price ✓
+- Update site_config[contact_info] → footer + contact page reflect change ✓
+- Edit blog post → appears on /blog and on homepage if featured ✓
+- Disable a service from settings → /services/<slug> returns 404 or redirects ✓
+- Suspend a supplier → their products vanish from /marketplace ✓
+- ...etc for every admin action
+
+For each broken cross-wire: fix it. Some need realtime subscriptions, some need cache invalidation, some need a missing fetch on the consumer page.
+
+### Phase 4 — BUTTON SWEEP (1 day)
+For every button on every admin page:
+- Does it have an onClick handler?
+- Does the handler call the right API?
+- Does the API exist?
+- Does the API write to the right table?
+- Does it return success?
+- Does the UI update after success?
+- Is there error handling?
+- Does it need a confirmation dialog?
+
+### Phase 5 — LABEL FIX (2 hrs)
+Sweep every page title, button label, sidebar entry, breadcrumb. Make sure they say what they do.
+
+### Phase 6 — DELETE DEAD CODE
+Per the redundant-code audit: 3 dead directories, 41 _UNUSED_ constants, dead hooks, duplicate migration numbers (027/036), unused API routes.
+
+### Estimated effort: 5-7 days
+### Priority: HIGH after farmer end-to-end is done
