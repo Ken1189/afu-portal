@@ -60,39 +60,49 @@ export default function EditableServicePage({
 }) {
   const [cfg, setCfg] = useState<ServicePageConfig>(fallback);
 
+  // Check for ?preview=draft in URL
+  const isPreview =
+    typeof window !== 'undefined' &&
+    new URLSearchParams(window.location.search).get('preview') === 'draft';
+
+  const mergeConfig = (v: Partial<ServicePageConfig>): ServicePageConfig => ({
+    hero_title: v.hero_title ?? fallback.hero_title,
+    hero_subtitle: v.hero_subtitle ?? fallback.hero_subtitle,
+    hero_image: v.hero_image ?? fallback.hero_image,
+    features:
+      Array.isArray(v.features) && v.features.length > 0
+        ? v.features
+        : fallback.features,
+    how_it_works:
+      Array.isArray(v.how_it_works) && v.how_it_works.length > 0
+        ? v.how_it_works
+        : fallback.how_it_works,
+    stats:
+      Array.isArray(v.stats) && v.stats.length > 0 ? v.stats : fallback.stats,
+    cta_text: v.cta_text ?? fallback.cta_text,
+    cta_link: v.cta_link ?? fallback.cta_link,
+  });
+
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
         const supabase = createClient();
+        const key = isPreview ? `service_${slug}_draft` : `service_${slug}`;
         const { data } = await supabase
           .from('site_config')
           .select('value')
-          .eq('key', `service_${slug}`)
+          .eq('key', key)
           .maybeSingle();
 
         if (cancelled) return;
-        const v = data?.value as Partial<ServicePageConfig> | undefined;
+        const raw = data?.value;
+        const v =
+          typeof raw === 'string'
+            ? (JSON.parse(raw) as Partial<ServicePageConfig>)
+            : (raw as Partial<ServicePageConfig> | undefined);
         if (v && typeof v === 'object') {
-          setCfg({
-            hero_title: v.hero_title ?? fallback.hero_title,
-            hero_subtitle: v.hero_subtitle ?? fallback.hero_subtitle,
-            hero_image: v.hero_image ?? fallback.hero_image,
-            features:
-              Array.isArray(v.features) && v.features.length > 0
-                ? v.features
-                : fallback.features,
-            how_it_works:
-              Array.isArray(v.how_it_works) && v.how_it_works.length > 0
-                ? v.how_it_works
-                : fallback.how_it_works,
-            stats:
-              Array.isArray(v.stats) && v.stats.length > 0
-                ? v.stats
-                : fallback.stats,
-            cta_text: v.cta_text ?? fallback.cta_text,
-            cta_link: v.cta_link ?? fallback.cta_link,
-          });
+          setCfg(mergeConfig(v));
         }
       } catch (err) {
         // Silent: keep fallback
@@ -102,7 +112,21 @@ export default function EditableServicePage({
     return () => {
       cancelled = true;
     };
-  }, [slug, fallback]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slug, fallback, isPreview]);
+
+  // Listen for postMessage live updates from content editor iframe parent
+  useEffect(() => {
+    if (!isPreview) return;
+    const handler = (e: MessageEvent) => {
+      if (e.data?.type === 'preview-update' && e.data?.content) {
+        setCfg(mergeConfig(e.data.content as Partial<ServicePageConfig>));
+      }
+    };
+    window.addEventListener('message', handler);
+    return () => window.removeEventListener('message', handler);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPreview]);
 
   const heroImage =
     cfg.hero_image ||

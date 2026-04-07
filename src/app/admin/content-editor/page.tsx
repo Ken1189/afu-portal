@@ -3,24 +3,23 @@
 /**
  * Unified Content Editor with Live Preview
  *
- * - Left:  schema-driven form for editing every editable field on the public site
- * - Right: <iframe src="/?preview=draft"> showing the live homepage with draft content
+ * - Left sidebar: grouped list of every editable page on the public site
+ * - Middle:       schema-driven form for the active page
+ * - Right:        <iframe src="<previewPath>"> showing live draft content
  *
  * Storage model (site_config rows):
- *   homepage_content_draft      ← what the editor writes on every change (debounced)
- *   homepage_content_published  ← what the public site reads by default
+ *   <draftKey>     ← what the editor writes on every change (debounced)
+ *   <publishedKey> ← what the public site reads by default
  *
- * "Save Draft" persists draft state. "Publish" copies draft → published.
+ * "Save & Publish" copies draft → published.
  *
- * The public homepage reads ?preview=draft to load the draft blob, and listens for
- * window.postMessage({ type: 'preview-update', content }) to update instantly while
- * the editor is being typed in (no DB roundtrip required for live preview).
+ * Public pages read ?preview=draft to load the draft blob, and listen for
+ * window.postMessage({ type: 'preview-update', content }) for instant updates.
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import {
-  Save,
   Send,
   Loader2,
   CheckCircle2,
@@ -31,228 +30,14 @@ import {
   Eye,
   RotateCcw,
 } from 'lucide-react';
-
-// ───────────────────────────────────────────────────────────────────────
-//  Schemas
-// ───────────────────────────────────────────────────────────────────────
-
-type FieldType = 'text' | 'textarea' | 'image' | 'string-list' | 'object-list';
-
-interface FieldDef {
-  key: string;
-  label: string;
-  type: FieldType;
-  placeholder?: string;
-  // for object-list
-  itemFields?: { key: string; label: string; type: 'text' | 'textarea' }[];
-  // for default empty item
-  defaultItem?: Record<string, string>;
-  defaultString?: string;
-}
-
-interface SectionDef {
-  id: string;
-  title: string;
-  fields: FieldDef[];
-}
-
-interface PageSchema {
-  id: string;
-  label: string;
-  /** site_config key for the published blob */
-  publishedKey: string;
-  /** site_config key for the draft blob */
-  draftKey: string;
-  /** preview URL relative path */
-  previewPath: string;
-  sections: SectionDef[];
-}
-
-const HOMEPAGE_SCHEMA: PageSchema = {
-  id: 'homepage',
-  label: 'Homepage',
-  publishedKey: 'homepage_content_published',
-  draftKey: 'homepage_content_draft',
-  previewPath: '/?preview=draft',
-  sections: [
-    {
-      id: 'stats',
-      title: 'Stats Section',
-      fields: [
-        { key: 'stats_eyebrow', label: 'Eyebrow', type: 'text' },
-        { key: 'stats_title', label: 'Title', type: 'text' },
-        { key: 'stats_subtitle', label: 'Subtitle', type: 'textarea' },
-      ],
-    },
-    {
-      id: 'services',
-      title: 'Services Section Header',
-      fields: [
-        { key: 'services_eyebrow', label: 'Eyebrow', type: 'text' },
-        { key: 'services_title', label: 'Title', type: 'text' },
-        { key: 'services_subtitle', label: 'Subtitle', type: 'textarea' },
-      ],
-    },
-    {
-      id: 'programs',
-      title: 'Programs Section Header',
-      fields: [
-        { key: 'programs_eyebrow', label: 'Eyebrow', type: 'text' },
-        { key: 'programs_title', label: 'Title', type: 'text' },
-        { key: 'programs_subtitle', label: 'Subtitle', type: 'textarea' },
-      ],
-    },
-    {
-      id: 'flywheel',
-      title: 'AFU Flywheel',
-      fields: [
-        { key: 'flywheel_eyebrow', label: 'Eyebrow', type: 'text' },
-        { key: 'flywheel_title', label: 'Title', type: 'text' },
-        { key: 'flywheel_subtitle', label: 'Subtitle', type: 'textarea' },
-        {
-          key: 'flywheel_labels',
-          label: 'Step Labels (7 steps)',
-          type: 'string-list',
-          defaultString: 'Step',
-        },
-        { key: 'flywheel_recycle_text', label: 'Recycle Caption', type: 'text' },
-      ],
-    },
-    {
-      id: 'how_it_works',
-      title: 'How It Works',
-      fields: [
-        { key: 'how_it_works_eyebrow', label: 'Eyebrow', type: 'text' },
-        { key: 'how_it_works_title', label: 'Title', type: 'text' },
-        { key: 'how_it_works_subtitle', label: 'Subtitle', type: 'textarea' },
-        {
-          key: 'how_it_works_steps',
-          label: 'Steps',
-          type: 'object-list',
-          itemFields: [
-            { key: 'step', label: 'Step #', type: 'text' },
-            { key: 'title', label: 'Title', type: 'text' },
-            { key: 'desc', label: 'Description', type: 'textarea' },
-          ],
-          defaultItem: { step: '01', title: 'New Step', desc: '' },
-        },
-      ],
-    },
-    {
-      id: 'ai',
-      title: 'AI / Technology Feature',
-      fields: [
-        { key: 'ai_eyebrow', label: 'Eyebrow', type: 'text' },
-        { key: 'ai_title', label: 'Title', type: 'text' },
-        { key: 'ai_body', label: 'Body Text', type: 'textarea' },
-        { key: 'ai_features', label: 'Feature Bullets', type: 'string-list', defaultString: 'New feature' },
-        { key: 'ai_link_text', label: 'Link Text', type: 'text' },
-        { key: 'ai_image', label: 'Image URL', type: 'image' },
-      ],
-    },
-    {
-      id: 'investor',
-      title: 'Investor Section',
-      fields: [
-        { key: 'investor_eyebrow', label: 'Badge Text', type: 'text' },
-        { key: 'investor_title_pre', label: 'Title (Pre Highlight)', type: 'text' },
-        { key: 'investor_title_highlight', label: 'Title Highlight Word', type: 'text' },
-        { key: 'investor_body', label: 'Body Text', type: 'textarea' },
-      ],
-    },
-    {
-      id: 'promise',
-      title: 'Our Promise Section',
-      fields: [
-        { key: 'promise_eyebrow', label: 'Eyebrow', type: 'text' },
-        { key: 'promise_title', label: 'Title', type: 'text' },
-        { key: 'promise_subtitle', label: 'Subtitle', type: 'textarea' },
-      ],
-    },
-    {
-      id: 'showup',
-      title: '"We Show Up" Section',
-      fields: [
-        { key: 'showup_eyebrow', label: 'Eyebrow', type: 'text' },
-        { key: 'showup_title', label: 'Title', type: 'text' },
-        { key: 'showup_subtitle', label: 'Subtitle', type: 'textarea' },
-      ],
-    },
-    {
-      id: 'sponsor',
-      title: 'Sponsor a Farmer Section',
-      fields: [
-        { key: 'sponsor_eyebrow', label: 'Eyebrow', type: 'text' },
-        { key: 'sponsor_title', label: 'Title (plain text overrides default)', type: 'text' },
-        { key: 'sponsor_subtitle', label: 'Subtitle', type: 'textarea' },
-      ],
-    },
-    {
-      id: 'final_cta',
-      title: 'Final CTA',
-      fields: [
-        { key: 'final_cta_title', label: 'Title', type: 'text' },
-        { key: 'final_cta_body', label: 'Body Text', type: 'textarea' },
-        { key: 'final_cta_primary_text', label: 'Primary Button Text', type: 'text' },
-        { key: 'final_cta_primary_link', label: 'Primary Button Link', type: 'text' },
-        { key: 'final_cta_secondary_text', label: 'Secondary Button Text', type: 'text' },
-        { key: 'final_cta_secondary_link', label: 'Secondary Button Link', type: 'text' },
-      ],
-    },
-  ],
-};
-
-const FOOTER_SCHEMA: PageSchema = {
-  id: 'footer',
-  label: 'Footer',
-  publishedKey: 'footer_config',
-  draftKey: 'footer_config',
-  previewPath: '/',
-  sections: [
-    {
-      id: 'main',
-      title: 'Footer Mission & Branding',
-      fields: [
-        { key: 'mission', label: 'Mission Statement', type: 'textarea' },
-      ],
-    },
-    {
-      id: 'columns',
-      title: 'Footer Link Columns (advanced — edit JSON via Site Content tab)',
-      fields: [],
-    },
-  ],
-};
-
-const ABOUT_SCHEMA: PageSchema = {
-  id: 'about',
-  label: 'About',
-  publishedKey: 'about_content_published',
-  draftKey: 'about_content_draft',
-  previewPath: '/about?preview=draft',
-  sections: [
-    {
-      id: 'hero',
-      title: 'About Hero',
-      fields: [
-        { key: 'hero_title', label: 'Hero Title', type: 'text' },
-        { key: 'hero_subtitle', label: 'Hero Subtitle', type: 'text' },
-        { key: 'hero_body', label: 'Hero Body', type: 'textarea' },
-        { key: 'hero_image', label: 'Hero Image URL', type: 'image' },
-      ],
-    },
-    {
-      id: 'mission',
-      title: 'Mission Section',
-      fields: [
-        { key: 'mission_title', label: 'Mission Title', type: 'text' },
-        { key: 'mission_body', label: 'Mission Body', type: 'textarea' },
-      ],
-    },
-  ],
-};
-
-const SCHEMAS: PageSchema[] = [HOMEPAGE_SCHEMA, FOOTER_SCHEMA, ABOUT_SCHEMA];
+import {
+  ALL_SCHEMAS,
+  SCHEMA_GROUPS,
+  HOMEPAGE_SCHEMA,
+  type FieldDef,
+  type PageSchema,
+} from './schemas';
+import ImageUploader from '@/components/ui/ImageUploader';
 
 // ───────────────────────────────────────────────────────────────────────
 //  Component
@@ -264,7 +49,8 @@ type Content = Record<string, ContentValue>;
 export default function ContentEditorPage() {
   const supabase = useMemo(() => createClient(), []);
   const [activePageId, setActivePageId] = useState<string>('homepage');
-  const activeSchema = SCHEMAS.find((s) => s.id === activePageId) || HOMEPAGE_SCHEMA;
+  const activeSchema: PageSchema =
+    ALL_SCHEMAS.find((s) => s.id === activePageId) || HOMEPAGE_SCHEMA;
 
   const [content, setContent] = useState<Content>({});
   const [loading, setLoading] = useState(true);
@@ -281,7 +67,6 @@ export default function ContentEditorPage() {
     async function load() {
       setLoading(true);
       try {
-        // Try draft first
         const { data: draft } = await supabase
           .from('site_config')
           .select('value')
@@ -291,7 +76,6 @@ export default function ContentEditorPage() {
         if (draft?.value) {
           value = typeof draft.value === 'string' ? JSON.parse(draft.value) : draft.value;
         } else {
-          // Fall back to published if draft empty
           const { data: pub } = await supabase
             .from('site_config')
             .select('value')
@@ -313,7 +97,7 @@ export default function ContentEditorPage() {
     };
   }, [activeSchema.draftKey, activeSchema.publishedKey, supabase]);
 
-  // Push live updates into the iframe via postMessage so the preview reacts instantly
+  // Push live updates into the iframe via postMessage
   useEffect(() => {
     if (!iframeRef.current?.contentWindow) return;
     try {
@@ -326,7 +110,7 @@ export default function ContentEditorPage() {
     }
   }, [content]);
 
-  // Debounced save-to-draft on change
+  // Debounced save-to-draft
   const persistDraft = useCallback(
     async (next: Content) => {
       setSaving(true);
@@ -361,7 +145,6 @@ export default function ContentEditorPage() {
   const handlePublish = async () => {
     setPublishing(true);
     try {
-      // Make sure draft is up to date first (flush any pending debounce)
       if (saveTimer.current) {
         clearTimeout(saveTimer.current);
         saveTimer.current = null;
@@ -438,26 +221,14 @@ export default function ContentEditorPage() {
     }
     if (field.type === 'image') {
       return (
-        <div className="space-y-2">
-          <input
-            type="text"
-            value={(value as string) || ''}
-            onChange={(e) => updateField(field.key, e.target.value)}
-            placeholder="https://..."
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#5DB347]"
-          />
-          {value && typeof value === 'string' && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={value}
-              alt="preview"
-              className="h-20 w-full object-cover rounded border border-gray-200"
-              onError={(e) => {
-                (e.currentTarget as HTMLImageElement).style.display = 'none';
-              }}
-            />
-          )}
-        </div>
+        <ImageUploader
+          bucket="media"
+          folder="content-editor"
+          value={typeof value === 'string' ? value : ''}
+          onChange={(url) => updateField(field.key, url)}
+          label=""
+          allowUrl
+        />
       );
     }
     if (field.type === 'string-list') {
@@ -519,7 +290,7 @@ export default function ContentEditorPage() {
                     <label className="mb-0.5 block text-xs text-gray-500">{sub.label}</label>
                     {sub.type === 'textarea' ? (
                       <textarea
-                        value={item[sub.key] || ''}
+                        value={(item[sub.key] as string) || ''}
                         onChange={(e) => {
                           const next = [...list];
                           next[i] = { ...next[i], [sub.key]: e.target.value };
@@ -531,7 +302,7 @@ export default function ContentEditorPage() {
                     ) : (
                       <input
                         type="text"
-                        value={item[sub.key] || ''}
+                        value={(item[sub.key] as string) || ''}
                         onChange={(e) => {
                           const next = [...list];
                           next[i] = { ...next[i], [sub.key]: e.target.value };
@@ -547,7 +318,9 @@ export default function ContentEditorPage() {
           ))}
           <button
             type="button"
-            onClick={() => updateField(field.key, [...list, field.defaultItem || {}])}
+            onClick={() =>
+              updateField(field.key, [...list, { ...(field.defaultItem || {}) }])
+            }
             className="flex items-center gap-1 text-xs text-[#5DB347] hover:text-[#449933]"
           >
             <Plus className="h-3 w-3" /> Add Item
@@ -567,23 +340,13 @@ export default function ContentEditorPage() {
 
   return (
     <div className="flex h-[calc(100vh-4rem)] flex-col bg-gray-50">
-      {/* ── Top bar with page tabs ── */}
+      {/* ── Top bar ── */}
       <div className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-3">
-        <div className="flex items-center gap-2">
-          <h1 className="mr-4 text-lg font-bold text-[#1B2A4A]">Content Editor</h1>
-          {SCHEMAS.map((s) => (
-            <button
-              key={s.id}
-              onClick={() => setActivePageId(s.id)}
-              className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
-                activePageId === s.id
-                  ? 'bg-[#5DB347] text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              {s.label}
-            </button>
-          ))}
+        <div className="flex items-center gap-3">
+          <h1 className="text-lg font-bold text-[#1B2A4A]">Content Editor</h1>
+          <span className="text-sm text-gray-500">
+            Editing: <strong className="text-gray-700">{activeSchema.label}</strong>
+          </span>
         </div>
         <div className="flex items-center gap-2">
           {saving && (
@@ -610,7 +373,11 @@ export default function ContentEditorPage() {
             disabled={publishing}
             className="flex items-center gap-1 rounded-lg bg-[#5DB347] px-4 py-1.5 text-sm font-bold text-white shadow-sm hover:bg-[#449933] disabled:opacity-50"
           >
-            {publishing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
+            {publishing ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Send className="h-3.5 w-3.5" />
+            )}
             Save & Publish
           </button>
         </div>
@@ -634,10 +401,39 @@ export default function ContentEditorPage() {
         </div>
       )}
 
-      {/* ── Split editor + preview ── */}
+      {/* ── Sidebar + form + preview ── */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Left: form */}
-        <div className="w-1/2 overflow-y-auto border-r border-gray-200 bg-white p-4">
+        {/* Left sidebar: page picker */}
+        <div className="w-56 shrink-0 overflow-y-auto border-r border-gray-200 bg-white py-3">
+          {SCHEMA_GROUPS.map((group) => (
+            <div key={group.title} className="mb-4">
+              <div className="px-3 pb-1 text-[10px] font-bold uppercase tracking-wider text-gray-400">
+                {group.title}
+              </div>
+              {group.schemaIds.map((id) => {
+                const s = ALL_SCHEMAS.find((x) => x.id === id);
+                if (!s) return null;
+                const isActive = activePageId === id;
+                return (
+                  <button
+                    key={id}
+                    onClick={() => setActivePageId(id)}
+                    className={`block w-full px-3 py-1.5 text-left text-sm transition-colors ${
+                      isActive
+                        ? 'border-l-2 border-[#5DB347] bg-[#5DB347]/10 font-semibold text-[#5DB347]'
+                        : 'border-l-2 border-transparent text-gray-600 hover:bg-gray-50'
+                    }`}
+                  >
+                    {s.label}
+                  </button>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+
+        {/* Middle: form */}
+        <div className="w-[42%] overflow-y-auto border-r border-gray-200 bg-white p-4">
           {loading ? (
             <div className="flex h-full items-center justify-center text-gray-500">
               <Loader2 className="h-6 w-6 animate-spin" />
@@ -645,14 +441,17 @@ export default function ContentEditorPage() {
           ) : (
             <div className="space-y-6">
               {activeSchema.sections.map((section) => (
-                <div key={section.id} className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+                <div
+                  key={section.id}
+                  className="rounded-xl border border-gray-200 bg-gray-50 p-4"
+                >
                   <h3 className="mb-3 text-sm font-bold uppercase tracking-wider text-[#1B2A4A]">
                     {section.title}
                   </h3>
                   <div className="space-y-3">
                     {section.fields.length === 0 && (
                       <p className="text-xs italic text-gray-400">
-                        No editable fields in this section yet. Use the existing per-table editor.
+                        No editable fields in this section yet.
                       </p>
                     )}
                     {section.fields.map((field) => (
@@ -675,9 +474,9 @@ export default function ContentEditorPage() {
         </div>
 
         {/* Right: preview iframe */}
-        <div className="w-1/2 bg-gray-100 p-4">
+        <div className="flex-1 bg-gray-100 p-4">
           <div className="mb-2 flex items-center justify-between text-xs text-gray-500">
-            <span>Live Preview</span>
+            <span>Live Preview — {activeSchema.previewPath}</span>
             <button
               onClick={() => setIframeKey((k) => k + 1)}
               className="rounded border border-gray-300 bg-white px-2 py-0.5 text-xs hover:bg-gray-50"
@@ -688,7 +487,7 @@ export default function ContentEditorPage() {
           <div className="h-[calc(100%-1.5rem)] overflow-hidden rounded-xl border border-gray-300 bg-white shadow-sm">
             <iframe
               ref={iframeRef}
-              key={iframeKey}
+              key={`${activeSchema.id}-${iframeKey}`}
               src={activeSchema.previewPath}
               className="h-full w-full"
               title="Live preview"

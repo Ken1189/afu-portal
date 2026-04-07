@@ -255,6 +255,12 @@ type HomepageContent = {
   programs_eyebrow?: string;
   programs_title?: string;
   programs_subtitle?: string;
+  hero_headline?: string;
+  hero_subtitle?: string;
+  hero_cta_text?: string;
+  hero_cta_link?: string;
+  hero_bg_image?: string;
+  hero_badge_text?: string;
 };
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
@@ -627,6 +633,33 @@ export default function Home() {
     fetchMembershipTiers();
   }, []);
 
+  // Resolve hero fields with priority: homepage_content blob > legacy site_config (hero state) > HERO_DEFAULTS
+  const resolvedHero = {
+    hero_headline:
+      (typeof content.hero_headline === 'string' && content.hero_headline) ||
+      hero.hero_headline ||
+      HERO_DEFAULTS.hero_headline,
+    hero_subtitle:
+      (typeof content.hero_subtitle === 'string' && content.hero_subtitle) ||
+      hero.hero_subtitle ||
+      HERO_DEFAULTS.hero_subtitle,
+    hero_cta_text:
+      (typeof content.hero_cta_text === 'string' && content.hero_cta_text) ||
+      hero.hero_cta_text ||
+      HERO_DEFAULTS.hero_cta_text,
+    hero_cta_link:
+      (typeof content.hero_cta_link === 'string' && content.hero_cta_link) ||
+      hero.hero_cta_link ||
+      HERO_DEFAULTS.hero_cta_link,
+    hero_bg_image:
+      (typeof content.hero_bg_image === 'string' && content.hero_bg_image) ||
+      hero.hero_bg_image ||
+      HERO_DEFAULTS.hero_bg_image,
+    hero_badge_text:
+      (typeof content.hero_badge_text === 'string' && content.hero_badge_text) ||
+      'Active across 9 African countries',
+  };
+
   return (
     <>
       {/* ─── HERO ─── */}
@@ -634,7 +667,7 @@ export default function Home() {
         {/* Background image */}
         <div className="absolute inset-0">
           <Image
-            src={hero.hero_bg_image}
+            src={resolvedHero.hero_bg_image}
             alt="African farmland at sunrise"
             fill
             className="object-cover"
@@ -648,11 +681,11 @@ export default function Home() {
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 bg-[#5DB347]/20 backdrop-blur-sm border border-[#5DB347]/30 text-[#EBF7E5] px-4 py-1.5 rounded-full text-sm font-medium mb-6">
               <span className="w-2 h-2 bg-[#5DB347] rounded-full animate-pulse-soft" />
-              Active across 9 African countries
+              {resolvedHero.hero_badge_text}
             </div>
 
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] text-white mb-6">
-              {hero.hero_headline.includes('Grow Together') ? (
+              {resolvedHero.hero_headline.includes('Grow Together') ? (
                 <>
                   Let&apos;s{' '}
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#6ABF4B] to-[#90D87A]">
@@ -660,23 +693,23 @@ export default function Home() {
                   </span>
                 </>
               ) : (
-                hero.hero_headline
+                resolvedHero.hero_headline
               )}
             </h1>
 
             <p className="text-lg md:text-xl text-gray-300 mb-10 leading-relaxed max-w-2xl">
-              {hero.hero_subtitle}
+              {resolvedHero.hero_subtitle}
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
-                href={hero.hero_cta_link}
+                href={resolvedHero.hero_cta_link}
                 className="group text-white px-8 py-4 rounded-xl font-semibold text-lg transition-smooth flex items-center justify-center gap-2 shadow-lg"
                 style={{ background: '#5DB347' }}
                 onMouseEnter={(e) => (e.currentTarget.style.background = '#449933')}
                 onMouseLeave={(e) => (e.currentTarget.style.background = '#5DB347')}
               >
-                {hero.hero_cta_text}
+                {resolvedHero.hero_cta_text}
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link

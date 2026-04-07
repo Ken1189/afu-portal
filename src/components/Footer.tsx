@@ -94,39 +94,67 @@ export default function Footer() {
   const [mission, setMission] = useState(FALLBACK_MISSION);
   const [countries, setCountries] = useState(FALLBACK_COUNTRIES);
 
+  const isPreview =
+    typeof window !== "undefined" &&
+    new URLSearchParams(window.location.search).get("preview") === "draft";
+
+  const applyFooterConfig = (raw: unknown) => {
+    if (!raw) return;
+    let config: FooterConfig;
+    try {
+      config = (typeof raw === "string" ? JSON.parse(raw) : raw) as FooterConfig;
+    } catch {
+      return;
+    }
+    if (config.columns && Array.isArray(config.columns) && config.columns.length > 0) {
+      setFooterColumns(config.columns);
+    }
+    if (config.social_links && Array.isArray(config.social_links) && config.social_links.length > 0) {
+      setSocialLinks(
+        config.social_links.map((s) => ({
+          label: s.platform,
+          href: s.url,
+          icon: s.icon,
+          viewBox: s.viewBox || "0 0 24 24",
+        }))
+      );
+    }
+    if (config.mission && typeof config.mission === "string") {
+      setMission(config.mission);
+    }
+    if (config.countries && Array.isArray(config.countries) && config.countries.length > 0) {
+      setCountries(config.countries);
+    }
+  };
+
   useEffect(() => {
     const supabase = createClient();
+    const key = isPreview ? "footer_config_draft" : "footer_config";
     supabase
       .from("site_config")
       .select("value")
-      .eq("key", "footer_config")
-      .single()
+      .eq("key", key)
+      .maybeSingle()
       .then(({ data, error }) => {
         if (!error && data?.value) {
-          const config = data.value as FooterConfig;
-          if (config.columns && Array.isArray(config.columns) && config.columns.length > 0) {
-            setFooterColumns(config.columns);
-          }
-          if (config.social_links && Array.isArray(config.social_links) && config.social_links.length > 0) {
-            setSocialLinks(
-              config.social_links.map((s) => ({
-                label: s.platform,
-                href: s.url,
-                icon: s.icon,
-                viewBox: s.viewBox || "0 0 24 24",
-              }))
-            );
-          }
-          if (config.mission && typeof config.mission === 'string') {
-            setMission(config.mission);
-          }
-          if (config.countries && Array.isArray(config.countries) && config.countries.length > 0) {
-            setCountries(config.countries);
-          }
+          applyFooterConfig(data.value);
         }
-        // On error or empty, keep fallback values
       });
-  }, []);
+     
+  }, [isPreview]);
+
+  // Listen for postMessage live updates from content editor iframe parent
+  useEffect(() => {
+    if (!isPreview) return;
+    const handler = (e: MessageEvent) => {
+      if (e.data?.type === "preview-update" && e.data?.content) {
+        applyFooterConfig(e.data.content);
+      }
+    };
+    window.addEventListener("message", handler);
+    return () => window.removeEventListener("message", handler);
+     
+  }, [isPreview]);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
