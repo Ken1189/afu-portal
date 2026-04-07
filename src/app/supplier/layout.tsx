@@ -82,20 +82,22 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
     }
 
     let retried = false;
+    let checkCompleted = false;
     const allowedRoles = ['supplier', 'admin', 'super_admin'];
 
-    // Safety timeout: complete the check (hide spinner) but do NOT auto-authorize
+    // Safety timeout — only fires if checkRole never responds (10s for Vercel cold starts)
     const safetyTimer = setTimeout(() => {
-      if (!roleChecked) {
-        setRoleChecked(true);
-        router.replace('/dashboard');
-      }
-    }, 3000);
+      if (checkCompleted) return;
+      setRoleChecked(true);
+      router.replace('/dashboard');
+    }, 10000);
 
     const checkRole = async () => {
       try {
         const res = await fetch('/api/auth/me');
         if (!res.ok) {
+          checkCompleted = true;
+          clearTimeout(safetyTimer);
           setRoleChecked(true);
           router.replace('/dashboard');
           return;
@@ -103,6 +105,8 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
         const data = await res.json();
         const { role } = data;
         if (role && allowedRoles.includes(role)) {
+          checkCompleted = true;
+          clearTimeout(safetyTimer);
           setAuthorized(true);
           setRoleChecked(true);
 
@@ -129,6 +133,8 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
           }
         } else {
           // No role or role not allowed → redirect to dashboard
+          checkCompleted = true;
+          clearTimeout(safetyTimer);
           setRoleChecked(true);
           router.replace('/dashboard');
         }
@@ -138,6 +144,8 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
           setTimeout(checkRole, 2000);
           return;
         }
+        checkCompleted = true;
+        clearTimeout(safetyTimer);
         setRoleChecked(true);
         router.replace('/dashboard');
       }
@@ -146,7 +154,7 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
     checkRole();
 
     return () => clearTimeout(safetyTimer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [user, profile, authLoading, router, isPublicPage, pathname]);
 
   // Public pages render without the supplier layout chrome
@@ -237,12 +245,11 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
         {/* Sidebar Nav */}
         <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
           {(() => {
-            let lastSection = '';
-            return supplierLinks.map((link) => {
+            return supplierLinks.map((link, idx) => {
               const Icon = link.icon;
               const active = isActive(link.href);
-              const showHeader = link.section !== lastSection;
-              if (showHeader) lastSection = link.section;
+              const prevSection = idx > 0 ? supplierLinks[idx - 1].section : '';
+              const showHeader = link.section !== prevSection;
               return (
                 <div key={link.href}>
                   {showHeader && (

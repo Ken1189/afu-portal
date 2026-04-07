@@ -710,18 +710,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     }
 
     // SLOW PATH: profile not loaded yet or role unknown — check API
-    // Safety timeout — 3 seconds max. Does NOT auto-authorize: redirects instead.
+    // Safety timeout — 10 seconds, only fires if checkRole never responds
+    let checkCompleted = false;
     const timeout = setTimeout(() => {
-      if (!roleChecked) {
-        setRoleChecked(true);
-        router.replace('/dashboard');
-      }
-    }, 3000);
+      if (checkCompleted) return;
+      setRoleChecked(true);
+      router.replace('/dashboard');
+    }, 10000);
 
     const checkRole = async () => {
       try {
         const res = await fetch('/api/auth/me');
         if (!res.ok) {
+          checkCompleted = true;
+          clearTimeout(timeout);
           setRoleChecked(true);
           router.replace('/dashboard');
           return;
@@ -729,16 +731,22 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         const data = await res.json();
         const { role } = data;
         if (role === 'admin' || role === 'super_admin') {
+          checkCompleted = true;
+          clearTimeout(timeout);
           setAuthorized(true);
           setServerRole(role);
           setRoleChecked(true);
         } else {
           // No role OR role is not admin/super_admin → redirect
+          checkCompleted = true;
+          clearTimeout(timeout);
           setRoleChecked(true);
           router.replace('/dashboard');
         }
       } catch {
         // Network error — redirect rather than auto-authorize
+        checkCompleted = true;
+        clearTimeout(timeout);
         setRoleChecked(true);
         router.replace('/dashboard');
       }

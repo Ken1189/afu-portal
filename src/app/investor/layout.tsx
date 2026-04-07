@@ -63,20 +63,24 @@ export default function InvestorLayout({ children }: { children: React.ReactNode
     }
 
     let retried = false;
+    let checkCompleted = false;
     const allowedRoles = ['investor', 'admin', 'super_admin'];
 
     // Safety timeout: complete the check (hide spinner) but do NOT auto-authorize
     const safetyTimer = setTimeout(() => {
+      if (checkCompleted) return;
       if (!roleChecked) {
         setRoleChecked(true);
         router.replace('/dashboard');
       }
-    }, 3000);
+    }, 10000);
 
     const checkRole = async () => {
       try {
         const res = await fetch('/api/auth/me');
         if (!res.ok) {
+          checkCompleted = true;
+          clearTimeout(safetyTimer);
           setRoleChecked(true);
           router.replace('/dashboard');
           return;
@@ -85,9 +89,13 @@ export default function InvestorLayout({ children }: { children: React.ReactNode
         const { role } = data;
         setServerRole(role || null);
         if (role && allowedRoles.includes(role)) {
+          checkCompleted = true;
+          clearTimeout(safetyTimer);
           setAuthorized(true);
           setRoleChecked(true);
         } else {
+          checkCompleted = true;
+          clearTimeout(safetyTimer);
           setRoleChecked(true);
           router.replace('/dashboard');
         }
@@ -97,6 +105,8 @@ export default function InvestorLayout({ children }: { children: React.ReactNode
           setTimeout(checkRole, 2000);
           return;
         }
+        checkCompleted = true;
+        clearTimeout(safetyTimer);
         setRoleChecked(true);
         router.replace('/dashboard');
       }
