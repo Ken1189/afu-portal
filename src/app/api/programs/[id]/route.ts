@@ -31,13 +31,18 @@ async function requireAdmin(req: NextRequest) {
  * GET /api/programs/[id]
  * Returns program with inclusions and enrollment count.
  */
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const db = svc();
     const { id } = await params;
+    if (!UUID_RE.test(id)) {
+      return NextResponse.json({ error: 'Invalid program id' }, { status: 400 });
+    }
+    const db = svc();
 
     const { data: program, error } = await db
       .from('programs')
