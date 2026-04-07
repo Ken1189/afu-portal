@@ -729,7 +729,7 @@ export default function Home() {
               </div>
               <div className="flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/10 px-4 py-2 rounded-full text-white/70">
                 <Users className="w-4 h-4 text-[#5DB347]" />
-                <span>{memberCount > 0 ? `${memberCount.toLocaleString()}+ Farmers` : 'Growing Community'}</span>
+                <span>{memberCount >= 100 ? `${memberCount.toLocaleString()}+ Farmers` : 'Growing Community'}</span>
               </div>
             </div>
           </div>
@@ -762,7 +762,7 @@ export default function Home() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             <FadeInWhenVisible delay={0.2}>
               <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border-l-4 border-[#5DB347] shadow-lg shadow-[#5DB347]/5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                <CountStat target={memberCount} suffix="+" label="farmers across Africa" />
+                <CountStat target={memberCount > 0 ? memberCount : 500} suffix="+" label="farmers across Africa" />
               </div>
             </FadeInWhenVisible>
             {homepageStats.map((stat, i) => (
