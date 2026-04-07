@@ -5,7 +5,130 @@ import Stripe from 'stripe';
 import { Resend } from 'resend';
 import { emitEventAsync } from '@/lib/events/event-bus';
 import { sendWelcomeSeriesEmail } from '@/lib/email/lifecycle-emails';
+import {
+  sendSubscriptionConfirmation,
+  sendPaymentReceived,
+  sendPaymentFailed,
+  sendSubscriptionCanceled,
+} from '@/lib/email/supplier-subscriptions';
 import '@/lib/events/handlers';
+
+// ── Helper: upsert supplier_subscriptions from a Stripe.Subscription ──
+async function upsertSupplierSubscription(
+  adminClient: ReturnType<typeof createAdminClient> extends Promise<infer T> ? T : never,
+  subscription: Stripe.Subscription
+): Promise<{ supplierId: string | null; planSlug: string | null }> {
+  const meta = subscription.metadata || {};
+  let supplierId: string | null = meta.supplier_id || null;
+  let planSlug: string | null = meta.plan_slug || null;
+
+  // Fallback: look up supplier by stripe_customer_id
+  if (!supplierId && subscription.customer) {
+    const customerId =
+      typeof subscription.customer === 'string'
+        ? subscription.customer
+        : subscription.customer.id;
+    const { data } = await adminClient
+      .from('suppliers')
+      .select('id')
+      .eq('stripe_customer_id', customerId)
+      .maybeSingle();
+    if (data) supplierId = data.id;
+  }
+
+  // Fallback: derive plan slug from price
+  if (!planSlug) {
+    const priceId = subscription.items?.data?.[0]?.price?.id;
+    if (priceId) {
+      const { data: planByPrice } = await adminClient
+        .from('supplier_subscription_plans')
+        .select('slug')
+        .eq('stripe_price_id', priceId)
+        .maybeSingle();
+      if (planByPrice) planSlug = planByPrice.slug;
+    }
+  }
+
+  if (!supplierId) return { supplierId: null, planSlug };
+
+  // Look up plan id by slug
+  let planId: string | null = null;
+  if (planSlug) {
+    const { data: plan } = await adminClient
+      .from('supplier_subscription_plans')
+      .select('id')
+      .eq('slug', planSlug)
+      .maybeSingle();
+    if (plan) planId = plan.id;
+  }
+
+  const customerId =
+    typeof subscription.customer === 'string'
+      ? subscription.customer
+      : subscription.customer?.id || null;
+
+  // Stripe SDK types vary; use any for period accessors
+  const subAny = subscription as unknown as {
+    current_period_start?: number;
+    current_period_end?: number;
+    items?: { data?: Array<{ current_period_start?: number; current_period_end?: number }> };
+  };
+  const itemPeriod = subAny.items?.data?.[0] || {};
+  const startSec = subAny.current_period_start ?? itemPeriod.current_period_start;
+  const endSec = subAny.current_period_end ?? itemPeriod.current_period_end;
+  const periodStart = startSec ? new Date(startSec * 1000).toISOString() : null;
+  const periodEnd = endSec ? new Date(endSec * 1000).toISOString() : null;
+  const trialEnd = subscription.trial_end
+    ? new Date(subscription.trial_end * 1000).toISOString()
+    : null;
+  const canceledAt = subscription.canceled_at
+    ? new Date(subscription.canceled_at * 1000).toISOString()
+    : null;
+
+  // Upsert by stripe_subscription_id
+  const { data: existing } = await adminClient
+    .from('supplier_subscriptions')
+    .select('id')
+    .eq('stripe_subscription_id', subscription.id)
+    .maybeSingle();
+
+  const row = {
+    supplier_id: supplierId,
+    plan_id: planId,
+    plan_slug: planSlug || 'starter',
+    stripe_customer_id: customerId,
+    stripe_subscription_id: subscription.id,
+    status: subscription.status,
+    current_period_start: periodStart,
+    current_period_end: periodEnd,
+    cancel_at_period_end: subscription.cancel_at_period_end || false,
+    canceled_at: canceledAt,
+    trial_end: trialEnd,
+    updated_at: new Date().toISOString(),
+  };
+
+  if (existing) {
+    await adminClient
+      .from('supplier_subscriptions')
+      .update(row)
+      .eq('id', existing.id);
+  } else {
+    await adminClient.from('supplier_subscriptions').insert(row);
+  }
+
+  // Mirror onto suppliers table for fast lookups
+  await adminClient
+    .from('suppliers')
+    .update({
+      subscription_plan_slug: planSlug || 'starter',
+      subscription_status: subscription.status,
+      subscription_current_period_end: periodEnd,
+      ...(customerId ? { stripe_customer_id: customerId } : {}),
+    })
+    .eq('id', supplierId);
+
+  return { supplierId, planSlug };
+}
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM = 'African Farming Union <noreply@mail.africanfarmingunion.org>';
@@ -99,6 +222,49 @@ export async function POST(request: NextRequest) {
             .update({ status: 'completed', provider_response: session as unknown as Record<string, unknown> })
             .eq('payment_id', paymentId)
             .eq('status', 'pending');
+        }
+
+        // ── Supplier subscription checkout completed ──
+        if (paymentType === 'supplier_subscription') {
+          try {
+            const supplierId = meta.supplier_id;
+            const planSlug = meta.plan_slug;
+            const customerId =
+              typeof session.customer === 'string'
+                ? session.customer
+                : session.customer?.id || null;
+            const subscriptionId =
+              typeof session.subscription === 'string'
+                ? session.subscription
+                : session.subscription?.id || null;
+
+            if (supplierId && customerId) {
+              await adminClient
+                .from('suppliers')
+                .update({ stripe_customer_id: customerId })
+                .eq('id', supplierId);
+            }
+
+            // Pre-create / upsert supplier_subscriptions row (status updates via subscription.* events)
+            if (supplierId && subscriptionId) {
+              const { data: existing } = await adminClient
+                .from('supplier_subscriptions')
+                .select('id')
+                .eq('stripe_subscription_id', subscriptionId)
+                .maybeSingle();
+              if (!existing) {
+                await adminClient.from('supplier_subscriptions').insert({
+                  supplier_id: supplierId,
+                  plan_slug: planSlug || 'starter',
+                  stripe_customer_id: customerId,
+                  stripe_subscription_id: subscriptionId,
+                  status: 'incomplete',
+                });
+              }
+            }
+          } catch (e) {
+            console.error('[supplier checkout completed] handler error:', e);
+          }
         }
 
         // Handle membership activation
@@ -384,15 +550,30 @@ export async function POST(request: NextRequest) {
             const orderTotal = Number(order?.total ?? (session.amount_total || 0) / 100);
 
             // Look up real commission_rate from suppliers table (fallback 10%)
+            // Override with subscription plan's commission_rate if supplier has an active sub
             let commissionRate = 10;
             if (supplierId) {
               const { data: supplierRate } = await adminClient
                 .from('suppliers')
-                .select('commission_rate')
+                .select('commission_rate, subscription_plan_slug, subscription_status')
                 .eq('id', supplierId)
                 .maybeSingle();
               if (supplierRate?.commission_rate != null) {
                 commissionRate = Number(supplierRate.commission_rate) || 10;
+              }
+              // If active subscription, prefer plan's commission rate
+              if (
+                supplierRate?.subscription_plan_slug &&
+                ['active', 'trialing'].includes(supplierRate.subscription_status || '')
+              ) {
+                const { data: planRate } = await adminClient
+                  .from('supplier_subscription_plans')
+                  .select('commission_rate')
+                  .eq('slug', supplierRate.subscription_plan_slug)
+                  .maybeSingle();
+                if (planRate?.commission_rate != null) {
+                  commissionRate = Number(planRate.commission_rate) || commissionRate;
+                }
               }
             }
             const commissionAmount = +(orderTotal * (commissionRate / 100)).toFixed(2);
@@ -600,23 +781,311 @@ export async function POST(request: NextRequest) {
         break;
       }
 
+      // ── Subscription created (new supplier sub) ─────────────────────────
+      case 'customer.subscription.created': {
+        try {
+          const subscription = event.data.object as Stripe.Subscription;
+          if (subscription.metadata?.type === 'supplier_subscription') {
+            const { supplierId, planSlug } = await upsertSupplierSubscription(
+              adminClient,
+              subscription
+            );
+            // Send welcome / confirmation email
+            if (supplierId && planSlug) {
+              try {
+                const { data: supplier } = await adminClient
+                  .from('suppliers')
+                  .select('email, company_name')
+                  .eq('id', supplierId)
+                  .maybeSingle();
+                const { data: plan } = await adminClient
+                  .from('supplier_subscription_plans')
+                  .select('name, price_monthly')
+                  .eq('slug', planSlug)
+                  .maybeSingle();
+                if (supplier?.email && plan) {
+                  await sendSubscriptionConfirmation(
+                    supplier.email,
+                    supplier.company_name || 'Supplier',
+                    plan.name,
+                    Number(plan.price_monthly)
+                  );
+                }
+              } catch (e) {
+                console.error('[supplier subscription.created] email failed:', e);
+              }
+            }
+          }
+        } catch (e) {
+          console.error('[customer.subscription.created] handler error:', e);
+        }
+        break;
+      }
+
+      // ── Subscription updated (status, plan changes) ──────────────────────
+      case 'customer.subscription.updated': {
+        try {
+          const subscription = event.data.object as Stripe.Subscription;
+          // Try to detect supplier subscription via metadata or customer match
+          const isSupplier =
+            subscription.metadata?.type === 'supplier_subscription' ||
+            (await (async () => {
+              const customerId =
+                typeof subscription.customer === 'string'
+                  ? subscription.customer
+                  : subscription.customer?.id;
+              if (!customerId) return false;
+              const { data } = await adminClient
+                .from('suppliers')
+                .select('id')
+                .eq('stripe_customer_id', customerId)
+                .maybeSingle();
+              return !!data;
+            })());
+
+          if (isSupplier) {
+            await upsertSupplierSubscription(adminClient, subscription);
+          }
+        } catch (e) {
+          console.error('[customer.subscription.updated] handler error:', e);
+        }
+        break;
+      }
+
       // ── Subscription cancelled ───────────────────────────────────────────
       case 'customer.subscription.deleted': {
         const subscription = event.data.object as Stripe.Subscription;
         const subId = subscription.id;
 
         // Deactivate member subscription
-        await adminClient
-          .from('members')
-          .update({ status: 'inactive', updated_at: new Date().toISOString() })
-          .eq('stripe_subscription_id', subId);
+        try {
+          await adminClient
+            .from('members')
+            .update({ status: 'inactive', updated_at: new Date().toISOString() })
+            .eq('stripe_subscription_id', subId);
+        } catch (e) {
+          console.error('[subscription.deleted] members update failed:', e);
+        }
 
         // Deactivate sponsorship subscription
-        await adminClient
-          .from('sponsorships')
-          .update({ status: 'cancelled' })
-          .eq('stripe_subscription_id', subId);
+        try {
+          await adminClient
+            .from('sponsorships')
+            .update({ status: 'cancelled' })
+            .eq('stripe_subscription_id', subId);
+        } catch (e) {
+          console.error('[subscription.deleted] sponsorships update failed:', e);
+        }
 
+        // Supplier subscription cancellation
+        try {
+          const { data: subRow } = await adminClient
+            .from('supplier_subscriptions')
+            .select('id, supplier_id, plan_slug, current_period_end')
+            .eq('stripe_subscription_id', subId)
+            .maybeSingle();
+
+          if (subRow) {
+            const canceledAtIso = subscription.canceled_at
+              ? new Date(subscription.canceled_at * 1000).toISOString()
+              : new Date().toISOString();
+
+            await adminClient
+              .from('supplier_subscriptions')
+              .update({
+                status: 'canceled',
+                canceled_at: canceledAtIso,
+                updated_at: new Date().toISOString(),
+              })
+              .eq('id', subRow.id);
+
+            await adminClient
+              .from('suppliers')
+              .update({
+                subscription_plan_slug: null,
+                subscription_status: 'canceled',
+                subscription_current_period_end: null,
+              })
+              .eq('id', subRow.supplier_id);
+
+            // Send cancellation email
+            try {
+              const { data: supplier } = await adminClient
+                .from('suppliers')
+                .select('email, company_name')
+                .eq('id', subRow.supplier_id)
+                .maybeSingle();
+              const { data: plan } = await adminClient
+                .from('supplier_subscription_plans')
+                .select('name')
+                .eq('slug', subRow.plan_slug)
+                .maybeSingle();
+              if (supplier?.email) {
+                await sendSubscriptionCanceled(
+                  supplier.email,
+                  supplier.company_name || 'Supplier',
+                  plan?.name || subRow.plan_slug,
+                  subRow.current_period_end
+                );
+              }
+            } catch (e) {
+              console.error('[subscription.deleted] supplier email failed:', e);
+            }
+          }
+        } catch (e) {
+          console.error('[subscription.deleted] supplier update failed:', e);
+        }
+
+        break;
+      }
+
+      // ── Invoice payment succeeded ────────────────────────────────────────
+      case 'invoice.payment_succeeded': {
+        try {
+          const invoice = event.data.object as Stripe.Invoice;
+          const customerId =
+            typeof invoice.customer === 'string'
+              ? invoice.customer
+              : invoice.customer?.id || null;
+          const invoiceAny = invoice as unknown as { subscription?: string | { id: string } | null };
+          const subscriptionId =
+            typeof invoiceAny.subscription === 'string'
+              ? invoiceAny.subscription
+              : invoiceAny.subscription?.id || null;
+
+          if (customerId) {
+            // Find supplier
+            const { data: supplier } = await adminClient
+              .from('suppliers')
+              .select('id, email, company_name, subscription_plan_slug')
+              .eq('stripe_customer_id', customerId)
+              .maybeSingle();
+
+            if (supplier) {
+              // Find local subscription row
+              let subscriptionRowId: string | null = null;
+              if (subscriptionId) {
+                const { data: subRow } = await adminClient
+                  .from('supplier_subscriptions')
+                  .select('id')
+                  .eq('stripe_subscription_id', subscriptionId)
+                  .maybeSingle();
+                if (subRow) subscriptionRowId = subRow.id;
+              }
+
+              await adminClient.from('supplier_invoices').upsert(
+                {
+                  supplier_id: supplier.id,
+                  subscription_id: subscriptionRowId,
+                  stripe_invoice_id: invoice.id,
+                  amount: ((invoice.amount_paid || 0) / 100),
+                  currency: invoice.currency || 'usd',
+                  status: 'paid',
+                  invoice_pdf: invoice.invoice_pdf || null,
+                  hosted_invoice_url: invoice.hosted_invoice_url || null,
+                  period_start: invoice.period_start
+                    ? new Date(invoice.period_start * 1000).toISOString()
+                    : null,
+                  period_end: invoice.period_end
+                    ? new Date(invoice.period_end * 1000).toISOString()
+                    : null,
+                  paid_at: invoice.status_transitions?.paid_at
+                    ? new Date(invoice.status_transitions.paid_at * 1000).toISOString()
+                    : new Date().toISOString(),
+                },
+                { onConflict: 'stripe_invoice_id' }
+              );
+
+              // Email
+              try {
+                if (supplier.email) {
+                  await sendPaymentReceived(
+                    supplier.email,
+                    supplier.company_name || 'Supplier',
+                    (invoice.amount_paid || 0) / 100,
+                    invoice.hosted_invoice_url || ''
+                  );
+                }
+              } catch (e) {
+                console.error('[invoice.payment_succeeded] email failed:', e);
+              }
+            }
+          }
+        } catch (e) {
+          console.error('[invoice.payment_succeeded] handler error:', e);
+        }
+        break;
+      }
+
+      // ── Invoice payment failed ───────────────────────────────────────────
+      case 'invoice.payment_failed': {
+        try {
+          const invoice = event.data.object as Stripe.Invoice;
+          const customerId =
+            typeof invoice.customer === 'string'
+              ? invoice.customer
+              : invoice.customer?.id || null;
+          const invoiceAny = invoice as unknown as { subscription?: string | { id: string } | null };
+          const subscriptionId =
+            typeof invoiceAny.subscription === 'string'
+              ? invoiceAny.subscription
+              : invoiceAny.subscription?.id || null;
+
+          if (customerId) {
+            const { data: supplier } = await adminClient
+              .from('suppliers')
+              .select('id, email, company_name')
+              .eq('stripe_customer_id', customerId)
+              .maybeSingle();
+
+            if (supplier) {
+              let subscriptionRowId: string | null = null;
+              if (subscriptionId) {
+                const { data: subRow } = await adminClient
+                  .from('supplier_subscriptions')
+                  .select('id')
+                  .eq('stripe_subscription_id', subscriptionId)
+                  .maybeSingle();
+                if (subRow) subscriptionRowId = subRow.id;
+              }
+
+              await adminClient.from('supplier_invoices').upsert(
+                {
+                  supplier_id: supplier.id,
+                  subscription_id: subscriptionRowId,
+                  stripe_invoice_id: invoice.id,
+                  amount: ((invoice.amount_due || 0) / 100),
+                  currency: invoice.currency || 'usd',
+                  status: 'open',
+                  invoice_pdf: invoice.invoice_pdf || null,
+                  hosted_invoice_url: invoice.hosted_invoice_url || null,
+                  period_start: invoice.period_start
+                    ? new Date(invoice.period_start * 1000).toISOString()
+                    : null,
+                  period_end: invoice.period_end
+                    ? new Date(invoice.period_end * 1000).toISOString()
+                    : null,
+                },
+                { onConflict: 'stripe_invoice_id' }
+              );
+
+              try {
+                if (supplier.email) {
+                  await sendPaymentFailed(
+                    supplier.email,
+                    supplier.company_name || 'Supplier',
+                    (invoice.amount_due || 0) / 100,
+                    invoice.hosted_invoice_url || ''
+                  );
+                }
+              } catch (e) {
+                console.error('[invoice.payment_failed] email failed:', e);
+              }
+            }
+          }
+        } catch (e) {
+          console.error('[invoice.payment_failed] handler error:', e);
+        }
         break;
       }
 

@@ -140,6 +140,7 @@ const navGroups: NavGroup[] = [
     links: [
       { href: '/admin/loans', label: 'Loan Management', icon: <HandCoins className={ICON_CLS} /> },
       { href: '/admin/payments', label: 'Payments', icon: <CreditCard className={ICON_CLS} /> },
+      { href: '/admin/subscriptions', label: 'Subscriptions', icon: <CreditCard className={ICON_CLS} /> },
       { href: '/admin/payouts', label: 'Payouts', icon: <Wallet className={ICON_CLS} /> },
       { href: '/admin/financial', label: 'Financial Overview', icon: <Landmark className={ICON_CLS} /> },
       { href: '/admin/financial/collections', label: 'Collections', icon: <Coins className={ICON_CLS} /> },
