@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
   Search, Users, Eye, MapPin, Loader2, Download, LogIn, UserCog, Save, X,
+  UserPlus, Mail, Trash2,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/supabase/auth-context';
@@ -108,6 +109,27 @@ export default function AdminMembersPage() {
   const [pendingRole, setPendingRole] = useState<string>('');
   const [savingRole, setSavingRole] = useState(false);
   const [togglingCapability, setTogglingCapability] = useState<string | null>(null);
+
+  // Add User modal state
+  const [showAddUser, setShowAddUser] = useState(false);
+  const [addForm, setAddForm] = useState({
+    email: '',
+    full_name: '',
+    role: 'farmer',
+    capabilities: [] as string[],
+    country: '',
+    phone: '',
+    send_welcome: true,
+  });
+  const [addSubmitting, setAddSubmitting] = useState(false);
+
+  // Delete confirmation modal state
+  const [deleteTarget, setDeleteTarget] = useState<ProfileRow | null>(null);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [deleting, setDeleting] = useState(false);
+
+  // Resend welcome state (track per-user loading)
+  const [resendingWelcome, setResendingWelcome] = useState<string | null>(null);
 
   const showSuccess = (msg: string) => {
     setSuccessMsg(msg);
@@ -355,6 +377,127 @@ export default function AdminMembersPage() {
     }
   };
 
+  // ── Add User ────────────────────────────────────────────────────
+  const resetAddForm = () => {
+    setAddForm({
+      email: '',
+      full_name: '',
+      role: 'farmer',
+      capabilities: [],
+      country: '',
+      phone: '',
+      send_welcome: true,
+    });
+  };
+
+  const handleAddUser = async () => {
+    if (!addForm.email || !addForm.full_name || !addForm.role) {
+      showError('Email, full name, and role are required');
+      return;
+    }
+    setAddSubmitting(true);
+    try {
+      const res = await fetch('/api/admin/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: addForm.email.trim().toLowerCase(),
+          full_name: addForm.full_name.trim(),
+          role: addForm.role,
+          capabilities: addForm.capabilities,
+          country: addForm.country || null,
+          phone: addForm.phone || null,
+          send_welcome: addForm.send_welcome,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        showError(data.error || 'Failed to create user');
+        return;
+      }
+      const emailMsg = addForm.send_welcome
+        ? 'User created. Welcome email sent.'
+        : `User created. Temporary password: ${data.user?.temp_password || '—'}`;
+      showSuccess(emailMsg);
+      setShowAddUser(false);
+      resetAddForm();
+      await fetchProfiles();
+    } catch {
+      showError('Failed to create user');
+    } finally {
+      setAddSubmitting(false);
+    }
+  };
+
+  const toggleAddCapability = (cap: string) => {
+    setAddForm(prev => ({
+      ...prev,
+      capabilities: prev.capabilities.includes(cap)
+        ? prev.capabilities.filter(c => c !== cap)
+        : [...prev.capabilities, cap],
+    }));
+  };
+
+  // ── Delete ─────────────────────────────────────────────────────
+  const openDeleteConfirm = (user: ProfileRow) => {
+    setDeleteTarget(user);
+    setDeleteConfirmText('');
+  };
+
+  const closeDeleteConfirm = () => {
+    setDeleteTarget(null);
+    setDeleteConfirmText('');
+  };
+
+  const handleDeleteUser = async () => {
+    if (!deleteTarget) return;
+    if (deleteConfirmText !== 'DELETE') {
+      showError('Type DELETE to confirm');
+      return;
+    }
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/admin/users/${deleteTarget.id}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ confirm: 'DELETE' }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        showError(data.error || 'Failed to delete user');
+        return;
+      }
+      showSuccess(`User ${deleteTarget.full_name || deleteTarget.email || ''} deleted (${data.mode})`);
+      closeDeleteConfirm();
+      await fetchProfiles();
+    } catch {
+      showError('Failed to delete user');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  // ── Resend Welcome ─────────────────────────────────────────────
+  const handleResendWelcome = async (userId: string, name: string) => {
+    setResendingWelcome(userId);
+    try {
+      const res = await fetch(`/api/admin/users/${userId}/send-welcome`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        showError(data.error || 'Failed to resend welcome');
+        return;
+      }
+      showSuccess(`Welcome email sent to ${name}`);
+    } catch {
+      showError('Failed to resend welcome');
+    } finally {
+      setResendingWelcome(null);
+    }
+  };
+
   const summaryCards = [
     { label: 'Total People', value: stats.all || 0, color: 'text-navy', bg: 'bg-navy/10' },
     { label: 'Farmers', value: stats.farmer || 0, color: 'text-green-700', bg: 'bg-green-50' },
@@ -370,13 +513,22 @@ export default function AdminMembersPage() {
           <h1 className="text-2xl font-bold text-navy">People Directory</h1>
           <p className="text-sm text-gray-500 mt-0.5">All members, suppliers, ambassadors, investors, partners, and admins</p>
         </div>
-        <button
-          onClick={handleExportCSV}
-          className="flex items-center gap-2 px-4 py-2 bg-navy text-white text-sm font-medium rounded-lg hover:bg-navy/90 transition-colors"
-        >
-          <Download className="w-4 h-4" />
-          Export CSV
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleExportCSV}
+            className="flex items-center gap-2 px-4 py-2 bg-navy text-white text-sm font-medium rounded-lg hover:bg-navy/90 transition-colors"
+          >
+            <Download className="w-4 h-4" />
+            Export CSV
+          </button>
+          <button
+            onClick={() => { resetAddForm(); setShowAddUser(true); }}
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 text-white text-sm font-semibold rounded-lg hover:from-green-700 hover:to-green-800 transition-all shadow-sm"
+          >
+            <UserPlus className="w-4 h-4" />
+            Add User
+          </button>
+        </div>
       </div>
 
       {/* Summary */}
@@ -534,6 +686,23 @@ export default function AdminMembersPage() {
                               {impersonateLoading === p.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogIn className="w-4 h-4" />}
                             </button>
                           )}
+                          <button
+                            onClick={() => handleResendWelcome(p.id, p.full_name || p.email || 'user')}
+                            disabled={resendingWelcome === p.id}
+                            className="p-2 rounded-lg hover:bg-blue-50 text-gray-400 hover:text-blue-600 transition-colors disabled:opacity-50"
+                            title="Resend welcome email (generates new temp password)"
+                          >
+                            {resendingWelcome === p.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
+                          </button>
+                          {isSuperAdmin && p.id !== authUser?.id && p.role !== 'super_admin' && (
+                            <button
+                              onClick={() => openDeleteConfirm(p)}
+                              className="p-2 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-600 transition-colors"
+                              title="Delete user"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -689,6 +858,204 @@ export default function AdminMembersPage() {
                 </div>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Add User Modal */}
+      {showAddUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 sticky top-0 bg-white rounded-t-2xl">
+              <div className="flex items-center gap-2">
+                <UserPlus className="w-5 h-5 text-green-600" />
+                <h2 className="text-lg font-bold text-navy">Add New User</h2>
+              </div>
+              <button
+                onClick={() => { setShowAddUser(false); resetAddForm(); }}
+                className="p-1 rounded-lg hover:bg-gray-100 text-gray-400"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">Email *</label>
+                  <input
+                    type="email"
+                    value={addForm.email}
+                    onChange={(e) => setAddForm(p => ({ ...p, email: e.target.value }))}
+                    placeholder="user@example.com"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500/50"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">Full Name *</label>
+                  <input
+                    type="text"
+                    value={addForm.full_name}
+                    onChange={(e) => setAddForm(p => ({ ...p, full_name: e.target.value }))}
+                    placeholder="Jane Farmer"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500/50"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">Primary Role *</label>
+                  <select
+                    value={addForm.role}
+                    onChange={(e) => setAddForm(p => ({ ...p, role: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-500/50"
+                  >
+                    {PRIMARY_ROLE_OPTIONS.map(opt => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">Country</label>
+                  <select
+                    value={addForm.country}
+                    onChange={(e) => setAddForm(p => ({ ...p, country: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-500/50"
+                  >
+                    <option value="">Select country</option>
+                    <option value="Botswana">Botswana</option>
+                    <option value="Kenya">Kenya</option>
+                    <option value="Mozambique">Mozambique</option>
+                    <option value="Nigeria">Nigeria</option>
+                    <option value="Sierra Leone">Sierra Leone</option>
+                    <option value="South Africa">South Africa</option>
+                    <option value="Tanzania">Tanzania</option>
+                    <option value="Uganda">Uganda</option>
+                    <option value="Zambia">Zambia</option>
+                    <option value="Zimbabwe">Zimbabwe</option>
+                  </select>
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">Phone</label>
+                  <input
+                    type="tel"
+                    value={addForm.phone}
+                    onChange={(e) => setAddForm(p => ({ ...p, phone: e.target.value }))}
+                    placeholder="+254 700 000 000"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500/50"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-2">Additional Capabilities</label>
+                <div className="flex flex-wrap gap-2">
+                  {CAPABILITY_LIST.map((cap) => {
+                    const on = addForm.capabilities.includes(cap.key);
+                    return (
+                      <button
+                        key={cap.key}
+                        type="button"
+                        onClick={() => toggleAddCapability(cap.key)}
+                        className={`text-xs px-3 py-1.5 rounded-full font-medium border transition-all ${
+                          on
+                            ? cap.chipClass
+                            : 'bg-white text-gray-400 border-gray-200 hover:border-gray-300'
+                        }`}
+                      >
+                        {on ? '✓ ' : '+ '}{cap.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 pt-2">
+                <input
+                  type="checkbox"
+                  id="send_welcome"
+                  checked={addForm.send_welcome}
+                  onChange={(e) => setAddForm(p => ({ ...p, send_welcome: e.target.checked }))}
+                  className="w-4 h-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
+                />
+                <label htmlFor="send_welcome" className="text-sm text-gray-700">
+                  Send welcome email with login credentials
+                </label>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-4 border-t border-gray-100">
+                <button
+                  onClick={() => { setShowAddUser(false); resetAddForm(); }}
+                  className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-navy transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleAddUser}
+                  disabled={addSubmitting || !addForm.email || !addForm.full_name}
+                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 text-white text-sm font-semibold rounded-lg hover:from-green-700 hover:to-green-800 transition-all disabled:opacity-50"
+                >
+                  {addSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <UserPlus className="w-4 h-4" />}
+                  Create User
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+              <div className="flex items-center gap-2">
+                <Trash2 className="w-5 h-5 text-red-600" />
+                <h2 className="text-lg font-bold text-navy">Delete User</h2>
+              </div>
+              <button
+                onClick={closeDeleteConfirm}
+                className="p-1 rounded-lg hover:bg-gray-100 text-gray-400"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <p className="text-sm text-gray-700">
+                Delete <strong>{deleteTarget.full_name || deleteTarget.email}</strong>?
+                This will <strong>soft-delete</strong> the account — the user will be
+                anonymized, banned from sign-in, and their role set to{' '}
+                <code className="bg-gray-100 px-1 rounded">deleted</code>.
+              </p>
+              <p className="text-xs text-gray-500">
+                Linked records (suppliers, members, ambassadors) are preserved for audit history.
+              </p>
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">
+                  Type <code className="bg-red-50 text-red-700 px-1 rounded">DELETE</code> to confirm
+                </label>
+                <input
+                  type="text"
+                  value={deleteConfirmText}
+                  onChange={(e) => setDeleteConfirmText(e.target.value)}
+                  placeholder="DELETE"
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500/50"
+                />
+              </div>
+              <div className="flex justify-end gap-2 pt-2 border-t border-gray-100">
+                <button
+                  onClick={closeDeleteConfirm}
+                  className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-navy transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteUser}
+                  disabled={deleting || deleteConfirmText !== 'DELETE'}
+                  className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+                >
+                  {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                  Delete User
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
