@@ -15,6 +15,7 @@ interface Profile {
   avatar_url: string | null;
   role: UserRole;
   roles?: UserRole[]; // TEXT[] column — supports dual-role (e.g. member + supplier)
+  capabilities?: string[]; // TEXT[] column — additive capability flags (ambassador, sponsor, investor, etc)
   country: string | null;
   region: string | null;
 }
@@ -32,6 +33,8 @@ interface AuthContextType {
   realProfile: Profile | null;
   roles: string[];
   hasRole: (role: string) => boolean;
+  capabilities: string[];
+  hasCapability: (cap: string) => boolean;
   signUp: (email: string, password: string, fullName: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signInWithMagicLink: (email: string) => Promise<{ error: Error | null }>;
@@ -268,6 +271,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const hasRole = (role: string): boolean => roles.includes(role);
 
+  // Capabilities array — gracefully handles null/undefined from older profiles
+  const capabilities: string[] = Array.isArray(profile?.capabilities)
+    ? (profile!.capabilities as string[])
+    : [];
+
+  const hasCapability = (cap: string): boolean => capabilities.includes(cap);
+
   const isSuperAdmin = hasRole('super_admin');
   const isAdmin = hasRole('admin') || hasRole('super_admin');
   const isSupplier = hasRole('supplier') || isAdmin;
@@ -288,6 +298,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         realProfile,
         roles,
         hasRole,
+        capabilities,
+        hasCapability,
         signUp,
         signIn,
         signInWithMagicLink,

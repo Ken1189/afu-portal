@@ -29,6 +29,7 @@ import {
   Save,
   Loader2,
 } from 'lucide-react';
+import CapabilitiesCard from '@/components/CapabilitiesCard';
 
 // ── Fallback data (shown when no supplier record exists) ──
 
@@ -528,6 +529,13 @@ export default function SupplierProfilePage() {
           Profile saved successfully!
         </motion.div>
       )}
+
+      {/* =====================================================================
+          CAPABILITIES CARD
+      ====================================================================== */}
+      <motion.div variants={fadeUp}>
+        <CapabilitiesCard />
+      </motion.div>
 
       {/* =====================================================================
           2. PROFILE HEADER CARD

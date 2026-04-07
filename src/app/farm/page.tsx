@@ -31,6 +31,8 @@ import {
   Search,
   CircleDot,
   X,
+  Megaphone,
+  Loader2,
 } from 'lucide-react';
 import { useFarmPlots, useFarmActivities, useFarmTransactions } from '@/lib/supabase/use-farm-plots';
 import type { FarmPlotRow } from '@/lib/supabase/use-farm-plots';
@@ -380,7 +382,7 @@ const priorityBadge: Record<string, { bg: string; dot: string; label: string }> 
 
 export default function FarmDashboardPage() {
   const { t } = useLanguage();
-  const { user, profile } = useAuth();
+  const { user, profile, hasCapability, refreshProfile } = useAuth();
   const { plots: livePlots } = useFarmPlots(user?.id);
   const { activities: liveActivities } = useFarmActivities();
   const { transactions: liveTransactions, income: liveIncome, expenses: liveExpenses } = useFarmTransactions(user?.id);
@@ -429,6 +431,32 @@ export default function FarmDashboardPage() {
 
   // Weather popup state
   const [selectedWeatherDay, setSelectedWeatherDay] = useState<number | null>(null);
+
+  // Ambassador capability state
+  const isAmbassador = hasCapability('ambassador');
+  const [activatingAmbassador, setActivatingAmbassador] = useState(false);
+  const [ambassadorError, setAmbassadorError] = useState<string | null>(null);
+
+  const handleBecomeAmbassador = async () => {
+    setActivatingAmbassador(true);
+    setAmbassadorError(null);
+    try {
+      const res = await fetch('/api/user/capabilities/activate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ capability: 'ambassador' }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to activate ambassador capability');
+      }
+      await refreshProfile();
+    } catch (err) {
+      setAmbassadorError(err instanceof Error ? err.message : 'Unknown error');
+    } finally {
+      setActivatingAmbassador(false);
+    }
+  };
 
   return (
     <motion.div
@@ -491,6 +519,72 @@ export default function FarmDashboardPage() {
       {/* ================================================================= */}
       <motion.section variants={itemVariants}>
         <QuickStartCard />
+      </motion.section>
+
+      {/* ================================================================= */}
+      {/* AMBASSADOR CAPABILITY CARD                                        */}
+      {/* ================================================================= */}
+      <motion.section variants={itemVariants} className="px-4">
+        {isAmbassador ? (
+          <Link
+            href="/ambassador"
+            className="block rounded-2xl border border-[#5DB347]/30 bg-gradient-to-br from-[#5DB347]/10 to-[#F5F0E1]/60 p-4 hover:border-[#5DB347]/60 transition-colors"
+          >
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-[#5DB347] flex items-center justify-center flex-shrink-0">
+                <Megaphone className="w-5 h-5 text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-sm font-bold text-[#1B2A4A]">You&apos;re an AFU Ambassador</h3>
+                <p className="text-xs text-gray-600 mt-0.5">
+                  View your referrals and track commissions
+                </p>
+              </div>
+              <ArrowRight className="w-4 h-4 text-[#5DB347] flex-shrink-0 mt-1" />
+            </div>
+          </Link>
+        ) : (
+          <div className="rounded-2xl border border-[#F5F0E1] bg-gradient-to-br from-[#F5F0E1]/80 to-white p-4">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-[#1B2A4A] flex items-center justify-center flex-shrink-0">
+                <Megaphone className="w-5 h-5 text-[#5DB347]" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-sm font-bold text-[#1B2A4A]">
+                  Earn commission referring other farmers
+                </h3>
+                <p className="text-xs text-gray-600 mt-0.5">
+                  Become an AFU Ambassador and get paid for every farmer you bring on.
+                </p>
+                {ambassadorError && (
+                  <p className="text-xs text-red-600 mt-1">{ambassadorError}</p>
+                )}
+                <div className="flex items-center gap-2 mt-3">
+                  <button
+                    type="button"
+                    onClick={handleBecomeAmbassador}
+                    disabled={activatingAmbassador}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#5DB347] hover:bg-[#449933] text-white text-xs font-semibold transition-colors disabled:opacity-60"
+                  >
+                    {activatingAmbassador ? (
+                      <>
+                        <Loader2 className="w-3 h-3 animate-spin" /> Activating...
+                      </>
+                    ) : (
+                      <>Become an Ambassador</>
+                    )}
+                  </button>
+                  <Link
+                    href="/ambassador-info"
+                    className="text-xs font-medium text-[#1B2A4A] hover:text-[#5DB347]"
+                  >
+                    Learn more
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </motion.section>
 
       {/* ================================================================= */}

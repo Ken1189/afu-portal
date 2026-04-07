@@ -720,6 +720,52 @@ export default function SupplierDashboard() {
       </motion.div>
 
       {/* ══════════════════════════════════════════════════════════════════
+          SPONSOR CAPABILITY BANNER
+      ═════════════════════════════════════════════════════════════════ */}
+      <motion.div variants={fadeUp}>
+        {supplier.sponsorshipTier ? (
+          <Link
+            href="/supplier/sponsorship"
+            className="flex items-center justify-between gap-3 rounded-xl border border-[#5DB347]/30 bg-gradient-to-r from-[#5DB347]/10 to-[#F5F0E1]/60 p-4 hover:border-[#5DB347]/60 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-[#5DB347] flex items-center justify-center flex-shrink-0">
+                <Star className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-[#1B2A4A]">
+                  Active sponsor:{' '}
+                  <span className="capitalize">{supplier.sponsorshipTier}</span>
+                </p>
+                <p className="text-xs text-gray-600 mt-0.5">Manage your sponsorship tier</p>
+              </div>
+            </div>
+            <ChevronRight className="w-5 h-5 text-[#5DB347] flex-shrink-0" />
+          </Link>
+        ) : (
+          <Link
+            href="/supplier/sponsorship"
+            className="flex items-center justify-between gap-3 rounded-xl border border-[#F5F0E1] bg-gradient-to-r from-[#F5F0E1]/80 to-white p-4 hover:border-[#1B2A4A]/20 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-[#1B2A4A] flex items-center justify-center flex-shrink-0">
+                <Megaphone className="w-5 h-5 text-[#5DB347]" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-[#1B2A4A]">
+                  Sponsor a program for marketing exposure
+                </p>
+                <p className="text-xs text-gray-600 mt-0.5">
+                  Reach more farmers by sponsoring AFU programs
+                </p>
+              </div>
+            </div>
+            <ChevronRight className="w-5 h-5 text-[#1B2A4A] flex-shrink-0" />
+          </Link>
+        )}
+      </motion.div>
+
+      {/* ══════════════════════════════════════════════════════════════════
           2. KPI STATS ROW
       ═════════════════════════════════════════════════════════════════ */}
       <motion.div

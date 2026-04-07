@@ -153,7 +153,7 @@ const FALLBACK_SERVICES = [
     title: 'Processing Hubs',
     desc: 'Milling, drying, cold chain, and packaging. Value-addition at source.',
     link: '/services/processing',
-    img: 'https://images.unsplash.com/photo-1599058917765-a780eda07a3e?w=800&h=500&fit=crop',
+    img: 'https://images.unsplash.com/photo-1518977822534-7049a61ee0c2?w=1200&q=80&auto=format&fit=crop',
   },
   {
     icon: ShieldCheck,

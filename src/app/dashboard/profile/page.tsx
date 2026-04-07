@@ -38,6 +38,7 @@ import {
 import { useAuth } from '@/lib/supabase/auth-context';
 import { createClient } from '@/lib/supabase/client';
 import ImageUploader from '@/components/ui/ImageUploader';
+import CapabilitiesCard from '@/components/CapabilitiesCard';
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -413,6 +414,11 @@ export default function ProfilePage() {
           {saveError}
         </motion.div>
       )}
+
+      {/* Capabilities card */}
+      <div className="mb-6">
+        <CapabilitiesCard />
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* ==================== LEFT COLUMN ==================== */}

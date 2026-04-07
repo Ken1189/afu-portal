@@ -20,8 +20,10 @@ type Portal = {
   href: string;
   label: string;
   Icon: React.ComponentType<{ className?: string }>;
-  show: (roles: string[]) => boolean;
+  show: (roles: string[], caps: string[]) => boolean;
 };
+
+const isAdminRole = (r: string[]) => r.includes('admin') || r.includes('super_admin');
 
 const ALL_PORTALS: Portal[] = [
   {
@@ -29,50 +31,49 @@ const ALL_PORTALS: Portal[] = [
     href: '/admin',
     label: 'Admin Portal',
     Icon: Shield,
-    show: (r) => r.includes('admin') || r.includes('super_admin'),
+    show: (r) => isAdminRole(r),
   },
   {
     key: 'farm',
     href: '/farm',
     label: 'Farmer Portal',
     Icon: Tractor,
-    show: (r) =>
+    show: (r, c) =>
       r.includes('farmer') ||
       r.includes('member') ||
-      r.includes('admin') ||
-      r.includes('super_admin'),
+      c.includes('farmer') ||
+      isAdminRole(r),
   },
   {
     key: 'supplier',
     href: '/supplier',
     label: 'Supplier Portal',
     Icon: Store,
-    show: (r) => r.includes('supplier') || r.includes('admin') || r.includes('super_admin'),
+    show: (r, c) => r.includes('supplier') || c.includes('supplier') || isAdminRole(r),
   },
   {
     key: 'ambassador',
     href: '/ambassador',
     label: 'Ambassador Portal',
     Icon: Megaphone,
-    show: (r) =>
-      r.includes('ambassador') || r.includes('admin') || r.includes('super_admin'),
+    show: (r, c) => r.includes('ambassador') || c.includes('ambassador') || isAdminRole(r),
   },
   {
     key: 'investor',
     href: '/investor',
     label: 'Investor Portal',
     Icon: TrendingUp,
-    show: (r) => r.includes('investor') || r.includes('admin') || r.includes('super_admin'),
+    show: (r, c) => r.includes('investor') || c.includes('investor') || isAdminRole(r),
   },
   {
     key: 'warehouse',
     href: '/warehouse',
     label: 'Warehouse Portal',
     Icon: WarehouseIcon,
-    show: (r) =>
+    show: (r, c) =>
       r.includes('warehouse_operator') ||
-      r.includes('admin') ||
-      r.includes('super_admin'),
+      c.includes('warehouse_op') ||
+      isAdminRole(r),
   },
   {
     key: 'public',
@@ -91,7 +92,7 @@ interface Props {
 }
 
 export default function PortalSwitcherDropdown({ variant = 'dark', className = '' }: Props) {
-  const { roles } = useAuth();
+  const { roles, capabilities } = useAuth();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -107,7 +108,7 @@ export default function PortalSwitcherDropdown({ variant = 'dark', className = '
     return () => document.removeEventListener('mousedown', handleClick);
   }, [open]);
 
-  const available = ALL_PORTALS.filter((p) => p.show(roles || []));
+  const available = ALL_PORTALS.filter((p) => p.show(roles || [], capabilities || []));
 
   // Determine the current portal from pathname
   const currentPortal =
