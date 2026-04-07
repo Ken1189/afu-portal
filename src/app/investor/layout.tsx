@@ -22,6 +22,7 @@ import {
   LogOut,
 } from 'lucide-react';
 import { useAuth } from '@/lib/supabase/auth-context';
+import NotificationBell from '@/components/NotificationBell';
 
 const navLinks = [
   { href: '/investor', label: 'Dashboard', icon: LayoutDashboard },
@@ -318,6 +319,7 @@ export default function InvestorLayout({ children }: { children: React.ReactNode
                 Admin
               </Link>
             )}
+            <NotificationBell />
             <div className="w-8 h-8 bg-[#5DB347] rounded-full flex items-center justify-center">
               <span className="text-white text-xs font-bold">{initials}</span>
             </div>

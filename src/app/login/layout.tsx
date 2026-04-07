@@ -1,11 +1,9 @@
-import { createPageMetadata } from '@/lib/seo/metadata';
+import type { Metadata } from 'next';
+import { getDynamicMetadata } from '@/lib/seo/dynamic-metadata';
 
-export const metadata = createPageMetadata({
-  title: 'Login',
-  description: 'Sign in to your African Farming Union member portal.',
-  path: '/login',
-  noIndex: true,
-});
+export async function generateMetadata(): Promise<Metadata> {
+  return getDynamicMetadata('/login');
+}
 
 export default function LoginLayout({ children }: { children: React.ReactNode }) {
   return children;

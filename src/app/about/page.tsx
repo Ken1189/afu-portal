@@ -80,6 +80,36 @@ const FALLBACK_RISK_STRATEGIES = [
   { risk: "Fraud / Leakage", mitigation: "Controlled procurement + field verification + audit trail", iconName: "Lock" },
 ];
 
+/* ─── NEW EDITABLE BLOCKS (058) ─── */
+
+const FALLBACK_HERO = {
+  title: 'About AFU',
+  subtitle: 'By Farmers, For Farmers',
+  body:
+    'The African Farming Union is a vertically integrated agriculture development platform — By Farmers, For Farmers — building toward becoming a specialized agri development platform and full-stack execution engine for African farmers. Our model includes trade finance instruments such as SBLCs, Letters of Credit, and export pre-financing designed to unlock international markets.',
+  image:
+    'https://images.unsplash.com/photo-1589923188651-268a9765e432?w=1920&h=700&fit=crop',
+};
+
+const FALLBACK_PROBLEM_CARDS = [
+  { title: 'Inputs Needed', description: 'Capital arrives late', icon: 'Sprout' },
+  { title: 'Yields Stay Low', description: 'No guaranteed buyers', icon: 'Tractor' },
+  { title: 'Crops Sold Cheap', description: 'Or wasted entirely', icon: 'BarChart3' },
+  { title: 'Payments Delayed', description: 'Next season underfunded', icon: 'Lock' },
+  { title: 'Repeat', description: 'The cycle continues', icon: 'Settings' },
+];
+
+const FALLBACK_MISSION =
+  "Africa's agriculture doesn't fail at farming — it fails at finance + trade finance + offtake + processing.";
+
+const FALLBACK_CTA = {
+  title: "Let's Grow Together",
+  body:
+    "Whether you're a farmer, investor, partner, or sponsor — there's a place for you in the AFU family. Tell us your story.",
+  button_text: 'Join Our Farming Family →',
+  button_link: '/apply',
+};
+
 const FALLBACK_COMMUNITY_PROGRAMS = [
   {
     iconName: 'HeartHandshake',
@@ -127,6 +157,10 @@ async function fetchAboutContent() {
   let operatingModel = FALLBACK_OPERATING_MODEL;
   let riskStrategies = FALLBACK_RISK_STRATEGIES;
   let communityPrograms = FALLBACK_COMMUNITY_PROGRAMS;
+  let hero = FALLBACK_HERO;
+  let problemCards = FALLBACK_PROBLEM_CARDS;
+  let mission = FALLBACK_MISSION;
+  let cta = FALLBACK_CTA;
 
   try {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -143,6 +177,10 @@ async function fetchAboutContent() {
           'about_operating_model',
           'about_risk_strategies',
           'about_community_programs',
+          'about_hero',
+          'about_problem_cards',
+          'about_mission',
+          'about_cta',
         ]);
 
       if (!error && data) {
@@ -160,6 +198,21 @@ async function fetchAboutContent() {
             case 'about_community_programs':
               communityPrograms = row.value as typeof FALLBACK_COMMUNITY_PROGRAMS;
               break;
+            case 'about_hero':
+              hero = { ...FALLBACK_HERO, ...(row.value as any) };
+              break;
+            case 'about_problem_cards':
+              if (Array.isArray(row.value) && row.value.length > 0) {
+                problemCards = row.value as typeof FALLBACK_PROBLEM_CARDS;
+              }
+              break;
+            case 'about_mission':
+              if (typeof row.value === 'string') mission = row.value;
+              else if (row.value && typeof (row.value as any).text === 'string') mission = (row.value as any).text;
+              break;
+            case 'about_cta':
+              cta = { ...FALLBACK_CTA, ...(row.value as any) };
+              break;
           }
         }
       }
@@ -168,11 +221,29 @@ async function fetchAboutContent() {
     // Silently fall back to hardcoded data
   }
 
-  return { heroStats, operatingModel, riskStrategies, communityPrograms };
+  return {
+    heroStats,
+    operatingModel,
+    riskStrategies,
+    communityPrograms,
+    hero,
+    problemCards,
+    mission,
+    cta,
+  };
 }
 
 export default async function AboutPage() {
-  const { heroStats, operatingModel, riskStrategies, communityPrograms } = await fetchAboutContent();
+  const {
+    heroStats,
+    operatingModel,
+    riskStrategies,
+    communityPrograms,
+    hero,
+    problemCards,
+    mission,
+    cta,
+  } = await fetchAboutContent();
 
   return (
     <>
@@ -180,7 +251,7 @@ export default async function AboutPage() {
       <section className="relative py-28 text-white overflow-hidden">
         <div className="absolute inset-0">
           <Image
-            src="https://images.unsplash.com/photo-1589923188651-268a9765e432?w=1920&h=700&fit=crop"
+            src={hero.image}
             alt=""
             aria-hidden="true"
             fill
@@ -200,16 +271,13 @@ export default async function AboutPage() {
               Pan-African Agriculture Development Platform
             </span>
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
-              About <span className="bg-gradient-to-r from-[#5DB347] to-[#6ABF4B] bg-clip-text text-transparent">AFU</span>
+              {hero.title}
             </h1>
             <p className="text-2xl font-semibold italic text-[#6ABF4B] mb-4">
-              By Farmers, For Farmers
+              {hero.subtitle}
             </p>
             <p className="text-xl text-white/80 leading-relaxed mb-10">
-              The African Farming Union is a vertically integrated agriculture development platform —
-              <strong className="text-white"> By Farmers, For Farmers</strong> — building toward becoming a specialized agri development platform
-              and full-stack execution engine for African farmers.
-              Our model includes trade finance instruments such as SBLCs, Letters of Credit, and export pre-financing designed to unlock international markets.
+              {hero.body}
             </p>
             {/* 3 stat pills — glassmorphism */}
             <div className="flex flex-wrap gap-4">
@@ -239,13 +307,7 @@ export default async function AboutPage() {
             </h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-            {[
-              { title: "Inputs Needed", desc: "Capital arrives late" },
-              { title: "Yields Stay Low", desc: "No guaranteed buyers" },
-              { title: "Crops Sold Cheap", desc: "Or wasted entirely" },
-              { title: "Payments Delayed", desc: "Next season underfunded" },
-              { title: "Repeat", desc: "The cycle continues" },
-            ].map((step, i) => (
+            {problemCards.map((step, i) => (
               <div
                 key={i}
                 className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 text-center shadow-lg shadow-[#5DB347]/5 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 border-l-4 border-[#5DB347]"
@@ -256,15 +318,12 @@ export default async function AboutPage() {
                   {i + 1}
                 </div>
                 <h3 className="font-bold text-[#1B2A4A] mb-1">{step.title}</h3>
-                <p className="text-gray-500 text-sm">{step.desc}</p>
+                <p className="text-gray-500 text-sm">{step.description}</p>
               </div>
             ))}
           </div>
           <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 mt-8 shadow-lg shadow-[#5DB347]/5 border-l-4 border-[#5DB347]">
-            <p className="text-[#1B2A4A] text-center font-medium">
-              Africa&apos;s agriculture doesn&apos;t fail at farming &mdash; it fails at{' '}
-              <strong className="text-green">finance + trade finance + offtake + processing</strong>.
-            </p>
+            <p className="text-[#1B2A4A] text-center font-medium">{mission}</p>
           </div>
         </div>
       </section>
@@ -422,16 +481,16 @@ export default async function AboutPage() {
             Join the Movement
           </span>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6">
-            Let&apos;s <span className="bg-gradient-to-r from-[#5DB347] to-[#6ABF4B] bg-clip-text text-transparent">Grow Together</span>
+            {cta.title}
           </h2>
           <p className="text-lg text-white/70 mb-10 max-w-xl mx-auto">
-            Whether you&apos;re a farmer, investor, partner, or sponsor — there&apos;s a place for you in the AFU family. Tell us your story.
+            {cta.body}
           </p>
           <Link
-            href="/apply"
+            href={cta.button_link}
             className="inline-block font-semibold text-lg px-10 py-4 rounded-2xl transition-all duration-300 text-white shadow-xl shadow-[#5DB347]/30 hover:-translate-y-1 hover:shadow-2xl hover:shadow-[#5DB347]/40 gradient-green"
           >
-            Join Our Farming Family →
+            {cta.button_text}
           </Link>
         </div>
       </section>

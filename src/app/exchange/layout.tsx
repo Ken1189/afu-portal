@@ -1,10 +1,9 @@
-import { createPageMetadata } from '@/lib/seo/metadata';
+import type { Metadata } from 'next';
+import { getDynamicMetadata } from '@/lib/seo/dynamic-metadata';
 
-export const metadata = createPageMetadata({
-  title: 'AFU Exchange',
-  description: 'Agricultural commodity exchange connecting African farmers to buyers. Trade crops, livestock, equipment, and farm inputs.',
-  path: '/exchange',
-});
+export async function generateMetadata(): Promise<Metadata> {
+  return getDynamicMetadata('/exchange');
+}
 
 export default function ExchangeLayout({ children }: { children: React.ReactNode }) {
   return children;

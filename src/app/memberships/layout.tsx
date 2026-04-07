@@ -1,10 +1,9 @@
-import { createPageMetadata } from '@/lib/seo/metadata';
+import type { Metadata } from 'next';
+import { getDynamicMetadata } from '@/lib/seo/dynamic-metadata';
 
-export const metadata = createPageMetadata({
-  title: 'Membership Tiers',
-  description: 'AFU membership plans for smallholder, commercial, enterprise, and partner tiers. Access financing, insurance, training, and guaranteed markets.',
-  path: '/memberships',
-});
+export async function generateMetadata(): Promise<Metadata> {
+  return getDynamicMetadata('/memberships');
+}
 
 export default function MembershipsLayout({ children }: { children: React.ReactNode }) {
   return children;

@@ -1,10 +1,9 @@
-import { createPageMetadata } from '@/lib/seo/metadata';
+import type { Metadata } from 'next';
+import { getDynamicMetadata } from '@/lib/seo/dynamic-metadata';
 
-export const metadata = createPageMetadata({
-  title: 'Ambassadors',
-  description: 'Become an AFU ambassador. Champion African farming, grow your community, earn rewards, and help connect farmers across the continent.',
-  path: '/ambassadors',
-});
+export async function generateMetadata(): Promise<Metadata> {
+  return getDynamicMetadata('/ambassadors');
+}
 
 export default function AmbassadorsLayout({ children }: { children: React.ReactNode }) {
   return children;

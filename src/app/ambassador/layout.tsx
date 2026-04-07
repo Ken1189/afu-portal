@@ -20,6 +20,7 @@ import {
   Handshake,
 } from 'lucide-react';
 import { useAuth } from '@/lib/supabase/auth-context';
+import NotificationBell from '@/components/NotificationBell';
 
 const navLinks = [
   { href: '/ambassador', label: 'Dashboard', icon: LayoutDashboard },
@@ -316,6 +317,7 @@ export default function AmbassadorLayout({ children }: { children: React.ReactNo
             </div>
           </div>
           <div className="flex items-center gap-3">
+            <NotificationBell />
             <div className="w-8 h-8 bg-[#5DB347] rounded-full flex items-center justify-center">
               <span className="text-white text-xs font-bold">{initials}</span>
             </div>

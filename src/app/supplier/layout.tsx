@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import NotificationBell from '@/components/NotificationBell';
 
 const supplierLinks = [
   { href: '/supplier', label: 'Dashboard', icon: LayoutDashboard, section: 'Overview' },
@@ -265,9 +266,7 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
             </button>
             <h1 className="text-base font-bold leading-tight truncate">{getPageTitle()}</h1>
           </div>
-          <button onClick={() => alert('Notifications coming soon')} className="w-9 h-9 flex items-center justify-center rounded-lg bg-white/15 active:bg-white/25 transition-colors relative">
-            <Bell className="w-5 h-5" />
-          </button>
+          <NotificationBell variant="dark" />
         </header>
 
         {/* ─── Desktop Top Bar (hidden on mobile) ─── */}
@@ -277,9 +276,7 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
             <p className="text-xs text-gray-400">Supplier Portal — {displayName}</p>
           </div>
           <div className="flex items-center gap-4">
-            <button onClick={() => alert('Notifications coming soon')} className="relative text-gray-400 hover:text-navy transition-colors">
-              <Bell className="w-5 h-5" />
-            </button>
+            <NotificationBell />
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 bg-[#729E82] rounded-full flex items-center justify-center">
                 <span className="text-white text-sm font-bold">{initials}</span>

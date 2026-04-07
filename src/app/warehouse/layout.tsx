@@ -21,6 +21,7 @@ import {
   LogOut,
 } from 'lucide-react';
 import { useAuth } from '@/lib/supabase/auth-context';
+import NotificationBell from '@/components/NotificationBell';
 
 const navLinks = [
   { href: '/warehouse', label: 'Dashboard', icon: LayoutDashboard },
@@ -318,6 +319,7 @@ export default function WarehouseLayout({ children }: { children: React.ReactNod
                 Admin
               </Link>
             )}
+            <NotificationBell />
             {profile?.avatar_url ? (
               <img src={profile.avatar_url} alt="" className="w-8 h-8 rounded-full object-cover" />
             ) : (

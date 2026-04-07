@@ -1,10 +1,9 @@
-import { createPageMetadata } from '@/lib/seo/metadata';
+import type { Metadata } from 'next';
+import { getDynamicMetadata } from '@/lib/seo/dynamic-metadata';
 
-export const metadata = createPageMetadata({
-  title: 'FAQ',
-  description: 'Frequently asked questions about AFU membership, services, financing, insurance, training programs, and how to join the union.',
-  path: '/faq',
-});
+export async function generateMetadata(): Promise<Metadata> {
+  return getDynamicMetadata('/faq');
+}
 
 export default function FaqLayout({ children }: { children: React.ReactNode }) {
   return children;

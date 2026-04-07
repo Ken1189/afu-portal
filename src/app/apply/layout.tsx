@@ -1,10 +1,9 @@
-import { createPageMetadata } from '@/lib/seo/metadata';
+import type { Metadata } from 'next';
+import { getDynamicMetadata } from '@/lib/seo/dynamic-metadata';
 
-export const metadata = createPageMetadata({
-  title: 'Apply for Membership',
-  description: 'Join the African Farming Union. Apply for smallholder, commercial, enterprise, or partner membership and access financing, markets, and training.',
-  path: '/apply',
-});
+export async function generateMetadata(): Promise<Metadata> {
+  return getDynamicMetadata('/apply');
+}
 
 export default function ApplyLayout({ children }: { children: React.ReactNode }) {
   return children;

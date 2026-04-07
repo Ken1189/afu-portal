@@ -328,11 +328,46 @@ export default function PaymentsPage() {
   };
 
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [refundModal, setRefundModal] = useState<{ paymentId: string } | null>(null);
+  const [refundReason, setRefundReason] = useState('');
 
   const handlePaymentAction = async (paymentId: string, action: 'refunded' | 'verified') => {
+    if (action === 'refunded') {
+      setRefundModal({ paymentId });
+      setRefundReason('');
+      return;
+    }
     setActionLoading(paymentId);
-    await updatePaymentStatus(paymentId, action === 'verified' ? 'completed' : 'reversed');
+    await updatePaymentStatus(paymentId, 'completed');
     setActionLoading(null);
+  };
+
+  const submitRefund = async () => {
+    if (!refundModal) return;
+    const { paymentId } = refundModal;
+    setActionLoading(paymentId);
+    try {
+      const res = await fetch('/api/admin/payments/refund', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paymentId, reason: refundReason }),
+      });
+      if (res.ok) {
+        setPayments((prev) =>
+          prev.map((p) => (p.id === paymentId ? { ...p, status: 'reversed' as PaymentRecord['status'] } : p))
+        );
+        setRefundModal(null);
+        setRefundReason('');
+      } else {
+        const j = await res.json().catch(() => ({}));
+        alert(`Refund failed: ${j.error ?? 'Unknown error'}`);
+      }
+    } catch (err) {
+      console.error('[refund] Error:', err);
+      alert('Refund failed.');
+    } finally {
+      setActionLoading(null);
+    }
   };
 
   // ── Computed stats ────────────────────────────────────────────────────
@@ -847,6 +882,40 @@ export default function PaymentsPage() {
           </div>
         )}
       </motion.div>
+
+      {/* Refund modal */}
+      {refundModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-2xl">
+            <h3 className="mb-2 text-lg font-semibold text-navy">Refund payment</h3>
+            <p className="mb-4 text-sm text-gray-600">
+              Provide a reason for this refund. This will be logged in the audit trail.
+            </p>
+            <textarea
+              value={refundReason}
+              onChange={(e) => setRefundReason(e.target.value)}
+              placeholder="Reason for refund..."
+              rows={4}
+              className="mb-4 w-full rounded-lg border border-gray-300 p-3 text-sm focus:border-[#5DB347] focus:outline-none"
+            />
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => { setRefundModal(null); setRefundReason(''); }}
+                className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={submitRefund}
+                disabled={!refundReason.trim() || actionLoading === refundModal.paymentId}
+                className="rounded-lg bg-[#5DB347] px-4 py-2 text-sm font-semibold text-white hover:bg-[#449933] disabled:opacity-50"
+              >
+                {actionLoading === refundModal.paymentId ? 'Processing...' : 'Confirm refund'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 }

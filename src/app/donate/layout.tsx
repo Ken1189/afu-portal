@@ -1,10 +1,9 @@
-import { createPageMetadata } from '@/lib/seo/metadata';
+import type { Metadata } from 'next';
+import { getDynamicMetadata } from '@/lib/seo/dynamic-metadata';
 
-export const metadata = createPageMetadata({
-  title: 'Donate',
-  description: 'Support African farmers with a one-time or monthly donation. Fund training, inputs, insurance, and infrastructure for smallholder communities.',
-  path: '/donate',
-});
+export async function generateMetadata(): Promise<Metadata> {
+  return getDynamicMetadata('/donate');
+}
 
 export default function DonateLayout({ children }: { children: React.ReactNode }) {
   return children;

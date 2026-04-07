@@ -112,7 +112,7 @@ interface CountryTeamData {
   members: CountryTeamMember[];
 }
 
-type TabId = 'content' | 'flags' | 'config' | 'templates' | 'broadcasts' | 'country_teams' | 'branding' | 'hero' | 'homepage_stats' | 'membership_tiers' | 'footer_extras' | 'seo';
+type TabId = 'content' | 'flags' | 'config' | 'templates' | 'broadcasts' | 'country_teams' | 'branding' | 'hero' | 'homepage_stats' | 'membership_tiers' | 'footer_extras' | 'seo' | 'service_pages' | 'about_page';
 
 // ═══════════════════════════════════════════════════════
 //  CONSTANTS
@@ -131,6 +131,8 @@ const TABS: { id: TabId; label: string; icon: React.ReactNode }[] = [
   { id: 'membership_tiers', label: 'Membership Tiers', icon: <CreditCard className="w-4 h-4" /> },
   { id: 'footer_extras', label: 'Footer', icon: <FileText className="w-4 h-4" /> },
   { id: 'seo', label: 'SEO', icon: <Search className="w-4 h-4" /> },
+  { id: 'service_pages', label: 'Service Pages', icon: <FileText className="w-4 h-4" /> },
+  { id: 'about_page', label: 'About Page', icon: <FileText className="w-4 h-4" /> },
 ];
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -284,6 +286,8 @@ export default function AdminContentPage() {
       {activeTab === 'membership_tiers' && <MembershipTiersTab showToast={showToast} />}
       {activeTab === 'footer_extras' && <FooterExtrasTab showToast={showToast} />}
       {activeTab === 'seo' && <SEOTab showToast={showToast} />}
+      {activeTab === 'service_pages' && <ServicePagesTab showToast={showToast} />}
+      {activeTab === 'about_page' && <AboutPageTab showToast={showToast} />}
 
       {/* Toast */}
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
@@ -2481,6 +2485,513 @@ function SEOTab({ showToast }: { showToast: (msg: string, type?: 'success' | 'er
 
       <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#5DB347] text-white text-sm font-medium hover:bg-[#4ea03c] disabled:opacity-50">
         {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Save SEO
+      </button>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════
+//  SERVICE PAGES TAB
+// ═══════════════════════════════════════════════════════
+
+const SERVICE_SLUGS: { slug: string; label: string }[] = [
+  { slug: 'financing', label: 'Financing' },
+  { slug: 'insurance', label: 'Insurance' },
+  { slug: 'training', label: 'Training & Extension' },
+  { slug: 'veterinary', label: 'Veterinary Services' },
+  { slug: 'inputs', label: 'Farm Inputs' },
+];
+
+interface ServicePageEditorState {
+  hero_title: string;
+  hero_subtitle: string;
+  hero_image: string;
+  features: { title: string; description: string; icon?: string }[];
+  how_it_works: { step: number; title: string; description: string }[];
+  cta_text: string;
+  cta_link: string;
+}
+
+const EMPTY_SERVICE: ServicePageEditorState = {
+  hero_title: '',
+  hero_subtitle: '',
+  hero_image: '',
+  features: [],
+  how_it_works: [],
+  cta_text: 'Get Started',
+  cta_link: '/apply',
+};
+
+function ServicePagesTab({ showToast }: { showToast: (m: string, t?: 'success' | 'error') => void }) {
+  const [selected, setSelected] = useState<string>(SERVICE_SLUGS[0].slug);
+  const [state, setState] = useState<ServicePageEditorState>(EMPTY_SERVICE);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      try {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from('site_config')
+          .select('value')
+          .eq('key', `service_${selected}`)
+          .maybeSingle();
+        if (cancelled) return;
+        const v = (data?.value as Partial<ServicePageEditorState>) || {};
+        setState({
+          ...EMPTY_SERVICE,
+          ...v,
+          features: Array.isArray(v.features) ? v.features : [],
+          how_it_works: Array.isArray(v.how_it_works) ? v.how_it_works : [],
+        });
+      } catch (e) {
+        if (!cancelled) setState(EMPTY_SERVICE);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [selected]);
+
+  const updateFeature = (i: number, patch: Partial<{ title: string; description: string; icon?: string }>) => {
+    setState((s) => ({
+      ...s,
+      features: s.features.map((f, idx) => (idx === i ? { ...f, ...patch } : f)),
+    }));
+  };
+  const addFeature = () =>
+    setState((s) => ({ ...s, features: [...s.features, { title: '', description: '', icon: '' }] }));
+  const removeFeature = (i: number) =>
+    setState((s) => ({ ...s, features: s.features.filter((_, idx) => idx !== i) }));
+
+  const updateStep = (i: number, patch: Partial<{ step: number; title: string; description: string }>) => {
+    setState((s) => ({
+      ...s,
+      how_it_works: s.how_it_works.map((st, idx) => (idx === i ? { ...st, ...patch } : st)),
+    }));
+  };
+  const addStep = () =>
+    setState((s) => ({
+      ...s,
+      how_it_works: [
+        ...s.how_it_works,
+        { step: s.how_it_works.length + 1, title: '', description: '' },
+      ],
+    }));
+  const removeStep = (i: number) =>
+    setState((s) => ({ ...s, how_it_works: s.how_it_works.filter((_, idx) => idx !== i) }));
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const supabase = createClient();
+      const { error } = await supabase
+        .from('site_config')
+        .upsert({ key: `service_${selected}`, value: state }, { onConflict: 'key' });
+      if (error) throw error;
+      showToast('Service page saved');
+    } catch (e: any) {
+      console.error(e);
+      showToast(e?.message || 'Save failed', 'error');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-wrap gap-2">
+        {SERVICE_SLUGS.map((s) => (
+          <button
+            key={s.slug}
+            onClick={() => setSelected(s.slug)}
+            className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
+              selected === s.slug
+                ? 'bg-[#5DB347] text-white border-[#5DB347]'
+                : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+            }`}
+          >
+            {s.label}
+          </button>
+        ))}
+      </div>
+
+      {loading ? (
+        <div className="text-sm text-gray-400">Loading…</div>
+      ) : (
+        <div className="space-y-5 bg-white rounded-xl border border-gray-100 p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="text-xs font-semibold text-gray-600 uppercase">Hero title</label>
+              <input
+                value={state.hero_title}
+                onChange={(e) => setState((s) => ({ ...s, hero_title: e.target.value }))}
+                className="mt-1 w-full px-3 py-2 rounded-lg border border-gray-200 text-sm"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-gray-600 uppercase">Hero image URL</label>
+              <input
+                value={state.hero_image}
+                onChange={(e) => setState((s) => ({ ...s, hero_image: e.target.value }))}
+                className="mt-1 w-full px-3 py-2 rounded-lg border border-gray-200 text-sm"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="text-xs font-semibold text-gray-600 uppercase">Hero subtitle</label>
+            <textarea
+              value={state.hero_subtitle}
+              onChange={(e) => setState((s) => ({ ...s, hero_subtitle: e.target.value }))}
+              rows={2}
+              className="mt-1 w-full px-3 py-2 rounded-lg border border-gray-200 text-sm"
+            />
+          </div>
+
+          {/* Features */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-xs font-semibold text-gray-600 uppercase">Features</label>
+              <button
+                onClick={addFeature}
+                className="text-xs px-2 py-1 rounded-lg border border-gray-200 hover:bg-gray-50"
+              >
+                + Add feature
+              </button>
+            </div>
+            <div className="space-y-3">
+              {state.features.map((f, i) => (
+                <div key={i} className="grid grid-cols-1 md:grid-cols-12 gap-2 items-start">
+                  <input
+                    placeholder="Title"
+                    value={f.title}
+                    onChange={(e) => updateFeature(i, { title: e.target.value })}
+                    className="md:col-span-3 px-3 py-2 rounded-lg border border-gray-200 text-sm"
+                  />
+                  <input
+                    placeholder="Icon (emoji)"
+                    value={f.icon || ''}
+                    onChange={(e) => updateFeature(i, { icon: e.target.value })}
+                    className="md:col-span-2 px-3 py-2 rounded-lg border border-gray-200 text-sm"
+                  />
+                  <input
+                    placeholder="Description"
+                    value={f.description}
+                    onChange={(e) => updateFeature(i, { description: e.target.value })}
+                    className="md:col-span-6 px-3 py-2 rounded-lg border border-gray-200 text-sm"
+                  />
+                  <button
+                    onClick={() => removeFeature(i)}
+                    className="md:col-span-1 px-2 py-2 rounded-lg text-red-500 hover:bg-red-50"
+                    aria-label="Remove feature"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* How it works */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-xs font-semibold text-gray-600 uppercase">How it works</label>
+              <button
+                onClick={addStep}
+                className="text-xs px-2 py-1 rounded-lg border border-gray-200 hover:bg-gray-50"
+              >
+                + Add step
+              </button>
+            </div>
+            <div className="space-y-3">
+              {state.how_it_works.map((st, i) => (
+                <div key={i} className="grid grid-cols-1 md:grid-cols-12 gap-2 items-start">
+                  <input
+                    type="number"
+                    value={st.step}
+                    onChange={(e) => updateStep(i, { step: Number(e.target.value) })}
+                    className="md:col-span-1 px-3 py-2 rounded-lg border border-gray-200 text-sm"
+                  />
+                  <input
+                    placeholder="Title"
+                    value={st.title}
+                    onChange={(e) => updateStep(i, { title: e.target.value })}
+                    className="md:col-span-3 px-3 py-2 rounded-lg border border-gray-200 text-sm"
+                  />
+                  <input
+                    placeholder="Description"
+                    value={st.description}
+                    onChange={(e) => updateStep(i, { description: e.target.value })}
+                    className="md:col-span-7 px-3 py-2 rounded-lg border border-gray-200 text-sm"
+                  />
+                  <button
+                    onClick={() => removeStep(i)}
+                    className="md:col-span-1 px-2 py-2 rounded-lg text-red-500 hover:bg-red-50"
+                    aria-label="Remove step"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* CTA */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="text-xs font-semibold text-gray-600 uppercase">CTA text</label>
+              <input
+                value={state.cta_text}
+                onChange={(e) => setState((s) => ({ ...s, cta_text: e.target.value }))}
+                className="mt-1 w-full px-3 py-2 rounded-lg border border-gray-200 text-sm"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-gray-600 uppercase">CTA link</label>
+              <input
+                value={state.cta_link}
+                onChange={(e) => setState((s) => ({ ...s, cta_link: e.target.value }))}
+                className="mt-1 w-full px-3 py-2 rounded-lg border border-gray-200 text-sm"
+              />
+            </div>
+          </div>
+
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#5DB347] text-white text-sm font-medium hover:bg-[#4ea03c] disabled:opacity-50"
+          >
+            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Save service page
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════
+//  ABOUT PAGE TAB
+// ═══════════════════════════════════════════════════════
+
+interface AboutEditorState {
+  hero: { title: string; subtitle: string; body: string; image: string };
+  problem_cards: { title: string; description: string; icon?: string }[];
+  mission: string;
+  cta: { title: string; body: string; button_text: string; button_link: string };
+}
+
+const EMPTY_ABOUT: AboutEditorState = {
+  hero: { title: '', subtitle: '', body: '', image: '' },
+  problem_cards: [],
+  mission: '',
+  cta: { title: '', body: '', button_text: '', button_link: '' },
+};
+
+function AboutPageTab({ showToast }: { showToast: (m: string, t?: 'success' | 'error') => void }) {
+  const [state, setState] = useState<AboutEditorState>(EMPTY_ABOUT);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      try {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from('site_config')
+          .select('key, value')
+          .in('key', ['about_hero', 'about_problem_cards', 'about_mission', 'about_cta']);
+        if (cancelled) return;
+        const next = { ...EMPTY_ABOUT };
+        for (const row of data || []) {
+          if (row.key === 'about_hero') next.hero = { ...next.hero, ...(row.value as any) };
+          if (row.key === 'about_problem_cards' && Array.isArray(row.value)) next.problem_cards = row.value as any;
+          if (row.key === 'about_mission') {
+            if (typeof row.value === 'string') next.mission = row.value;
+            else if (row.value && typeof (row.value as any).text === 'string') next.mission = (row.value as any).text;
+          }
+          if (row.key === 'about_cta') next.cta = { ...next.cta, ...(row.value as any) };
+        }
+        setState(next);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const updateCard = (i: number, patch: Partial<{ title: string; description: string; icon?: string }>) => {
+    setState((s) => ({
+      ...s,
+      problem_cards: s.problem_cards.map((c, idx) => (idx === i ? { ...c, ...patch } : c)),
+    }));
+  };
+  const addCard = () =>
+    setState((s) => ({
+      ...s,
+      problem_cards: [...s.problem_cards, { title: '', description: '', icon: '' }],
+    }));
+  const removeCard = (i: number) =>
+    setState((s) => ({ ...s, problem_cards: s.problem_cards.filter((_, idx) => idx !== i) }));
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const supabase = createClient();
+      const rows = [
+        { key: 'about_hero', value: state.hero },
+        { key: 'about_problem_cards', value: state.problem_cards },
+        { key: 'about_mission', value: { text: state.mission } },
+        { key: 'about_cta', value: state.cta },
+      ];
+      const { error } = await supabase.from('site_config').upsert(rows, { onConflict: 'key' });
+      if (error) throw error;
+      showToast('About page saved');
+    } catch (e: any) {
+      console.error(e);
+      showToast(e?.message || 'Save failed', 'error');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) return <div className="text-sm text-gray-400">Loading…</div>;
+
+  return (
+    <div className="space-y-6 bg-white rounded-xl border border-gray-100 p-6">
+      {/* Hero */}
+      <div>
+        <h3 className="text-sm font-bold text-navy mb-2">Hero</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <input
+            placeholder="Title"
+            value={state.hero.title}
+            onChange={(e) => setState((s) => ({ ...s, hero: { ...s.hero, title: e.target.value } }))}
+            className="px-3 py-2 rounded-lg border border-gray-200 text-sm"
+          />
+          <input
+            placeholder="Subtitle"
+            value={state.hero.subtitle}
+            onChange={(e) => setState((s) => ({ ...s, hero: { ...s.hero, subtitle: e.target.value } }))}
+            className="px-3 py-2 rounded-lg border border-gray-200 text-sm"
+          />
+        </div>
+        <textarea
+          placeholder="Body paragraph"
+          value={state.hero.body}
+          onChange={(e) => setState((s) => ({ ...s, hero: { ...s.hero, body: e.target.value } }))}
+          rows={4}
+          className="mt-2 w-full px-3 py-2 rounded-lg border border-gray-200 text-sm"
+        />
+        <input
+          placeholder="Image URL"
+          value={state.hero.image}
+          onChange={(e) => setState((s) => ({ ...s, hero: { ...s.hero, image: e.target.value } }))}
+          className="mt-2 w-full px-3 py-2 rounded-lg border border-gray-200 text-sm"
+        />
+      </div>
+
+      {/* Problem cards */}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-sm font-bold text-navy">Problem cards (broken-cycle)</h3>
+          <button
+            onClick={addCard}
+            className="text-xs px-2 py-1 rounded-lg border border-gray-200 hover:bg-gray-50"
+          >
+            + Add card
+          </button>
+        </div>
+        <div className="space-y-3">
+          {state.problem_cards.map((c, i) => (
+            <div key={i} className="grid grid-cols-1 md:grid-cols-12 gap-2 items-start">
+              <input
+                placeholder="Title"
+                value={c.title}
+                onChange={(e) => updateCard(i, { title: e.target.value })}
+                className="md:col-span-3 px-3 py-2 rounded-lg border border-gray-200 text-sm"
+              />
+              <input
+                placeholder="Icon"
+                value={c.icon || ''}
+                onChange={(e) => updateCard(i, { icon: e.target.value })}
+                className="md:col-span-2 px-3 py-2 rounded-lg border border-gray-200 text-sm"
+              />
+              <input
+                placeholder="Description"
+                value={c.description}
+                onChange={(e) => updateCard(i, { description: e.target.value })}
+                className="md:col-span-6 px-3 py-2 rounded-lg border border-gray-200 text-sm"
+              />
+              <button
+                onClick={() => removeCard(i)}
+                className="md:col-span-1 px-2 py-2 rounded-lg text-red-500 hover:bg-red-50"
+                aria-label="Remove card"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Mission */}
+      <div>
+        <h3 className="text-sm font-bold text-navy mb-2">Our Mission callout</h3>
+        <textarea
+          value={state.mission}
+          onChange={(e) => setState((s) => ({ ...s, mission: e.target.value }))}
+          rows={3}
+          className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm"
+        />
+      </div>
+
+      {/* CTA */}
+      <div>
+        <h3 className="text-sm font-bold text-navy mb-2">Final CTA</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <input
+            placeholder="Title"
+            value={state.cta.title}
+            onChange={(e) => setState((s) => ({ ...s, cta: { ...s.cta, title: e.target.value } }))}
+            className="px-3 py-2 rounded-lg border border-gray-200 text-sm"
+          />
+          <input
+            placeholder="Button text"
+            value={state.cta.button_text}
+            onChange={(e) => setState((s) => ({ ...s, cta: { ...s.cta, button_text: e.target.value } }))}
+            className="px-3 py-2 rounded-lg border border-gray-200 text-sm"
+          />
+        </div>
+        <textarea
+          placeholder="Body"
+          value={state.cta.body}
+          onChange={(e) => setState((s) => ({ ...s, cta: { ...s.cta, body: e.target.value } }))}
+          rows={3}
+          className="mt-2 w-full px-3 py-2 rounded-lg border border-gray-200 text-sm"
+        />
+        <input
+          placeholder="Button link"
+          value={state.cta.button_link}
+          onChange={(e) => setState((s) => ({ ...s, cta: { ...s.cta, button_link: e.target.value } }))}
+          className="mt-2 w-full px-3 py-2 rounded-lg border border-gray-200 text-sm"
+        />
+      </div>
+
+      <button
+        onClick={handleSave}
+        disabled={saving}
+        className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#5DB347] text-white text-sm font-medium hover:bg-[#4ea03c] disabled:opacity-50"
+      >
+        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Save About page
       </button>
     </div>
   );

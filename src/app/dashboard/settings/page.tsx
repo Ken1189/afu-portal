@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Variants } from 'framer-motion';
@@ -520,7 +521,7 @@ export default function SettingsPage() {
   return (
     <div>
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-6">
         <h1 className="text-2xl font-bold text-navy">Settings</h1>
         <p className="text-gray-500 text-sm mt-1">
           Manage your account preferences and privacy &mdash;{' '}
@@ -528,6 +529,40 @@ export default function SettingsPage() {
             {profile?.full_name || `${activeUser.firstName} ${activeUser.lastName}`}
           </span>
         </p>
+      </div>
+
+      {/* Quick links to dedicated pages */}
+      <div className="mb-8 grid sm:grid-cols-2 gap-3 max-w-3xl">
+        <Link
+          href="/dashboard/security"
+          className="group flex items-center justify-between gap-3 bg-white border border-gray-200 hover:border-[#5DB347] rounded-xl p-4 transition-colors"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-[#EBF7E5] flex items-center justify-center">
+              <Shield className="w-5 h-5 text-[#5DB347]" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-navy">Security &amp; 2FA</p>
+              <p className="text-[11px] text-gray-500">Two-factor authentication and login</p>
+            </div>
+          </div>
+          <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-[#5DB347] transition-colors" />
+        </Link>
+        <Link
+          href="/dashboard/preferences"
+          className="group flex items-center justify-between gap-3 bg-white border border-gray-200 hover:border-[#5DB347] rounded-xl p-4 transition-colors"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-[#EBF7E5] flex items-center justify-center">
+              <Bell className="w-5 h-5 text-[#5DB347]" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-navy">Preferences</p>
+              <p className="text-[11px] text-gray-500">Notifications, currency, language, timezone</p>
+            </div>
+          </div>
+          <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-[#5DB347] transition-colors" />
+        </Link>
       </div>
 
       {/* Tab bar */}
@@ -1004,7 +1039,30 @@ export default function SettingsPage() {
                   including profile information, transaction history, and
                   activity logs.
                 </p>
-                <button className="inline-flex items-center gap-2 bg-[#5DB347] hover:bg-[#449933] text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition-colors">
+                <button
+                  onClick={async () => {
+                    try {
+                      const res = await fetch('/api/account/export');
+                      if (!res.ok) {
+                        alert('Export failed. Please try again.');
+                        return;
+                      }
+                      const blob = await res.blob();
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = `afu-data-export-${Date.now()}.json`;
+                      document.body.appendChild(a);
+                      a.click();
+                      a.remove();
+                      URL.revokeObjectURL(url);
+                    } catch (err) {
+                      console.error('[GDPR Export] Error:', err);
+                      alert('Export failed.');
+                    }
+                  }}
+                  className="inline-flex items-center gap-2 bg-[#5DB347] hover:bg-[#449933] text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition-colors"
+                >
                   <Download size={16} />
                   Export All My Data
                 </button>

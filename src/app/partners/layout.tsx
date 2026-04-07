@@ -1,10 +1,9 @@
-import { createPageMetadata } from '@/lib/seo/metadata';
+import type { Metadata } from 'next';
+import { getDynamicMetadata } from '@/lib/seo/dynamic-metadata';
 
-export const metadata = createPageMetadata({
-  title: 'Partners',
-  description: 'AFU strategic partners powering African agriculture. Explore partnerships in financing, technology, logistics, and market access.',
-  path: '/partners',
-});
+export async function generateMetadata(): Promise<Metadata> {
+  return getDynamicMetadata('/partners');
+}
 
 export default function PartnersLayout({ children }: { children: React.ReactNode }) {
   return children;

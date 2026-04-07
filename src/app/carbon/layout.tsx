@@ -1,10 +1,9 @@
-import { createPageMetadata } from '@/lib/seo/metadata';
+import type { Metadata } from 'next';
+import { getDynamicMetadata } from '@/lib/seo/dynamic-metadata';
 
-export const metadata = createPageMetadata({
-  title: 'Carbon Credits',
-  description: 'Agricultural carbon credit marketplace. Buy verified carbon offsets from African farming projects supporting regenerative agriculture.',
-  path: '/carbon',
-});
+export async function generateMetadata(): Promise<Metadata> {
+  return getDynamicMetadata('/carbon');
+}
 
 export default function CarbonLayout({ children }: { children: React.ReactNode }) {
   return children;
