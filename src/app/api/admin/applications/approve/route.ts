@@ -233,18 +233,27 @@ export async function POST(request: Request) {
     // If approved as supplier or partner, create a suppliers row
     if (assignedRole === 'supplier' || assignedRole === 'partner') {
       const companyName = application.farm_name || application.full_name || 'Unnamed';
-      const { error: supplierRowError } = await svc.from('suppliers').insert({
+      const supplierInsert = {
         profile_id: userId,
         company_name: companyName,
-        category: 'general',
-        country: application.country || null,
-        status: 'active',
+        contact_name: application.full_name || 'Unknown',
+        email: application.email,
+        phone: application.phone || null,
+        category: 'input-supplier' as const,
+        country: application.country || 'Unknown',
+        status: 'active' as const,
         verified: false,
-        partner_type: assignedRole === 'partner' ? 'partner' : null,
-      });
+      };
+      console.log('[approve] Creating supplier row:', supplierInsert);
+      const { error: supplierRowError } = await svc.from('suppliers').insert(supplierInsert);
       if (supplierRowError) {
-        console.error('Failed to create suppliers row:', supplierRowError.message);
+        console.error('[approve] Failed to create suppliers row:', supplierRowError.message, supplierRowError);
+        return NextResponse.json(
+          { success: false, error: 'Failed to create supplier record: ' + supplierRowError.message },
+          { status: 500 }
+        );
       }
+      console.log('[approve] Supplier row created successfully for profile:', userId);
     }
 
     // Update the application status to approved

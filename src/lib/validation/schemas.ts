@@ -85,6 +85,8 @@ export const createApplicationSchema = z.object({
   primary_crops: z.array(z.string()).default([]),
   requested_tier: membershipTier.default('smallholder'),
   notes: z.string().max(5000).optional().nullable(),
+  // Supplier/partner application support
+  application_type: z.enum(['farmer', 'supplier', 'partner', 'ambassador']).optional(),
 });
 
 export const listApplicationsParams = paginationParams.extend({

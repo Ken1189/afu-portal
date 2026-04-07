@@ -150,7 +150,7 @@ export default function PublicMarketplacePage() {
   useEffect(() => {
     const supabase = createClient();
     async function fetch() {
-      const { data } = await supabase.from('products').select('*').eq('status', 'active').order('name');
+      const { data } = await supabase.from('products').select('*').eq('in_stock', true).order('name');
       if (data && data.length > 0) {
         setProducts(data.map((p: Record<string, unknown>) => ({
           id: String(p.id), supplierName: String(p.supplier_name || p.brand || 'AFU Supplier'),
@@ -159,7 +159,7 @@ export default function PublicMarketplacePage() {
           memberPrice: Number(p.member_price || (Number(p.price || 0) * 0.9)),
           currency: 'USD', unit: String(p.unit || 'per unit'),
           image: String(p.image_url || p.image || 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400&h=300&fit=crop'),
-          availability: (p.status === 'active' ? 'in-stock' : 'out-of-stock') as Product['availability'],
+          availability: (p.in_stock !== false ? 'in-stock' : 'out-of-stock') as Product['availability'],
           rating: Number(p.rating || 4.5), reviewCount: Number(p.review_count || 0),
           tags: Array.isArray(p.tags) ? p.tags as string[] : [], featured: Boolean(p.featured),
         })));

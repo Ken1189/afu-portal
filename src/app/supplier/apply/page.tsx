@@ -15,8 +15,6 @@ import {
   Loader2,
   ArrowLeft,
 } from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
-
 const CATEGORIES = [
   { value: 'seeds', label: 'Seeds' },
   { value: 'fertiliser', label: 'Fertiliser' },
@@ -58,42 +56,25 @@ export default function SupplierApplyPage() {
     setIsLoading(true);
 
     try {
-      const supabase = createClient();
-
-      // Insert into membership_applications with type indicator
-      const { error: appError } = await supabase
-        .from('membership_applications')
-        .insert({
+      // Submit via the validated API endpoint (uses admin client + zod validation)
+      const res = await fetch('/api/applications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           full_name: form.contactName,
           email: form.email,
-          phone: form.phone || null,
+          phone: form.phone || undefined,
           country: form.country,
           farm_name: form.businessName,
-          requested_tier: 'partner',
+          requested_tier: 'smallholder',
           application_type: 'supplier',
-          status: 'pending',
           notes: `[SUPPLIER APPLICATION] Category: ${form.category} | Website: ${form.website || 'N/A'} | Description: ${form.description || 'N/A'}`,
-        });
+        }),
+      });
 
-      if (appError) {
-        // Try suppliers table as fallback
-        const { error: supplierError } = await supabase
-          .from('suppliers')
-          .insert({
-            business_name: form.businessName,
-            contact_name: form.contactName,
-            email: form.email,
-            phone: form.phone || null,
-            country: form.country,
-            category: form.category,
-            website: form.website || null,
-            description: form.description || null,
-            status: 'pending',
-          });
-
-        if (supplierError) {
-          throw new Error(supplierError.message);
-        }
+      if (!res.ok) {
+        const json = await res.json().catch(() => ({}));
+        throw new Error(json.error || 'Failed to submit application');
       }
 
       // Send email notifications (fire and forget)

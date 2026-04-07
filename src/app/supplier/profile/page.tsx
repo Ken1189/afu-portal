@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/supabase/auth-context';
@@ -113,6 +114,9 @@ const categoryOptions = [
 export default function SupplierProfilePage() {
   const { user, profile, refreshProfile } = useAuth();
   const supabase = createClient();
+  const searchParams = useSearchParams();
+  const isOnboarding = searchParams?.get('onboarding') === '1';
+  const [hasSavedOnce, setHasSavedOnce] = useState(false);
 
   const [supplierId, setSupplierId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -322,6 +326,7 @@ export default function SupplierProfilePage() {
 
       setSaveSuccess(true);
       setEditing(false);
+      setHasSavedOnce(true);
       setTimeout(() => setSaveSuccess(false), 2500);
     } catch (err) {
       setSaveError('Failed to save. Please try again.');
@@ -477,6 +482,28 @@ export default function SupplierProfilePage() {
           {editing ? 'Cancel Editing' : 'Edit Profile'}
         </button>
       </motion.div>
+
+      {/* Onboarding welcome banner */}
+      {isOnboarding && !hasSavedOnce && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-gradient-to-r from-[#5DB347]/10 to-[#729E82]/10 border border-[#5DB347]/30 rounded-xl p-4 flex items-start gap-3"
+        >
+          <div className="w-9 h-9 rounded-lg bg-[#5DB347] flex items-center justify-center flex-shrink-0">
+            <Building2 className="w-5 h-5 text-white" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-[#1B2A4A]">
+              Welcome! Complete your profile to start adding products and receiving orders.
+            </p>
+            <p className="text-xs text-gray-600 mt-1">
+              Fill in your company name, description, and upload a logo to unlock the full
+              supplier dashboard.
+            </p>
+          </div>
+        </motion.div>
+      )}
 
       {/* Fallback notice */}
       {usingFallback && (

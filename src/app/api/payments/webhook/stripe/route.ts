@@ -366,19 +366,35 @@ export async function POST(request: NextRequest) {
           const orderItemId = meta.order_item_id;
 
           if (orderId) {
-            // 1) Mark order as paid
-            const { data: order } = await adminClient
+            // 1) Mark order as confirmed (order_status enum: pending|confirmed|processing|shipped|delivered|cancelled|refunded — 'paid' is invalid)
+            const { data: order, error: orderUpdErr } = await adminClient
               .from('orders')
               .update({
-                status: 'paid',
+                status: 'confirmed',
                 updated_at: new Date().toISOString(),
               })
               .eq('id', orderId)
               .select('id, total, currency, member_id')
               .single();
 
+            if (orderUpdErr) {
+              console.error('[marketplace order] failed to mark order confirmed:', orderUpdErr);
+            }
+
             const orderTotal = Number(order?.total ?? (session.amount_total || 0) / 100);
-            const commissionRate = 10; // 10%
+
+            // Look up real commission_rate from suppliers table (fallback 10%)
+            let commissionRate = 10;
+            if (supplierId) {
+              const { data: supplierRate } = await adminClient
+                .from('suppliers')
+                .select('commission_rate')
+                .eq('id', supplierId)
+                .maybeSingle();
+              if (supplierRate?.commission_rate != null) {
+                commissionRate = Number(supplierRate.commission_rate) || 10;
+              }
+            }
             const commissionAmount = +(orderTotal * (commissionRate / 100)).toFixed(2);
 
             // 2) Insert commission row
@@ -425,7 +441,7 @@ export async function POST(request: NextRequest) {
                       <div style="background:white;border-left:4px solid #5DB347;padding:16px;border-radius:4px;margin:16px 0">
                         <p style="margin:0;color:#1B2A4A"><strong>Order total:</strong> $${orderTotal.toFixed(2)}</p>
                         <p style="margin:6px 0 0;color:#1B2A4A"><strong>Buyer:</strong> ${buyerName}</p>
-                        <p style="margin:6px 0 0;color:#1B2A4A"><strong>Commission (10%):</strong> $${commissionAmount.toFixed(2)}</p>
+                        <p style="margin:6px 0 0;color:#1B2A4A"><strong>Commission (${commissionRate}%):</strong> $${commissionAmount.toFixed(2)}</p>
                       </div>
                       <a href="https://africanfarmingunion.org/supplier/orders" style="display:inline-block;background:#5DB347;color:white;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:600">View Order</a>
                     </div>

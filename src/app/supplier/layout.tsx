@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/supabase/auth-context';
+import { createClient } from '@/lib/supabase/client';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import {
   LayoutDashboard,
@@ -101,6 +102,28 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
         if (role && allowedRoles.includes(role)) {
           setAuthorized(true);
           setRoleChecked(true);
+
+          // ── Onboarding gate: redirect freshly approved suppliers to profile ──
+          // Skip the check if already on the profile page to avoid redirect loop.
+          if (role === 'supplier' && !pathname.startsWith('/supplier/profile')) {
+            try {
+              const supabase = createClient();
+              const { data: supplier } = await supabase
+                .from('suppliers')
+                .select('company_name, description, logo_url')
+                .eq('profile_id', user.id)
+                .maybeSingle();
+              if (
+                supplier &&
+                (!supplier.company_name || !supplier.description || !supplier.logo_url)
+              ) {
+                router.replace('/supplier/profile?onboarding=1');
+                return;
+              }
+            } catch {
+              // If the check fails, don't block the user — just let them through.
+            }
+          }
         } else {
           // No role or role not allowed → redirect to dashboard
           setRoleChecked(true);
@@ -120,7 +143,8 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
     checkRole();
 
     return () => clearTimeout(safetyTimer);
-  }, [user, profile, authLoading, router, isPublicPage]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, profile, authLoading, router, isPublicPage, pathname]);
 
   // Public pages render without the supplier layout chrome
   if (isPublicPage) {

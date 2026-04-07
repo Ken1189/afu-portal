@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
     // ── Resolve buyer's member row ────────────────────────────────────────
     const { data: member } = await admin
       .from('members')
-      .select('id, membership_tier, email')
+      .select('id, tier')
       .eq('profile_id', user.id)
       .maybeSingle();
 
@@ -114,9 +114,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Email comes from the supabase auth user, not the members table
+    const buyerEmail = user.email || undefined;
+
     // Pricing — members get member_price if available
     const unitPrice = Number(
-      member.membership_tier && product.member_price ? product.member_price : product.price
+      member.tier && product.member_price ? product.member_price : product.price
     );
     const totalPrice = +(unitPrice * quantity).toFixed(2);
     const currency = (product.currency || 'USD').toLowerCase();
@@ -169,7 +172,7 @@ export async function POST(req: NextRequest) {
     const session = await getStripe().checkout.sessions.create({
       mode: 'payment',
       payment_method_types: ['card'],
-      customer_email: member.email || user.email || undefined,
+      customer_email: buyerEmail,
       line_items: [
         {
           price_data: {
