@@ -111,40 +111,46 @@ const emptyForm: FormData = {
 
 /* ─── Constants ─── */
 
+// Ambassador categories — reflects the REAL mix of ambassadors (most aren't farmers)
+// Kept as text (not enum) so admin can add new categories without a migration.
 const SECTORS = [
-  'Grains',
-  'Cash Crops',
+  'Investment',
+  'Academia',
+  'Business Development',
+  'Agronomy',
+  'Finance',
+  'Agribusiness',
+  'Government & Policy',
+  'NGO / Development',
+  'Technology',
+  'Media & Communications',
+  'Legal',
+  'Logistics & Trade',
+  'Farming',
   'Livestock',
-  'Horticulture',
-  'Poultry',
-  'Machinery',
-  'Processing',
-  'Aquaculture',
+  'Other',
 ];
 
-const COUNTRIES = [
-  'Botswana',
-  'Ghana',
-  'Kenya',
-  'Mozambique',
-  'Nigeria',
-  'Sierra Leone',
-  'South Africa',
-  'Tanzania',
-  'Uganda',
-  'Zambia',
-  'Zimbabwe',
-];
+// Full African country list — uses the canonical list from src/lib/countries.ts
+import { ALL_AFRICAN_COUNTRIES as ALL_COUNTRIES_DATA } from '@/lib/countries';
+const COUNTRIES = ALL_COUNTRIES_DATA.map((c) => c.name).sort();
 
 const SECTOR_COLORS: Record<string, string> = {
-  Grains: 'bg-amber-100 text-amber-700',
-  'Cash Crops': 'bg-green-100 text-green-700',
-  Livestock: 'bg-orange-100 text-orange-700',
-  Horticulture: 'bg-emerald-100 text-emerald-700',
-  Poultry: 'bg-yellow-100 text-yellow-700',
-  Machinery: 'bg-blue-100 text-blue-700',
-  Processing: 'bg-purple-100 text-purple-700',
-  Aquaculture: 'bg-cyan-100 text-cyan-700',
+  Investment: 'bg-emerald-100 text-emerald-700',
+  Academia: 'bg-indigo-100 text-indigo-700',
+  'Business Development': 'bg-blue-100 text-blue-700',
+  Agronomy: 'bg-green-100 text-green-700',
+  Finance: 'bg-teal-100 text-teal-700',
+  Agribusiness: 'bg-lime-100 text-lime-700',
+  'Government & Policy': 'bg-slate-100 text-slate-700',
+  'NGO / Development': 'bg-rose-100 text-rose-700',
+  Technology: 'bg-cyan-100 text-cyan-700',
+  'Media & Communications': 'bg-pink-100 text-pink-700',
+  Legal: 'bg-purple-100 text-purple-700',
+  'Logistics & Trade': 'bg-orange-100 text-orange-700',
+  Farming: 'bg-amber-100 text-amber-700',
+  Livestock: 'bg-yellow-100 text-yellow-700',
+  Other: 'bg-gray-100 text-gray-700',
 };
 
 const TIERS = ['Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond'] as const;
@@ -605,7 +611,7 @@ export default function AdminAmbassadorsPage() {
       return;
     }
     if (!form.sector) {
-      setToast({ message: 'Sector is required', type: 'error' });
+      setToast({ message: 'Category is required', type: 'error' });
       return;
     }
     if (!form.country) {
@@ -870,7 +876,7 @@ export default function AdminAmbassadorsPage() {
                         Status / Tier
                       </th>
                       <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">
-                        Sector
+                        Category
                       </th>
                       <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">
                         Country
@@ -1566,11 +1572,11 @@ export default function AdminAmbassadorsPage() {
                 />
               </div>
 
-              {/* Sector + Country */}
+              {/* Category + Country */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-gray-600 mb-1">
-                    Sector *
+                    Category *
                   </label>
                   <select
                     value={form.sector}
@@ -1579,7 +1585,7 @@ export default function AdminAmbassadorsPage() {
                     }
                     className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-green-200 focus:border-green-400 outline-none"
                   >
-                    <option value="">Select sector...</option>
+                    <option value="">Select category...</option>
                     {SECTORS.map((s) => (
                       <option key={s} value={s}>
                         {s}
@@ -1608,11 +1614,11 @@ export default function AdminAmbassadorsPage() {
                 </div>
               </div>
 
-              {/* Region + Farm Name */}
+              {/* Region + Organisation */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-gray-600 mb-1">
-                    Region
+                    Region / City
                   </label>
                   <input
                     value={form.region}
@@ -1620,12 +1626,12 @@ export default function AdminAmbassadorsPage() {
                       setForm({ ...form, region: e.target.value })
                     }
                     className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-green-200 focus:border-green-400 outline-none"
-                    placeholder="e.g. Mashonaland West"
+                    placeholder="e.g. Nairobi"
                   />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-600 mb-1">
-                    Farm Name
+                    Organisation / Affiliation
                   </label>
                   <input
                     value={form.farm_name}
@@ -1633,45 +1639,28 @@ export default function AdminAmbassadorsPage() {
                       setForm({ ...form, farm_name: e.target.value })
                     }
                     className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-green-200 focus:border-green-400 outline-none"
-                    placeholder="Moyo Family Farm"
+                    placeholder="e.g. University of Nairobi, AgriCo Ltd"
                   />
                 </div>
               </div>
 
-              {/* Farm Size + Years Experience */}
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-semibold text-gray-600 mb-1">
-                    Farm Size (ha)
-                  </label>
-                  <input
-                    type="number"
-                    step="0.1"
-                    value={form.farm_size_ha}
-                    onChange={(e) =>
-                      setForm({ ...form, farm_size_ha: e.target.value })
-                    }
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-green-200 focus:border-green-400 outline-none"
-                    placeholder="4.5"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-gray-600 mb-1">
-                    Years Experience
-                  </label>
-                  <input
-                    type="number"
-                    value={form.years_experience}
-                    onChange={(e) =>
-                      setForm({
-                        ...form,
-                        years_experience: e.target.value,
-                      })
-                    }
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-green-200 focus:border-green-400 outline-none"
-                    placeholder="10"
-                  />
-                </div>
+              {/* Years of Experience (generic, not farming-specific) */}
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">
+                  Years of Experience (in their field)
+                </label>
+                <input
+                  type="number"
+                  value={form.years_experience}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      years_experience: e.target.value,
+                    })
+                  }
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-green-200 focus:border-green-400 outline-none"
+                  placeholder="10"
+                />
               </div>
 
               {/* Bio */}

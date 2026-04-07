@@ -22,12 +22,23 @@ import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/supabase/auth-context';
 import { WORLD_COUNTRIES } from '@/lib/countries';
 
+// Ambassador categories — reflects real mix (most ambassadors aren't farmers)
 const SECTORS = [
-  { value: 'farming', label: 'Farming' },
-  { value: 'business', label: 'Business' },
-  { value: 'community', label: 'Community' },
-  { value: 'education', label: 'Education' },
-  { value: 'other', label: 'Other' },
+  { value: 'Investment', label: 'Investment' },
+  { value: 'Academia', label: 'Academia' },
+  { value: 'Business Development', label: 'Business Development' },
+  { value: 'Agronomy', label: 'Agronomy' },
+  { value: 'Finance', label: 'Finance' },
+  { value: 'Agribusiness', label: 'Agribusiness' },
+  { value: 'Government & Policy', label: 'Government & Policy' },
+  { value: 'NGO / Development', label: 'NGO / Development' },
+  { value: 'Technology', label: 'Technology' },
+  { value: 'Media & Communications', label: 'Media & Communications' },
+  { value: 'Legal', label: 'Legal' },
+  { value: 'Logistics & Trade', label: 'Logistics & Trade' },
+  { value: 'Farming', label: 'Farming' },
+  { value: 'Livestock', label: 'Livestock' },
+  { value: 'Other', label: 'Other' },
 ];
 
 const COUNTRIES = [...WORLD_COUNTRIES, 'Other'];
@@ -385,10 +396,10 @@ export default function AmbassadorApplyPage() {
               </div>
             </div>
 
-            {/* Sector */}
+            {/* Category / Field of expertise */}
             <div>
               <label htmlFor="sector" className="block text-sm font-medium text-[#1B2A4A] mb-2">
-                Sector <span className="text-red-500">*</span>
+                Category / Field of Expertise <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400 pointer-events-none" />
@@ -400,7 +411,7 @@ export default function AmbassadorApplyPage() {
                   onChange={handleChange}
                   className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl bg-white text-[#1B2A4A] focus:outline-none focus:ring-2 focus:ring-[#5DB347]/40 focus:border-[#5DB347] transition-shadow appearance-none"
                 >
-                  <option value="">Select your sector</option>
+                  <option value="">Select your category</option>
                   {SECTORS.map((s) => (
                     <option key={s.value} value={s.value}>
                       {s.label}

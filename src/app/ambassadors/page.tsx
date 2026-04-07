@@ -171,17 +171,22 @@ const SECTOR_COLORS: Record<string, string> = {
   community: 'bg-purple-100 text-purple-700',
   education: 'bg-amber-100 text-amber-700',
   technology: 'bg-cyan-100 text-cyan-700',
-  // Legacy crop-based sectors (fallback data)
-  Grains: 'bg-amber-100 text-amber-700',
-  'Cash Crops': 'bg-green-100 text-green-700',
-  Livestock: 'bg-orange-100 text-orange-700',
-  Horticulture: 'bg-emerald-100 text-emerald-700',
-  Poultry: 'bg-yellow-100 text-yellow-700',
-  grains: 'bg-amber-100 text-amber-700',
-  cash_crops: 'bg-green-100 text-green-700',
-  livestock: 'bg-orange-100 text-orange-700',
-  horticulture: 'bg-emerald-100 text-emerald-700',
-  poultry: 'bg-yellow-100 text-yellow-700',
+  // Ambassador categories (most ambassadors are NOT farmers)
+  Investment: 'bg-emerald-100 text-emerald-700',
+  Academia: 'bg-indigo-100 text-indigo-700',
+  'Business Development': 'bg-blue-100 text-blue-700',
+  Agronomy: 'bg-green-100 text-green-700',
+  Finance: 'bg-teal-100 text-teal-700',
+  Agribusiness: 'bg-lime-100 text-lime-700',
+  'Government & Policy': 'bg-slate-100 text-slate-700',
+  'NGO / Development': 'bg-rose-100 text-rose-700',
+  Technology: 'bg-cyan-100 text-cyan-700',
+  'Media & Communications': 'bg-pink-100 text-pink-700',
+  Legal: 'bg-purple-100 text-purple-700',
+  'Logistics & Trade': 'bg-orange-100 text-orange-700',
+  Farming: 'bg-amber-100 text-amber-700',
+  Livestock: 'bg-yellow-100 text-yellow-700',
+  Other: 'bg-gray-100 text-gray-700',
 };
 
 const SECTOR_ICONS: Record<string, React.ReactNode> = {
@@ -190,11 +195,21 @@ const SECTOR_ICONS: Record<string, React.ReactNode> = {
   community: <Users className="w-4 h-4" />,
   education: <GraduationCap className="w-4 h-4" />,
   technology: <Globe className="w-4 h-4" />,
-  Grains: <Wheat className="w-4 h-4" />,
-  'Cash Crops': <Sprout className="w-4 h-4" />,
+  Investment: <Briefcase className="w-4 h-4" />,
+  Academia: <GraduationCap className="w-4 h-4" />,
+  'Business Development': <Briefcase className="w-4 h-4" />,
+  Agronomy: <Sprout className="w-4 h-4" />,
+  Finance: <Briefcase className="w-4 h-4" />,
+  Agribusiness: <Sprout className="w-4 h-4" />,
+  'Government & Policy': <Users className="w-4 h-4" />,
+  'NGO / Development': <Users className="w-4 h-4" />,
+  Technology: <Globe className="w-4 h-4" />,
+  'Media & Communications': <Users className="w-4 h-4" />,
+  Legal: <Briefcase className="w-4 h-4" />,
+  'Logistics & Trade': <Globe className="w-4 h-4" />,
+  Farming: <Wheat className="w-4 h-4" />,
   Livestock: <Beef className="w-4 h-4" />,
-  Horticulture: <TreePine className="w-4 h-4" />,
-  Poultry: <Egg className="w-4 h-4" />,
+  Other: <Users className="w-4 h-4" />,
 };
 
 const AFRICAN_REGIONS = [
@@ -758,21 +773,18 @@ export default function AmbassadorsPage() {
                     </span>
                   </div>
 
-                  {/* Farm info */}
+                  {/* Organisation + experience info (no farm size for non-farmer ambassadors) */}
                   <div className="flex items-center justify-center gap-4 mt-3 text-xs text-gray-400">
                     {amb.farm_name && (
                       <span className="flex items-center gap-1">
-                        <MapPin className="w-3 h-3" />
+                        <Briefcase className="w-3 h-3" />
                         {amb.farm_name}
                       </span>
-                    )}
-                    {amb.farm_size_ha && (
-                      <span>{amb.farm_size_ha} ha</span>
                     )}
                     {amb.years_experience && (
                       <span className="flex items-center gap-1">
                         <Clock className="w-3 h-3" />
-                        {amb.years_experience} yrs
+                        {amb.years_experience} yrs experience
                       </span>
                     )}
                   </div>
