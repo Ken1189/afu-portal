@@ -1560,6 +1560,32 @@ export default function Home() {
             ))}
           </div>
 
+          {/* Farmer profile preview row */}
+          <div className="mb-10">
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-4 max-w-5xl mx-auto">
+              {[
+                { name: 'Grace M.', country: 'Zimbabwe', flag: '🇿🇼', crop: 'Maize', img: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=300&h=300&q=80&auto=format&fit=crop' },
+                { name: 'Joseph O.', country: 'Tanzania', flag: '🇹🇿', crop: 'Coffee', img: 'https://images.unsplash.com/photo-1605000797499-95a51c5269ae?w=300&h=300&q=80&auto=format&fit=crop' },
+                { name: 'Amina H.', country: 'Kenya', flag: '🇰🇪', crop: 'Teff', img: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=300&h=300&q=80&auto=format&fit=crop' },
+                { name: 'Sipho D.', country: 'Botswana', flag: '🇧🇼', crop: 'Beef Cattle', img: 'https://images.unsplash.com/photo-1500595046743-cd271d694d30?w=300&h=300&q=80&auto=format&fit=crop' },
+                { name: 'Fatima D.', country: 'Senegal', flag: '🇸🇳', crop: 'Groundnuts', img: 'https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=300&h=300&q=80&auto=format&fit=crop' },
+                { name: 'Peter K.', country: 'Ethiopia', flag: '🇪🇹', crop: 'Sorghum', img: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=300&h=300&q=80&auto=format&fit=crop' },
+              ].map((f) => (
+                <div key={f.name} className="text-center group">
+                  <div className="relative w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-3 rounded-full overflow-hidden border-4 border-white shadow-lg ring-2 ring-[#5DB347]/20 group-hover:ring-[#5DB347] transition-all">
+                    <Image src={f.img} alt={f.name} fill sizes="96px" className="object-cover" />
+                  </div>
+                  <div className="font-semibold text-navy text-sm">{f.name}</div>
+                  <div className="text-xs text-gray-500">{f.flag} {f.country}</div>
+                  <div className="text-xs text-[#5DB347] font-medium mt-1">{f.crop}</div>
+                </div>
+              ))}
+            </div>
+            <p className="text-center text-sm text-gray-500 mt-6">
+              Real farmers from 11 countries — your sponsorship goes directly to them
+            </p>
+          </div>
+
           <div className="text-center">
             <Link href="/sponsor" className="inline-flex items-center gap-2 text-white font-semibold px-8 py-4 rounded-xl transition-smooth shadow-lg hover:shadow-xl" style={{ background: '#5DB347' }} onMouseEnter={(e) => (e.currentTarget.style.background = '#449933')} onMouseLeave={(e) => (e.currentTarget.style.background = '#5DB347')}>
               Meet the Farmers
