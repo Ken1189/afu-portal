@@ -55,6 +55,7 @@ interface Ambassador {
   pull_quote: string | null;
   bio: string | null;
   achievements: string[] | null;
+  regions: string[] | null; // African countries this ambassador serves
 }
 
 interface CommissionRate {
@@ -212,13 +213,9 @@ const SECTOR_ICONS: Record<string, React.ReactNode> = {
   Other: <Users className="w-4 h-4" />,
 };
 
-const AFRICAN_REGIONS = [
-  'East Africa',
-  'West Africa',
-  'Southern Africa',
-  'Central Africa',
-  'North Africa',
-];
+// Replaced broad regions with specific African countries
+import { ALL_AFRICAN_COUNTRIES as AFRICAN_COUNTRIES_DATA } from '@/lib/countries';
+const AFRICAN_REGIONS = AFRICAN_COUNTRIES_DATA.map((c) => c.name).sort();
 
 const AFU_COUNTRIES = [...WORLD_COUNTRIES, 'Other'];
 
@@ -788,6 +785,14 @@ export default function AmbassadorsPage() {
                       </span>
                     )}
                   </div>
+                  {/* Countries Served */}
+                  {amb.regions && amb.regions.length > 0 && (
+                    <div className="mt-2 text-xs text-gray-500 text-center">
+                      <span className="font-medium text-[#5DB347]">Serves:</span>{' '}
+                      {amb.regions.slice(0, 3).join(', ')}
+                      {amb.regions.length > 3 && ` +${amb.regions.length - 3}`}
+                    </div>
+                  )}
                 </div>
 
                 {/* Quote */}
@@ -975,10 +980,10 @@ export default function AmbassadorsPage() {
                 </select>
               </div>
 
-              {/* Regions to assist */}
+              {/* Countries to serve */}
               <div>
                 <label className="block text-sm font-semibold text-[#1B2A4A] mb-1.5">
-                  Which regions of Africa do you want to assist in?
+                  Which African countries will you serve?
                 </label>
                 <p className="text-xs text-gray-400 mb-2">Select all that apply</p>
                 <div className="flex flex-wrap gap-2">

@@ -45,6 +45,7 @@ interface Ambassador {
   years_experience: number | null;
   achievements: string[] | null;
   crops_or_products: string[] | null;
+  regions: string[] | null; // African countries this ambassador serves
   is_featured: boolean;
   is_active: boolean;
   sort_order: number;
@@ -88,6 +89,7 @@ interface FormData {
   years_experience: string;
   achievements: string[];
   crops_or_products: string[];
+  serves_countries: string[]; // backed by DB column `regions` (text[])
   is_featured: boolean;
   sort_order: string;
 }
@@ -105,6 +107,7 @@ const emptyForm: FormData = {
   years_experience: '',
   achievements: [],
   crops_or_products: [],
+  serves_countries: [],
   is_featured: false,
   sort_order: '0',
 };
@@ -131,9 +134,11 @@ const SECTORS = [
   'Other',
 ];
 
-// Full African country list — uses the canonical list from src/lib/countries.ts
-import { ALL_AFRICAN_COUNTRIES as ALL_COUNTRIES_DATA } from '@/lib/countries';
-const COUNTRIES = ALL_COUNTRIES_DATA.map((c) => c.name).sort();
+// Ambassador can be based ANYWHERE in the world
+// They SERVE specific African countries (via the `regions` text[] column)
+import { WORLD_COUNTRIES, ALL_AFRICAN_COUNTRIES as ALL_AFRICAN } from '@/lib/countries';
+const COUNTRIES = WORLD_COUNTRIES;
+const AFRICAN_COUNTRIES = ALL_AFRICAN.map((c) => c.name).sort();
 
 const SECTOR_COLORS: Record<string, string> = {
   Investment: 'bg-emerald-100 text-emerald-700',
@@ -366,6 +371,7 @@ export default function AdminAmbassadorsPage() {
             crops_or_products: Array.isArray(a.crops_or_products)
               ? a.crops_or_products
               : [],
+            regions: Array.isArray(a.regions) ? a.regions : null,
             status: (a.status as string) || 'pending',
             tier: (a.tier as string) || null,
             total_earned: typeof a.total_earned === 'number' ? a.total_earned : 0,
@@ -599,6 +605,7 @@ export default function AdminAmbassadorsPage() {
         a.years_experience != null ? String(a.years_experience) : '',
       achievements: a.achievements || [],
       crops_or_products: a.crops_or_products || [],
+      serves_countries: a.regions || [],
       is_featured: a.is_featured,
       sort_order: String(a.sort_order),
     });
@@ -639,6 +646,8 @@ export default function AdminAmbassadorsPage() {
         form.achievements.length > 0 ? form.achievements : null,
       crops_or_products:
         form.crops_or_products.length > 0 ? form.crops_or_products : null,
+      regions:
+        form.serves_countries.length > 0 ? form.serves_countries : null,
       is_featured: form.is_featured,
       sort_order: parseInt(form.sort_order) || 0,
     };
@@ -1595,7 +1604,7 @@ export default function AdminAmbassadorsPage() {
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-600 mb-1">
-                    Country *
+                    Based In (Country) *
                   </label>
                   <select
                     value={form.country}
@@ -1611,7 +1620,45 @@ export default function AdminAmbassadorsPage() {
                       </option>
                     ))}
                   </select>
+                  <p className="text-[10px] text-gray-500 mt-1">Where the ambassador lives (anywhere in the world)</p>
                 </div>
+              </div>
+
+              {/* Countries Served (African countries) */}
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">
+                  Countries Served (African markets they cover)
+                </label>
+                <div className="max-h-40 overflow-y-auto border border-gray-200 rounded-lg p-2 bg-gray-50">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-1">
+                    {AFRICAN_COUNTRIES.map((c) => {
+                      const checked = form.serves_countries.includes(c);
+                      return (
+                        <label key={c} className="flex items-center gap-2 text-xs cursor-pointer hover:bg-white rounded px-2 py-1">
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={() => {
+                              setForm({
+                                ...form,
+                                serves_countries: checked
+                                  ? form.serves_countries.filter((x) => x !== c)
+                                  : [...form.serves_countries, c],
+                              });
+                            }}
+                            className="accent-[#5DB347]"
+                          />
+                          <span>{c}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+                {form.serves_countries.length > 0 && (
+                  <p className="text-[10px] text-[#5DB347] mt-1 font-medium">
+                    Selected: {form.serves_countries.join(', ')}
+                  </p>
+                )}
               </div>
 
               {/* Region + Organisation */}
