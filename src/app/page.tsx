@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { motion, useInView } from 'framer-motion';
 import { useRef, useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import {
   Banknote,
   Cog,
@@ -201,12 +202,60 @@ const FALLBACK_PARTNERS = [
 ];
 
 /* ─── How it works ─── */
-const howItWorks = [
-  { step: '01', title: 'Tell Us Your Story', desc: 'Tell us about you and your vision. Share your farming story, your land, your dreams. We want to understand what makes your farm unique.', icon: Users },
-  { step: '02', title: 'Get Financed', desc: 'Access working capital, input finance, and equipment leasing tailored to your crop cycle.', icon: Banknote },
-  { step: '03', title: 'Grow & Process', desc: 'Use premium inputs, expert training, and processing hubs to maximize yields and value.', icon: Leaf },
-  { step: '04', title: 'Sell & Scale', desc: 'Guaranteed offtake contracts and trade finance turn your harvest into predictable cash flows.', icon: TrendingUp },
+const FALLBACK_HOW_IT_WORKS = [
+  { step: '01', title: 'Tell Us Your Story', desc: 'Tell us about you and your vision. Share your farming story, your land, your dreams. We want to understand what makes your farm unique.' },
+  { step: '02', title: 'Get Financed', desc: 'Access working capital, input finance, and equipment leasing tailored to your crop cycle.' },
+  { step: '03', title: 'Grow & Process', desc: 'Use premium inputs, expert training, and processing hubs to maximize yields and value.' },
+  { step: '04', title: 'Sell & Scale', desc: 'Guaranteed offtake contracts and trade finance turn your harvest into predictable cash flows.' },
 ];
+const HOW_IT_WORKS_ICONS = [Users, Banknote, Leaf, TrendingUp];
+
+/* ─── Unified editable homepage content blob (homepage_content key) ─── */
+type HomepageContent = {
+  flywheel_eyebrow?: string;
+  flywheel_title?: string;
+  flywheel_subtitle?: string;
+  flywheel_labels?: string[];
+  flywheel_recycle_text?: string;
+  how_it_works_eyebrow?: string;
+  how_it_works_title?: string;
+  how_it_works_subtitle?: string;
+  how_it_works_steps?: { step: string; title: string; desc: string }[];
+  ai_eyebrow?: string;
+  ai_title?: string;
+  ai_body?: string;
+  ai_features?: string[];
+  ai_link_text?: string;
+  ai_image?: string;
+  investor_eyebrow?: string;
+  investor_title_pre?: string;
+  investor_title_highlight?: string;
+  investor_body?: string;
+  promise_eyebrow?: string;
+  promise_title?: string;
+  promise_subtitle?: string;
+  showup_eyebrow?: string;
+  showup_title?: string;
+  showup_subtitle?: string;
+  sponsor_eyebrow?: string;
+  sponsor_title?: string;
+  sponsor_subtitle?: string;
+  final_cta_title?: string;
+  final_cta_body?: string;
+  final_cta_primary_text?: string;
+  final_cta_primary_link?: string;
+  final_cta_secondary_text?: string;
+  final_cta_secondary_link?: string;
+  stats_eyebrow?: string;
+  stats_title?: string;
+  stats_subtitle?: string;
+  services_eyebrow?: string;
+  services_title?: string;
+  services_subtitle?: string;
+  programs_eyebrow?: string;
+  programs_title?: string;
+  programs_subtitle?: string;
+};
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 /* ─── Hero defaults ─── */
@@ -299,6 +348,47 @@ export default function Home() {
   const [memberCount, setMemberCount] = useState(0);
   const [homepageStats, setHomepageStats] = useState<HomepageStat[]>(FALLBACK_HOMEPAGE_STATS);
   const [membershipTiers, setMembershipTiers] = useState<HomepageMembershipTier[]>(FALLBACK_MEMBERSHIP_TIERS);
+
+  /* ─── Unified editable content blob (with draft preview) ─── */
+  const searchParams = useSearchParams();
+  const isPreview = searchParams?.get('preview') === 'draft' || searchParams?.get('preview') === 'true';
+  const [content, setContent] = useState<HomepageContent>({});
+  const c = (key: keyof HomepageContent, fallback: string): string => {
+    const v = content[key];
+    return typeof v === 'string' && v.length > 0 ? v : fallback;
+  };
+
+  useEffect(() => {
+    const supabase = createClient();
+    const key = isPreview ? 'homepage_content_draft' : 'homepage_content_published';
+    supabase
+      .from('site_config')
+      .select('value')
+      .eq('key', key)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data?.value) {
+          try {
+            const parsed = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
+            if (parsed && typeof parsed === 'object') setContent(parsed as HomepageContent);
+          } catch {
+            // ignore parse errors
+          }
+        }
+      });
+  }, [isPreview]);
+
+  // Listen for postMessage from parent (content editor) for instant live preview
+  useEffect(() => {
+    if (!isPreview) return;
+    const handler = (e: MessageEvent) => {
+      if (e.data?.type === 'preview-update' && e.data?.content) {
+        setContent(e.data.content as HomepageContent);
+      }
+    };
+    window.addEventListener('message', handler);
+    return () => window.removeEventListener('message', handler);
+  }, [isPreview]);
 
   // Section visibility from site_config key "homepage_sections"
   const [sectionVisibility, setSectionVisibility] = useState<Record<string, boolean>>({});
@@ -625,12 +715,12 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeInWhenVisible>
             <div className="text-center mb-14">
-              <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#5DB347' }}>The Africa Agriculture Paradox</span>
+              <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#5DB347' }}>{c('stats_eyebrow', 'The Africa Agriculture Paradox')}</span>
               <h2 className="text-3xl md:text-4xl font-bold text-navy mt-2 mb-4 text-gradient-green">
-                The Opportunity is Enormous
+                {c('stats_title', 'The Opportunity is Enormous')}
               </h2>
               <p className="text-gray-500 max-w-2xl mx-auto">
-                Africa has the land, labor, and demand. What&apos;s missing is the integrated infrastructure and finance to unlock it.
+                {c('stats_subtitle', "Africa has the land, labor, and demand. What's missing is the integrated infrastructure and finance to unlock it.")}
               </p>
             </div>
           </FadeInWhenVisible>
@@ -662,12 +752,12 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeInWhenVisible>
             <div className="text-center mb-14">
-              <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#5DB347' }}>Our Services</span>
+              <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#5DB347' }}>{c('services_eyebrow', 'Our Services')}</span>
               <h2 className="text-3xl md:text-4xl font-bold text-navy mt-2 mb-4 text-gradient-green">
-                One Platform, Complete Value Chain
+                {c('services_title', 'One Platform, Complete Value Chain')}
               </h2>
               <p className="text-gray-500 max-w-2xl mx-auto">
-                A vertically integrated agriculture development platform — the specialized agri dev bank and execution engine Africa has been missing.
+                {c('services_subtitle', 'A vertically integrated agriculture development platform — the specialized agri dev bank and execution engine Africa has been missing.')}
               </p>
             </div>
           </FadeInWhenVisible>
@@ -722,12 +812,12 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <FadeInWhenVisible>
             <div className="text-center mb-14">
-              <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#5DB347' }}>Active Programs</span>
+              <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#5DB347' }}>{c('programs_eyebrow', 'Active Programs')}</span>
               <h2 className="text-3xl md:text-4xl font-bold text-navy mt-2 mb-4 text-gradient-green">
-                Our Programs
+                {c('programs_title', 'Our Programs')}
               </h2>
               <p className="text-gray-500 max-w-2xl mx-auto">
-                Real farming programs generating real revenue. From blueberries bound for Europe to castor oil feeding global biofuel demand.
+                {c('programs_subtitle', 'Real farming programs generating real revenue. From blueberries bound for Europe to castor oil feeding global biofuel demand.')}
               </p>
             </div>
           </FadeInWhenVisible>
@@ -773,12 +863,12 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeInWhenVisible>
             <div className="text-center mb-16">
-              <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#5DB347' }}>The Model</span>
+              <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#5DB347' }}>{c('flywheel_eyebrow', 'The Model')}</span>
               <h2 className="text-3xl md:text-4xl font-bold mt-2 mb-4 text-glow">
-                The AFU Flywheel
+                {c('flywheel_title', 'The AFU Flywheel')}
               </h2>
               <p className="text-gray-400 max-w-2xl mx-auto">
-                Most players only do one piece. AFU ties the full loop together — capital flows in, crops flow out, cash recycles.
+                {c('flywheel_subtitle', 'Most players only do one piece. AFU ties the full loop together — capital flows in, crops flow out, cash recycles.')}
               </p>
             </div>
           </FadeInWhenVisible>
@@ -786,8 +876,9 @@ export default function Home() {
           {/* Flywheel steps */}
           <StaggerChildren className="relative">
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-4">
-              {flywheelSteps.map((item) => {
+              {flywheelSteps.map((item, idx) => {
                 const Icon = item.icon;
+                const overrideLabel = content.flywheel_labels?.[idx];
                 return (
                   <motion.div
                     key={item.step}
@@ -802,7 +893,7 @@ export default function Home() {
                         <Icon className="w-9 h-9 text-white" />
                       </div>
                       <span className="text-xs font-bold mb-1" style={{ color: '#5DB347' }}>Step {item.step}</span>
-                      <span className="text-sm font-semibold text-white">{item.label}</span>
+                      <span className="text-sm font-semibold text-white">{overrideLabel || item.label}</span>
                     </div>
                     {/* Connector arrow (hidden on last item and small screens) */}
                     {item.step < 7 && (
@@ -819,7 +910,7 @@ export default function Home() {
               <div className="mt-8 flex items-center justify-center gap-3" style={{ color: '#5DB347' }}>
                 <div className="h-px w-16 bg-gradient-to-r from-transparent to-[#5DB347]/50" />
                 <Zap className="w-5 h-5" />
-                <span className="text-sm font-semibold">That&apos;s the compounding flywheel — cash recycles back into capital</span>
+                <span className="text-sm font-semibold">{c('flywheel_recycle_text', "That's the compounding flywheel — cash recycles back into capital")}</span>
                 <div className="h-px w-16 bg-gradient-to-l from-transparent to-[#5DB347]/50" />
               </div>
             </FadeInWhenVisible>
@@ -833,19 +924,19 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <FadeInWhenVisible>
             <div className="text-center mb-14">
-              <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#5DB347' }}>Getting Started</span>
+              <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#5DB347' }}>{c('how_it_works_eyebrow', 'Getting Started')}</span>
               <h2 className="text-3xl md:text-4xl font-bold text-navy mt-2 mb-4 text-gradient-green">
-                Four Steps to Growth
+                {c('how_it_works_title', 'Four Steps to Growth')}
               </h2>
               <p className="text-gray-500 max-w-2xl mx-auto">
-                From your first conversation to export income — we walk the journey with you, every step of the way.
+                {c('how_it_works_subtitle', 'From your first conversation to export income — we walk the journey with you, every step of the way.')}
               </p>
             </div>
           </FadeInWhenVisible>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {howItWorks.map((item, i) => {
-              const Icon = item.icon;
+            {(content.how_it_works_steps && content.how_it_works_steps.length > 0 ? content.how_it_works_steps : FALLBACK_HOW_IT_WORKS).map((item, i) => {
+              const Icon = HOW_IT_WORKS_ICONS[i] || HOW_IT_WORKS_ICONS[0];
               return (
                 <FadeInWhenVisible key={item.step} delay={i * 0.12}>
                   <div className="relative group">
@@ -883,7 +974,7 @@ export default function Home() {
             <FadeInWhenVisible direction="right">
               <div className="relative rounded-3xl overflow-hidden shadow-2xl">
                 <Image
-                  src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&h=600&fit=crop"
+                  src={c('ai_image', 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&h=600&fit=crop')}
                   alt="African farmer inspecting crops"
                   width={800}
                   height={600}
@@ -906,21 +997,20 @@ export default function Home() {
             {/* Text */}
             <FadeInWhenVisible direction="left">
               <div>
-                <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#5DB347' }}>Technology Advantage</span>
+                <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#5DB347' }}>{c('ai_eyebrow', 'Technology Advantage')}</span>
                 <h2 className="text-3xl md:text-4xl font-bold text-navy mt-2 mb-6 text-gradient-green">
-                  AI-Powered Agriculture for Smarter Farming
+                  {c('ai_title', 'AI-Powered Agriculture for Smarter Farming')}
                 </h2>
                 <p className="text-gray-500 mb-8 leading-relaxed">
-                  Our Amara AI assistant helps farmers with crop diagnostics, market pricing,
-                  weather alerts, and personalized recommendations — accessible via the portal or WhatsApp.
+                  {c('ai_body', 'Our Amara AI assistant helps farmers with crop diagnostics, market pricing, weather alerts, and personalized recommendations — accessible via the portal or WhatsApp.')}
                 </p>
                 <div className="space-y-4">
-                  {[
+                  {(content.ai_features && content.ai_features.length > 0 ? content.ai_features : [
                     'Crop health scanner with photo-based diagnosis',
                     'AI credit scoring for faster loan decisions',
                     'Real-time market prices and trend alerts',
                     'Satellite monitoring and weather forecasts',
-                  ].map((item, i) => (
+                  ]).map((item, i) => (
                     <div key={i} className="flex items-start gap-3">
                       <CheckCircle2 className="w-5 h-5 shrink-0 mt-0.5" style={{ color: '#5DB347' }} />
                       <span className="text-navy text-sm font-medium">{item}</span>
@@ -932,7 +1022,7 @@ export default function Home() {
                   className="inline-flex items-center gap-2 mt-8 font-semibold hover:gap-3 transition-all"
                   style={{ color: '#5DB347' }}
                 >
-                  Learn more about our technology
+                  {c('ai_link_text', 'Learn more about our technology')}
                   <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
@@ -1141,17 +1231,16 @@ export default function Home() {
             <div className="text-center mb-16">
               <div className="inline-flex items-center gap-2 bg-gold/20 border border-gold/30 text-gold px-4 py-1.5 rounded-full text-sm font-medium mb-4">
                 <Landmark className="w-4 h-4" />
-                Investment Opportunity
+                {c('investor_eyebrow', 'Investment Opportunity')}
               </div>
               <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mt-2 mb-4">
-                Invest in Africa&apos;s Agricultural{' '}
+                {c('investor_title_pre', "Invest in Africa's Agricultural")}{' '}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold to-amber-300">
-                  Transformation
+                  {c('investor_title_highlight', 'Transformation')}
                 </span>
               </h2>
               <p className="text-gray-300 max-w-3xl mx-auto text-lg">
-                AFU is raising a multi-million dollar funding round to build Africa&apos;s first vertically integrated agriculture
-                development bank and operating platform. Trade finance, input lending, and offtake — tapping into Africa&apos;s growing agricultural market.
+                {c('investor_body', "AFU is raising a multi-million dollar funding round to build Africa's first vertically integrated agriculture development bank and operating platform. Trade finance, input lending, and offtake — tapping into Africa's growing agricultural market.")}
               </p>
             </div>
           </FadeInWhenVisible>
@@ -1401,14 +1490,13 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
             <span className="inline-block bg-[#5DB347]/10 text-sm font-semibold px-4 py-1.5 rounded-full mb-4" style={{ color: '#5DB347' }}>
-              Sponsor a Farmer
+              {c('sponsor_eyebrow', 'Sponsor a Farmer')}
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-navy mb-4">
-              Turn <span className="text-gradient-green">$5 a Month</span> Into a Farm&apos;s Future
+              {content.sponsor_title ? content.sponsor_title : (<>Turn <span className="text-gradient-green">$5 a Month</span> Into a Farm&apos;s Future</>)}
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Real farmers. Real crops. Real impact. Sponsor an African farmer&apos;s membership, inputs,
-              and program access — and get monthly updates as their season unfolds.
+              {c('sponsor_subtitle', "Real farmers. Real crops. Real impact. Sponsor an African farmer's membership, inputs, and program access — and get monthly updates as their season unfolds.")}
             </p>
           </div>
 
@@ -1450,12 +1538,12 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeInWhenVisible>
             <div className="text-center mb-14">
-              <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#5DB347' }}>What Makes Us Different</span>
+              <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#5DB347' }}>{c('promise_eyebrow', 'What Makes Us Different')}</span>
               <h2 className="text-3xl md:text-4xl font-bold text-navy mt-2 mb-4 text-gradient-green">
-                Our Promise
+                {c('promise_title', 'Our Promise')}
               </h2>
               <p className="text-gray-500 max-w-2xl mx-auto">
-                We&apos;re not a bank in a boardroom. We&apos;re farmers who built a platform to solve the problems we lived through ourselves.
+                {c('promise_subtitle', "We're not a bank in a boardroom. We're farmers who built a platform to solve the problems we lived through ourselves.")}
               </p>
             </div>
           </FadeInWhenVisible>
@@ -1511,13 +1599,12 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <FadeInWhenVisible>
             <div className="text-center mb-14">
-              <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#5DB347' }}>Our People On Your Farm</span>
+              <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#5DB347' }}>{c('showup_eyebrow', 'Our People On Your Farm')}</span>
               <h2 className="text-3xl md:text-4xl font-bold text-navy mt-2 mb-4 text-gradient-green">
-                We Don&apos;t Just Finance — We Show Up
+                {c('showup_title', "We Don't Just Finance — We Show Up")}
               </h2>
               <p className="text-gray-500 max-w-2xl mx-auto">
-                Our network of commercial farmers, agronomists, and specialists come to your farm to help you succeed.
-                These are real people with real experience — not just software.
+                {c('showup_subtitle', 'Our network of commercial farmers, agronomists, and specialists come to your farm to help you succeed. These are real people with real experience — not just software.')}
               </p>
             </div>
           </FadeInWhenVisible>
@@ -1564,28 +1651,27 @@ export default function Home() {
           <FadeInWhenVisible>
             <Droplets className="w-14 h-14 text-[#5DB347]/40 mx-auto mb-6" />
             <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 leading-tight text-glow">
-              Ready to Grow With Us?
+              {c('final_cta_title', 'Ready to Grow With Us?')}
             </h2>
             <p className="text-white/80 text-xl mb-12 max-w-2xl mx-auto leading-relaxed">
-              Whether you farm two hectares or two thousand, we&apos;re here to help.
-              Tell us your story, share your vision, and let&apos;s build something extraordinary together.
+              {c('final_cta_body', "Whether you farm two hectares or two thousand, we're here to help. Tell us your story, share your vision, and let's build something extraordinary together.")}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
-                href="/apply"
+                href={c('final_cta_primary_link', '/apply')}
                 className="group px-10 py-5 rounded-2xl font-bold text-lg transition-all duration-300 flex items-center justify-center gap-2 text-white shadow-lg shadow-[#5DB347]/30 hover:shadow-xl hover:shadow-[#5DB347]/40 hover:scale-105"
                 style={{ background: 'linear-gradient(135deg, #5DB347, #449933)' }}
                 onMouseEnter={(e) => (e.currentTarget.style.background = 'linear-gradient(135deg, #6ABF4B, #5DB347)')}
                 onMouseLeave={(e) => (e.currentTarget.style.background = 'linear-gradient(135deg, #5DB347, #449933)')}
               >
-                Join Our Farming Family
+                {c('final_cta_primary_text', 'Join Our Farming Family')}
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
-                href="/contact"
+                href={c('final_cta_secondary_link', '/contact')}
                 className="border-2 border-white/50 hover:border-white hover:bg-white/10 text-white px-10 py-5 rounded-2xl font-bold text-lg transition-all duration-300 flex items-center justify-center"
               >
-                We&apos;re Here to Help
+                {c('final_cta_secondary_text', "We're Here to Help")}
               </Link>
             </div>
           </FadeInWhenVisible>

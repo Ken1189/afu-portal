@@ -185,6 +185,7 @@ const navGroups: NavGroup[] = [
     label: 'Content',
     defaultOpen: false,
     links: [
+      { href: '/admin/content-editor', label: 'Content Editor', icon: <PenSquare className={ICON_CLS} /> },
       { href: '/admin/content', label: 'Site Content', icon: <FileEdit className={ICON_CLS} /> },
       { href: '/admin/blog', label: 'Blog / News', icon: <PenSquare className={ICON_CLS} /> },
       { href: '/admin/media', label: 'Media Library', icon: <ImageIcon className={ICON_CLS} /> },
