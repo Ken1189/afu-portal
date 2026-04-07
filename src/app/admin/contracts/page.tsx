@@ -9,6 +9,7 @@ import {
   Users, Building2, Award, Shield, ChevronRight, RefreshCw,
 } from 'lucide-react';
 import { useConfirm } from '@/components/ui/useConfirm';
+import { ALL_AFRICAN_COUNTRIES } from '@/lib/countries';
 
 /* ─── Types ─── */
 interface Contract {
@@ -60,7 +61,7 @@ const PAYMENT_TERMS = [
   { value: 'net_90', label: 'Net 90 Days' },
 ];
 
-const COUNTRIES = ['Botswana', 'Ethiopia', 'Ghana', 'Kenya', 'Mozambique', 'Nigeria', 'Sierra Leone', 'South Africa', 'Tanzania', 'Uganda', 'Zambia', 'Zimbabwe'];
+const COUNTRIES = [...ALL_AFRICAN_COUNTRIES].sort();
 
 export default function AdminContractsPage() {
   const supabase = useMemo(() => createClient(), []);

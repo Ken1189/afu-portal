@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { useSuppliers } from '@/lib/supabase/use-suppliers';
 import type { SupplierCategory } from '@/lib/supabase/types';
+import { WORLD_COUNTRIES, ALL_AFRICAN_COUNTRIES } from '@/lib/countries';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 16 },
@@ -36,7 +37,8 @@ const categories: { value: SupplierCategory; label: string }[] = [
   { value: 'financial-services', label: 'Financial Services' },
 ];
 
-const countries = ['Botswana', 'Ethiopia', 'Kenya', 'Mozambique', 'Nigeria', 'Sierra Leone', 'South Africa', 'Tanzania', 'Uganda', 'Zambia', 'Zimbabwe'];
+const countries = [...WORLD_COUNTRIES].sort();
+const africanMarkets = [...ALL_AFRICAN_COUNTRIES].sort();
 
 export default function AddSupplierPage() {
   const router = useRouter();
@@ -53,6 +55,7 @@ export default function AddSupplierPage() {
     category: 'input-supplier' as SupplierCategory,
     country: 'Botswana',
     region: '',
+    serves_countries: [] as string[],
     description: '',
     commission_rate: '10',
     member_discount_percent: '10',
@@ -61,6 +64,15 @@ export default function AddSupplierPage() {
   const updateField = (field: string, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
     if (error) setError('');
+  };
+
+  const toggleServesCountry = (country: string) => {
+    setForm((prev) => ({
+      ...prev,
+      serves_countries: prev.serves_countries.includes(country)
+        ? prev.serves_countries.filter((c) => c !== country)
+        : [...prev.serves_countries, country],
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -84,6 +96,7 @@ export default function AddSupplierPage() {
       category: form.category,
       country: form.country,
       region: form.region || undefined,
+      serves_countries: form.serves_countries.length > 0 ? form.serves_countries : undefined,
       description: form.description || undefined,
       commission_rate: parseFloat(form.commission_rate) || 10,
       member_discount_percent: parseFloat(form.member_discount_percent) || 10,
@@ -291,6 +304,33 @@ export default function AddSupplierPage() {
                 placeholder="e.g. Gaborone"
               />
             </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-navy mb-1.5">
+              African Markets Served
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              Suppliers can be based anywhere in the world but serve specific African markets. Select all that apply.
+            </p>
+            <div className="max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-3 grid grid-cols-2 sm:grid-cols-3 gap-2 bg-gray-50/50">
+              {africanMarkets.map((c) => (
+                <label key={c} className="flex items-center gap-2 text-sm text-navy cursor-pointer hover:text-teal">
+                  <input
+                    type="checkbox"
+                    checked={form.serves_countries.includes(c)}
+                    onChange={() => toggleServesCountry(c)}
+                    className="w-4 h-4 rounded border-gray-300 text-teal focus:ring-teal/50"
+                  />
+                  {c}
+                </label>
+              ))}
+            </div>
+            {form.serves_countries.length > 0 && (
+              <p className="text-xs text-gray-500 mt-2">
+                {form.serves_countries.length} {form.serves_countries.length === 1 ? 'country' : 'countries'} selected
+              </p>
+            )}
           </div>
         </div>
 

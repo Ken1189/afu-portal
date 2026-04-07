@@ -22,6 +22,7 @@ import FilterBar, {
   type FilterValues,
 } from '@/components/admin/FilterBar';
 import { createClient } from '@/lib/supabase/client';
+import { ALL_AFRICAN_COUNTRIES } from '@/lib/countries';
 
 /* ─── Types ─── */
 
@@ -85,11 +86,7 @@ const SECTORS = [
   'Horticulture', 'Livestock', 'Grains', 'Cash Crops', 'Macadamia',
   'Blueberry', 'Avocado', 'Mixed Farming',
 ];
-const COUNTRIES = [
-  'Pan-Africa', 'Zimbabwe', 'Kenya', 'Uganda', 'Tanzania',
-  'Mozambique', 'South Africa', 'Botswana', 'Zambia', 'Ghana',
-  'Nigeria', 'East Africa', 'Southern Africa',
-];
+const COUNTRIES = ['Pan-Africa', 'East Africa', 'Southern Africa', 'West Africa', 'North Africa', ...[...ALL_AFRICAN_COUNTRIES].sort()];
 
 const TYPE_FILTER: FilterConfig = {
   key: 'type',

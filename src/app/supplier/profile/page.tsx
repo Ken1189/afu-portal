@@ -30,6 +30,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import CapabilitiesCard from '@/components/CapabilitiesCard';
+import { WORLD_COUNTRIES, ALL_AFRICAN_COUNTRIES } from '@/lib/countries';
 
 // ── Fallback data (shown when no supplier record exists) ──
 
@@ -136,6 +137,7 @@ export default function SupplierProfilePage() {
   const [description, setDescription] = useState('');
   const [country, setCountry] = useState('');
   const [region, setRegion] = useState('');
+  const [servesCountries, setServesCountries] = useState<string[]>([]);
   const [category, setCategory] = useState('');
   const [address, setAddress] = useState('');
 
@@ -198,6 +200,7 @@ export default function SupplierProfilePage() {
         setDescription(data.description);
         setCountry(data.country);
         setRegion(data.region);
+        setServesCountries([]);
         setCategory(data.category);
         setAddress('');
         setJoinDate(data.joinDate);
@@ -215,6 +218,7 @@ export default function SupplierProfilePage() {
         setDescription(data.description || '');
         setCountry(data.country || '');
         setRegion(data.region || '');
+        setServesCountries(Array.isArray(data.serves_countries) ? data.serves_countries : []);
         setCategory(data.category || 'input-supplier');
         setAddress(data.address || '');
         setJoinDate(data.created_at || data.join_date || '');
@@ -279,6 +283,7 @@ export default function SupplierProfilePage() {
             description,
             country,
             region,
+            serves_countries: servesCountries.length > 0 ? servesCountries : null,
             category,
             address,
             certifications,
@@ -299,6 +304,7 @@ export default function SupplierProfilePage() {
             description,
             country,
             region,
+            serves_countries: servesCountries.length > 0 ? servesCountries : null,
             category: category || 'input-supplier',
             address,
             certifications,
@@ -732,13 +738,11 @@ export default function SupplierProfilePage() {
                   className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347] transition-colors bg-gray-50 appearance-none"
                 >
                   <option value="">Select country...</option>
-                  {['Botswana', 'Ethiopia', 'Kenya', 'Mozambique', 'Nigeria', 'Sierra Leone', 'South Africa', 'Tanzania', 'Uganda', 'Zambia', 'Zimbabwe'].map(
-                    (c) => (
-                      <option key={c} value={c}>
-                        {c}
-                      </option>
-                    )
-                  )}
+                  {[...WORLD_COUNTRIES].sort().map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
                 </select>
               ) : (
                 <div className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-100 text-sm bg-gray-50/70 text-[#1B2A4A]">
@@ -756,6 +760,39 @@ export default function SupplierProfilePage() {
             isEditing={editing}
             onChange={setRegion}
           />
+
+          {/* African Markets Served */}
+          <div className="md:col-span-2">
+            <label className="block text-xs font-medium text-gray-500 mb-1.5">
+              African Markets Served
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              You can be based anywhere in the world. Select the African countries where you serve customers.
+            </p>
+            {editing ? (
+              <div className="max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-3 grid grid-cols-2 sm:grid-cols-3 gap-2 bg-gray-50/50">
+                {[...ALL_AFRICAN_COUNTRIES].sort().map((c) => (
+                  <label key={c} className="flex items-center gap-2 text-sm text-[#1B2A4A] cursor-pointer hover:text-[#5DB347]">
+                    <input
+                      type="checkbox"
+                      checked={servesCountries.includes(c)}
+                      onChange={() => {
+                        setServesCountries((prev) =>
+                          prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]
+                        );
+                      }}
+                      className="w-4 h-4 rounded border-gray-300"
+                    />
+                    {c}
+                  </label>
+                ))}
+              </div>
+            ) : (
+              <div className="w-full px-4 py-2.5 rounded-lg border border-gray-100 text-sm bg-gray-50/70 text-[#1B2A4A]">
+                {servesCountries.length > 0 ? servesCountries.join(', ') : <span className="text-gray-400 italic">No markets selected</span>}
+              </div>
+            )}
+          </div>
 
           {/* Category */}
           <div>

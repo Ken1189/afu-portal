@@ -15,6 +15,7 @@ import {
   ArrowLeft,
 } from 'lucide-react';
 import Link from 'next/link';
+import { ALL_AFRICAN_COUNTRIES } from '@/lib/countries';
 
 // ── Types ──
 interface Equipment {
@@ -27,7 +28,7 @@ interface Equipment {
 }
 
 const EQUIPMENT_TYPES = ['Machinery', 'Irrigation', 'Processing', 'Planting', 'Spraying', 'Storage', 'Transport'];
-const COUNTRIES = ['Zimbabwe', 'Uganda', 'Kenya', 'Tanzania', 'Zambia', 'Malawi', 'Mozambique', 'Rwanda', 'Ethiopia'];
+const COUNTRIES = [...ALL_AFRICAN_COUNTRIES].sort();
 
 const DEFAULT_CATALOG: Equipment[] = [
   { name: 'Tractor', type: 'Machinery', description: 'Multi-purpose farm tractor for plowing, hauling and field preparation.', daily_rate: 75, purchase_price: 25000, available_countries: ['Zimbabwe', 'Kenya', 'Tanzania', 'Uganda'] },

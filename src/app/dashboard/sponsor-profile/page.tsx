@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, KeyboardEvent } from 'react';
 import { useAuth } from '@/lib/supabase/auth-context';
 import { createClient } from '@/lib/supabase/client';
+import { ALL_AFRICAN_COUNTRIES } from '@/lib/countries';
 import {
   Heart,
   Copy,
@@ -21,19 +22,7 @@ import {
 const supabase = createClient();
 
 // ── Constants ──
-const AFU_COUNTRIES = [
-  'Botswana',
-  'Zimbabwe',
-  'Tanzania',
-  'Kenya',
-  'South Africa',
-  'Nigeria',
-  'Zambia',
-  'Mozambique',
-  'Sierra Leone',
-  'Uganda',
-  'Ethiopia',
-];
+const AFU_COUNTRIES = [...ALL_AFRICAN_COUNTRIES].sort();
 
 // ── Slug generator ──
 function generateSlug(name: string): string {

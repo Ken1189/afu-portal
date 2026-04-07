@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/supabase/auth-context';
 import { createClient } from '@/lib/supabase/client';
 import ImageUploader from '@/components/ui/ImageUploader';
 import { User, Mail, Phone, MapPin, Globe, Loader2, CheckCircle2, AlertCircle, Save } from 'lucide-react';
+import { ALL_AFRICAN_COUNTRIES } from '@/lib/countries';
 
 interface ProfileFields {
   full_name: string;
@@ -15,10 +16,7 @@ interface ProfileFields {
   avatar_url: string | null;
 }
 
-const COUNTRIES = [
-  'Nigeria', 'Kenya', 'Ghana', 'South Africa', 'Tanzania',
-  'Uganda', 'Ethiopia', 'Rwanda', 'Zambia',
-];
+const COUNTRIES = [...ALL_AFRICAN_COUNTRIES].sort();
 
 export default function WarehouseProfilePage() {
   const { user, profile, refreshProfile } = useAuth();

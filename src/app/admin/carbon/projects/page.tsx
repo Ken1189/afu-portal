@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/lib/supabase/auth-context';
 import { createClient } from '@/lib/supabase/client';
+import { ALL_AFRICAN_COUNTRIES } from '@/lib/countries';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -65,7 +66,7 @@ const _UNUSED_demoEnrollments: Record<string, Enrollment[]> = {
   ],
 };
 
-const COUNTRIES = ['Botswana', 'Ethiopia', 'Zimbabwe', 'Tanzania', 'Kenya', 'Uganda', 'Mozambique', 'Zambia', 'Malawi', 'South Africa'];
+const COUNTRIES = [...ALL_AFRICAN_COUNTRIES].sort();
 const PRACTICES = ['Agroforestry', 'No-Till', 'Cover Cropping', 'Composting', 'Crop Rotation', 'Mulching', 'Biogas Installation', 'Manure Management', 'Shade Trees', 'Intercropping', 'Biochar Production', 'Minimum Tillage', 'Waste Reduction'];
 
 const emptyForm = {

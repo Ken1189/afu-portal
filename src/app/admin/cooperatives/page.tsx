@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/supabase/auth-context';
+import { ALL_AFRICAN_COUNTRIES } from '@/lib/countries';
 import {
   Users,
   Loader2,
@@ -55,7 +56,7 @@ const _UNUSED_FALLBACK_COOPERATIVES: Cooperative[] = [
   { id: 'c5', name: 'Green Valley Farmers', country: 'Uganda', region: 'Mbale', member_count: 56, description: 'Organic farmers union', contact_email: 'info@greenvalley.ug', contact_phone: '+256 700 999 000', status: 'suspended', created_at: '2023-09-05' },
 ];
 
-const COUNTRIES = ['Kenya', 'Uganda', 'Tanzania', 'Rwanda', 'Ethiopia', 'Nigeria', 'Ghana', 'South Africa', 'Zambia', 'Malawi', 'Mozambique', 'Zimbabwe'];
+const COUNTRIES = [...ALL_AFRICAN_COUNTRIES].sort();
 const COOP_TYPES = ['crop', 'livestock', 'mixed', 'processing', 'marketing'];
 
 const STATUS_COLORS: Record<string, string> = {

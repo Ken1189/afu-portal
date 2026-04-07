@@ -138,7 +138,7 @@ const SECTORS = [
 // They SERVE specific African countries (via the `regions` text[] column)
 import { WORLD_COUNTRIES, ALL_AFRICAN_COUNTRIES as ALL_AFRICAN } from '@/lib/countries';
 const COUNTRIES = WORLD_COUNTRIES;
-const AFRICAN_COUNTRIES = ALL_AFRICAN.map((c) => c.name).sort();
+const AFRICAN_COUNTRIES = [...ALL_AFRICAN].sort();
 
 const SECTOR_COLORS: Record<string, string> = {
   Investment: 'bg-emerald-100 text-emerald-700',

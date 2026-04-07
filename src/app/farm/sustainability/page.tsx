@@ -41,7 +41,7 @@ import { useCarbonCredits } from '@/lib/supabase/use-sustainability';
 type CarbonCreditType = 'agroforestry' | 'soil-carbon' | 'methane-reduction' | 'conservation-tillage' | 'biochar';
 type CreditStatus = 'verified' | 'pending' | 'retired' | 'listed';
 type ProjectType = 'agroforestry' | 'soil-carbon' | 'methane-reduction' | 'conservation-tillage' | 'biochar' | 'water-conservation' | 'renewable-energy';
-type ProjectCountry = 'Botswana' | 'Zimbabwe' | 'Tanzania';
+type ProjectCountry = string;
 type ProjectStatus = 'active' | 'completed' | 'planning';
 type MetricCategory = 'carbon' | 'water' | 'biodiversity' | 'soil' | 'energy';
 type MetricTrend = 'up' | 'down' | 'stable';

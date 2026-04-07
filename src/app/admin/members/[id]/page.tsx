@@ -55,7 +55,7 @@ import {
 type MemberTier = 'smallholder' | 'commercial' | 'enterprise' | 'partner';
 type MemberStatus = 'active' | 'pending' | 'suspended';
 type KycStatus = 'complete' | 'partial' | 'pending';
-type MemberCountry = 'Botswana' | 'Kenya' | 'Mozambique' | 'Nigeria' | 'Sierra Leone' | 'South Africa' | 'Tanzania' | 'Uganda' | 'Zambia' | 'Zimbabwe';
+type MemberCountry = string;
 
 interface Member {
   id: string;

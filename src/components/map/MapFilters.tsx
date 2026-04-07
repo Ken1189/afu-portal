@@ -1,6 +1,7 @@
 'use client';
 
 import { ChevronDown } from 'lucide-react';
+import { ALL_AFRICAN_COUNTRIES } from '@/lib/countries';
 
 export interface MapFilterState {
   country: string;
@@ -17,28 +18,7 @@ interface MapFiltersProps {
   availableCountries: string[];
 }
 
-const ALL_COUNTRIES = [
-  'Botswana',
-  'Egypt',
-  'Ethiopia',
-  'Ghana',
-  'Guinea-Bissau',
-  'Ivory Coast',
-  'Kenya',
-  'Liberia',
-  'Malawi',
-  'Mali',
-  'Mozambique',
-  'Namibia',
-  'Nigeria',
-  'Republic of Guinea',
-  'Sierra Leone',
-  'South Africa',
-  'Tanzania',
-  'Uganda',
-  'Zambia',
-  'Zimbabwe',
-];
+const ALL_COUNTRIES = [...ALL_AFRICAN_COUNTRIES].sort();
 
 const HEALTH_OPTIONS: { key: 'green' | 'yellow' | 'red'; label: string; color: string }[] = [
   { key: 'green', label: 'Healthy', color: '#5DB347' },

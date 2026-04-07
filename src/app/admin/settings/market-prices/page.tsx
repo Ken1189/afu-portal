@@ -16,6 +16,7 @@ import {
   MapPin,
 } from 'lucide-react';
 import Link from 'next/link';
+import { ALL_AFRICAN_COUNTRIES } from '@/lib/countries';
 
 // ── Types ──
 interface MarketEntry {
@@ -30,7 +31,7 @@ interface CommoditySource {
 }
 
 const UNITS = ['kg', 'ton', 'bag (50kg)', 'bag (90kg)', 'bushel', 'crate', 'litre'];
-const COUNTRIES = ['Zimbabwe', 'Uganda', 'Kenya', 'Tanzania', 'Zambia', 'Malawi', 'Mozambique', 'Rwanda', 'Ethiopia'];
+const COUNTRIES = [...ALL_AFRICAN_COUNTRIES].sort();
 
 const DEFAULT_SOURCES: CommoditySource[] = [
   { commodity: 'Maize', unit: 'ton', markets: [{ name: 'Harare Mbare', country: 'Zimbabwe' }, { name: 'Nairobi Exchange', country: 'Kenya' }, { name: 'Dar es Salaam', country: 'Tanzania' }] },

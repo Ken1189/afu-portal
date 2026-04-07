@@ -16,6 +16,10 @@ import { ArrowLeft, Loader2, Save } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import type { SupplierCategory, SupplierStatus, SponsorshipTier } from '@/lib/supabase/types';
 import type { SupplierRow } from '@/lib/supabase/use-suppliers';
+import { WORLD_COUNTRIES, ALL_AFRICAN_COUNTRIES } from '@/lib/countries';
+
+const COUNTRY_OPTIONS = [...WORLD_COUNTRIES].sort();
+const AFRICAN_MARKETS = [...ALL_AFRICAN_COUNTRIES].sort();
 
 const CATEGORIES: SupplierCategory[] = [
   'input-supplier',
@@ -40,6 +44,7 @@ type FormState = {
   status: SupplierStatus;
   country: string;
   region: string;
+  serves_countries: string[];
   description: string;
   verified: boolean;
   is_founding: boolean;
@@ -61,6 +66,7 @@ function rowToForm(row: SupplierRow): FormState {
     status: row.status ?? 'pending',
     country: row.country ?? '',
     region: row.region ?? '',
+    serves_countries: Array.isArray(row.serves_countries) ? row.serves_countries : [],
     description: row.description ?? '',
     verified: !!row.verified,
     is_founding: !!row.is_founding,
@@ -85,6 +91,7 @@ function formToUpdate(form: FormState): Partial<SupplierRow> {
     status: form.status,
     country: form.country.trim(),
     region: form.region.trim() || null,
+    serves_countries: form.serves_countries.length > 0 ? form.serves_countries : null,
     description: form.description.trim() || null,
     verified: form.verified,
     is_founding: form.is_founding,
@@ -293,14 +300,18 @@ export default function EditSupplierPage() {
             </select>
           </Field>
 
-          <Field label="Country" required>
-            <input
-              type="text"
+          <Field label="Country (HQ — based anywhere in the world)" required>
+            <select
               required
               value={form.country}
               onChange={(e) => handleChange('country', e.target.value)}
               className="input"
-            />
+            >
+              <option value="">Select country...</option>
+              {COUNTRY_OPTIONS.map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
           </Field>
 
           <Field label="Region">
@@ -355,6 +366,38 @@ export default function EditSupplierPage() {
               className="input"
             />
           </Field>
+
+          <div className="md:col-span-2">
+            <Field label="African Markets Served">
+              <p className="text-xs text-gray-400 mb-2">
+                Select the African countries this supplier serves. Suppliers can be based anywhere but typically serve specific African markets.
+              </p>
+              <div className="max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-3 grid grid-cols-2 sm:grid-cols-3 gap-2 bg-gray-50/50">
+                {AFRICAN_MARKETS.map((c) => (
+                  <label key={c} className="flex items-center gap-2 text-sm text-navy cursor-pointer hover:text-teal">
+                    <input
+                      type="checkbox"
+                      checked={form.serves_countries.includes(c)}
+                      onChange={() => {
+                        const current = form.serves_countries;
+                        const next = current.includes(c)
+                          ? current.filter((x) => x !== c)
+                          : [...current, c];
+                        handleChange('serves_countries', next);
+                      }}
+                      className="w-4 h-4 rounded border-gray-300"
+                    />
+                    {c}
+                  </label>
+                ))}
+              </div>
+              {form.serves_countries.length > 0 && (
+                <p className="text-xs text-gray-500 mt-2">
+                  {form.serves_countries.length} {form.serves_countries.length === 1 ? 'country' : 'countries'} selected
+                </p>
+              )}
+            </Field>
+          </div>
 
           <div className="md:col-span-2">
             <Field label="Description">

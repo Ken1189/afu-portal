@@ -55,7 +55,7 @@ interface Ambassador {
   pull_quote: string | null;
   bio: string | null;
   achievements: string[] | null;
-  regions: string[] | null; // African countries this ambassador serves
+  regions?: string[] | null; // African countries this ambassador serves
 }
 
 interface CommissionRate {
@@ -215,7 +215,7 @@ const SECTOR_ICONS: Record<string, React.ReactNode> = {
 
 // Replaced broad regions with specific African countries
 import { ALL_AFRICAN_COUNTRIES as AFRICAN_COUNTRIES_DATA } from '@/lib/countries';
-const AFRICAN_REGIONS = AFRICAN_COUNTRIES_DATA.map((c) => c.name).sort();
+const AFRICAN_REGIONS = [...AFRICAN_COUNTRIES_DATA].sort();
 
 const AFU_COUNTRIES = [...WORLD_COUNTRIES, 'Other'];
 

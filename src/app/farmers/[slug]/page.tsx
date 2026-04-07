@@ -2,6 +2,7 @@
 
 import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
+import { WORLD_COUNTRIES } from '@/lib/countries';
 
 /* ─── Types ─── */
 
@@ -289,19 +290,7 @@ const TIER_CONFIG: Record<
   gold: { label: 'Gold', emoji: '🥇', monthlyPrice: 500, color: '#C9A84C' },
 };
 
-const COUNTRIES = [
-  'Afghanistan', 'Albania', 'Algeria', 'Angola', 'Argentina', 'Australia',
-  'Austria', 'Bahrain', 'Bangladesh', 'Belgium', 'Botswana', 'Brazil',
-  'Canada', 'China', 'Colombia', 'Denmark', 'Egypt', 'Ethiopia', 'Finland',
-  'France', 'Germany', 'Ghana', 'Greece', 'India', 'Indonesia', 'Iran',
-  'Ireland', 'Israel', 'Italy', 'Japan', 'Jordan', 'Kenya', 'Kuwait',
-  'Malawi', 'Malaysia', 'Mozambique', 'Netherlands', 'New Zealand', 'Nigeria',
-  'Norway', 'Oman', 'Pakistan', 'Philippines', 'Poland', 'Portugal',
-  'Qatar', 'Romania', 'Rwanda', 'Saudi Arabia', 'Singapore', 'South Africa',
-  'South Korea', 'Spain', 'Sweden', 'Switzerland', 'Tanzania', 'Thailand',
-  'Turkey', 'UAE', 'Uganda', 'UK', 'USA', 'Ukraine', 'Vietnam', 'Zambia',
-  'Zimbabwe',
-];
+const COUNTRIES = [...WORLD_COUNTRIES].sort();
 
 /* ─── Funding progress bar ─── */
 function FundingProgress({

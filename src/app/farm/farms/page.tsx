@@ -20,6 +20,7 @@ import {
 import { useAuth } from '@/lib/supabase/auth-context';
 import { createClient } from '@/lib/supabase/client';
 import ImageUploader from '@/components/ui/ImageUploader';
+import { ALL_AFRICAN_COUNTRIES } from '@/lib/countries';
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -61,18 +62,7 @@ const EMPTY_FORM: FarmFormData = {
   photo_url: '',
 };
 
-const AFRICAN_COUNTRIES = [
-  'Botswana',
-  'Ghana',
-  'Kenya',
-  'Mozambique',
-  'Nigeria',
-  'South Africa',
-  'Tanzania',
-  'Uganda',
-  'Zambia',
-  'Zimbabwe',
-];
+const AFRICAN_COUNTRIES = [...ALL_AFRICAN_COUNTRIES].sort();
 
 // ── Component ───────────────────────────────────────────────────────────────
 

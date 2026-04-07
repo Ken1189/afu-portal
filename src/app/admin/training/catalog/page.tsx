@@ -15,6 +15,7 @@ import {
   ArrowLeft,
 } from 'lucide-react';
 import Link from 'next/link';
+import { ALL_AFRICAN_COUNTRIES } from '@/lib/countries';
 
 // ── Types ──
 interface Course {
@@ -39,7 +40,7 @@ const DEFAULT_CATALOG: Course[] = [
 
 const CATEGORIES = ['Agriculture', 'Business', 'Insurance', 'Environment', 'Technology', 'Compliance', 'Health'];
 const LEVELS = ['Beginner', 'Intermediate', 'Advanced'];
-const COUNTRIES = ['All', 'Zimbabwe', 'Uganda', 'Kenya', 'Tanzania', 'Zambia', 'Malawi', 'Mozambique', 'Rwanda', 'Ethiopia'];
+const COUNTRIES = ['All', ...[...ALL_AFRICAN_COUNTRIES].sort()];
 
 const CONFIG_KEY = 'training_catalog';
 

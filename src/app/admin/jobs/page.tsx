@@ -26,6 +26,7 @@ import FilterBar, {
   type FilterValues,
 } from '@/components/admin/FilterBar';
 import { createClient } from '@/lib/supabase/client';
+import { ALL_AFRICAN_COUNTRIES } from '@/lib/countries';
 
 /* ─── Types ─── */
 
@@ -91,11 +92,7 @@ const SECTORS = [
   'Cash Crops', 'Machinery', 'Processing',
 ];
 
-const COUNTRIES = [
-  'Botswana', 'Zimbabwe', 'Tanzania', 'Kenya', 'South Africa',
-  'Nigeria', 'Zambia', 'Mozambique', 'Ghana', 'Uganda',
-  'Sierra Leone', 'Malawi', 'Egypt', 'Ethiopia', 'Namibia',
-];
+const COUNTRIES = [...ALL_AFRICAN_COUNTRIES].sort();
 
 const JOB_TYPES = ['Full-time', 'Part-time', 'Contract', 'Seasonal', 'Casual', 'Internship'];
 const PAY_TYPES = ['Hourly', 'Daily', 'Weekly', 'Monthly', 'Per Season', 'Per Harvest', 'Negotiable'];

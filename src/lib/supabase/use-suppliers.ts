@@ -18,6 +18,7 @@ export interface SupplierRow {
   status: SupplierStatus;
   country: string;
   region: string | null;
+  serves_countries: string[] | null;
   description: string | null;
   verified: boolean;
   is_founding: boolean;
@@ -45,6 +46,7 @@ export interface SupplierInsert {
   category: SupplierCategory;
   country: string;
   region?: string;
+  serves_countries?: string[];
   description?: string;
   commission_rate?: number;
   member_discount_percent?: number;

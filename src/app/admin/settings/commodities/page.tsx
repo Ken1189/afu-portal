@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { ALL_AFRICAN_COUNTRIES } from '@/lib/countries';
 import {
   Boxes,
   Plus,
@@ -30,7 +31,7 @@ interface TradingCommodity {
 }
 
 const CATEGORIES = ['Grain', 'Beverage Crop', 'Fiber', 'Oil Seed', 'Cash Crop', 'Nut'];
-const COUNTRIES = ['Zimbabwe', 'Uganda', 'Kenya', 'Tanzania', 'Zambia', 'Malawi', 'Mozambique', 'Ethiopia', 'Rwanda'];
+const COUNTRIES = [...ALL_AFRICAN_COUNTRIES].sort();
 
 const DEFAULT_COMMODITIES: TradingCommodity[] = [
   { name: 'Maize', symbol: 'MZE', unit: 'MT', category: 'Grain', countries: ['Zimbabwe', 'Kenya', 'Tanzania', 'Zambia', 'Malawi'], is_active: true },

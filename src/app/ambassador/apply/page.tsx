@@ -20,7 +20,9 @@ import {
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/supabase/auth-context';
-import { WORLD_COUNTRIES } from '@/lib/countries';
+import { WORLD_COUNTRIES, ALL_AFRICAN_COUNTRIES } from '@/lib/countries';
+
+const AFRICAN_MARKETS = [...ALL_AFRICAN_COUNTRIES].sort();
 
 // Ambassador categories — reflects real mix (most ambassadors aren't farmers)
 const SECTORS = [
@@ -57,6 +59,7 @@ export default function AmbassadorApplyPage() {
     bio: '',
     socialLinks: '',
   });
+  const [servesCountries, setServesCountries] = useState<string[]>([]);
   const [honeypot, setHoneypot] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -138,6 +141,7 @@ export default function AmbassadorApplyPage() {
         phone: form.phone || null,
         country: form.country,
         region: form.region || null,
+        regions: servesCountries.length > 0 ? servesCountries : null,
         sector: form.sector || null,
         bio: form.bio || null,
         motivation: form.bio || null,
@@ -394,6 +398,38 @@ export default function AmbassadorApplyPage() {
                   />
                 </div>
               </div>
+            </div>
+
+            {/* Countries You'll Serve */}
+            <div>
+              <label className="block text-sm font-medium text-[#1B2A4A] mb-2">
+                African Countries You&apos;ll Serve
+              </label>
+              <p className="text-xs text-gray-500 mb-2">
+                You can be based anywhere in the world. Select the African countries where you&apos;ll represent AFU.
+              </p>
+              <div className="max-h-48 overflow-y-auto border border-gray-200 rounded-xl p-3 grid grid-cols-2 sm:grid-cols-3 gap-2 bg-gray-50/50">
+                {AFRICAN_MARKETS.map((c) => (
+                  <label key={c} className="flex items-center gap-2 text-sm text-[#1B2A4A] cursor-pointer hover:text-[#5DB347]">
+                    <input
+                      type="checkbox"
+                      checked={servesCountries.includes(c)}
+                      onChange={() => {
+                        setServesCountries((prev) =>
+                          prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]
+                        );
+                      }}
+                      className="w-4 h-4 rounded border-gray-300"
+                    />
+                    {c}
+                  </label>
+                ))}
+              </div>
+              {servesCountries.length > 0 && (
+                <p className="text-xs text-gray-500 mt-1">
+                  {servesCountries.length} {servesCountries.length === 1 ? 'country' : 'countries'} selected
+                </p>
+              )}
             </div>
 
             {/* Category / Field of expertise */}

@@ -17,6 +17,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import Link from 'next/link';
+import { ALL_AFRICAN_COUNTRIES } from '@/lib/countries';
 
 // ── Types ──
 interface CropEntry {
@@ -32,7 +33,7 @@ interface RegionRecommendation {
   crops: CropEntry[];
 }
 
-const COUNTRIES = ['Zimbabwe', 'Uganda', 'Kenya', 'Tanzania', 'Zambia', 'Malawi', 'Mozambique', 'Rwanda', 'Ethiopia'];
+const COUNTRIES = [...ALL_AFRICAN_COUNTRIES].sort();
 const SEASONS = ['Long Rains', 'Short Rains', 'Dry Season', 'Year-round', 'Winter', 'Summer'];
 const SOIL_TYPES = ['Loam', 'Clay', 'Sandy', 'Silt', 'Laterite', 'Alluvial', 'Volcanic', 'Black Cotton'];
 

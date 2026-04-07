@@ -7,6 +7,9 @@ import {
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import ImageUploader from '@/components/ui/ImageUploader';
+import { ALL_AFRICAN_COUNTRIES } from '@/lib/countries';
+
+const AFRICAN_MARKETS = [...ALL_AFRICAN_COUNTRIES].sort();
 
 interface Partner {
   id: string;
@@ -16,6 +19,7 @@ interface Partner {
   category: string;
   featured: boolean;
   display_order: number;
+  serves_countries?: string[] | null;
   created_at: string;
 }
 
@@ -26,12 +30,13 @@ interface PartnerFormData {
   category: string;
   featured: boolean;
   display_order: string;
+  serves_countries: string[];
 }
 
 const CATEGORIES = ['DFI', 'Bank', 'Insurance', 'Input Supplier', 'Technology', 'Government', 'NGO'];
 
 const EMPTY_FORM: PartnerFormData = {
-  name: '', logo_url: '', website: '', category: 'Technology', featured: false, display_order: '0',
+  name: '', logo_url: '', website: '', category: 'Technology', featured: false, display_order: '0', serves_countries: [],
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -98,7 +103,7 @@ export default function AdminPartnersPage() {
 
   const openEdit = (p: Partner) => {
     setEditingId(p.id);
-    setFormData({ name: p.name, logo_url: p.logo_url || '', website: p.website || '', category: p.category, featured: p.featured, display_order: String(p.display_order) });
+    setFormData({ name: p.name, logo_url: p.logo_url || '', website: p.website || '', category: p.category, featured: p.featured, display_order: String(p.display_order), serves_countries: Array.isArray(p.serves_countries) ? p.serves_countries : [] });
     setShowModal(true);
   };
 
@@ -112,6 +117,7 @@ export default function AdminPartnersPage() {
       category: formData.category,
       featured: formData.featured,
       display_order: parseInt(formData.display_order, 10) || 0,
+      serves_countries: formData.serves_countries.length > 0 ? formData.serves_countries : null,
     };
     if (editingId && !editingId.startsWith('demo-')) {
       const { error } = await supabase.from('managed_partners').update(payload).eq('id', editingId);
@@ -270,6 +276,31 @@ export default function AdminPartnersPage() {
                   <input type="number" value={formData.display_order} onChange={(e) => setFormData({ ...formData, display_order: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#5DB347]/20 focus:border-[#5DB347]" />
                 </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">African Markets Served</label>
+                <p className="text-xs text-gray-400 mb-2">Partners can be based anywhere. Select the African countries this partner operates in.</p>
+                <div className="max-h-40 overflow-y-auto border border-gray-200 rounded-lg p-3 grid grid-cols-2 gap-2 bg-gray-50/50">
+                  {AFRICAN_MARKETS.map((c) => (
+                    <label key={c} className="flex items-center gap-2 text-sm text-[#1B2A4A] cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={formData.serves_countries.includes(c)}
+                        onChange={() => {
+                          const next = formData.serves_countries.includes(c)
+                            ? formData.serves_countries.filter((x) => x !== c)
+                            : [...formData.serves_countries, c];
+                          setFormData({ ...formData, serves_countries: next });
+                        }}
+                        className="w-4 h-4 rounded border-gray-300"
+                      />
+                      {c}
+                    </label>
+                  ))}
+                </div>
+                {formData.serves_countries.length > 0 && (
+                  <p className="text-xs text-gray-500 mt-1">{formData.serves_countries.length} selected</p>
+                )}
               </div>
               <label className="flex items-center gap-3 cursor-pointer">
                 <button type="button" onClick={() => setFormData({ ...formData, featured: !formData.featured })}

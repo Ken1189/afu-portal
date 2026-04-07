@@ -44,7 +44,7 @@ import {
 
 type SupplierCategory = 'input-supplier' | 'equipment' | 'logistics' | 'processing' | 'technology' | 'financial-services';
 type SponsorshipTier = 'platinum' | 'gold' | 'silver' | 'bronze';
-type Country = 'Botswana' | 'Kenya' | 'Mozambique' | 'Nigeria' | 'Sierra Leone' | 'South Africa' | 'Tanzania' | 'Uganda' | 'Zambia' | 'Zimbabwe';
+type Country = string;
 
 interface Supplier {
   id: string;

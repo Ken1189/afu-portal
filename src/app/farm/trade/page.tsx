@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/supabase/auth-context';
+import { ALL_AFRICAN_COUNTRIES } from '@/lib/countries';
 import Link from 'next/link';
 import {
   ArrowLeftRight,
@@ -108,7 +109,7 @@ const FALLBACK_COMMODITIES = [
 
 const UNITS = ['kg', 'tonnes', 'bags (50kg)', 'bags (90kg)', 'litres', 'heads', 'pieces', 'crates'];
 const QUALITY_GRADES = ['Grade A (Premium)', 'Grade B (Standard)', 'Grade C (Economy)', 'Organic Certified', 'Fair Trade'];
-const COUNTRIES = ['Kenya', 'Uganda', 'Tanzania', 'Rwanda', 'Ethiopia', 'Nigeria', 'Ghana', 'South Africa', 'Zambia', 'Malawi', 'Mozambique', 'Zimbabwe'];
+const COUNTRIES = [...ALL_AFRICAN_COUNTRIES].sort();
 
 // ── Demo price history data ───────────────────────────────────────────────
 function generatePriceHistory(commodity: string, days: number) {
