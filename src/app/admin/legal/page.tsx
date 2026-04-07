@@ -19,6 +19,7 @@ import {
   FileText,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { COUNTRY_DATA } from '@/lib/countries';
 
 // ── Types ─────────────────────────────────────────────────
 
@@ -55,16 +56,7 @@ const emptyForm: FormData = {
 
 const COUNTRIES = [
   { code: '', name: 'Global (All Countries)' },
-  { code: 'BW', name: 'Botswana' },
-  { code: 'ZW', name: 'Zimbabwe' },
-  { code: 'TZ', name: 'Tanzania' },
-  { code: 'KE', name: 'Kenya' },
-  { code: 'ZM', name: 'Zambia' },
-  { code: 'SL', name: 'Sierra Leone' },
-  { code: 'NG', name: 'Nigeria' },
-  { code: 'MZ', name: 'Mozambique' },
-  { code: 'UG', name: 'Uganda' },
-  { code: 'ZA', name: 'South Africa' },
+  ...COUNTRY_DATA,
 ];
 
 function Toast({ message, type, onClose }: { message: string; type: 'success' | 'error'; onClose: () => void }) {

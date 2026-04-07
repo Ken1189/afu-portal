@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import ImageUploader from '@/components/ui/ImageUploader';
+import { COUNTRY_DATA } from '@/lib/countries';
 
 // ── Types ─────────────────────────────────────────────────
 
@@ -62,18 +63,7 @@ const emptyForm: FormData = {
 };
 
 const ROLES = ['Smallholder Farmer', 'Commercial Farmer', 'Enterprise Farmer', 'Supplier', 'Partner', 'Sponsor'];
-const COUNTRIES = [
-  { code: 'BW', name: 'Botswana' },
-  { code: 'ZW', name: 'Zimbabwe' },
-  { code: 'TZ', name: 'Tanzania' },
-  { code: 'KE', name: 'Kenya' },
-  { code: 'ZM', name: 'Zambia' },
-  { code: 'SL', name: 'Sierra Leone' },
-  { code: 'NG', name: 'Nigeria' },
-  { code: 'MZ', name: 'Mozambique' },
-  { code: 'UG', name: 'Uganda' },
-  { code: 'ZA', name: 'South Africa' },
-];
+const COUNTRIES = COUNTRY_DATA;
 
 // ── Toast ─────────────────────────────────────────────────
 

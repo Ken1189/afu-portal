@@ -33,6 +33,7 @@ import {
 } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 import { createClient } from '@/lib/supabase/client';
+import { COUNTRY_DATA } from '@/lib/countries';
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -83,18 +84,7 @@ const initialData: OnboardingData = {
 /* ------------------------------------------------------------------ */
 /*  Constants                                                          */
 /* ------------------------------------------------------------------ */
-const FALLBACK_COUNTRIES = [
-  { name: 'Botswana', currency: 'BWP' },
-  { name: 'Zimbabwe', currency: 'ZWL' },
-  { name: 'Tanzania', currency: 'TZS' },
-  { name: 'Kenya', currency: 'KES' },
-  { name: 'South Africa', currency: 'ZAR' },
-  { name: 'Nigeria', currency: 'NGN' },
-  { name: 'Uganda', currency: 'UGX' },
-  { name: 'Zambia', currency: 'ZMW' },
-  { name: 'Mozambique', currency: 'MZN' },
-  { name: 'Sierra Leone', currency: 'SLL' },
-];
+const FALLBACK_COUNTRIES = COUNTRY_DATA;
 
 const FALLBACK_CROPS = ['Maize', 'Wheat', 'Sorghum', 'Coffee', 'Cotton', 'Tobacco', 'Sugarcane', 'Tea'];
 

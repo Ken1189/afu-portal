@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/supabase/auth-context';
+import { COUNTRY_DATA } from '@/lib/countries';
 
 // ── Types ──
 
@@ -340,16 +341,7 @@ export default function CampaignsPage() {
     return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${colors[ch] || 'bg-gray-100 text-gray-700'}`}>{ch.toUpperCase()}</span>;
   };
 
-  const COUNTRIES = [
-    { code: 'ZW', name: 'Zimbabwe' },
-    { code: 'MZ', name: 'Mozambique' },
-    { code: 'TZ', name: 'Tanzania' },
-    { code: 'ET', name: 'Ethiopia' },
-    { code: 'KE', name: 'Kenya' },
-    { code: 'UG', name: 'Uganda' },
-    { code: 'ZM', name: 'Zambia' },
-    { code: 'MW', name: 'Malawi' },
-  ];
+  const COUNTRIES = COUNTRY_DATA;
 
   const TIERS = ['A', 'B', 'C', 'D'];
   const ROLES = ['member', 'farmer', 'cooperative_lead', 'supplier'];
