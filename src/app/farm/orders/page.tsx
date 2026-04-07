@@ -90,7 +90,7 @@ export default function FarmOrdersPage() {
               quantity,
               supplier_id,
               product:products ( name ),
-              supplier:suppliers ( id, business_name )
+              supplier:suppliers ( id, company_name )
             )
           `)
           .eq('member_id', member.id)
@@ -109,7 +109,7 @@ export default function FarmOrdersPage() {
             reviewed: o.reviewed,
             review_id: o.review_id,
             supplier_id: item?.supplier?.id ?? item?.supplier_id ?? null,
-            supplier_name: item?.supplier?.business_name ?? null,
+            supplier_name: item?.supplier?.company_name ?? null,
             product_name: item?.product?.name ?? null,
             quantity: item?.quantity ?? null,
           };

@@ -62,23 +62,12 @@ interface JournalEntry {
   currency?: string;
 }
 
-const initialEntries: JournalEntry[] = [
-  { id: 'JRN-001', date: '2026-03-12', time: '07:30', type: 'fertilizing', plotId: 'PLT-001', plotName: 'Main Blueberry Field', title: 'Applied acidifier', description: 'Spread sulfur-based acidifier around drip lines. Berries looking plump — 2 more weeks to peak harvest.', photo: 'https://images.unsplash.com/photo-1498579809087-ef1e558fd1da?w=400&h=300&fit=crop', mood: 'great', weather: 'sunny', cost: 45, currency: 'USD' },
-  { id: 'JRN-002', date: '2026-03-11', time: '06:00', type: 'scouting', plotId: 'PLT-001', plotName: 'Main Blueberry Field', title: 'Morning scout — aphid check', description: 'Walked all 12 rows. Found minimal aphid activity on row 7. Will monitor closely. Neem oil sprayed as precaution.', mood: 'good', weather: 'partly-cloudy' },
-  { id: 'JRN-003', date: '2026-03-10', time: '08:00', type: 'weeding', plotId: 'PLT-002', plotName: 'Cassava Plot', title: 'Weeding day', description: 'Hired 3 laborers to weed between cassava rows. Took 4 hours. Soil looking dry — need to irrigate soon.', mood: 'okay', weather: 'sunny', cost: 36, currency: 'USD' },
-  { id: 'JRN-004', date: '2026-03-09', time: '05:30', type: 'watering', plotId: 'PLT-003', plotName: 'Sesame Strip', title: 'Early morning irrigation', description: 'Ran drip system for 2 hours. Sesame flowers opening beautifully. Should see pods forming within the week.', mood: 'great', weather: 'sunny' },
-  { id: 'JRN-005', date: '2026-03-07', time: '06:00', type: 'harvesting', plotId: 'PLT-001', plotName: 'Main Blueberry Field', title: 'First harvest!', description: 'First pick of the season! 120kg Grade A berries. Sold immediately to FreshPack at $8/kg. Revenue: $960. Great start!', photo: 'https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=400&h=300&fit=crop', mood: 'great', weather: 'sunny' },
-  { id: 'JRN-006', date: '2026-03-05', time: '07:00', type: 'fertilizing', plotId: 'PLT-002', plotName: 'Cassava Plot', title: 'NPK side dressing', description: 'Applied NPK 15-15-15 at 200kg/ha. Cassava stems growing strong but need to watch for mosaic symptoms.', mood: 'good', weather: 'cloudy', cost: 90, currency: 'USD' },
-  { id: 'JRN-007', date: '2026-03-03', time: '09:00', type: 'soil-test', plotId: 'PLT-001', plotName: 'Main Blueberry Field', title: 'Soil pH check', description: 'Tested soil pH across 6 points. Average 4.8 — perfect for blueberries. No sulfur needed this month.', mood: 'great', weather: 'partly-cloudy', cost: 15, currency: 'USD' },
-  { id: 'JRN-008', date: '2026-03-01', time: '06:00', type: 'planting', plotId: 'PLT-004', plotName: 'Maize Field', title: 'Planted maize!', description: 'Planted SC 513 variety. 75cm row spacing, 25cm between plants. Used 10kg seed for 1 hectare. Rain expected this week — perfect timing.', photo: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400&h=300&fit=crop', mood: 'great', weather: 'cloudy', cost: 85, currency: 'USD' },
-];
-
-const farmPlots = [
-  { id: 'PLT-001', name: 'Main Blueberry Field', crop: 'Blueberries', variety: 'Duke' },
-  { id: 'PLT-002', name: 'Cassava Plot', crop: 'Cassava', variety: 'TMS 30572' },
-  { id: 'PLT-003', name: 'Sesame Strip', crop: 'Sesame', variety: 'S42 White' },
-  { id: 'PLT-004', name: 'Maize Field', crop: 'Maize', variety: 'SC 513' },
-];
+interface FarmPlotOption {
+  id: string;
+  name: string;
+  crop: string;
+  variety: string;
+}
 
 // ---------------------------------------------------------------------------
 // Constants & Mappings
@@ -271,11 +260,13 @@ function FilterBar({
   setPlotFilter,
   activityFilter,
   setActivityFilter,
+  farmPlots,
 }: {
   plotFilter: string;
   setPlotFilter: (v: string) => void;
   activityFilter: ActivityType | 'all';
   setActivityFilter: (v: ActivityType | 'all') => void;
+  farmPlots: FarmPlotOption[];
 }) {
   const { t } = useLanguage();
   return (
@@ -523,7 +514,7 @@ function PhotoGallery({
   );
 }
 
-function NewEntryForm({ onClose, onSave }: { onClose: () => void; onSave: (entry: JournalEntry) => void }) {
+function NewEntryForm({ onClose, onSave, farmPlots }: { onClose: () => void; onSave: (entry: JournalEntry) => void; farmPlots: FarmPlotOption[] }) {
   const { t } = useLanguage();
   const { user } = useAuth();
   const [activityType, setActivityType] = useState<ActivityType | null>(null);
@@ -784,17 +775,59 @@ function PhotoViewer({ url, onClose }: { url: string; onClose: () => void }) {
 export default function FarmJournalPage() {
   const { t } = useLanguage();
   const { user } = useAuth();
-  const [entries, setEntries] = useState<JournalEntry[]>(initialEntries);
+  const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
+  const [farmPlots, setFarmPlots] = useState<FarmPlotOption[]>([]);
+
+  // Load real farm plots for the current user
+  useEffect(() => {
+    if (!user) return;
+    const supabase = createClient();
+    (async () => {
+      try {
+        // Resolve member id
+        const { data: m } = await supabase
+          .from('members')
+          .select('id')
+          .eq('profile_id', user.id)
+          .maybeSingle();
+        const memberId = m?.id;
+        let query = supabase.from('farm_plots').select('id, name, crop, variety');
+        if (memberId) query = query.eq('member_id', memberId);
+        const { data } = await query;
+        if (data) {
+          setFarmPlots(
+            data.map((p: any) => ({
+              id: p.id,
+              name: p.name || 'Unnamed Plot',
+              crop: p.crop || '',
+              variety: p.variety || '',
+            }))
+          );
+        }
+      } catch { /* leave empty */ }
+    })();
+  }, [user]);
 
   useEffect(() => {
     const supabase = createClient();
     const load = async () => {
       try {
+        // Resolve member id for current user
+        let memberId: string | null = null;
+        if (user) {
+          const { data: m } = await supabase
+            .from('members')
+            .select('id')
+            .eq('profile_id', user.id)
+            .maybeSingle();
+          memberId = m?.id || null;
+        }
         let query = supabase.from('farm_activities').select('*').order('date', { ascending: false });
-        if (user) query = query.eq('member_id', user.id);
+        if (memberId) query = query.eq('member_id', memberId);
+        else if (user) query = query.eq('member_id', user.id);
         const { data } = await query;
-        if (data && data.length > 0) {
+        if (data) {
           const mapped: JournalEntry[] = data.map((a: any) => ({
             id: a.id,
             date: a.date || a.created_at?.split('T')[0] || '',
@@ -810,9 +843,9 @@ export default function FarmJournalPage() {
             cost: a.cost || undefined,
             currency: a.currency || 'USD',
           }));
-          setEntries(mapped.length > 0 ? mapped : initialEntries);
+          setEntries(mapped);
         }
-      } catch { /* keep fallback */ }
+      } catch { /* leave empty */ }
       setDataLoading(false);
     };
     load();
@@ -851,8 +884,18 @@ export default function FarmJournalPage() {
     // Save to DB first
     const supabase = createClient();
     try {
+      // Resolve member id from auth user id
+      let memberId: string | null = user?.id || null;
+      if (user) {
+        const { data: m } = await supabase
+          .from('members')
+          .select('id')
+          .eq('profile_id', user.id)
+          .maybeSingle();
+        memberId = m?.id || user.id;
+      }
       await supabase.from('farm_activities').insert({
-        member_id: user?.id || null,
+        member_id: memberId,
         plot_id: entry.plotId || null,
         type: entry.type,
         date: entry.date,
@@ -892,6 +935,7 @@ export default function FarmJournalPage() {
         setPlotFilter={setPlotFilter}
         activityFilter={activityFilter}
         setActivityFilter={setActivityFilter}
+        farmPlots={farmPlots}
       />
 
       {/* ─── View Toggle: Timeline / Gallery ─── */}
@@ -973,6 +1017,7 @@ export default function FarmJournalPage() {
           <NewEntryForm
             onClose={() => setShowNewEntry(false)}
             onSave={handleSaveEntry}
+            farmPlots={farmPlots}
           />
         )}
       </AnimatePresence>

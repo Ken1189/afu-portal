@@ -63,6 +63,7 @@ import {
   type FarmerTier,
 } from '@/lib/farmer-tiers';
 import { MembershipProvider } from '@/lib/membership-context';
+import PortalSwitcherDropdown from '@/components/PortalSwitcherDropdown';
 
 // ── Icon Lookup ──────────────────────────────────────────────────────────
 const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -162,6 +163,23 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
       router.replace('/login?redirect=/farm');
     }
   }, [authLoading, user, router]);
+
+  // Role guard — only farmers/members can access /farm
+  useEffect(() => {
+    if (authLoading || !user || !profile?.role) return;
+    const role = profile.role as string;
+    const allowed = ['farmer', 'member'];
+    if (!allowed.includes(role)) {
+      const target =
+        role === 'admin' || role === 'super_admin' ? '/admin'
+        : role === 'supplier' ? '/supplier'
+        : role === 'partner' ? '/supplier'
+        : role === 'ambassador' ? '/ambassador'
+        : role === 'warehouse_operator' ? '/warehouse'
+        : '/dashboard';
+      router.replace(target);
+    }
+  }, [authLoading, user, profile?.role, router]);
 
   const handleTourComplete = useCallback(() => {
     setShowTour(false);
@@ -478,21 +496,8 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
         )}
 
         {/* Sidebar Footer */}
-        <div className="p-3 border-t border-gray-100 space-y-0.5">
-          <Link
-            href="/"
-            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors"
-          >
-            <ChevronLeft className="w-5 h-5" />
-            {t.common.backToPortal}
-          </Link>
-          <Link
-            href="/"
-            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors"
-          >
-            <ExternalLink className="w-5 h-5" />
-            AFU Home
-          </Link>
+        <div className="p-3 border-t border-gray-100">
+          <PortalSwitcherDropdown variant="light" />
         </div>
       </aside>
 
@@ -732,23 +737,8 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
                   </div>
                 )}
 
-                <div className="p-3 border-t border-gray-100 space-y-0.5">
-                  <Link
-                    href="/"
-                    onClick={() => setDrawerOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-500 active:bg-gray-50"
-                  >
-                    <ChevronLeft className="w-5 h-5" />
-                    {t.common.backToPortal}
-                  </Link>
-                  <Link
-                    href="/"
-                    onClick={() => setDrawerOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-500 active:bg-gray-50"
-                  >
-                    <ExternalLink className="w-5 h-5" />
-                    AFU Home
-                  </Link>
+                <div className="p-3 border-t border-gray-100">
+                  <PortalSwitcherDropdown variant="light" />
                 </div>
               </motion.aside>
             </>

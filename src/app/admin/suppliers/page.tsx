@@ -751,12 +751,14 @@ export default function AdminSuppliersPage() {
       )}
 
       {/* Edit */}
-      <button
+      <Link
+        href={`/admin/suppliers/${supplier.id}/edit`}
+        onClick={(e) => e.stopPropagation()}
         className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-[#1B2A4A] transition-colors"
         title="Edit"
       >
         <Pencil className="w-4 h-4" />
-      </button>
+      </Link>
     </div>
   );
 

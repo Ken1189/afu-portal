@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/lib/supabase/auth-context';
 import NotificationBell from '@/components/NotificationBell';
+import PortalSwitcherDropdown from '@/components/PortalSwitcherDropdown';
 
 const navLinks = [
   { href: '/investor', label: 'Dashboard', icon: LayoutDashboard },
@@ -189,23 +190,8 @@ export default function InvestorLayout({ children }: { children: React.ReactNode
           {renderNavLinks()}
         </nav>
 
-        <div className="p-3 border-t border-white/10 space-y-1">
-          <Link
-            href="/"
-            className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-colors"
-          >
-            <Home className="w-4 h-4" />
-            AFU Home
-          </Link>
-          {(serverRole === 'admin' || serverRole === 'super_admin') && (
-            <Link
-              href="/admin"
-              className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-colors"
-            >
-              <ExternalLink className="w-4 h-4" />
-              Admin Portal
-            </Link>
-          )}
+        <div className="p-3 border-t border-white/10 space-y-2">
+          <PortalSwitcherDropdown variant="dark" />
           <button
             onClick={async () => {
               const { createBrowserClient } = await import('@supabase/ssr');
@@ -254,25 +240,8 @@ export default function InvestorLayout({ children }: { children: React.ReactNode
               <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
                 {renderNavLinks(() => setMobileOpen(false))}
               </nav>
-              <div className="p-3 border-t border-white/10 space-y-1">
-                <Link
-                  href="/"
-                  onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-colors"
-                >
-                  <Home className="w-4 h-4" />
-                  AFU Home
-                </Link>
-                {(serverRole === 'admin' || serverRole === 'super_admin') && (
-                  <Link
-                    href="/admin"
-                    onClick={() => setMobileOpen(false)}
-                    className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-colors"
-                  >
-                    <ExternalLink className="w-4 h-4" />
-                    Admin Portal
-                  </Link>
-                )}
+              <div className="p-3 border-t border-white/10 space-y-2">
+                <PortalSwitcherDropdown variant="dark" />
                 <button
                   onClick={async () => {
                     const { createBrowserClient } = await import('@supabase/ssr');

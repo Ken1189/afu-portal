@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
+import PortalSwitcherDropdown from '@/components/PortalSwitcherDropdown';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/lib/supabase/auth-context';
 import { usePermissions, SIDEBAR_PERMISSION_MAP } from '@/lib/permissions';
@@ -969,6 +970,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         {/* User section + toggle at bottom */}
         <div className="border-t border-white/10">
+          {showLabels && (
+            <div className="p-3 border-b border-white/10">
+              <PortalSwitcherDropdown variant="dark" />
+            </div>
+          )}
           {/* User info */}
           <div
             className="flex items-center"
@@ -1116,7 +1122,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </nav>
 
               {/* Mobile user section */}
-              <div className="border-t border-white/10 p-3">
+              <div className="border-t border-white/10 p-3 space-y-3">
+                <PortalSwitcherDropdown variant="dark" />
                 <div className="flex items-center gap-2.5">
                   <div className="w-8 h-8 bg-[#5DB347] rounded-full flex items-center justify-center flex-shrink-0">
                     <span className="text-white text-xs font-bold">{initials}</span>

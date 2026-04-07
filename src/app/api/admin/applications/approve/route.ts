@@ -99,11 +99,12 @@ export async function POST(request: Request) {
     // S1.2: Assign role based on application type instead of hardcoding 'member'
     const ROLE_MAP: Record<string, string> = {
       farmer: 'farmer',
+      member: 'farmer',
       supplier: 'supplier',
       ambassador: 'ambassador',
       partner: 'partner',
     };
-    const assignedRole = ROLE_MAP[application.application_type] || 'member';
+    const assignedRole = ROLE_MAP[application.application_type] || 'farmer';
 
     // Generate a temporary password
     const tempPassword = `AFU-${crypto.randomBytes(12).toString('hex').toUpperCase()}`;

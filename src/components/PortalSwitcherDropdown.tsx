@@ -1,0 +1,164 @@
+'use client';
+
+import { useState, useEffect, useRef } from 'react';
+import {
+  ChevronDown,
+  Shield,
+  Tractor,
+  Store,
+  Megaphone,
+  TrendingUp,
+  Warehouse as WarehouseIcon,
+  Globe,
+  Check,
+} from 'lucide-react';
+import { useAuth } from '@/lib/supabase/auth-context';
+import { usePathname } from 'next/navigation';
+
+type Portal = {
+  key: string;
+  href: string;
+  label: string;
+  Icon: React.ComponentType<{ className?: string }>;
+  show: (roles: string[]) => boolean;
+};
+
+const ALL_PORTALS: Portal[] = [
+  {
+    key: 'admin',
+    href: '/admin',
+    label: 'Admin Portal',
+    Icon: Shield,
+    show: (r) => r.includes('admin') || r.includes('super_admin'),
+  },
+  {
+    key: 'farm',
+    href: '/farm',
+    label: 'Farmer Portal',
+    Icon: Tractor,
+    show: (r) =>
+      r.includes('farmer') ||
+      r.includes('member') ||
+      r.includes('admin') ||
+      r.includes('super_admin'),
+  },
+  {
+    key: 'supplier',
+    href: '/supplier',
+    label: 'Supplier Portal',
+    Icon: Store,
+    show: (r) => r.includes('supplier') || r.includes('admin') || r.includes('super_admin'),
+  },
+  {
+    key: 'ambassador',
+    href: '/ambassador',
+    label: 'Ambassador Portal',
+    Icon: Megaphone,
+    show: (r) =>
+      r.includes('ambassador') || r.includes('admin') || r.includes('super_admin'),
+  },
+  {
+    key: 'investor',
+    href: '/investor',
+    label: 'Investor Portal',
+    Icon: TrendingUp,
+    show: (r) => r.includes('investor') || r.includes('admin') || r.includes('super_admin'),
+  },
+  {
+    key: 'warehouse',
+    href: '/warehouse',
+    label: 'Warehouse Portal',
+    Icon: WarehouseIcon,
+    show: (r) =>
+      r.includes('warehouse_operator') ||
+      r.includes('admin') ||
+      r.includes('super_admin'),
+  },
+  {
+    key: 'public',
+    href: '/',
+    label: 'Public Site',
+    Icon: Globe,
+    show: () => true,
+  },
+];
+
+interface Props {
+  /** Visual variant: 'dark' for sidebars on dark bg, 'light' for white headers */
+  variant?: 'dark' | 'light';
+  /** Optional className override for the trigger button */
+  className?: string;
+}
+
+export default function PortalSwitcherDropdown({ variant = 'dark', className = '' }: Props) {
+  const { roles } = useAuth();
+  const pathname = usePathname();
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  // Close on outside click
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    if (open) document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [open]);
+
+  const available = ALL_PORTALS.filter((p) => p.show(roles || []));
+
+  // Determine the current portal from pathname
+  const currentPortal =
+    available.find((p) => p.key !== 'public' && pathname?.startsWith(p.href)) ||
+    available.find((p) => p.key === 'public');
+
+  const triggerColors =
+    variant === 'dark'
+      ? 'bg-white/10 hover:bg-white/15 text-white border-white/10'
+      : 'bg-gray-50 hover:bg-gray-100 text-[#1B2A4A] border-gray-200';
+
+  return (
+    <div ref={ref} className={`relative ${className}`}>
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className={`w-full flex items-center justify-between gap-2 px-4 py-2.5 rounded-lg text-sm font-medium border transition-colors ${triggerColors}`}
+      >
+        <span className="flex items-center gap-2 min-w-0">
+          {currentPortal && <currentPortal.Icon className="w-4 h-4 flex-shrink-0" />}
+          <span className="truncate">Switch Portal</span>
+        </span>
+        <ChevronDown
+          className={`w-4 h-4 flex-shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}
+        />
+      </button>
+
+      {open && (
+        <div className="absolute bottom-full left-0 right-0 mb-2 bg-white rounded-lg shadow-2xl border border-gray-200 overflow-hidden z-50">
+          <div className="py-1 max-h-[60vh] overflow-y-auto">
+            {available.map((p) => {
+              const isCurrent = currentPortal?.key === p.key;
+              return (
+                <a
+                  key={p.key}
+                  href={p.href}
+                  className={`flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
+                    isCurrent
+                      ? 'bg-[#5DB347]/10 text-[#449933] font-semibold'
+                      : 'text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  <p.Icon className="w-4 h-4 flex-shrink-0" />
+                  <span className="flex-1 truncate">{p.label}</span>
+                  {isCurrent && <Check className="w-4 h-4 text-[#5DB347]" />}
+                </a>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

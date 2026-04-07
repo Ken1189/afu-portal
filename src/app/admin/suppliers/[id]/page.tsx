@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -68,10 +68,11 @@ const fadeUp = {
 
 // ── Helpers ───────────────────────────────────────────────────────────────
 
-function formatCurrency(value: number): string {
-  if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
-  if (value >= 1_000) return `$${(value / 1_000).toFixed(0)}K`;
-  return `$${value.toLocaleString()}`;
+function formatCurrency(value: number | null | undefined): string {
+  const v = Number(value) || 0;
+  if (v >= 1_000_000) return `$${(v / 1_000_000).toFixed(1)}M`;
+  if (v >= 1_000) return `$${(v / 1_000).toFixed(0)}K`;
+  return `$${v.toLocaleString()}`;
 }
 
 const categoryLabels: Record<SupplierCategory, string> = {
@@ -126,9 +127,9 @@ function RatingStars({ rating, size = 'sm' }: { rating: number; size?: 'sm' | 'm
 
 // ── Mock data generators ──────────────────────────────────────────────────
 
-function generateMonthlySales(totalSales: number) {
+function generateMonthlySales(totalSales: number | null | undefined) {
   const months = ['Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
-  const base = totalSales / 12;
+  const base = (Number(totalSales) || 0) / 12;
   return months.map((month, i) => ({
     month,
     sales: Math.round(base * (0.6 + Math.random() * 0.8) * (1 + i * 0.03)),
@@ -136,7 +137,7 @@ function generateMonthlySales(totalSales: number) {
   }));
 }
 
-function generateProducts(category: SupplierCategory, count: number) {
+function generateProducts(category: SupplierCategory | null | undefined, count: number) {
   const productNames: Record<SupplierCategory, string[]> = {
     'input-supplier': [
       'Hybrid Maize Seed 25kg', 'NPK Fertilizer 50kg', 'Organic Compost Blend', 'Foliar Spray 5L',
@@ -167,7 +168,9 @@ function generateProducts(category: SupplierCategory, count: number) {
     ],
   };
 
-  const names = productNames[category];
+  const safeCategory: SupplierCategory = category && category in productNames ? category : 'input-supplier';
+  const names = productNames[safeCategory];
+  const safeCount = Number.isFinite(count) && count > 0 ? count : 0;
   const images = [
     'https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=300&h=200&fit=crop',
     'https://images.unsplash.com/photo-1530267981375-f0de937f5f13?w=300&h=200&fit=crop',
@@ -179,7 +182,7 @@ function generateProducts(category: SupplierCategory, count: number) {
     'https://images.unsplash.com/photo-1504370805625-d32c54b16100?w=300&h=200&fit=crop',
   ];
 
-  return Array.from({ length: Math.min(count, names.length) }).map((_, i) => {
+  return Array.from({ length: Math.min(safeCount, names.length) }).map((_, i) => {
     const price = Math.round((50 + Math.random() * 500) * 10) / 10;
     const discountPct = 5 + Math.floor(Math.random() * 15);
     return {
@@ -195,13 +198,15 @@ function generateProducts(category: SupplierCategory, count: number) {
   });
 }
 
-function generateCommissionHistory(commissionRate: number, totalSales: number) {
+function generateCommissionHistory(commissionRate: number | null | undefined, totalSales: number | null | undefined) {
   const months = [
     'Oct 2025', 'Nov 2025', 'Dec 2025', 'Jan 2026', 'Feb 2026', 'Mar 2026',
   ];
+  const safeTotal = Number(totalSales) || 0;
+  const safeRate = Number(commissionRate) || 0;
   return months.map((month, i) => {
-    const sales = Math.round((totalSales / 12) * (0.7 + Math.random() * 0.6));
-    const rate = commissionRate;
+    const sales = Math.round((safeTotal / 12) * (0.7 + Math.random() * 0.6));
+    const rate = safeRate;
     const commission = Math.round(sales * (rate / 100));
     return {
       month,
@@ -279,23 +284,40 @@ const tabs: { key: TabKey; label: string; icon: React.ReactNode }[] = [
 
 export default function SupplierDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const id = params.id as string;
   const [supplier, setSupplier] = useState<SupplierRow | null>(null);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabKey>('overview');
 
   // Fetch supplier from Supabase
   useEffect(() => {
-    const supabase = createClient();
-    supabase
-      .from('suppliers')
-      .select('*')
-      .eq('id', id)
-      .single()
-      .then(({ data, error }) => {
-        if (!error && data) setSupplier(data as SupplierRow);
-        setLoading(false);
-      });
+    let cancelled = false;
+    (async () => {
+      try {
+        const supabase = createClient();
+        const { data, error } = await supabase
+          .from('suppliers')
+          .select('*')
+          .eq('id', id)
+          .maybeSingle();
+        if (cancelled) return;
+        if (error) {
+          console.error('[admin/suppliers/[id]] supabase error:', error);
+          setFetchError(error.message);
+          setSupplier(null);
+        } else {
+          setSupplier((data as SupplierRow) || null);
+        }
+      } catch (err) {
+        console.error('[admin/suppliers/[id]] exception:', err);
+        if (!cancelled) setFetchError(err instanceof Error ? err.message : 'Unknown error');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
   }, [id]);
 
   // Generate data based on supplier
@@ -328,9 +350,11 @@ export default function SupplierDetailPage() {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center">
         <Package className="w-12 h-12 text-gray-300 mb-4" />
-        <h2 className="text-xl font-bold text-navy mb-2">Supplier Not Found</h2>
+        <h2 className="text-xl font-bold text-navy mb-2">
+          {fetchError ? 'Error Loading Supplier' : 'Supplier Not Found'}
+        </h2>
         <p className="text-sm text-gray-500 mb-4">
-          No supplier exists with ID &quot;{id}&quot;
+          {fetchError ? fetchError : `No supplier exists with ID "${id}"`}
         </p>
         <Link
           href="/admin/suppliers"
@@ -394,11 +418,11 @@ export default function SupplierDetailPage() {
               </div>
               <p className="text-sm text-gray-500 mt-1">{supplier.contact_name}</p>
               <div className="flex flex-wrap items-center gap-3 mt-2">
-                <span className={`inline-block text-xs px-2.5 py-0.5 rounded-full font-medium ${categoryColors[supplier.category]}`}>
-                  {categoryLabels[supplier.category]}
+                <span className={`inline-block text-xs px-2.5 py-0.5 rounded-full font-medium ${categoryColors[supplier.category] || 'bg-gray-100 text-gray-700'}`}>
+                  {categoryLabels[supplier.category] || supplier.category || 'Uncategorized'}
                 </span>
-                <span className={`inline-flex items-center gap-1 text-xs px-2.5 py-0.5 rounded-full font-medium ${statusColors[supplier.status]}`}>
-                  {supplier.status.charAt(0).toUpperCase() + supplier.status.slice(1)}
+                <span className={`inline-flex items-center gap-1 text-xs px-2.5 py-0.5 rounded-full font-medium ${statusColors[supplier.status] || 'bg-gray-100 text-gray-700'}`}>
+                  {supplier.status ? supplier.status.charAt(0).toUpperCase() + supplier.status.slice(1) : 'Unknown'}
                 </span>
                 {supplier.sponsorship_tier && (
                   <span className={`inline-block text-xs px-2.5 py-0.5 rounded-full font-medium ${tierColors[supplier.sponsorship_tier]}`}>
@@ -411,9 +435,9 @@ export default function SupplierDetailPage() {
                 </span>
               </div>
               <div className="flex items-center gap-2 mt-2">
-                <RatingStars rating={supplier.rating} size="md" />
-                <span className="text-sm font-medium text-navy">{supplier.rating.toFixed(1)}</span>
-                <span className="text-xs text-gray-400">({supplier.review_count} reviews)</span>
+                <RatingStars rating={Number(supplier.rating) || 0} size="md" />
+                <span className="text-sm font-medium text-navy">{(Number(supplier.rating) || 0).toFixed(1)}</span>
+                <span className="text-xs text-gray-400">({supplier.review_count ?? 0} reviews)</span>
               </div>
             </div>
           </div>
@@ -422,7 +446,7 @@ export default function SupplierDetailPage() {
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-3 lg:w-72">
             <div className="bg-cream rounded-lg p-3 text-center">
               <p className="text-xs text-gray-500">Products</p>
-              <p className="text-lg font-bold text-navy">{supplier.products_count}</p>
+              <p className="text-lg font-bold text-navy">{supplier.products_count ?? 0}</p>
             </div>
             <div className="bg-cream rounded-lg p-3 text-center">
               <p className="text-xs text-gray-500">Total Sales</p>
@@ -430,18 +454,22 @@ export default function SupplierDetailPage() {
             </div>
             <div className="bg-cream rounded-lg p-3 text-center">
               <p className="text-xs text-gray-500">Orders</p>
-              <p className="text-lg font-bold text-navy">{supplier.total_orders.toLocaleString()}</p>
+              <p className="text-lg font-bold text-navy">{(Number(supplier.total_orders) || 0).toLocaleString()}</p>
             </div>
             <div className="bg-cream rounded-lg p-3 text-center">
               <p className="text-xs text-gray-500">Commission</p>
-              <p className="text-lg font-bold text-navy">{supplier.commission_rate}%</p>
+              <p className="text-lg font-bold text-navy">{supplier.commission_rate ?? 0}%</p>
             </div>
           </div>
         </div>
 
         {/* Admin Actions */}
         <div className="flex flex-wrap gap-2 mt-5 pt-5 border-t border-gray-100">
-          <button className="inline-flex items-center gap-1.5 px-4 py-2 bg-navy hover:bg-navy/90 text-white rounded-lg text-sm font-medium transition-colors">
+          <button
+            type="button"
+            onClick={() => router.push(`/admin/suppliers/${id}/edit`)}
+            className="inline-flex items-center gap-1.5 px-4 py-2 bg-navy hover:bg-navy/90 text-white rounded-lg text-sm font-medium transition-colors"
+          >
             <Pencil className="w-3.5 h-3.5" />
             Edit Profile
           </button>
@@ -560,11 +588,13 @@ export default function SupplierDetailPage() {
                         <div>
                           <p className="text-xs text-gray-400">Joined</p>
                           <p className="text-sm text-navy">
-                            {new Date(supplier.join_date).toLocaleDateString('en-US', {
-                              year: 'numeric',
-                              month: 'long',
-                              day: 'numeric',
-                            })}
+                            {supplier.join_date
+                              ? new Date(supplier.join_date).toLocaleDateString('en-US', {
+                                  year: 'numeric',
+                                  month: 'long',
+                                  day: 'numeric',
+                                })
+                              : '—'}
                           </p>
                         </div>
                       </div>
@@ -600,7 +630,7 @@ export default function SupplierDetailPage() {
                     {/* Certifications */}
                     <div>
                       <h3 className="font-semibold text-navy text-sm mb-2">Certifications</h3>
-                      {supplier.certifications.length > 0 ? (
+                      {supplier.certifications && supplier.certifications.length > 0 ? (
                         <div className="flex flex-wrap gap-2">
                           {supplier.certifications.map((cert, i) => (
                             <span

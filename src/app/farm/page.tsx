@@ -385,53 +385,41 @@ export default function FarmDashboardPage() {
   const { activities: liveActivities } = useFarmActivities();
   const { transactions: liveTransactions, income: liveIncome, expenses: liveExpenses } = useFarmTransactions(user?.id);
 
-  const farmPlots = livePlots.length > 0 ? livePlots.map(adaptFarmPlot) : FALLBACK_FARM_PLOTS;
+  const farmPlots = livePlots.map(adaptFarmPlot);
 
-  const farmActivities: FarmActivity[] = liveActivities.length > 0
-    ? liveActivities.map((a) => ({
-        id: a.id,
-        plotId: a.plot_id || '',
-        plotName: '',
-        type: a.type as ActivityType,
-        date: a.date,
-        time: '',
-        description: a.description || '',
-        cost: a.cost || undefined,
-        currency: a.currency || 'USD',
-      }))
-    : FALLBACK_FARM_ACTIVITIES;
+  const farmActivities: FarmActivity[] = liveActivities.map((a) => ({
+    id: a.id,
+    plotId: a.plot_id || '',
+    plotName: '',
+    type: a.type as ActivityType,
+    date: a.date,
+    time: '',
+    description: a.description || '',
+    cost: a.cost || undefined,
+    currency: a.currency || 'USD',
+  }));
 
   const summary = useMemo(() => {
-    if (livePlots.length > 0 || liveTransactions.length > 0) {
-      const totalHectares = farmPlots.reduce((sum, p) => sum + p.size, 0);
-      const avgHealthScore = farmPlots.length
-        ? Math.round(farmPlots.reduce((sum, p) => sum + p.healthScore, 0) / farmPlots.length)
-        : 0;
-      const pendingTasks = initialFarmTasks.filter(t => !t.completed).length;
-      const highPriorityTasks = initialFarmTasks.filter(t => !t.completed && t.priority === 'high').length;
-      return {
-        totalIncome: liveIncome,
-        totalExpenses: liveExpenses,
-        profit: liveIncome - liveExpenses,
-        totalHectares,
-        avgHealthScore,
-        pendingTasks,
-        highPriorityTasks,
-        plotCount: farmPlots.length,
-      };
-    }
-    return getFallbackFarmSummary();
-  }, [livePlots, liveTransactions, farmPlots, liveIncome, liveExpenses]);
+    const totalHectares = farmPlots.reduce((sum, p) => sum + p.size, 0);
+    const avgHealthScore = farmPlots.length
+      ? Math.round(farmPlots.reduce((sum, p) => sum + p.healthScore, 0) / farmPlots.length)
+      : 0;
+    return {
+      totalIncome: liveIncome,
+      totalExpenses: liveExpenses,
+      profit: liveIncome - liveExpenses,
+      totalHectares,
+      avgHealthScore,
+      pendingTasks: 0,
+      highPriorityTasks: 0,
+      plotCount: farmPlots.length,
+    };
+  }, [farmPlots, liveIncome, liveExpenses]);
 
   const today = weatherForecast[0];
 
-  // Task completion state
-  const [tasks, setTasks] = useState<FarmTask[]>(() =>
-    [...initialFarmTasks].sort((a, b) => {
-      const order = { high: 0, medium: 1, low: 2 };
-      return order[a.priority] - order[b.priority];
-    })
-  );
+  // Task completion state — start empty; real tasks will come from DB
+  const [tasks, setTasks] = useState<FarmTask[]>([]);
 
   const toggleTask = (id: string) => {
     setTasks((prev) =>
