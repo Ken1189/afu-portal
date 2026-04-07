@@ -50,6 +50,36 @@ export default function CarbonMarketplacePage() {
   const [credits, setCredits] = useState<CarbonCredit[]>([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState(demoStats);
+  const [chrome, setChrome] = useState<Record<string, unknown> | null>(null);
+
+  useEffect(() => {
+    async function fetchChrome() {
+      try {
+        const { data } = await supabase
+          .from('site_config')
+          .select('value')
+          .eq('key', 'page_chrome_carbon')
+          .single();
+        if (data?.value) {
+          const parsed = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
+          if (parsed && typeof parsed === 'object') setChrome(parsed);
+        }
+      } catch { /* keep fallback */ }
+    }
+    fetchChrome();
+  }, [supabase]);
+
+  const heroBadge = (chrome?.hero_badge as string) ?? 'AFU Carbon Credit Marketplace';
+  const heroTitle = (chrome?.hero_title as string) ?? null;
+  const heroSubtitle = (chrome?.hero_subtitle as string) ?? 'Support smallholder farmers across Africa while achieving your sustainability goals. Every credit directly funds regenerative farming practices.';
+  const statLabels = (chrome?.stat_labels as string[]) ?? ['Credits Available', 'Countries', 'Farmers Enrolled', 'CO\u2082 Offset (tonnes)'];
+  const howSectionTitle = (chrome?.how_section_title as string) ?? 'How Carbon Credits Help African Farmers';
+  const howSectionBody = (chrome?.how_section_body as string) ?? 'When you purchase carbon credits through AFU, you directly fund sustainable agriculture practices that improve farmer livelihoods, protect biodiversity, and build climate resilience across Africa.';
+  const impactItems = (chrome?.impact_items as { title: string; body: string }[]) ?? [
+    { title: '70% to Farmers', body: 'Revenue goes directly to participating smallholder farmers' },
+    { title: 'Verified Impact', body: 'All credits are verified by Verra or Gold Standard registries' },
+    { title: 'Co-Benefits', body: 'Projects deliver biodiversity, water, and community benefits beyond carbon' },
+  ];
 
   // Filters
   const [searchQuery, setSearchQuery] = useState('');
@@ -204,13 +234,15 @@ export default function CarbonMarketplacePage() {
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center max-w-3xl mx-auto">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#5DB347]/20 text-[#5DB347] text-sm font-medium mb-6">
               <Leaf className="w-4 h-4" />
-              AFU Carbon Credit Marketplace
+              {heroBadge}
             </div>
             <h1 className="text-3xl md:text-5xl font-bold text-white mb-4 leading-tight">
-              Offset Your Carbon Footprint with <span style={{ color: '#5DB347' }}>African Agriculture</span>
+              {heroTitle ?? (
+                <>Offset Your Carbon Footprint with <span style={{ color: '#5DB347' }}>African Agriculture</span></>
+              )}
             </h1>
             <p className="text-lg text-gray-300 mb-8">
-              Support smallholder farmers across Africa while achieving your sustainability goals. Every credit directly funds regenerative farming practices.
+              {heroSubtitle}
             </p>
           </motion.div>
         </div>
@@ -221,10 +253,10 @@ export default function CarbonMarketplacePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[
-              { label: 'Credits Available', value: stats.totalCredits.toLocaleString(), icon: Award, color: '#5DB347' },
-              { label: 'Countries', value: stats.countries, icon: Globe, color: '#6366F1' },
-              { label: 'Farmers Enrolled', value: stats.farmersEnrolled.toLocaleString(), icon: Users, color: '#F59E0B' },
-              { label: 'CO\u2082 Offset (tonnes)', value: stats.co2Offset.toLocaleString(), icon: TreePine, color: '#10B981' },
+              { label: statLabels[0] ?? 'Credits Available', value: stats.totalCredits.toLocaleString(), icon: Award, color: '#5DB347' },
+              { label: statLabels[1] ?? 'Countries', value: stats.countries, icon: Globe, color: '#6366F1' },
+              { label: statLabels[2] ?? 'Farmers Enrolled', value: stats.farmersEnrolled.toLocaleString(), icon: Users, color: '#F59E0B' },
+              { label: statLabels[3] ?? 'CO\u2082 Offset (tonnes)', value: stats.co2Offset.toLocaleString(), icon: TreePine, color: '#10B981' },
             ].map(s => (
               <div key={s.label} className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${s.color}15` }}>
@@ -365,15 +397,15 @@ export default function CarbonMarketplacePage() {
         {/* Impact Section */}
         <div className="mt-16 rounded-2xl bg-gradient-to-br from-[#1B2A4A] to-[#0F1A30] p-8 md:p-12 text-white">
           <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">How Carbon Credits Help African Farmers</h2>
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">{howSectionTitle}</h2>
             <p className="text-gray-300 mb-8">
-              When you purchase carbon credits through AFU, you directly fund sustainable agriculture practices that improve farmer livelihoods, protect biodiversity, and build climate resilience across Africa.
+              {howSectionBody}
             </p>
             <div className="grid md:grid-cols-3 gap-6">
               {[
-                { icon: Users, title: '70% to Farmers', desc: 'Revenue goes directly to participating smallholder farmers' },
-                { icon: TreePine, title: 'Verified Impact', desc: 'All credits are verified by Verra or Gold Standard registries' },
-                { icon: Heart, title: 'Co-Benefits', desc: 'Projects deliver biodiversity, water, and community benefits beyond carbon' },
+                { icon: Users, title: impactItems[0]?.title ?? '70% to Farmers', desc: impactItems[0]?.body ?? 'Revenue goes directly to participating smallholder farmers' },
+                { icon: TreePine, title: impactItems[1]?.title ?? 'Verified Impact', desc: impactItems[1]?.body ?? 'All credits are verified by Verra or Gold Standard registries' },
+                { icon: Heart, title: impactItems[2]?.title ?? 'Co-Benefits', desc: impactItems[2]?.body ?? 'Projects deliver biodiversity, water, and community benefits beyond carbon' },
               ].map(item => (
                 <div key={item.title} className="text-center">
                   <div className="w-12 h-12 rounded-xl bg-[#5DB347]/20 flex items-center justify-center mx-auto mb-3">

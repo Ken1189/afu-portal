@@ -76,6 +76,7 @@ export default function FaqPage() {
   const [faqs, setFaqs] = useState<FaqItem[]>(FALLBACK_FAQ);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [chrome, setChrome] = useState<Record<string, string> | null>(null);
 
   useEffect(() => {
     async function fetchFaqs() {
@@ -104,7 +105,32 @@ export default function FaqPage() {
       }
     }
     fetchFaqs();
+
+    async function fetchChrome() {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from('site_config')
+          .select('value')
+          .eq('key', 'page_chrome_faq')
+          .single();
+        if (data?.value) {
+          const parsed = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
+          if (parsed && typeof parsed === 'object') setChrome(parsed);
+        }
+      } catch {
+        // keep fallback
+      }
+    }
+    fetchChrome();
   }, []);
+
+  const heroBadge = chrome?.hero_badge ?? 'Help Centre';
+  const heroTitle = chrome?.hero_title ?? 'Frequently Asked Questions';
+  const heroSubtitle = chrome?.hero_subtitle ?? 'Everything you need to know about joining and using the African Farming Union platform.';
+  const ctaTitle = chrome?.cta_title ?? 'Still have questions?';
+  const ctaBody = chrome?.cta_body ?? 'Our team is here to help. Reach out and we will get back to you within 24 hours.';
+  const ctaButton = chrome?.cta_button ?? 'Contact Us';
 
   const toggle = (id: string) => {
     setExpandedId(expandedId === id ? null : id);
@@ -120,13 +146,13 @@ export default function FaqPage() {
         <div className="max-w-7xl mx-auto text-center relative z-10">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 text-white/80 text-sm font-medium mb-6">
             <HelpCircle className="w-4 h-4" />
-            Help Centre
+            {heroBadge}
           </div>
           <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-4 tracking-tight">
-            Frequently Asked Questions
+            {heroTitle}
           </h1>
           <p className="text-lg text-white/70 max-w-2xl mx-auto">
-            Everything you need to know about joining and using the African Farming Union platform.
+            {heroSubtitle}
           </p>
         </div>
       </section>
@@ -181,17 +207,17 @@ export default function FaqPage() {
         <div className="mt-12 text-center bg-white rounded-xl border border-gray-100 shadow-sm p-8">
           <MessageCircle className="w-10 h-10 text-[#5DB347] mx-auto mb-3" />
           <h3 className="text-lg font-bold text-[#1B2A4A] mb-2">
-            Still have questions?
+            {ctaTitle}
           </h3>
           <p className="text-gray-500 text-sm mb-4">
-            Our team is here to help. Reach out and we will get back to you within 24 hours.
+            {ctaBody}
           </p>
           <Link
             href="/contact"
             className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-white font-semibold text-sm transition-all hover:shadow-lg hover:shadow-[#5DB347]/30 hover:-translate-y-0.5"
             style={{ background: 'linear-gradient(135deg, #5DB347, #449933)' }}
           >
-            Contact Us
+            {ctaButton}
           </Link>
         </div>
       </section>

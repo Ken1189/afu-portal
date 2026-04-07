@@ -241,6 +241,7 @@ export default function AmbassadorsPage() {
 
   // Commission rates from site_config
   const [commissionRates, setCommissionRates] = useState<CommissionRate[]>(DEFAULT_COMMISSION_RATES);
+  const [chrome, setChrome] = useState<Record<string, unknown> | null>(null);
 
   // Apply form state
   const applyFormRef = useRef<HTMLDivElement>(null);
@@ -325,10 +326,39 @@ export default function AmbassadorsPage() {
         // keep defaults
       }
 
+      // Fetch page chrome from site_config
+      try {
+        const { data: chromeData } = await supabase
+          .from('site_config')
+          .select('value')
+          .eq('key', 'page_chrome_ambassadors')
+          .single();
+        if (chromeData?.value) {
+          const parsed = typeof chromeData.value === 'string' ? JSON.parse(chromeData.value) : chromeData.value;
+          if (parsed && typeof parsed === 'object') setChrome(parsed);
+        }
+      } catch {
+        // keep defaults
+      }
+
       setLoading(false);
     }
     init();
   }, []);
+
+  const heroBadge = (chrome?.hero_badge as string) ?? 'Ambassador Program';
+  const heroTitle = (chrome?.hero_title as string) ?? null;
+  const heroSubtitle = (chrome?.hero_subtitle as string) ?? "Earn commissions by connecting farmers, suppliers, and investors to Africa's largest agricultural platform";
+  const heroCtaText = (chrome?.hero_cta_text as string) ?? 'Apply Now';
+  const stat1Value = (chrome?.stat1_value as string) ?? '500+';
+  const stat1Label = (chrome?.stat1_label as string) ?? 'Ambassadors';
+  const stat2Value = (chrome?.stat2_value as string) ?? '20';
+  const stat2Label = (chrome?.stat2_label as string) ?? 'Countries';
+  const stat3Value = (chrome?.stat3_value as string) ?? '15%';
+  const stat3Label = (chrome?.stat3_label as string) ?? 'Earn Up To';
+  const howItWorksTitle = (chrome?.how_it_works_title as string) ?? 'How It Works';
+  const tiersTitle = (chrome?.tiers_title as string) ?? 'Ambassador Tiers';
+  const applyTitle = (chrome?.apply_title as string) ?? 'Apply to Become an Ambassador';
 
   const filtered = useMemo(() => {
     if (activeSector === 'All') return ambassadors;
@@ -447,16 +477,15 @@ export default function AmbassadorsPage() {
         <div className="max-w-7xl mx-auto text-center relative z-10">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#5DB347]/20 text-[#5DB347] text-sm font-semibold mb-6 border border-[#5DB347]/30">
             <Award className="w-4 h-4" />
-            Ambassador Program
+            {heroBadge}
           </div>
 
           <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-6 tracking-tight leading-tight">
-            Become an AFU<br />Ambassador
+            {heroTitle ?? (<>Become an AFU<br />Ambassador</>)}
           </h1>
 
           <p className="text-lg md:text-xl text-white/70 max-w-3xl mx-auto mb-10 leading-relaxed">
-            Earn commissions by connecting farmers, suppliers, and investors to
-            Africa&apos;s largest agricultural platform
+            {heroSubtitle}
           </p>
 
           <button
@@ -464,7 +493,7 @@ export default function AmbassadorsPage() {
             className="inline-flex items-center gap-2 px-8 py-4 rounded-xl text-white font-bold text-lg transition-all hover:shadow-xl hover:shadow-[#5DB347]/30 hover:-translate-y-0.5 active:translate-y-0"
             style={{ background: 'linear-gradient(135deg, #5DB347, #449933)' }}
           >
-            Apply Now
+            {heroCtaText}
             <ArrowRight className="w-5 h-5" />
           </button>
 
@@ -473,25 +502,25 @@ export default function AmbassadorsPage() {
             <div className="text-center">
               <div className="flex items-center justify-center gap-2 text-white font-bold text-2xl md:text-3xl">
                 <Users className="w-6 h-6 text-[#5DB347]" />
-                500+
+                {stat1Value}
               </div>
-              <p className="text-white/50 text-sm mt-1">Ambassadors</p>
+              <p className="text-white/50 text-sm mt-1">{stat1Label}</p>
             </div>
             <div className="w-px h-10 bg-white/10 hidden md:block" />
             <div className="text-center">
               <div className="flex items-center justify-center gap-2 text-white font-bold text-2xl md:text-3xl">
                 <Globe className="w-6 h-6 text-[#5DB347]" />
-                20
+                {stat2Value}
               </div>
-              <p className="text-white/50 text-sm mt-1">Countries</p>
+              <p className="text-white/50 text-sm mt-1">{stat2Label}</p>
             </div>
             <div className="w-px h-10 bg-white/10 hidden md:block" />
             <div className="text-center">
               <div className="flex items-center justify-center gap-2 text-white font-bold text-2xl md:text-3xl">
                 <TrendingUp className="w-6 h-6 text-[#5DB347]" />
-                15%
+                {stat3Value}
               </div>
-              <p className="text-white/50 text-sm mt-1">Earn Up To</p>
+              <p className="text-white/50 text-sm mt-1">{stat3Label}</p>
             </div>
           </div>
         </div>
@@ -504,7 +533,7 @@ export default function AmbassadorsPage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-14">
             <h2 className="text-3xl md:text-4xl font-extrabold text-[#1B2A4A] mb-4">
-              How It Works
+              {howItWorksTitle}
             </h2>
             <p className="text-gray-500 max-w-2xl mx-auto">
               Start earning in four simple steps. No experience required.
@@ -586,7 +615,7 @@ export default function AmbassadorsPage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-14">
             <h2 className="text-3xl md:text-4xl font-extrabold text-[#1B2A4A] mb-4">
-              Ambassador Tiers
+              {tiersTitle}
             </h2>
             <p className="text-gray-500 max-w-2xl mx-auto">
               The more you grow, the more you earn. Advance through tiers as you bring new members to AFU.
@@ -818,7 +847,7 @@ export default function AmbassadorsPage() {
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-10">
             <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4">
-              Apply to Become an Ambassador
+              {applyTitle}
             </h2>
             <p className="text-white/60 max-w-xl mx-auto">
               Join our network of ambassadors across Africa and start earning commissions today.

@@ -17,6 +17,7 @@ const FALLBACK_CONTACT = {
 export default function ContactPage() {
   const searchParams = useSearchParams();
   const [contactInfo, setContactInfo] = useState(FALLBACK_CONTACT);
+  const [chrome, setChrome] = useState<Record<string, unknown> | null>(null);
 
   // Fetch contact info from site_config
   useEffect(() => {
@@ -39,7 +40,32 @@ export default function ContactPage() {
       }
     }
     fetchContactInfo();
+
+    async function fetchChrome() {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from('site_config')
+          .select('value')
+          .eq('key', 'page_chrome_contact')
+          .single();
+        if (data?.value) {
+          const parsed = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
+          if (parsed && typeof parsed === 'object') setChrome(parsed);
+        }
+      } catch {
+        // keep fallback
+      }
+    }
+    fetchChrome();
   }, []);
+
+  const heroTitle = (chrome?.hero_title as string) ?? 'Contact Us';
+  const heroSubtitle = (chrome?.hero_subtitle as string) ?? 'Have questions about AFU? Want to explore partnership opportunities? Get in touch.';
+  const infoCardLabels = (chrome?.info_card_labels as string[]) ?? ['Headquarters', 'Email', 'Operations'];
+  const formTitle = (chrome?.form_title as string) ?? 'Get in Touch';
+  const successTitle = (chrome?.success_title as string) ?? 'Message Sent!';
+  const successBody = (chrome?.success_body as string) ?? 'Thank you for reaching out. Our team will get back to you within 48 hours.';
 
   const [honeypot, setHoneypot] = useState("");
   const [formData, setFormData] = useState({
@@ -160,9 +186,9 @@ export default function ContactPage() {
     <>
       <section className="bg-navy text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-[#5DB347] to-[#6ABF4B] bg-clip-text text-transparent">Contact Us</h1>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-[#5DB347] to-[#6ABF4B] bg-clip-text text-transparent">{heroTitle}</h1>
           <p className="text-xl text-gray-300 max-w-3xl">
-            Have questions about AFU? Want to explore partnership opportunities? Get in touch.
+            {heroSubtitle}
           </p>
         </div>
       </section>
@@ -172,7 +198,7 @@ export default function ContactPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* Contact Info */}
             <div className="space-y-6">
-              <h2 className="text-2xl font-bold text-[#1B2A4A] mb-6">Get in Touch</h2>
+              <h2 className="text-2xl font-bold text-[#1B2A4A] mb-6">{formTitle}</h2>
 
               {/* HQ Card */}
               <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg shadow-[#5DB347]/5 border border-white/60 hover:-translate-y-1 hover:shadow-xl transition-all duration-300">
@@ -184,7 +210,7 @@ export default function ContactPage() {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-[#1B2A4A]">Headquarters</h3>
+                    <h3 className="font-semibold text-[#1B2A4A]">{infoCardLabels[0] ?? 'Headquarters'}</h3>
                     <p className="text-gray-500 text-sm">{contactInfo.hq_city}, {contactInfo.hq_country}</p>
                   </div>
                 </div>
@@ -199,7 +225,7 @@ export default function ContactPage() {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-[#1B2A4A]">Email</h3>
+                    <h3 className="font-semibold text-[#1B2A4A]">{infoCardLabels[1] ?? 'Email'}</h3>
                     <p className="text-gray-500 text-sm">{contactInfo.primary_email}</p>
                   </div>
                 </div>
@@ -214,7 +240,7 @@ export default function ContactPage() {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-[#1B2A4A]">Operations</h3>
+                    <h3 className="font-semibold text-[#1B2A4A]">{infoCardLabels[2] ?? 'Operations'}</h3>
                     <p className="text-gray-500 text-sm">{contactInfo.operations}</p>
                   </div>
                 </div>
@@ -228,8 +254,8 @@ export default function ContactPage() {
                   <svg className="w-16 h-16 text-[#5DB347] mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <h3 className="text-2xl font-bold text-[#1B2A4A] mb-2">Message Sent!</h3>
-                  <p className="text-gray-600">Thank you for reaching out. Our team will get back to you within 48 hours.</p>
+                  <h3 className="text-2xl font-bold text-[#1B2A4A] mb-2">{successTitle}</h3>
+                  <p className="text-gray-600">{successBody}</p>
                 </div>
               ) : (
                 <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 md:p-10 shadow-lg shadow-[#5DB347]/5 border border-white/60">

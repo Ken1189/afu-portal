@@ -3,12 +3,12 @@
 /**
  * EditableServicePage
  *
- * Renders a public service-page layout (hero + features + how-it-works + CTA)
+ * Renders a public service-page layout (hero + features + how-it-works + stats + CTA)
  * from a config object. On mount it tries to fetch site_config[`service_<slug>`]
  * and if found, overrides any fields the admin has set. The hardcoded
  * `fallback` prop is always rendered first, so the page is never blank.
  *
- * Each of the 5 service pages becomes a thin wrapper:
+ * Each service page becomes a thin wrapper:
  *
  *     <EditableServicePage slug="financing" fallback={DEFAULTS} />
  */
@@ -32,12 +32,19 @@ export interface ServiceHowItWorksStep {
   description: string;
 }
 
+export interface ServiceStat {
+  value: string;
+  label: string;
+  sub?: string;
+}
+
 export interface ServicePageConfig {
   hero_title: string;
   hero_subtitle: string;
   hero_image?: string;
   features: ServiceFeature[];
   how_it_works: ServiceHowItWorksStep[];
+  stats?: ServiceStat[];
   cta_text: string;
   cta_link: string;
 }
@@ -79,6 +86,10 @@ export default function EditableServicePage({
               Array.isArray(v.how_it_works) && v.how_it_works.length > 0
                 ? v.how_it_works
                 : fallback.how_it_works,
+            stats:
+              Array.isArray(v.stats) && v.stats.length > 0
+                ? v.stats
+                : fallback.stats,
             cta_text: v.cta_text ?? fallback.cta_text,
             cta_link: v.cta_link ?? fallback.cta_link,
           });
@@ -187,6 +198,36 @@ export default function EditableServicePage({
                   <p className="text-gray-600 text-sm leading-relaxed">
                     {step.description}
                   </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* STATS */}
+      {cfg.stats && cfg.stats.length > 0 && (
+        <section className="py-16 bg-[#1B2A4A]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+              {cfg.stats.map((s, i) => (
+                <div
+                  key={i}
+                  className="text-center bg-white/5 backdrop-blur-sm rounded-3xl p-8 border border-white/10"
+                >
+                  <div
+                    className="text-4xl md:text-5xl font-black mb-2"
+                    style={{
+                      backgroundImage:
+                        'linear-gradient(135deg, #6ABF4B, #5DB347)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                    }}
+                  >
+                    {s.value}
+                  </div>
+                  <div className="text-white font-semibold mb-1">{s.label}</div>
+                  {s.sub && <div className="text-gray-400 text-sm">{s.sub}</div>}
                 </div>
               ))}
             </div>

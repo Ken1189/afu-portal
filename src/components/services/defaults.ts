@@ -135,6 +135,246 @@ export const SERVICE_DEFAULTS: Record<string, ServicePageConfig> = {
     cta_link: '/farm/vet',
   },
 
+  processing: {
+    hero_title: 'Processing & Value Addition',
+    hero_subtitle:
+      'Shared-use milling, drying, cold chain, and packaging facilities located near farming clusters. Turn raw commodities into market-ready products worth 2-3x more — and eliminate post-harvest waste.',
+    hero_image:
+      'https://images.unsplash.com/photo-1599058917765-a780eda07a3e?w=1920&h=1080&fit=crop',
+    features: [
+      {
+        title: 'Milling & Grinding',
+        description:
+          'State-of-the-art milling equipment for maize, wheat, rice, and sorghum. Produce flour, grits, and meal that meet commercial buyer specifications and retail packaging standards.',
+        icon: '🌾',
+      },
+      {
+        title: 'Solar Drying Systems',
+        description:
+          'Reduce moisture content to safe storage levels with our solar-hybrid dryers. Extend shelf life from weeks to months while preserving nutritional value and minimising energy costs.',
+        icon: '🌡️',
+      },
+      {
+        title: 'Cold Chain Infrastructure',
+        description:
+          'Solar-powered cold rooms and refrigerated logistics for perishables — fruits, vegetables, dairy, and fish. Maintain the cold chain from farm gate to final buyer.',
+        icon: '❄️',
+      },
+      {
+        title: 'Grading & Packaging',
+        description:
+          'Automated sorting, grading, and packaging lines. Products are labelled with traceability codes linking back to the originating farm, cooperative, and processing batch.',
+        icon: '📦',
+      },
+      {
+        title: 'Quality Certification',
+        description:
+          'On-site testing laboratories for aflatoxin, moisture, and microbiological analysis. We support HACCP, ISO 22000, GlobalG.A.P., and organic certification pathways.',
+        icon: '🏅',
+      },
+      {
+        title: 'Waste-to-Value',
+        description:
+          'Processing by-products are converted into animal feed, compost, and biochar. Nothing goes to waste — our circular model generates additional revenue streams for cooperatives.',
+        icon: '🍃',
+      },
+    ],
+    how_it_works: [
+      { step: 1, title: 'Harvest & Deliver', description: 'Bring your raw produce to the nearest AFU processing hub. Our strategically located centres sit within 30 km of major farming clusters, minimising transport costs and spoilage.' },
+      { step: 2, title: 'Process & Package', description: 'Trained operators handle milling, drying, grading, and packaging to international standards. You choose your processing level — from cleaned raw commodity to retail-ready product.' },
+      { step: 3, title: 'Quality Certification', description: 'Every batch undergoes quality testing. Products that meet HACCP, ISO 22000, or organic standards receive certification, unlocking premium domestic and export markets.' },
+      { step: 4, title: 'Market & Earn More', description: 'Processed products command 2-3x the price of raw commodities. AFU connects your value-added output directly to buyers through our offtake network.' },
+    ],
+    stats: [
+      { value: '12', label: 'Processing Hubs', sub: 'planned across Africa' },
+      { value: '3x', label: 'Value Multiplication', sub: 'raw to processed' },
+      { value: '60%', label: 'Waste Reduction', sub: 'in post-harvest losses' },
+      { value: '5,000+', label: 'Tonnes Processed', sub: 'annual capacity per hub' },
+    ],
+    cta_text: 'Book Processing Time',
+    cta_link: '/apply',
+  },
+
+  offtake: {
+    hero_title: 'Guaranteed Offtake & Market Access',
+    hero_subtitle:
+      'Pre-arranged buyer contracts before planting season. Price-floor guarantees eliminate market risk, while our digital marketplace and export network ensure you always find the best buyer for your crop.',
+    hero_image:
+      'https://images.unsplash.com/photo-1504370805625-d32c54b16100?w=1920&h=1080&fit=crop',
+    features: [
+      {
+        title: 'Pre-Season Contracts',
+        description:
+          'Binding offtake agreements signed before planting season. Farmers know exactly who will buy, at what price, and in what quantity before a single seed goes into the ground.',
+        icon: '📝',
+      },
+      {
+        title: 'Price Floor Guarantees',
+        description:
+          'Every contract includes a guaranteed minimum price. If market prices rise above the floor, farmers benefit from the upside. If prices fall, the floor protects their income.',
+        icon: '🛡️',
+      },
+      {
+        title: 'Export Market Access',
+        description:
+          'AFU connects cooperatives to buyers across 15 export markets in Europe, the Middle East, and Asia. We handle phytosanitary certification, customs documentation, and logistics.',
+        icon: '🌍',
+      },
+      {
+        title: 'Digital Marketplace',
+        description:
+          "Surplus production beyond contracted volumes can be listed on AFU's digital marketplace. Buyers bid in real-time, ensuring farmers capture the best available price.",
+        icon: '🏪',
+      },
+      {
+        title: 'Market Intelligence',
+        description:
+          'Real-time commodity pricing, demand forecasts, and seasonal trend analysis. Make informed planting decisions based on data, not guesswork.',
+        icon: '📈',
+      },
+      {
+        title: 'Traceability & Compliance',
+        description:
+          'Full farm-to-fork traceability for every consignment. Meet EU, UK, and US import requirements with digital documentation that tracks origin, handling, and quality at each stage.',
+        icon: '📊',
+      },
+    ],
+    how_it_works: [
+      { step: 1, title: 'Register Your Production', description: 'List your planned crop, estimated volume, and target harvest date on the AFU platform. Our matching algorithm identifies the best-fit buyers for your specific commodity and quality grade.' },
+      { step: 2, title: 'Lock In Your Contract', description: 'Before you even plant, sign a binding offtake agreement with a verified buyer. The contract specifies quantity, quality standards, delivery window, and a guaranteed minimum price.' },
+      { step: 3, title: 'Grow with Confidence', description: 'With a guaranteed buyer and price floor in place, focus on maximising yield. AFU provides agronomic support and input financing secured against your confirmed offtake contract.' },
+      { step: 4, title: 'Deliver & Get Paid', description: "Deliver your harvest to the designated collection point. Payment flows through AFU's tri-party escrow — you receive funds within 48 hours of delivery confirmation." },
+    ],
+    stats: [
+      { value: '$50M+', label: 'Offtake Agreements', sub: 'in contracted value' },
+      { value: '200+', label: 'Active Buyers', sub: 'exporters, retailers, processors' },
+      { value: '15', label: 'Export Markets', sub: 'across 3 continents' },
+      { value: '100%', label: 'Payment Guarantee', sub: 'via escrow settlement' },
+    ],
+    cta_text: 'List Your Crop',
+    cta_link: '/apply',
+  },
+
+  'trade-finance': {
+    hero_title: 'Trade Finance & Export Support',
+    hero_subtitle:
+      'Letters of credit, pre-export financing, forex management, and end-to-end logistics. AFU unlocks cross-border agricultural trade across COMESA, SADC, and AfCFTA corridors — so African produce reaches global markets.',
+    hero_image:
+      'https://images.unsplash.com/photo-1530267981375-f0de937f5f13?w=1920&h=1080&fit=crop',
+    features: [
+      {
+        title: 'Letters of Credit',
+        description:
+          'Bank-backed letters of credit issued through our partner financial institutions. Protect both buyer and seller with irrevocable payment guarantees recognised by banks worldwide.',
+        icon: '📄',
+      },
+      {
+        title: 'Pre-Export Financing',
+        description:
+          'Access working capital against confirmed export orders. Fund harvesting, processing, packing, and transport costs before the buyer pays — bridging the cash flow gap that kills deals.',
+        icon: '💵',
+      },
+      {
+        title: 'Export Guarantees',
+        description:
+          'Credit insurance and export guarantees that protect against buyer default, political risk, and currency inconvertibility. Trade with confidence into emerging and frontier markets.',
+        icon: '🛡️',
+      },
+      {
+        title: 'Forex Management',
+        description:
+          'Hedge currency risk with forward contracts and natural hedging strategies. Our treasury desk manages USD, EUR, GBP, and local currency exposures across all 9 operating countries.',
+        icon: '🔄',
+      },
+      {
+        title: 'Logistics & Customs',
+        description:
+          'End-to-end freight management from farm gate to destination port. Customs brokerage, fumigation certificates, bills of lading, and real-time shipment tracking — all in one platform.',
+        icon: '🚢',
+      },
+      {
+        title: 'Trade Corridor Access',
+        description:
+          'Leverage preferential tariff rates under COMESA, SADC, EAC, and AfCFTA trade agreements. Our compliance team ensures every shipment meets origin rules for duty-free or reduced-tariff entry.',
+        icon: '🌐',
+      },
+    ],
+    how_it_works: [
+      { step: 1, title: 'Secure an Offtake Contract', description: "Start with a confirmed buyer order — domestic or international. AFU's offtake network provides the foundation, or bring your own buyer and we structure the finance around the deal." },
+      { step: 2, title: 'Structure the Financing', description: 'Our trade finance team structures the optimal instrument — letter of credit, pre-export facility, or invoice discounting — based on the buyer profile, destination, and commodity.' },
+      { step: 3, title: 'Ship with Confidence', description: 'AFU handles customs documentation, phytosanitary certificates, and logistics coordination. Our freight partners move your cargo by road, rail, sea, or air across 15 export corridors.' },
+      { step: 4, title: 'Get Paid Fast', description: "Payment flows through AFU's escrow system. Pre-export advances are settled, and net proceeds are disbursed to your account within 48 hours of buyer confirmation." },
+    ],
+    stats: [
+      { value: '$200M+', label: 'Trade Facilitated', sub: 'in cumulative value' },
+      { value: '15', label: 'Export Destinations', sub: 'across 3 continents' },
+      { value: '98%', label: 'Delivery Success', sub: 'on-time, in-full rate' },
+      { value: '48hrs', label: 'Payment Speed', sub: 'after delivery confirmation' },
+    ],
+    cta_text: 'Apply for Trade Finance',
+    cta_link: '/apply',
+  },
+
+  'legal-assistance': {
+    hero_title: 'Legal Assistance for African Farmers',
+    hero_subtitle:
+      'Professional legal support that protects your land, your contracts, and your livelihood. From land tenure disputes to export compliance, our pan-African network of 50+ law firms has you covered.',
+    hero_image:
+      'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1920&h=1080&fit=crop',
+    features: [
+      {
+        title: 'Land Rights & Tenure',
+        description:
+          'Secure your land. We help farmers navigate title deeds, customary land rights, lease agreements, and land dispute resolution. Our specialists understand both statutory and traditional tenure systems across Africa.',
+        icon: '📍',
+      },
+      {
+        title: 'Contract Review & Drafting',
+        description:
+          'Never sign a bad deal. Every offtake agreement, supply contract, equipment lease, and partnership MOU can be reviewed by our legal team before you commit. We also draft standard contracts tailored to your needs.',
+        icon: '📄',
+      },
+      {
+        title: 'Dispute Resolution',
+        description:
+          'Fast, fair outcomes. We provide mediation, arbitration, and where necessary, litigation support for disputes with buyers, suppliers, landlords, cooperatives, and government agencies.',
+        icon: '⚖️',
+      },
+      {
+        title: 'Regulatory Compliance',
+        description:
+          'Stay on the right side of the law. Export permits, phytosanitary certificates, tax obligations, environmental regulations, and labour law compliance — we guide you through every requirement.',
+        icon: '🛡️',
+      },
+      {
+        title: 'Cooperative Governance',
+        description:
+          'Build strong farmer organizations. We assist with cooperative registration, constitution drafting, governance frameworks, AGM procedures, and internal dispute resolution for farmer groups and associations.',
+        icon: '👥',
+      },
+      {
+        title: 'Intellectual Property',
+        description:
+          'Protect your innovations. From registering new seed varieties and organic certifications to trademarking your farm brand and protecting indigenous knowledge, we help farmers own their intellectual assets.',
+        icon: '📚',
+      },
+    ],
+    how_it_works: [
+      { step: 1, title: 'Request a Consultation', description: 'Submit your legal query through the AFU platform or call our toll-free helpline. Describe your situation — land dispute, contract question, regulatory issue, or cooperative matter — and we match you with the right specialist.' },
+      { step: 2, title: 'Expert Review', description: 'A qualified legal professional from our network reviews your case. For straightforward matters, you receive guidance within 48 hours. Complex cases get a full assessment with recommended next steps and cost estimates.' },
+      { step: 3, title: 'Advice & Representation', description: 'Receive clear, actionable legal advice in plain language. Where needed, our partner law firms provide direct representation — from drafting contracts to appearing at land tribunals and mediation sessions.' },
+      { step: 4, title: 'Resolution & Follow-Up', description: 'We track every case to resolution and follow up to ensure outcomes are enforced. All documents are stored securely in your AFU profile for future reference, building your legal history and strengthening future claims.' },
+    ],
+    stats: [
+      { value: '10,000+', label: 'Farmers Assisted', sub: 'across all legal services' },
+      { value: '20', label: 'Countries Covered', sub: 'with local legal expertise' },
+      { value: '95%', label: 'Resolution Rate', sub: 'cases resolved successfully' },
+      { value: '50+', label: 'Partner Law Firms', sub: 'pan-African legal network' },
+    ],
+    cta_text: 'Get Legal Help',
+    cta_link: '/apply',
+  },
+
   inputs: {
     hero_title: 'Farm Inputs',
     hero_subtitle:

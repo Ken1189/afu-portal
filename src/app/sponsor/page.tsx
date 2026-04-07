@@ -543,9 +543,46 @@ export default function SponsorPage() {
   const [selectedCountry, setSelectedCountry] = useState<string>('All');
   const [showAnnual, setShowAnnual] = useState(false);
   const [sponsorTiers, setSponsorTiers] = useState<SponsorTier[]>(FALLBACK_TIERS);
+  const [chrome, setChrome] = useState<Record<string, unknown> | null>(null);
 
   const farmersRef = useRef<HTMLDivElement>(null);
   const tiersRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    async function fetchChrome() {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from('site_config')
+          .select('value')
+          .eq('key', 'page_chrome_sponsor')
+          .single();
+        if (data?.value) {
+          const parsed = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
+          if (parsed && typeof parsed === 'object') setChrome(parsed);
+        }
+      } catch { /* keep fallback */ }
+    }
+    fetchChrome();
+  }, []);
+
+  const heroBadge = (chrome?.hero_badge as string) ?? 'Supporting African smallholder farmers';
+  const heroTitle = (chrome?.hero_title as string) ?? null;
+  const heroSubtitle = (chrome?.hero_subtitle as string) ?? "Your monthly contribution funds a real farmer's inputs, insurance, and offtake — transforming a smallholder into a thriving agri-business.";
+  const heroCta1Text = (chrome?.hero_cta1_text as string) ?? 'Sponsor a Farmer →';
+  const heroCta2Text = (chrome?.hero_cta2_text as string) ?? 'Learn How It Works';
+  const howItWorksTitle = (chrome?.how_it_works_title as string) ?? 'How It Works';
+  const tiersTitleText = (chrome?.tiers_title as string) ?? 'Sponsorship Tiers';
+  const farmersTitle = (chrome?.farmers_title as string) ?? 'Meet the Farmers';
+  const impactTitle = (chrome?.impact_title as string) ?? 'Your Impact in Numbers';
+  const impactStats = (chrome?.impact_stats as { value: string; label: string }[]) ?? [
+    { value: '847', label: 'Farmers waiting for a sponsor' },
+    { value: '$47', label: 'Average monthly contribution' },
+    { value: '94%', label: 'Sponsored farmers complete their season' },
+    { value: '3.2×', label: 'Average income increase after first program' },
+  ];
+  const finalCtaTitle = (chrome?.final_cta_title as string) ?? 'Watson & Fine and others are already making an impact';
+  const finalCtaBody = (chrome?.final_cta_body as string) ?? 'Corporate sponsors partner with AFU to fund entire cohorts of farmers — 10 to 50 at a time. Get a branded CSR impact report, your logo on the AFU platform, and the knowledge that your company is transforming African agriculture at scale.';
 
   useEffect(() => {
     async function loadFarmers() {
@@ -615,20 +652,21 @@ export default function SponsorPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
           <div className="max-w-3xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-sm font-medium mb-6">
-              <span>Supporting African smallholder farmers</span>
+              <span>{heroBadge}</span>
             </div>
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold leading-tight mb-6">
-              Sponsor an{' '}
-              <span
-                className="text-transparent bg-clip-text"
-                style={{ backgroundImage: 'linear-gradient(135deg, #6ABF4B, #5DB347, #449933)' }}
-              >
-                African Farmer
-              </span>
+              {heroTitle ?? (
+                <>Sponsor an{' '}
+                <span
+                  className="text-transparent bg-clip-text"
+                  style={{ backgroundImage: 'linear-gradient(135deg, #6ABF4B, #5DB347, #449933)' }}
+                >
+                  African Farmer
+                </span></>
+              )}
             </h1>
             <p className="text-lg md:text-xl text-white/80 leading-relaxed mb-10">
-              Your monthly contribution funds a real farmer&apos;s inputs, insurance, and offtake
-              — transforming a smallholder into a thriving agri-business.
+              {heroSubtitle}
             </p>
 
             {/* CTA Buttons */}
@@ -640,13 +678,13 @@ export default function SponsorPage() {
                 onMouseEnter={(e) => (e.currentTarget.style.background = 'linear-gradient(135deg, #449933, #3A8829)')}
                 onMouseLeave={(e) => (e.currentTarget.style.background = 'linear-gradient(135deg, #5DB347, #449933)')}
               >
-                Sponsor a Farmer →
+                {heroCta1Text}
               </button>
               <button
                 onClick={() => scrollTo(tiersRef)}
                 className="w-full sm:w-auto bg-white/10 hover:bg-white/20 border border-white/30 text-white font-semibold px-8 py-4 rounded-xl text-lg transition-colors"
               >
-                Learn How It Works
+                {heroCta2Text}
               </button>
             </div>
 
@@ -669,7 +707,7 @@ export default function SponsorPage() {
       <section className="bg-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-[#1B2A4A] to-[#5DB347]">How It Works</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-[#1B2A4A] to-[#5DB347]">{howItWorksTitle}</h2>
             <p className="text-gray-500 text-lg">Three simple steps from sponsor to impact.</p>
           </div>
 
@@ -714,7 +752,7 @@ export default function SponsorPage() {
       <section ref={tiersRef} id="tiers" style={{ background: '#F5F0E8' }} className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
-            <h2 className="text-3xl md:text-4xl font-bold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-[#1B2A4A] to-[#5DB347]">Sponsorship Tiers</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-[#1B2A4A] to-[#5DB347]">{tiersTitleText}</h2>
             <p className="text-gray-600 text-lg mb-6">
               Choose the level of support that works for you.
             </p>
@@ -772,7 +810,7 @@ export default function SponsorPage() {
       <section ref={farmersRef} id="farmers" className="bg-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
-            <h2 className="text-3xl md:text-4xl font-bold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-[#1B2A4A] to-[#5DB347]">Meet the Farmers</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-[#1B2A4A] to-[#5DB347]">{farmersTitle}</h2>
             <p className="text-gray-500 text-lg">Real people, real farms, real impact.</p>
           </div>
 
@@ -865,17 +903,17 @@ export default function SponsorPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
-              Your Impact in Numbers
+              {impactTitle}
             </h2>
             <p className="text-white/60 text-lg">Real outcomes from AFU-sponsored farmers.</p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { value: '847', label: 'Farmers waiting for a sponsor', color: '#6ABF4B' },
-              { value: '$47', label: 'Average monthly contribution', color: '#C9A84C' },
-              { value: '94%', label: 'Sponsored farmers complete their season', color: '#6ABF4B' },
-              { value: '3.2×', label: 'Average income increase after first program', color: '#C9A84C' },
+              { value: impactStats[0]?.value ?? '847', label: impactStats[0]?.label ?? 'Farmers waiting for a sponsor', color: '#6ABF4B' },
+              { value: impactStats[1]?.value ?? '$47', label: impactStats[1]?.label ?? 'Average monthly contribution', color: '#C9A84C' },
+              { value: impactStats[2]?.value ?? '94%', label: impactStats[2]?.label ?? 'Sponsored farmers complete their season', color: '#6ABF4B' },
+              { value: impactStats[3]?.value ?? '3.2×', label: impactStats[3]?.label ?? 'Average income increase after first program', color: '#C9A84C' },
             ].map((stat) => (
               <div
                 key={stat.label}
@@ -896,12 +934,10 @@ export default function SponsorPage() {
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="w-12 h-12 rounded-xl bg-[#5DB347]/10 flex items-center justify-center mb-4 mx-auto"><Building2 className="w-6 h-6 text-[#5DB347]" /></div>
           <h2 className="text-3xl md:text-4xl font-bold text-navy mb-4">
-            Watson &amp; Fine and others are already making an impact
+            {finalCtaTitle}
           </h2>
           <p className="text-gray-500 text-lg leading-relaxed mb-3">
-            Corporate sponsors partner with AFU to fund entire cohorts of farmers — 10 to 50 at a
-            time. Get a branded CSR impact report, your logo on the AFU platform, and the knowledge
-            that your company is transforming African agriculture at scale.
+            {finalCtaBody}
           </p>
           <p className="text-gray-500 mb-8">
             Recognised across Africa. Reported quarterly. Fully transparent.

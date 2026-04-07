@@ -14,72 +14,156 @@ import {
   Globe,
   CreditCard,
   Smartphone,
+  type LucideIcon,
 } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
 
-// ─── Programs ───
+// ─── Types ───
 
-const programs = [
-  {
-    slug: 'women-in-agriculture',
-    name: 'Women in Agriculture',
+type ProgramConfig = {
+  slug: string;
+  name: string;
+  description: string;
+  impact: string[];
+  preset_amounts: number[];
+};
+
+type MethodConfig = { key: string; label: string };
+
+type DonateContent = {
+  hero: { title: string; subtitle: string };
+  programs: ProgramConfig[];
+  sections: {
+    choose_title: string;
+    donation_title: string;
+    impact_title: string;
+    methods_label: string;
+  };
+  methods: MethodConfig[];
+  footer_disclaimer: string;
+  success: { title: string; body: string };
+};
+
+// ─── Fallback ───
+
+const FALLBACK_DONATE: DonateContent = {
+  hero: {
+    title: 'Support African Farmers',
+    subtitle:
+      'Every donation directly supports smallholder farmers across Africa. 100% of programme donations go to the field.',
+  },
+  programs: [
+    {
+      slug: 'women-in-agriculture',
+      name: 'Women in Agriculture',
+      description:
+        'Empowering women farmers across Africa with access to financing, training, land rights support, and market opportunities. Your donation helps women gain financial independence and feed their communities.',
+      impact: [
+        'Help women farmers across Africa gain agricultural training',
+        'Micro-loans for women-led farms',
+        'Legal support for land ownership',
+        'Childcare cooperatives enabling women to farm',
+      ],
+      preset_amounts: [25, 50, 100, 250, 500, 1000],
+    },
+    {
+      slug: 'feed-a-child',
+      name: 'Feed a Child',
+      description:
+        'Connecting surplus farm production to school feeding programmes and orphanages. Every dollar feeds a child for a week. We work directly with smallholder farmers to source nutritious food locally.',
+      impact: [
+        'Provide nutritious meals to children in need',
+        'Connecting schools to local farms for fresh food',
+        'Nutrition programmes across Africa',
+        'Zero food miles — sourced from local farmers',
+      ],
+      preset_amounts: [10, 25, 50, 100, 250, 500],
+    },
+    {
+      slug: 'young-farmers',
+      name: 'Young Farmers Programme',
+      description:
+        'Investing in the next generation of African farmers. We provide agricultural education, starter seed kits, mentorship, and micro-financing to young people aged 18-30 to start and grow their own farms.',
+      impact: [
+        'Enrol young farmers across Africa in training programmes',
+        'Starter kits distributed to aspiring farmers',
+        'Mentorship pairing with experienced farmers',
+        'Building a generation of sustainable farming entrepreneurs',
+      ],
+      preset_amounts: [25, 50, 100, 250, 500, 1000],
+    },
+    {
+      slug: 'general',
+      name: 'General Fund',
+      description:
+        "Support AFU's mission across all programmes. Your donation goes where it's needed most — from emergency drought relief to building rural infrastructure, veterinary services, and legal assistance for farmers.",
+      impact: [
+        'Emergency response for drought and flood',
+        'Rural infrastructure development',
+        'Free veterinary services for smallholders',
+        'Legal aid for land rights disputes',
+      ],
+      preset_amounts: [25, 50, 100, 250, 500, 1000],
+    },
+  ],
+  sections: {
+    choose_title: 'Choose a Programme',
+    donation_title: 'Your Donation',
+    impact_title: 'Your Impact',
+    methods_label: 'Payment methods',
+  },
+  methods: [
+    { key: 'card', label: 'Card' },
+    { key: 'mpesa', label: 'M-Pesa' },
+    { key: 'ecocash', label: 'EcoCash' },
+  ],
+  footer_disclaimer: 'Secure payment via Stripe. AFU is a registered non-profit.',
+  success: {
+    title: 'Thank You for Your Generosity!',
+    body: 'will make a real difference.',
+  },
+};
+
+// ─── Visual maps (kept local — not in DB) ───
+
+const PROGRAM_VISUALS: Record<string, { icon: LucideIcon; color: string; accent: string }> = {
+  'women-in-agriculture': {
     icon: Users,
     color: 'bg-pink-50 text-pink-600 border-pink-200',
     accent: 'bg-pink-600',
-    description: 'Empowering women farmers across Africa with access to financing, training, land rights support, and market opportunities. Your donation helps women gain financial independence and feed their communities.',
-    impact: [
-      'Help women farmers across Africa gain agricultural training',
-      'Micro-loans for women-led farms',
-      'Legal support for land ownership',
-      'Childcare cooperatives enabling women to farm',
-    ],
-    amounts: [25, 50, 100, 250, 500, 1000],
   },
-  {
-    slug: 'feed-a-child',
-    name: 'Feed a Child',
+  'feed-a-child': {
     icon: Apple,
     color: 'bg-orange-50 text-orange-600 border-orange-200',
     accent: 'bg-orange-600',
-    description: 'Connecting surplus farm production to school feeding programmes and orphanages. Every dollar feeds a child for a week. We work directly with smallholder farmers to source nutritious food locally.',
-    impact: [
-      'Provide nutritious meals to children in need',
-      'Connecting schools to local farms for fresh food',
-      'Nutrition programmes across Africa',
-      'Zero food miles — sourced from local farmers',
-    ],
-    amounts: [10, 25, 50, 100, 250, 500],
   },
-  {
-    slug: 'young-farmers',
-    name: 'Young Farmers Programme',
+  'young-farmers': {
     icon: Sprout,
     color: 'bg-green-50 text-green-600 border-green-200',
     accent: 'bg-green-600',
-    description: 'Investing in the next generation of African farmers. We provide agricultural education, starter seed kits, mentorship, and micro-financing to young people aged 18-30 to start and grow their own farms.',
-    impact: [
-      'Enrol young farmers across Africa in training programmes',
-      'Starter kits distributed to aspiring farmers',
-      'Mentorship pairing with experienced farmers',
-      'Building a generation of sustainable farming entrepreneurs',
-    ],
-    amounts: [25, 50, 100, 250, 500, 1000],
   },
-  {
-    slug: 'general',
-    name: 'General Fund',
+  general: {
     icon: Globe,
     color: 'bg-blue-50 text-blue-600 border-blue-200',
     accent: 'bg-blue-600',
-    description: 'Support AFU\'s mission across all programmes. Your donation goes where it\'s needed most — from emergency drought relief to building rural infrastructure, veterinary services, and legal assistance for farmers.',
-    impact: [
-      'Emergency response for drought and flood',
-      'Rural infrastructure development',
-      'Free veterinary services for smallholders',
-      'Legal aid for land rights disputes',
-    ],
-    amounts: [25, 50, 100, 250, 500, 1000],
   },
-];
+};
+
+const METHOD_ICONS: Record<string, LucideIcon> = {
+  card: CreditCard,
+  mpesa: Smartphone,
+  ecocash: Smartphone,
+};
+
+function getProgramVisual(slug: string) {
+  return (
+    PROGRAM_VISUALS[slug] || {
+      icon: Globe,
+      color: 'bg-gray-50 text-gray-600 border-gray-200',
+      accent: 'bg-gray-600',
+    }
+  );
+}
 
 // ─── Component ───
 
@@ -87,8 +171,9 @@ export default function DonatePage() {
   const searchParams = useSearchParams();
   const programSlug = searchParams.get('program');
 
-  const [selectedProgram, setSelectedProgram] = useState(
-    programs.find((p) => p.slug === programSlug) || programs[0]
+  const [content, setContent] = useState<DonateContent>(FALLBACK_DONATE);
+  const [selectedProgram, setSelectedProgram] = useState<ProgramConfig>(
+    FALLBACK_DONATE.programs.find((p) => p.slug === programSlug) || FALLBACK_DONATE.programs[0]
   );
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [customAmount, setCustomAmount] = useState('');
@@ -97,10 +182,54 @@ export default function DonatePage() {
   const [isMonthly, setIsMonthly] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
+  // Fetch site_config and shallow-merge per section
   useEffect(() => {
-    const prog = programs.find((p) => p.slug === programSlug);
+    async function fetchContent() {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from('site_config')
+          .select('value')
+          .eq('key', 'page_donate')
+          .single();
+        if (data && data.value) {
+          let parsed: Partial<DonateContent> | null = null;
+          try {
+            parsed = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
+          } catch {
+            parsed = null;
+          }
+          if (parsed && typeof parsed === 'object') {
+            setContent({
+              hero: { ...FALLBACK_DONATE.hero, ...(parsed.hero || {}) },
+              programs:
+                Array.isArray(parsed.programs) && parsed.programs.length > 0
+                  ? parsed.programs
+                  : FALLBACK_DONATE.programs,
+              sections: { ...FALLBACK_DONATE.sections, ...(parsed.sections || {}) },
+              methods:
+                Array.isArray(parsed.methods) && parsed.methods.length > 0
+                  ? parsed.methods
+                  : FALLBACK_DONATE.methods,
+              footer_disclaimer:
+                parsed.footer_disclaimer || FALLBACK_DONATE.footer_disclaimer,
+              success: { ...FALLBACK_DONATE.success, ...(parsed.success || {}) },
+            });
+          }
+        }
+      } catch {
+        // keep fallback
+      }
+    }
+    fetchContent();
+  }, []);
+
+  // Keep selected program in sync with content + URL
+  useEffect(() => {
+    const prog =
+      content.programs.find((p) => p.slug === programSlug) || content.programs[0];
     if (prog) setSelectedProgram(prog);
-  }, [programSlug]);
+  }, [programSlug, content.programs]);
 
   const donationAmount = selectedAmount || (customAmount ? parseFloat(customAmount) : 0);
 
@@ -138,6 +267,9 @@ export default function DonatePage() {
     }
   };
 
+  const selectedVisual = getProgramVisual(selectedProgram.slug);
+  const SelectedIcon = selectedVisual.icon;
+
   if (submitted) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
@@ -145,10 +277,10 @@ export default function DonatePage() {
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle2 className="w-8 h-8 text-green-600" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-3">Thank You for Your Generosity!</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-3">{content.success.title}</h1>
           <p className="text-gray-600 mb-2">
             Your {isMonthly ? 'monthly ' : ''}donation of <span className="font-semibold text-green-600">${donationAmount.toFixed(2)}</span> to{' '}
-            <span className="font-semibold">{selectedProgram.name}</span> will make a real difference.
+            <span className="font-semibold">{selectedProgram.name}</span> {content.success.body}
           </p>
           <p className="text-sm text-gray-400 mb-8">
             A confirmation email will be sent to {donorEmail || 'your email address'}.
@@ -179,12 +311,9 @@ export default function DonatePage() {
           </Link>
           <div className="flex items-center gap-3 mb-4">
             <Heart className="w-8 h-8 text-[#5DB347]" />
-            <h1 className="text-3xl md:text-4xl font-bold">Support African Farmers</h1>
+            <h1 className="text-3xl md:text-4xl font-bold">{content.hero.title}</h1>
           </div>
-          <p className="text-white/70 text-lg max-w-2xl">
-            Every donation directly supports smallholder farmers across Africa.
-            100% of programme donations go to the field.
-          </p>
+          <p className="text-white/70 text-lg max-w-2xl">{content.hero.subtitle}</p>
         </div>
       </div>
 
@@ -194,44 +323,48 @@ export default function DonatePage() {
           <div className="lg:col-span-2 space-y-8">
             {/* Program Cards */}
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Choose a Programme</h2>
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">{content.sections.choose_title}</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {programs.map((prog) => (
-                  <button
-                    key={prog.slug}
-                    onClick={() => setSelectedProgram(prog)}
-                    className={`p-4 rounded-xl border-2 text-left transition-all ${
-                      selectedProgram.slug === prog.slug
-                        ? 'border-[#5DB347] bg-[#EBF7E5] shadow-sm'
-                        : 'border-gray-200 bg-white hover:border-gray-300'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${prog.color}`}>
-                        <prog.icon className="w-5 h-5" />
+                {content.programs.map((prog) => {
+                  const visual = getProgramVisual(prog.slug);
+                  const Icon = visual.icon;
+                  return (
+                    <button
+                      key={prog.slug}
+                      onClick={() => setSelectedProgram(prog)}
+                      className={`p-4 rounded-xl border-2 text-left transition-all ${
+                        selectedProgram.slug === prog.slug
+                          ? 'border-[#5DB347] bg-[#EBF7E5] shadow-sm'
+                          : 'border-gray-200 bg-white hover:border-gray-300'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${visual.color}`}>
+                          <Icon className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-gray-900 text-sm">{prog.name}</div>
+                          {selectedProgram.slug === prog.slug && (
+                            <div className="text-xs text-[#5DB347]">Selected</div>
+                          )}
+                        </div>
                       </div>
-                      <div>
-                        <div className="font-semibold text-gray-900 text-sm">{prog.name}</div>
-                        {selectedProgram.slug === prog.slug && (
-                          <div className="text-xs text-[#5DB347]">Selected</div>
-                        )}
-                      </div>
-                    </div>
-                  </button>
-                ))}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
             {/* Program Detail */}
             <div className="bg-white rounded-xl border p-6">
               <div className="flex items-center gap-3 mb-4">
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${selectedProgram.color}`}>
-                  <selectedProgram.icon className="w-6 h-6" />
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${selectedVisual.color}`}>
+                  <SelectedIcon className="w-6 h-6" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900">{selectedProgram.name}</h3>
               </div>
               <p className="text-gray-600 leading-relaxed mb-6">{selectedProgram.description}</p>
-              <h4 className="font-semibold text-gray-900 mb-3">Your Impact</h4>
+              <h4 className="font-semibold text-gray-900 mb-3">{content.sections.impact_title}</h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {selectedProgram.impact.map((item, i) => (
                   <div key={i} className="flex items-start gap-2">
@@ -246,7 +379,7 @@ export default function DonatePage() {
           {/* Right: Donation Form */}
           <div>
             <div className="bg-white rounded-xl border p-6 sticky top-6">
-              <h3 className="font-semibold text-gray-900 mb-4">Your Donation</h3>
+              <h3 className="font-semibold text-gray-900 mb-4">{content.sections.donation_title}</h3>
 
               {/* One-time / Monthly toggle */}
               <div className="flex bg-gray-100 rounded-lg p-1 mb-6">
@@ -270,7 +403,7 @@ export default function DonatePage() {
 
               {/* Amount Selection */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-4">
-                {selectedProgram.amounts.map((amount) => (
+                {selectedProgram.preset_amounts.map((amount) => (
                   <button
                     key={amount}
                     onClick={() => { setSelectedAmount(amount); setCustomAmount(''); }}
@@ -316,17 +449,16 @@ export default function DonatePage() {
 
                 {/* Payment Methods */}
                 <div className="pt-2">
-                  <p className="text-xs text-gray-400 mb-3">Payment methods</p>
+                  <p className="text-xs text-gray-400 mb-3">{content.sections.methods_label}</p>
                   <div className="flex gap-2">
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 rounded-lg border text-xs text-gray-600">
-                      <CreditCard className="w-3.5 h-3.5" /> Card
-                    </div>
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 rounded-lg border text-xs text-gray-600">
-                      <Smartphone className="w-3.5 h-3.5" /> M-Pesa
-                    </div>
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 rounded-lg border text-xs text-gray-600">
-                      <Smartphone className="w-3.5 h-3.5" /> EcoCash
-                    </div>
+                    {content.methods.map((m) => {
+                      const Icon = METHOD_ICONS[m.key] || CreditCard;
+                      return (
+                        <div key={m.key} className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 rounded-lg border text-xs text-gray-600">
+                          <Icon className="w-3.5 h-3.5" /> {m.label}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -356,7 +488,7 @@ export default function DonatePage() {
 
               <div className="mt-4 flex items-center gap-2 justify-center">
                 <Shield className="w-3.5 h-3.5 text-gray-400" />
-                <span className="text-xs text-gray-400">Secure payment via Stripe. AFU is a registered non-profit.</span>
+                <span className="text-xs text-gray-400">{content.footer_disclaimer}</span>
               </div>
             </div>
           </div>

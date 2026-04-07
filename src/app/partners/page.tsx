@@ -72,6 +72,40 @@ const CATEGORY_TO_TAB: Record<string, PartnerTab> = {
 export default function PartnersPage() {
   const [activeTab, setActiveTab] = useState<PartnerTab>("business");
   const [partners, setPartners] = useState<Record<PartnerTab, Partner[]>>(FALLBACK_PARTNERS);
+  const [chrome, setChrome] = useState<Record<string, unknown> | null>(null);
+
+  useEffect(() => {
+    async function fetchChrome() {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from('site_config')
+          .select('value')
+          .eq('key', 'page_chrome_partners')
+          .single();
+        if (data?.value) {
+          const parsed = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
+          if (parsed && typeof parsed === 'object') setChrome(parsed);
+        }
+      } catch { /* keep fallback */ }
+    }
+    fetchChrome();
+  }, []);
+
+  const heroBadge = (chrome?.hero_badge as string) ?? 'Our Network';
+  const heroTitle = (chrome?.hero_title as string) ?? 'Our Partners & Network';
+  const heroSubtitle = (chrome?.hero_subtitle as string) ?? 'AFU is building a network of partners across Africa — from business networks and technology providers to farming unions, governments, and research institutions. Together, we are creating an ecosystem that de-risks agriculture and unlocks growth.';
+  const tabLabels = (chrome?.tab_labels as string[]) ?? ['Farming Unions', 'Business Networks', 'Governments', 'Universities'];
+  const emptyTitles = (chrome?.empty_state_titles as string[]) ?? ['Seeking Farming Union Partners', 'Building Business Partnerships', 'Seeking Government Partnerships', 'Seeking University & Research Partners'];
+  const emptyBodies = (chrome?.empty_state_bodies as string[]) ?? [
+    'We are actively seeking partnerships with national and regional farming unions across Africa. If your organisation represents farmers and would like to explore collaboration with AFU, we would love to hear from you.',
+    "We're building partnerships with leading institutions across Africa — banks, agri-businesses, technology providers, and logistics networks. Get in touch to explore working with AFU.",
+    'AFU is engaging with ministries of agriculture and development agencies across our operating countries. If you represent a government body interested in digital agriculture transformation, let us connect.',
+    'We are building research partnerships with agricultural universities and institutes across Africa. If your institution is interested in collaborative research, student placements, or technology transfer, get in touch.',
+  ];
+  const ctaTitle = (chrome?.cta_title as string) ?? 'Become an AFU Partner';
+  const ctaBody = (chrome?.cta_body as string) ?? 'Join our growing network of farming unions, businesses, government agencies, and research institutions. Together we are building a more prosperous agricultural future for Africa.';
+  const ctaPriceText = (chrome?.cta_price_text as string) ?? 'Partner membership is $250/year and gives you access to the AFU deal flow, member network, and co-branded programmes.';
 
   useEffect(() => {
     async function fetchPartners() {
@@ -131,16 +165,13 @@ export default function PartnersPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <span className="inline-block bg-[#EBF7E5] text-[#5DB347] text-sm font-medium px-4 py-1.5 rounded-full mb-6">
-              Our Network
+              {heroBadge}
             </span>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight bg-gradient-to-r from-[#6ABF4B] via-[#5DB347] to-[#8CB89C] bg-clip-text text-transparent">
-              Our Partners &amp; Network
+              {heroTitle}
             </h1>
             <p className="text-xl text-gray-300 leading-relaxed">
-              AFU is building a network of partners across Africa &mdash; from
-              business networks and technology providers to farming unions,
-              governments, and research institutions. Together, we are creating
-              an ecosystem that de-risks agriculture and unlocks growth.
+              {heroSubtitle}
             </p>
           </div>
         </div>
@@ -151,7 +182,7 @@ export default function PartnersPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Tabs */}
           <div className="flex flex-wrap gap-3 mb-12">
-            {tabs.map((tab) => {
+            {tabs.map((tab, idx) => {
               const Icon = tab.icon;
               return (
                 <button
@@ -164,7 +195,7 @@ export default function PartnersPage() {
                   }`}
                 >
                   <Icon className="w-4 h-4" />
-                  {tab.label}
+                  {tabLabels[idx] ?? tab.label}
                 </button>
               );
             })}
@@ -188,16 +219,16 @@ export default function PartnersPage() {
                     {activeTab === 'universities' && <GraduationCap className="w-10 h-10 text-[#5DB347]" />}
                   </div>
                   <h3 className="text-2xl font-bold text-[#1B2A4A] mb-3">
-                    {activeTab === 'unions' && 'Seeking Farming Union Partners'}
-                    {activeTab === 'business' && 'Building Business Partnerships'}
-                    {activeTab === 'governments' && 'Seeking Government Partnerships'}
-                    {activeTab === 'universities' && 'Seeking University & Research Partners'}
+                    {activeTab === 'unions' && (emptyTitles[0] ?? 'Seeking Farming Union Partners')}
+                    {activeTab === 'business' && (emptyTitles[1] ?? 'Building Business Partnerships')}
+                    {activeTab === 'governments' && (emptyTitles[2] ?? 'Seeking Government Partnerships')}
+                    {activeTab === 'universities' && (emptyTitles[3] ?? 'Seeking University & Research Partners')}
                   </h3>
                   <p className="text-gray-500 max-w-lg mx-auto mb-8 leading-relaxed">
-                    {activeTab === 'unions' && 'We are actively seeking partnerships with national and regional farming unions across Africa. If your organisation represents farmers and would like to explore collaboration with AFU, we would love to hear from you.'}
-                    {activeTab === 'business' && "We're building partnerships with leading institutions across Africa — banks, agri-businesses, technology providers, and logistics networks. Get in touch to explore working with AFU."}
-                    {activeTab === 'governments' && 'AFU is engaging with ministries of agriculture and development agencies across our operating countries. If you represent a government body interested in digital agriculture transformation, let us connect.'}
-                    {activeTab === 'universities' && 'We are building research partnerships with agricultural universities and institutes across Africa. If your institution is interested in collaborative research, student placements, or technology transfer, get in touch.'}
+                    {activeTab === 'unions' && (emptyBodies[0] ?? '')}
+                    {activeTab === 'business' && (emptyBodies[1] ?? '')}
+                    {activeTab === 'governments' && (emptyBodies[2] ?? '')}
+                    {activeTab === 'universities' && (emptyBodies[3] ?? '')}
                   </p>
                   <div className="flex items-center justify-center gap-4">
                     <Link
@@ -284,16 +315,13 @@ export default function PartnersPage() {
             {/* Decorative gradient accent */}
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#5DB347] via-[#6ABF4B] to-[#8CB89C]" />
             <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent">
-              Become an AFU Partner
+              {ctaTitle}
             </h2>
             <p className="text-gray-300 text-lg mb-4 max-w-2xl mx-auto">
-              Join our growing network of farming unions, businesses,
-              government agencies, and research institutions. Together we are
-              building a more prosperous agricultural future for Africa.
+              {ctaBody}
             </p>
             <p className="text-gray-400 mb-8 max-w-xl mx-auto text-sm">
-              Partner membership is $250/year and gives you access to the AFU
-              deal flow, member network, and co-branded programmes.
+              {ctaPriceText}
             </p>
             <Link
               href="/apply"

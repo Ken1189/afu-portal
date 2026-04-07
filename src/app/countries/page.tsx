@@ -210,8 +210,35 @@ async function getCountries() {
   return FALLBACK_COUNTRIES;
 }
 
+async function getChrome(): Promise<Record<string, string> | null> {
+  try {
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+    const { data } = await supabase
+      .from('site_config')
+      .select('value')
+      .eq('key', 'page_chrome_countries')
+      .single();
+    if (data?.value) {
+      const parsed = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
+      if (parsed && typeof parsed === 'object') return parsed as Record<string, string>;
+    }
+  } catch { /* use fallback */ }
+  return null;
+}
+
 export default async function CountriesPage() {
   const countries = await getCountries();
+  const chrome = await getChrome();
+  const heroBadge = chrome?.hero_badge ?? 'Pan-African Reach';
+  const heroTitleHtml = chrome?.hero_title ?? null;
+  const heroSubtitle = chrome?.hero_subtitle ?? 'Strategic markets across Africa, each serving a distinct purpose in the AFU flywheel.';
+  const sectionEyebrow = chrome?.section_eyebrow ?? 'Where We Operate';
+  const sectionTitle = chrome?.section_title ?? 'Strategic Markets Across Africa';
+  const ctaTitle = chrome?.cta_title ?? null;
+  const ctaBody = chrome?.cta_body ?? 'Multiple countries. One integrated platform. Apply for membership or become a supplier today.';
   return (
     <>
       {/* ─── HERO ─── */}
@@ -220,13 +247,17 @@ export default async function CountriesPage() {
         <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full opacity-10 blur-3xl" style={{ background: '#5DB347' }} />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <span className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5 text-sm font-medium mb-6" style={{ color: '#6ABF4B' }}>
-            Pan-African Reach
+            {heroBadge}
           </span>
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6">
-            Our <span className="bg-gradient-to-r from-[#5DB347] to-[#6ABF4B] bg-clip-text text-transparent">Countries</span>
+            {heroTitleHtml ? (
+              heroTitleHtml
+            ) : (
+              <>Our <span className="bg-gradient-to-r from-[#5DB347] to-[#6ABF4B] bg-clip-text text-transparent">Countries</span></>
+            )}
           </h1>
           <p className="text-xl text-gray-300 max-w-3xl">
-            Strategic markets across Africa, each serving a distinct purpose in the AFU flywheel.
+            {heroSubtitle}
           </p>
           <div className="flex flex-wrap gap-3 mt-8">
             {countries.map((c) => (
@@ -244,10 +275,10 @@ export default async function CountriesPage() {
           {/* Section header */}
           <div className="text-center mb-12">
             <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#5DB347' }}>
-              Where We Operate
+              {sectionEyebrow}
             </span>
             <h2 className="text-3xl md:text-4xl font-bold mt-2">
-              <span className="bg-gradient-to-r from-[#1B2A4A] to-[#5DB347] bg-clip-text text-transparent">Strategic Markets Across Africa</span>
+              <span className="bg-gradient-to-r from-[#1B2A4A] to-[#5DB347] bg-clip-text text-transparent">{sectionTitle}</span>
             </h2>
           </div>
 
@@ -297,9 +328,11 @@ export default async function CountriesPage() {
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[200px] rounded-full opacity-15 blur-3xl" style={{ background: '#5DB347' }} />
             <div className="relative">
               <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">
-                Join the Pan-African <span className="bg-gradient-to-r from-[#5DB347] to-[#6ABF4B] bg-clip-text text-transparent">Agricultural Revolution</span>
+                {ctaTitle ?? (
+                  <>Join the Pan-African <span className="bg-gradient-to-r from-[#5DB347] to-[#6ABF4B] bg-clip-text text-transparent">Agricultural Revolution</span></>
+                )}
               </h3>
-              <p className="text-white/70 mb-8 max-w-lg mx-auto">Multiple countries. One integrated platform. Apply for membership or become a supplier today.</p>
+              <p className="text-white/70 mb-8 max-w-lg mx-auto">{ctaBody}</p>
               <div className="flex flex-wrap gap-4 justify-center">
                 <Link
                   href="/apply"

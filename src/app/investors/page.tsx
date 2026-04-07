@@ -1,3 +1,6 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -28,45 +31,537 @@ import {
   Monitor,
   HeartHandshake,
   UtensilsCrossed,
+  type LucideIcon,
 } from "lucide-react";
 import VideoCard from "@/components/VideoCard";
 import ScheduleDemoButton from "@/components/ScheduleDemoButton";
 import LegalDisclaimer from "@/components/ui/LegalDisclaimer";
+import { createClient } from '@/lib/supabase/client';
 
-export const metadata = {
-  title: "Invest in AFU - $500M Seed Round | African Farming Union",
-  description:
-    "Join AFU's $500M seed round to build Africa's first vertically integrated agriculture development bank. $1T market opportunity. De-risked, technology-enabled model across Africa.",
-  openGraph: {
-    title: "Invest in AFU - $500M Seed Round",
-    description:
-      "Africa's agriculture is a $1T market by 2030. AFU is the execution layer — financing, inputs, processing, offtake, trade finance, and training in one integrated platform.",
-    url: "https://africanfarmingunion.org/investors",
-    images: [
+// ─── Types ───
+
+type StatItem = { value: string; label: string };
+type IconTextItem = { icon?: string; title: string; desc: string };
+type TitleDescItem = { title: string; desc: string };
+type TractionItem = { value: string; label: string; desc: string; icon?: string };
+type TierItem = {
+  name: string;
+  min: string;
+  returns: string;
+  features: string[];
+  cta_text: string;
+  featured?: boolean;
+};
+type DemoItem = {
+  title: string;
+  subhead: string;
+  features: string[];
+  demo_link: string;
+};
+
+type InvestorsContent = {
+  hero: {
+    badge: string;
+    title: string;
+    subtitle: string;
+    cta1_text: string;
+    cta2_text: string;
+    image_url: string;
+  };
+  opportunity: {
+    eyebrow: string;
+    title: string;
+    intro: string;
+    stats: StatItem[];
+  };
+  by_numbers: StatItem[];
+  why_afu: {
+    eyebrow: string;
+    title: string;
+    items: TitleDescItem[];
+  };
+  pillars: {
+    title: string;
+    items: IconTextItem[];
+  };
+  traction: {
+    title: string;
+    items: TractionItem[];
+  };
+  tiers: {
+    eyebrow: string;
+    title: string;
+    intro: string;
+    items: TierItem[];
+  };
+  leadership: {
+    title: string;
+    body: string;
+    bullets: string[];
+    governance: TitleDescItem[];
+  };
+  demos: {
+    title: string;
+    items: DemoItem[];
+  };
+  final_cta: {
+    badge: string;
+    title: string;
+    body: string;
+    cta1_text: string;
+    cta2_text: string;
+    email: string;
+    phone: string;
+  };
+};
+
+// ─── Icon map ───
+
+const ICON_MAP: Record<string, LucideIcon> = {
+  Banknote,
+  Factory,
+  ShieldCheck,
+  CircleDollarSign,
+  GraduationCap,
+  Cog,
+  Target,
+  TrendingUp,
+  PieChart,
+  LineChart,
+  Landmark,
+  Building2,
+  BadgeDollarSign,
+  ShieldPlus,
+  Globe2,
+  Users,
+  BarChart3,
+  Leaf,
+  Sprout,
+  Monitor,
+  HeartHandshake,
+  UtensilsCrossed,
+};
+
+function getIcon(name: string | undefined, fallback: LucideIcon = Target): LucideIcon {
+  if (!name) return fallback;
+  return ICON_MAP[name] || fallback;
+}
+
+// ─── Fallback ───
+
+const FALLBACK_INVESTORS: InvestorsContent = {
+  hero: {
+    badge: '$500M Seed Round',
+    title: "Invest in Africa's Agricultural Transformation",
+    subtitle:
+      "AFU is building Africa's first vertically integrated agriculture development bank and operating platform — the execution layer for a $1 trillion market.",
+    cta1_text: 'Request Investor Pack',
+    cta2_text: 'Book a Demo',
+    image_url:
+      'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1920&q=80',
+  },
+  opportunity: {
+    eyebrow: 'The Opportunity',
+    title: "Africa's Agriculture Paradox",
+    intro:
+      "The world's largest untapped agricultural opportunity. The land, labor, and demand exist — what's missing is the infrastructure to connect them.",
+    stats: [
+      { value: '$1T', label: 'African agri market by 2030' },
+      { value: '$50B+', label: 'Annual food import gap across Africa' },
+      { value: '60%', label: "Of world's uncultivated arable land is in Africa" },
+      { value: '10x', label: 'Value chain multiplier from seed to export' },
+    ],
+  },
+  by_numbers: [
+    { value: '10', label: 'Countries' },
+    { value: '37+', label: 'Database Tables' },
+    { value: 'Growing', label: 'Farmer Community' },
+    { value: '$500M', label: 'Target Raise' },
+    { value: '6', label: 'Service Pillars' },
+    { value: '12', label: 'Languages' },
+  ],
+  why_afu: {
+    eyebrow: 'Competitive Advantage',
+    title: 'Why AFU',
+    items: [
       {
-        url: "https://africanfarmingunion.org/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "Invest in AFU - $500M Seed Round",
+        title: 'Vertically Integrated Model',
+        desc: 'AFU controls the full value chain — financing, inputs, processing, and offtake — creating compounding returns at every stage. No one else does this.',
+      },
+      {
+        title: '9 Countries, One Platform',
+        desc: 'Multi-country diversification de-risks exposure to any single market. Same playbook, different geographies, shared infrastructure.',
+      },
+      {
+        title: 'Technology-Enabled Execution',
+        desc: 'AI credit scoring, satellite crop monitoring, blockchain traceability, and a full digital platform create defensible advantages over traditional lenders.',
+      },
+      {
+        title: 'Trade Finance Revenue Engine',
+        desc: 'SBLCs, Letters of Credit, export pre-financing, and FX services via our banking partners generate high-margin fee income ($8M Year 3, $80M Year 5) while unlocking cross-border trade. Our highest-margin product line.',
+      },
+      {
+        title: 'De-Risked Capital Deployment',
+        desc: 'Input-in-kind financing, offtake contracts, and tranche releases mean capital is always tied to productive use. Escrow-controlled repayment eliminates leakage.',
+      },
+      {
+        title: 'ESG & Impact Aligned',
+        desc: 'Every dollar deployed creates measurable social impact: jobs, food security, rural income growth, and climate resilience. DFI-ready from day one.',
       },
     ],
   },
-  twitter: {
-    card: "summary_large_image",
-    title: "Invest in AFU - $500M Seed Round",
-    description:
-      "Africa's agriculture is a $1T market by 2030. AFU is the execution layer — financing, inputs, processing, offtake, trade finance, and training in one integrated platform.",
+  pillars: {
+    title: 'Six Integrated Pillars',
+    items: [
+      {
+        icon: 'Banknote',
+        title: 'Financing',
+        desc: 'Working capital, invoice finance, and crop financing. Escrow-controlled repayment through offtake.',
+      },
+      {
+        icon: 'Cog',
+        title: 'Inputs & Equipment',
+        desc: 'Bulk procurement of seeds, fertilizers, tractors, and irrigation. Better prices through aggregation.',
+      },
+      {
+        icon: 'Factory',
+        title: 'Processing Hubs',
+        desc: 'Milling, drying, cold chain, and packaging. Value-addition at source multiplies farmer income.',
+      },
+      {
+        icon: 'ShieldCheck',
+        title: 'Guaranteed Offtake',
+        desc: 'Pre-arranged buyers and distribution channels. No more selling cheap or wasting crops.',
+      },
+      {
+        icon: 'CircleDollarSign',
+        title: 'Trade Finance',
+        desc: 'SBLCs, Letters of Credit, export pre-financing, and FX via our banking partners. Our highest-margin product — projected $8M Year 3, $80M Year 5.',
+      },
+      {
+        icon: 'GraduationCap',
+        title: 'Training & Certification',
+        desc: 'Vocational partnerships to build scalable farmer capacity, compliance, and export readiness.',
+      },
+    ],
+  },
+  traction: {
+    title: 'Built, Not Projected',
+    items: [
+      {
+        value: '10',
+        label: 'Countries',
+        desc: 'Operational frameworks established across Zimbabwe, Botswana, Tanzania, Kenya, Zambia, Malawi, Mozambique, Ghana, DRC, and Rwanda',
+        icon: 'Globe2',
+      },
+      {
+        value: '37+',
+        label: 'Database Tables',
+        desc: 'Full relational database covering members, farms, crops, loans, payments, offtake, KYC, and more',
+        icon: 'BarChart3',
+      },
+      {
+        value: 'Full',
+        label: 'Platform Built',
+        desc: 'Farmer portal, trade finance page, supplier marketplace, admin dashboard, AI tools, insurance, crop scanner, weather, and training modules',
+        icon: 'Building2',
+      },
+      {
+        value: '$500M',
+        label: 'Target Raise',
+        desc: 'Seed round to fund first-wave deployments across Phase 1 countries and begin live farming operations',
+        icon: 'Target',
+      },
+    ],
+  },
+  tiers: {
+    eyebrow: 'Investment Structure',
+    title: 'Investment Tiers',
+    intro:
+      'Structured to accommodate different investor profiles with aligned incentives and clear return targets.',
+    items: [
+      {
+        name: 'Tier 1 — Seed Investor',
+        min: '$1M',
+        returns: '8% target annual return',
+        features: ['Quarterly distributions', 'Investor portal access', 'Quarterly reporting'],
+        cta_text: 'Request Details',
+        featured: false,
+      },
+      {
+        name: 'Tier 2 — Growth Partner',
+        min: '$10M',
+        returns: '10% target annual return',
+        features: [
+          'Quarterly distributions',
+          'Investor portal access',
+          'Board observer rights',
+          'Dedicated relationship manager',
+          'Off-take participation options',
+        ],
+        cta_text: 'Request Details',
+        featured: true,
+      },
+      {
+        name: 'Tier 3 — Strategic Partner',
+        min: '$100M',
+        returns: '13% target annual return',
+        features: [
+          'Quarterly distributions',
+          'Investor portal access',
+          'Board seat',
+          'Equity participation option',
+          'Dedicated relationship manager',
+          'Off-take participation options',
+          'Marketing rights across AFU member network',
+          'Co-investment rights on projects',
+        ],
+        cta_text: 'Request Details',
+        featured: false,
+      },
+    ],
+  },
+  leadership: {
+    title: 'Experienced Team',
+    body:
+      'AFU is governed by a Board of Directors and supported by an Advisory Council with deep expertise across agriculture, finance, technology, and African market development.',
+    bullets: [
+      'Board with agriculture finance and African market expertise',
+      'Advisory Council spanning agribusiness, technology, and development finance',
+      'Country Directors in each operational market',
+      'Technical team building AI, blockchain, and satellite monitoring tools',
+    ],
+    governance: [
+      {
+        title: 'Board of Directors',
+        desc: 'Strategic oversight, fiduciary responsibility, and investor alignment',
+      },
+      {
+        title: 'Advisory Council',
+        desc: 'Domain experts providing guidance on agriculture, finance, and technology',
+      },
+      {
+        title: 'Country Operations',
+        desc: 'Local directors managing on-ground execution in each market',
+      },
+    ],
+  },
+  demos: {
+    title: 'Live Product Demos',
+    items: [
+      {
+        title: 'Farmer Portal Demo',
+        subhead: 'See what 1,000,000+ smallholder farmers will experience',
+        features: [
+          'Dashboard & farm overview',
+          'AI Crop Doctor diagnosis',
+          'Loan tracking & repayments',
+          'Training & market prices',
+        ],
+        demo_link: '/demo/farm',
+      },
+      {
+        title: 'Commercial Dashboard Demo',
+        subhead: 'Enterprise-grade farm management tools',
+        features: [
+          'Multi-plot management',
+          'Offtake contracts & financing',
+          'Equipment booking & co-ops',
+          'Export readiness tracking',
+        ],
+        demo_link: '/demo/commercial',
+      },
+    ],
+  },
+  final_cta: {
+    badge: '$500M Seed Round — Now Open',
+    title: 'Ready to Build the Future of African Agriculture?',
+    body:
+      'Request our investor pack for the full financial model, trade finance revenue projections, country deployment plans, risk framework, and team profiles. Or schedule a call to discuss the opportunity directly.',
+    cta1_text: 'Request Investor Pack',
+    cta2_text: 'Schedule a Call',
+    email: 'peterw@africanfarmingunion.org',
+    phone: 'Contact via form',
   },
 };
 
+// Static styling tokens for tiers (DB only carries content)
+const TIER_STYLES = [
+  {
+    borderColor: 'border-[#5DB347]/40',
+    bgColor: 'bg-[#5DB347]/5',
+    badge: 'bg-[#5DB347]/20 text-[#5DB347]',
+    accentColor: '#5DB347',
+  },
+  {
+    borderColor: 'border-gold/40 ring-2 ring-gold/20',
+    bgColor: 'bg-gold/5',
+    badge: 'bg-gold/20 text-gold',
+    accentColor: '#D4A843',
+  },
+  {
+    borderColor: 'border-[#1B2A4A]/60 ring-2 ring-[#1B2A4A]/30',
+    bgColor: 'bg-[#1B2A4A]/10',
+    badge: 'bg-[#1B2A4A]/30 text-gray-200',
+    accentColor: '#1B2A4A',
+  },
+];
+
+const PILLAR_COLORS = [
+  'from-[#1B2A4A] to-[#2D4A7A]',
+  'from-[#5DB347] to-[#449933]',
+  'from-[#4A9E35] to-[#3d8a2e]',
+  'from-[#2D4A7A] to-[#1B2A4A]',
+  'from-[#6ABF4B] to-[#5DB347]',
+  'from-[#8CB89C] to-[#729E82]',
+];
+
+const OPPORTUNITY_COLORS = [
+  'from-gold to-amber-500',
+  'from-[#5DB347] to-emerald-500',
+  'from-cyan-500 to-blue-500',
+  'from-purple-500 to-indigo-500',
+];
+
+const DEMO_GRADIENTS = [
+  {
+    headerBg: 'bg-gradient-to-br from-[#5DB347] to-[#449933]',
+    icon: Sprout,
+    btnStyle: { background: 'linear-gradient(135deg, #5DB347, #449933)' },
+    btnShadow: 'shadow-lg shadow-[#5DB347]/20 hover:shadow-xl hover:shadow-[#5DB347]/30',
+  },
+  {
+    headerBg: 'bg-gradient-to-br from-[#1B2A4A] to-[#0F1A30]',
+    icon: Monitor,
+    btnStyle: { background: 'linear-gradient(135deg, #1B2A4A, #2D4A7A)' },
+    btnShadow: 'shadow-lg shadow-[#1B2A4A]/20 hover:shadow-xl hover:shadow-[#1B2A4A]/30',
+  },
+];
+
+const GOVERNANCE_ICONS: LucideIcon[] = [Users, Landmark, Globe2];
+
+// ─── Component ───
+
 export default function InvestorsPage() {
+  const [content, setContent] = useState<InvestorsContent>(FALLBACK_INVESTORS);
+
+  useEffect(() => {
+    async function fetchContent() {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from('site_config')
+          .select('value')
+          .eq('key', 'page_investors')
+          .single();
+        if (data && data.value) {
+          let parsed: Partial<InvestorsContent> | null = null;
+          try {
+            parsed = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
+          } catch {
+            parsed = null;
+          }
+          if (parsed && typeof parsed === 'object') {
+            setContent({
+              hero: { ...FALLBACK_INVESTORS.hero, ...(parsed.hero || {}) },
+              opportunity: {
+                ...FALLBACK_INVESTORS.opportunity,
+                ...(parsed.opportunity || {}),
+                stats:
+                  parsed.opportunity &&
+                  Array.isArray(parsed.opportunity.stats) &&
+                  parsed.opportunity.stats.length > 0
+                    ? parsed.opportunity.stats
+                    : FALLBACK_INVESTORS.opportunity.stats,
+              },
+              by_numbers:
+                Array.isArray(parsed.by_numbers) && parsed.by_numbers.length > 0
+                  ? parsed.by_numbers
+                  : FALLBACK_INVESTORS.by_numbers,
+              why_afu: {
+                ...FALLBACK_INVESTORS.why_afu,
+                ...(parsed.why_afu || {}),
+                items:
+                  parsed.why_afu &&
+                  Array.isArray(parsed.why_afu.items) &&
+                  parsed.why_afu.items.length > 0
+                    ? parsed.why_afu.items
+                    : FALLBACK_INVESTORS.why_afu.items,
+              },
+              pillars: {
+                ...FALLBACK_INVESTORS.pillars,
+                ...(parsed.pillars || {}),
+                items:
+                  parsed.pillars &&
+                  Array.isArray(parsed.pillars.items) &&
+                  parsed.pillars.items.length > 0
+                    ? parsed.pillars.items
+                    : FALLBACK_INVESTORS.pillars.items,
+              },
+              traction: {
+                ...FALLBACK_INVESTORS.traction,
+                ...(parsed.traction || {}),
+                items:
+                  parsed.traction &&
+                  Array.isArray(parsed.traction.items) &&
+                  parsed.traction.items.length > 0
+                    ? parsed.traction.items
+                    : FALLBACK_INVESTORS.traction.items,
+              },
+              tiers: {
+                ...FALLBACK_INVESTORS.tiers,
+                ...(parsed.tiers || {}),
+                items:
+                  parsed.tiers &&
+                  Array.isArray(parsed.tiers.items) &&
+                  parsed.tiers.items.length > 0
+                    ? parsed.tiers.items
+                    : FALLBACK_INVESTORS.tiers.items,
+              },
+              leadership: {
+                ...FALLBACK_INVESTORS.leadership,
+                ...(parsed.leadership || {}),
+                bullets:
+                  parsed.leadership &&
+                  Array.isArray(parsed.leadership.bullets) &&
+                  parsed.leadership.bullets.length > 0
+                    ? parsed.leadership.bullets
+                    : FALLBACK_INVESTORS.leadership.bullets,
+                governance:
+                  parsed.leadership &&
+                  Array.isArray(parsed.leadership.governance) &&
+                  parsed.leadership.governance.length > 0
+                    ? parsed.leadership.governance
+                    : FALLBACK_INVESTORS.leadership.governance,
+              },
+              demos: {
+                ...FALLBACK_INVESTORS.demos,
+                ...(parsed.demos || {}),
+                items:
+                  parsed.demos &&
+                  Array.isArray(parsed.demos.items) &&
+                  parsed.demos.items.length > 0
+                    ? parsed.demos.items
+                    : FALLBACK_INVESTORS.demos.items,
+              },
+              final_cta: { ...FALLBACK_INVESTORS.final_cta, ...(parsed.final_cta || {}) },
+            });
+          }
+        }
+      } catch {
+        // keep fallback
+      }
+    }
+    fetchContent();
+  }, []);
+
   return (
     <>
       {/* ─── HERO ─── */}
       <section className="relative min-h-[85vh] flex items-center overflow-hidden">
         <div className="absolute inset-0">
           <Image
-            src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1920&q=80"
+            src={content.hero.image_url}
             alt=""
             fill
             className="object-cover"
@@ -91,20 +586,15 @@ export default function InvestorsPage() {
             {/* Badge */}
             <div className="inline-flex items-center gap-2 bg-gold/20 border border-gold/30 text-gold px-5 py-2 rounded-full text-sm font-bold mb-8">
               <Landmark className="w-4 h-4" />
-              $500M Seed Round
+              {content.hero.badge}
             </div>
 
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] text-white mb-8">
-              Invest in Africa&apos;s Agricultural{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold to-amber-300">
-                Transformation
-              </span>
+              {content.hero.title}
             </h1>
 
             <p className="text-xl md:text-2xl text-gray-300 mb-6 leading-relaxed max-w-2xl">
-              AFU is building Africa&apos;s first vertically integrated agriculture
-              development bank and operating platform — the execution layer for a
-              $1 trillion market.
+              {content.hero.subtitle}
             </p>
             <p className="text-lg text-gray-400 mb-10 max-w-2xl">
               One integrated loop: Financing, Inputs, Processing, Offtake, Trade
@@ -117,11 +607,11 @@ export default function InvestorsPage() {
                 href="/contact"
                 className="group bg-gradient-to-r from-gold to-amber-500 hover:from-gold hover:to-amber-400 text-navy-dark px-10 py-5 rounded-2xl font-bold text-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-gold/20 hover:shadow-xl hover:shadow-gold/30 hover:scale-105"
               >
-                Request Investor Pack
+                {content.hero.cta1_text}
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
               <ScheduleDemoButton
-                label="Book a Demo"
+                label={content.hero.cta2_text}
                 className="border-2 border-white/30 hover:border-white/60 hover:bg-white/10 text-white px-10 py-5 rounded-2xl font-bold text-lg transition-all duration-300 flex items-center justify-center gap-2"
               />
             </div>
@@ -181,53 +671,29 @@ export default function InvestorsPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="text-center mb-16">
             <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: "#5DB347" }}>
-              The Opportunity
+              {content.opportunity.eyebrow}
             </span>
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mt-2 mb-4">
               <span className="bg-gradient-to-r from-[#1B2A4A] to-[#5DB347] bg-clip-text text-transparent">
-                Africa&apos;s Agriculture Paradox
+                {content.opportunity.title}
               </span>
             </h2>
             <p className="text-gray-500 max-w-2xl mx-auto text-lg">
-              The world&apos;s largest untapped agricultural opportunity. The land, labor, and demand exist — what&apos;s missing is the infrastructure to connect them.
+              {content.opportunity.intro}
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              {
-                icon: Target,
-                value: "$1T",
-                label: "African agri market by 2030",
-                color: "from-gold to-amber-500",
-              },
-              {
-                icon: TrendingUp,
-                value: "$50B+",
-                label: "Annual food import gap across Africa",
-                color: "from-[#5DB347] to-emerald-500",
-              },
-              {
-                icon: Globe2,
-                value: "60%",
-                label: "Of world's uncultivated arable land is in Africa",
-                color: "from-cyan-500 to-blue-500",
-              },
-              {
-                icon: LineChart,
-                value: "10x",
-                label: "Value chain multiplier from seed to export",
-                color: "from-purple-500 to-indigo-500",
-              },
-            ].map((item) => {
-              const Icon = item.icon;
+            {content.opportunity.stats.map((item, i) => {
+              const Icon = [Target, TrendingUp, Globe2, LineChart][i] || Target;
+              const color = OPPORTUNITY_COLORS[i] || OPPORTUNITY_COLORS[0];
               return (
                 <div
                   key={item.label}
                   className="bg-white rounded-3xl p-8 text-center shadow-lg shadow-[#5DB347]/5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100"
                 >
                   <div
-                    className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center mx-auto mb-4 shadow-lg`}
+                    className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${color} flex items-center justify-center mx-auto mb-4 shadow-lg`}
                   >
                     <Icon className="w-8 h-8 text-white" />
                   </div>
@@ -255,41 +721,15 @@ export default function InvestorsPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>
               <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: "#6ABF4B" }}>
-                Competitive Advantage
+                {content.why_afu.eyebrow}
               </span>
               <h2 className="text-3xl md:text-4xl font-bold mt-2 mb-8">
-                Why{" "}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#5DB347] to-[#6ABF4B]">
-                  AFU
+                  {content.why_afu.title}
                 </span>
               </h2>
               <div className="space-y-6">
-                {[
-                  {
-                    title: "Vertically Integrated Model",
-                    desc: "AFU controls the full value chain — financing, inputs, processing, and offtake — creating compounding returns at every stage. No one else does this.",
-                  },
-                  {
-                    title: "9 Countries, One Platform",
-                    desc: "Multi-country diversification de-risks exposure to any single market. Same playbook, different geographies, shared infrastructure.",
-                  },
-                  {
-                    title: "Technology-Enabled Execution",
-                    desc: "AI credit scoring, satellite crop monitoring, blockchain traceability, and a full digital platform create defensible advantages over traditional lenders.",
-                  },
-                  {
-                    title: "Trade Finance Revenue Engine",
-                    desc: "SBLCs, Letters of Credit, export pre-financing, and FX services via our banking partners generate high-margin fee income ($8M Year 3, $80M Year 5) while unlocking cross-border trade. Our highest-margin product line.",
-                  },
-                  {
-                    title: "De-Risked Capital Deployment",
-                    desc: "Input-in-kind financing, offtake contracts, and tranche releases mean capital is always tied to productive use. Escrow-controlled repayment eliminates leakage.",
-                  },
-                  {
-                    title: "ESG & Impact Aligned",
-                    desc: "Every dollar deployed creates measurable social impact: jobs, food security, rural income growth, and climate resilience. DFI-ready from day one.",
-                  },
-                ].map((item, i) => (
+                {content.why_afu.items.map((item, i) => (
                   <div key={i} className="flex gap-4 group">
                     <div className="w-10 h-10 rounded-xl bg-[#5DB347]/20 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-[#5DB347]/30 transition-colors">
                       <CheckCircle2 className="w-5 h-5" style={{ color: "#5DB347" }} />
@@ -311,14 +751,7 @@ export default function InvestorsPage() {
                   By The Numbers
                 </h3>
                 <div className="grid grid-cols-2 gap-6">
-                  {[
-                    { value: "10", label: "Countries" },
-                    { value: "37+", label: "Database Tables" },
-                    { value: "Growing", label: "Farmer Community" },
-                    { value: "$500M", label: "Target Raise" },
-                    { value: "6", label: "Service Pillars" },
-                    { value: "12", label: "Languages" },
-                  ].map((stat) => (
+                  {content.by_numbers.map((stat) => (
                     <div key={stat.label} className="text-center">
                       <div className="text-2xl md:text-3xl font-bold text-white">{stat.value}</div>
                       <p className="text-gray-400 text-xs">{stat.label}</p>
@@ -348,7 +781,7 @@ export default function InvestorsPage() {
             </span>
             <h2 className="text-3xl md:text-4xl font-bold mt-2 mb-4">
               <span className="bg-gradient-to-r from-[#1B2A4A] to-[#5DB347] bg-clip-text text-transparent">
-                Six Integrated Pillars
+                {content.pillars.title}
               </span>
             </h2>
             <p className="text-gray-500 max-w-2xl mx-auto">
@@ -358,52 +791,16 @@ export default function InvestorsPage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              {
-                icon: Banknote,
-                title: "Financing",
-                desc: "Working capital, invoice finance, and crop financing. Escrow-controlled repayment through offtake.",
-                color: "from-[#1B2A4A] to-[#2D4A7A]",
-              },
-              {
-                icon: Cog,
-                title: "Inputs & Equipment",
-                desc: "Bulk procurement of seeds, fertilizers, tractors, and irrigation. Better prices through aggregation.",
-                color: "from-[#5DB347] to-[#449933]",
-              },
-              {
-                icon: Factory,
-                title: "Processing Hubs",
-                desc: "Milling, drying, cold chain, and packaging. Value-addition at source multiplies farmer income.",
-                color: "from-[#4A9E35] to-[#3d8a2e]",
-              },
-              {
-                icon: ShieldCheck,
-                title: "Guaranteed Offtake",
-                desc: "Pre-arranged buyers and distribution channels. No more selling cheap or wasting crops.",
-                color: "from-[#2D4A7A] to-[#1B2A4A]",
-              },
-              {
-                icon: CircleDollarSign,
-                title: "Trade Finance",
-                desc: "SBLCs, Letters of Credit, export pre-financing, and FX via our banking partners. Our highest-margin product — projected $8M Year 3, $80M Year 5.",
-                color: "from-[#6ABF4B] to-[#5DB347]",
-              },
-              {
-                icon: GraduationCap,
-                title: "Training & Certification",
-                desc: "Vocational partnerships to build scalable farmer capacity, compliance, and export readiness.",
-                color: "from-[#8CB89C] to-[#729E82]",
-              },
-            ].map((pillar) => {
-              const Icon = pillar.icon;
+            {content.pillars.items.map((pillar, i) => {
+              const Icon = getIcon(pillar.icon, Banknote);
+              const color = PILLAR_COLORS[i] || PILLAR_COLORS[0];
               return (
                 <div
                   key={pillar.title}
                   className="bg-white rounded-3xl p-8 shadow-lg shadow-[#5DB347]/5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100 group"
                 >
                   <div
-                    className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${pillar.color} flex items-center justify-center mb-5 shadow-lg group-hover:scale-110 transition-transform`}
+                    className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${color} flex items-center justify-center mb-5 shadow-lg group-hover:scale-110 transition-transform`}
                   >
                     <Icon className="w-7 h-7 text-white" />
                   </div>
@@ -435,7 +832,7 @@ export default function InvestorsPage() {
             </span>
             <h2 className="text-3xl md:text-4xl font-bold mt-2 mb-4">
               <span className="bg-gradient-to-r from-[#1B2A4A] to-[#5DB347] bg-clip-text text-transparent">
-                Built, Not Projected
+                {content.traction.title}
               </span>
             </h2>
             <p className="text-gray-500 max-w-2xl mx-auto">
@@ -445,33 +842,8 @@ export default function InvestorsPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              {
-                value: "10",
-                label: "Countries",
-                desc: "Operational frameworks established across Zimbabwe, Botswana, Tanzania, Kenya, Zambia, Malawi, Mozambique, Ghana, DRC, and Rwanda",
-                icon: Globe2,
-              },
-              {
-                value: "37+",
-                label: "Database Tables",
-                desc: "Full relational database covering members, farms, crops, loans, payments, offtake, KYC, and more",
-                icon: BarChart3,
-              },
-              {
-                value: "Full",
-                label: "Platform Built",
-                desc: "Farmer portal, trade finance page, supplier marketplace, admin dashboard, AI tools, insurance, crop scanner, weather, and training modules",
-                icon: Building2,
-              },
-              {
-                value: "$500M",
-                label: "Target Raise",
-                desc: "Seed round to fund first-wave deployments across Phase 1 countries and begin live farming operations",
-                icon: Target,
-              },
-            ].map((item) => {
-              const Icon = item.icon;
+            {content.traction.items.map((item) => {
+              const Icon = getIcon(item.icon, Globe2);
               return (
                 <div
                   key={item.label}
@@ -621,108 +993,57 @@ export default function InvestorsPage() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: "#6ABF4B" }}>
-              Investment Structure
+              {content.tiers.eyebrow}
             </span>
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mt-2 mb-4">
-              Investment{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold to-amber-300">
-                Tiers
-              </span>
+              {content.tiers.title}
             </h2>
             <p className="text-gray-400 max-w-2xl mx-auto">
-              Structured to accommodate different investor profiles with aligned incentives and clear return targets.
+              {content.tiers.intro}
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              {
-                tier: "Tier 1 — Seed Investor",
-                min: "$1M",
-                returns: "8% target annual return",
-                features: [
-                  "Quarterly distributions",
-                  "Investor portal access",
-                  "Quarterly reporting",
-                ],
-                borderColor: "border-[#5DB347]/40",
-                bgColor: "bg-[#5DB347]/5",
-                badge: "bg-[#5DB347]/20 text-[#5DB347]",
-                accentColor: "#5DB347",
-              },
-              {
-                tier: "Tier 2 — Growth Partner",
-                min: "$10M",
-                returns: "10% target annual return",
-                features: [
-                  "Quarterly distributions",
-                  "Investor portal access",
-                  "Board observer rights",
-                  "Dedicated relationship manager",
-                  "Off-take participation options",
-                ],
-                borderColor: "border-gold/40 ring-2 ring-gold/20",
-                bgColor: "bg-gold/5",
-                badge: "bg-gold/20 text-gold",
-                featured: true,
-                accentColor: "#D4A843",
-              },
-              {
-                tier: "Tier 3 — Strategic Partner",
-                min: "$100M",
-                returns: "13% target annual return",
-                features: [
-                  "Quarterly distributions",
-                  "Investor portal access",
-                  "Board seat",
-                  "Equity participation option",
-                  "Dedicated relationship manager",
-                  "Off-take participation options",
-                  "Marketing rights across AFU member network",
-                  "Co-investment rights on projects",
-                ],
-                borderColor: "border-[#1B2A4A]/60 ring-2 ring-[#1B2A4A]/30",
-                bgColor: "bg-[#1B2A4A]/10",
-                badge: "bg-[#1B2A4A]/30 text-gray-200",
-                accentColor: "#1B2A4A",
-              },
-            ].map((item) => (
-              <div
-                key={item.tier}
-                className={`border rounded-3xl p-8 ${item.borderColor} ${item.bgColor} hover:scale-[1.02] transition-all duration-300 relative`}
-              >
-                {item.featured && (
-                  <div
-                    className="absolute -top-3.5 left-1/2 -translate-x-1/2 text-navy-dark text-xs font-bold px-5 py-1.5 rounded-full shadow-lg shadow-gold/30"
-                    style={{ background: "linear-gradient(135deg, #D4A843, #E8C547)" }}
-                  >
-                    Most Popular
-                  </div>
-                )}
-                <span className={`inline-block text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full mb-4 ${item.badge}`}>
-                  {item.tier}
-                </span>
-                <div className="text-3xl md:text-4xl font-extrabold text-white mb-2">{item.min}</div>
-                <div className="text-lg font-semibold mb-1" style={{ color: item.accentColor }}>
-                  {item.returns}
-                </div>
-                <p className="text-gray-400 text-sm mb-6">Minimum investment</p>
-                <ul className="space-y-3 mb-8">
-                  {item.features.map((f, j) => (
-                    <li key={j} className="flex items-start gap-2 text-sm text-gray-300">
-                      <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" style={{ color: "#5DB347" }} />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  href="/contact"
-                  className="block text-center py-3 rounded-xl font-semibold text-sm transition-all duration-300 bg-white/10 border border-white/20 text-white hover:bg-white/20"
+            {content.tiers.items.map((item, i) => {
+              const style = TIER_STYLES[i] || TIER_STYLES[0];
+              return (
+                <div
+                  key={item.name}
+                  className={`border rounded-3xl p-8 ${style.borderColor} ${style.bgColor} hover:scale-[1.02] transition-all duration-300 relative`}
                 >
-                  Request Details
-                </Link>
-              </div>
-            ))}
+                  {item.featured && (
+                    <div
+                      className="absolute -top-3.5 left-1/2 -translate-x-1/2 text-navy-dark text-xs font-bold px-5 py-1.5 rounded-full shadow-lg shadow-gold/30"
+                      style={{ background: "linear-gradient(135deg, #D4A843, #E8C547)" }}
+                    >
+                      Most Popular
+                    </div>
+                  )}
+                  <span className={`inline-block text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full mb-4 ${style.badge}`}>
+                    {item.name}
+                  </span>
+                  <div className="text-3xl md:text-4xl font-extrabold text-white mb-2">{item.min}</div>
+                  <div className="text-lg font-semibold mb-1" style={{ color: style.accentColor }}>
+                    {item.returns}
+                  </div>
+                  <p className="text-gray-400 text-sm mb-6">Minimum investment</p>
+                  <ul className="space-y-3 mb-8">
+                    {item.features.map((f, j) => (
+                      <li key={j} className="flex items-start gap-2 text-sm text-gray-300">
+                        <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" style={{ color: "#5DB347" }} />
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                  <Link
+                    href="/contact"
+                    className="block text-center py-3 rounded-xl font-semibold text-sm transition-all duration-300 bg-white/10 border border-white/20 text-white hover:bg-white/20"
+                  >
+                    {item.cta_text}
+                  </Link>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -737,20 +1058,14 @@ export default function InvestorsPage() {
               </span>
               <h2 className="text-3xl md:text-4xl font-bold mt-2 mb-6">
                 <span className="bg-gradient-to-r from-[#1B2A4A] to-[#5DB347] bg-clip-text text-transparent">
-                  Experienced Team
+                  {content.leadership.title}
                 </span>
               </h2>
               <p className="text-gray-500 mb-8 leading-relaxed">
-                AFU is governed by a Board of Directors and supported by an Advisory Council with deep
-                expertise across agriculture, finance, technology, and African market development.
+                {content.leadership.body}
               </p>
               <div className="space-y-4 mb-8">
-                {[
-                  "Board with agriculture finance and African market expertise",
-                  "Advisory Council spanning agribusiness, technology, and development finance",
-                  "Country Directors in each operational market",
-                  "Technical team building AI, blockchain, and satellite monitoring tools",
-                ].map((item, i) => (
+                {content.leadership.bullets.map((item, i) => (
                   <div key={i} className="flex items-start gap-3">
                     <CheckCircle2 className="w-5 h-5 shrink-0 mt-0.5" style={{ color: "#5DB347" }} />
                     <span className="text-[#1B2A4A] text-sm font-medium">{item}</span>
@@ -770,24 +1085,8 @@ export default function InvestorsPage() {
             <div className="bg-gradient-to-br from-[#EDF4EF] to-white rounded-3xl p-10 border border-gray-100">
               <h3 className="text-xl font-bold text-[#1B2A4A] mb-6">Governance Structure</h3>
               <div className="space-y-6">
-                {[
-                  {
-                    title: "Board of Directors",
-                    desc: "Strategic oversight, fiduciary responsibility, and investor alignment",
-                    icon: Users,
-                  },
-                  {
-                    title: "Advisory Council",
-                    desc: "Domain experts providing guidance on agriculture, finance, and technology",
-                    icon: Landmark,
-                  },
-                  {
-                    title: "Country Operations",
-                    desc: "Local directors managing on-ground execution in each market",
-                    icon: Globe2,
-                  },
-                ].map((item) => {
-                  const Icon = item.icon;
+                {content.leadership.governance.map((item, i) => {
+                  const Icon = GOVERNANCE_ICONS[i] || Users;
                   return (
                     <div key={item.title} className="flex gap-4">
                       <div
@@ -819,7 +1118,7 @@ export default function InvestorsPage() {
             </span>
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mt-2 mb-4">
               <span className="bg-gradient-to-r from-[#1B2A4A] to-[#5DB347] bg-clip-text text-transparent">
-                Live Product Demos
+                {content.demos.title}
               </span>
             </h2>
             <p className="text-gray-500 max-w-2xl mx-auto text-lg">
@@ -828,75 +1127,48 @@ export default function InvestorsPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Farmer Portal Demo Card */}
-            <div className="bg-white rounded-3xl border border-gray-100 shadow-lg shadow-[#5DB347]/5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden group">
-              <div className="bg-gradient-to-br from-[#5DB347] to-[#449933] p-8 relative overflow-hidden">
-                <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-white/10" />
-                <div className="absolute -right-2 -bottom-8 w-32 h-32 rounded-full bg-white/5" />
-                <div className="relative">
-                  <div className="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center mb-4">
-                    <Sprout className="w-7 h-7 text-white" />
-                  </div>
-                  <h3 className="text-xl font-bold text-white">Farmer Portal Demo</h3>
-                  <p className="text-white/80 text-sm mt-2">
-                    See what 1,000,000+ smallholder farmers will experience
-                  </p>
-                </div>
-              </div>
-              <div className="p-6">
-                <ul className="space-y-2 mb-6">
-                  {["Dashboard & farm overview", "AI Crop Doctor diagnosis", "Loan tracking & repayments", "Training & market prices"].map((f) => (
-                    <li key={f} className="flex items-center gap-2 text-sm text-gray-600">
-                      <CheckCircle2 className="w-4 h-4 shrink-0" style={{ color: "#5DB347" }} />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  href="/demo/farm"
-                  className="group/btn w-full flex items-center justify-center gap-2 py-4 rounded-xl font-bold text-white transition-all duration-300 shadow-lg shadow-[#5DB347]/20 hover:shadow-xl hover:shadow-[#5DB347]/30"
-                  style={{ background: "linear-gradient(135deg, #5DB347, #449933)" }}
+            {content.demos.items.map((demo, i) => {
+              const visual = DEMO_GRADIENTS[i] || DEMO_GRADIENTS[0];
+              const Icon = visual.icon;
+              return (
+                <div
+                  key={demo.title}
+                  className="bg-white rounded-3xl border border-gray-100 shadow-lg shadow-[#5DB347]/5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden group"
                 >
-                  Launch Demo
-                  <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
-                </Link>
-              </div>
-            </div>
-
-            {/* Commercial Dashboard Demo Card */}
-            <div className="bg-white rounded-3xl border border-gray-100 shadow-lg shadow-[#5DB347]/5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden group">
-              <div className="bg-gradient-to-br from-[#1B2A4A] to-[#0F1A30] p-8 relative overflow-hidden">
-                <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-white/10" />
-                <div className="absolute -right-2 -bottom-8 w-32 h-32 rounded-full bg-white/5" />
-                <div className="relative">
-                  <div className="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center mb-4">
-                    <Monitor className="w-7 h-7 text-white" />
+                  <div className={`${visual.headerBg} p-8 relative overflow-hidden`}>
+                    <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-white/10" />
+                    <div className="absolute -right-2 -bottom-8 w-32 h-32 rounded-full bg-white/5" />
+                    <div className="relative">
+                      <div className="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center mb-4">
+                        <Icon className="w-7 h-7 text-white" />
+                      </div>
+                      <h3 className="text-xl font-bold text-white">{demo.title}</h3>
+                      <p className="text-white/80 text-sm mt-2">
+                        {demo.subhead}
+                      </p>
+                    </div>
                   </div>
-                  <h3 className="text-xl font-bold text-white">Commercial Dashboard Demo</h3>
-                  <p className="text-white/80 text-sm mt-2">
-                    Enterprise-grade farm management tools
-                  </p>
+                  <div className="p-6">
+                    <ul className="space-y-2 mb-6">
+                      {demo.features.map((f) => (
+                        <li key={f} className="flex items-center gap-2 text-sm text-gray-600">
+                          <CheckCircle2 className="w-4 h-4 shrink-0" style={{ color: "#5DB347" }} />
+                          {f}
+                        </li>
+                      ))}
+                    </ul>
+                    <Link
+                      href={demo.demo_link}
+                      className={`group/btn w-full flex items-center justify-center gap-2 py-4 rounded-xl font-bold text-white transition-all duration-300 ${visual.btnShadow}`}
+                      style={visual.btnStyle}
+                    >
+                      Launch Demo
+                      <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
+                    </Link>
+                  </div>
                 </div>
-              </div>
-              <div className="p-6">
-                <ul className="space-y-2 mb-6">
-                  {["Multi-plot management", "Offtake contracts & financing", "Equipment booking & co-ops", "Export readiness tracking"].map((f) => (
-                    <li key={f} className="flex items-center gap-2 text-sm text-gray-600">
-                      <CheckCircle2 className="w-4 h-4 shrink-0" style={{ color: "#5DB347" }} />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  href="/demo/commercial"
-                  className="group/btn w-full flex items-center justify-center gap-2 py-4 rounded-xl font-bold text-white transition-all duration-300 shadow-lg shadow-[#1B2A4A]/20 hover:shadow-xl hover:shadow-[#1B2A4A]/30"
-                  style={{ background: "linear-gradient(135deg, #1B2A4A, #2D4A7A)" }}
-                >
-                  Launch Demo
-                  <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
-                </Link>
-              </div>
-            </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -913,18 +1185,13 @@ export default function InvestorsPage() {
         <div className="relative max-w-4xl mx-auto px-4 text-center">
           <div className="inline-flex items-center gap-2 bg-gold/20 border border-gold/30 text-gold px-5 py-2 rounded-full text-sm font-bold mb-8">
             <Landmark className="w-4 h-4" />
-            $500M Seed Round — Now Open
+            {content.final_cta.badge}
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 leading-tight">
-            Ready to Build the Future of{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold to-amber-300">
-              African Agriculture
-            </span>
-            ?
+            {content.final_cta.title}
           </h2>
           <p className="text-lg text-white/70 mb-12 max-w-2xl mx-auto">
-            Request our investor pack for the full financial model, trade finance revenue projections, country deployment plans,
-            risk framework, and team profiles. Or schedule a call to discuss the opportunity directly.
+            {content.final_cta.body}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
@@ -932,7 +1199,7 @@ export default function InvestorsPage() {
               href="/contact?subject=investor"
               className="group bg-gradient-to-r from-gold to-amber-500 hover:from-gold hover:to-amber-400 text-navy-dark px-10 py-5 rounded-2xl font-bold text-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-gold/20 hover:shadow-xl hover:shadow-gold/30 hover:scale-105"
             >
-              Request Investor Pack
+              {content.final_cta.cta1_text}
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
             <Link
@@ -940,20 +1207,20 @@ export default function InvestorsPage() {
               className="border-2 border-white/30 hover:border-white/60 hover:bg-white/10 text-white px-10 py-5 rounded-2xl font-bold text-lg transition-all duration-300 flex items-center justify-center gap-2"
             >
               <Calendar className="w-5 h-5" />
-              Schedule a Call
+              {content.final_cta.cta2_text}
             </Link>
           </div>
 
           {/* Contact info */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 text-gray-400 text-sm">
-            <a href="mailto:peterw@africanfarmingunion.org" className="flex items-center gap-2 hover:text-white transition-colors">
+            <a href={`mailto:${content.final_cta.email}`} className="flex items-center gap-2 hover:text-white transition-colors">
               <Mail className="w-4 h-4" />
-              peterw@africanfarmingunion.org
+              {content.final_cta.email}
             </a>
             <span className="hidden sm:block text-white/20">|</span>
             <a href="tel:+27000000000" className="flex items-center gap-2 hover:text-white transition-colors">
               <Phone className="w-4 h-4" />
-              Contact via form
+              {content.final_cta.phone}
             </a>
           </div>
         </div>
