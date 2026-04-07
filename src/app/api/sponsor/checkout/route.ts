@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
-import { createInboxConversation } from '@/lib/inbox/create-conversation';
+import { notifyAdmins } from '@/lib/email';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const FROM = 'African Farming Union <noreply@mail.africanfarmingunion.org>';
-const NOTIFY_TO = ['peterw@africanfarmingunion.org', 'devonk@africanfarmingunion.org'];
+const FROM = 'African Farming Union <info@africanfarmingunion.org>';
 
 // NOTE: Stripe integration coming soon — currently records the sponsorship in DB only.
 
@@ -195,28 +194,29 @@ export async function POST(req: NextRequest) {
       });
     } catch { /* non-critical */ }
 
-    // Notify Devon + Peter
+    // Notify all 3 admins (info, peter, devon) + write to universal inbox
     try {
-      await resend.emails.send({
-        from: FROM,
-        to: NOTIFY_TO,
+      await notifyAdmins({
         subject: `New Sponsorship: ${body.sponsor_name} — $${body.amount_usd} (${body.tier})`,
-        html: `<div style="font-family:Arial,sans-serif;padding:20px">
-          <h2 style="color:#1B2A4A">New Farmer Sponsorship</h2>
-          <p><strong>${body.sponsor_name}</strong>${body.sponsor_company ? ` (${body.sponsor_company})` : ''}</p>
-          <p>Tier: ${body.tier} | Amount: $${body.amount_usd} | Cycle: ${body.billing_cycle}</p>
-          <p>Email: ${body.sponsor_email} | Country: ${body.sponsor_country || 'N/A'}</p>
-          <a href="https://africanfarmingunion.org/admin/sponsor" style="display:inline-block;background:#5DB347;color:white;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600">View in Admin</a>
-        </div>`,
+        type: 'sponsor',
+        data: {
+          sponsor_name: body.sponsor_name,
+          sponsor_email: body.sponsor_email,
+          sponsor_company: body.sponsor_company || '',
+          sponsor_country: body.sponsor_country || '',
+          tier: body.tier,
+          amount_usd: body.amount_usd,
+          billing_cycle: body.billing_cycle,
+          farmer_profile_id: body.farmer_profile_id,
+          sponsorship_id: sponsorship.id,
+        },
+        reply_to: body.sponsor_email,
+        name: body.sponsor_name,
+        country: body.sponsor_country,
+        businessName: body.sponsor_company,
+        tags: ['sponsorship', body.tier],
       });
     } catch { /* non-critical */ }
-
-    createInboxConversation({
-      name: body.sponsor_name, email: body.sponsor_email, type: 'investor',
-      subject: `Sponsorship: ${body.tier} — $${body.amount_usd}`,
-      message: `New sponsorship!\nTier: ${body.tier}\nAmount: $${body.amount_usd} (${body.billing_cycle})\nCompany: ${body.sponsor_company || 'N/A'}\nCountry: ${body.sponsor_country || 'N/A'}`,
-      tags: ['sponsorship', body.tier], businessName: body.sponsor_company, country: body.sponsor_country,
-    }).catch(() => {});
 
     return NextResponse.json({
       success: true,

@@ -1,10 +1,9 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
-import { createInboxConversation } from '@/lib/inbox/create-conversation';
+import { notifyAdmins } from '@/lib/email';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const FROM = 'African Farming Union <noreply@mail.africanfarmingunion.org>';
-const NOTIFY_TO = ['peterw@africanfarmingunion.org', 'devonk@africanfarmingunion.org'];
+const FROM = 'African Farming Union <info@africanfarmingunion.org>';
 
 export async function POST(req: Request) {
   try {
@@ -16,10 +15,20 @@ export async function POST(req: Request) {
 
     const firstName = name.split(' ')[0];
 
-    // Notify Devon + Peter
-    await resend.emails.send({
+    // Notify all 3 admins (info, peter, devon) + write to universal inbox
+    await notifyAdmins({
+      subject: `New Ambassador Application from ${name} — ${country}`,
+      type: 'ambassador',
+      data: { name, email, phone: phone || '', country, region: region || '', sector: sector || '', bio: bio || '' },
+      reply_to: email,
+      name, phone, country,
+      tags: ['ambassador', 'application'],
+    });
+
+    // (legacy block kept disabled to preserve formatting)
+    if (false) await resend.emails.send({
       from: FROM,
-      to: NOTIFY_TO,
+      to: 'placeholder@example.com',
       subject: `New Ambassador Application from ${name} — ${country}`,
       html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
         <div style="background:#1B2A4A;padding:24px;text-align:center">
@@ -75,13 +84,6 @@ export async function POST(req: Request) {
         <div style="padding:20px;text-align:center;color:#999;font-size:12px">African Farming Union | Gaborone, Botswana<br>africanfarmingunion.org</div>
       </div>`,
     });
-
-    createInboxConversation({
-      name, email, phone, country, type: 'ambassador',
-      subject: 'Ambassador Application',
-      message: `Country: ${country}\nPhone: ${phone || 'N/A'}\nRegion: ${region || 'N/A'}\nSector: ${sector || 'N/A'}\n\n${bio || ''}`,
-      tags: ['ambassador', 'application'],
-    }).catch(() => {});
 
     return NextResponse.json({ success: true });
   } catch (err) {

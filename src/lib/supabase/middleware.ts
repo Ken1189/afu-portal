@@ -126,7 +126,7 @@ export async function updateSession(request: NextRequest) {
   const publicExceptions = ['/farmers', '/farms', '/farming', '/investors', '/investor-login', '/supplier/apply', '/ambassador/apply', '/ambassadors'];
   const isPublicException = publicExceptions.some((p) => pathname.startsWith(p));
 
-  const protectedPaths = ['/dashboard', '/farm', '/supplier', '/admin', '/investor', '/ambassador', '/warehouse', '/onboarding'];
+  const protectedPaths = ['/dashboard', '/farm', '/supplier', '/admin', '/investor', '/ambassador', '/warehouse', '/onboarding', '/portal-select'];
   const isProtected = !isPublicException && protectedPaths.some((p) => pathname.startsWith(p));
 
   // If accessing a protected route without a session → redirect to login

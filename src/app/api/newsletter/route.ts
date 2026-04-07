@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
+import { notifyAdmins } from '@/lib/email';
 
 export async function POST(req: NextRequest) {
   try {
@@ -35,6 +36,21 @@ export async function POST(req: NextRequest) {
     if (error) {
       console.error('Newsletter subscribe error:', error);
       return NextResponse.json({ error: 'Failed to subscribe. Please try again.' }, { status: 500 });
+    }
+
+    // Notify all 3 admins + write to universal inbox
+    try {
+      await notifyAdmins({
+        subject: `Newsletter signup: ${email}`,
+        type: 'newsletter',
+        data: { email, name: name || '', country: country || '', interests: interests || '' },
+        reply_to: email,
+        name: name || email,
+        country: country || undefined,
+        tags: ['newsletter', 'signup'],
+      });
+    } catch (notifyErr) {
+      console.error('[newsletter notifyAdmins]', notifyErr);
     }
 
     return NextResponse.json({ success: true, message: 'Thanks for subscribing!' });

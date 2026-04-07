@@ -1,8 +1,5 @@
 import { NextResponse } from 'next/server';
-import { sendEmail } from '@/lib/email';
-import { createInboxConversation } from '@/lib/inbox/create-conversation';
-
-const NOTIFY_TO = ['peterw@africanfarmingunion.org', 'devonk@africanfarmingunion.org'];
+import { sendEmail, notifyAdmins } from '@/lib/email';
 
 function escapeHtml(input: unknown): string {
   if (input === null || input === undefined) return '';
@@ -50,39 +47,20 @@ export async function POST(req: Request) {
     const safeAbout = escapeHtml(about ? String(about).substring(0, 500) : '');
     const firstName = escapeHtml(String(name).split(' ')[0]);
 
-    // Notify Devon + Peter — uses centralized sendEmail from @/lib/email
-    for (const recipient of NOTIFY_TO) {
-      await sendEmail(
-        recipient,
-        `New Membership Application from ${name} — ${tier} tier — ${country}`,
-        `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
-        <div style="background:#1B2A4A;padding:24px;text-align:center">
-          <h2 style="color:#5DB347;margin:0;font-size:20px">New Membership Application</h2>
-          <p style="color:#8CB89C;margin:6px 0 0;font-size:13px">AFU Portal</p>
-        </div>
-        <div style="padding:24px;background:#f8faf6">
-          <div style="background:white;border-left:4px solid #5DB347;padding:14px;border-radius:4px;margin-bottom:18px">
-            <p style="margin:0;font-size:15px;color:#1B2A4A;font-weight:600">${safeName} wants to join as a <strong>${safeTier}</strong> member</p>
-          </div>
-          <table style="width:100%;border-collapse:collapse;font-size:14px">
-            <tr><td style="padding:10px 0;border-bottom:1px solid #eee;color:#64748b;width:130px">Name</td><td style="padding:10px 0;border-bottom:1px solid #eee;color:#1B2A4A;font-weight:500">${safeName}</td></tr>
-            <tr><td style="padding:10px 0;border-bottom:1px solid #eee;color:#64748b">Email</td><td style="padding:10px 0;border-bottom:1px solid #eee;color:#1B2A4A"><a href="mailto:${safeEmail}" style="color:#2563eb">${safeEmail}</a></td></tr>
-            <tr><td style="padding:10px 0;border-bottom:1px solid #eee;color:#64748b">Phone</td><td style="padding:10px 0;border-bottom:1px solid #eee;color:#1B2A4A">${safePhone || 'N/A'}</td></tr>
-            <tr><td style="padding:10px 0;border-bottom:1px solid #eee;color:#64748b">Country</td><td style="padding:10px 0;border-bottom:1px solid #eee;color:#1B2A4A">${safeCountry}</td></tr>
-            <tr><td style="padding:10px 0;border-bottom:1px solid #eee;color:#64748b">Tier</td><td style="padding:10px 0;border-bottom:1px solid #eee;color:#5DB347;font-weight:600">${safeTier}</td></tr>
-            <tr><td style="padding:10px 0;border-bottom:1px solid #eee;color:#64748b">Organization</td><td style="padding:10px 0;border-bottom:1px solid #eee;color:#1B2A4A">${safeOrganization || 'N/A'}</td></tr>
-            <tr><td style="padding:10px 0;border-bottom:1px solid #eee;color:#64748b">Farm Size</td><td style="padding:10px 0;border-bottom:1px solid #eee;color:#1B2A4A">${safeFarmSize ? safeFarmSize + ' ha' : 'N/A'}</td></tr>
-            <tr><td style="padding:10px 0;border-bottom:1px solid #eee;color:#64748b">Crops</td><td style="padding:10px 0;border-bottom:1px solid #eee;color:#1B2A4A">${safeCrops || 'N/A'}</td></tr>
-            ${safeAbout ? `<tr><td style="padding:10px 0;color:#64748b;vertical-align:top">About</td><td style="padding:10px 0;color:#1B2A4A">${safeAbout}</td></tr>` : ''}
-          </table>
-          <div style="margin-top:20px;text-align:center">
-            <a href="https://africanfarmingunion.org/admin/applications" style="display:inline-block;background:#5DB347;color:white;padding:10px 24px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px">Review in Admin</a>
-          </div>
-        </div>
-        <div style="padding:16px;text-align:center;color:#999;font-size:12px">African Farming Union | africanfarmingunion.org</div>
-      </div>`,
-      );
-    }
+    // Notify all 3 admins + write to universal inbox
+    await notifyAdmins({
+      subject: `New Membership Application from ${name} — ${tier} tier — ${country}`,
+      type: 'application',
+      data: {
+        name, email, phone: phone || '', country, tier,
+        organization: organization || '', farmSize: farmSize || '',
+        crops: crops || '', about: about || '',
+      },
+      reply_to: email,
+      name, phone, country,
+      businessName: organization,
+      tags: ['application', String(tier)],
+    });
 
     // Auto-reply to applicant
     await sendEmail(
@@ -110,14 +88,6 @@ export async function POST(req: Request) {
         <div style="padding:20px;text-align:center;color:#999;font-size:12px">African Farming Union | Gaborone, Botswana<br>africanfarmingunion.org</div>
       </div>`,
     );
-
-    // Create inbox conversation
-    createInboxConversation({
-      name, email, phone, country, type: tier === 'ambassador' ? 'ambassador' : tier === 'partner' ? 'supplier' : 'member',
-      subject: `${tier} Application`,
-      message: `Tier: ${tier}\nCountry: ${country}\nPhone: ${phone || 'N/A'}\nOrg: ${organization || 'N/A'}\nFarm: ${farmSize || 'N/A'} ha\nCrops: ${crops || 'N/A'}\n\n${about || ''}`,
-      tags: ['application', tier],
-    }).catch(() => {});
 
     return NextResponse.json({ success: true });
   } catch (err) {

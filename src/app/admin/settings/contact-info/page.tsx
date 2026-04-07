@@ -37,8 +37,8 @@ interface ContactConfig {
 }
 
 const defaultConfig: ContactConfig = {
-  primary_email: 'peterw@africanfarmingunion.org',
-  support_email: 'devonk@africanfarmingunion.org',
+  primary_email: 'info@africanfarmingunion.org',
+  support_email: 'info@africanfarmingunion.org',
   phone: '',
   hq_address: '',
   hq_city: 'Gaborone',

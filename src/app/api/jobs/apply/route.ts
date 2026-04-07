@@ -1,14 +1,10 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
-import { createInboxConversation } from '@/lib/inbox/create-conversation';
+import { notifyAdmins } from '@/lib/email';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const FROM = 'African Farming Union <noreply@mail.africanfarmingunion.org>';
-const ADMIN_EMAILS = [
-  'peterw@africanfarmingunion.org',
-  'devonk@africanfarmingunion.org',
-];
+const FROM = 'African Farming Union <info@africanfarmingunion.org>';
 
 // Brand colors
 const NAVY = '#1B2A4A';
@@ -176,11 +172,21 @@ export async function POST(req: Request) {
 </div>`;
 
     try {
-      await resend.emails.send({
-        from: FROM,
-        to: ADMIN_EMAILS,
+      await notifyAdmins({
         subject: `[AFU Job Application] ${job_title} — from ${full_name}`,
-        html: adminHtml,
+        type: 'job',
+        data: {
+          job_id, job_title, full_name, email,
+          phone: phone || '', country: country || '',
+          cover_message,
+          cv_url: cv_url || '',
+          skills: skills || '',
+          application_id: applicationId,
+        },
+        reply_to: email,
+        name: full_name,
+        phone, country,
+        tags: ['job-application', 'recruitment'],
       });
     } catch (emailErr) {
       console.error('[admin notification email]', emailErr);
@@ -242,14 +248,6 @@ export async function POST(req: Request) {
     } catch (emailErr) {
       console.error('[applicant auto-reply email]', emailErr);
     }
-
-    // Create inbox conversation
-    createInboxConversation({
-      name: full_name, email, phone, type: 'lead',
-      subject: `Job Application: ${job_title}`,
-      message: `Applied for: ${job_title}\nCV: ${cv_url || 'Not uploaded'}\n\n${cover_message}`,
-      tags: ['job-application', 'recruitment'],
-    }).catch(() => {});
 
     return NextResponse.json({
       success: true,

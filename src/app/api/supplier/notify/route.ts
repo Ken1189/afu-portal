@@ -1,10 +1,9 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
-import { createInboxConversation } from '@/lib/inbox/create-conversation';
+import { notifyAdmins } from '@/lib/email';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const FROM = 'African Farming Union <noreply@mail.africanfarmingunion.org>';
-const NOTIFY_TO = ['peterw@africanfarmingunion.org', 'devonk@africanfarmingunion.org'];
+const FROM = 'African Farming Union <info@africanfarmingunion.org>';
 
 export async function POST(req: Request) {
   try {
@@ -16,10 +15,21 @@ export async function POST(req: Request) {
 
     const firstName = (contactName || company).split(' ')[0];
 
-    // Notify Devon + Peter
-    await resend.emails.send({
+    // Notify all 3 admins (info, peter, devon) + write to universal inbox
+    await notifyAdmins({
+      subject: `New Supplier Application from ${company} — ${category}`,
+      type: 'supplier',
+      data: { company, contactName: contactName || '', email, phone: phone || '', country: country || '', category, website: website || '', description: description || '' },
+      reply_to: email,
+      name: contactName || company,
+      phone, country,
+      businessName: company,
+      tags: ['supplier', 'application'],
+    });
+
+    if (false) await resend.emails.send({
       from: FROM,
-      to: NOTIFY_TO,
+      to: 'placeholder@example.com',
       subject: `New Supplier Application from ${company} — ${category}`,
       html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
         <div style="background:#1B2A4A;padding:24px;text-align:center">
@@ -76,13 +86,6 @@ export async function POST(req: Request) {
         <div style="padding:20px;text-align:center;color:#999;font-size:12px">African Farming Union | Gaborone, Botswana<br>africanfarmingunion.org</div>
       </div>`,
     });
-
-    createInboxConversation({
-      name: contactName || company, email, phone, country, type: 'supplier',
-      subject: 'Supplier Application',
-      message: `Company: ${company}\nContact: ${contactName}\nCategory: ${category || 'N/A'}\nCountry: ${country || 'N/A'}\nWebsite: ${website || 'N/A'}\n\n${description || ''}`,
-      tags: ['supplier', 'application'], businessName: company,
-    }).catch(() => {});
 
     return NextResponse.json({ success: true });
   } catch (err) {

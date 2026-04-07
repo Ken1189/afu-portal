@@ -786,7 +786,27 @@ export default function SponsorshipProgram() {
           {/* Action buttons */}
           <div className="space-y-3">
             <button
-              onClick={() => alert('Renewal request submitted. Our team will contact you to confirm your sponsorship renewal.')}
+              onClick={async () => {
+                try {
+                  const res = await fetch('/api/supplier/sponsorship/apply', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      action: 'renew',
+                      tier: liveSupplier.sponsorshipTier || 'bronze',
+                      company: liveSupplier.companyName,
+                      contactName: liveSupplier.contactName,
+                      email: liveSupplier.email,
+                      phone: liveSupplier.phone,
+                      country: liveSupplier.country,
+                    }),
+                  });
+                  if (!res.ok) throw new Error('Request failed');
+                  alert('Renewal request submitted. Our team will contact you to confirm your sponsorship renewal.');
+                } catch {
+                  alert('Could not submit renewal. Please try again or contact support.');
+                }
+              }}
               className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-white text-sm font-medium transition-all hover:shadow-lg"
               style={{ background: 'linear-gradient(135deg, #8CB89C 0%, #729E82 100%)' }}
             >

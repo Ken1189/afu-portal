@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
-import { createInboxConversation } from '@/lib/inbox/create-conversation';
+import { notifyAdmins } from '@/lib/email';
 
 // ── In-memory store (will be replaced with Supabase table) ────────────────
 interface InvestorExpression {
@@ -91,9 +91,29 @@ export async function POST(request: Request) {
           ? `$${expression.amount.toLocaleString()}`
           : 'Not specified';
 
-        await resend.emails.send({
-          from: 'AFU Investor Relations <noreply@mail.africanfarmingunion.org>',
-          to: ['peterw@africanfarmingunion.org', 'devonk@africanfarmingunion.org'],
+        await notifyAdmins({
+          subject: `New Investment Interest: ${expression.opportunityName} — ${expression.entityName}`,
+          type: 'investor',
+          data: {
+            investorName: expression.investorName,
+            entityName: expression.entityName,
+            opportunity: expression.opportunityName,
+            opportunityId: expression.opportunityId,
+            amount: expression.amount ? `$${expression.amount.toLocaleString()}` : 'Not specified',
+            email: expression.email,
+            phone: expression.phone,
+            notes: expression.notes,
+          },
+          reply_to: expression.email,
+          name: expression.investorName || expression.entityName,
+          phone: expression.phone,
+          businessName: expression.entityName,
+          tags: ['investor', 'interest'],
+        });
+
+        if (false) await resend.emails.send({
+          from: 'AFU Investor Relations <info@africanfarmingunion.org>',
+          to: 'placeholder@example.com',
           subject: `New Investment Interest: ${expression.opportunityName} — ${expression.entityName}`,
           html: `
             <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff;">
@@ -163,7 +183,7 @@ export async function POST(request: Request) {
         // Auto-reply to investor
         const investorFirstName = (expression.investorName || expression.entityName).split(' ')[0];
         await resend.emails.send({
-          from: 'African Farming Union <noreply@mail.africanfarmingunion.org>',
+          from: 'African Farming Union <info@africanfarmingunion.org>',
           to: expression.email,
           subject: `Thank you for your interest in ${expression.opportunityName}`,
           html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
@@ -196,18 +216,6 @@ export async function POST(request: Request) {
       // Email sending failed — log but don't fail the request
       console.error('[express-interest] Email notification failed:', emailErr);
     }
-
-    // Create inbox conversation
-    createInboxConversation({
-      name: expression.investorName || expression.email,
-      email: expression.email,
-      phone: expression.phone,
-      type: 'investor',
-      subject: `Investor Interest: ${expression.opportunityName}`,
-      message: `Investor: ${expression.investorName}\nEntity: ${expression.entityName || 'N/A'}\nOpportunity: ${expression.opportunityName}\nAmount: $${expression.amount?.toLocaleString() || 'N/A'}\n\n${expression.notes || ''}`,
-      tags: ['investor', 'interest'],
-      businessName: expression.entityName,
-    }).catch(() => {});
 
     return NextResponse.json({
       success: true,

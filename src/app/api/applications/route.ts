@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase/server';
+import { notifyAdmins } from '@/lib/email';
 
 /**
  * GET /api/applications
@@ -77,6 +78,27 @@ export async function POST(request: NextRequest) {
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  // Notify all 3 admins + write to universal inbox
+  try {
+    const fields = (validation.data ?? {}) as Record<string, unknown>;
+    const submitterEmail = (fields.email as string | undefined) ?? undefined;
+    const submitterName =
+      (fields.full_name as string | undefined) ??
+      (fields.name as string | undefined) ??
+      submitterEmail ??
+      'Membership applicant';
+    await notifyAdmins({
+      subject: `New Membership Application from ${submitterName}`,
+      type: 'application',
+      data: { ...fields, application_id: data?.id },
+      reply_to: submitterEmail,
+      name: submitterName,
+      tags: ['application'],
+    });
+  } catch (notifyErr) {
+    console.error('[applications notifyAdmins]', notifyErr);
   }
 
   return NextResponse.json({ application: data }, { status: 201 });
