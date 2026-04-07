@@ -39,7 +39,7 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: 'X-Frame-Options',
-            value: 'DENY',
+            value: 'SAMEORIGIN',
           },
           {
             key: 'X-Content-Type-Options',
@@ -70,7 +70,7 @@ const nextConfig: NextConfig = {
               "img-src 'self' data: blob: https://images.unsplash.com https://*.supabase.co https://flagcdn.com https://ui-avatars.com https://lh3.googleusercontent.com https://cdnjs.cloudflare.com https://*.tile.openstreetmap.org",
               "font-src 'self' data:",
               "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://eth-mainnet.g.alchemy.com https://*.edma.app https://*.sentry.io https://*.ingest.sentry.io https://checkout.stripe.com https://api.stripe.com https://*.resend.com https://*.tile.openstreetmap.org https://*.openstreetmap.org",
-              "frame-ancestors 'none'",
+              "frame-ancestors 'self'",
               "base-uri 'self'",
               "form-action 'self'",
             ].join('; '),

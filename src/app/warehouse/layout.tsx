@@ -195,11 +195,11 @@ export default function WarehouseLayout({ children }: { children: React.ReactNod
 
         <div className="p-3 border-t border-white/10 space-y-1">
           <Link
-            href="/dashboard"
+            href="/portal-select"
             className="flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-colors min-h-[44px]"
           >
             <Home className="w-4 h-4" />
-            Back to Dashboard
+            Switch Portal
           </Link>
           <Link
             href="/"
@@ -258,12 +258,12 @@ export default function WarehouseLayout({ children }: { children: React.ReactNod
               </nav>
               <div className="p-3 border-t border-white/10 space-y-1">
                 <Link
-                  href="/dashboard"
+                  href="/portal-select"
                   onClick={() => setMobileOpen(false)}
                   className="flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-colors min-h-[44px]"
                 >
                   <Home className="w-4 h-4" />
-                  Back to Dashboard
+                  Switch Portal
                 </Link>
                 <Link
                   href="/"

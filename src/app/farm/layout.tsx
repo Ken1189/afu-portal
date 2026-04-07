@@ -43,7 +43,7 @@ import {
   Rabbit,
   Tractor,
 } from 'lucide-react';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LanguageProvider, useLanguage } from '@/lib/i18n/LanguageContext';
@@ -167,35 +167,7 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
     setShowTour(false);
   }, []);
 
-  const supabase = createClient();
-
-  // Auth loading state — show spinner while auth context is resolving.
-  // If authLoading is false and there's no user, the redirect effect above
-  // will fire. Show spinner until redirect happens — do NOT render content.
-  if (authLoading && !authCheckComplete) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#5DB347]" />
-      </div>
-    );
-  }
-  if (!user) {
-    // Auth finished but no user — show spinner while redirect fires
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#5DB347]" />
-      </div>
-    );
-  }
-
-  const displayName = profile?.full_name || profile?.email?.split('@')[0] || 'Farmer';
-  const firstName = displayName.split(' ')[0];
-  const initials = displayName
-    .split(' ')
-    .map((n: string) => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
+  const supabase = useMemo(() => createClient(), []);
 
   // Fetch membership tier from members table
   useEffect(() => {
@@ -255,6 +227,34 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     fetchTier();
   }, [fetchTier]);
+
+  // Auth loading state — show spinner while auth context is resolving.
+  // If authLoading is false and there's no user, the redirect effect above
+  // will fire. Show spinner until redirect happens — do NOT render content.
+  if (authLoading && !authCheckComplete) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#5DB347]" />
+      </div>
+    );
+  }
+  if (!user) {
+    // Auth finished but no user — show spinner while redirect fires
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#5DB347]" />
+      </div>
+    );
+  }
+
+  const displayName = profile?.full_name || profile?.email?.split('@')[0] || 'Farmer';
+  const firstName = displayName.split(' ')[0];
+  const initials = displayName
+    .split(' ')
+    .map((n: string) => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
 
   const getPageTitle = () => {
     if (pathname === '/farm') return 'Mkulima Hub';
@@ -480,7 +480,7 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
         {/* Sidebar Footer */}
         <div className="p-3 border-t border-gray-100 space-y-0.5">
           <Link
-            href="/dashboard"
+            href="/portal-select"
             className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors"
           >
             <ChevronLeft className="w-5 h-5" />
@@ -734,7 +734,7 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
 
                 <div className="p-3 border-t border-gray-100 space-y-0.5">
                   <Link
-                    href="/dashboard"
+                    href="/portal-select"
                     onClick={() => setDrawerOpen(false)}
                     className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-500 active:bg-gray-50"
                   >
