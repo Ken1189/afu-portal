@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 
 import { createPageMetadata } from '@/lib/seo/metadata';
+import LegalDisclaimer from '@/components/ui/LegalDisclaimer';
 
 export const metadata = createPageMetadata({
   title: 'Veterinary Services',
@@ -150,6 +151,10 @@ export default function VeterinaryServicesPage() {
           </div>
         </div>
       </section>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <LegalDisclaimer type="medical" />
+      </div>
 
       {/* ── How It Works ── */}
       <section className="py-16 bg-white">

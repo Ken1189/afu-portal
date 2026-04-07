@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Tractor, Wheat, Hospital, Home, Ship, Beef, ShieldCheck, Cog, Landmark, Truck, type LucideIcon } from "lucide-react";
 import { createPageMetadata } from '@/lib/seo/metadata';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
+import LegalDisclaimer from "@/components/ui/LegalDisclaimer";
 
 export const metadata = createPageMetadata({
   title: 'Insurance Products',
@@ -184,6 +185,10 @@ export default async function InsuranceHubPage() {
           </p>
         </div>
       </section>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <LegalDisclaimer type="insurance" />
+      </div>
 
       {/* Stats */}
       <section className="text-white py-12" style={{ background: 'linear-gradient(135deg, #5DB347, #449933)' }}>

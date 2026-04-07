@@ -1,4 +1,5 @@
 import Link from "next/link";
+import LegalDisclaimer from "@/components/ui/LegalDisclaimer";
 
 export const metadata = { title: "Financing - AFU Services" };
 
@@ -34,6 +35,7 @@ export default function FinancingServicePage() {
       </section>
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <LegalDisclaimer type="finance" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
             <div className="rounded-3xl p-8 text-white shadow-lg shadow-[#5DB347]/10 hover:-translate-y-1 hover:shadow-xl transition-all duration-300" style={{ background: 'linear-gradient(135deg, #5DB347, #449933)' }}>
               <h3 className="text-xl font-bold mb-4">Product 1: Pre-export Working Capital</h3>

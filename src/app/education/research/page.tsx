@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import LegalDisclaimer from '@/components/ui/LegalDisclaimer';
 
 interface ResearchCentre {
   id: string;
@@ -192,6 +193,10 @@ export default function ResearchCentresPage() {
           </p>
         </div>
       </section>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <LegalDisclaimer type="research" />
+      </div>
 
       {/* Research Centres Grid */}
       <section className="py-16 bg-[#EBF7E5]/30">

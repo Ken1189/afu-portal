@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Landmark, Globe, FlaskConical, Tractor, Sprout, Package, Home, type LucideIcon } from "lucide-react";
 import { createPageMetadata } from '@/lib/seo/metadata';
+import LegalDisclaimer from "@/components/ui/LegalDisclaimer";
 
 export const metadata = createPageMetadata({
   title: 'Agricultural Finance',
@@ -93,6 +94,10 @@ export default function FinanceHubPage() {
           </p>
         </div>
       </section>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <LegalDisclaimer type="finance" />
+      </div>
 
       {/* Trust Indicators */}
       <section className="bg-[#5DB347] text-white py-12">

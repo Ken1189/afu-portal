@@ -286,6 +286,11 @@ export default function Footer() {
           </div>
         </div>
 
+        {/* Regulatory disclaimer */}
+        <p className="text-xs text-gray-500 max-w-4xl mx-auto text-center mt-6 leading-relaxed">
+          AFU is currently building infrastructure across banking, insurance, finance, and trade services. Some products described on this site are part of our planned offering and are pending regulatory approval. AFU is not currently a licensed bank, insurance provider, or registered financial institution. Information on this site does not constitute an offer of securities, investment advice, or financial services.
+        </p>
+
         {/* Bottom bar */}
         <div className="border-t border-gray-700/50 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-gray-500 text-sm">

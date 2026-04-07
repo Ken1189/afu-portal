@@ -37,6 +37,7 @@ import {
 } from 'lucide-react';
 import { useCountUp } from '@/hooks/useCountUp';
 import { createClient } from '@/lib/supabase/client';
+import LegalDisclaimer from '@/components/ui/LegalDisclaimer';
 
 /* ─── Animation helpers ─── */
 function FadeInWhenVisible({
@@ -1590,6 +1591,10 @@ export default function Home() {
           </FadeInWhenVisible>
         </div>
       </section>}
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+        <LegalDisclaimer type="general" variant="footnote" />
+      </div>
     </>
   );
 }

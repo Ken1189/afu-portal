@@ -30,6 +30,8 @@ import {
   UtensilsCrossed,
 } from "lucide-react";
 import VideoCard from "@/components/VideoCard";
+import ScheduleDemoButton from "@/components/ScheduleDemoButton";
+import LegalDisclaimer from "@/components/ui/LegalDisclaimer";
 
 export const metadata = {
   title: "Invest in AFU - $500M Seed Round | African Farming Union",
@@ -118,13 +120,10 @@ export default function InvestorsPage() {
                 Request Investor Pack
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
-              <Link
-                href="/contact"
+              <ScheduleDemoButton
+                label="Book a Demo"
                 className="border-2 border-white/30 hover:border-white/60 hover:bg-white/10 text-white px-10 py-5 rounded-2xl font-bold text-lg transition-all duration-300 flex items-center justify-center gap-2"
-              >
-                <Calendar className="w-5 h-5" />
-                Schedule a Call
-              </Link>
+              />
             </div>
 
             {/* Trust badges */}
@@ -147,6 +146,10 @@ export default function InvestorsPage() {
           </div>
         </div>
       </section>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <LegalDisclaimer type="investment" />
+      </div>
 
       {/* ─── INVESTOR OVERVIEW VIDEO ─── */}
       <section

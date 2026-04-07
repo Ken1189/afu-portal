@@ -183,8 +183,11 @@ export default function DemoLayout({ children }: { children: React.ReactNode }) 
                           const el = document.getElementById(item.id);
                           if (el) {
                             el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                            setMobileOpen(false);
+                          } else {
+                            // Section not present on this demo variant — scroll to top
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
                           }
+                          setMobileOpen(false);
                         }}
                         className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs transition-colors text-left ${
                           unlocked

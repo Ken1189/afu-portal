@@ -1,4 +1,5 @@
 import Link from "next/link";
+import LegalDisclaimer from "@/components/ui/LegalDisclaimer";
 
 export const metadata = {
   title: "AFU Bank - Agricultural Banking Services - AFU",
@@ -101,6 +102,10 @@ export default function AFUBankPage() {
           </div>
         </div>
       </section>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <LegalDisclaimer type="banking" />
+      </div>
 
       {/* Gradient Banner */}
       <section className="bg-gradient-to-r from-[#8CB89C] to-[#729E82] text-white py-10">

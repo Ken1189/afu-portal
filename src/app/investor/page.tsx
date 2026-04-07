@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/lib/supabase/auth-context';
 import { createClient } from '@/lib/supabase/client';
+import LegalDisclaimer from '@/components/ui/LegalDisclaimer';
 
 // ── Interfaces ──────────────────────────────────────────────────────────────
 
@@ -549,6 +550,7 @@ export default function InvestorDashboard() {
 
   return (
     <div className="space-y-8">
+      <LegalDisclaimer type="investment" />
       {/* ── Header ────────────────────────────────────────────────────────── */}
       <motion.div
         initial={{ opacity: 0, y: -8 }}
