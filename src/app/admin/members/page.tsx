@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
-  Search, Users, Eye, MapPin, Loader2, Download, LogIn,
+  Search, Users, Eye, MapPin, Loader2, Download, LogIn, UserCog, Save, X,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/supabase/auth-context';
@@ -17,6 +17,7 @@ interface ProfileRow {
   role: string | null;
   country: string | null;
   region: string | null;
+  capabilities?: string[] | null;
   created_at: string;
   members?: { tier: string | null }[] | { tier: string | null } | null;
 }
@@ -57,6 +58,35 @@ const tierLabels: Record<string, string> = {
   enterprise: 'Enterprise',
 };
 
+const CAPABILITY_LIST: { key: string; label: string; chipClass: string }[] = [
+  { key: 'ambassador', label: 'Ambassador', chipClass: 'bg-purple-100 text-purple-700 border-purple-200' },
+  { key: 'supplier', label: 'Supplier', chipClass: 'bg-blue-100 text-blue-700 border-blue-200' },
+  { key: 'investor', label: 'Investor', chipClass: 'bg-green-100 text-green-700 border-green-200' },
+  { key: 'sponsor', label: 'Sponsor', chipClass: 'bg-orange-100 text-orange-700 border-orange-200' },
+  { key: 'advisor', label: 'Advisor', chipClass: 'bg-gray-100 text-gray-700 border-gray-200' },
+  { key: 'warehouse_op', label: 'Warehouse Op', chipClass: 'bg-amber-100 text-amber-700 border-amber-200' },
+];
+
+const PRIMARY_ROLE_OPTIONS: { value: string; label: string }[] = [
+  { value: 'farmer', label: 'Farmer' },
+  { value: 'member', label: 'Member' },
+  { value: 'supplier', label: 'Supplier' },
+  { value: 'ambassador', label: 'Ambassador' },
+  { value: 'investor', label: 'Investor' },
+  { value: 'partner', label: 'Partner' },
+  { value: 'admin', label: 'Admin' },
+  { value: 'super_admin', label: 'Super Admin' },
+];
+
+interface UserDetails {
+  profile: ProfileRow & { capabilities: string[] };
+  linked: {
+    supplier: { id: string; created_at: string } | null;
+    ambassador: { id: string; created_at: string } | null;
+    member: { id: string; tier: string | null; created_at: string } | null;
+  };
+}
+
 export default function AdminMembersPage() {
   const supabase = useMemo(() => createClient(), []);
   const { isSuperAdmin, user: authUser } = useAuth();
@@ -66,16 +96,44 @@ export default function AdminMembersPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
   const [countryFilter, setCountryFilter] = useState('all');
+  const [capabilityFilter, setCapabilityFilter] = useState('all');
   const [impersonateLoading, setImpersonateLoading] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+  // Manage modal state
+  const [manageUserId, setManageUserId] = useState<string | null>(null);
+  const [manageDetails, setManageDetails] = useState<UserDetails | null>(null);
+  const [manageLoading, setManageLoading] = useState(false);
+  const [pendingRole, setPendingRole] = useState<string>('');
+  const [savingRole, setSavingRole] = useState(false);
+  const [togglingCapability, setTogglingCapability] = useState<string | null>(null);
+
+  const showSuccess = (msg: string) => {
+    setSuccessMsg(msg);
+    setTimeout(() => setSuccessMsg(null), 3000);
+  };
+  const showError = (msg: string) => {
+    setErrorMsg(msg);
+    setTimeout(() => setErrorMsg(null), 4000);
+  };
 
   const fetchProfiles = useCallback(async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      // Try with capabilities first; gracefully fall back if column doesn't exist
+      let { data, error } = await supabase
         .from('profiles')
-        .select('id, full_name, email, role, country, region, created_at, members(tier)')
+        .select('id, full_name, email, role, country, region, capabilities, created_at, members(tier)')
         .order('created_at', { ascending: false });
+      if (error && /capabilities/i.test(error.message)) {
+        const fallback = await supabase
+          .from('profiles')
+          .select('id, full_name, email, role, country, region, created_at, members(tier)')
+          .order('created_at', { ascending: false });
+        data = (fallback.data as unknown) as typeof data;
+        error = fallback.error;
+      }
       if (error) {
         console.error('[admin/members] fetch error', error);
         setErrorMsg(error.message);
@@ -157,8 +215,11 @@ export default function AdminMembersPage() {
       result = result.filter(p => normalizedRole(p.role) === roleFilter);
     }
     if (countryFilter !== 'all') result = result.filter(p => p.country === countryFilter);
+    if (capabilityFilter !== 'all') {
+      result = result.filter(p => Array.isArray(p.capabilities) && p.capabilities.includes(capabilityFilter));
+    }
     return result;
-  }, [profiles, searchQuery, roleFilter, countryFilter]);
+  }, [profiles, searchQuery, roleFilter, countryFilter, capabilityFilter]);
 
   const stats = useMemo(() => {
     const counts: Record<string, number> = { all: profiles.length, farmer: 0, supplier: 0, ambassador: 0, investor: 0, partner: 0, admin: 0 };
@@ -187,6 +248,111 @@ export default function AdminMembersPage() {
     a.download = `afu-people-${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
+  };
+
+  // ── Manage Modal ────────────────────────────────────────────────
+  const openManage = async (userId: string) => {
+    setManageUserId(userId);
+    setManageDetails(null);
+    setManageLoading(true);
+    try {
+      const res = await fetch(`/api/admin/users/${userId}`);
+      const data = await res.json();
+      if (!res.ok) {
+        showError(data.error || 'Failed to load user');
+        setManageUserId(null);
+      } else {
+        setManageDetails(data);
+        setPendingRole(data.profile.role || '');
+      }
+    } catch {
+      showError('Failed to load user');
+      setManageUserId(null);
+    } finally {
+      setManageLoading(false);
+    }
+  };
+
+  const closeManage = () => {
+    setManageUserId(null);
+    setManageDetails(null);
+    setPendingRole('');
+  };
+
+  const handleSaveRole = async () => {
+    if (!manageDetails || !manageUserId) return;
+    if (pendingRole === manageDetails.profile.role) return;
+
+    if (pendingRole === 'super_admin') {
+      const ok = window.confirm(
+        'Are you sure you want to grant super_admin? This is a powerful role with full system access.'
+      );
+      if (!ok) return;
+    }
+
+    setSavingRole(true);
+    try {
+      const res = await fetch(`/api/admin/users/${manageUserId}/role`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role: pendingRole }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showError(data.error || 'Failed to update role');
+        return;
+      }
+      const sideEffectMsg = data.sideEffects?.length ? ` (${data.sideEffects.join(', ')})` : '';
+      showSuccess(`Role updated to ${pendingRole}${sideEffectMsg}`);
+      // Update local state
+      setProfiles(prev => prev.map(p => p.id === manageUserId ? { ...p, role: pendingRole } : p));
+      setManageDetails(prev => prev ? { ...prev, profile: { ...prev.profile, role: pendingRole } } : prev);
+      // Re-fetch user details to refresh linked records
+      const refresh = await fetch(`/api/admin/users/${manageUserId}`);
+      if (refresh.ok) setManageDetails(await refresh.json());
+    } catch {
+      showError('Failed to update role');
+    } finally {
+      setSavingRole(false);
+    }
+  };
+
+  const handleToggleCapability = async (capability: string, currentlyOn: boolean) => {
+    if (!manageUserId || !manageDetails) return;
+    setTogglingCapability(capability);
+    try {
+      const res = await fetch(`/api/admin/users/${manageUserId}/capabilities`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: currentlyOn ? 'remove' : 'add', capability }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showError(data.error || 'Failed to update capability');
+        return;
+      }
+      showSuccess(`${currentlyOn ? 'Removed' : 'Added'} ${capability}`);
+      setManageDetails(prev => prev ? {
+        ...prev,
+        profile: { ...prev.profile, capabilities: data.capabilities || [] },
+      } : prev);
+      // Update table row capabilities
+      setProfiles(prev => prev.map(p =>
+        p.id === manageUserId ? { ...p, capabilities: data.capabilities || [] } : p
+      ));
+      // If linked records changed, refresh
+      if (data.sideEffects?.length) {
+        const refresh = await fetch(`/api/admin/users/${manageUserId}`);
+        if (refresh.ok) {
+          const refreshed = await refresh.json();
+          setManageDetails(refreshed);
+        }
+      }
+    } catch {
+      showError('Failed to update capability');
+    } finally {
+      setTogglingCapability(null);
+    }
   };
 
   const summaryCards = [
@@ -253,6 +419,14 @@ export default function AdminMembersPage() {
               <option value="partner">Partners</option>
               <option value="admin">Admins</option>
             </select>
+            <select value={capabilityFilter} onChange={(e) => setCapabilityFilter(e.target.value)} className="px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white">
+              <option value="all">All Capabilities</option>
+              <option value="ambassador">Has Ambassador</option>
+              <option value="supplier">Has Supplier</option>
+              <option value="investor">Has Investor</option>
+              <option value="sponsor">Has Sponsor</option>
+              <option value="advisor">Has Advisor</option>
+            </select>
             <select value={countryFilter} onChange={(e) => setCountryFilter(e.target.value)} className="px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white">
               <option value="all">All Countries</option>
               <option value="Botswana">Botswana</option>
@@ -290,7 +464,7 @@ export default function AdminMembersPage() {
                 <tr className="border-b border-gray-100 bg-cream/50">
                   <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Name</th>
                   <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Email</th>
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Role</th>
+                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Role &amp; Capabilities</th>
                   <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Tier</th>
                   <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Country</th>
                   <th className="text-right py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Actions</th>
@@ -300,6 +474,7 @@ export default function AdminMembersPage() {
                 {filtered.map((p) => {
                   const role = normalizedRole(p.role);
                   const tier = getTier(p);
+                  const caps = Array.isArray(p.capabilities) ? p.capabilities : [];
                   return (
                     <tr key={p.id} className="hover:bg-cream/50 transition-colors">
                       <td className="py-3 px-4">
@@ -307,9 +482,20 @@ export default function AdminMembersPage() {
                       </td>
                       <td className="py-3 px-4 text-gray-500">{p.email || '—'}</td>
                       <td className="py-3 px-4">
-                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${roleColors[role] || 'bg-gray-100 text-gray-600'}`}>
-                          {roleLabels[role] || role}
-                        </span>
+                        <div className="flex flex-wrap items-center gap-1">
+                          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${roleColors[role] || 'bg-gray-100 text-gray-600'}`}>
+                            {roleLabels[role] || role}
+                          </span>
+                          {caps.map((c) => {
+                            const def = CAPABILITY_LIST.find(x => x.key === c);
+                            if (!def) return null;
+                            return (
+                              <span key={c} className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium border ${def.chipClass}`}>
+                                +{def.label}
+                              </span>
+                            );
+                          })}
+                        </div>
                       </td>
                       <td className="py-3 px-4">
                         {role === 'farmer' && tier ? (
@@ -328,6 +514,13 @@ export default function AdminMembersPage() {
                       </td>
                       <td className="py-3 px-4">
                         <div className="flex items-center justify-end gap-1">
+                          <button
+                            onClick={() => openManage(p.id)}
+                            className="p-2 rounded-lg hover:bg-teal/10 text-gray-400 hover:text-teal transition-colors"
+                            title="Manage roles & capabilities"
+                          >
+                            <UserCog className="w-4 h-4" />
+                          </button>
                           <Link href={`/admin/members/${p.id}`} className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-navy transition-colors" title="View details">
                             <Eye className="w-4 h-4" />
                           </Link>
@@ -360,10 +553,155 @@ export default function AdminMembersPage() {
         </div>
       )}
 
-      {/* Toast */}
+      {/* Manage Modal */}
+      {manageUserId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 sticky top-0 bg-white rounded-t-2xl">
+              <div className="flex items-center gap-2">
+                <UserCog className="w-5 h-5 text-teal" />
+                <h2 className="text-lg font-bold text-navy">Manage User</h2>
+              </div>
+              <button onClick={closeManage} className="p-1 rounded-lg hover:bg-gray-100 text-gray-400">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {manageLoading && (
+              <div className="py-12 text-center">
+                <Loader2 className="w-6 h-6 text-teal animate-spin mx-auto" />
+              </div>
+            )}
+
+            {!manageLoading && manageDetails && (
+              <div className="p-6 space-y-6">
+                {/* User identity */}
+                <div className="bg-cream/50 rounded-xl p-4">
+                  <p className="font-semibold text-navy text-base">{manageDetails.profile.full_name || '—'}</p>
+                  <p className="text-sm text-gray-500">{manageDetails.profile.email || '—'}</p>
+                  <div className="mt-2">
+                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${roleColors[normalizedRole(manageDetails.profile.role)] || 'bg-gray-100 text-gray-600'}`}>
+                      Current: {roleLabels[normalizedRole(manageDetails.profile.role)] || manageDetails.profile.role || 'unknown'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Primary Role */}
+                <div>
+                  <h3 className="text-sm font-semibold text-navy mb-2">Primary Role</h3>
+                  <div className="flex gap-2">
+                    <select
+                      value={pendingRole}
+                      onChange={(e) => setPendingRole(e.target.value)}
+                      className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-teal/50"
+                    >
+                      {PRIMARY_ROLE_OPTIONS.map(opt => (
+                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                      ))}
+                    </select>
+                    <button
+                      onClick={handleSaveRole}
+                      disabled={savingRole || pendingRole === manageDetails.profile.role}
+                      className="flex items-center gap-1 px-4 py-2 bg-teal text-white rounded-lg text-sm font-medium hover:bg-teal/90 transition-colors disabled:opacity-50"
+                    >
+                      {savingRole ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                      Save
+                    </button>
+                  </div>
+                  <p className="text-xs text-gray-400 mt-1">
+                    Changing the role may auto-create supplier, ambassador, or member records.
+                  </p>
+                </div>
+
+                {/* Capabilities */}
+                <div>
+                  <h3 className="text-sm font-semibold text-navy mb-2">Capabilities (additive)</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {CAPABILITY_LIST.map((cap) => {
+                      const on = (manageDetails.profile.capabilities || []).includes(cap.key);
+                      const isLoading = togglingCapability === cap.key;
+                      return (
+                        <button
+                          key={cap.key}
+                          onClick={() => handleToggleCapability(cap.key, on)}
+                          disabled={isLoading}
+                          className={`text-xs px-3 py-1.5 rounded-full font-medium border transition-all flex items-center gap-1 ${
+                            on
+                              ? cap.chipClass + ' opacity-100'
+                              : 'bg-white text-gray-400 border-gray-200 hover:border-gray-300'
+                          } disabled:opacity-50`}
+                        >
+                          {isLoading && <Loader2 className="w-3 h-3 animate-spin" />}
+                          {on ? '✓ ' : '+ '}{cap.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <p className="text-xs text-gray-400 mt-2">
+                    Toggles save instantly. Removing a capability does not delete linked records.
+                  </p>
+                </div>
+
+                {/* Linked Records */}
+                <div>
+                  <h3 className="text-sm font-semibold text-navy mb-2">Linked Records</h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-center justify-between p-2 rounded-lg bg-gray-50">
+                      <span className="text-gray-600">Suppliers row</span>
+                      {manageDetails.linked.supplier ? (
+                        <span className="text-xs text-green-700">
+                          Created {new Date(manageDetails.linked.supplier.created_at).toLocaleDateString()}
+                        </span>
+                      ) : (
+                        <span className="text-xs text-gray-400">—</span>
+                      )}
+                    </div>
+                    <div className="flex items-center justify-between p-2 rounded-lg bg-gray-50">
+                      <span className="text-gray-600">Ambassadors row</span>
+                      {manageDetails.linked.ambassador ? (
+                        <span className="text-xs text-green-700">
+                          Created {new Date(manageDetails.linked.ambassador.created_at).toLocaleDateString()}
+                        </span>
+                      ) : (
+                        <span className="text-xs text-gray-400">—</span>
+                      )}
+                    </div>
+                    <div className="flex items-center justify-between p-2 rounded-lg bg-gray-50">
+                      <span className="text-gray-600">Members row</span>
+                      {manageDetails.linked.member ? (
+                        <span className="text-xs text-green-700">
+                          {manageDetails.linked.member.tier || 'free'} · Created {new Date(manageDetails.linked.member.created_at).toLocaleDateString()}
+                        </span>
+                      ) : (
+                        <span className="text-xs text-gray-400">—</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-end pt-2 border-t border-gray-100">
+                  <button
+                    onClick={closeManage}
+                    className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-navy transition-colors"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Toasts */}
       {errorMsg && (
-        <div className="fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-lg text-white text-sm font-medium bg-red-600">
+        <div className="fixed top-4 right-4 z-[60] px-4 py-3 rounded-xl shadow-lg text-white text-sm font-medium bg-red-600">
           {errorMsg}
+        </div>
+      )}
+      {successMsg && (
+        <div className="fixed top-4 right-4 z-[60] px-4 py-3 rounded-xl shadow-lg text-white text-sm font-medium bg-green-600">
+          {successMsg}
         </div>
       )}
     </div>
