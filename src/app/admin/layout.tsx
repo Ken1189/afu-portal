@@ -283,7 +283,6 @@ const navGroups: NavGroup[] = [
     defaultOpen: false,
     superAdminOnly: true,
     links: [
-      { href: '/portal-select', label: 'Choose Portal…', icon: <LayoutDashboard className={ICON_CLS} /> },
       { href: '/investor', label: 'Investor Portal', icon: <BarChart3 className={ICON_CLS} /> },
       { href: '/ambassador', label: 'Ambassador Portal', icon: <Megaphone className={ICON_CLS} /> },
       { href: '/supplier', label: 'Supplier Portal', icon: <Store className={ICON_CLS} /> },

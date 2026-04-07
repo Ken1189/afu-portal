@@ -480,7 +480,7 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
         {/* Sidebar Footer */}
         <div className="p-3 border-t border-gray-100 space-y-0.5">
           <Link
-            href="/portal-select"
+            href="/"
             className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors"
           >
             <ChevronLeft className="w-5 h-5" />
@@ -734,7 +734,7 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
 
                 <div className="p-3 border-t border-gray-100 space-y-0.5">
                   <Link
-                    href="/portal-select"
+                    href="/"
                     onClick={() => setDrawerOpen(false)}
                     className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-500 active:bg-gray-50"
                   >

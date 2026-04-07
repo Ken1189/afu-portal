@@ -195,11 +195,11 @@ export default function WarehouseLayout({ children }: { children: React.ReactNod
 
         <div className="p-3 border-t border-white/10 space-y-1">
           <Link
-            href="/portal-select"
+            href="/"
             className="flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-colors min-h-[44px]"
           >
             <Home className="w-4 h-4" />
-            Switch Portal
+            Back to Home
           </Link>
           <Link
             href="/"
@@ -258,12 +258,12 @@ export default function WarehouseLayout({ children }: { children: React.ReactNod
               </nav>
               <div className="p-3 border-t border-white/10 space-y-1">
                 <Link
-                  href="/portal-select"
+                  href="/"
                   onClick={() => setMobileOpen(false)}
                   className="flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-colors min-h-[44px]"
                 >
                   <Home className="w-4 h-4" />
-                  Switch Portal
+                  Back to Home
                 </Link>
                 <Link
                   href="/"
@@ -314,7 +314,7 @@ export default function WarehouseLayout({ children }: { children: React.ReactNod
           </div>
           <div className="flex items-center gap-3">
             {(serverRole === 'admin' || serverRole === 'super_admin') && (
-              <Link href="/admin" className="hidden sm:flex items-center gap-1.5 text-xs text-gray-500 hover:text-[#1B2A4A] transition-colors px-3 py-1.5 rounded-lg hover:bg-gray-100">
+              <Link href="/" className="hidden sm:flex items-center gap-1.5 text-xs text-gray-500 hover:text-[#1B2A4A] transition-colors px-3 py-1.5 rounded-lg hover:bg-gray-100">
                 <ExternalLink className="w-3.5 h-3.5" />
                 Admin
               </Link>

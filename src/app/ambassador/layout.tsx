@@ -199,11 +199,11 @@ export default function AmbassadorLayout({ children }: { children: React.ReactNo
 
         <div className="p-3 border-t border-white/10 space-y-1">
           <Link
-            href="/portal-select"
+            href="/"
             className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-colors"
           >
             <Home className="w-4 h-4" />
-            Switch Portal
+            Back to Home
           </Link>
           <Link
             href="/"
@@ -262,12 +262,12 @@ export default function AmbassadorLayout({ children }: { children: React.ReactNo
               </nav>
               <div className="p-3 border-t border-white/10 space-y-1">
                 <Link
-                  href="/portal-select"
+                  href="/"
                   onClick={() => setMobileOpen(false)}
                   className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-colors"
                 >
                   <Home className="w-4 h-4" />
-                  Switch Portal
+                  Back to Home
                 </Link>
                 <Link
                   href="/"
