@@ -97,7 +97,8 @@ interface Shipment {
 
 // ── Mock Data ───────────────────────────────────────────────────────────────
 
-const mockShipments: Shipment[] = [
+const mockShipments: Shipment[] = [];
+const _UNUSED_mockShipments: Shipment[] = [
   {
     id: 'SHP-001',
     reference: 'AFU-EXP-2026-001',

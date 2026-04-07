@@ -50,9 +50,11 @@ interface Product {
   featured: boolean;
 }
 
-/* ─── Static products ─── */
+/* ─── Static products REMOVED — 12 hardcoded fake products deleted.
+     Page now fetches from products table only. ─── */
 
-const PRODUCTS: Product[] = [
+const PRODUCTS: Product[] = [];
+const _UNUSED_PRODUCTS: Product[] = [
   { id: 'P001', supplierName: 'Kalahari Seeds Co.', name: 'Drought-Resistant Sorghum (Macia)', description: 'Early-maturing white sorghum variety for semi-arid conditions. 25kg bag.', category: 'seeds', price: 65, memberPrice: 58.50, currency: 'USD', unit: 'per 25kg bag', image: 'https://images.unsplash.com/photo-1595855759920-86582396756a?w=400&h=300&fit=crop', availability: 'in-stock', rating: 4.7, reviewCount: 89, tags: ['drought-resistant', 'sorghum'], featured: true },
   { id: 'P002', supplierName: 'Kalahari Seeds Co.', name: 'Hybrid Maize Seed (PAN 4M-21)', description: 'High-yielding hybrid maize with drought tolerance. 10kg bag treats 1 hectare.', category: 'seeds', price: 48, memberPrice: 43.20, currency: 'USD', unit: 'per 10kg bag', image: 'https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=400&h=300&fit=crop', availability: 'in-stock', rating: 4.6, reviewCount: 134, tags: ['maize', 'hybrid'], featured: true },
   { id: 'P003', supplierName: 'Victoria Falls Seed Bank', name: 'Cowpea Seeds (IT18)', description: 'Improved cowpea variety with pest resistance. Dual-purpose grain and fodder. 5kg pack.', category: 'seeds', price: 22, memberPrice: 20.24, currency: 'USD', unit: 'per 5kg pack', image: 'https://images.unsplash.com/photo-1590682680695-43b964a3ae17?w=400&h=300&fit=crop', availability: 'in-stock', rating: 4.5, reviewCount: 67, tags: ['cowpea', 'legume'], featured: false },
@@ -183,7 +185,7 @@ export default function PublicMarketplacePage() {
     return list;
   }, [search, category]);
 
-  const featuredProducts = PRODUCTS.filter((p) => p.featured);
+  // featured products removed — fetched from DB when populated
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -336,7 +338,18 @@ export default function PublicMarketplacePage() {
           )}
         </div>
 
-        {filtered.length === 0 ? (
+        {products.length === 0 ? (
+          <div className="text-center py-20 max-w-md mx-auto">
+            <div className="w-16 h-16 rounded-2xl bg-[#5DB347]/10 flex items-center justify-center mb-4 mx-auto">
+              <Package className="w-8 h-8 text-[#5DB347]" />
+            </div>
+            <h3 className="text-xl font-bold text-navy mb-2">Marketplace launching soon</h3>
+            <p className="text-gray-500 mb-6">Be the first to list your products. Join as a supplier to sell to farmers across Africa.</p>
+            <Link href="/apply?tier=supplier" className="inline-flex items-center gap-2 bg-[#5DB347] text-white px-6 py-3 rounded-full font-semibold hover:bg-[#449933] transition-colors">
+              Become a supplier <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        ) : filtered.length === 0 ? (
           <div className="text-center py-20">
             <Package className="w-12 h-12 text-gray-300 mx-auto mb-3" />
             <p className="text-gray-500">No products found. Try adjusting your search or filters.</p>

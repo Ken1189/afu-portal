@@ -43,10 +43,10 @@ export async function GET(request: NextRequest) {
     if (overdueLoans && overdueLoans.length > 0) {
       for (const loan of overdueLoans) {
         try {
-          // Mark as overdue (update status or add flag)
+          // Mark as defaulted (loan_status enum has 'defaulted', not 'overdue')
           await svc
             .from('loans')
-            .update({ status: 'overdue', updated_at: now.toISOString() })
+            .update({ status: 'defaulted', updated_at: now.toISOString() })
             .eq('id', loan.id);
 
           // Notify the member

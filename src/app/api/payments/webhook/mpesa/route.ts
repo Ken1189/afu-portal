@@ -1,7 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'crypto';
 import { createAdminClient } from '@/lib/supabase/server';
 import { emitEventAsync } from '@/lib/events/event-bus';
 import '@/lib/events/handlers';
+
+function verifyMpesaSignature(rawBody: string, signature: string | null): boolean {
+  const secret = process.env.MPESA_WEBHOOK_SECRET;
+  if (!secret) {
+    console.warn('[mpesa webhook] MPESA_WEBHOOK_SECRET not set — allowing request (dev mode)');
+    return true;
+  }
+  if (!signature) return false;
+  const expected = crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
+  try {
+    return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(signature));
+  } catch {
+    return false;
+  }
+}
 
 interface MpesaStkCallback {
   MerchantRequestID: string;
@@ -24,9 +40,15 @@ interface MpesaCallbackBody {
  * M-Pesa STK Push callback handler. No auth required.
  */
 export async function POST(request: NextRequest) {
+  const rawBody = await request.text();
+  const signature = request.headers.get('x-mpesa-signature');
+  if (!verifyMpesaSignature(rawBody, signature)) {
+    return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+  }
+
   let body: MpesaCallbackBody;
   try {
-    body = await request.json();
+    body = JSON.parse(rawBody);
   } catch {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }

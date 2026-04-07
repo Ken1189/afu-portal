@@ -24,26 +24,9 @@ import { useAuth } from '@/lib/supabase/auth-context';
 /* ------------------------------------------------------------------ */
 /*  Testimonial data                                                   */
 /* ------------------------------------------------------------------ */
-const testimonials = [
-  {
-    quote:
-      'AFU transformed my small maize operation into a thriving commercial farm. The financing and training programs are world-class.',
-    name: 'Grace Mwangi',
-    role: 'Commercial Farmer, Kenya',
-  },
-  {
-    quote:
-      'Access to trade finance through AFU opened export markets I never thought possible. My cassava now reaches three countries.',
-    name: 'Kwame Asante',
-    role: 'Export Farmer, Ghana',
-  },
-  {
-    quote:
-      'The input supply program cut my costs by 30%. AFU is not just a union \u2014 it is a growth partner for every African farmer.',
-    name: 'Amina Diallo',
-    role: 'Cooperative Leader, Senegal',
-  },
-];
+// Testimonials removed — will be populated from DB when real member testimonials exist
+const _UNUSED_testimonials: { quote: string; name: string; role: string }[] = [];
+const testimonials: { quote: string; name: string; role: string }[] = [];
 
 /* ------------------------------------------------------------------ */
 /*  Framer Motion variants (typed for strict TS)                       */
@@ -291,77 +274,59 @@ export default function LoginPage() {
               </h2>
             </div>
 
-            {/* Testimonial */}
-            <div className="relative min-h-[160px]">
-              <AnimatePresence mode="wait">
-                <motion.blockquote
-                  key={activeTestimonial}
-                  variants={testimonialVariant}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                  className="absolute inset-0"
-                >
-                  <p className="text-white/75 text-base xl:text-lg leading-relaxed italic">
-                    &ldquo;{testimonials[activeTestimonial].quote}&rdquo;
-                  </p>
-                  <footer className="mt-5 flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-[#5DB347]/30 flex items-center justify-center text-white font-semibold text-sm">
-                      {testimonials[activeTestimonial].name.charAt(0)}
-                    </div>
-                    <div>
-                      <p className="text-white font-medium text-sm">
-                        {testimonials[activeTestimonial].name}
-                      </p>
-                      <p className="text-white/50 text-xs">
-                        {testimonials[activeTestimonial].role}
-                      </p>
-                    </div>
-                  </footer>
-                </motion.blockquote>
-              </AnimatePresence>
-            </div>
+            {/* Testimonial — only shown when real testimonials exist */}
+            {testimonials.length > 0 && (
+              <div className="relative min-h-[160px]">
+                <AnimatePresence mode="wait">
+                  <motion.blockquote
+                    key={activeTestimonial}
+                    variants={testimonialVariant}
+                    initial="enter"
+                    animate="center"
+                    exit="exit"
+                    className="absolute inset-0"
+                  >
+                    <p className="text-white/75 text-base xl:text-lg leading-relaxed italic">
+                      &ldquo;{testimonials[activeTestimonial].quote}&rdquo;
+                    </p>
+                    <footer className="mt-5 flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-[#5DB347]/30 flex items-center justify-center text-white font-semibold text-sm">
+                        {testimonials[activeTestimonial].name.charAt(0)}
+                      </div>
+                      <div>
+                        <p className="text-white font-medium text-sm">
+                          {testimonials[activeTestimonial].name}
+                        </p>
+                        <p className="text-white/50 text-xs">
+                          {testimonials[activeTestimonial].role}
+                        </p>
+                      </div>
+                    </footer>
+                  </motion.blockquote>
+                </AnimatePresence>
+              </div>
+            )}
 
-            {/* Dots indicator */}
-            <div className="flex gap-2 mt-4">
-              {testimonials.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setActiveTestimonial(i)}
-                  className={`h-1.5 rounded-full transition-all duration-300 ${
-                    i === activeTestimonial
-                      ? 'w-8 bg-[#5DB347]'
-                      : 'w-4 bg-white/25 hover:bg-white/40'
-                  }`}
-                  aria-label={`Show testimonial ${i + 1}`}
-                />
-              ))}
-            </div>
+            {/* Dots indicator — only when real testimonials exist */}
+            {testimonials.length > 1 && (
+              <div className="flex gap-2 mt-4">
+                {testimonials.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setActiveTestimonial(i)}
+                    className={`h-1.5 rounded-full transition-all duration-300 ${
+                      i === activeTestimonial
+                        ? 'w-8 bg-[#5DB347]'
+                        : 'w-4 bg-white/25 hover:bg-white/40'
+                    }`}
+                    aria-label={`Show testimonial ${i + 1}`}
+                  />
+                ))}
+              </div>
+            )}
           </div>
 
-          {/* Bottom: Stats bar */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-8 border-t border-white/10">
-            {[
-              // S5.6: Updated to reflect actual platform scope
-              { icon: Users, label: 'Members', value: '5,000+' },
-              { icon: Globe, label: 'Countries', value: '9+' },
-              { icon: DollarSign, label: 'Financed', value: '$50M+' },
-            ].map((stat, i) => (
-              <motion.div
-                key={stat.label}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8 + i * 0.15, duration: 0.5 }}
-                className="text-center"
-              >
-                <stat.icon className="w-5 h-5 text-[#8CB89C]/60 mx-auto mb-1.5" />
-                <p className="text-white font-bold text-lg">{stat.value}</p>
-                <p className="text-white/40 text-xs uppercase tracking-wider">
-                  {stat.label}
-                </p>
-              </motion.div>
-            ))}
-          </div>
+          {/* Bottom stats bar removed — hardcoded stats ("5,000+ Members", "$50M+ Financed") were unverified claims */}
         </div>
       </motion.div>
 
@@ -603,7 +568,7 @@ export default function LoginPage() {
           {/* Security footer */}
           <div className="flex items-center justify-center gap-1.5 mt-4 text-gray-400 text-xs">
             <Shield className="w-3.5 h-3.5" />
-            <span>256-bit SSL encrypted &middot; SOC 2 compliant</span>
+            <span>Bank-grade encryption</span>
           </div>
         </div>
       </div>

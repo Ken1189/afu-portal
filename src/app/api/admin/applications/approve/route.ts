@@ -8,6 +8,16 @@ import { emitEventAsync } from '@/lib/events/event-bus';
 import '@/lib/events/handlers';
 import { fireAutomations } from '@/lib/automations/executor';
 
+function escapeHtml(input: unknown): string {
+  if (input === null || input === undefined) return '';
+  return String(input)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM = 'African Farming Union <noreply@mail.africanfarmingunion.org>';
 
@@ -96,7 +106,7 @@ export async function POST(request: Request) {
     const assignedRole = ROLE_MAP[application.application_type] || 'member';
 
     // Generate a temporary password
-    const tempPassword = `AFU-${crypto.randomBytes(4).toString('hex').toUpperCase()}`;
+    const tempPassword = `AFU-${crypto.randomBytes(12).toString('hex').toUpperCase()}`;
 
     // Create a Supabase auth user with the applicant's email
     const { data: newUser, error: createUserError } = await svc.auth.admin.createUser({
@@ -127,7 +137,7 @@ export async function POST(request: Request) {
         }
 
         // Still send a notification email
-        const fn = application.full_name?.split(' ')[0] || 'Member';
+        const fn = escapeHtml(application.full_name?.split(' ')[0] || 'Member');
         try {
           await resend.emails.send({
             from: FROM,
@@ -150,7 +160,6 @@ export async function POST(request: Request) {
 
         return NextResponse.json({
           success: true,
-          tempPassword: null,
           message: 'Application approved. User already has an account — approval email sent.',
         });
       }
@@ -232,10 +241,16 @@ export async function POST(request: Request) {
     });
 
     // Send welcome email with credentials
-    const firstName = application.full_name?.split(' ')[0] || 'Member';
-    const tierName = application.requested_tier
+    const firstName = escapeHtml(application.full_name?.split(' ')[0] || 'Member');
+    const safeFullName = escapeHtml(application.full_name || '');
+    const tierNameRaw = application.requested_tier
       ? application.requested_tier.charAt(0).toUpperCase() + application.requested_tier.slice(1).replace(/_/g, ' ')
       : 'Member';
+    const tierName = escapeHtml(tierNameRaw);
+    const safeEmail = escapeHtml(application.email);
+    const safeMemberId = escapeHtml(memberId);
+    const safeTempPassword = escapeHtml(tempPassword);
+    const safeCountry = escapeHtml(application.country || 'N/A');
 
     try {
       await resend.emails.send({
@@ -263,15 +278,15 @@ export async function POST(request: Request) {
                 </tr>
                 <tr>
                   <td style="padding:8px 0;color:#64748b">Email</td>
-                  <td style="padding:8px 0;color:#1B2A4A;font-weight:600">${application.email}</td>
+                  <td style="padding:8px 0;color:#1B2A4A;font-weight:600">${safeEmail}</td>
                 </tr>
                 <tr>
                   <td style="padding:8px 0;color:#64748b">Password</td>
-                  <td style="padding:8px 0;color:#1B2A4A;font-weight:600;font-family:monospace;font-size:16px">${tempPassword}</td>
+                  <td style="padding:8px 0;color:#1B2A4A;font-weight:600;font-family:monospace;font-size:16px">${safeTempPassword}</td>
                 </tr>
                 <tr>
                   <td style="padding:8px 0;color:#64748b">Member ID</td>
-                  <td style="padding:8px 0;color:#1B2A4A;font-weight:600">${memberId}</td>
+                  <td style="padding:8px 0;color:#1B2A4A;font-weight:600">${safeMemberId}</td>
                 </tr>
               </table>
               <p style="color:#EF4444;font-size:12px;margin-bottom:0">Please change your password after your first login.</p>
@@ -306,12 +321,12 @@ export async function POST(request: Request) {
       await resend.emails.send({
         from: FROM,
         to: ['peterw@africanfarmingunion.org', 'devonk@africanfarmingunion.org'],
-        subject: `Member Approved: ${application.full_name} (${tierName})`,
+        subject: `Member Approved: ${application.full_name} (${tierNameRaw})`,
         html: `<div style="font-family:Arial,sans-serif;padding:20px">
           <h2 style="color:#1B2A4A">Member Approved</h2>
-          <p><strong>${application.full_name}</strong> — ${tierName} tier</p>
-          <p>Country: ${application.country || 'N/A'} | Email: ${application.email}</p>
-          <p>Member ID: ${memberId}</p>
+          <p><strong>${safeFullName}</strong> — ${tierName} tier</p>
+          <p>Country: ${safeCountry} | Email: ${safeEmail}</p>
+          <p>Member ID: ${safeMemberId}</p>
           <a href="https://africanfarmingunion.org/admin/members" style="display:inline-block;background:#5DB347;color:white;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600">View in Admin</a>
         </div>`,
       });
@@ -328,7 +343,6 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      tempPassword,
       message: `Account created for ${application.email}. Welcome email sent with login credentials.`,
     });
   } catch (err: unknown) {

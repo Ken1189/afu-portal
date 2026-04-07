@@ -35,110 +35,12 @@ const tabs: { key: PartnerTab; label: string; icon: typeof Wheat }[] = [
   { key: "universities", label: "Universities", icon: GraduationCap },
 ];
 
+// ALL fake partners (AfDB, IFAD, WFP, Stanbic, FNB, John Deere, Syngenta, Corteva, Safaricom, Econet) REMOVED.
+// These were NOT real partners and listing them was legal exposure.
+// Partners are now only loaded from the managed_partners table.
 const FALLBACK_PARTNERS: Record<PartnerTab, Partner[]> = {
   unions: [],
-  business: [
-    {
-      name: "African Development Bank (AfDB)",
-      initials: "AD",
-      color: "bg-blue-700",
-      type: "Development Finance",
-      country: "Pan-African",
-      description:
-        "Strategic financing partner providing concessional lending, capacity building grants, and technical assistance for agricultural transformation across the continent.",
-      focus: "Development finance & capacity building",
-    },
-    {
-      name: "International Fund for Agricultural Development (IFAD)",
-      initials: "IF",
-      color: "bg-amber-700",
-      type: "UN Agency",
-      country: "Pan-African",
-      description:
-        "UN specialised agency investing in rural people. Co-finances smallholder value chain programmes and climate adaptation projects with AFU member countries.",
-      focus: "Smallholder investment & rural development",
-    },
-    {
-      name: "World Food Programme (WFP)",
-      initials: "WF",
-      color: "bg-red-600",
-      type: "UN Agency",
-      country: "Pan-African",
-      description:
-        "Partners on post-harvest loss reduction, school feeding procurement from local farmers, and emergency food security response across AFU territories.",
-      focus: "Food security & local procurement",
-    },
-    {
-      name: "Safaricom (M-Pesa)",
-      initials: "MP",
-      color: "bg-[#5DB347]",
-      type: "Mobile Payments",
-      country: "Kenya",
-      description:
-        "Mobile money integration partner enabling seamless farmer payments, loan disbursements, and marketplace transactions via M-Pesa across East Africa.",
-      focus: "Mobile payments & digital finance",
-    },
-    {
-      name: "Stanbic Bank",
-      initials: "SB",
-      color: "bg-blue-800",
-      type: "Banking & Finance",
-      country: "Pan-African",
-      description:
-        "Provides structured trade finance facilities, agricultural lending, foreign exchange services, and investment products tailored for AFU member cooperatives.",
-      focus: "Trade finance & agricultural lending",
-    },
-    {
-      name: "FNB (First National Bank)",
-      initials: "FN",
-      color: "bg-cyan-700",
-      type: "Banking & Finance",
-      country: "Southern Africa",
-      description:
-        "Retail and commercial banking partner offering agri-business accounts, equipment financing, and digital banking solutions for farmers.",
-      focus: "Agri-business banking & equipment finance",
-    },
-    {
-      name: "Econet (EcoCash)",
-      initials: "EC",
-      color: "bg-indigo-600",
-      type: "Mobile Payments",
-      country: "Zimbabwe",
-      description:
-        "Mobile money and telecoms partner enabling farmer payments, premium collections, and financial inclusion through the EcoCash platform.",
-      focus: "Mobile money & financial inclusion",
-    },
-    {
-      name: "John Deere Africa",
-      initials: "JD",
-      color: "bg-green-700",
-      type: "Equipment & Mechanisation",
-      country: "Pan-African",
-      description:
-        "Mechanisation partner providing tractors, harvesters, and precision agriculture equipment with lease-to-own financing for AFU cooperatives.",
-      focus: "Farm mechanisation & precision equipment",
-    },
-    {
-      name: "Syngenta",
-      initials: "SY",
-      color: "bg-emerald-700",
-      type: "Crop Science",
-      country: "Pan-African",
-      description:
-        "Global crop protection and seed technology partner. Supplies herbicides, fungicides, and high-yield hybrid seeds adapted to African growing conditions.",
-      focus: "Crop protection & seed technology",
-    },
-    {
-      name: "Corteva Agriscience",
-      initials: "CA",
-      color: "bg-navy",
-      type: "Crop Science",
-      country: "Pan-African",
-      description:
-        "Agricultural innovation partner providing crop protection products, seed germplasm, and digital agronomic advisory services for sustainable intensification.",
-      focus: "Agriscience innovation & digital advisory",
-    },
-  ],
+  business: [],
   governments: [],
   universities: [],
 };
@@ -281,16 +183,19 @@ export default function PartnersPage() {
                 <div className="text-center py-20 px-4">
                   <div className="w-20 h-20 rounded-3xl bg-[#EBF7E5] flex items-center justify-center mx-auto mb-6">
                     {activeTab === 'unions' && <Wheat className="w-10 h-10 text-[#5DB347]" />}
+                    {activeTab === 'business' && <Briefcase className="w-10 h-10 text-[#5DB347]" />}
                     {activeTab === 'governments' && <Landmark className="w-10 h-10 text-[#5DB347]" />}
                     {activeTab === 'universities' && <GraduationCap className="w-10 h-10 text-[#5DB347]" />}
                   </div>
                   <h3 className="text-2xl font-bold text-[#1B2A4A] mb-3">
                     {activeTab === 'unions' && 'Seeking Farming Union Partners'}
+                    {activeTab === 'business' && 'Building Business Partnerships'}
                     {activeTab === 'governments' && 'Seeking Government Partnerships'}
                     {activeTab === 'universities' && 'Seeking University & Research Partners'}
                   </h3>
                   <p className="text-gray-500 max-w-lg mx-auto mb-8 leading-relaxed">
                     {activeTab === 'unions' && 'We are actively seeking partnerships with national and regional farming unions across Africa. If your organisation represents farmers and would like to explore collaboration with AFU, we would love to hear from you.'}
+                    {activeTab === 'business' && "We're building partnerships with leading institutions across Africa — banks, agri-businesses, technology providers, and logistics networks. Get in touch to explore working with AFU."}
                     {activeTab === 'governments' && 'AFU is engaging with ministries of agriculture and development agencies across our operating countries. If you represent a government body interested in digital agriculture transformation, let us connect.'}
                     {activeTab === 'universities' && 'We are building research partnerships with agricultural universities and institutes across Africa. If your institution is interested in collaborative research, student placements, or technology transfer, get in touch.'}
                   </p>

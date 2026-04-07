@@ -16,7 +16,7 @@ import { createServerSupabaseClient } from '@/lib/supabase/server';
  *   - conversations (where email matches)
  * Then deletes the auth user via Supabase admin API.
  */
-export async function DELETE() {
+export async function DELETE(request: Request) {
   try {
     // 1. Verify the user is authenticated
     const supabase = await createServerSupabaseClient();
@@ -32,6 +32,22 @@ export async function DELETE() {
       );
     }
 
+    // Require explicit confirmation phrase in body
+    let confirmation: string | undefined;
+    try {
+      const body = await request.json();
+      confirmation = body?.confirmation;
+    } catch {
+      // No body
+    }
+
+    if (confirmation !== 'DELETE_MY_ACCOUNT') {
+      return NextResponse.json(
+        { error: 'Missing or invalid confirmation. Provide { "confirmation": "DELETE_MY_ACCOUNT" }.' },
+        { status: 400 },
+      );
+    }
+
     const userId = user.id;
     const userEmail = user.email;
 
@@ -40,6 +56,22 @@ export async function DELETE() {
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!,
     );
+
+    // Audit log before any destructive action
+    try {
+      await adminSupabase.from('audit_log').insert({
+        action: 'account_delete',
+        entity_type: 'user',
+        entity_id: userId,
+        user_id: userId,
+        details: {
+          email: userEmail,
+          timestamp: new Date().toISOString(),
+        },
+      });
+    } catch (e) {
+      console.warn('Failed to write audit_log for account deletion:', e);
+    }
 
     // Delete from each table — errors are collected but non-fatal
     const deletions = [

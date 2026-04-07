@@ -27,9 +27,9 @@ const programs = [
     accent: 'bg-pink-600',
     description: 'Empowering women farmers across Africa with access to financing, training, land rights support, and market opportunities. Your donation helps women gain financial independence and feed their communities.',
     impact: [
-      'Goal: Train thousands of women in agricultural techniques',
-      'Micro-loans for women-led farms across Africa',
-      'Legal support for land ownership across Africa',
+      'Help women farmers across Africa gain agricultural training',
+      'Micro-loans for women-led farms',
+      'Legal support for land ownership',
       'Childcare cooperatives enabling women to farm',
     ],
     amounts: [25, 50, 100, 250, 500, 1000],
@@ -42,7 +42,7 @@ const programs = [
     accent: 'bg-orange-600',
     description: 'Connecting surplus farm production to school feeding programmes and orphanages. Every dollar feeds a child for a week. We work directly with smallholder farmers to source nutritious food locally.',
     impact: [
-      'Goal: Serve thousands of meals to children monthly',
+      'Provide nutritious meals to children in need',
       'Connecting schools to local farms for fresh food',
       'Nutrition programmes across Africa',
       'Zero food miles — sourced from local farmers',
@@ -57,7 +57,7 @@ const programs = [
     accent: 'bg-green-600',
     description: 'Investing in the next generation of African farmers. We provide agricultural education, starter seed kits, mentorship, and micro-financing to young people aged 18-30 to start and grow their own farms.',
     impact: [
-      'Goal: Enrol thousands of young farmers across Africa',
+      'Enrol young farmers across Africa in training programmes',
       'Starter kits distributed to aspiring farmers',
       'Mentorship pairing with experienced farmers',
       'Building a generation of sustainable farming entrepreneurs',

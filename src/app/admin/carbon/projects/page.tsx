@@ -39,7 +39,8 @@ interface Enrollment {
 
 // ── Demo data ────────────────────────────────────────────────────────────────
 
-const demoProjects: CarbonProject[] = [
+const demoProjects: CarbonProject[] = [];
+const _UNUSED_demoProjects: CarbonProject[] = [
   { id: 'p1', name: 'Chobe Agroforestry Initiative', description: 'Large-scale agroforestry carbon sequestration in northern Botswana', methodology: 'VM0042', registry: 'Verra', country: 'Botswana', region: 'Chobe District', eligible_practices: ['Agroforestry', 'Cover Cropping', 'Mulching'], price_per_credit: 18.5, co_benefits: ['Biodiversity', 'Water', 'Community'], status: 'active', start_date: '2024-01-15', end_date: '2034-01-15', target_credits: 5000, created_at: '2024-01-15' },
   { id: 'p2', name: 'Makgadikgadi Soil Carbon Project', description: 'Regenerative agriculture building soil organic carbon', methodology: 'GS-Soil-001', registry: 'Gold Standard', country: 'Botswana', region: 'Central District', eligible_practices: ['No-Till', 'Composting', 'Crop Rotation'], price_per_credit: 22, co_benefits: ['Soil Health', 'Water Retention'], status: 'active', start_date: '2024-03-01', end_date: '2034-03-01', target_credits: 3000, created_at: '2024-03-01' },
   { id: 'p3', name: 'Eastern Highlands Methane Capture', description: 'Biogas from dairy farm methane capture', methodology: 'VM0017', registry: 'Verra', country: 'Zimbabwe', region: 'Manicaland', eligible_practices: ['Biogas Installation', 'Manure Management'], price_per_credit: 15.75, co_benefits: ['Clean Energy', 'Community', 'Health'], status: 'active', start_date: '2024-06-01', end_date: '2034-06-01', target_credits: 8000, created_at: '2024-06-01' },
@@ -48,7 +49,8 @@ const demoProjects: CarbonProject[] = [
   { id: 'p6', name: 'Tuli Block Conservation Tillage', description: 'No-till and minimum tillage farming practices', methodology: 'GS-Soil-002', registry: 'Gold Standard', country: 'Botswana', region: 'Central District', eligible_practices: ['No-Till', 'Minimum Tillage', 'Cover Cropping'], price_per_credit: 13.5, co_benefits: ['Soil Health', 'Erosion Prevention'], status: 'active', start_date: '2025-02-01', end_date: '2035-02-01', target_credits: 2500, created_at: '2025-02-01' },
 ];
 
-const demoEnrollments: Record<string, Enrollment[]> = {
+const demoEnrollments: Record<string, Enrollment[]> = {};
+const _UNUSED_demoEnrollments: Record<string, Enrollment[]> = {
   p1: [
     { id: 'e1', farmer_name: 'Tebogo Moyo', farm_name: 'Moyo Homestead', status: 'active', enrolled_at: '2024-02-10' },
     { id: 'e2', farmer_name: 'Naledi Kgosi', farm_name: 'Kgosi Farms', status: 'active', enrolled_at: '2024-03-15' },

@@ -1,3 +1,4 @@
+// TODO: Replace with Upstash Redis for production. In-memory map is per-Lambda instance, ineffective on Vercel.
 import { NextResponse } from 'next/server';
 
 /**

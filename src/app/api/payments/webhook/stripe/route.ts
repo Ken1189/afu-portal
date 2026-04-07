@@ -49,6 +49,33 @@ export async function POST(request: NextRequest) {
 
   const adminClient = await createAdminClient();
 
+  // ── Deduplication: prevent reprocessing on Stripe retries ────────────────
+  {
+    const { data: existingEvent } = await adminClient
+      .from('stripe_event_log')
+      .select('id, status')
+      .eq('stripe_event_id', event.id)
+      .maybeSingle();
+
+    if (existingEvent) {
+      return NextResponse.json({ received: true, duplicate: true });
+    }
+
+    const { error: insertErr } = await adminClient
+      .from('stripe_event_log')
+      .insert({
+        stripe_event_id: event.id,
+        event_type: event.type,
+        status: 'processing',
+        payload: event as unknown as Record<string, unknown>,
+      });
+
+    // If insert failed due to unique constraint (concurrent retry), treat as duplicate
+    if (insertErr && insertErr.code === '23505') {
+      return NextResponse.json({ received: true, duplicate: true });
+    }
+  }
+
   try {
     switch (event.type) {
       // ── Checkout completed (membership or sponsorship subscription) ──────
@@ -476,9 +503,20 @@ export async function POST(request: NextRequest) {
       details: { provider: 'stripe', event_type: event.type, event_id: event.id },
     });
 
+    // Mark event as completed in dedup log
+    await adminClient
+      .from('stripe_event_log')
+      .update({ status: 'completed', processed_at: new Date().toISOString() })
+      .eq('stripe_event_id', event.id);
+
     return NextResponse.json({ received: true });
   } catch (err) {
     console.error('Error processing Stripe webhook:', err);
+    // Mark failed so Stripe retries can be reprocessed if needed
+    await adminClient
+      .from('stripe_event_log')
+      .update({ status: 'failed', processed_at: new Date().toISOString() })
+      .eq('stripe_event_id', event.id);
     return NextResponse.json(
       { error: 'Webhook processing failed' },
       { status: 500 }

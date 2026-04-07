@@ -62,7 +62,8 @@ interface Loan {
   country: string;
 }
 
-const mockLoans: Loan[] = [
+const mockLoans: Loan[] = [];
+const _UNUSED_mockLoans: Loan[] = [
   { id: 'FIN-2024-001', memberId: 'AFU-2024-036', memberName: 'Thabo Molefe', type: 'working-capital', amount: 85000, outstanding: 42500, interestRate: 12.5, tenor: 180, status: 'active', disbursementDate: '2025-10-15', maturityDate: '2026-04-13', nextPaymentDate: '2026-03-15', nextPaymentAmount: 14800, repaidPercentage: 50, crop: 'Blueberries', buyer: null, country: 'Botswana' },
   { id: 'FIN-2024-002', memberId: 'AFU-2024-037', memberName: 'Rudo Chidyamakono', type: 'invoice-finance', amount: 120000, outstanding: 36000, interestRate: 10.0, tenor: 90, status: 'active', disbursementDate: '2026-01-10', maturityDate: '2026-04-10', nextPaymentDate: '2026-03-20', nextPaymentAmount: 18500, repaidPercentage: 70, crop: 'Tobacco', buyer: 'Berry Fresh UK', country: 'Zimbabwe' },
   { id: 'FIN-2024-003', memberId: 'AFU-2024-003', memberName: 'Tendai Moyo', type: 'input-bundle', amount: 8500, outstanding: 5950, interestRate: 15.0, tenor: 120, status: 'active', disbursementDate: '2025-12-20', maturityDate: '2026-04-19', nextPaymentDate: '2026-03-20', nextPaymentAmount: 2200, repaidPercentage: 30, crop: 'Maize', buyer: null, country: 'Zimbabwe' },

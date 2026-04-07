@@ -102,7 +102,9 @@ interface LivestockSummary {
   upcomingVaccinations: number;
 }
 
-const FALLBACK_ANIMALS: Animal[] = [
+// Fallback animals REMOVED — new farmers see an empty state instead of 15+ fake animals.
+const FALLBACK_ANIMALS: Animal[] = [];
+const _UNUSED_FALLBACK_ANIMALS: Animal[] = [
   { id: 'ANM-001', name: 'Mosi', type: 'cattle', breed: 'Brahman', tag: 'BW-C-0041', dateOfBirth: '2021-06-15', gender: 'male', weight: 620, status: 'healthy', parentSire: null, parentDam: null, acquisitionDate: '2022-01-10', acquisitionMethod: 'purchased', purchasePrice: 1200, currentValue: 1850, image: 'https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?w=400&h=300&fit=crop', notes: 'Herd bull. Excellent temperament and conformation. Purchased from Makalamabedi Ranch, Botswana.' },
   { id: 'ANM-002', name: 'Thandi', type: 'cattle', breed: 'Tuli', tag: 'BW-C-0042', dateOfBirth: '2020-09-22', gender: 'female', weight: 480, status: 'lactating', parentSire: null, parentDam: null, acquisitionDate: '2021-03-05', acquisitionMethod: 'purchased', purchasePrice: 950, currentValue: 1400, image: 'https://images.unsplash.com/photo-1596733430284-f7437764b1a9?w=400&h=300&fit=crop', notes: 'Strong milker. Third lactation. Calved January 2026 — calf Lesedi (ANM-009).' },
   { id: 'ANM-003', name: 'Bongani', type: 'cattle', breed: 'Bonsmara', tag: 'ZW-C-0118', dateOfBirth: '2022-02-10', gender: 'male', weight: 560, status: 'healthy', parentSire: null, parentDam: null, acquisitionDate: '2022-02-10', acquisitionMethod: 'born', purchasePrice: null, currentValue: 1650, image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=400&h=300&fit=crop', notes: 'Born on farm in Masvingo, Zimbabwe. Growing well — potential breeding bull.' },
@@ -130,7 +132,8 @@ const FALLBACK_ANIMALS: Animal[] = [
   { id: 'ANM-025', name: 'Ayana', type: 'pig', breed: 'Large White', tag: 'ZW-PG-0702', dateOfBirth: '2024-01-20', gender: 'female', weight: 145, status: 'pregnant', parentSire: null, parentDam: null, acquisitionDate: '2024-06-10', acquisitionMethod: 'purchased', purchasePrice: 350, currentValue: 600, image: 'https://images.unsplash.com/photo-1604848698030-c434ba08ece1?w=400&h=300&fit=crop', notes: 'First-time sow. Bred to Themba. Expected to farrow mid-April 2026. Good body condition score.' },
 ];
 
-const FALLBACK_VET_RECORDS: VetRecord[] = [
+const FALLBACK_VET_RECORDS: VetRecord[] = [];
+const _UNUSED_FALLBACK_VET_RECORDS: VetRecord[] = [
   { id: 'VET-001', animalId: 'ANM-001', animalName: 'Mosi', type: 'vaccination', description: 'Foot-and-Mouth Disease (FMD) vaccination — trivalent SAT1/SAT2/SAT3', date: '2025-03-15', veterinarian: 'Dr. Keabetswe Molefe', clinic: 'Maun Veterinary Services', cost: 18, nextDueDate: '2025-09-15', medications: ['FMD Trivalent Vaccine'], notes: 'Bi-annual FMD vaccination as per Botswana DVS protocol. No adverse reaction.' },
   { id: 'VET-002', animalId: 'ANM-002', animalName: 'Thandi', type: 'vaccination', description: 'Lumpy Skin Disease (LSD) vaccination', date: '2025-04-02', veterinarian: 'Dr. Keabetswe Molefe', clinic: 'Maun Veterinary Services', cost: 12, nextDueDate: '2026-04-02', medications: ['Lumpy Skin Disease Vaccine (Neethling strain)'], notes: 'Annual LSD vaccination. Mild swelling at injection site — resolved in 48 hours.' },
   { id: 'VET-003', animalId: 'ANM-003', animalName: 'Bongani', type: 'vaccination', description: 'Anthrax vaccination — annual booster', date: '2025-05-20', veterinarian: 'Dr. Tatenda Mhike', clinic: 'Masvingo Vet Clinic', cost: 8, nextDueDate: '2026-05-20', medications: ['Anthrax Spore Vaccine (Sterne 34F2)'], notes: 'Anthrax endemic area — annual vaccination mandatory in Masvingo district.' },

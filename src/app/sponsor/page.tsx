@@ -33,8 +33,10 @@ interface FarmerProfile {
   } | null;
 }
 
-/* ─── Fallback farmer data (shown until DB is seeded) ─── */
-const FALLBACK_FARMERS: FarmerProfile[] = [
+/* ─── Fallback farmer data REMOVED — all fake profiles deleted.
+     Page now shows empty state when farmer_public_profiles is empty. ─── */
+const FALLBACK_FARMERS: FarmerProfile[] = [];
+const _UNUSED_FALLBACK_FARMERS: FarmerProfile[] = [
   {
     id: 'dummy-1',
     slug: 'grace-moyo',
@@ -839,6 +841,19 @@ export default function SponsorPage() {
                 >
                   View all countries
                 </button>
+              </p>
+            </div>
+          )}
+
+          {/* Empty state — no farmer public profiles yet */}
+          {!loading && farmers.length === 0 && (
+            <div className="text-center py-16">
+              <div className="w-16 h-16 rounded-2xl bg-[#5DB347]/10 flex items-center justify-center mb-4 mx-auto">
+                <Search className="w-8 h-8 text-[#5DB347]" />
+              </div>
+              <h3 className="text-xl font-bold text-navy mb-2">Farmer profiles coming soon</h3>
+              <p className="text-gray-500 max-w-md mx-auto">
+                We&apos;re onboarding farmers across Africa. Check back soon to meet the farmers you can sponsor.
               </p>
             </div>
           )}

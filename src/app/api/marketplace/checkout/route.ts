@@ -46,6 +46,23 @@ export async function POST(req: NextRequest) {
 
     const admin = await createAdminClient();
 
+    // ── Idempotency: reuse existing checkout if key matches ─────────────────
+    const idempotencyKey = req.headers.get('idempotency-key');
+    if (idempotencyKey) {
+      const { data: existingPayment } = await admin
+        .from('payments')
+        .select('id, order_id, provider_reference, description')
+        .eq('idempotency_key', idempotencyKey)
+        .maybeSingle();
+      if (existingPayment?.provider_reference) {
+        return NextResponse.json({
+          url: existingPayment.provider_reference,
+          orderId: existingPayment.order_id,
+          idempotent: true,
+        });
+      }
+    }
+
     // ── Look up the product ───────────────────────────────────────────────
     const { data: product, error: productErr } = await admin
       .from('products')
@@ -61,14 +78,26 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Product is out of stock' }, { status: 400 });
     }
     if (
-      typeof product.stock_quantity === 'number' &&
-      product.stock_quantity > 0 &&
-      product.stock_quantity < quantity
+      product.stock_quantity != null &&
+      (product.stock_quantity <= 0 || product.stock_quantity < quantity)
     ) {
       return NextResponse.json(
-        { error: `Only ${product.stock_quantity} units available` },
+        { error: `Out of stock${product.stock_quantity > 0 ? ` (only ${product.stock_quantity} available)` : ''}` },
         { status: 400 }
       );
+    }
+
+    // ── Atomic stock decrement (fixes oversell race condition) ──────────────
+    const { data: stockOk, error: stockErr } = await admin.rpc('decrement_product_stock', {
+      p_product_id: product.id,
+      p_quantity: quantity,
+    });
+    if (stockErr) {
+      console.error('[marketplace/checkout] stock decrement failed:', stockErr);
+      return NextResponse.json({ error: 'Failed to reserve stock' }, { status: 500 });
+    }
+    if (stockOk === false) {
+      return NextResponse.json({ error: 'Product is out of stock' }, { status: 400 });
     }
 
     // ── Resolve buyer's member row ────────────────────────────────────────
@@ -167,6 +196,21 @@ export async function POST(req: NextRequest) {
         quantity: String(quantity),
       },
     });
+
+    // Persist the payment row with idempotency key + session URL so retries
+    // with the same Idempotency-Key return the same checkout URL.
+    if (idempotencyKey || session.url) {
+      await admin.from('payments').insert({
+        order_id: order.id,
+        member_id: member.id,
+        amount: totalPrice,
+        description: `Order ${orderNumber}`,
+        provider: 'stripe',
+        provider_reference: session.url,
+        idempotency_key: idempotencyKey || null,
+        status: 'pending',
+      });
+    }
 
     return NextResponse.json({ url: session.url, orderId: order.id });
   } catch (err) {

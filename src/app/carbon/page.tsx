@@ -30,22 +30,17 @@ interface CarbonCredit {
   };
 }
 
-// ── Demo data ────────────────────────────────────────────────────────────────
+// ── FAKE CARBON CREDITS REMOVED — all 6 demo credits with fabricated Verra serial numbers deleted.
+//    Fabricated carbon credit serial numbers are fraud territory and have been wiped.
+//    Page now fetches only from carbon_credits table.
 
-const demoCredits: CarbonCredit[] = [
-  { id: 'c1', serial_number: 'ACR-2025-0012', vintage_year: 2025, quantity: 450, status: 'listed', price_per_tonne: 18.5, project_id: 'p1', carbon_projects: { name: 'Chobe Agroforestry Initiative', registry: 'Verra', country: 'Botswana', co_benefits: ['Biodiversity', 'Water', 'Community'], methodology: 'VM0042', description: 'Large-scale agroforestry carbon sequestration' } },
-  { id: 'c2', serial_number: 'ACR-2025-0045', vintage_year: 2025, quantity: 280, status: 'listed', price_per_tonne: 22, project_id: 'p2', carbon_projects: { name: 'Makgadikgadi Soil Carbon Project', registry: 'Gold Standard', country: 'Botswana', co_benefits: ['Soil Health', 'Water Retention'], methodology: 'GS-Soil-001', description: 'Regenerative agriculture building soil organic carbon' } },
-  { id: 'c3', serial_number: 'ACR-2024-0089', vintage_year: 2024, quantity: 620, status: 'listed', price_per_tonne: 15.75, project_id: 'p3', carbon_projects: { name: 'Eastern Highlands Methane Capture', registry: 'Verra', country: 'Zimbabwe', co_benefits: ['Clean Energy', 'Community', 'Health'], methodology: 'VM0017', description: 'Biogas from dairy farm methane capture' } },
-  { id: 'c4', serial_number: 'ACR-2025-0102', vintage_year: 2025, quantity: 520, status: 'listed', price_per_tonne: 24.5, project_id: 'p4', carbon_projects: { name: 'Kilimanjaro Shade-Grown Coffee', registry: 'Gold Standard', country: 'Tanzania', co_benefits: ['Biodiversity', 'Livelihoods', 'Water'], methodology: 'GS-Agro-002', description: 'Shade-grown coffee agroforestry on Kilimanjaro' } },
-  { id: 'c5', serial_number: 'ACR-2024-0156', vintage_year: 2024, quantity: 340, status: 'listed', price_per_tonne: 85, project_id: 'p5', carbon_projects: { name: 'Okavango Delta Biochar Programme', registry: 'Verra', country: 'Botswana', co_benefits: ['Soil Fertility', 'Waste Reduction'], methodology: 'Puro-BC-001', description: 'Agricultural waste to biochar carbon removal' } },
-  { id: 'c6', serial_number: 'ACR-2025-0178', vintage_year: 2025, quantity: 310, status: 'issued', price_per_tonne: 13.5, project_id: 'p6', carbon_projects: { name: 'Tuli Block Conservation Tillage', registry: 'Gold Standard', country: 'Botswana', co_benefits: ['Soil Health', 'Erosion Prevention'], methodology: 'GS-Soil-002', description: 'No-till and minimum tillage farming' } },
-];
+const demoCredits: CarbonCredit[] = [];
 
 const demoStats = {
-  totalCredits: 2520,
-  countries: 3,
-  farmersEnrolled: 850,
-  co2Offset: 4200,
+  totalCredits: 0,
+  countries: 0,
+  farmersEnrolled: 0,
+  co2Offset: 0,
 };
 
 // ── Component ────────────────────────────────────────────────────────────────
@@ -90,8 +85,8 @@ export default function CarbonMarketplacePage() {
           const countries = new Set(data.map(c => c.carbon_projects?.country).filter(Boolean));
           setStats({
             totalCredits: data.reduce((s, c) => s + (c.quantity || 0), 0),
-            countries: countries.size || 3,
-            farmersEnrolled: 850,
+            countries: countries.size || 0,
+            farmersEnrolled: 0,
             co2Offset: data.reduce((s, c) => s + (c.quantity || 0), 0),
           });
         } else {
@@ -348,7 +343,18 @@ export default function CarbonMarketplacePage() {
           </div>
         )}
 
-        {filteredCredits.length === 0 && !loading && (
+        {credits.length === 0 && !loading && (
+          <div className="text-center py-20 max-w-md mx-auto">
+            <div className="w-16 h-16 rounded-2xl bg-[#5DB347]/10 flex items-center justify-center mb-4 mx-auto">
+              <TreePine className="w-8 h-8 text-[#5DB347]" />
+            </div>
+            <h3 className="text-xl font-bold text-[#1B2A4A] mb-2">Carbon credit marketplace launching soon</h3>
+            <p className="text-gray-500">
+              We&apos;re building a verified carbon credit marketplace for African agriculture. Check back soon.
+            </p>
+          </div>
+        )}
+        {credits.length > 0 && filteredCredits.length === 0 && !loading && (
           <div className="text-center py-16 text-gray-400">
             <TreePine className="w-16 h-16 mx-auto mb-4 opacity-30" />
             <p className="text-lg">No credits match your filters</p>

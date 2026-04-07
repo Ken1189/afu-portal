@@ -1,7 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'crypto';
 import { createAdminClient } from '@/lib/supabase/server';
 import { emitEventAsync } from '@/lib/events/event-bus';
 import '@/lib/events/handlers';
+
+function verifyMobileSignature(rawBody: string, signature: string | null): boolean {
+  const secret = process.env.MOBILE_WEBHOOK_SECRET;
+  if (!secret) {
+    console.warn('[mobile webhook] MOBILE_WEBHOOK_SECRET not set — allowing request (dev mode)');
+    return true;
+  }
+  if (!signature) return false;
+  const expected = crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
+  try {
+    return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(signature));
+  } catch {
+    return false;
+  }
+}
 
 const KNOWN_PROVIDERS = ['ecocash', 'mtn', 'orange', 'airtel'] as const;
 type MobileProvider = (typeof KNOWN_PROVIDERS)[number];
@@ -21,9 +37,15 @@ interface MobileCallbackBody {
  * Accepts normalized format: { provider, reference, status, amount, currency }
  */
 export async function POST(request: NextRequest) {
+  const rawBody = await request.text();
+  const signature = request.headers.get('x-mobile-signature');
+  if (!verifyMobileSignature(rawBody, signature)) {
+    return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+  }
+
   let body: MobileCallbackBody;
   try {
-    body = await request.json();
+    body = JSON.parse(rawBody);
   } catch {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }

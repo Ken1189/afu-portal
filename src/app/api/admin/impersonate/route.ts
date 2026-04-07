@@ -119,6 +119,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Audit log: record impersonation start
+    try {
+      await svc.from('audit_log').insert({
+        action: 'impersonation_start',
+        entity_type: 'user',
+        entity_id: targetProfile.id,
+        user_id: user.id,
+        details: {
+          admin_id: user.id,
+          admin_name: callerProfile?.full_name || null,
+          target_id: targetProfile.id,
+          target_email: targetProfile.email,
+          target_role: targetProfile.role,
+          started_at: new Date().toISOString(),
+        },
+      });
+    } catch (e) {
+      console.warn('Failed to write audit_log for impersonation:', e);
+    }
+
     return NextResponse.json({
       success: true,
       impersonation: {

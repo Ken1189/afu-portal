@@ -103,43 +103,22 @@ export function useOrders(memberId?: string) {
       description: `Order ${order.order_number}`,
     });
 
-    // Create commissions for each supplier
-    for (const item of items) {
-      const { data: supplier } = await supabase
-        .from('suppliers')
-        .select('commission_rate')
-        .eq('id', item.supplier_id)
-        .single();
+    // NOTE: Commission creation is handled by the Stripe webhook (single source of truth).
+    // Do NOT insert commissions here — doing so would double-count every order.
 
-      if (supplier) {
-        await supabase.from('commissions').insert({
-          supplier_id: item.supplier_id,
-          order_id: order.id,
-          sale_amount: item.total_price,
-          commission_rate: supplier.commission_rate,
-          commission_amount: Math.round(item.total_price * (supplier.commission_rate / 100) * 100) / 100,
-        });
-      }
-    }
-
-    // Update supplier total_sales and total_orders
+    // Update supplier total_sales and total_orders atomically via RPC
+    // (fixes read-modify-write lost-update race condition)
     const supplierTotals = new Map<string, number>();
     items.forEach(i => {
       supplierTotals.set(i.supplier_id, (supplierTotals.get(i.supplier_id) || 0) + i.total_price);
     });
 
     for (const [sid, amount] of supplierTotals) {
-      const { data: sup } = await supabase
-        .from('suppliers')
-        .select('total_sales, total_orders')
-        .eq('id', sid)
-        .single();
-      if (sup) {
-        await supabase.from('suppliers').update({
-          total_sales: (sup.total_sales || 0) + amount,
-          total_orders: (sup.total_orders || 0) + 1,
-        }).eq('id', sid);
-      }
+      await supabase.rpc('increment_supplier_totals', {
+        p_supplier_id: sid,
+        p_sales: amount,
+        p_orders: 1,
+      });
     }
 
     await fetchOrders();

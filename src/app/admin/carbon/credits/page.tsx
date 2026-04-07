@@ -44,30 +44,10 @@ interface SaleRecord {
 
 // ── Demo data ────────────────────────────────────────────────────────────────
 
-const demoProjects: CarbonProject[] = [
-  { id: 'p1', name: 'Chobe Agroforestry Initiative', price_per_credit: 18.5 },
-  { id: 'p2', name: 'Makgadikgadi Soil Carbon Project', price_per_credit: 22 },
-  { id: 'p3', name: 'Eastern Highlands Methane Capture', price_per_credit: 15.75 },
-  { id: 'p4', name: 'Kilimanjaro Shade-Grown Coffee', price_per_credit: 24.5 },
-  { id: 'p5', name: 'Okavango Delta Biochar Programme', price_per_credit: 85 },
-  { id: 'p6', name: 'Tuli Block Conservation Tillage', price_per_credit: 13.5 },
-];
-
-const demoCredits: CarbonCredit[] = [
-  { id: 'c1', serial_number: 'ACR-2025-0012', project_id: 'p1', vintage_year: 2025, quantity: 450, status: 'listed', price_per_tonne: 18.5, minted_at: '2025-01-15', project_name: 'Chobe Agroforestry Initiative' },
-  { id: 'c2', serial_number: 'ACR-2025-0045', project_id: 'p2', vintage_year: 2025, quantity: 280, status: 'listed', price_per_tonne: 22, minted_at: '2025-02-01', project_name: 'Makgadikgadi Soil Carbon Project' },
-  { id: 'c3', serial_number: 'ACR-2024-0089', project_id: 'p3', vintage_year: 2024, quantity: 620, status: 'sold', price_per_tonne: 15.75, minted_at: '2024-08-15', project_name: 'Eastern Highlands Methane Capture', buyer_name: 'GreenFuture Corp' },
-  { id: 'c4', serial_number: 'ACR-2025-0102', project_id: 'p4', vintage_year: 2025, quantity: 520, status: 'listed', price_per_tonne: 24.5, minted_at: '2025-03-01', project_name: 'Kilimanjaro Shade-Grown Coffee' },
-  { id: 'c5', serial_number: 'ACR-2024-0156', project_id: 'p5', vintage_year: 2024, quantity: 340, status: 'retired', price_per_tonne: 85, minted_at: '2024-11-01', project_name: 'Okavango Delta Biochar Programme', buyer_name: 'EcoVentures Ltd' },
-  { id: 'c6', serial_number: 'ACR-2025-0178', project_id: 'p6', vintage_year: 2025, quantity: 310, status: 'issued', price_per_tonne: 13.5, minted_at: '2025-03-10', project_name: 'Tuli Block Conservation Tillage' },
-];
-
-const demoSales: SaleRecord[] = [
-  { id: 's1', credit_serial: 'ACR-2024-0089', buyer_name: 'GreenFuture Corp', quantity: 50, total_amount: 787.5, farmer_share: 551.25, afu_share: 157.5, buffer_share: 78.75, purchased_at: '2025-02-15' },
-  { id: 's2', credit_serial: 'ACR-2024-0089', buyer_name: 'SustainTech Inc', quantity: 100, total_amount: 1575, farmer_share: 1102.5, afu_share: 315, buffer_share: 157.5, purchased_at: '2025-02-20' },
-  { id: 's3', credit_serial: 'ACR-2024-0156', buyer_name: 'EcoVentures Ltd', quantity: 30, total_amount: 2550, farmer_share: 1785, afu_share: 510, buffer_share: 255, purchased_at: '2025-03-01' },
-  { id: 's4', credit_serial: 'ACR-2025-0012', buyer_name: 'CarbonNeutral AG', quantity: 200, total_amount: 3700, farmer_share: 2590, afu_share: 740, buffer_share: 370, purchased_at: '2025-03-10' },
-];
+// Demo data REMOVED — all fake projects, credits (with fabricated Verra serial numbers), and sales deleted.
+const demoProjects: CarbonProject[] = [];
+const demoCredits: CarbonCredit[] = [];
+const demoSales: SaleRecord[] = [];
 
 const statusColors: Record<string, string> = {
   issued: 'bg-blue-100 text-blue-700',

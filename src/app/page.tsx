@@ -558,22 +558,9 @@ export default function Home() {
             </div>
           </FadeInWhenVisible>
 
+          {/* NOTE: These macro stats need verified, citable sources before shipping.
+              Current values are placeholders pending sourcing (FAO, AfDB, World Bank). */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            <FadeInWhenVisible delay={0}>
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border-l-4 border-[#5DB347] shadow-lg shadow-[#5DB347]/5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                <CountStat target={60} suffix="%" label="of world's uncultivated arable land is in Africa" />
-              </div>
-            </FadeInWhenVisible>
-            <FadeInWhenVisible delay={0.1}>
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border-l-4 border-[#5DB347] shadow-lg shadow-[#5DB347]/5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                <CountStat target={50} prefix="$" suffix="B+" label="of food imported annually across Africa" />
-              </div>
-            </FadeInWhenVisible>
-            <FadeInWhenVisible delay={0.2}>
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border-l-4 border-[#5DB347] shadow-lg shadow-[#5DB347]/5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                <CountStat target={40} suffix="%" label="of food lost post-harvest due to weak infrastructure" />
-              </div>
-            </FadeInWhenVisible>
             <FadeInWhenVisible delay={0.3}>
               <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border-l-4 border-[#5DB347] shadow-lg shadow-[#5DB347]/5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                 <CountStat target={memberCount} suffix="+" label="farmers across Africa" />
@@ -1151,19 +1138,19 @@ export default function Home() {
                 </span>
               </h2>
               <p className="text-gray-300 max-w-3xl mx-auto text-lg">
-                AFU is raising a $500M seed round to build Africa&apos;s first vertically integrated agriculture
-                development bank and operating platform. Trade finance, input lending, and offtake — a $1 trillion market by 2030.
+                AFU is raising a multi-million dollar funding round to build Africa&apos;s first vertically integrated agriculture
+                development bank and operating platform. Trade finance, input lending, and offtake — tapping into Africa&apos;s growing agricultural market.
               </p>
             </div>
           </FadeInWhenVisible>
 
-          {/* Investment metrics */}
+          {/* Investment metrics — specific figures removed pending verified sourcing */}
           <StaggerChildren className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-16">
             {[
-              { icon: Target, value: '$500M', label: 'Seed Round Target', color: 'from-gold to-amber-500' },
-              { icon: TrendingUp, value: '$1T', label: 'African Agri Market by 2030', color: 'from-green-400 to-emerald-500' },
-              { icon: PieChart, value: '$50B+', label: 'Annual Food Import Gap', color: 'from-[#8CB89C] to-cyan-400' },
-              { icon: LineChart, value: '10x', label: 'Value-Chain Multiplier', color: 'from-purple-400 to-indigo-400' },
+              { icon: Target, value: 'Multi-Million', label: 'Funding Round', color: 'from-gold to-amber-500' },
+              { icon: TrendingUp, value: 'Growing', label: 'African Agri Market', color: 'from-green-400 to-emerald-500' },
+              { icon: PieChart, value: 'Major', label: 'Food Import Gap', color: 'from-[#8CB89C] to-cyan-400' },
+              { icon: LineChart, value: 'Integrated', label: 'Value-Chain Model', color: 'from-purple-400 to-indigo-400' },
             ].map((item) => {
               const Icon = item.icon;
               return (
@@ -1201,7 +1188,7 @@ export default function Home() {
                     },
                     {
                       title: 'Massive Addressable Market',
-                      desc: 'Africa imports $50B+ in food annually despite having 60% of the world\'s uncultivated arable land. The supply gap is our opportunity.',
+                      desc: 'Africa has vast uncultivated arable land and a significant food import gap. That supply gap is our opportunity.',
                     },
                     {
                       title: 'Technology Moat',

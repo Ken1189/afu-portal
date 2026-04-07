@@ -122,7 +122,9 @@ interface DispatchRecord {
 }
 
 // ── Demo Data ────────────────────────────────────────────────────────────
-const demoWarehouses: WarehouseRecord[] = [
+// Demo warehouse data REMOVED — page now reflects DB state only.
+const demoWarehouses: WarehouseRecord[] = [];
+const _UNUSED_demoWarehouses: WarehouseRecord[] = [
   { id: 'wh-1', name: 'Kampala Central Warehouse', location: 'Kampala, Central Region', country: 'Uganda', capacity_tonnes: 5000, current_stock_tonnes: 3200, certifications: ['ISO 22000', 'HACCP'], contact_phone: '+256-700-123456', contact_email: 'kampala@afuwarehouse.com', manager_name: 'James Okello', status: 'active' },
   { id: 'wh-2', name: 'Nairobi Grain Storage', location: 'Nairobi, Nairobi County', country: 'Kenya', capacity_tonnes: 8000, current_stock_tonnes: 5500, certifications: ['ISO 22000', 'GMP'], contact_phone: '+254-700-234567', contact_email: 'nairobi@afuwarehouse.com', manager_name: 'Mary Wanjiku', status: 'active' },
   { id: 'wh-3', name: 'Dar es Salaam Hub', location: 'Dar es Salaam', country: 'Tanzania', capacity_tonnes: 6000, current_stock_tonnes: 2100, certifications: ['HACCP'], contact_phone: '+255-700-345678', contact_email: 'dar@afuwarehouse.com', manager_name: 'Hassan Mwanga', status: 'active' },
@@ -131,7 +133,8 @@ const demoWarehouses: WarehouseRecord[] = [
   { id: 'wh-6', name: 'Accra Commodity Depot', location: 'Accra', country: 'Ghana', capacity_tonnes: 7000, current_stock_tonnes: 4300, certifications: ['ISO 22000', 'GMP', 'HACCP'], contact_phone: '+233-700-678901', contact_email: 'accra@afuwarehouse.com', manager_name: 'Kofi Asante', status: 'active' },
 ];
 
-const demoReceipts: ReceiptRecord[] = [
+const demoReceipts: ReceiptRecord[] = [];
+const _UNUSED_demoReceipts: ReceiptRecord[] = [
   { id: 'r-1', receipt_number: 'WR-20260315-1234', farmer_id: 'f-1', farmer_name: 'John Okello', commodity_type: 'Maize', quantity: 2500, quantity_unit: 'kg', grade: 'Grade A', grade_estimate: 'Grade A', market_value: 1875, status: 'active', deposit_date: '2026-03-15', delivery_date: '2026-03-14', notes: '', warehouse: demoWarehouses[0], quality_inspection: [{ id: 'qi-1', receipt_id: 'r-1', moisture_content: 12.5, foreign_matter: 0.8, damage_percentage: 1.2, aflatoxin_level: 3.5, grade_assigned: 'Grade A', status: 'approved', inspection_date: '2026-03-15', notes: 'Excellent' }], financing: [] },
   { id: 'r-2', receipt_number: 'WR-20260310-5678', farmer_id: 'f-2', farmer_name: 'Mary Wanjiku', commodity_type: 'Coffee (Arabica)', quantity: 800, quantity_unit: 'kg', grade: 'Grade B', grade_estimate: 'Grade A', market_value: 4800, status: 'active', deposit_date: '2026-03-10', delivery_date: '2026-03-09', notes: '', warehouse: demoWarehouses[1], quality_inspection: [], financing: [{ id: 'fin-1', receipt_id: 'r-2', borrower_id: 'f-2', requested_amount: 3000, approved_amount: 2800, interest_rate: 12, duration_months: 6, status: 'active', due_date: '2026-09-10', disbursement_date: '2026-03-12', application_date: '2026-03-11' }] },
   { id: 'r-3', receipt_number: 'WR-20260320-9012', farmer_id: 'f-3', farmer_name: 'Hassan Mwanga', commodity_type: 'Sorghum', quantity: 1500, quantity_unit: 'kg', grade: '', grade_estimate: 'Grade B', market_value: 900, status: 'pending', deposit_date: '2026-03-20', delivery_date: '2026-03-19', notes: 'Awaiting inspection', warehouse: demoWarehouses[2], quality_inspection: [], financing: [] },
@@ -140,26 +143,22 @@ const demoReceipts: ReceiptRecord[] = [
   { id: 'r-6', receipt_number: 'WR-20260325-2345', farmer_id: 'f-6', farmer_name: 'Kofi Asante', commodity_type: 'Cocoa', quantity: 1200, quantity_unit: 'kg', grade: 'Grade A', grade_estimate: 'Grade A', market_value: 6000, status: 'financed', deposit_date: '2026-03-25', delivery_date: '2026-03-24', notes: '', warehouse: demoWarehouses[5], quality_inspection: [], financing: [{ id: 'fin-3', receipt_id: 'r-6', borrower_id: 'f-6', requested_amount: 4000, approved_amount: 3500, interest_rate: 10, duration_months: 4, status: 'active', due_date: '2026-07-25', disbursement_date: '2026-03-26', application_date: '2026-03-25' }] },
 ];
 
-const demoFinancing: FinancingRecord[] = [
+const demoFinancing: FinancingRecord[] = [];
+const _UNUSED_demoFinancing: FinancingRecord[] = [
   { id: 'fin-1', receipt_id: 'r-2', borrower_id: 'f-2', requested_amount: 3000, approved_amount: 2800, interest_rate: 12, duration_months: 6, status: 'active', due_date: '2026-09-10', disbursement_date: '2026-03-12', application_date: '2026-03-11', receipt: demoReceipts[1] },
   { id: 'fin-2', receipt_id: 'r-4', borrower_id: 'f-4', requested_amount: 2000, approved_amount: 0, interest_rate: 0, duration_months: 0, status: 'pending', due_date: '', disbursement_date: '', application_date: '2026-03-25', receipt: demoReceipts[3] },
   { id: 'fin-3', receipt_id: 'r-6', borrower_id: 'f-6', requested_amount: 4000, approved_amount: 3500, interest_rate: 10, duration_months: 4, status: 'active', due_date: '2026-07-25', disbursement_date: '2026-03-26', application_date: '2026-03-25', receipt: demoReceipts[5] },
 ];
 
-const demoDispatches: DispatchRecord[] = [
+const demoDispatches: DispatchRecord[] = [];
+const _UNUSED_demoDispatches: DispatchRecord[] = [
   { id: 'd-1', receipt_id: 'r-1', receipt_number: 'WR-20260315-1234', farmer_name: 'John Okello', commodity_type: 'Maize', quantity: 1000, quantity_unit: 'kg', destination: 'Mombasa Export Terminal', requested_date: '2026-03-28', dispatch_date: '', status: 'pending', assigned_grader: '', warehouse_name: 'Kampala Central Warehouse', notes: 'Partial dispatch for export' },
   { id: 'd-2', receipt_id: 'r-2', receipt_number: 'WR-20260310-5678', farmer_name: 'Mary Wanjiku', commodity_type: 'Coffee (Arabica)', quantity: 500, quantity_unit: 'kg', destination: 'Nairobi Auction House', requested_date: '2026-03-27', dispatch_date: '', status: 'pending', assigned_grader: '', warehouse_name: 'Nairobi Grain Storage', notes: 'Auction lot preparation' },
   { id: 'd-3', receipt_id: 'r-4', receipt_number: 'WR-20260318-3456', farmer_name: 'Claire Uwimana', commodity_type: 'Rice', quantity: 2000, quantity_unit: 'kg', destination: 'Kigali Central Market', requested_date: '2026-03-25', dispatch_date: '2026-03-26', status: 'dispatched', assigned_grader: 'Samuel Nkurunziza', warehouse_name: 'Kigali Cold Storage', notes: '' },
   { id: 'd-4', receipt_id: 'r-6', receipt_number: 'WR-20260325-2345', farmer_name: 'Kofi Asante', commodity_type: 'Cocoa', quantity: 600, quantity_unit: 'kg', destination: 'Tema Port Export', requested_date: '2026-03-29', dispatch_date: '', status: 'pending', assigned_grader: '', warehouse_name: 'Accra Commodity Depot', notes: 'For EU buyer' },
 ];
 
-const demoGraders = [
-  { id: 'g-1', name: 'Samuel Nkurunziza' },
-  { id: 'g-2', name: 'Aisha Kamara' },
-  { id: 'g-3', name: 'Peter Odhiambo' },
-  { id: 'g-4', name: 'Fatima Diallo' },
-  { id: 'g-5', name: 'Emmanuel Tetteh' },
-];
+const demoGraders: { id: string; name: string }[] = [];
 
 // ── Helpers ──────────────────────────────────────────────────────────────
 const statusColor: Record<string, string> = {

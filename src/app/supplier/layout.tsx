@@ -77,12 +77,13 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
     }
 
     let retried = false;
+    const allowedRoles = ['supplier', 'admin', 'super_admin'];
 
-    // Safety timeout: auto-authorize after 3s since middleware is the real guard
+    // Safety timeout: complete the check (hide spinner) but do NOT auto-authorize
     const safetyTimer = setTimeout(() => {
       if (!roleChecked) {
-        setAuthorized(true);
         setRoleChecked(true);
+        router.replace('/dashboard');
       }
     }, 3000);
 
@@ -90,28 +91,28 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
       try {
         const res = await fetch('/api/auth/me');
         if (!res.ok) {
-          setAuthorized(true);
           setRoleChecked(true);
+          router.replace('/dashboard');
           return;
         }
         const data = await res.json();
         const { role } = data;
-        if (role === 'supplier' || role === 'admin' || role === 'super_admin') {
+        if (role && allowedRoles.includes(role)) {
           setAuthorized(true);
-        } else if (role) {
-          setDenied(true);
+          setRoleChecked(true);
         } else {
-          setAuthorized(true);
+          // No role or role not allowed → redirect to dashboard
+          setRoleChecked(true);
+          router.replace('/dashboard');
         }
-        setRoleChecked(true);
       } catch {
         if (!retried) {
           retried = true;
           setTimeout(checkRole, 2000);
           return;
         }
-        setAuthorized(true);
         setRoleChecked(true);
+        router.replace('/dashboard');
       }
     };
 

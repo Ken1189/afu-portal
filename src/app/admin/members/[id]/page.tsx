@@ -78,7 +78,9 @@ interface Member {
   creditScore: number;
 }
 
-const mockMembers: Member[] = [
+// All mock data arrays in this file have been emptied. The component now renders empty states when DB returns no data.
+const mockMembers: Member[] = [];
+const _UNUSED_mockMembers: Member[] = [
   { id: 'AFU-2024-001', firstName: 'Kgosi', lastName: 'Mosweu', email: 'kgosi.mosweu@email.com', phone: '+267 71 234 567', tier: 'smallholder', country: 'Botswana', region: 'North-West', status: 'active', kycStatus: 'complete', profileCompleteness: 92, farmName: 'Mosweu Family Fields', farmSize: 4.5, primaryCrops: ['Maize', 'Groundnuts'], joinDate: '2024-10-15', lastActive: '2026-03-12', avatar: null, creditScore: 72 },
   { id: 'AFU-2024-002', firstName: 'Naledi', lastName: 'Sekgoma', email: 'naledi.sekgoma@email.com', phone: '+267 72 345 678', tier: 'smallholder', country: 'Botswana', region: 'Central', status: 'active', kycStatus: 'complete', profileCompleteness: 88, farmName: 'Sunrise Lands', farmSize: 3.2, primaryCrops: ['Sorghum', 'Groundnuts'], joinDate: '2024-11-02', lastActive: '2026-03-11', avatar: null, creditScore: 65 },
   { id: 'AFU-2024-003', firstName: 'Tendai', lastName: 'Moyo', email: 'tendai.moyo@email.com', phone: '+263 77 123 4567', tier: 'smallholder', country: 'Zimbabwe', region: 'Mashonaland East', status: 'active', kycStatus: 'complete', profileCompleteness: 95, farmName: 'Moyo Heritage Farm', farmSize: 6.0, primaryCrops: ['Maize', 'Soybeans'], joinDate: '2024-09-20', lastActive: '2026-03-13', avatar: null, creditScore: 78 },
@@ -110,7 +112,8 @@ interface Loan {
   country: string;
 }
 
-const mockLoans: Loan[] = [
+const mockLoans: Loan[] = [];
+const _UNUSED_mockLoans: Loan[] = [
   { id: 'FIN-2024-001', memberId: 'AFU-2024-036', memberName: 'Thabo Molefe', type: 'working-capital', amount: 85000, outstanding: 42500, interestRate: 12.5, tenor: 180, status: 'active', disbursementDate: '2025-10-15', maturityDate: '2026-04-13', nextPaymentDate: '2026-03-15', nextPaymentAmount: 14800, repaidPercentage: 50, crop: 'Blueberries', buyer: null, country: 'Botswana' },
   { id: 'FIN-2024-002', memberId: 'AFU-2024-037', memberName: 'Rudo Chidyamakono', type: 'invoice-finance', amount: 120000, outstanding: 36000, interestRate: 10.0, tenor: 90, status: 'active', disbursementDate: '2026-01-10', maturityDate: '2026-04-10', nextPaymentDate: '2026-03-20', nextPaymentAmount: 18500, repaidPercentage: 70, crop: 'Tobacco', buyer: 'Berry Fresh UK', country: 'Zimbabwe' },
   { id: 'FIN-2024-003', memberId: 'AFU-2024-003', memberName: 'Tendai Moyo', type: 'input-bundle', amount: 8500, outstanding: 5950, interestRate: 15.0, tenor: 120, status: 'active', disbursementDate: '2025-12-20', maturityDate: '2026-04-19', nextPaymentDate: '2026-03-20', nextPaymentAmount: 2200, repaidPercentage: 30, crop: 'Maize', buyer: null, country: 'Zimbabwe' },
@@ -188,7 +191,8 @@ const kycColors: Record<string, { bg: string; text: string; icon: React.ReactNod
 
 // ── Mock Data ───────────────────────────────────────────────────────────────
 
-const mockDocuments = [
+const mockDocuments: { id: string; name: string; type: string; uploadDate: string; status: string; fileSize: string }[] = [];
+const _UNUSED_mockDocuments = [
   { id: 'DOC-001', name: 'National ID', type: 'identity', uploadDate: '2024-10-15', status: 'verified', fileSize: '2.4 MB' },
   { id: 'DOC-002', name: 'Farm Title Deed', type: 'property', uploadDate: '2024-10-16', status: 'verified', fileSize: '5.1 MB' },
   { id: 'DOC-003', name: 'Bank Statement (3 months)', type: 'financial', uploadDate: '2024-11-02', status: 'verified', fileSize: '1.8 MB' },
@@ -198,7 +202,8 @@ const mockDocuments = [
   { id: 'DOC-007', name: 'Cooperative Membership Card', type: 'membership', uploadDate: '2025-03-01', status: 'verified', fileSize: '450 KB' },
 ];
 
-const mockRepaymentData = [
+const mockRepaymentData: { month: string; paid: number; expected: number }[] = [];
+const _UNUSED_mockRepaymentData = [
   { month: 'Oct', paid: 1200, expected: 1200 },
   { month: 'Nov', paid: 1200, expected: 1200 },
   { month: 'Dec', paid: 1350, expected: 1200 },
@@ -207,7 +212,8 @@ const mockRepaymentData = [
   { month: 'Mar', paid: 800, expected: 1200 },
 ];
 
-const mockCreditBreakdown = [
+const mockCreditBreakdown: { factor: string; score: number; weight: string }[] = [];
+const _UNUSED_mockCreditBreakdown = [
   { factor: 'Repayment History', score: 85, weight: '35%' },
   { factor: 'Farm Productivity', score: 72, weight: '20%' },
   { factor: 'Documentation', score: 90, weight: '15%' },
@@ -215,7 +221,8 @@ const mockCreditBreakdown = [
   { factor: 'Time on Platform', score: 60, weight: '15%' },
 ];
 
-const mockCourses = [
+const mockCourses: { id: string; title: string; progress: number; status: string; completedDate: string | null; certificate: boolean }[] = [];
+const _UNUSED_mockCourses = [
   { id: 'CRS-001', title: 'Sustainable Farming Practices', progress: 100, status: 'completed', completedDate: '2025-01-15', certificate: true },
   { id: 'CRS-002', title: 'Financial Literacy for Farmers', progress: 100, status: 'completed', completedDate: '2025-02-28', certificate: true },
   { id: 'CRS-003', title: 'Blueberry Cultivation Techniques', progress: 72, status: 'in-progress', completedDate: null, certificate: false },
@@ -224,7 +231,8 @@ const mockCourses = [
   { id: 'CRS-006', title: 'Climate-Smart Agriculture', progress: 100, status: 'completed', completedDate: '2025-03-10', certificate: true },
 ];
 
-const mockActivity = [
+const mockActivity: { id: number; action: string; detail: string; timestamp: string; type: string }[] = [];
+const _UNUSED_mockActivity = [
   { id: 1, action: 'Completed training module', detail: 'Climate-Smart Agriculture - Final Assessment', timestamp: '2026-03-13T09:30:00Z', type: 'training' },
   { id: 2, action: 'Loan payment received', detail: '$1,200.00 payment processed for FIN-2024-005', timestamp: '2026-03-12T14:15:00Z', type: 'payment' },
   { id: 3, action: 'Document uploaded', detail: 'Cooperative Membership Card submitted for verification', timestamp: '2026-03-10T11:00:00Z', type: 'document' },

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getStripe, MEMBERSHIP_PRICES, SPONSOR_PRICES } from '@/lib/stripe';
-import { createAdminClient } from '@/lib/supabase/server';
+import { createAdminClient, createServerSupabaseClient } from '@/lib/supabase/server';
 import { emitEventAsync } from '@/lib/events/event-bus';
 import '@/lib/events/handlers';
 
@@ -9,7 +9,7 @@ const checkoutSchema = z.object({
   type: z.enum(['membership', 'sponsorship']),
   tier: z.string().min(1, 'Tier is required'),
   farmerId: z.string().optional(),
-  userId: z.string().optional(),
+  // userId is intentionally NOT accepted from the body — derived from session only
   email: z.string().email().optional(),
   successUrl: z.string().url().optional(),
   cancelUrl: z.string().url().optional(),
@@ -38,7 +38,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: messages }, { status: 400 });
     }
 
-    const { type, tier, farmerId, userId, email, successUrl, cancelUrl } = parsed.data;
+    const { type, tier, farmerId, email, successUrl, cancelUrl } = parsed.data;
+
+    // Derive userId from authenticated session only — never trust the client.
+    // Anonymous checkout is still allowed; userId will be null in that case.
+    let userId: string | null = null;
+    try {
+      const authClient = await createServerSupabaseClient();
+      const { data: { user } } = await authClient.auth.getUser();
+      if (user) userId = user.id;
+    } catch (e) {
+      console.warn('[checkout] Could not resolve session user:', e);
+    }
 
     // Look up pricing
     type PriceEntry = { amount: number; currency: string; name: string; interval: 'month' };

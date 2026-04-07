@@ -60,8 +60,10 @@ const CATEGORY_ICONS: Record<string, React.ComponentType<{ className?: string }>
   knowledge: GraduationCap,
 };
 
-// ── Demo listings ──
-const DEMO_LISTINGS: Listing[] = [
+// ── Demo listings REMOVED — hardcoded fake listings deleted.
+//    Exchange is launching soon and will fetch real data from DB. ──
+const DEMO_LISTINGS: Listing[] = [];
+const _UNUSED_DEMO_LISTINGS: Listing[] = [
   {
     id: '1',
     title: 'John Deere Tractor — Available for Hire',
@@ -289,10 +291,12 @@ export default function ExchangePage() {
 
         {/* ── Listings Grid ── */}
         {filtered.length === 0 ? (
-          <div className="text-center py-16">
-            <Tractor className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-500 font-medium">No listings found</p>
-            <p className="text-gray-400 text-sm mt-1">Try a different category or search term</p>
+          <div className="text-center py-20 max-w-md mx-auto">
+            <div className="w-16 h-16 rounded-2xl bg-[#5DB347]/10 flex items-center justify-center mb-4 mx-auto">
+              <Tractor className="w-8 h-8 text-[#5DB347]" />
+            </div>
+            <h3 className="text-xl font-bold text-[#1B2A4A] mb-2">Exchange launching soon</h3>
+            <p className="text-gray-500">The peer-to-peer farmer exchange is coming soon. Check back to buy, sell, and trade with fellow farmers.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">

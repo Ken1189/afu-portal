@@ -64,9 +64,11 @@ interface CommissionRate {
   gradient?: string;
 }
 
-/* ─── Fallback data ─── */
+/* ─── Fallback ambassador data REMOVED — all hardcoded fake profiles deleted.
+     Page now fetches from ambassadors table only. ─── */
 
-const FALLBACK_AMBASSADORS: Ambassador[] = [
+const FALLBACK_AMBASSADORS: Ambassador[] = [];
+const _UNUSED_FALLBACK_AMBASSADORS: Ambassador[] = [
   {
     id: 'amb-1',
     full_name: 'Grace Moyo',
@@ -715,6 +717,17 @@ export default function AmbassadorsPage() {
           <div className="text-center py-20">
             <div className="animate-spin w-8 h-8 border-2 border-[#5DB347] border-t-transparent rounded-full mx-auto mb-3" />
             <p className="text-gray-500 text-sm">Loading ambassadors...</p>
+          </div>
+        ) : ambassadors.length === 0 ? (
+          <div className="text-center py-20 max-w-md mx-auto">
+            <div className="w-16 h-16 rounded-2xl bg-[#5DB347]/10 flex items-center justify-center mb-4 mx-auto">
+              <Award className="w-8 h-8 text-[#5DB347]" />
+            </div>
+            <h3 className="text-xl font-bold text-[#1B2A4A] mb-2">Become one of our first ambassadors</h3>
+            <p className="text-gray-500 mb-6">We&apos;re recruiting farmer ambassadors across Africa to lead their communities.</p>
+            <Link href="/apply?tier=ambassador" className="inline-flex items-center gap-2 bg-[#5DB347] text-white px-6 py-3 rounded-full font-semibold hover:bg-[#449933] transition-colors">
+              Apply to become an ambassador
+            </Link>
           </div>
         ) : filtered.length === 0 ? (
           <div className="text-center py-20">

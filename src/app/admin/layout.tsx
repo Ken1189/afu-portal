@@ -766,20 +766,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     }
 
     // SLOW PATH: profile not loaded yet or role unknown — check API
-    // Safety timeout — 2 seconds max before we authorize anyway (middleware is the real guard)
+    // Safety timeout — 3 seconds max. Does NOT auto-authorize: redirects instead.
     const timeout = setTimeout(() => {
       if (!roleChecked) {
-        setAuthorized(true);
         setRoleChecked(true);
+        router.replace('/dashboard');
       }
-    }, 2000);
+    }, 3000);
 
     const checkRole = async () => {
       try {
         const res = await fetch('/api/auth/me');
         if (!res.ok) {
-          setAuthorized(true);
           setRoleChecked(true);
+          router.replace('/dashboard');
           return;
         }
         const data = await res.json();
@@ -787,16 +787,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         if (role === 'admin' || role === 'super_admin') {
           setAuthorized(true);
           setServerRole(role);
-        } else if (role) {
-          router.replace('/dashboard');
+          setRoleChecked(true);
         } else {
-          setAuthorized(true);
+          // No role OR role is not admin/super_admin → redirect
+          setRoleChecked(true);
+          router.replace('/dashboard');
         }
-        setRoleChecked(true);
       } catch {
-        // Network error — just authorize, middleware is the real guard
-        setAuthorized(true);
+        // Network error — redirect rather than auto-authorize
         setRoleChecked(true);
+        router.replace('/dashboard');
       }
     };
 
@@ -804,9 +804,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return () => clearTimeout(timeout);
   }, [user, authLoading, profileIsAdmin, profile, router]);
 
-  // Middleware already guards /admin — if user reached this layout, they're authorized.
-  // Only show loading if auth context is still initializing AND no user data exists yet.
-  if (authLoading && !user) {
+  // Gate content on authorization. Middleware is the primary guard,
+  // this client-side check is the secondary one. Show spinner until
+  // the role check completes AND the user is explicitly authorized.
+  if (authLoading || !roleChecked || !authorized) {
     return (
       <div className="min-h-screen bg-cream flex items-center justify-center">
         <div className="text-center">

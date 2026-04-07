@@ -4,6 +4,16 @@ import { sendEmail } from '@/lib/email';
 
 const ADMIN_EMAILS = ['peterw@africanfarmingunion.org', 'devonk@africanfarmingunion.org'];
 
+function escapeHtml(input: unknown): string {
+  if (input === null || input === undefined) return '';
+  return String(input)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 /**
  * POST /api/chat/human — Public endpoint for chatbot "Talk to Human" requests.
  * No authentication required (visitors are not logged in).
@@ -14,6 +24,21 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { name, email, phone, message, chatHistory, conversationId } = body;
 
+    // Length validation
+    if (name && String(name).length > 100) {
+      return NextResponse.json({ error: 'Name too long (max 100)' }, { status: 400 });
+    }
+    if (email && String(email).length > 200) {
+      return NextResponse.json({ error: 'Email too long (max 200)' }, { status: 400 });
+    }
+    if (message && String(message).length > 5000) {
+      return NextResponse.json({ error: 'Message too long (max 5000)' }, { status: 400 });
+    }
+
+    // Get request IP for conversation owner verification
+    const forwardedFor = req.headers.get('x-forwarded-for');
+    const requestIp = forwardedFor?.split(',')[0]?.trim() || 'unknown';
+
     // ── Follow-up message to an existing conversation ──
     if (conversationId && message) {
       const { createClient } = await import('@supabase/supabase-js');
@@ -21,6 +46,23 @@ export async function POST(req: NextRequest) {
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.SUPABASE_SERVICE_ROLE_KEY!
       );
+
+      // Verify conversation exists and belongs to the same email/IP
+      const { data: existingConvo, error: convoErr } = await db
+        .from('conversations')
+        .select('id, email, ip_address')
+        .eq('id', conversationId)
+        .maybeSingle();
+
+      if (convoErr || !existingConvo) {
+        return NextResponse.json({ error: 'Conversation not found' }, { status: 404 });
+      }
+
+      const emailMatches = email && existingConvo.email && existingConvo.email === email;
+      const ipMatches = existingConvo.ip_address && existingConvo.ip_address === requestIp;
+      if (!emailMatches && !ipMatches) {
+        return NextResponse.json({ error: 'Not authorized for this conversation' }, { status: 403 });
+      }
 
       await db.from('conversation_messages').insert({
         conversation_id: conversationId,
@@ -68,19 +110,24 @@ export async function POST(req: NextRequest) {
 
     // Send email notification to admins — uses centralized sendEmail from @/lib/email
     try {
+      const safeName = escapeHtml(name);
+      const safeEmail = escapeHtml(email);
+      const safePhone = escapeHtml(phone);
+      const safeMessage = escapeHtml(message);
+      const safeChatHistory = escapeHtml(chatHistory || '(no history)');
       const adminHtml = `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
           <div style="background:#1B2A4A;padding:20px;text-align:center">
             <h2 style="color:#5DB347;margin:0">New Chat Request</h2>
             <p style="color:#8CB89C;margin:4px 0 0;font-size:13px">Someone wants to talk to a human</p>
           </div>
           <div style="padding:24px;background:#f8faf6">
-            <p style="color:#333;font-size:14px"><strong>Name:</strong> ${name}</p>
-            <p style="color:#333;font-size:14px"><strong>Email:</strong> ${email}</p>
-            ${phone ? `<p style="color:#333;font-size:14px"><strong>Phone:</strong> ${phone}</p>` : ''}
-            ${message ? `<hr style="border:1px solid #eee;margin:16px 0"><p style="color:#333;font-size:14px"><strong>Message:</strong></p><p style="color:#555;font-size:14px;white-space:pre-wrap">${message}</p>` : ''}
+            <p style="color:#333;font-size:14px"><strong>Name:</strong> ${safeName}</p>
+            <p style="color:#333;font-size:14px"><strong>Email:</strong> ${safeEmail}</p>
+            ${phone ? `<p style="color:#333;font-size:14px"><strong>Phone:</strong> ${safePhone}</p>` : ''}
+            ${message ? `<hr style="border:1px solid #eee;margin:16px 0"><p style="color:#333;font-size:14px"><strong>Message:</strong></p><p style="color:#555;font-size:14px;white-space:pre-wrap">${safeMessage}</p>` : ''}
             <hr style="border:1px solid #eee;margin:16px 0">
             <p style="color:#999;font-size:12px"><strong>Chat History:</strong></p>
-            <pre style="color:#777;font-size:12px;white-space:pre-wrap;background:#fff;padding:12px;border-radius:6px;border:1px solid #eee">${chatHistory || '(no history)'}</pre>
+            <pre style="color:#777;font-size:12px;white-space:pre-wrap;background:#fff;padding:12px;border-radius:6px;border:1px solid #eee">${safeChatHistory}</pre>
           </div>
           <div style="padding:16px;text-align:center">
             <a href="https://africanfarmingunion.org/admin/inbox${result.id ? `?conversation=${result.id}` : ''}" style="display:inline-block;padding:10px 24px;background:#5DB347;color:#fff;text-decoration:none;border-radius:6px;font-size:14px;font-weight:600">View in Inbox</a>
@@ -99,7 +146,7 @@ export async function POST(req: NextRequest) {
 
     // Send auto-reply to the visitor
     try {
-      const firstName = name.split(' ')[0];
+      const firstName = escapeHtml(String(name).split(' ')[0]);
       await sendEmail(
         email,
         'We received your message - African Farming Union',
