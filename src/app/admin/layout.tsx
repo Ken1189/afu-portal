@@ -147,6 +147,7 @@ const navGroups: NavGroup[] = [
       { href: '/admin/banking', label: 'Banking Operations', icon: <Landmark className={ICON_CLS} /> },
       { href: '/admin/wallet', label: 'Wallet', icon: <Wallet className={ICON_CLS} /> },
       { href: '/admin/credit-scores', label: 'Credit Scoring', icon: <Gauge className={ICON_CLS} /> },
+      { href: '/admin/disputes', label: 'Disputes', icon: <Scale className={ICON_CLS} /> },
       { href: '/admin/exports', label: 'Exports', icon: <Ship className={ICON_CLS} /> },
       { href: '/admin/investors', label: 'All Investors', icon: <Users className={ICON_CLS} /> },
       { href: '/admin/investments', label: 'Total Investments', icon: <BarChart3 className={ICON_CLS} /> },

@@ -9,30 +9,33 @@ import { motion, AnimatePresence } from 'framer-motion';
 interface Notification {
   id: string;
   title: string;
-  body: string;
-  category: string;
-  priority: string;
-  is_read: boolean;
+  message: string;
+  type: string;
+  read: boolean;
   action_url: string | null;
   created_at: string;
 }
 
-const categoryIcons: Record<string, typeof Bell> = {
+const typeIcons: Record<string, typeof Bell> = {
   loan: DollarSign,
   kyc: FileText,
   payment: DollarSign,
   order: FileText,
   system: Info,
   alert: AlertTriangle,
+  warning: AlertTriangle,
   membership: CheckCircle2,
+  success: CheckCircle2,
   training: Info,
   marketing: Info,
+  info: Info,
 };
 
-const priorityColors: Record<string, string> = {
-  high: 'bg-red-500',
-  medium: 'bg-amber-500',
-  low: 'bg-blue-500',
+const typeColors: Record<string, string> = {
+  alert: 'bg-red-500',
+  warning: 'bg-amber-500',
+  success: 'bg-green-500',
+  info: 'bg-blue-500',
 };
 
 interface NotificationBellProps {
@@ -46,7 +49,7 @@ export default function NotificationBell({ variant = 'light' }: NotificationBell
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
-  const unreadCount = notifications.filter((n) => !n.is_read).length;
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
   // Initial fetch + realtime subscription
   useEffect(() => {
@@ -58,7 +61,7 @@ export default function NotificationBell({ variant = 'light' }: NotificationBell
       const { data } = await supabase
         .from('notifications')
         .select('*')
-        .eq('recipient_id', user.id)
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(20);
 
@@ -74,7 +77,7 @@ export default function NotificationBell({ variant = 'light' }: NotificationBell
           event: 'INSERT',
           schema: 'public',
           table: 'notifications',
-          filter: `recipient_id=eq.${user.id}`,
+          filter: `user_id=eq.${user.id}`,
         },
         (payload) => {
           const n = payload.new as Notification;
@@ -87,7 +90,7 @@ export default function NotificationBell({ variant = 'light' }: NotificationBell
           event: 'UPDATE',
           schema: 'public',
           table: 'notifications',
-          filter: `recipient_id=eq.${user.id}`,
+          filter: `user_id=eq.${user.id}`,
         },
         (payload) => {
           const n = payload.new as Notification;
@@ -113,8 +116,8 @@ export default function NotificationBell({ variant = 'light' }: NotificationBell
 
   const markRead = async (id: string) => {
     const supabase = createClient();
-    await supabase.from('notifications').update({ is_read: true }).eq('id', id);
-    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, is_read: true } : n)));
+    await supabase.from('notifications').update({ read: true }).eq('id', id);
+    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
   };
 
   const markAllRead = async () => {
@@ -122,10 +125,10 @@ export default function NotificationBell({ variant = 'light' }: NotificationBell
     const supabase = createClient();
     await supabase
       .from('notifications')
-      .update({ is_read: true })
-      .eq('recipient_id', user.id)
-      .eq('is_read', false);
-    setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
+      .update({ read: true })
+      .eq('user_id', user.id)
+      .eq('read', false);
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
   };
 
   const timeAgo = (dateStr: string) => {
@@ -186,16 +189,16 @@ export default function NotificationBell({ variant = 'light' }: NotificationBell
             <div className="max-h-80 overflow-y-auto divide-y divide-gray-50">
               {notifications.length > 0 ? (
                 notifications.map((n) => {
-                  const Icon = categoryIcons[n.category] || Bell;
+                  const Icon = typeIcons[n.type] || Bell;
                   return (
                     <button
                       key={n.id}
                       onClick={() => {
-                        if (!n.is_read) markRead(n.id);
+                        if (!n.read) markRead(n.id);
                         if (n.action_url) window.location.href = n.action_url;
                       }}
                       className={`w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors flex gap-3 ${
-                        !n.is_read ? 'bg-[#EBF7E5]/30' : ''
+                        !n.read ? 'bg-[#EBF7E5]/30' : ''
                       }`}
                     >
                       <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
@@ -203,22 +206,22 @@ export default function NotificationBell({ variant = 'light' }: NotificationBell
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1.5">
-                          {!n.is_read && (
+                          {!n.read && (
                             <span
                               className={`w-1.5 h-1.5 rounded-full ${
-                                priorityColors[n.priority] || 'bg-blue-500'
+                                typeColors[n.type] || 'bg-blue-500'
                               }`}
                             />
                           )}
                           <p
                             className={`text-xs truncate ${
-                              !n.is_read ? 'font-semibold text-[#1B2A4A]' : 'font-medium text-gray-700'
+                              !n.read ? 'font-semibold text-[#1B2A4A]' : 'font-medium text-gray-700'
                             }`}
                           >
                             {n.title}
                           </p>
                         </div>
-                        <p className="text-[11px] text-gray-500 mt-0.5 line-clamp-2">{n.body}</p>
+                        <p className="text-[11px] text-gray-500 mt-0.5 line-clamp-2">{n.message}</p>
                         <p className="text-[10px] text-gray-400 mt-1">{timeAgo(n.created_at)}</p>
                       </div>
                     </button>

@@ -11,6 +11,6 @@ export const metadata = createPageMetadata({
 
 export default function InputsServicePage() {
   return (
-    <EditableServicePage slug="inputs" fallback={SERVICE_DEFAULTS.inputs} />
+    <EditableServicePage slug="inputs" fallback={SERVICE_DEFAULTS.inputs} disclaimerType="general" />
   );
 }

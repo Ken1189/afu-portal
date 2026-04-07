@@ -11,6 +11,6 @@ export const metadata = createPageMetadata({
 
 export default function TrainingServicePage() {
   return (
-    <EditableServicePage slug="training" fallback={SERVICE_DEFAULTS.training} />
+    <EditableServicePage slug="training" fallback={SERVICE_DEFAULTS.training} disclaimerType="general" />
   );
 }

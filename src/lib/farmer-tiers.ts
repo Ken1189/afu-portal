@@ -67,6 +67,8 @@ export const FARM_SIDEBAR_ITEMS = [
   { href: '/farm/crops', label: 'My Crops', icon: 'Sprout', tier: 'sprout' as FarmerTier, group: 'Farm Management' },
   { href: '/farm/cooperatives', label: 'Cooperatives', icon: 'UsersRound', tier: 'sprout' as FarmerTier, group: 'Farm Management' },
   { href: '/farm/cooperatives/dashboard', label: 'My Cooperative', icon: 'UsersRound', tier: 'sprout' as FarmerTier, group: 'Farm Management' },
+  { href: '/farm/orders', label: 'My Orders', icon: 'ShoppingBag', tier: 'sprout' as FarmerTier, group: 'Farm Management' },
+  { href: '/farm/reviews', label: 'My Reviews', icon: 'Star', tier: 'sprout' as FarmerTier, group: 'Farm Management' },
 
   // Growth tier
   { href: '/farm/financing', label: 'Financing', icon: 'Wallet', tier: 'growth' as FarmerTier, group: 'Finance' },

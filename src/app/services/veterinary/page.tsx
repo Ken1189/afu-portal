@@ -11,6 +11,6 @@ export const metadata = createPageMetadata({
 
 export default function VeterinaryServicePage() {
   return (
-    <EditableServicePage slug="veterinary" fallback={SERVICE_DEFAULTS.veterinary} />
+    <EditableServicePage slug="veterinary" fallback={SERVICE_DEFAULTS.veterinary} disclaimerType="medical" />
   );
 }

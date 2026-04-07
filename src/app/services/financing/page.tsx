@@ -5,6 +5,6 @@ export const metadata = { title: 'Financing - AFU Services' };
 
 export default function FinancingServicePage() {
   return (
-    <EditableServicePage slug="financing" fallback={SERVICE_DEFAULTS.financing} />
+    <EditableServicePage slug="financing" fallback={SERVICE_DEFAULTS.financing} disclaimerType="finance" />
   );
 }

@@ -16,6 +16,9 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
+import LegalDisclaimer from '@/components/ui/LegalDisclaimer';
+
+type DisclaimerType = 'banking' | 'insurance' | 'finance' | 'investment' | 'research' | 'legal' | 'medical' | 'general';
 
 export interface ServiceFeature {
   title: string;
@@ -42,9 +45,11 @@ export interface ServicePageConfig {
 export default function EditableServicePage({
   slug,
   fallback,
+  disclaimerType,
 }: {
   slug: string;
   fallback: ServicePageConfig;
+  disclaimerType?: DisclaimerType;
 }) {
   const [cfg, setCfg] = useState<ServicePageConfig>(fallback);
 
@@ -94,6 +99,11 @@ export default function EditableServicePage({
 
   return (
     <>
+      {disclaimerType && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+          <LegalDisclaimer type={disclaimerType} />
+        </div>
+      )}
       {/* HERO */}
       <section className="relative min-h-[520px] flex items-center overflow-hidden">
         <div
