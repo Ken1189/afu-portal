@@ -164,19 +164,19 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
     }
   }, [authLoading, user, router]);
 
-  // Role guard — only farmers/members can access /farm
+  // Role guard — farmers/members + admin/super_admin preview access
   useEffect(() => {
     if (authLoading || !user || !profile?.role) return;
     const role = profile.role as string;
-    const allowed = ['farmer', 'member'];
+    // Admin and super_admin can preview ANY portal
+    const allowed = ['farmer', 'member', 'admin', 'super_admin'];
     if (!allowed.includes(role)) {
       const target =
-        role === 'admin' || role === 'super_admin' ? '/admin'
-        : role === 'supplier' ? '/supplier'
+        role === 'supplier' ? '/supplier'
         : role === 'partner' ? '/supplier'
         : role === 'ambassador' ? '/ambassador'
         : role === 'warehouse_operator' ? '/warehouse'
-        : '/dashboard';
+        : '/';
       router.replace(target);
     }
   }, [authLoading, user, profile?.role, router]);

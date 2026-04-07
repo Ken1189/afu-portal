@@ -230,20 +230,8 @@ const navGroups: NavGroup[] = [
       { href: '/admin/run-migration', label: 'Run Migrations', icon: <Database className={ICON_CLS} />, superAdminOnly: true },
     ],
   },
-  // ── 8. Switch Portal ──
-  {
-    label: 'Switch Portal',
-    defaultOpen: false,
-    superAdminOnly: true,
-    links: [
-      { href: '/investor', label: 'Investor Portal', icon: <BarChart3 className={ICON_CLS} /> },
-      { href: '/ambassador', label: 'Ambassador Portal', icon: <Megaphone className={ICON_CLS} /> },
-      { href: '/supplier', label: 'Supplier Portal', icon: <Store className={ICON_CLS} /> },
-      { href: '/warehouse', label: 'Warehouse Portal', icon: <Warehouse className={ICON_CLS} /> },
-      { href: '/farm', label: 'Farmer Portal', icon: <Tractor className={ICON_CLS} /> },
-      { href: '/', label: 'Public Website', icon: <ExternalLink className={ICON_CLS} /> },
-    ],
-  },
+  // Switch Portal dropdown is now at the TOP of the sidebar (see PortalSwitcherDropdown component).
+  // The old navGroup here was removed to avoid duplication.
 ];
 
 // ── Helper: flatten all links for search ──
