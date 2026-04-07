@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
           full_name: profile.full_name || 'Unnamed',
           email: profile.email,
           country: profile.country || 'Unknown',
-          bio: 'Profile pending — self-activated via capabilities API.',
+          bio: null,
           sector: 'mixed',
         });
         if (!ambErr) sideEffects.push('created ambassadors row');

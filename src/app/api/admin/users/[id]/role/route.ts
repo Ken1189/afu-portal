@@ -169,7 +169,7 @@ export async function PATCH(
           full_name: targetProfile.full_name || 'Unnamed',
           email: targetProfile.email,
           country: targetProfile.country || 'Unknown',
-          bio: 'Profile pending — created via admin role assignment.',
+          bio: null,
           sector: 'mixed',
         });
         if (ambErr) {

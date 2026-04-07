@@ -1203,20 +1203,30 @@ export default function Home() {
                     {item.name}
                   </h3>
                   <div className="mb-6">
-                    <span
-                      className={`text-4xl md:text-5xl font-extrabold ${
-                        item.highlight ? 'text-white' : 'text-navy'
-                      }`}
-                    >
-                      {item.price}
-                    </span>
-                    <span
-                      className={`text-sm ${
-                        item.highlight ? 'text-gray-300' : 'text-gray-500'
-                      }`}
-                    >
-                      {item.period}
-                    </span>
+                    {(() => {
+                      // Numeric prices render big; text prices (e.g. "On Request") render small
+                      const isNumeric = /^\$?\d/.test(item.price.trim());
+                      return (
+                        <>
+                          <span
+                            className={`${
+                              isNumeric ? 'text-4xl md:text-5xl font-extrabold' : 'text-xl md:text-2xl font-bold'
+                            } ${item.highlight ? 'text-white' : 'text-navy'}`}
+                          >
+                            {item.price}
+                          </span>
+                          {item.period && (
+                            <span
+                              className={`text-sm ${
+                                item.highlight ? 'text-gray-300' : 'text-gray-500'
+                              }`}
+                            >
+                              {item.period}
+                            </span>
+                          )}
+                        </>
+                      );
+                    })()}
                   </div>
                   <ul className="space-y-3 mb-8 flex-1">
                     {item.features.map((f, j) => (

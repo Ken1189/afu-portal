@@ -315,7 +315,14 @@ export default function AmbassadorsPage() {
         if (error || !data || data.length === 0) {
           setAmbassadors(FALLBACK_AMBASSADORS);
         } else {
-          setAmbassadors(data);
+          // Sort ambassadors with a profile photo to the top; placeholders last
+          const sorted = [...data].sort((a, b) => {
+            const aHas = a.photo_url ? 1 : 0;
+            const bHas = b.photo_url ? 1 : 0;
+            if (aHas !== bHas) return bHas - aHas;
+            return (a.sort_order ?? 0) - (b.sort_order ?? 0);
+          });
+          setAmbassadors(sorted);
         }
       } catch {
         setAmbassadors(FALLBACK_AMBASSADORS);
@@ -823,8 +830,8 @@ export default function AmbassadorsPage() {
                   </div>
                 )}
 
-                {/* Bio expand */}
-                {amb.bio && (
+                {/* Bio expand — hide placeholder text for ambassadors without real profiles */}
+                {amb.bio && !amb.bio.toLowerCase().startsWith('profile pending') && (
                   <div className="px-6 pb-6">
                     <button
                       onClick={() => setExpandedBio(expandedBio === amb.id ? null : amb.id)}

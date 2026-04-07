@@ -233,7 +233,7 @@ export async function POST(request: Request) {
         full_name,
         email,
         country: country || 'Unknown',
-        bio: 'Profile pending — created via admin user creation.',
+        bio: null,
         sector: 'mixed',
       });
       if (!ambErr) sideEffects.push('created ambassadors row');
@@ -269,7 +269,7 @@ export async function POST(request: Request) {
             full_name,
             email,
             country: country || 'Unknown',
-            bio: 'Profile pending — created via admin capability grant.',
+            bio: null,
             sector: 'mixed',
           });
           sideEffects.push('created ambassadors row (capability)');

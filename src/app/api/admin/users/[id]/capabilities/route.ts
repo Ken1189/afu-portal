@@ -161,7 +161,7 @@ export async function PATCH(
             full_name: targetProfile.full_name || 'Unnamed',
             email: targetProfile.email,
             country: targetProfile.country || 'Unknown',
-            bio: 'Profile pending — created via admin capability grant.',
+            bio: null,
             sector: 'mixed',
           });
           if (!ambErr) sideEffects.push('created ambassadors row');
