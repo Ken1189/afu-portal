@@ -19,6 +19,7 @@ interface Course {
   tier_unlock: string;
   slug: string;
   category: string;
+  xp_value?: number;
 }
 
 interface CourseCompletion {
@@ -542,6 +543,7 @@ export default function TrainingPage() {
   const [completing, setCompleting] = useState<string | null>(null);
   const [currentTier, setCurrentTier] = useState<FarmerTier>('seedling');
   const [celebrateCourse, setCelebrateCourse] = useState<string | null>(null);
+  const [tierUpMessage, setTierUpMessage] = useState<string | null>(null);
 
   // ── Lesson viewer state ────────────────────────────────────────────────
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
@@ -768,6 +770,46 @@ export default function TrainingPage() {
         tier_unlocked: course.tier_unlock,
       });
 
+      // ── Award XP + recalculate farmer tier ─────────────────────────────
+      try {
+        const xpEarned = course.xp_value || 100;
+
+        const { data: tierRec } = await supabase
+          .from('farmer_tiers')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+
+        const newXp = (tierRec?.total_xp || 0) + xpEarned;
+        const newCoursesCompleted = (tierRec?.total_courses_completed || 0) + 1;
+
+        let newTier = tierRec?.current_tier || 'seedling';
+        if (newXp >= 1000 && newCoursesCompleted >= 4) newTier = 'pioneer';
+        else if (newXp >= 500 && newCoursesCompleted >= 3) newTier = 'harvest';
+        else if (newXp >= 250 && newCoursesCompleted >= 2) newTier = 'growth';
+        else if (newXp >= 100 && newCoursesCompleted >= 1) newTier = 'sprout';
+
+        await supabase
+          .from('farmer_tiers')
+          .upsert(
+            {
+              user_id: user.id,
+              total_xp: newXp,
+              total_courses_completed: newCoursesCompleted,
+              current_tier: newTier,
+              last_updated: new Date().toISOString(),
+            },
+            { onConflict: 'user_id' }
+          );
+
+        if (tierRec && newTier !== tierRec.current_tier) {
+          setTierUpMessage(`Congratulations! You've reached ${newTier} tier!`);
+          setTimeout(() => setTierUpMessage(null), 5000);
+        }
+      } catch {
+        // XP/tier update is best-effort; never block course completion
+      }
+
       setCelebrateCourse(course.id);
       setTimeout(() => setCelebrateCourse(null), 2500);
       await fetchCompletions();
@@ -794,6 +836,12 @@ export default function TrainingPage() {
 
   return (
     <div className="min-h-screen bg-[#0F1A2E] text-white">
+      {/* Tier-up toast */}
+      {tierUpMessage && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[100] bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-3 rounded-xl shadow-2xl font-semibold text-sm">
+          {tierUpMessage}
+        </div>
+      )}
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div

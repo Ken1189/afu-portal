@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from './client';
 
 // ---------------------------------------------------------------------------
@@ -41,13 +41,14 @@ export interface LivestockHealthRecordRow {
 // ---------------------------------------------------------------------------
 
 export function useLivestock(memberId?: string) {
+  const supabase = useMemo(() => createClient(), []);
   const [livestock, setLivestock] = useState<LivestockRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClient();
 
   const fetchLivestock = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       let query = supabase
         .from('livestock')
@@ -59,13 +60,16 @@ export function useLivestock(memberId?: string) {
       const { data, error: fetchError } = await query;
 
       if (fetchError) {
+        console.error('[useLivestock] fetch error:', fetchError);
         setError(fetchError.message);
         setLivestock([]);
       } else {
-        setLivestock((data as LivestockRow[]) || []);
+        setLivestock((data || []) as LivestockRow[]);
       }
     } catch (err) {
-      console.error("[use-livestock.ts] fetch error:", err);
+      console.error('[useLivestock] exception:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error');
+      setLivestock([]);
     } finally {
       setLoading(false);
     }
@@ -92,7 +96,7 @@ export function useLivestock(memberId?: string) {
   const totalCount = livestock.reduce((s, l) => s + l.count, 0);
   const totalValue = livestock.reduce((s, l) => s + (l.value_estimate || 0), 0);
 
-  return { livestock, loading, error, totalCount, totalValue, fetchLivestock };
+  return { livestock, loading, error, totalCount, totalValue, fetchLivestock, refetch: fetchLivestock };
 }
 
 // ---------------------------------------------------------------------------
@@ -100,13 +104,19 @@ export function useLivestock(memberId?: string) {
 // ---------------------------------------------------------------------------
 
 export function useCreateLivestock() {
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const createLivestock = async (
     item: Omit<LivestockRow, 'id' | 'created_at' | 'updated_at'>
   ) => {
-    const { error } = await supabase.from('livestock').insert(item);
-    return { error: error?.message || null };
+    try {
+      const { data, error } = await supabase.from('livestock').insert(item).select().single();
+      if (error) return { data: null, error: error.message };
+      return { data, error: null };
+    } catch (err) {
+      console.error('[useCreateLivestock] exception:', err);
+      return { data: null, error: err instanceof Error ? err.message : 'Unknown error' };
+    }
   };
 
   return { createLivestock };
@@ -117,11 +127,17 @@ export function useCreateLivestock() {
 // ---------------------------------------------------------------------------
 
 export function useUpdateLivestock() {
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const updateLivestock = async (id: string, updates: Partial<LivestockRow>) => {
-    const { error } = await supabase.from('livestock').update(updates).eq('id', id);
-    return { error: error?.message || null };
+    try {
+      const { data, error } = await supabase.from('livestock').update(updates).eq('id', id).select().single();
+      if (error) return { data: null, error: error.message };
+      return { data, error: null };
+    } catch (err) {
+      console.error('[useUpdateLivestock] exception:', err);
+      return { data: null, error: err instanceof Error ? err.message : 'Unknown error' };
+    }
   };
 
   return { updateLivestock };
@@ -132,13 +148,14 @@ export function useUpdateLivestock() {
 // ---------------------------------------------------------------------------
 
 export function useLivestockHealthRecords(livestockId: string) {
+  const supabase = useMemo(() => createClient(), []);
   const [records, setRecords] = useState<LivestockHealthRecordRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClient();
 
   const fetchRecords = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       const { data, error: fetchError } = await supabase
         .from('livestock_health_records')
@@ -147,13 +164,16 @@ export function useLivestockHealthRecords(livestockId: string) {
         .order('date', { ascending: false });
 
       if (fetchError) {
+        console.error('[useLivestockHealthRecords] fetch error:', fetchError);
         setError(fetchError.message);
         setRecords([]);
       } else {
-        setRecords((data as LivestockHealthRecordRow[]) || []);
+        setRecords((data || []) as LivestockHealthRecordRow[]);
       }
     } catch (err) {
-      console.error("[use-livestock.ts] fetch error:", err);
+      console.error('[useLivestockHealthRecords] exception:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error');
+      setRecords([]);
     } finally {
       setLoading(false);
     }
@@ -177,7 +197,7 @@ export function useLivestockHealthRecords(livestockId: string) {
     };
   }, [supabase, livestockId, fetchRecords]);
 
-  return { records, loading, error, fetchRecords };
+  return { records, loading, error, fetchRecords, refetch: fetchRecords };
 }
 
 // ---------------------------------------------------------------------------
@@ -185,13 +205,19 @@ export function useLivestockHealthRecords(livestockId: string) {
 // ---------------------------------------------------------------------------
 
 export function useCreateHealthRecord() {
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const createHealthRecord = async (
     record: Omit<LivestockHealthRecordRow, 'id' | 'created_at'>
   ) => {
-    const { error } = await supabase.from('livestock_health_records').insert(record);
-    return { error: error?.message || null };
+    try {
+      const { data, error } = await supabase.from('livestock_health_records').insert(record).select().single();
+      if (error) return { data: null, error: error.message };
+      return { data, error: null };
+    } catch (err) {
+      console.error('[useCreateHealthRecord] exception:', err);
+      return { data: null, error: err instanceof Error ? err.message : 'Unknown error' };
+    }
   };
 
   return { createHealthRecord };

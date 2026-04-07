@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from './client';
 
 export interface ExportDocumentRow {
@@ -18,21 +18,29 @@ export interface ExportDocumentRow {
 }
 
 export function useExportDocuments(memberId?: string) {
+  const supabase = useMemo(() => createClient(), []);
   const [documents, setDocuments] = useState<ExportDocumentRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClient();
 
   const fetchDocuments = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       let query = supabase.from('export_documents').select('*').order('created_at', { ascending: false });
       if (memberId) query = query.eq('member_id', memberId);
       const { data, error: fetchError } = await query;
-      if (fetchError) { setError(fetchError.message); setDocuments([]); }
-      else { setDocuments((data as ExportDocumentRow[]) || []); }
+      if (fetchError) {
+        console.error('[useExportDocuments] fetch error:', fetchError);
+        setError(fetchError.message);
+        setDocuments([]);
+      } else {
+        setDocuments((data || []) as ExportDocumentRow[]);
+      }
     } catch (err) {
-      console.error("[use-export-documents.ts] fetch error:", err);
+      console.error('[useExportDocuments] exception:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error');
+      setDocuments([]);
     } finally {
       setLoading(false);
     }
@@ -41,16 +49,28 @@ export function useExportDocuments(memberId?: string) {
   useEffect(() => { fetchDocuments(); }, [fetchDocuments]);
 
   const createDocument = async (doc: Omit<ExportDocumentRow, 'id' | 'created_at' | 'updated_at' | 'status'>) => {
-    const { error } = await supabase.from('export_documents').insert(doc);
-    if (!error) await fetchDocuments();
-    return { error: error?.message || null };
+    try {
+      const { data, error: insertError } = await supabase.from('export_documents').insert(doc).select().single();
+      if (insertError) return { data: null, error: insertError.message };
+      await fetchDocuments();
+      return { data, error: null };
+    } catch (err) {
+      console.error('[useExportDocuments] createDocument exception:', err);
+      return { data: null, error: err instanceof Error ? err.message : 'Unknown error' };
+    }
   };
 
   const updateDocument = async (id: string, updates: Partial<ExportDocumentRow>) => {
-    const { error } = await supabase.from('export_documents').update(updates).eq('id', id);
-    if (!error) await fetchDocuments();
-    return { error: error?.message || null };
+    try {
+      const { error: updateError } = await supabase.from('export_documents').update(updates).eq('id', id);
+      if (updateError) return { error: updateError.message };
+      await fetchDocuments();
+      return { error: null };
+    } catch (err) {
+      console.error('[useExportDocuments] updateDocument exception:', err);
+      return { error: err instanceof Error ? err.message : 'Unknown error' };
+    }
   };
 
-  return { documents, loading, error, fetchDocuments, createDocument, updateDocument };
+  return { documents, loading, error, fetchDocuments, refetch: fetchDocuments, createDocument, updateDocument };
 }

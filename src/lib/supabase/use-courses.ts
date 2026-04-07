@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from './client';
 
 // ---------------------------------------------------------------------------
@@ -53,13 +53,14 @@ export interface CourseEnrollmentRow {
 // ---------------------------------------------------------------------------
 
 export function useCourses() {
+  const supabase = useMemo(() => createClient(), []);
   const [courses, setCourses] = useState<CourseRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClient();
 
   const fetchCourses = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       const { data, error: fetchError } = await supabase
         .from('courses')
@@ -68,13 +69,16 @@ export function useCourses() {
         .order('created_at', { ascending: false });
 
       if (fetchError) {
+        console.error('[useCourses] fetch error:', fetchError);
         setError(fetchError.message);
         setCourses([]);
       } else {
-        setCourses((data as CourseRow[]) || []);
+        setCourses((data || []) as CourseRow[]);
       }
     } catch (err) {
-      console.error("[use-courses.ts] fetch error:", err);
+      console.error('[useCourses] exception:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error');
+      setCourses([]);
     } finally {
       setLoading(false);
     }
@@ -98,7 +102,7 @@ export function useCourses() {
     };
   }, [supabase, fetchCourses]);
 
-  return { courses, loading, error, fetchCourses };
+  return { courses, loading, error, fetchCourses, refetch: fetchCourses };
 }
 
 // ---------------------------------------------------------------------------
@@ -106,13 +110,14 @@ export function useCourses() {
 // ---------------------------------------------------------------------------
 
 export function useCourseModules(courseId: string) {
+  const supabase = useMemo(() => createClient(), []);
   const [modules, setModules] = useState<CourseModuleRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClient();
 
   const fetchModules = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       const { data, error: fetchError } = await supabase
         .from('course_modules')
@@ -121,13 +126,16 @@ export function useCourseModules(courseId: string) {
         .order('order_index', { ascending: true });
 
       if (fetchError) {
+        console.error('[useCourseModules] fetch error:', fetchError);
         setError(fetchError.message);
         setModules([]);
       } else {
-        setModules((data as CourseModuleRow[]) || []);
+        setModules((data || []) as CourseModuleRow[]);
       }
     } catch (err) {
-      console.error("[use-courses.ts] fetch error:", err);
+      console.error('[useCourseModules] exception:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error');
+      setModules([]);
     } finally {
       setLoading(false);
     }
@@ -137,7 +145,7 @@ export function useCourseModules(courseId: string) {
     fetchModules();
   }, [fetchModules]);
 
-  return { modules, loading, error, fetchModules };
+  return { modules, loading, error, fetchModules, refetch: fetchModules };
 }
 
 // ---------------------------------------------------------------------------
@@ -145,13 +153,14 @@ export function useCourseModules(courseId: string) {
 // ---------------------------------------------------------------------------
 
 export function useCourseEnrollments(memberId?: string) {
+  const supabase = useMemo(() => createClient(), []);
   const [enrollments, setEnrollments] = useState<CourseEnrollmentRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClient();
 
   const fetchEnrollments = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       let query = supabase
         .from('course_enrollments')
@@ -163,13 +172,16 @@ export function useCourseEnrollments(memberId?: string) {
       const { data, error: fetchError } = await query;
 
       if (fetchError) {
+        console.error('[useCourseEnrollments] fetch error:', fetchError);
         setError(fetchError.message);
         setEnrollments([]);
       } else {
-        setEnrollments((data as CourseEnrollmentRow[]) || []);
+        setEnrollments((data || []) as CourseEnrollmentRow[]);
       }
     } catch (err) {
-      console.error("[use-courses.ts] fetch error:", err);
+      console.error('[useCourseEnrollments] exception:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error');
+      setEnrollments([]);
     } finally {
       setLoading(false);
     }
@@ -195,7 +207,7 @@ export function useCourseEnrollments(memberId?: string) {
 
   const completedCount = enrollments.filter((e) => e.completed_at).length;
 
-  return { enrollments, loading, error, completedCount, fetchEnrollments };
+  return { enrollments, loading, error, completedCount, fetchEnrollments, refetch: fetchEnrollments };
 }
 
 // ---------------------------------------------------------------------------
@@ -203,13 +215,20 @@ export function useCourseEnrollments(memberId?: string) {
 // ---------------------------------------------------------------------------
 
 export function enrollInCourse() {
-  const supabase = createClient();
-
   const enroll = async (courseId: string, memberId: string) => {
-    const { error } = await supabase
-      .from('course_enrollments')
-      .insert({ course_id: courseId, member_id: memberId });
-    return { error: error?.message || null };
+    try {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from('course_enrollments')
+        .insert({ course_id: courseId, member_id: memberId })
+        .select()
+        .single();
+      if (error) return { data: null, error: error.message };
+      return { data, error: null };
+    } catch (err) {
+      console.error('[enrollInCourse] exception:', err);
+      return { data: null, error: err instanceof Error ? err.message : 'Unknown error' };
+    }
   };
 
   return { enroll };
@@ -220,17 +239,24 @@ export function enrollInCourse() {
 // ---------------------------------------------------------------------------
 
 export function updateProgress() {
-  const supabase = createClient();
-
   const update = async (enrollmentId: string, progress: number) => {
-    const updates: Record<string, unknown> = { progress_percent: progress };
-    if (progress >= 100) updates.completed_at = new Date().toISOString();
+    try {
+      const supabase = createClient();
+      const updates: Record<string, unknown> = { progress_percent: progress };
+      if (progress >= 100) updates.completed_at = new Date().toISOString();
 
-    const { error } = await supabase
-      .from('course_enrollments')
-      .update(updates)
-      .eq('id', enrollmentId);
-    return { error: error?.message || null };
+      const { data, error } = await supabase
+        .from('course_enrollments')
+        .update(updates)
+        .eq('id', enrollmentId)
+        .select()
+        .single();
+      if (error) return { data: null, error: error.message };
+      return { data, error: null };
+    } catch (err) {
+      console.error('[updateProgress] exception:', err);
+      return { data: null, error: err instanceof Error ? err.message : 'Unknown error' };
+    }
   };
 
   return { update };

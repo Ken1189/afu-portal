@@ -177,6 +177,130 @@ export async function POST(request: NextRequest) {
                 .eq('id', paymentId);
             }
 
+            // ── Ambassador commission auto-trigger (Sprint 2B) ───────────
+            try {
+              // Find the member record (re-use memberId from above if set)
+              type RefMemberRow = { id: string; referred_by: string | null };
+              let refMemberRow: RefMemberRow | null = null;
+              if (memberId) {
+                const { data } = await adminClient
+                  .from('members')
+                  .select('id, referred_by')
+                  .eq('id', memberId)
+                  .maybeSingle();
+                refMemberRow = (data as unknown) as RefMemberRow | null;
+              } else if (userId) {
+                const { data } = await adminClient
+                  .from('members')
+                  .select('id, referred_by')
+                  .eq('profile_id', userId)
+                  .maybeSingle();
+                refMemberRow = (data as unknown) as RefMemberRow | null;
+              }
+
+              if (refMemberRow?.referred_by) {
+                // Look up ambassador by user_id (profile id)
+                const { data: amb } = await adminClient
+                  .from('ambassadors')
+                  .select('id, user_id, tier, commission_rate_override, email, name')
+                  .eq('user_id', refMemberRow.referred_by)
+                  .maybeSingle();
+
+                if (amb?.id) {
+                  // Determine rate — prefer override, fall back to 10%
+                  let ratePercent = 10;
+                  const override = amb.commission_rate_override as
+                    | { membership?: number }
+                    | null
+                    | undefined;
+                  if (override && typeof override.membership === 'number') {
+                    ratePercent = override.membership;
+                  } else {
+                    // Try commission_rates table for membership type
+                    const { data: rateRow } = await adminClient
+                      .from('commission_rates')
+                      .select('rate_percent, tier')
+                      .eq('commission_type', 'membership')
+                      .eq('is_active', true)
+                      .order('tier', { ascending: true });
+                    if (rateRow && rateRow.length > 0) {
+                      const matched =
+                        rateRow.find((r: { tier: string | null }) => r.tier === amb.tier) ||
+                        rateRow.find((r: { tier: string | null }) => r.tier === null);
+                      if (matched) ratePercent = Number(matched.rate_percent) || 10;
+                    }
+                  }
+
+                  const sourceAmount = (session.amount_total || 0) / 100;
+                  const commissionAmount = +(sourceAmount * (ratePercent / 100)).toFixed(2);
+
+                  const { error: commErr } = await adminClient
+                    .from('commission_entries')
+                    .insert({
+                      ambassador_id: amb.id,
+                      commission_type: 'membership',
+                      description: `Membership payment (${tier}) from ${customerName}`,
+                      source_amount: sourceAmount,
+                      rate_percent: ratePercent,
+                      commission_amount: commissionAmount,
+                      currency: (session.currency || 'usd').toUpperCase(),
+                      source_reference: paymentId || session.id,
+                      source_type: 'membership_payment',
+                      status: 'pending',
+                      reference_id: refMemberRow.id,
+                      reference_type: 'member',
+                    });
+
+                  if (commErr) {
+                    console.error('[webhook membership] commission insert failed:', commErr);
+                  } else {
+                    // Bump ambassador totals (best-effort)
+                    await adminClient
+                      .from('ambassadors')
+                      .update({
+                        pending_earnings: (amb as unknown as { pending_earnings?: number }).pending_earnings
+                          ? ((amb as unknown as { pending_earnings: number }).pending_earnings + commissionAmount)
+                          : commissionAmount,
+                      })
+                      .eq('id', amb.id);
+
+                    // Notify the ambassador (fire-and-forget)
+                    const ambEmail = (amb as unknown as { email?: string }).email;
+                    const ambName = (amb as unknown as { name?: string }).name || 'Ambassador';
+                    if (ambEmail) {
+                      try {
+                        await resend.emails.send({
+                          from: FROM,
+                          to: ambEmail,
+                          subject: `You earned a $${commissionAmount.toFixed(2)} commission! 🎉`,
+                          html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
+                            <div style="background:#1B2A4A;padding:24px;text-align:center">
+                              <h1 style="color:#5DB347;margin:0;font-size:22px">New Commission Earned</h1>
+                            </div>
+                            <div style="padding:24px;background:#f8faf6">
+                              <p style="color:#1B2A4A">Hi ${ambName},</p>
+                              <p style="color:#333;font-size:15px;line-height:1.6">
+                                One of your referrals just purchased a <strong>${tier}</strong> membership, and you've earned a commission!
+                              </p>
+                              <div style="background:white;border-left:4px solid #5DB347;padding:16px;border-radius:4px;margin:16px 0">
+                                <p style="margin:0;color:#1B2A4A"><strong>Commission:</strong> $${commissionAmount.toFixed(2)} (${ratePercent}%)</p>
+                                <p style="margin:6px 0 0;color:#1B2A4A"><strong>Status:</strong> Pending payout</p>
+                              </div>
+                              <a href="https://africanfarmingunion.org/ambassador" style="display:inline-block;background:#5DB347;color:white;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:600">View Dashboard</a>
+                            </div>
+                          </div>`,
+                        });
+                      } catch (emailErr) {
+                        console.error('[webhook membership] ambassador email failed:', emailErr);
+                      }
+                    }
+                  }
+                }
+              }
+            } catch (commissionErr) {
+              console.error('[webhook membership] commission handler error:', commissionErr);
+            }
+
             // Welcome email
             if (customerEmail) {
               try {

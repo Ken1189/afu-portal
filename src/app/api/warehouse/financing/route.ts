@@ -44,23 +44,83 @@ export async function POST(request: NextRequest) {
   const body = await request.json();
   const adminClient = await createAdminClient();
 
-  const insertData = {
-    receipt_id: body.receipt_id,
-    borrower_id: auth.memberId,
-    requested_amount: body.requested_amount,
-    market_value: body.market_value,
-    status: 'pending',
-    application_date: new Date().toISOString(),
-  };
+  // 1. Verify the receipt exists, belongs to the user, and is not already pledged
+  const { data: receipt, error: receiptErr } = await adminClient
+    .from('warehouse_receipts')
+    .select('*')
+    .eq('id', body.receipt_id)
+    .single();
 
-  const { data, error } = await adminClient
+  if (receiptErr || !receipt) {
+    return NextResponse.json({ error: 'Receipt not found' }, { status: 404 });
+  }
+  if (receipt.member_id && receipt.member_id !== auth.memberId && !auth.isAdmin) {
+    return NextResponse.json({ error: 'Receipt does not belong to you' }, { status: 403 });
+  }
+  if (receipt.pledged) {
+    return NextResponse.json({ error: 'Receipt is already pledged to a loan' }, { status: 400 });
+  }
+
+  const requestedAmount = Number(body.requested_amount ?? body.amount ?? 0);
+  const termMonths = Number(body.term_months ?? body.duration_months ?? 6);
+  const marketValue = Number(body.market_value ?? receipt.estimated_value ?? receipt.value ?? 0);
+
+  // 2. Insert into loans with collateral linkage
+  const { data: loan, error: loanErr } = await adminClient
+    .from('loans')
+    .insert({
+      user_id: auth.userId,
+      member_id: auth.memberId,
+      loan_type: 'warehouseReceipt',
+      amount: requestedAmount,
+      interest_rate: 9.5,
+      term_months: termMonths,
+      status: 'pending',
+      purpose: `Receipt-backed loan against warehouse receipt ${receipt.receipt_number || receipt.id}`,
+      collateral_type: 'warehouse_receipt',
+      collateral_id: body.receipt_id,
+      amount_repaid: 0,
+    })
+    .select('*')
+    .single();
+
+  if (loanErr) {
+    return NextResponse.json({ error: loanErr.message }, { status: 500 });
+  }
+
+  // 3. Insert receipt_financing linking receipt to loan
+  const { data: financing, error: finErr } = await adminClient
     .from('receipt_financing')
-    .insert(insertData)
+    .insert({
+      receipt_id: body.receipt_id,
+      borrower_id: auth.memberId,
+      requested_amount: requestedAmount,
+      market_value: marketValue,
+      duration_months: termMonths,
+      status: 'pending',
+      loan_id: loan.id,
+      application_date: new Date().toISOString(),
+    })
     .select('*, receipt:warehouse_receipts(*)')
     .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ financing: data }, { status: 201 });
+  if (finErr) {
+    // Best-effort rollback of loan
+    await adminClient.from('loans').delete().eq('id', loan.id);
+    return NextResponse.json({ error: finErr.message }, { status: 500 });
+  }
+
+  // 4. Lock the receipt (status = pledged)
+  await adminClient
+    .from('warehouse_receipts')
+    .update({
+      status: 'pledged',
+      pledged: true,
+      pledged_to_loan_id: loan.id,
+    })
+    .eq('id', body.receipt_id);
+
+  return NextResponse.json({ financing, loan }, { status: 201 });
 }
 
 export async function PATCH(request: NextRequest) {

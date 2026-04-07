@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from './client';
 
 // ---------------------------------------------------------------------------
@@ -43,13 +43,14 @@ export interface EquipmentBookingRow {
 // ---------------------------------------------------------------------------
 
 export function useEquipment(country?: string) {
+  const supabase = useMemo(() => createClient(), []);
   const [equipment, setEquipment] = useState<EquipmentRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClient();
 
   const fetchEquipment = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       let query = supabase.from('equipment').select('*').order('name');
       if (country) query = query.eq('country', country);
@@ -57,13 +58,16 @@ export function useEquipment(country?: string) {
       const { data, error: fetchError } = await query;
 
       if (fetchError) {
+        console.error('[useEquipment] fetch error:', fetchError);
         setError(fetchError.message);
         setEquipment([]);
       } else {
-        setEquipment((data as EquipmentRow[]) || []);
+        setEquipment((data || []) as EquipmentRow[]);
       }
     } catch (err) {
-      console.error("[use-equipment.ts] fetch error:", err);
+      console.error('[useEquipment] exception:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error');
+      setEquipment([]);
     } finally {
       setLoading(false);
     }
@@ -89,7 +93,7 @@ export function useEquipment(country?: string) {
 
   const available = equipment.filter((e) => e.status === 'available');
 
-  return { equipment, available, loading, error, fetchEquipment };
+  return { equipment, available, loading, error, fetchEquipment, refetch: fetchEquipment };
 }
 
 // ---------------------------------------------------------------------------
@@ -97,13 +101,14 @@ export function useEquipment(country?: string) {
 // ---------------------------------------------------------------------------
 
 export function useEquipmentBookings(memberId?: string) {
+  const supabase = useMemo(() => createClient(), []);
   const [bookings, setBookings] = useState<EquipmentBookingRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClient();
 
   const fetchBookings = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       let query = supabase
         .from('equipment_bookings')
@@ -115,13 +120,16 @@ export function useEquipmentBookings(memberId?: string) {
       const { data, error: fetchError } = await query;
 
       if (fetchError) {
+        console.error('[useEquipmentBookings] fetch error:', fetchError);
         setError(fetchError.message);
         setBookings([]);
       } else {
-        setBookings((data as EquipmentBookingRow[]) || []);
+        setBookings((data || []) as EquipmentBookingRow[]);
       }
     } catch (err) {
-      console.error("[use-equipment.ts] fetch error:", err);
+      console.error('[useEquipmentBookings] exception:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error');
+      setBookings([]);
     } finally {
       setLoading(false);
     }
@@ -146,15 +154,21 @@ export function useEquipmentBookings(memberId?: string) {
   }, [supabase, fetchBookings]);
 
   const cancelBooking = async (id: string) => {
-    const { error } = await supabase
-      .from('equipment_bookings')
-      .update({ status: 'cancelled' })
-      .eq('id', id);
-    if (!error) await fetchBookings();
-    return { error: error?.message || null };
+    try {
+      const { error: cancelError } = await supabase
+        .from('equipment_bookings')
+        .update({ status: 'cancelled' })
+        .eq('id', id);
+      if (cancelError) return { error: cancelError.message };
+      await fetchBookings();
+      return { error: null };
+    } catch (err) {
+      console.error('[useEquipmentBookings] cancelBooking exception:', err);
+      return { error: err instanceof Error ? err.message : 'Unknown error' };
+    }
   };
 
-  return { bookings, loading, error, fetchBookings, cancelBooking };
+  return { bookings, loading, error, fetchBookings, refetch: fetchBookings, cancelBooking };
 }
 
 // ---------------------------------------------------------------------------
@@ -162,13 +176,19 @@ export function useEquipmentBookings(memberId?: string) {
 // ---------------------------------------------------------------------------
 
 export function useCreateBooking() {
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const createBooking = async (
     booking: Omit<EquipmentBookingRow, 'id' | 'created_at' | 'updated_at' | 'status' | 'equipment'>
   ) => {
-    const { error } = await supabase.from('equipment_bookings').insert(booking);
-    return { error: error?.message || null };
+    try {
+      const { data, error } = await supabase.from('equipment_bookings').insert(booking).select().single();
+      if (error) return { data: null, error: error.message };
+      return { data, error: null };
+    } catch (err) {
+      console.error('[useCreateBooking] exception:', err);
+      return { data: null, error: err instanceof Error ? err.message : 'Unknown error' };
+    }
   };
 
   return { createBooking };

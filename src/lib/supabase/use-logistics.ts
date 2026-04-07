@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from './client';
 
 export interface ShipmentRow {
@@ -23,21 +23,29 @@ export interface ShipmentRow {
 }
 
 export function useShipments(memberId?: string) {
+  const supabase = useMemo(() => createClient(), []);
   const [shipments, setShipments] = useState<ShipmentRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClient();
 
   const fetchShipments = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       let query = supabase.from('shipments').select('*').order('created_at', { ascending: false });
       if (memberId) query = query.eq('member_id', memberId);
       const { data, error: fetchError } = await query;
-      if (fetchError) { setError(fetchError.message); setShipments([]); }
-      else { setShipments((data as ShipmentRow[]) || []); }
+      if (fetchError) {
+        console.error('[useShipments] fetch error:', fetchError);
+        setError(fetchError.message);
+        setShipments([]);
+      } else {
+        setShipments((data || []) as ShipmentRow[]);
+      }
     } catch (err) {
-      console.error("[use-logistics.ts] fetch error:", err);
+      console.error('[useShipments] exception:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error');
+      setShipments([]);
     } finally {
       setLoading(false);
     }
@@ -46,15 +54,27 @@ export function useShipments(memberId?: string) {
   useEffect(() => { fetchShipments(); }, [fetchShipments]);
 
   const createShipment = async (shipment: Omit<ShipmentRow, 'id' | 'created_at' | 'updated_at'>) => {
-    const { error } = await supabase.from('shipments').insert(shipment);
-    if (!error) await fetchShipments();
-    return { error: error?.message || null };
+    try {
+      const { data, error: insertError } = await supabase.from('shipments').insert(shipment).select().single();
+      if (insertError) return { data: null, error: insertError.message };
+      await fetchShipments();
+      return { data, error: null };
+    } catch (err) {
+      console.error('[useShipments] createShipment exception:', err);
+      return { data: null, error: err instanceof Error ? err.message : 'Unknown error' };
+    }
   };
 
   const updateShipment = async (id: string, updates: Partial<ShipmentRow>) => {
-    const { error } = await supabase.from('shipments').update(updates).eq('id', id);
-    if (!error) await fetchShipments();
-    return { error: error?.message || null };
+    try {
+      const { error: updateError } = await supabase.from('shipments').update(updates).eq('id', id);
+      if (updateError) return { error: updateError.message };
+      await fetchShipments();
+      return { error: null };
+    } catch (err) {
+      console.error('[useShipments] updateShipment exception:', err);
+      return { error: err instanceof Error ? err.message : 'Unknown error' };
+    }
   };
 
   const stats = {
@@ -63,5 +83,5 @@ export function useShipments(memberId?: string) {
     delivered: shipments.filter(s => s.status === 'delivered').length,
   };
 
-  return { shipments, loading, error, stats, fetchShipments, createShipment, updateShipment };
+  return { shipments, loading, error, stats, fetchShipments, refetch: fetchShipments, createShipment, updateShipment };
 }

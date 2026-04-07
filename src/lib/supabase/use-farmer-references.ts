@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from './client';
 import { useAuth } from './auth-context';
 
@@ -38,30 +38,40 @@ export const RELATIONSHIP_OPTIONS = [
 
 export function useFarmerReferences() {
   const { user } = useAuth();
+  const supabase = useMemo(() => createClient(), []);
   const [references, setReferences] = useState<FarmerReference[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchReferences = useCallback(async () => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
+    setError(null);
     try {
-      const supabase = createClient();
-
-      const { data, error } = await supabase
+      const { data, error: fetchError } = await supabase
         .from('farmer_references')
         .select('*')
         .eq('farmer_id', user.id)
         .order('is_primary', { ascending: false });
 
-      if (!error && data) {
-        setReferences(data as FarmerReference[]);
+      if (fetchError) {
+        console.error('[useFarmerReferences] fetch error:', fetchError);
+        setError(fetchError.message);
+        setReferences([]);
+      } else {
+        setReferences((data || []) as FarmerReference[]);
       }
     } catch (err) {
-      console.error("[use-farmer-references.ts] fetch error:", err);
+      console.error('[useFarmerReferences] exception:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error');
+      setReferences([]);
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [supabase, user]);
 
   useEffect(() => {
     fetchReferences();
@@ -77,62 +87,74 @@ export function useFarmerReferences() {
     statement?: string;
     is_primary?: boolean;
   }) => {
-    if (!user) return { error: { message: 'Not authenticated' } };
+    if (!user) return { data: null, error: { message: 'Not authenticated' } };
 
-    const supabase = createClient();
-    const { data, error } = await supabase
-      .from('farmer_references')
-      .insert({
-        farmer_id: user.id,
-        reference_name: ref.reference_name,
-        relationship: ref.relationship,
-        relationship_other: ref.relationship_other || null,
-        phone_number: ref.phone_number,
-        location: ref.location || null,
-        years_known: ref.years_known || null,
-        statement: ref.statement || null,
-        is_primary: ref.is_primary ?? true,
-        verification_status: 'pending',
-      })
-      .select()
-      .single();
+    try {
+      const { data, error: insertError } = await supabase
+        .from('farmer_references')
+        .insert({
+          farmer_id: user.id,
+          reference_name: ref.reference_name,
+          relationship: ref.relationship,
+          relationship_other: ref.relationship_other || null,
+          phone_number: ref.phone_number,
+          location: ref.location || null,
+          years_known: ref.years_known || null,
+          statement: ref.statement || null,
+          is_primary: ref.is_primary ?? true,
+          verification_status: 'pending',
+        })
+        .select()
+        .single();
 
-    if (!error && data) {
-      setReferences(prev => [data as FarmerReference, ...prev]);
+      if (!insertError && data) {
+        setReferences(prev => [data as FarmerReference, ...prev]);
+      }
+
+      return { data, error: insertError };
+    } catch (err) {
+      console.error('[useFarmerReferences] addReference exception:', err);
+      return { data: null, error: { message: err instanceof Error ? err.message : 'Unknown error' } };
     }
-
-    return { data, error };
-  }, [user]);
+  }, [supabase, user]);
 
   const updateReference = useCallback(async (id: string, updates: Partial<FarmerReference>) => {
-    const supabase = createClient();
-    const { data, error } = await supabase
-      .from('farmer_references')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single();
+    try {
+      const { data, error: updateError } = await supabase
+        .from('farmer_references')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
 
-    if (!error && data) {
-      setReferences(prev => prev.map(r => r.id === id ? data as FarmerReference : r));
+      if (!updateError && data) {
+        setReferences(prev => prev.map(r => r.id === id ? data as FarmerReference : r));
+      }
+
+      return { data, error: updateError };
+    } catch (err) {
+      console.error('[useFarmerReferences] updateReference exception:', err);
+      return { data: null, error: { message: err instanceof Error ? err.message : 'Unknown error' } };
     }
-
-    return { data, error };
-  }, []);
+  }, [supabase]);
 
   const deleteReference = useCallback(async (id: string) => {
-    const supabase = createClient();
-    const { error } = await supabase
-      .from('farmer_references')
-      .delete()
-      .eq('id', id);
+    try {
+      const { error: deleteError } = await supabase
+        .from('farmer_references')
+        .delete()
+        .eq('id', id);
 
-    if (!error) {
-      setReferences(prev => prev.filter(r => r.id !== id));
+      if (!deleteError) {
+        setReferences(prev => prev.filter(r => r.id !== id));
+      }
+
+      return { error: deleteError };
+    } catch (err) {
+      console.error('[useFarmerReferences] deleteReference exception:', err);
+      return { error: { message: err instanceof Error ? err.message : 'Unknown error' } };
     }
-
-    return { error };
-  }, []);
+  }, [supabase]);
 
   const primaryRef = references.find(r => r.is_primary);
   const secondaryRef = references.find(r => !r.is_primary);
@@ -140,6 +162,7 @@ export function useFarmerReferences() {
   return {
     references,
     loading,
+    error,
     primaryRef,
     secondaryRef,
     addReference,

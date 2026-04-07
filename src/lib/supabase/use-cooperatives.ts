@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from './client';
 
 // ---------------------------------------------------------------------------
@@ -44,13 +44,14 @@ export interface CooperativeMemberRow {
 // ---------------------------------------------------------------------------
 
 export function useCooperatives(country?: string) {
+  const supabase = useMemo(() => createClient(), []);
   const [cooperatives, setCooperatives] = useState<CooperativeRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClient();
 
   const fetchCooperatives = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       let query = supabase.from('cooperatives').select('*').order('name');
       if (country) query = query.eq('country', country);
@@ -58,13 +59,16 @@ export function useCooperatives(country?: string) {
       const { data, error: fetchError } = await query;
 
       if (fetchError) {
+        console.error('[useCooperatives] fetch error:', fetchError);
         setError(fetchError.message);
         setCooperatives([]);
       } else {
-        setCooperatives((data as CooperativeRow[]) || []);
+        setCooperatives((data || []) as CooperativeRow[]);
       }
     } catch (err) {
-      console.error("[use-cooperatives.ts] fetch error:", err);
+      console.error('[useCooperatives] exception:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error');
+      setCooperatives([]);
     } finally {
       setLoading(false);
     }
@@ -88,7 +92,7 @@ export function useCooperatives(country?: string) {
     };
   }, [supabase, fetchCooperatives]);
 
-  return { cooperatives, loading, error, fetchCooperatives };
+  return { cooperatives, loading, error, fetchCooperatives, refetch: fetchCooperatives };
 }
 
 // ---------------------------------------------------------------------------
@@ -96,13 +100,14 @@ export function useCooperatives(country?: string) {
 // ---------------------------------------------------------------------------
 
 export function useCooperativeMembers(cooperativeId: string) {
+  const supabase = useMemo(() => createClient(), []);
   const [members, setMembers] = useState<CooperativeMemberRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClient();
 
   const fetchMembers = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       const { data, error: fetchError } = await supabase
         .from('cooperative_members')
@@ -111,13 +116,16 @@ export function useCooperativeMembers(cooperativeId: string) {
         .order('joined_at', { ascending: false });
 
       if (fetchError) {
+        console.error('[useCooperativeMembers] fetch error:', fetchError);
         setError(fetchError.message);
         setMembers([]);
       } else {
-        setMembers((data as CooperativeMemberRow[]) || []);
+        setMembers((data || []) as CooperativeMemberRow[]);
       }
     } catch (err) {
-      console.error("[use-cooperatives.ts] fetch error:", err);
+      console.error('[useCooperativeMembers] exception:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error');
+      setMembers([]);
     } finally {
       setLoading(false);
     }
@@ -141,7 +149,7 @@ export function useCooperativeMembers(cooperativeId: string) {
     };
   }, [supabase, cooperativeId, fetchMembers]);
 
-  return { members, loading, error, fetchMembers };
+  return { members, loading, error, fetchMembers, refetch: fetchMembers };
 }
 
 // ---------------------------------------------------------------------------
@@ -149,13 +157,21 @@ export function useCooperativeMembers(cooperativeId: string) {
 // ---------------------------------------------------------------------------
 
 export function useJoinCooperative() {
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const joinCooperative = async (cooperativeId: string, memberId: string) => {
-    const { error } = await supabase
-      .from('cooperative_members')
-      .insert({ cooperative_id: cooperativeId, member_id: memberId });
-    return { error: error?.message || null };
+    try {
+      const { data, error } = await supabase
+        .from('cooperative_members')
+        .insert({ cooperative_id: cooperativeId, member_id: memberId })
+        .select()
+        .single();
+      if (error) return { data: null, error: error.message };
+      return { data, error: null };
+    } catch (err) {
+      console.error('[useJoinCooperative] exception:', err);
+      return { data: null, error: err instanceof Error ? err.message : 'Unknown error' };
+    }
   };
 
   return { joinCooperative };

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from './client';
 
 export interface CarbonCreditRow {
@@ -17,21 +17,29 @@ export interface CarbonCreditRow {
 }
 
 export function useCarbonCredits(memberId?: string) {
+  const supabase = useMemo(() => createClient(), []);
   const [credits, setCredits] = useState<CarbonCreditRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClient();
 
   const fetchCredits = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       let query = supabase.from('carbon_credits').select('*').order('created_at', { ascending: false });
       if (memberId) query = query.eq('member_id', memberId);
       const { data, error: fetchError } = await query;
-      if (fetchError) { setError(fetchError.message); setCredits([]); }
-      else { setCredits((data as CarbonCreditRow[]) || []); }
+      if (fetchError) {
+        console.error('[useCarbonCredits] fetch error:', fetchError);
+        setError(fetchError.message);
+        setCredits([]);
+      } else {
+        setCredits((data || []) as CarbonCreditRow[]);
+      }
     } catch (err) {
-      console.error("[use-sustainability.ts] fetch error:", err);
+      console.error('[useCarbonCredits] exception:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error');
+      setCredits([]);
     } finally {
       setLoading(false);
     }
@@ -43,5 +51,5 @@ export function useCarbonCredits(memberId?: string) {
   const totalValue = credits.reduce((s, c) => s + (c.value_usd || 0), 0);
   const verified = credits.filter(c => c.verification_status === 'verified');
 
-  return { credits, totalCredits, totalValue, verified, loading, error, fetchCredits };
+  return { credits, totalCredits, totalValue, verified, loading, error, fetchCredits, refetch: fetchCredits };
 }

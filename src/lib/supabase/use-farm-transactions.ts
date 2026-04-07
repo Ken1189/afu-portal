@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from './client';
 
 export interface FarmTransactionRow {
@@ -17,21 +17,29 @@ export interface FarmTransactionRow {
 }
 
 export function useFarmTransactions(memberId?: string) {
+  const supabase = useMemo(() => createClient(), []);
   const [transactions, setTransactions] = useState<FarmTransactionRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClient();
 
   const fetchTransactions = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       let query = supabase.from('farm_transactions').select('*').order('date', { ascending: false });
       if (memberId) query = query.eq('member_id', memberId);
       const { data, error: fetchError } = await query;
-      if (fetchError) { setError(fetchError.message); setTransactions([]); }
-      else { setTransactions((data as FarmTransactionRow[]) || []); }
+      if (fetchError) {
+        console.error('[useFarmTransactions] fetch error:', fetchError);
+        setError(fetchError.message);
+        setTransactions([]);
+      } else {
+        setTransactions((data || []) as FarmTransactionRow[]);
+      }
     } catch (err) {
-      console.error("[use-farm-transactions.ts] fetch error:", err);
+      console.error('[useFarmTransactions] exception:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error');
+      setTransactions([]);
     } finally {
       setLoading(false);
     }
@@ -40,13 +48,19 @@ export function useFarmTransactions(memberId?: string) {
   useEffect(() => { fetchTransactions(); }, [fetchTransactions]);
 
   const createTransaction = async (tx: Omit<FarmTransactionRow, 'id' | 'created_at'>) => {
-    const { error } = await supabase.from('farm_transactions').insert(tx);
-    if (!error) await fetchTransactions();
-    return { error: error?.message || null };
+    try {
+      const { data, error: insertError } = await supabase.from('farm_transactions').insert(tx).select().single();
+      if (insertError) return { data: null, error: insertError.message };
+      await fetchTransactions();
+      return { data, error: null };
+    } catch (err) {
+      console.error('[useFarmTransactions] createTransaction exception:', err);
+      return { data: null, error: err instanceof Error ? err.message : 'Unknown error' };
+    }
   };
 
   const income = transactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
   const expenses = transactions.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
 
-  return { transactions, loading, error, income, expenses, balance: income - expenses, fetchTransactions, createTransaction };
+  return { transactions, loading, error, income, expenses, balance: income - expenses, fetchTransactions, refetch: fetchTransactions, createTransaction };
 }

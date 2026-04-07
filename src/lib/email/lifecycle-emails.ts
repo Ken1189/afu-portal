@@ -111,6 +111,51 @@ export async function sendLoanApprovalEmail(
 }
 
 // ---------------------------------------------------------------------------
+// 1b. Loan Disbursed
+// ---------------------------------------------------------------------------
+
+export async function sendLoanDisbursedEmail(
+  memberEmail: string,
+  memberName: string,
+  loanAmount: number,
+  currency: string,
+  monthlyPayment: number,
+  firstDueDate: string,
+): Promise<void> {
+  try {
+    const formattedDue = new Date(firstDueDate).toLocaleDateString('en-US', {
+      month: 'long', day: 'numeric', year: 'numeric',
+    });
+    const html = wrap(`
+      <h2 style="color:#1B2A4A;margin:0 0 16px;">Your Loan Has Been Disbursed</h2>
+      <p style="color:#374151;line-height:1.6;">Hi ${memberName},</p>
+      <p style="color:#374151;line-height:1.6;">
+        Your loan of <strong style="color:#2D7A1E;">${currency} ${loanAmount.toLocaleString()}</strong>
+        has been credited to your AFU wallet and is available for use immediately.
+      </p>
+      <table style="width:100%;border-collapse:collapse;margin:16px 0;">
+        <tr><td style="padding:12px 16px;background:#f0fdf4;border-radius:6px;">
+          <strong style="color:#1B2A4A;">Monthly Payment:</strong>
+          <span style="color:#2D7A1E;margin-left:8px;">${currency} ${monthlyPayment.toLocaleString(undefined,{maximumFractionDigits:2})}</span>
+        </td></tr>
+        <tr><td style="padding:4px;"></td></tr>
+        <tr><td style="padding:12px 16px;background:#f0fdf4;border-radius:6px;">
+          <strong style="color:#1B2A4A;">First Due Date:</strong>
+          <span style="margin-left:8px;">${formattedDue}</span>
+        </td></tr>
+      </table>
+      <p style="color:#374151;line-height:1.6;">
+        Your repayment schedule is now available in your dashboard.
+      </p>
+      ${cta('View Wallet & Schedule', `${PORTAL_URL}/farm/financing`)}
+    `);
+    await sendEmail(memberEmail, 'Your loan has been disbursed', html, FROM);
+  } catch (err) {
+    await logEmailError('sendLoanDisbursedEmail', err, memberEmail);
+  }
+}
+
+// ---------------------------------------------------------------------------
 // 2. Loan Rejection
 // ---------------------------------------------------------------------------
 

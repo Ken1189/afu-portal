@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from './client';
 
 // ---------------------------------------------------------------------------
@@ -58,13 +58,14 @@ export interface FarmTransactionRow {
 // ---------------------------------------------------------------------------
 
 export function useFarmPlots(memberId?: string) {
+  const supabase = useMemo(() => createClient(), []);
   const [plots, setPlots] = useState<FarmPlotRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClient();
 
   const fetchPlots = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       let query = supabase
         .from('farm_plots')
@@ -76,13 +77,16 @@ export function useFarmPlots(memberId?: string) {
       const { data, error: fetchError } = await query;
 
       if (fetchError) {
+        console.error('[useFarmPlots] fetch error:', fetchError);
         setError(fetchError.message);
         setPlots([]);
       } else {
-        setPlots((data as FarmPlotRow[]) || []);
+        setPlots((data || []) as FarmPlotRow[]);
       }
     } catch (err) {
-      console.error("[use-farm-plots.ts] fetch error:", err);
+      console.error('[useFarmPlots] exception:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error');
+      setPlots([]);
     } finally {
       setLoading(false);
     }
@@ -114,7 +118,7 @@ export function useFarmPlots(memberId?: string) {
       : 0,
   };
 
-  return { plots, loading, error, stats, fetchPlots };
+  return { plots, loading, error, stats, fetchPlots, refetch: fetchPlots };
 }
 
 // ---------------------------------------------------------------------------
@@ -122,13 +126,19 @@ export function useFarmPlots(memberId?: string) {
 // ---------------------------------------------------------------------------
 
 export function useCreateFarmPlot() {
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const createPlot = async (
     plot: Omit<FarmPlotRow, 'id' | 'created_at' | 'updated_at' | 'health_score'>
   ) => {
-    const { error } = await supabase.from('farm_plots').insert(plot);
-    return { error: error?.message || null };
+    try {
+      const { data, error } = await supabase.from('farm_plots').insert(plot).select().single();
+      if (error) return { data: null, error: error.message };
+      return { data, error: null };
+    } catch (err) {
+      console.error('[useCreateFarmPlot] exception:', err);
+      return { data: null, error: err instanceof Error ? err.message : 'Unknown error' };
+    }
   };
 
   return { createPlot };
@@ -139,11 +149,17 @@ export function useCreateFarmPlot() {
 // ---------------------------------------------------------------------------
 
 export function useUpdateFarmPlot() {
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const updatePlot = async (id: string, updates: Partial<FarmPlotRow>) => {
-    const { error } = await supabase.from('farm_plots').update(updates).eq('id', id);
-    return { error: error?.message || null };
+    try {
+      const { data, error } = await supabase.from('farm_plots').update(updates).eq('id', id).select().single();
+      if (error) return { data: null, error: error.message };
+      return { data, error: null };
+    } catch (err) {
+      console.error('[useUpdateFarmPlot] exception:', err);
+      return { data: null, error: err instanceof Error ? err.message : 'Unknown error' };
+    }
   };
 
   return { updatePlot };
@@ -154,13 +170,14 @@ export function useUpdateFarmPlot() {
 // ---------------------------------------------------------------------------
 
 export function useFarmActivities(plotId?: string) {
+  const supabase = useMemo(() => createClient(), []);
   const [activities, setActivities] = useState<FarmActivityRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClient();
 
   const fetchActivities = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       let query = supabase
         .from('farm_activities')
@@ -172,13 +189,16 @@ export function useFarmActivities(plotId?: string) {
       const { data, error: fetchError } = await query;
 
       if (fetchError) {
+        console.error('[useFarmActivities] fetch error:', fetchError);
         setError(fetchError.message);
         setActivities([]);
       } else {
-        setActivities((data as FarmActivityRow[]) || []);
+        setActivities((data || []) as FarmActivityRow[]);
       }
     } catch (err) {
-      console.error("[use-farm-plots.ts] fetch error:", err);
+      console.error('[useFarmActivities] exception:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error');
+      setActivities([]);
     } finally {
       setLoading(false);
     }
@@ -202,7 +222,7 @@ export function useFarmActivities(plotId?: string) {
     };
   }, [supabase, fetchActivities]);
 
-  return { activities, loading, error, fetchActivities };
+  return { activities, loading, error, fetchActivities, refetch: fetchActivities };
 }
 
 // ---------------------------------------------------------------------------
@@ -210,13 +230,19 @@ export function useFarmActivities(plotId?: string) {
 // ---------------------------------------------------------------------------
 
 export function useCreateFarmActivity() {
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const createActivity = async (
     activity: Omit<FarmActivityRow, 'id' | 'created_at'>
   ) => {
-    const { error } = await supabase.from('farm_activities').insert(activity);
-    return { error: error?.message || null };
+    try {
+      const { data, error } = await supabase.from('farm_activities').insert(activity).select().single();
+      if (error) return { data: null, error: error.message };
+      return { data, error: null };
+    } catch (err) {
+      console.error('[useCreateFarmActivity] exception:', err);
+      return { data: null, error: err instanceof Error ? err.message : 'Unknown error' };
+    }
   };
 
   return { createActivity };
@@ -227,13 +253,14 @@ export function useCreateFarmActivity() {
 // ---------------------------------------------------------------------------
 
 export function useFarmTransactions(memberId?: string) {
+  const supabase = useMemo(() => createClient(), []);
   const [transactions, setTransactions] = useState<FarmTransactionRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClient();
 
   const fetchTransactions = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       let query = supabase
         .from('farm_transactions')
@@ -245,13 +272,16 @@ export function useFarmTransactions(memberId?: string) {
       const { data, error: fetchError } = await query;
 
       if (fetchError) {
+        console.error('[useFarmTransactions] fetch error:', fetchError);
         setError(fetchError.message);
         setTransactions([]);
       } else {
-        setTransactions((data as FarmTransactionRow[]) || []);
+        setTransactions((data || []) as FarmTransactionRow[]);
       }
     } catch (err) {
-      console.error("[use-farm-plots.ts] fetch error:", err);
+      console.error('[useFarmTransactions] exception:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error');
+      setTransactions([]);
     } finally {
       setLoading(false);
     }
@@ -278,5 +308,5 @@ export function useFarmTransactions(memberId?: string) {
   const income = transactions.filter((t) => t.type === 'income').reduce((s, t) => s + t.amount, 0);
   const expenses = transactions.filter((t) => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
 
-  return { transactions, loading, error, income, expenses, balance: income - expenses, fetchTransactions };
+  return { transactions, loading, error, income, expenses, balance: income - expenses, fetchTransactions, refetch: fetchTransactions };
 }

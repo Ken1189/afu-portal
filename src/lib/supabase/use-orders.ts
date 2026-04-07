@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from './client';
 import type { OrderStatus } from './types';
 
@@ -30,22 +30,32 @@ export interface OrderItemInsert {
 }
 
 export function useOrders(memberId?: string) {
+  const supabase = useMemo(() => createClient(), []);
   const [orders, setOrders] = useState<OrderRow[]>([]);
   const [loading, setLoading] = useState(true);
-  const supabase = createClient();
+  const [error, setError] = useState<string | null>(null);
 
   const fetchOrders = useCallback(async () => {
     if (!memberId) { setLoading(false); return; }
     setLoading(true);
+    setError(null);
     try {
-      const { data } = await supabase
+      const { data, error: fetchError } = await supabase
         .from('orders')
         .select('*')
         .eq('member_id', memberId)
         .order('created_at', { ascending: false });
-      setOrders((data as OrderRow[]) || []);
+      if (fetchError) {
+        console.error('[useOrders] fetch error:', fetchError);
+        setError(fetchError.message);
+        setOrders([]);
+      } else {
+        setOrders((data || []) as OrderRow[]);
+      }
     } catch (err) {
-      console.error("[use-orders.ts] fetch error:", err);
+      console.error('[useOrders] exception:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error');
+      setOrders([]);
     } finally {
       setLoading(false);
     }
@@ -59,71 +69,68 @@ export function useOrders(memberId?: string) {
     shippingAddress?: Record<string, string>,
     notes?: string
   ) => {
-    const subtotal = items.reduce((s, i) => s + i.total_price, 0);
-    const discount = 0;
-    const shipping = subtotal > 500 ? 0 : 25;
-    const tax = Math.round(subtotal * 0.05 * 100) / 100; // 5% tax
-    const total = subtotal - discount + shipping + tax;
+    try {
+      const subtotal = items.reduce((s, i) => s + i.total_price, 0);
+      const discount = 0;
+      const shipping = subtotal > 500 ? 0 : 25;
+      const tax = Math.round(subtotal * 0.05 * 100) / 100; // 5% tax
+      const total = subtotal - discount + shipping + tax;
 
-    // Create order
-    const { data: order, error: orderError } = await supabase
-      .from('orders')
-      .insert({
+      const { data: order, error: orderError } = await supabase
+        .from('orders')
+        .insert({
+          member_id: memberId,
+          subtotal,
+          discount,
+          shipping,
+          tax,
+          total,
+          shipping_address: shippingAddress || null,
+          notes: notes || null,
+        })
+        .select()
+        .single();
+
+      if (orderError) return { data: null, error: orderError.message };
+
+      const orderItems = items.map(item => ({
+        order_id: order.id,
+        ...item,
+      }));
+
+      const { error: itemsError } = await supabase
+        .from('order_items')
+        .insert(orderItems);
+
+      if (itemsError) return { data: order as OrderRow, error: itemsError.message };
+
+      await supabase.from('payments').insert({
+        order_id: order.id,
         member_id: memberId,
-        subtotal,
-        discount,
-        shipping,
-        tax,
-        total,
-        shipping_address: shippingAddress || null,
-        notes: notes || null,
-      })
-      .select()
-      .single();
-
-    if (orderError) return { data: null, error: orderError.message };
-
-    // Create order items
-    const orderItems = items.map(item => ({
-      order_id: order.id,
-      ...item,
-    }));
-
-    const { error: itemsError } = await supabase
-      .from('order_items')
-      .insert(orderItems);
-
-    if (itemsError) return { data: order as OrderRow, error: itemsError.message };
-
-    // Create pending payment record
-    await supabase.from('payments').insert({
-      order_id: order.id,
-      member_id: memberId,
-      amount: total,
-      description: `Order ${order.order_number}`,
-    });
-
-    // NOTE: Commission creation is handled by the Stripe webhook (single source of truth).
-    // Do NOT insert commissions here — doing so would double-count every order.
-
-    // Update supplier total_sales and total_orders atomically via RPC
-    // (fixes read-modify-write lost-update race condition)
-    const supplierTotals = new Map<string, number>();
-    items.forEach(i => {
-      supplierTotals.set(i.supplier_id, (supplierTotals.get(i.supplier_id) || 0) + i.total_price);
-    });
-
-    for (const [sid, amount] of supplierTotals) {
-      await supabase.rpc('increment_supplier_totals', {
-        p_supplier_id: sid,
-        p_sales: amount,
-        p_orders: 1,
+        amount: total,
+        description: `Order ${order.order_number}`,
       });
-    }
 
-    await fetchOrders();
-    return { data: order as OrderRow, error: null };
+      const supplierTotals = new Map<string, number>();
+      items.forEach(i => {
+        supplierTotals.set(i.supplier_id, (supplierTotals.get(i.supplier_id) || 0) + i.total_price);
+      });
+
+      for (const [sid, amount] of supplierTotals) {
+        await supabase.rpc('increment_supplier_totals', {
+          p_supplier_id: sid,
+          p_sales: amount,
+          p_orders: 1,
+        });
+      }
+
+      await fetchOrders();
+      return { data: order as OrderRow, error: null };
+    } catch (err) {
+      console.error('[useOrders] createOrder exception:', err);
+      return { data: null, error: err instanceof Error ? err.message : 'Unknown error' };
+    }
   };
 
-  return { orders, loading, fetchOrders, createOrder };
+  return { orders, loading, error, fetchOrders, refetch: fetchOrders, createOrder };
 }

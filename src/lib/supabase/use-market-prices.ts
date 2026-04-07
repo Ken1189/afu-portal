@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from './client';
 
 // ---------------------------------------------------------------------------
@@ -25,13 +25,14 @@ export interface MarketPriceRow {
 // ---------------------------------------------------------------------------
 
 export function useMarketPrices(country?: string, commodity?: string) {
+  const supabase = useMemo(() => createClient(), []);
   const [prices, setPrices] = useState<MarketPriceRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClient();
 
   const fetchPrices = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       let query = supabase
         .from('market_prices')
@@ -45,13 +46,16 @@ export function useMarketPrices(country?: string, commodity?: string) {
       const { data, error: fetchError } = await query;
 
       if (fetchError) {
+        console.error('[useMarketPrices] fetch error:', fetchError);
         setError(fetchError.message);
         setPrices([]);
       } else {
-        setPrices((data as MarketPriceRow[]) || []);
+        setPrices((data || []) as MarketPriceRow[]);
       }
     } catch (err) {
-      console.error("[use-market-prices.ts] fetch error:", err);
+      console.error('[useMarketPrices] exception:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error');
+      setPrices([]);
     } finally {
       setLoading(false);
     }
@@ -77,5 +81,5 @@ export function useMarketPrices(country?: string, commodity?: string) {
 
   const commodities = [...new Set(prices.map((p) => p.commodity))];
 
-  return { prices, commodities, loading, error, fetchPrices };
+  return { prices, commodities, loading, error, fetchPrices, refetch: fetchPrices };
 }

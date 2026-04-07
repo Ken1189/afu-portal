@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from './client';
 import type { SupplierCategory, SupplierStatus, SponsorshipTier } from './types';
 
@@ -53,32 +53,31 @@ export interface SupplierInsert {
 // ── Hook: useSuppliers ────────────────────────────────────────────────────
 
 export function useSuppliers() {
+  const supabase = useMemo(() => createClient(), []);
   const [suppliers, setSuppliers] = useState<SupplierRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const supabase = createClient();
-
   const fetchSuppliers = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
-      setError(null);
-
       const { data, error: fetchError } = await supabase
         .from('suppliers')
         .select('*')
         .order('company_name');
 
       if (fetchError) {
+        console.error('[useSuppliers] fetch error:', fetchError);
         setError(fetchError.message);
-        // Fall back to empty array
         setSuppliers([]);
       } else {
-        setSuppliers((data as SupplierRow[]) || []);
+        setSuppliers((data || []) as SupplierRow[]);
       }
-
     } catch (err) {
-      console.error("[use-suppliers.ts] fetch error:", err);
+      console.error('[useSuppliers] exception:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error');
+      setSuppliers([]);
     } finally {
       setLoading(false);
     }
@@ -91,33 +90,36 @@ export function useSuppliers() {
   // ── CRUD Operations ────────────────────────────────────────────────────
 
   const addSupplier = async (supplier: SupplierInsert) => {
-    const { data, error: insertError } = await supabase
-      .from('suppliers')
-      .insert(supplier)
-      .select()
-      .single();
+    try {
+      const { data, error: insertError } = await supabase
+        .from('suppliers')
+        .insert(supplier)
+        .select()
+        .single();
 
-    if (insertError) {
-      return { data: null, error: insertError.message };
+      if (insertError) return { data: null, error: insertError.message };
+      await fetchSuppliers();
+      return { data: data as SupplierRow, error: null };
+    } catch (err) {
+      console.error('[useSuppliers] addSupplier exception:', err);
+      return { data: null, error: err instanceof Error ? err.message : 'Unknown error' };
     }
-
-    // Refresh list
-    await fetchSuppliers();
-    return { data: data as SupplierRow, error: null };
   };
 
   const updateSupplier = async (id: string, updates: Partial<SupplierRow>) => {
-    const { error: updateError } = await supabase
-      .from('suppliers')
-      .update(updates)
-      .eq('id', id);
+    try {
+      const { error: updateError } = await supabase
+        .from('suppliers')
+        .update(updates)
+        .eq('id', id);
 
-    if (updateError) {
-      return { error: updateError.message };
+      if (updateError) return { error: updateError.message };
+      await fetchSuppliers();
+      return { error: null };
+    } catch (err) {
+      console.error('[useSuppliers] updateSupplier exception:', err);
+      return { error: err instanceof Error ? err.message : 'Unknown error' };
     }
-
-    await fetchSuppliers();
-    return { error: null };
   };
 
   const approveSupplier = async (id: string) => {
@@ -152,6 +154,7 @@ export function useSuppliers() {
     error,
     stats,
     fetchSuppliers,
+    refetch: fetchSuppliers,
     addSupplier,
     updateSupplier,
     approveSupplier,

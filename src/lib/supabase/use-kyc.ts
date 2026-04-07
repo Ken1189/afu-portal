@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from './client';
 
 export type KycTier = 'tier_1' | 'tier_2' | 'tier_3';
@@ -53,33 +53,38 @@ export interface CreditScoreRow {
 }
 
 export function useKyc() {
+  const supabase = useMemo(() => createClient(), []);
   const [documents, setDocuments] = useState<KycDocumentRow[]>([]);
   const [verification, setVerification] = useState<KycVerificationRow | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClient();
 
   const fetchKyc = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
-
       const [docsRes, verRes] = await Promise.all([
         supabase.from('kyc_documents').select('*').order('created_at', { ascending: false }),
         supabase.from('kyc_verifications').select('*').order('created_at', { ascending: false }).limit(1),
       ]);
 
       if (docsRes.error) {
+        console.error('[useKyc] docs fetch error:', docsRes.error);
         setError(docsRes.error.message);
+        setDocuments([]);
       } else {
-        setDocuments((docsRes.data as KycDocumentRow[]) || []);
+        setDocuments((docsRes.data || []) as KycDocumentRow[]);
       }
 
-      if (verRes.data && verRes.data.length > 0) {
+      if (verRes.error) {
+        console.error('[useKyc] verification fetch error:', verRes.error);
+      } else if (verRes.data && verRes.data.length > 0) {
         setVerification(verRes.data[0] as KycVerificationRow);
       }
-
     } catch (err) {
-      console.error("[use-kyc.ts] fetch error:", err);
+      console.error('[useKyc] exception:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error');
+      setDocuments([]);
     } finally {
       setLoading(false);
     }
@@ -93,16 +98,21 @@ export function useKyc() {
     file_url: string;
     expires_at?: string;
   }) => {
-    const { data, error } = await supabase
-      .from('kyc_documents')
-      .insert(doc)
-      .select()
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('kyc_documents')
+        .insert(doc)
+        .select()
+        .single();
 
-    if (!error && data) {
-      setDocuments((prev) => [data as KycDocumentRow, ...prev]);
+      if (!error && data) {
+        setDocuments((prev) => [data as KycDocumentRow, ...prev]);
+      }
+      return { data, error };
+    } catch (err) {
+      console.error('[useKyc] uploadDocument exception:', err);
+      return { data: null, error: err instanceof Error ? { message: err.message } : { message: 'Unknown error' } };
     }
-    return { data, error };
   };
 
   const currentTier: KycTier | null = verification?.status === 'verified' ? verification.tier : null;
@@ -111,22 +121,35 @@ export function useKyc() {
 }
 
 export function useCreditScore() {
+  const supabase = useMemo(() => createClient(), []);
   const [creditScore, setCreditScore] = useState<CreditScoreRow | null>(null);
   const [loading, setLoading] = useState(true);
-  const supabase = createClient();
+  const [error, setError] = useState<string | null>(null);
 
   const fetchScore = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
-      const { data } = await supabase
+      const { data, error: fetchError } = await supabase
         .from('credit_scores')
         .select('*')
         .limit(1)
         .single();
 
-      if (data) setCreditScore(data as CreditScoreRow);
+      if (fetchError) {
+        // single() throws PGRST116 when 0 rows; not necessarily an error for this hook
+        if (fetchError.code !== 'PGRST116') {
+          console.error('[useCreditScore] fetch error:', fetchError);
+          setError(fetchError.message);
+        }
+        setCreditScore(null);
+      } else if (data) {
+        setCreditScore(data as CreditScoreRow);
+      }
     } catch (err) {
-      console.error("[use-kyc.ts] fetch error:", err);
+      console.error('[useCreditScore] exception:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error');
+      setCreditScore(null);
     } finally {
       setLoading(false);
     }
@@ -134,5 +157,5 @@ export function useCreditScore() {
 
   useEffect(() => { fetchScore(); }, [fetchScore]);
 
-  return { creditScore, loading, refetch: fetchScore };
+  return { creditScore, loading, error, refetch: fetchScore };
 }

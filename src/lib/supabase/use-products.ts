@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from './client';
 import type { SupplierCategory } from './types';
 
@@ -54,13 +54,14 @@ export interface ProductInsert {
 }
 
 export function useProducts(supplierId?: string) {
+  const supabase = useMemo(() => createClient(), []);
   const [products, setProducts] = useState<ProductRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClient();
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       let query = supabase
         .from('products')
@@ -74,13 +75,16 @@ export function useProducts(supplierId?: string) {
       const { data, error: fetchError } = await query;
 
       if (fetchError) {
+        console.error('[useProducts] fetch error:', fetchError);
         setError(fetchError.message);
         setProducts([]);
       } else {
-        setProducts((data as ProductRow[]) || []);
+        setProducts((data || []) as ProductRow[]);
       }
     } catch (err) {
-      console.error("[use-products.ts] fetch error:", err);
+      console.error('[useProducts] exception:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error');
+      setProducts([]);
     } finally {
       setLoading(false);
     }
@@ -89,33 +93,43 @@ export function useProducts(supplierId?: string) {
   useEffect(() => { fetchProducts(); }, [fetchProducts]);
 
   const addProduct = async (product: ProductInsert) => {
-    const { data, error } = await supabase
-      .from('products')
-      .insert(product)
-      .select()
-      .single();
+    try {
+      const { data, error: insertError } = await supabase
+        .from('products')
+        .insert(product)
+        .select()
+        .single();
 
-    if (!error) {
+      if (insertError) return { data: null, error: insertError.message };
+
       await fetchProducts();
-      // Update supplier product count
       try {
         await supabase.from('suppliers').update({
           products_count: (await supabase.from('products').select('id', { count: 'exact', head: true }).eq('supplier_id', product.supplier_id)).count || 0
         }).eq('id', product.supplier_id);
       } catch { /* non-critical */ }
+      return { data: data as ProductRow, error: null };
+    } catch (err) {
+      console.error('[useProducts] addProduct exception:', err);
+      return { data: null, error: err instanceof Error ? err.message : 'Unknown error' };
     }
-    return { data: data as ProductRow | null, error: error?.message || null };
   };
 
   const updateProduct = async (id: string, updates: Partial<ProductRow>) => {
-    const { error } = await supabase.from('products').update(updates).eq('id', id);
-    if (!error) await fetchProducts();
-    return { error: error?.message || null };
+    try {
+      const { error: updateError } = await supabase.from('products').update(updates).eq('id', id);
+      if (updateError) return { error: updateError.message };
+      await fetchProducts();
+      return { error: null };
+    } catch (err) {
+      console.error('[useProducts] updateProduct exception:', err);
+      return { error: err instanceof Error ? err.message : 'Unknown error' };
+    }
   };
 
   const toggleStock = async (id: string, inStock: boolean) => {
     return updateProduct(id, { in_stock: inStock });
   };
 
-  return { products, loading, error, fetchProducts, addProduct, updateProduct, toggleStock };
+  return { products, loading, error, fetchProducts, refetch: fetchProducts, addProduct, updateProduct, toggleStock };
 }

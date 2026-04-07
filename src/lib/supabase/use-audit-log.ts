@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from './client';
 
 export interface AuditLogRow {
@@ -15,23 +15,31 @@ export interface AuditLogRow {
 }
 
 export function useAuditLog(limit = 100) {
+  const supabase = useMemo(() => createClient(), []);
   const [logs, setLogs] = useState<AuditLogRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClient();
 
   const fetchLogs = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       const { data, error: fetchError } = await supabase
         .from('audit_log')
         .select('*')
         .order('created_at', { ascending: false })
         .limit(limit);
-      if (fetchError) { setError(fetchError.message); setLogs([]); }
-      else { setLogs((data as AuditLogRow[]) || []); }
+      if (fetchError) {
+        console.error('[useAuditLog] fetch error:', fetchError);
+        setError(fetchError.message);
+        setLogs([]);
+      } else {
+        setLogs((data || []) as AuditLogRow[]);
+      }
     } catch (err) {
-      console.error("[use-audit-log.ts] fetch error:", err);
+      console.error('[useAuditLog] exception:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error');
+      setLogs([]);
     } finally {
       setLoading(false);
     }
@@ -39,5 +47,5 @@ export function useAuditLog(limit = 100) {
 
   useEffect(() => { fetchLogs(); }, [fetchLogs]);
 
-  return { logs, loading, error, fetchLogs };
+  return { logs, loading, error, fetchLogs, refetch: fetchLogs };
 }

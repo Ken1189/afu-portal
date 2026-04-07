@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from './client';
 
 export interface PaymentRow {
@@ -50,13 +50,14 @@ export interface PaymentGatewayRow {
 }
 
 export function usePayments(filters?: { status?: string; purpose?: string }) {
+  const supabase = useMemo(() => createClient(), []);
   const [payments, setPayments] = useState<PaymentRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClient();
 
   const fetchPayments = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       let query = supabase
         .from('payments')
@@ -69,13 +70,16 @@ export function usePayments(filters?: { status?: string; purpose?: string }) {
       const { data, error: fetchError } = await query;
 
       if (fetchError) {
+        console.error('[usePayments] fetch error:', fetchError);
         setError(fetchError.message);
         setPayments([]);
       } else {
-        setPayments((data as PaymentRow[]) || []);
+        setPayments((data || []) as PaymentRow[]);
       }
     } catch (err) {
-      console.error("[use-payments.ts] fetch error:", err);
+      console.error('[usePayments] exception:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error');
+      setPayments([]);
     } finally {
       setLoading(false);
     }
@@ -87,25 +91,38 @@ export function usePayments(filters?: { status?: string; purpose?: string }) {
 }
 
 export function usePaymentDetail(paymentId: string | null) {
+  const supabase = useMemo(() => createClient(), []);
   const [payment, setPayment] = useState<PaymentRow | null>(null);
   const [attempts, setAttempts] = useState<PaymentAttemptRow[]>([]);
   const [loading, setLoading] = useState(true);
-  const supabase = createClient();
+  const [error, setError] = useState<string | null>(null);
 
   const fetchDetail = useCallback(async () => {
     if (!paymentId) { setLoading(false); return; }
     setLoading(true);
+    setError(null);
     try {
-
       const [paymentRes, attemptsRes] = await Promise.all([
         supabase.from('payments').select('*').eq('id', paymentId).single(),
         supabase.from('payment_attempts').select('*').eq('payment_id', paymentId).order('created_at', { ascending: false }),
       ]);
 
-      if (paymentRes.data) setPayment(paymentRes.data as PaymentRow);
-      if (attemptsRes.data) setAttempts((attemptsRes.data as PaymentAttemptRow[]) || []);
+      if (paymentRes.error) {
+        console.error('[usePaymentDetail] payment fetch error:', paymentRes.error);
+        setError(paymentRes.error.message);
+      } else if (paymentRes.data) {
+        setPayment(paymentRes.data as PaymentRow);
+      }
+
+      if (attemptsRes.error) {
+        console.error('[usePaymentDetail] attempts fetch error:', attemptsRes.error);
+        setError(attemptsRes.error.message);
+      } else if (attemptsRes.data) {
+        setAttempts((attemptsRes.data || []) as PaymentAttemptRow[]);
+      }
     } catch (err) {
-      console.error("[use-payments.ts] fetch error:", err);
+      console.error('[usePaymentDetail] exception:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
       setLoading(false);
     }
@@ -113,16 +130,18 @@ export function usePaymentDetail(paymentId: string | null) {
 
   useEffect(() => { fetchDetail(); }, [fetchDetail]);
 
-  return { payment, attempts, loading, refetch: fetchDetail };
+  return { payment, attempts, loading, error, refetch: fetchDetail };
 }
 
 export function usePaymentGateways(country?: string) {
+  const supabase = useMemo(() => createClient(), []);
   const [gateways, setGateways] = useState<PaymentGatewayRow[]>([]);
   const [loading, setLoading] = useState(true);
-  const supabase = createClient();
+  const [error, setError] = useState<string | null>(null);
 
   const fetchGateways = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       let query = supabase
         .from('payment_gateways')
@@ -132,10 +151,18 @@ export function usePaymentGateways(country?: string) {
 
       if (country) query = query.eq('country', country);
 
-      const { data, error } = await query;
-      if (!error && data) setGateways(data as PaymentGatewayRow[]);
+      const { data, error: fetchError } = await query;
+      if (fetchError) {
+        console.error('[usePaymentGateways] fetch error:', fetchError);
+        setError(fetchError.message);
+        setGateways([]);
+      } else {
+        setGateways((data || []) as PaymentGatewayRow[]);
+      }
     } catch (err) {
-      console.error("[use-payments.ts] fetch error:", err);
+      console.error('[usePaymentGateways] exception:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error');
+      setGateways([]);
     } finally {
       setLoading(false);
     }
@@ -143,5 +170,5 @@ export function usePaymentGateways(country?: string) {
 
   useEffect(() => { fetchGateways(); }, [fetchGateways]);
 
-  return { gateways, loading };
+  return { gateways, loading, error, refetch: fetchGateways };
 }

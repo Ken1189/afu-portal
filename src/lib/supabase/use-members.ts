@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from './client';
 import type { MembershipTier, MemberStatus } from './types';
 
@@ -34,13 +34,14 @@ export interface MemberRow {
 }
 
 export function useMembers() {
+  const supabase = useMemo(() => createClient(), []);
   const [members, setMembers] = useState<MemberRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClient();
 
   const fetchMembers = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       const { data, error: fetchError } = await supabase
         .from('members')
@@ -48,13 +49,14 @@ export function useMembers() {
         .order('created_at', { ascending: false });
 
       if (fetchError) {
+        console.error('[useMembers] fetch error:', fetchError);
         setError(fetchError.message);
         setMembers([]);
       } else {
-        setMembers((data as MemberRow[]) || []);
+        setMembers((data || []) as MemberRow[]);
       }
     } catch (err) {
-      console.error('Failed to fetch members:', err);
+      console.error('[useMembers] exception:', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
       setMembers([]);
     } finally {
@@ -65,9 +67,15 @@ export function useMembers() {
   useEffect(() => { fetchMembers(); }, [fetchMembers]);
 
   const updateMember = async (id: string, updates: Partial<MemberRow>) => {
-    const { error } = await supabase.from('members').update(updates).eq('id', id);
-    if (!error) await fetchMembers();
-    return { error: error?.message || null };
+    try {
+      const { error: updateError } = await supabase.from('members').update(updates).eq('id', id);
+      if (updateError) return { error: updateError.message };
+      await fetchMembers();
+      return { error: null };
+    } catch (err) {
+      console.error('[useMembers] updateMember exception:', err);
+      return { error: err instanceof Error ? err.message : 'Unknown error' };
+    }
   };
 
   const suspendMember = (id: string) => updateMember(id, { status: 'suspended' as MemberStatus });
@@ -80,5 +88,5 @@ export function useMembers() {
     suspended: members.filter(m => m.status === 'suspended').length,
   };
 
-  return { members, loading, error, stats, fetchMembers, updateMember, suspendMember, activateMember };
+  return { members, loading, error, stats, fetchMembers, refetch: fetchMembers, updateMember, suspendMember, activateMember };
 }

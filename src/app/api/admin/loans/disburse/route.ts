@@ -6,6 +6,7 @@ import { sendNotification } from '@/lib/notifications/engine';
 import { paymentReceivedTemplate } from '@/lib/notifications/templates';
 import { loanDisburseSchema } from '@/lib/validation/schemas';
 import { emitEventAsync } from '@/lib/events/event-bus';
+import { sendLoanDisbursedEmail } from '@/lib/email/lifecycle-emails';
 import '@/lib/events/handlers';
 
 export async function POST(request: NextRequest) {
@@ -53,7 +54,7 @@ export async function POST(request: NextRequest) {
     // Verify loan exists and is approved
     const { data: loan, error: loanError } = await svc
       .from('loans')
-      .select('id, status, member_id, amount')
+      .select('id, status, member_id, borrower_id, amount, currency, interest_rate, term_months')
       .eq('id', loanId)
       .single();
 
@@ -65,14 +66,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: `Cannot disburse: loan status is "${loan.status}", must be "approved"` }, { status: 400 });
     }
 
+    // Resolve borrower id (schema has both member_id and borrower_id variants)
+    const borrowerId: string | null =
+      (loan as { borrower_id?: string | null }).borrower_id ||
+      (loan as { member_id?: string | null }).member_id ||
+      null;
+    const loanCurrency = (loan as { currency?: string }).currency || currency || 'USD';
+    const termMonths = Number((loan as { term_months?: number }).term_months || 12);
+    const interestRate = Number((loan as { interest_rate?: number }).interest_rate || 0.10);
+    const loanAmount = Number((loan as { amount?: number }).amount || amount);
+
     // Create disbursement record
     const { data: disbursement, error: disbError } = await svc
       .from('loan_disbursements')
       .insert({
         loan_id: loanId,
-        member_id: loan.member_id,
+        member_id: borrowerId,
         amount,
-        currency: currency || 'USD',
+        currency: loanCurrency,
         disbursement_method: method,
         status: 'completed',
         disbursed_at: new Date().toISOString(),
@@ -84,12 +95,85 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: disbError.message }, { status: 500 });
     }
 
-    // Update loan status to disbursed
+    // ----------------------------------------------------------------------
+    // 1. Find or create borrower wallet
+    // ----------------------------------------------------------------------
+    let walletId: string | undefined;
+    if (borrowerId) {
+      const { data: wallet } = await svc
+        .from('wallet_accounts')
+        .select('id')
+        .eq('user_id', borrowerId)
+        .maybeSingle();
+      walletId = wallet?.id;
+      if (!walletId) {
+        const { data: newWallet } = await svc
+          .from('wallet_accounts')
+          .insert({
+            user_id: borrowerId,
+            balance: 0,
+            currency: loanCurrency,
+            status: 'active',
+          })
+          .select('id')
+          .single();
+        walletId = newWallet?.id;
+      }
+
+      // 2. Credit wallet atomically
+      if (walletId) {
+        await svc.rpc('credit_wallet', {
+          p_wallet_id: walletId,
+          p_amount: loanAmount,
+          p_description: `Loan disbursement: ${loanId}`,
+        });
+
+        // 3. Insert wallet transaction for audit
+        await svc.from('wallet_transactions').insert({
+          wallet_id: walletId,
+          user_id: borrowerId,
+          amount: loanAmount,
+          type: 'credit',
+          status: 'completed',
+          description: 'Loan disbursement',
+          reference: loanId,
+        });
+      }
+    }
+
+    // ----------------------------------------------------------------------
+    // 4. Generate repayment schedule
+    // ----------------------------------------------------------------------
+    const monthlyAmount = (loanAmount * (1 + interestRate)) / termMonths;
+    const scheduleRows: Array<{
+      loan_id: string;
+      due_date: string;
+      amount_due: number;
+      status: string;
+    }> = [];
+    for (let i = 1; i <= termMonths; i++) {
+      const dueDate = new Date();
+      dueDate.setMonth(dueDate.getMonth() + i);
+      scheduleRows.push({
+        loan_id: loanId,
+        due_date: dueDate.toISOString().split('T')[0],
+        amount_due: Number(monthlyAmount.toFixed(2)),
+        status: 'pending',
+      });
+    }
+    if (scheduleRows.length > 0) {
+      await svc.from('loan_schedules').insert(scheduleRows);
+    }
+
+    // 5. Update loan status + disbursement details
     await svc
       .from('loans')
       .update({
         status: 'disbursed',
         disbursed_at: new Date().toISOString(),
+        disbursed_amount: loanAmount,
+        next_payment_amount: Number(monthlyAmount.toFixed(2)),
+        next_payment_date: scheduleRows[0]?.due_date,
         updated_at: new Date().toISOString(),
       })
       .eq('id', loanId);
@@ -104,30 +188,53 @@ export async function POST(request: NextRequest) {
     });
 
     // Notify member of disbursement (fire-and-forget)
-    if (loan.member_id) {
-      const cur = currency || 'USD';
-      const template = paymentReceivedTemplate(String(amount), cur, disbursement.id);
+    if (borrowerId) {
+      const template = paymentReceivedTemplate(String(amount), loanCurrency, disbursement.id);
       sendNotification({
-        recipientId: loan.member_id,
+        recipientId: borrowerId,
         category: 'loan',
         priority: 'high',
         channels: ['in_app', 'email', 'sms'],
         actionUrl: '/dashboard/financing',
         ...template,
         title: 'Loan Disbursed',
-        body: `Your loan of ${cur} ${amount.toLocaleString()} has been disbursed via ${method}.`,
+        body: `Your loan of ${loanCurrency} ${amount.toLocaleString()} has been disbursed via ${method}.`,
       }).catch(() => {});
+
+      // Lifecycle email with repayment details
+      try {
+        const { data: prof } = await svc
+          .from('profiles')
+          .select('email, full_name, first_name')
+          .eq('id', borrowerId)
+          .maybeSingle();
+        const email = (prof as { email?: string } | null)?.email;
+        const name =
+          (prof as { full_name?: string; first_name?: string } | null)?.full_name ||
+          (prof as { first_name?: string } | null)?.first_name ||
+          'Member';
+        if (email && scheduleRows[0]) {
+          sendLoanDisbursedEmail(
+            email,
+            name,
+            loanAmount,
+            loanCurrency,
+            Number(monthlyAmount.toFixed(2)),
+            scheduleRows[0].due_date,
+          ).catch(() => {});
+        }
+      } catch { /* non-blocking */ }
     }
 
     // S2.9: Emit LOAN_DISBURSED event for cross-system workflows
-    if (loan.member_id) {
+    if (borrowerId) {
       emitEventAsync({
         type: 'LOAN_DISBURSED',
         data: {
           loanId,
-          userId: loan.member_id,
-          amount,
-          walletId: undefined,
+          userId: borrowerId,
+          amount: loanAmount,
+          walletId,
         },
       });
     }

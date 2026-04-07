@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { createClient } from '@/lib/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Wallet,
@@ -84,6 +85,81 @@ export default function FinancingPage() {
     notes: '',
   });
   const [submitted, setSubmitted] = useState(false);
+
+  // ── Receipt-backed loans state ─────────────────────────────────────────
+  interface WarehouseReceipt {
+    id: string;
+    receipt_number?: string;
+    commodity?: string;
+    weight_kg?: number;
+    estimated_value?: number;
+    value?: number;
+    status?: string;
+    pledged?: boolean;
+  }
+  const [receipts, setReceipts] = useState<WarehouseReceipt[]>([]);
+  const [receiptModal, setReceiptModal] = useState<WarehouseReceipt | null>(null);
+  const [receiptAmount, setReceiptAmount] = useState<number>(0);
+  const [receiptTerm, setReceiptTerm] = useState<number>(6);
+  const [receiptSubmitting, setReceiptSubmitting] = useState(false);
+  const [receiptToast, setReceiptToast] = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
+
+  const fetchReceipts = useCallback(async () => {
+    try {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data } = await supabase
+        .from('warehouse_receipts')
+        .select('id, receipt_number, commodity, weight_kg, estimated_value, value, status, pledged')
+        .eq('status', 'active')
+        .or('pledged.is.null,pledged.eq.false');
+      setReceipts((data as WarehouseReceipt[]) || []);
+    } catch {
+      setReceipts([]);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchReceipts();
+  }, [fetchReceipts]);
+
+  const openReceiptModal = (r: WarehouseReceipt) => {
+    const val = Number(r.estimated_value ?? r.value ?? 0);
+    // Default to 70% LTV
+    setReceiptAmount(Math.round(val * 0.7));
+    setReceiptTerm(6);
+    setReceiptModal(r);
+  };
+
+  const submitReceiptLoan = async () => {
+    if (!receiptModal) return;
+    setReceiptSubmitting(true);
+    try {
+      const res = await fetch('/api/warehouse/financing', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          receipt_id: receiptModal.id,
+          amount: receiptAmount,
+          requested_amount: receiptAmount,
+          term_months: receiptTerm,
+          market_value: Number(receiptModal.estimated_value ?? receiptModal.value ?? 0),
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'Failed to submit');
+      setReceiptToast({ type: 'success', msg: 'Receipt-backed loan application submitted!' });
+      setReceiptModal(null);
+      await fetchReceipts();
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'Failed to submit';
+      setReceiptToast({ type: 'error', msg });
+    } finally {
+      setReceiptSubmitting(false);
+      setTimeout(() => setReceiptToast(null), 4000);
+    }
+  };
 
   const handleApply = () => {
     setTab('apply');
@@ -279,6 +355,113 @@ export default function FinancingPage() {
                 >
                   {tf.applyNow}
                 </button>
+              </div>
+            )}
+
+            {/* Receipt-Backed Loans */}
+            {receipts.length > 0 && (
+              <div className="bg-white rounded-xl border border-gray-100 p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <FileText className="w-5 h-5 text-teal" />
+                  <h3 className="font-semibold text-navy">Receipt-Backed Loans</h3>
+                </div>
+                <p className="text-xs text-gray-500 mb-4">
+                  Use your active warehouse receipts as collateral for fast, low-interest loans.
+                </p>
+                <div className="space-y-3">
+                  {receipts.map((r) => {
+                    const val = Number(r.estimated_value ?? r.value ?? 0);
+                    return (
+                      <div
+                        key={r.id}
+                        className="border border-gray-100 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
+                      >
+                        <div>
+                          <p className="text-sm font-semibold text-navy">
+                            {r.commodity || 'Commodity'} — {r.weight_kg ?? 0} kg
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {r.receipt_number || r.id.slice(0, 10)} · Value: P {val.toLocaleString()}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => openReceiptModal(r)}
+                          className="bg-teal hover:bg-teal-dark text-white px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap"
+                        >
+                          Apply for loan
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Toast */}
+            {receiptToast && (
+              <div
+                className={`fixed bottom-4 right-4 z-50 px-4 py-3 rounded-xl shadow-lg text-sm font-medium ${
+                  receiptToast.type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
+                }`}
+              >
+                {receiptToast.msg}
+              </div>
+            )}
+
+            {/* Receipt loan modal */}
+            {receiptModal && (
+              <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+                <div className="bg-white rounded-xl max-w-md w-full p-5">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-bold text-navy">Receipt-Backed Loan</h3>
+                    <button onClick={() => setReceiptModal(null)} className="text-gray-400 hover:text-gray-600">
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                  <p className="text-xs text-gray-500 mb-4">
+                    Collateral: {receiptModal.commodity} · {receiptModal.weight_kg} kg · Value P{' '}
+                    {Number(receiptModal.estimated_value ?? receiptModal.value ?? 0).toLocaleString()}
+                  </p>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-xs font-medium text-navy block mb-1">Loan amount (P)</label>
+                      <input
+                        type="number"
+                        value={receiptAmount || ''}
+                        onChange={(e) => setReceiptAmount(Number(e.target.value))}
+                        className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-navy block mb-1">Term (months)</label>
+                      <select
+                        value={receiptTerm}
+                        onChange={(e) => setReceiptTerm(Number(e.target.value))}
+                        className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm"
+                      >
+                        <option value={3}>3 months</option>
+                        <option value={6}>6 months</option>
+                        <option value={9}>9 months</option>
+                        <option value={12}>12 months</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="flex gap-2 mt-5">
+                    <button
+                      onClick={() => setReceiptModal(null)}
+                      className="flex-1 py-2 rounded-lg border border-gray-200 text-sm font-medium"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={submitReceiptLoan}
+                      disabled={receiptSubmitting || receiptAmount <= 0}
+                      className="flex-1 py-2 rounded-lg bg-teal text-white text-sm font-semibold disabled:opacity-50"
+                    >
+                      {receiptSubmitting ? 'Submitting...' : 'Submit'}
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
 

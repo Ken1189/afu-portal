@@ -187,6 +187,32 @@ export async function POST(request: Request) {
       // Not a fatal error — the user can still log in
     }
 
+    // Look up the referring ambassador by referral_code (if any)
+    let referredByAmbassadorProfileId: string | null = null;
+    if (application.referral_code) {
+      try {
+        const { data: amb } = await svc
+          .from('ambassadors')
+          .select('id, user_id')
+          .eq('referral_code', application.referral_code)
+          .maybeSingle();
+        if (amb?.user_id) {
+          referredByAmbassadorProfileId = amb.user_id;
+        } else {
+          // Fallback: check referral_links table
+          const { data: link } = await svc
+            .from('referral_links')
+            .select('ambassador_id, ambassadors(user_id)')
+            .eq('referral_code', application.referral_code)
+            .maybeSingle();
+          const linked = (link as unknown as { ambassadors?: { user_id?: string } } | null)?.ambassadors;
+          if (linked?.user_id) referredByAmbassadorProfileId = linked.user_id;
+        }
+      } catch (e) {
+        console.error('[approve] ambassador lookup failed:', e);
+      }
+    }
+
     // Create a member record
     const memberId = `AFU-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 99999)).padStart(5, '0')}`;
     const { error: memberError } = await svc.from('members').insert({
@@ -197,6 +223,8 @@ export async function POST(request: Request) {
       farm_name: application.farm_name || null,
       farm_size_ha: application.farm_size_ha || null,
       primary_crops: application.primary_crops || null,
+      referred_by: referredByAmbassadorProfileId,
+      referral_code_used: application.referral_code || null,
     });
     if (memberError) {
       console.error('Failed to create member:', memberError.message);

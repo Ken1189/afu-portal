@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from './client';
 import type { MembershipTier, ApplicationStatus } from './types';
 
@@ -34,16 +34,20 @@ export interface ApplicationInsert {
   farm_size_ha?: number;
   primary_crops?: string[];
   requested_tier?: MembershipTier;
+  application_type?: 'member' | 'farmer' | 'supplier' | 'ambassador' | 'partner';
+  referral_code?: string;
+  notes?: string;
 }
 
 export function useApplications() {
+  const supabase = useMemo(() => createClient(), []);
   const [applications, setApplications] = useState<ApplicationRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClient();
 
   const fetchApplications = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       const { data, error: fetchError } = await supabase
         .from('membership_applications')
@@ -51,13 +55,16 @@ export function useApplications() {
         .order('created_at', { ascending: false });
 
       if (fetchError) {
+        console.error('[useApplications] fetch error:', fetchError);
         setError(fetchError.message);
         setApplications([]);
       } else {
-        setApplications((data as ApplicationRow[]) || []);
+        setApplications((data || []) as ApplicationRow[]);
       }
     } catch (err) {
-      console.error("[use-applications.ts] fetch error:", err);
+      console.error('[useApplications] exception:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error');
+      setApplications([]);
     } finally {
       setLoading(false);
     }
@@ -66,19 +73,16 @@ export function useApplications() {
   useEffect(() => { fetchApplications(); }, [fetchApplications]);
 
   const approveApplication = async (id: string, profileId: string) => {
-    // Update application status
-    const { error: appError } = await supabase
-      .from('membership_applications')
-      .update({ status: 'approved' as ApplicationStatus, reviewed_at: new Date().toISOString() })
-      .eq('id', id);
+    try {
+      const { error: appError } = await supabase
+        .from('membership_applications')
+        .update({ status: 'approved' as ApplicationStatus, reviewed_at: new Date().toISOString() })
+        .eq('id', id);
 
-    if (appError) return { error: appError.message };
+      if (appError) return { error: appError.message };
 
-    // Get the application to create member record
-    const app = applications.find(a => a.id === id);
-    if (app) {
-      // Create a member record if profile exists
-      if (app.profile_id) {
+      const app = applications.find(a => a.id === id);
+      if (app && app.profile_id) {
         await supabase.from('members').insert({
           profile_id: app.profile_id,
           tier: app.requested_tier || 'new_enterprise',
@@ -88,35 +92,50 @@ export function useApplications() {
           primary_crops: app.primary_crops,
         });
       }
-    }
 
-    await fetchApplications();
-    return { error: null };
+      await fetchApplications();
+      return { error: null };
+    } catch (err) {
+      console.error('[useApplications] approveApplication exception:', err);
+      return { error: err instanceof Error ? err.message : 'Unknown error' };
+    }
   };
 
   const rejectApplication = async (id: string, notes?: string) => {
-    const { error } = await supabase
-      .from('membership_applications')
-      .update({
-        status: 'rejected' as ApplicationStatus,
-        reviewed_at: new Date().toISOString(),
-        notes: notes || 'Application rejected',
-      })
-      .eq('id', id);
+    try {
+      const { error: rejectError } = await supabase
+        .from('membership_applications')
+        .update({
+          status: 'rejected' as ApplicationStatus,
+          reviewed_at: new Date().toISOString(),
+          notes: notes || 'Application rejected',
+        })
+        .eq('id', id);
 
-    if (!error) await fetchApplications();
-    return { error: error?.message || null };
+      if (rejectError) return { error: rejectError.message };
+      await fetchApplications();
+      return { error: null };
+    } catch (err) {
+      console.error('[useApplications] rejectApplication exception:', err);
+      return { error: err instanceof Error ? err.message : 'Unknown error' };
+    }
   };
 
   const submitApplication = async (app: ApplicationInsert) => {
-    const { data, error } = await supabase
-      .from('membership_applications')
-      .insert(app)
-      .select()
-      .single();
+    try {
+      const { data, error: insertError } = await supabase
+        .from('membership_applications')
+        .insert(app)
+        .select()
+        .single();
 
-    if (!error) await fetchApplications();
-    return { data: data as ApplicationRow | null, error: error?.message || null };
+      if (insertError) return { data: null, error: insertError.message };
+      await fetchApplications();
+      return { data: data as ApplicationRow | null, error: null };
+    } catch (err) {
+      console.error('[useApplications] submitApplication exception:', err);
+      return { data: null, error: err instanceof Error ? err.message : 'Unknown error' };
+    }
   };
 
   const stats = {
@@ -127,5 +146,5 @@ export function useApplications() {
     rejected: applications.filter(a => a.status === 'rejected').length,
   };
 
-  return { applications, loading, error, stats, fetchApplications, approveApplication, rejectApplication, submitApplication };
+  return { applications, loading, error, stats, fetchApplications, refetch: fetchApplications, approveApplication, rejectApplication, submitApplication };
 }
