@@ -228,6 +228,12 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
           </Link>
         </div>
 
+        {/* Portal Switcher (top placement) */}
+        <div className="px-3 pt-3 pb-2 border-b border-white/10">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-white/60 px-1 mb-1.5">Portal</p>
+          <PortalSwitcherDropdown variant="dark" position="down" />
+        </div>
+
         {/* Sidebar Nav */}
         <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
           {(() => {
@@ -261,10 +267,6 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
           })()}
         </nav>
 
-        {/* Sidebar Footer */}
-        <div className="p-3 border-t border-white/10">
-          <PortalSwitcherDropdown variant="dark" position="up" />
-        </div>
       </aside>
 
       {/* ─── Main Column ─── */}
@@ -343,6 +345,12 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
                   </div>
                 </div>
 
+                {/* Drawer Portal Switcher (top placement) */}
+                <div className="px-3 pt-3 pb-2 border-b border-white/10">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-white/60 px-1 mb-1.5">Portal</p>
+                  <PortalSwitcherDropdown variant="dark" position="down" />
+                </div>
+
                 {/* Drawer Nav */}
                 <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
                   {(() => {
@@ -377,10 +385,6 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
                   })()}
                 </nav>
 
-                {/* Drawer Footer */}
-                <div className="p-3 border-t border-white/10">
-                  <PortalSwitcherDropdown variant="dark" position="up" />
-                </div>
               </motion.aside>
             </>
           )}

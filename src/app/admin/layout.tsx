@@ -112,10 +112,9 @@ const navGroups: NavGroup[] = [
     label: 'Dashboard',
     defaultOpen: true,
     links: [
-      { href: '/admin', label: 'Dashboard', icon: <LayoutDashboard className={ICON_CLS} /> },
-      { href: '/admin/analytics', label: 'Analytics', icon: <TrendingUp className={ICON_CLS} /> },
+      { href: '/admin', label: 'Overview', icon: <LayoutDashboard className={ICON_CLS} /> },
+      { href: '/admin/analytics', label: 'Analytics & Reports', icon: <TrendingUp className={ICON_CLS} /> },
       { href: '/admin/reports', label: 'Reports', icon: <BarChart3 className={ICON_CLS} /> },
-      { href: '/admin/inbox/pipeline', label: 'Pipeline', icon: <Activity className={ICON_CLS} /> },
     ],
   },
   // ── 2. People ──
@@ -123,15 +122,15 @@ const navGroups: NavGroup[] = [
     label: 'People',
     defaultOpen: true,
     links: [
-      { href: '/admin/members', label: 'Members', icon: <Users className={ICON_CLS} /> },
+      { href: '/admin/members', label: 'All Members', icon: <Users className={ICON_CLS} /> },
       { href: '/admin/applications', label: 'Applications', icon: <FileText className={ICON_CLS} /> },
       { href: '/admin/farmers', label: 'Farmers', icon: <Upload className={ICON_CLS} /> },
       { href: '/admin/suppliers', label: 'Suppliers', icon: <Store className={ICON_CLS} /> },
       { href: '/admin/ambassadors', label: 'Ambassadors', icon: <Megaphone className={ICON_CLS} /> },
       { href: '/admin/investor-relations', label: 'Investors', icon: <Landmark className={ICON_CLS} /> },
       { href: '/admin/partners', label: 'Partners', icon: <Handshake className={ICON_CLS} /> },
-      { href: '/admin/kyc', label: 'KYC / References', icon: <ScanEye className={ICON_CLS} /> },
-      { href: '/admin/contacts', label: 'Contacts', icon: <Users className={ICON_CLS} /> },
+      { href: '/admin/kyc', label: 'KYC', icon: <ScanEye className={ICON_CLS} /> },
+      { href: '/admin/countries', label: 'Country Teams', icon: <Globe className={ICON_CLS} /> },
     ],
   },
   // ── 3. Finance ──
@@ -139,22 +138,14 @@ const navGroups: NavGroup[] = [
     label: 'Finance',
     defaultOpen: false,
     links: [
-      { href: '/admin/loans', label: 'Loan Management', icon: <HandCoins className={ICON_CLS} /> },
+      { href: '/admin/loans', label: 'Loans', icon: <HandCoins className={ICON_CLS} /> },
       { href: '/admin/payments', label: 'Payments', icon: <CreditCard className={ICON_CLS} /> },
-      { href: '/admin/subscriptions', label: 'Subscriptions', icon: <CreditCard className={ICON_CLS} /> },
       { href: '/admin/payouts', label: 'Payouts', icon: <Wallet className={ICON_CLS} /> },
-      { href: '/admin/financial', label: 'Financial Overview', icon: <Landmark className={ICON_CLS} /> },
-      { href: '/admin/financial/collections', label: 'Collections', icon: <Coins className={ICON_CLS} /> },
-      { href: '/admin/financial/disbursements', label: 'Disbursements', icon: <Banknote className={ICON_CLS} /> },
+      { href: '/admin/subscriptions', label: 'Subscriptions', icon: <CreditCard className={ICON_CLS} /> },
+      { href: '/admin/disputes', label: 'Disputes', icon: <Scale className={ICON_CLS} /> },
       { href: '/admin/trade-finance', label: 'Trade Finance', icon: <Ship className={ICON_CLS} /> },
-      { href: '/admin/banking', label: 'Banking Operations', icon: <Landmark className={ICON_CLS} /> },
       { href: '/admin/wallet', label: 'Wallet', icon: <Wallet className={ICON_CLS} /> },
       { href: '/admin/credit-scores', label: 'Credit Scoring', icon: <Gauge className={ICON_CLS} /> },
-      { href: '/admin/disputes', label: 'Disputes', icon: <Scale className={ICON_CLS} /> },
-      { href: '/admin/exports', label: 'Exports', icon: <Ship className={ICON_CLS} /> },
-      { href: '/admin/investors', label: 'All Investors', icon: <Users className={ICON_CLS} /> },
-      { href: '/admin/investments', label: 'Total Investments', icon: <BarChart3 className={ICON_CLS} /> },
-      { href: '/admin/investor-relations/opportunities', label: 'Opportunities', icon: <TrendingUp className={ICON_CLS} /> },
     ],
   },
   // ── 4. Operations ──
@@ -162,26 +153,16 @@ const navGroups: NavGroup[] = [
     label: 'Operations',
     defaultOpen: false,
     links: [
-      { href: '/admin/farm-overview', label: 'Farm Overview', icon: <Gauge className={ICON_CLS} /> },
-      { href: '/admin/map', label: 'Farm Map', icon: <MapPin className={ICON_CLS} /> },
-      { href: '/admin/equipment', label: 'Equipment', icon: <Wrench className={ICON_CLS} /> },
+      { href: '/admin/farm-overview', label: 'Farm Operations', icon: <Gauge className={ICON_CLS} /> },
       { href: '/admin/insurance', label: 'Insurance', icon: <Shield className={ICON_CLS} /> },
-      { href: '/admin/insurance/products', label: 'Insurance Products', icon: <Shield className={ICON_CLS} /> },
-      { href: '/admin/insurance/parametric', label: 'Parametric', icon: <Zap className={ICON_CLS} /> },
+      { href: '/admin/carbon', label: 'Carbon Credits', icon: <Leaf className={ICON_CLS} /> },
+      { href: '/admin/trading', label: 'Trading Desk', icon: <ArrowLeftRight className={ICON_CLS} /> },
+      { href: '/admin/exchange', label: 'Exchange', icon: <HandCoins className={ICON_CLS} /> },
+      { href: '/admin/warehouse', label: 'Warehouse Ops', icon: <Warehouse className={ICON_CLS} /> },
+      { href: '/admin/programs', label: 'Programs', icon: <Sprout className={ICON_CLS} /> },
       { href: '/admin/crops', label: 'Crops', icon: <Sprout className={ICON_CLS} /> },
       { href: '/admin/livestock', label: 'Livestock', icon: <Beef className={ICON_CLS} /> },
-      { href: '/admin/legal-services', label: 'Legal Services', icon: <ScaleIcon className={ICON_CLS} /> },
-      { href: '/admin/veterinary', label: 'Veterinary', icon: <Stethoscope className={ICON_CLS} /> },
-      { href: '/admin/warehouse', label: 'Warehouse', icon: <Warehouse className={ICON_CLS} /> },
-      { href: '/admin/cooperatives', label: 'Cooperatives', icon: <Users className={ICON_CLS} /> },
-      { href: '/admin/programs', label: 'Programs', icon: <Sprout className={ICON_CLS} /> },
-      { href: '/admin/trading', label: 'Trading', icon: <ArrowLeftRight className={ICON_CLS} /> },
-      { href: '/admin/exchange', label: 'Exchange', icon: <HandCoins className={ICON_CLS} /> },
-      { href: '/admin/contracts', label: 'Contracts', icon: <ScrollText className={ICON_CLS} /> },
-      { href: '/admin/carbon', label: 'Carbon Dashboard', icon: <Leaf className={ICON_CLS} /> },
-      { href: '/admin/carbon/projects', label: 'Carbon Projects', icon: <FolderOpen className={ICON_CLS} /> },
-      { href: '/admin/carbon/credits', label: 'Carbon Credits', icon: <Coins className={ICON_CLS} /> },
-      { href: '/admin/carbon/verifications', label: 'Carbon Verifications', icon: <ClipboardCheck className={ICON_CLS} /> },
+      { href: '/admin/equipment', label: 'Equipment', icon: <Wrench className={ICON_CLS} /> },
     ],
   },
   // ── 5. Content ──
@@ -190,20 +171,14 @@ const navGroups: NavGroup[] = [
     defaultOpen: false,
     links: [
       { href: '/admin/content-editor', label: 'Content Editor', icon: <PenSquare className={ICON_CLS} /> },
-      { href: '/admin/content', label: 'Site Content', icon: <FileEdit className={ICON_CLS} /> },
-      { href: '/admin/blog', label: 'Blog / News', icon: <PenSquare className={ICON_CLS} /> },
+      { href: '/admin/blog', label: 'Blog', icon: <PenSquare className={ICON_CLS} /> },
+      { href: '/admin/faq', label: 'FAQ', icon: <HelpCircle className={ICON_CLS} /> },
       { href: '/admin/media', label: 'Media Library', icon: <ImageIcon className={ICON_CLS} /> },
-      { href: '/admin/faq', label: 'FAQ Manager', icon: <HelpCircle className={ICON_CLS} /> },
+      { href: '/admin/testimonials', label: 'Testimonials', icon: <MessageSquare className={ICON_CLS} /> },
       { href: '/admin/announcements', label: 'Announcements', icon: <Bell className={ICON_CLS} /> },
       { href: '/admin/training', label: 'Training', icon: <GraduationCap className={ICON_CLS} /> },
-      { href: '/admin/training/catalog', label: 'Training Catalog', icon: <GraduationCap className={ICON_CLS} /> },
       { href: '/admin/legal', label: 'Legal Pages', icon: <Scale className={ICON_CLS} /> },
-      { href: '/admin/testimonials', label: 'Testimonials', icon: <MessageSquare className={ICON_CLS} /> },
-      { href: '/admin/settings/videos', label: 'Videos', icon: <Play className={ICON_CLS} /> },
       { href: '/admin/research', label: 'Research', icon: <FlaskConical className={ICON_CLS} /> },
-      { href: '/admin/countries', label: 'Countries', icon: <Globe className={ICON_CLS} /> },
-      { href: '/admin/settings/homepage-sections', label: 'Homepage Sections', icon: <Layers className={ICON_CLS} /> },
-      { href: '/admin/settings/homepage-images', label: 'Homepage Images', icon: <Image className={ICON_CLS} /> },
     ],
   },
   // ── 6. Marketing ──
@@ -211,17 +186,13 @@ const navGroups: NavGroup[] = [
     label: 'Marketing',
     defaultOpen: false,
     links: [
-      { href: '/admin/inbox', label: 'Inbox', icon: <Inbox className={ICON_CLS} /> },
-      { href: '/admin/messaging', label: 'Messaging', icon: <MessageSquare className={ICON_CLS} /> },
-      { href: '/admin/messaging/templates', label: 'Templates', icon: <FileText className={ICON_CLS} /> },
+      { href: '/admin/inbox', label: 'Unified Inbox', icon: <Inbox className={ICON_CLS} /> },
+      { href: '/admin/messaging', label: 'Messaging & Templates', icon: <MessageSquare className={ICON_CLS} /> },
       { href: '/admin/messaging/campaigns', label: 'Campaigns', icon: <Send className={ICON_CLS} /> },
       { href: '/admin/automations', label: 'Automations', icon: <Zap className={ICON_CLS} /> },
       { href: '/admin/advertising', label: 'Advertising', icon: <Megaphone className={ICON_CLS} /> },
-      { href: '/admin/advertising/review', label: 'Ad Review', icon: <Megaphone className={ICON_CLS} /> },
       { href: '/admin/sponsor', label: 'Sponsor a Farmer', icon: <Heart className={ICON_CLS} /> },
-      { href: '/admin/sponsor-tiers', label: 'Sponsor Tiers', icon: <Gift className={ICON_CLS} /> },
       { href: '/admin/jobs', label: 'Jobs Board', icon: <Briefcase className={ICON_CLS} /> },
-      { href: '/admin/partnerships', label: 'Partnerships', icon: <Handshake className={ICON_CLS} /> },
     ],
   },
   // ── 7. Settings ──
@@ -230,52 +201,22 @@ const navGroups: NavGroup[] = [
     defaultOpen: false,
     superAdminOnly: true,
     links: [
-      // — General —
-      { href: '/admin/settings', label: 'Settings', icon: <Settings className={ICON_CLS} />, section: 'General' },
-      { href: '/admin/settings/branding', label: 'Branding', icon: <Palette className={ICON_CLS} /> },
-      { href: '/admin/settings/navigation', label: 'Navigation', icon: <LayoutDashboard className={ICON_CLS} /> },
-      { href: '/admin/settings/contact-info', label: 'Contact Info', icon: <Mail className={ICON_CLS} /> },
-      // — Access —
-      { href: '/admin/users', label: 'Users & Roles', icon: <UserCog className={ICON_CLS} />, section: 'Access' },
-      { href: '/admin/users/permissions', label: 'Permissions', icon: <ShieldCheck className={ICON_CLS} />, superAdminOnly: true },
-      { href: '/admin/audit', label: 'Audit Trail', icon: <ScrollText className={ICON_CLS} /> },
+      { href: '/admin/settings', label: 'System Settings', icon: <Settings className={ICON_CLS} /> },
+      { href: '/admin/users', label: 'Roles & Permissions', icon: <UserCog className={ICON_CLS} /> },
+      { href: '/admin/audit', label: 'Audit Log', icon: <ScrollText className={ICON_CLS} /> },
       { href: '/admin/system', label: 'System Health', icon: <Activity className={ICON_CLS} /> },
       { href: '/admin/compliance', label: 'Compliance', icon: <Shield className={ICON_CLS} /> },
       { href: '/admin/events', label: 'Event Monitor', icon: <Zap className={ICON_CLS} /> },
-      // — Membership —
-      { href: '/admin/settings/membership-tiers', label: 'Membership Tiers', icon: <Crown className={ICON_CLS} />, section: 'Membership' },
-      { href: '/admin/settings/onboarding-options', label: 'Onboarding Options', icon: <Settings className={ICON_CLS} /> },
-      { href: '/admin/settings/fresh-tiers', label: 'Fresh Tiers', icon: <Store className={ICON_CLS} /> },
-      // — Finance —
-      { href: '/admin/settings/loan-products', label: 'Loan Products', icon: <Banknote className={ICON_CLS} />, section: 'Finance' },
-      { href: '/admin/settings/insurance-pricing', label: 'Insurance Pricing', icon: <ShieldCheck className={ICON_CLS} /> },
-      { href: '/admin/settings/ltv-ratios', label: 'LTV Ratios', icon: <Scale className={ICON_CLS} /> },
-      { href: '/admin/settings/trading-commissions', label: 'Trading Commissions', icon: <Percent className={ICON_CLS} /> },
-      { href: '/admin/settings/trading-rules', label: 'Trading Rules', icon: <Globe className={ICON_CLS} /> },
-      { href: '/admin/settings/storage-fees', label: 'Storage Fees', icon: <Warehouse className={ICON_CLS} /> },
-      // — Operations —
-      { href: '/admin/settings/commodities', label: 'Commodities', icon: <Wheat className={ICON_CLS} />, section: 'Operations' },
-      { href: '/admin/settings/product-categories', label: 'Product Categories', icon: <Tags className={ICON_CLS} /> },
-      { href: '/admin/settings/equipment-catalog', label: 'Equipment Catalog', icon: <Wrench className={ICON_CLS} /> },
-      { href: '/admin/settings/marketplace-rules', label: 'Marketplace Rules', icon: <ScrollText className={ICON_CLS} /> },
-      { href: '/admin/settings/grading-standards', label: 'Grading Standards', icon: <Star className={ICON_CLS} /> },
-      { href: '/admin/settings/supplier-verification', label: 'Supplier Settings', icon: <ShieldCheck className={ICON_CLS} /> },
-      { href: '/admin/settings/supplier-commissions', label: 'Supplier Commissions', icon: <Percent className={ICON_CLS} /> },
-      { href: '/admin/settings/cooperative-rules', label: 'Cooperative Rules', icon: <Users className={ICON_CLS} /> },
-      { href: '/admin/settings/crop-recommendations', label: 'Crop Recommendations', icon: <Sprout className={ICON_CLS} /> },
-      { href: '/admin/settings/weather-alerts', label: 'Weather Alerts', icon: <Cloud className={ICON_CLS} /> },
-      { href: '/admin/settings/market-prices', label: 'Market Price Sources', icon: <TrendingUp className={ICON_CLS} /> },
-      // — Content —
-      { href: '/admin/settings/homepage-sections', label: 'Homepage Sections', icon: <Layers className={ICON_CLS} />, section: 'Content' },
-      { href: '/admin/settings/homepage-images', label: 'Homepage Images', icon: <Image className={ICON_CLS} /> },
-      { href: '/admin/settings/videos', label: 'Videos', icon: <Play className={ICON_CLS} /> },
-      { href: '/admin/settings/ad-packages', label: 'Ad Packages', icon: <Megaphone className={ICON_CLS} /> },
-      { href: '/admin/settings/impact-metrics', label: 'Impact Metrics', icon: <Target className={ICON_CLS} /> },
-      { href: '/admin/settings/fund-documents', label: 'Fund Documents', icon: <FileText className={ICON_CLS} /> },
-      // — System —
-      { href: '/admin/notifications', label: 'Notifications', icon: <Bell className={ICON_CLS} />, section: 'System' },
-      { href: '/admin/blockchain', label: 'Blockchain', icon: <Database className={ICON_CLS} /> },
-      { href: '/admin/run-migration', label: 'Run Migrations', icon: <Database className={ICON_CLS} /> },
+    ],
+  },
+  // ── Super Admin (hidden dev tools) ──
+  {
+    label: 'Super Admin',
+    defaultOpen: false,
+    superAdminOnly: true,
+    links: [
+      { href: '/admin/blockchain', label: 'Blockchain', icon: <Database className={ICON_CLS} />, superAdminOnly: true },
+      { href: '/admin/run-migration', label: 'Run Migrations', icon: <Database className={ICON_CLS} />, superAdminOnly: true },
     ],
   },
   // ── 8. Switch Portal ──
@@ -593,7 +534,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   // ── Section nav (two-tier) ──
   type SectionKey = 'all' | 'dashboard' | 'crm' | 'finance' | 'operations' | 'marketplace' | 'content' | 'system';
   const SECTIONS: { key: SectionKey; label: string; icon: React.ReactNode; groups: string[] }[] = [
-    { key: 'all', label: 'All', icon: <Layers className="w-4 h-4" />, groups: ['Dashboard', 'People', 'Finance', 'Operations', 'Content', 'Marketing', 'Settings', 'Switch Portal'] },
+    { key: 'all', label: 'All', icon: <Layers className="w-4 h-4" />, groups: ['Dashboard', 'People', 'Finance', 'Operations', 'Content', 'Marketing', 'Settings', 'Super Admin', 'Switch Portal'] },
     { key: 'dashboard', label: 'Home', icon: <LayoutDashboard className="w-4 h-4" />, groups: ['Dashboard'] },
     { key: 'crm', label: 'CRM', icon: <Inbox className="w-4 h-4" />, groups: ['People', 'Marketing'] },
     { key: 'finance', label: 'Finance', icon: <Landmark className="w-4 h-4" />, groups: ['Finance'] },
@@ -889,6 +830,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </Link>
         </div>
 
+        {/* Portal Switcher (top placement) */}
+        {showLabels && (
+          <div className="px-3 pt-3 pb-2 border-b border-white/10">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-white/50 px-1 mb-1.5">Portal</p>
+            <PortalSwitcherDropdown variant="dark" position="down" />
+          </div>
+        )}
+
         {/* Search */}
         <div
           className="border-b border-white/10"
@@ -970,11 +919,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         {/* User section + toggle at bottom */}
         <div className="border-t border-white/10">
-          {showLabels && (
-            <div className="p-3 border-b border-white/10">
-              <PortalSwitcherDropdown variant="dark" position="up" />
-            </div>
-          )}
           {/* User info */}
           <div
             className="flex items-center"
@@ -1073,6 +1017,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 </button>
               </div>
 
+              {/* Mobile portal switcher (top placement) */}
+              <div className="px-3 pt-3 pb-2 border-b border-white/10">
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-white/50 px-1 mb-1.5">Portal</p>
+                <PortalSwitcherDropdown variant="dark" position="down" />
+              </div>
+
               {/* Mobile search */}
               <div className="px-3 py-2 border-b border-white/10">
                 <div className="relative">
@@ -1123,7 +1073,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
               {/* Mobile user section */}
               <div className="border-t border-white/10 p-3 space-y-3">
-                <PortalSwitcherDropdown variant="dark" position="up" />
                 <div className="flex items-center gap-2.5">
                   <div className="w-8 h-8 bg-[#5DB347] rounded-full flex items-center justify-center flex-shrink-0">
                     <span className="text-white text-xs font-bold">{initials}</span>

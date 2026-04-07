@@ -186,12 +186,17 @@ export default function InvestorLayout({ children }: { children: React.ReactNode
           </div>
         </div>
 
+        {/* Portal Switcher (top placement) */}
+        <div className="px-3 pt-3 pb-2 border-b border-white/10">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-white/50 px-1 mb-1.5">Portal</p>
+          <PortalSwitcherDropdown variant="dark" position="down" />
+        </div>
+
         <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
           {renderNavLinks()}
         </nav>
 
         <div className="p-3 border-t border-white/10 space-y-2">
-          <PortalSwitcherDropdown variant="dark" position="up" />
           <button
             onClick={async () => {
               const { createBrowserClient } = await import('@supabase/ssr');
@@ -237,11 +242,15 @@ export default function InvestorLayout({ children }: { children: React.ReactNode
                   <X className="w-4 h-4" />
                 </button>
               </div>
+              {/* Mobile portal switcher (top placement) */}
+              <div className="px-3 pt-3 pb-2 border-b border-white/10">
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-white/50 px-1 mb-1.5">Portal</p>
+                <PortalSwitcherDropdown variant="dark" position="down" />
+              </div>
               <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
                 {renderNavLinks(() => setMobileOpen(false))}
               </nav>
               <div className="p-3 border-t border-white/10 space-y-2">
-                <PortalSwitcherDropdown variant="dark" position="up" />
                 <button
                   onClick={async () => {
                     const { createBrowserClient } = await import('@supabase/ssr');

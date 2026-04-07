@@ -431,6 +431,12 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
           )}
         </div>
 
+        {/* Portal Switcher (top placement) */}
+        <div className="px-3 pt-3 pb-2 border-b border-gray-100">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 px-1 mb-1.5">Portal</p>
+          <PortalSwitcherDropdown variant="light" position="down" />
+        </div>
+
         {/* Sidebar Nav — grouped by tier */}
         <nav className="flex-1 p-3 overflow-y-auto">
           {TIER_ORDER.map((tier) => renderTierSection(tier))}
@@ -495,10 +501,6 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
           </div>
         )}
 
-        {/* Sidebar Footer */}
-        <div className="p-3 border-t border-gray-100">
-          <PortalSwitcherDropdown variant="light" position="up" />
-        </div>
       </aside>
 
       {/* ─── Main Column ─── */}
@@ -686,6 +688,12 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
                   )}
                 </div>
 
+                {/* Drawer Portal Switcher (top placement) */}
+                <div className="px-3 pt-3 pb-2 border-b border-gray-100">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 px-1 mb-1.5">Portal</p>
+                  <PortalSwitcherDropdown variant="light" position="down" />
+                </div>
+
                 {/* Drawer Nav — grouped by tier */}
                 <nav className="flex-1 p-3 overflow-y-auto">
                   {TIER_ORDER.map((tier) =>
@@ -737,9 +745,6 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
                   </div>
                 )}
 
-                <div className="p-3 border-t border-gray-100">
-                  <PortalSwitcherDropdown variant="light" position="up" />
-                </div>
               </motion.aside>
             </>
           )}

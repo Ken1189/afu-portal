@@ -153,8 +153,8 @@ export default function PortalSwitcherDropdown({
 
   const triggerColors =
     variant === 'dark'
-      ? 'bg-white/10 hover:bg-white/15 text-white border-white/10'
-      : 'bg-gray-50 hover:bg-gray-100 text-[#1B2A4A] border-gray-200';
+      ? 'bg-white/10 hover:bg-white/20 text-white border-[#5DB347]/60 hover:border-[#5DB347] ring-1 ring-[#5DB347]/30'
+      : 'bg-white hover:bg-gray-50 text-[#1B2A4A] border-[#5DB347]/60 hover:border-[#5DB347] ring-1 ring-[#5DB347]/30';
 
   // Label shows the CURRENT portal name (e.g. "Admin Portal") so users
   // see where they are and click to switch.
