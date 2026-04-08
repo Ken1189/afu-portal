@@ -111,9 +111,12 @@ interface CommodityPrice {
   icon: string;
 }
 
-/** Market prices with sparkline data (DB format lacks sparkline/change fields).
- *  TODO: Replace hardcoded sample data with real market data integration
- *  (e.g. API feed, database table, or external pricing service). */
+/** Market prices fallback with sparkline data.
+ *  Live `currentPrice` is hydrated from the `market_prices` table at runtime
+ *  (see useEffect below). The DB schema does not store sparkline arrays, so
+ *  these constants supply the historical curve while the latest price comes
+ *  from the table. To fully replace this fallback, extend market_prices with
+ *  a `history JSONB` column or build a separate price_history table. */
 const MARKET_PRICES: CommodityPrice[] = [
   {
     crop: 'Blueberries', currentPrice: 12.50, currency: 'USD', unit: 'kg', change24h: 0.8, change7d: 3.2, icon: '\uD83E\uDED0',
@@ -343,8 +346,9 @@ function LoanTooltip({
 // ---------------------------------------------------------------------------
 export default function DashboardPage() {
   const { profile, user } = useAuth();
-  // Market prices (DB format lacks sparkline/change data needed for UI)
-  const marketPrices = MARKET_PRICES;
+  // Market prices: hydrate from market_prices table when available, else fall
+  // back to MARKET_PRICES (which has sparkline data the DB doesn't store yet).
+  const [marketPrices, setMarketPrices] = useState<CommodityPrice[]>(MARKET_PRICES);
   const [alertDismissed, setAlertDismissed] = useState(false);
   const [liveWeather, setLiveWeather] = useState(DEFAULT_WEATHER);
   const [dashData, setDashData] = useState<DashboardData | null>(null);
@@ -359,6 +363,39 @@ export default function DashboardPage() {
       .then(res => res.json())
       .then(data => { if (!data.error) setDashData(data); })
       .catch(() => { /* fallback to mock */ });
+  }, []);
+
+  // Hydrate market prices from market_prices table — fall back to MARKET_PRICES
+  // (which has sparkline arrays the DB schema doesn't store yet).
+  useEffect(() => {
+    const supabase = createClient();
+    (async () => {
+      try {
+        const { data } = await supabase
+          .from('market_prices')
+          .select('commodity, price, currency, unit, date')
+          .order('date', { ascending: false })
+          .limit(60);
+        if (!data || data.length === 0) return;
+        // Group by commodity, take latest price per commodity
+        const byCommodity = new Map<string, { price: number; currency: string; unit: string }>();
+        for (const row of data as Array<{ commodity: string; price: number; currency: string; unit: string }>) {
+          const key = row.commodity?.toLowerCase();
+          if (!key || byCommodity.has(key)) continue;
+          byCommodity.set(key, { price: Number(row.price), currency: row.currency || 'USD', unit: row.unit || 'kg' });
+        }
+        if (byCommodity.size === 0) return;
+        // Merge live prices into MARKET_PRICES, preserving sparkline data
+        const merged = MARKET_PRICES.map((p) => {
+          const live = byCommodity.get(p.crop.toLowerCase());
+          if (!live) return p;
+          return { ...p, currentPrice: live.price, currency: live.currency, unit: live.unit };
+        });
+        setMarketPrices(merged);
+      } catch {
+        /* keep fallback */
+      }
+    })();
   }, []);
 
   // Fetch available programs for banner

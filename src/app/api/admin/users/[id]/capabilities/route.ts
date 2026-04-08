@@ -26,11 +26,11 @@ async function writeAudit(
     });
     if (error) {
       console.warn('[AUDIT] insert failed:', error.message, payload);
-      // TODO: ensure audit_log table exists in production
+      // audit_log is created in migrations 001 + 047; non-fatal here.
     }
   } catch (e) {
     console.warn('[AUDIT] exception:', e, payload);
-    // TODO: ensure audit_log table exists in production
+    // audit_log is created in migrations 001 + 047; non-fatal here.
   }
 }
 
