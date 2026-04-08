@@ -1,5 +1,27 @@
 -- Seed initial investor updates so the /investor/updates page isn't empty.
 -- Idempotent: only inserts if no published updates exist yet.
+--
+-- Migration 048 (master_complete) recreated investor_updates with a stripped
+-- schema. Re-add the columns from migration 017 before seeding.
+
+ALTER TABLE investor_updates
+  ADD COLUMN IF NOT EXISTS update_type TEXT DEFAULT 'quarterly',
+  ADD COLUMN IF NOT EXISTS metrics JSONB DEFAULT '{}'::jsonb,
+  ADD COLUMN IF NOT EXISTS is_published BOOLEAN DEFAULT false,
+  ADD COLUMN IF NOT EXISTS published_at TIMESTAMPTZ,
+  ADD COLUMN IF NOT EXISTS author_id UUID REFERENCES profiles(id);
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.constraint_column_usage
+    WHERE table_name = 'investor_updates' AND constraint_name = 'investor_updates_update_type_check'
+  ) THEN
+    ALTER TABLE investor_updates
+      ADD CONSTRAINT investor_updates_update_type_check
+      CHECK (update_type IN ('quarterly', 'milestone', 'alert', 'report', 'announcement'));
+  END IF;
+END $$;
 
 INSERT INTO investor_updates (title, body, update_type, metrics, is_published, published_at)
 SELECT * FROM (VALUES
