@@ -288,6 +288,106 @@ export default function SupplierProductsPage() {
     setShowModal(true);
   };
 
+  // Quick-start product templates — pre-fill the modal so new suppliers
+  // can ship their first listing in <60 seconds.
+  const PRODUCT_TEMPLATES: Array<{
+    label: string;
+    icon: string;
+    data: ProductFormData;
+  }> = [
+    {
+      label: 'Maize Seed (Hybrid)',
+      icon: 'Seed',
+      data: {
+        name: 'Hybrid Maize Seed (10kg)',
+        description: 'Drought-tolerant hybrid maize variety. High-yield, suitable for SADC region. 10kg pack treats approximately 0.4 hectares.',
+        price: '45',
+        currency: 'USD',
+        stock_quantity: '100',
+        category: 'seeds',
+        unit: '10kg bag',
+        image_url: '',
+      },
+    },
+    {
+      label: 'NPK Fertiliser',
+      icon: 'Fertilizer',
+      data: {
+        name: 'NPK 23:21:0+4S Fertiliser (50kg)',
+        description: 'Compound fertiliser ideal for cereal crops at planting. 50kg bag covers approximately 0.2 hectares at recommended rate.',
+        price: '52',
+        currency: 'USD',
+        stock_quantity: '200',
+        category: 'fertilizers',
+        unit: '50kg bag',
+        image_url: '',
+      },
+    },
+    {
+      label: 'Knapsack Sprayer',
+      icon: 'Sprayer',
+      data: {
+        name: '16L Manual Knapsack Sprayer',
+        description: 'High-pressure manual knapsack sprayer with brass lance and adjustable nozzle. Padded shoulder straps. Ideal for crop protection application.',
+        price: '38',
+        currency: 'USD',
+        stock_quantity: '50',
+        category: 'tools',
+        unit: 'unit',
+        image_url: '',
+      },
+    },
+    {
+      label: 'Glyphosate Herbicide',
+      icon: 'Pesticide',
+      data: {
+        name: 'Glyphosate 360 SL Herbicide (5L)',
+        description: 'Non-selective systemic herbicide for control of annual and perennial weeds. 5L jerrycan covers approximately 5 hectares at standard rate.',
+        price: '32',
+        currency: 'USD',
+        stock_quantity: '120',
+        category: 'pesticides',
+        unit: '5L jerrycan',
+        image_url: '',
+      },
+    },
+    {
+      label: 'Drip Irrigation Kit',
+      icon: 'Drip',
+      data: {
+        name: 'Smallholder Drip Irrigation Kit (0.1ha)',
+        description: 'Complete drip irrigation kit covering 0.1 hectares. Includes mainline, laterals, emitters, filter, and connectors. Suitable for vegetable production.',
+        price: '180',
+        currency: 'USD',
+        stock_quantity: '20',
+        category: 'tools',
+        unit: 'kit',
+        image_url: '',
+      },
+    },
+    {
+      label: 'Pruning Shears',
+      icon: 'Shears',
+      data: {
+        name: 'Bypass Pruning Shears (Professional)',
+        description: 'Professional bypass pruning shears with SK5 steel blades. Ergonomic grip with safety lock. Essential for orchard and vineyard management.',
+        price: '14',
+        currency: 'USD',
+        stock_quantity: '80',
+        category: 'tools',
+        unit: 'unit',
+        image_url: '',
+      },
+    },
+  ];
+
+  const openModalWithTemplate = (template: ProductFormData) => {
+    setEditingProduct(null);
+    setFormData(template);
+    setFormError('');
+    setShowModal(true);
+  };
+
   const openEditModal = (product: SupplierProduct) => {
     setEditingProduct(product);
     setFormData({
@@ -708,12 +808,41 @@ export default function SupplierProductsPage() {
               Clear All Filters
             </button>
           ) : (
-            <button
-              onClick={openAddModal}
-              className="inline-flex items-center gap-2 bg-[#8CB89C] hover:bg-[#729E82] text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors"
-            >
-              <Plus className="w-4 h-4" /> Add Your First Product
-            </button>
+            <>
+              <button
+                onClick={openAddModal}
+                className="inline-flex items-center gap-2 bg-[#8CB89C] hover:bg-[#729E82] text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors"
+              >
+                <Plus className="w-4 h-4" /> Add Your First Product
+              </button>
+
+              <div className="mt-10 pt-8 border-t border-gray-100">
+                <p className="text-xs font-bold uppercase tracking-wide text-gray-500 mb-1">
+                  Or start from a template
+                </p>
+                <p className="text-xs text-gray-400 mb-5">
+                  Pick a common product, edit the details, and publish in 60 seconds.
+                </p>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 max-w-3xl mx-auto">
+                  {PRODUCT_TEMPLATES.map((tpl) => (
+                    <button
+                      key={tpl.label}
+                      onClick={() => openModalWithTemplate(tpl.data)}
+                      className="text-left p-4 rounded-xl border border-gray-200 hover:border-[#8CB89C] hover:bg-[#8CB89C]/5 transition-all group"
+                    >
+                      <div className="flex items-center gap-2 mb-1">
+                        <Package className="w-4 h-4 text-[#8CB89C] group-hover:text-[#729E82]" />
+                        <span className="text-sm font-semibold text-[#1B2A4A]">{tpl.label}</span>
+                      </div>
+                      <p className="text-[11px] text-gray-500 line-clamp-2">{tpl.data.description}</p>
+                      <p className="text-xs font-bold text-[#8CB89C] mt-2">
+                        ${tpl.data.price} <span className="font-normal text-gray-400">/ {tpl.data.unit}</span>
+                      </p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </>
           )}
         </motion.div>
       )}

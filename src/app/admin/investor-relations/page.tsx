@@ -21,12 +21,14 @@ import {
   Send,
   X,
   Target,
+  Megaphone,
 } from 'lucide-react';
 import { SectionTabs } from '@/components/admin/SectionTabs';
 
 const IR_TABS = [
   { href: '/admin/investor-relations', label: 'Investors', Icon: TrendingUp },
   { href: '/admin/investor-relations/opportunities', label: 'Opportunities', Icon: Target },
+  { href: '/admin/investor-relations/updates', label: 'Updates', Icon: Megaphone },
 ];
 
 // ── Types ─────────────────────────────────────────────────────────────────────

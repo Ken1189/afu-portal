@@ -65,7 +65,7 @@ export const CROPS: CropData[] = [
     name: 'Sorghum',
     slug: 'sorghum',
     category: 'Grains',
-    image: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=1200&q=80&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1568667256549-094345857637?w=1200&q=80&auto=format&fit=crop',
     tagline: 'Drought-resilient grain for dry-land farming',
     description: 'A drought-tolerant cereal that thrives in semi-arid conditions where maize cannot survive, sorghum is essential for food security in Africa\'s dryland regions.',
     overview: [
@@ -91,7 +91,7 @@ export const CROPS: CropData[] = [
     name: 'Millet',
     slug: 'millet',
     category: 'Grains',
-    image: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=1200&q=80&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1517022812141-23620dba5c23?w=1200&q=80&auto=format&fit=crop',
     tagline: 'Ancient grain with modern nutritional value',
     description: 'One of humanity\'s oldest cultivated grains, millet is a nutritional powerhouse that thrives in Africa\'s most challenging growing environments.',
     overview: [
@@ -143,7 +143,7 @@ export const CROPS: CropData[] = [
     name: 'Wheat',
     slug: 'wheat',
     category: 'Grains',
-    image: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=1200&q=80&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=1200&q=80&auto=format&fit=crop',
     tagline: 'Strategic grain for Africa\'s growing bakery and milling sector',
     description: 'A temperature-sensitive cereal grown in Africa\'s cooler highlands, wheat is critical for the continent\'s expanding bread, pasta, and biscuit industries.',
     overview: [
@@ -597,7 +597,7 @@ export const CROPS: CropData[] = [
     name: 'Cassava',
     slug: 'cassava',
     category: 'Vegetables',
-    image: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=1200&q=80&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1500595046743-cd271d694d30?w=1200&q=80&auto=format&fit=crop',
     tagline: 'Africa\'s food security champion — resilient and versatile',
     description: 'Cassava is the ultimate resilience crop, growing in poor soils with minimal inputs and providing food security for over 500 million Africans.',
     overview: [

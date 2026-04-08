@@ -588,6 +588,31 @@ export default function FarmDashboardPage() {
       </motion.section>
 
       {/* ================================================================= */}
+      {/* MEMBERSHIP UPGRADE CARD                                           */}
+      {/* ================================================================= */}
+      <motion.section variants={itemVariants} className="px-4">
+        <Link
+          href="/memberships"
+          className="block rounded-2xl border border-[#FFD700]/40 bg-gradient-to-br from-[#FFF8DC] to-[#FFFAE6] p-4 hover:border-[#FFD700]/70 transition-colors"
+        >
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#FFD700] to-[#E6BE00] flex items-center justify-center flex-shrink-0">
+              <ArrowRight className="w-5 h-5 text-[#1B2A4A]" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="text-sm font-bold text-[#1B2A4A]">Unlock more with a paid membership</h3>
+              <p className="text-xs text-gray-700 mt-0.5">
+                Higher loan limits, premium training, marketplace priority and more.
+              </p>
+              <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#1B2A4A] mt-2">
+                See plans <ArrowRight className="w-3 h-3" />
+              </span>
+            </div>
+          </div>
+        </Link>
+      </motion.section>
+
+      {/* ================================================================= */}
       {/* 2. WEATHER STRIP (7-day horizontal scroll)                        */}
       {/* ================================================================= */}
       <motion.section variants={itemVariants}>
