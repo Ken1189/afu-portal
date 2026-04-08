@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr';
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse, type NextRequest } from 'next/server';
-import { rateLimit } from '@/lib/rateLimit';
+import { rateLimitAsync } from '@/lib/rateLimit';
 
 /**
  * Creates a service-role Supabase client that bypasses RLS.
@@ -39,31 +39,26 @@ async function getUserRoleData(userId: string): Promise<{ role: string; roles: s
   const defaultResult = { role: 'member', roles: [] as string[] };
   try {
     const svc = getServiceClient();
-    // Try with roles column first, fall back to role only if roles column doesn't exist
+    // Single query selecting both columns. If `roles` column doesn't exist
+    // PostgREST returns a 42703 error and we fall back to role only.
     const { data, error } = await svc
+      .from('profiles')
+      .select('role, roles')
+      .eq('id', userId)
+      .single();
+    if (!error && data) {
+      return {
+        role: (data.role as string) ?? 'member',
+        roles: Array.isArray(data.roles) ? (data.roles as string[]) : [],
+      };
+    }
+    // Fallback: roles column missing — query role only
+    const { data: roleOnly } = await svc
       .from('profiles')
       .select('role')
       .eq('id', userId)
       .single();
-    if (error) {
-      console.warn('[Middleware] Role lookup failed for', userId, error.message);
-      // Retry once with just role
-      const { data: retry } = await svc.from('profiles').select('role').eq('id', userId).single();
-      if (retry?.role) return { role: retry.role, roles: [] };
-      return defaultResult;
-    }
-    const role = data?.role ?? 'member';
-    // Try to get roles array separately (column may not exist yet)
-    let roles: string[] = [];
-    try {
-      const { data: rolesData } = await svc.from('profiles').select('roles').eq('id', userId).single();
-      if (rolesData?.roles && Array.isArray(rolesData.roles)) {
-        roles = rolesData.roles;
-      }
-    } catch {
-      // roles column doesn't exist yet — that's fine
-    }
-    return { role, roles };
+    return { role: (roleOnly?.role as string) ?? 'member', roles: [] };
   } catch (err) {
     console.error('[Middleware] Role lookup error:', err);
     return defaultResult;
@@ -85,9 +80,9 @@ function userHasAnyRole(roleData: { role: string; roles: string[] }, targets: st
  * protects authenticated routes.
  */
 export async function updateSession(request: NextRequest) {
-  // ── Rate limiting on API routes ──────────────────────────────────────
+  // ── Rate limiting on API routes (Upstash-backed when configured) ────
   if (request.nextUrl.pathname.startsWith('/api/')) {
-    const rateLimitResponse = rateLimit(request);
+    const rateLimitResponse = await rateLimitAsync(request);
     if (rateLimitResponse) return rateLimitResponse;
   }
 
@@ -138,8 +133,17 @@ export async function updateSession(request: NextRequest) {
   }
 
   // S1.16: Fetch role ONCE and reuse for all checks (was 5 redundant DB calls)
-  // Now also fetches roles[] array to support dual-role users
-  const roleData = user ? await getUserRoleData(user.id) : null;
+  // Perf: only look up role when the path actually needs it. Public pages, API
+  // routes, and unauthenticated requests all skip the DB round-trip entirely.
+  const needsRoleCheck =
+    !!user &&
+    (pathname === '/login' ||
+      pathname.startsWith('/admin') ||
+      pathname.startsWith('/supplier') ||
+      pathname.startsWith('/investor') ||
+      pathname.startsWith('/ambassador') ||
+      pathname.startsWith('/warehouse'));
+  const roleData = needsRoleCheck ? await getUserRoleData(user!.id) : null;
   const role = roleData?.role ?? null;
 
   // If logged in and visiting /login → redirect based on primary role

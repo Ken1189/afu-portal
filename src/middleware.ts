@@ -1,13 +1,8 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { updateSession } from '@/lib/supabase/middleware';
-import { rateLimit } from '@/lib/rateLimit';
 
 export async function middleware(request: NextRequest) {
-  // Rate limit API routes
-  if (request.nextUrl.pathname.startsWith('/api/')) {
-    const rateLimitResponse = rateLimit(request);
-    if (rateLimitResponse) return rateLimitResponse;
-  }
+  // Note: rate limiting is handled inside updateSession() so we don't double-call.
 
   // Skip Supabase middleware if not configured yet (dev / demo mode)
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;

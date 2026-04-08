@@ -482,7 +482,7 @@ export default function DashboardPage() {
   const recentActivities = useMemo(() => FALLBACK_ACTIVITIES, []);
 
   // First 4 market commodities
-  const topCommodities = useMemo(() => marketPrices.slice(0, 4), []);
+  const topCommodities = useMemo(() => marketPrices.slice(0, 4), [marketPrices]);
 
   // Greeting based on hour
   const greeting = useMemo(() => {
