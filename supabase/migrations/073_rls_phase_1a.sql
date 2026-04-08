@@ -1,23 +1,15 @@
 -- ============================================================================
 -- RLS RE-ENABLE — PHASE 1A: financial / audit / wallet / KYC tables
 -- ============================================================================
--- These tables are accessed almost exclusively through service-role API routes.
--- Re-enabling RLS here is the lowest-risk first step because:
---   1. Service role bypasses RLS entirely → server-side code is unaffected
---   2. No client-side SSR reads of these tables exist in current codebase
---   3. Closes the gaping hole left by migration 048 disabling RLS globally
+-- Schema-defensive: this migration uses information_schema lookups so it works
+-- regardless of whether a given table was created by migration 003 (member_id),
+-- 020 (user_id), 046 (supplier_id), or the 048 squash. Some columns may exist,
+-- some may not — we add the policy only if the owner column actually exists.
 --
--- Policy pattern (cached auth.uid()):
---   - Owner can SELECT/INSERT/UPDATE/DELETE own rows
---   - Admin / super_admin can do everything
---   - Wrap auth.uid() in (SELECT auth.uid()) so Postgres caches per-statement
---     instead of re-evaluating per row (Supabase performance best practice)
---
--- If anything breaks, roll back with:
---   ALTER TABLE <name> DISABLE ROW LEVEL SECURITY;
+-- Service role bypasses RLS entirely, so server-side API routes are unaffected.
 -- ============================================================================
 
--- Helper: is_admin() check used by every policy. Created idempotently.
+-- Helper: cached admin check used by every policy.
 CREATE OR REPLACE FUNCTION public.is_admin_or_super()
 RETURNS BOOLEAN
 LANGUAGE sql
@@ -35,189 +27,107 @@ $$;
 GRANT EXECUTE ON FUNCTION public.is_admin_or_super() TO authenticated, anon;
 
 -- ============================================================================
--- KYC tables — only owner + admin can access
+-- Generic helper: enable RLS, add admin-all + owner policies for a table,
+-- choosing the owner column based on what actually exists.
 -- ============================================================================
+DO $outer$
+DECLARE
+  rec RECORD;
+  owner_col TEXT;
+  has_member_id BOOLEAN;
+  has_user_id BOOLEAN;
+  has_supplier_id BOOLEAN;
+  policy_sql TEXT;
+  -- (table_name, owner_join_kind)
+  -- owner_join_kind: 'direct_user'  → owner_col = auth.uid()
+  --                  'member'        → member_id IN (SELECT id FROM members WHERE profile_id = auth.uid())
+  --                  'supplier'      → supplier_id IN (SELECT id FROM suppliers WHERE profile_id = auth.uid())
+  --                  'admin_only'    → admins only, no owner read
+  tables TEXT[][] := ARRAY[
+    ['kyc_documents',       'auto'],
+    ['kyc_verifications',   'auto'],
+    ['payments',            'auto'],
+    ['payment_attempts',    'admin_only'],
+    ['payouts',             'auto'],
+    ['wallets',             'auto'],
+    ['wallet_accounts',     'auto'],
+    ['wallet_transactions', 'admin_only'],
+    ['credit_scores',       'auto'],
+    ['credit_score_history','auto'],
+    ['audit_log',           'admin_only'],
+    ['audit_logs',           'admin_only'],
+    ['admin_permissions',   'admin_only']
+  ];
+  i INT;
+  t_name TEXT;
+  t_kind TEXT;
+BEGIN
+  FOR i IN 1..array_length(tables, 1) LOOP
+    t_name := tables[i][1];
+    t_kind := tables[i][2];
 
-ALTER TABLE IF EXISTS kyc_documents ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS kyc_documents_owner_select ON kyc_documents;
-DROP POLICY IF EXISTS kyc_documents_owner_modify ON kyc_documents;
-DROP POLICY IF EXISTS kyc_documents_admin_all ON kyc_documents;
+    -- Skip if table doesn't exist
+    IF NOT EXISTS (
+      SELECT 1 FROM information_schema.tables
+      WHERE table_schema = 'public' AND table_name = t_name
+    ) THEN
+      RAISE NOTICE 'Skipping %: table does not exist', t_name;
+      CONTINUE;
+    END IF;
 
-CREATE POLICY kyc_documents_owner_select ON kyc_documents
-  FOR SELECT
-  USING (user_id = (SELECT auth.uid()));
+    -- Enable RLS
+    EXECUTE format('ALTER TABLE public.%I ENABLE ROW LEVEL SECURITY', t_name);
 
-CREATE POLICY kyc_documents_owner_modify ON kyc_documents
-  FOR ALL
-  USING (user_id = (SELECT auth.uid()))
-  WITH CHECK (user_id = (SELECT auth.uid()));
+    -- Always drop existing policies with our naming convention to allow reruns
+    EXECUTE format('DROP POLICY IF EXISTS %I_admin_all ON public.%I', t_name, t_name);
+    EXECUTE format('DROP POLICY IF EXISTS %I_owner_select ON public.%I', t_name, t_name);
+    EXECUTE format('DROP POLICY IF EXISTS %I_owner_modify ON public.%I', t_name, t_name);
 
-CREATE POLICY kyc_documents_admin_all ON kyc_documents
-  FOR ALL
-  USING (public.is_admin_or_super())
-  WITH CHECK (public.is_admin_or_super());
+    -- Admin-all policy is added to every table
+    EXECUTE format(
+      'CREATE POLICY %I_admin_all ON public.%I FOR ALL USING (public.is_admin_or_super()) WITH CHECK (public.is_admin_or_super())',
+      t_name, t_name
+    );
 
-ALTER TABLE IF EXISTS kyc_verifications ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS kyc_verifications_owner_select ON kyc_verifications;
-DROP POLICY IF EXISTS kyc_verifications_admin_all ON kyc_verifications;
+    IF t_kind = 'admin_only' THEN
+      RAISE NOTICE 'RLS enabled on % (admin-only)', t_name;
+      CONTINUE;
+    END IF;
 
-CREATE POLICY kyc_verifications_owner_select ON kyc_verifications
-  FOR SELECT
-  USING (user_id = (SELECT auth.uid()));
+    -- Auto-detect owner column
+    SELECT EXISTS(SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name=t_name AND column_name='user_id') INTO has_user_id;
+    SELECT EXISTS(SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name=t_name AND column_name='member_id') INTO has_member_id;
+    SELECT EXISTS(SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name=t_name AND column_name='supplier_id') INTO has_supplier_id;
 
-CREATE POLICY kyc_verifications_admin_all ON kyc_verifications
-  FOR ALL
-  USING (public.is_admin_or_super())
-  WITH CHECK (public.is_admin_or_super());
+    IF has_user_id THEN
+      -- Direct user_id check
+      EXECUTE format(
+        'CREATE POLICY %I_owner_select ON public.%I FOR SELECT USING (user_id = (SELECT auth.uid()))',
+        t_name, t_name
+      );
+      RAISE NOTICE 'RLS enabled on % (owner via user_id)', t_name;
 
--- ============================================================================
--- Payments / payouts — owner reads own, admin reads all
--- ============================================================================
+    ELSIF has_member_id THEN
+      -- Join through members.profile_id
+      EXECUTE format(
+        'CREATE POLICY %I_owner_select ON public.%I FOR SELECT USING (member_id IN (SELECT id FROM members WHERE profile_id = (SELECT auth.uid())))',
+        t_name, t_name
+      );
+      RAISE NOTICE 'RLS enabled on % (owner via member_id)', t_name;
 
-ALTER TABLE IF EXISTS payments ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS payments_owner_select ON payments;
-DROP POLICY IF EXISTS payments_admin_all ON payments;
+    ELSIF has_supplier_id THEN
+      -- Join through suppliers.profile_id
+      EXECUTE format(
+        'CREATE POLICY %I_owner_select ON public.%I FOR SELECT USING (supplier_id IN (SELECT id FROM suppliers WHERE profile_id = (SELECT auth.uid())))',
+        t_name, t_name
+      );
+      RAISE NOTICE 'RLS enabled on % (owner via supplier_id)', t_name;
 
-CREATE POLICY payments_owner_select ON payments
-  FOR SELECT
-  USING (user_id = (SELECT auth.uid()));
-
-CREATE POLICY payments_admin_all ON payments
-  FOR ALL
-  USING (public.is_admin_or_super())
-  WITH CHECK (public.is_admin_or_super());
-
-ALTER TABLE IF EXISTS payment_attempts ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS payment_attempts_admin_all ON payment_attempts;
-
-CREATE POLICY payment_attempts_admin_all ON payment_attempts
-  FOR ALL
-  USING (public.is_admin_or_super())
-  WITH CHECK (public.is_admin_or_super());
-
-ALTER TABLE IF EXISTS payouts ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS payouts_owner_select ON payouts;
-DROP POLICY IF EXISTS payouts_admin_all ON payouts;
-
-CREATE POLICY payouts_owner_select ON payouts
-  FOR SELECT
-  USING (user_id = (SELECT auth.uid()));
-
-CREATE POLICY payouts_admin_all ON payouts
-  FOR ALL
-  USING (public.is_admin_or_super())
-  WITH CHECK (public.is_admin_or_super());
-
--- ============================================================================
--- Wallets — owner reads own balance/transactions, admin sees all
--- ============================================================================
-
-ALTER TABLE IF EXISTS wallets ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS wallets_owner_select ON wallets;
-DROP POLICY IF EXISTS wallets_admin_all ON wallets;
-
-CREATE POLICY wallets_owner_select ON wallets
-  FOR SELECT
-  USING (user_id = (SELECT auth.uid()));
-
-CREATE POLICY wallets_admin_all ON wallets
-  FOR ALL
-  USING (public.is_admin_or_super())
-  WITH CHECK (public.is_admin_or_super());
-
-ALTER TABLE IF EXISTS wallet_accounts ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS wallet_accounts_owner_select ON wallet_accounts;
-DROP POLICY IF EXISTS wallet_accounts_admin_all ON wallet_accounts;
-
-CREATE POLICY wallet_accounts_owner_select ON wallet_accounts
-  FOR SELECT
-  USING (user_id = (SELECT auth.uid()));
-
-CREATE POLICY wallet_accounts_admin_all ON wallet_accounts
-  FOR ALL
-  USING (public.is_admin_or_super())
-  WITH CHECK (public.is_admin_or_super());
-
-ALTER TABLE IF EXISTS wallet_transactions ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS wallet_transactions_owner_select ON wallet_transactions;
-DROP POLICY IF EXISTS wallet_transactions_admin_all ON wallet_transactions;
-
-CREATE POLICY wallet_transactions_owner_select ON wallet_transactions
-  FOR SELECT
-  USING (user_id = (SELECT auth.uid()));
-
-CREATE POLICY wallet_transactions_admin_all ON wallet_transactions
-  FOR ALL
-  USING (public.is_admin_or_super())
-  WITH CHECK (public.is_admin_or_super());
-
--- ============================================================================
--- Credit scores — sensitive PII, owner read + admin all
--- ============================================================================
-
-ALTER TABLE IF EXISTS credit_scores ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS credit_scores_owner_select ON credit_scores;
-DROP POLICY IF EXISTS credit_scores_admin_all ON credit_scores;
-
-CREATE POLICY credit_scores_owner_select ON credit_scores
-  FOR SELECT
-  USING (user_id = (SELECT auth.uid()));
-
-CREATE POLICY credit_scores_admin_all ON credit_scores
-  FOR ALL
-  USING (public.is_admin_or_super())
-  WITH CHECK (public.is_admin_or_super());
-
-ALTER TABLE IF EXISTS credit_score_history ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS credit_score_history_owner_select ON credit_score_history;
-DROP POLICY IF EXISTS credit_score_history_admin_all ON credit_score_history;
-
-CREATE POLICY credit_score_history_owner_select ON credit_score_history
-  FOR SELECT
-  USING (user_id = (SELECT auth.uid()));
-
-CREATE POLICY credit_score_history_admin_all ON credit_score_history
-  FOR ALL
-  USING (public.is_admin_or_super())
-  WITH CHECK (public.is_admin_or_super());
-
--- ============================================================================
--- Audit logs — admin read only, system writes via service role
--- ============================================================================
-
-ALTER TABLE IF EXISTS audit_log ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS audit_log_admin_select ON audit_log;
-
-CREATE POLICY audit_log_admin_select ON audit_log
-  FOR SELECT
-  USING (public.is_admin_or_super());
-
-ALTER TABLE IF EXISTS audit_logs ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS audit_logs_admin_select ON audit_logs;
-
-CREATE POLICY audit_logs_admin_select ON audit_logs
-  FOR SELECT
-  USING (public.is_admin_or_super());
-
--- ============================================================================
--- Admin permissions — admin read only, never client-writable
--- ============================================================================
-
-ALTER TABLE IF EXISTS admin_permissions ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS admin_permissions_super_admin_only ON admin_permissions;
-
-CREATE POLICY admin_permissions_super_admin_only ON admin_permissions
-  FOR ALL
-  USING (
-    EXISTS (
-      SELECT 1 FROM profiles
-      WHERE id = (SELECT auth.uid())
-        AND role = 'super_admin'
-    )
-  );
-
--- ============================================================================
--- Schema reload
--- ============================================================================
+    ELSE
+      RAISE NOTICE 'RLS enabled on % (admin-only fallback — no owner column found)', t_name;
+    END IF;
+  END LOOP;
+END
+$outer$;
 
 NOTIFY pgrst, 'reload schema';
