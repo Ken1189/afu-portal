@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/supabase/auth-context';
+import ImageUploader from '@/components/ui/ImageUploader';
 import FeatureGate from '@/components/ui/FeatureGate';
 import { useMembershipTier } from '@/lib/membership-context';
 import Link from 'next/link';
@@ -820,15 +821,15 @@ export default function FarmExchangePage() {
                 </div>
               </div>
 
-              {/* Photo URL */}
+              {/* Photo Upload */}
               <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-1">Photo URL</label>
-                <input
-                  type="url"
-                  value={form.photoUrl}
-                  onChange={(e) => handleFormChange('photoUrl', e.target.value)}
-                  placeholder="https://..."
-                  className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347] outline-none"
+                <label className="block text-xs font-semibold text-gray-600 mb-1">Photo</label>
+                <ImageUploader
+                  value={form.photoUrl || null}
+                  onChange={(url) => handleFormChange('photoUrl', url)}
+                  bucket="media"
+                  folder="exchange"
+                  label="Upload photo or take a picture"
                 />
               </div>
 
