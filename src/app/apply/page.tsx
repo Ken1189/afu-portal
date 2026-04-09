@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { useApplications } from "@/lib/supabase/use-applications";
 import { createClient } from "@/lib/supabase/client";
 import { ALL_AFRICAN_COUNTRIES } from "@/lib/countries";
+import PromoCodeInput from "@/components/ui/PromoCodeInput";
 
 type Tier = "free" | "smallholder" | "commercial" | "enterprise" | "partner";
 
@@ -26,6 +27,7 @@ export default function ApplyPage() {
   const [referredBy, setReferredBy] = useState<string | null>(null);
   const [referralInput, setReferralInput] = useState("");
   const [honeypot, setHoneypot] = useState("");
+  const [promoCode, setPromoCode] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -150,7 +152,7 @@ export default function ApplyPage() {
       primary_crops: formData.crops ? formData.crops.split(',').map((c: string) => c.trim()) : undefined,
       requested_tier: (selectedTier || 'free') as any,
       application_type: (selectedTier === 'partner' ? 'partner' : 'farmer') as any,
-      notes: formData.about || undefined,
+      notes: (formData.about || '') + (promoCode ? ` | Promo: ${promoCode}` : '') || undefined,
       referral_code: storedRef || undefined,
     } as any);
 
@@ -427,6 +429,12 @@ export default function ApplyPage() {
                     </span>
                   </label>
                 </div>
+
+                {/* Promo Code */}
+                <PromoCodeInput
+                  context={selectedTier === 'partner' ? 'supplier' : 'farmer'}
+                  onValidated={(p) => setPromoCode(p?.code ?? null)}
+                />
 
                 {submitError && (
                   <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm mb-4">

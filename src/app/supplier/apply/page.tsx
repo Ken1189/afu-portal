@@ -15,6 +15,7 @@ import {
   Loader2,
   ArrowLeft,
 } from 'lucide-react';
+import PromoCodeInput from '@/components/ui/PromoCodeInput';
 const CATEGORIES = [
   { value: 'seeds', label: 'Seeds' },
   { value: 'fertiliser', label: 'Fertiliser' },
@@ -38,6 +39,7 @@ export default function SupplierApplyPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
+  const [promoCode, setPromoCode] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -68,7 +70,7 @@ export default function SupplierApplyPage() {
           farm_name: form.businessName,
           requested_tier: 'smallholder',
           application_type: 'supplier',
-          notes: `[SUPPLIER APPLICATION] Category: ${form.category} | Website: ${form.website || 'N/A'} | Description: ${form.description || 'N/A'}`,
+          notes: `[SUPPLIER APPLICATION] Category: ${form.category} | Website: ${form.website || 'N/A'} | Description: ${form.description || 'N/A'}${promoCode ? ` | Promo: ${promoCode}` : ''}`,
         }),
       });
 
@@ -319,6 +321,12 @@ export default function SupplierApplyPage() {
                 />
               </div>
             </div>
+
+            {/* Promo Code */}
+            <PromoCodeInput
+              context="supplier"
+              onValidated={(p) => setPromoCode(p?.code ?? null)}
+            />
 
             {/* Consent */}
             <div className="space-y-3 bg-gray-50 rounded-xl p-4">

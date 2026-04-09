@@ -137,65 +137,15 @@ function generateMonthlySales(totalSales: number | null | undefined) {
   }));
 }
 
-function generateProducts(category: SupplierCategory | null | undefined, count: number) {
-  const productNames: Record<SupplierCategory, string[]> = {
-    'input-supplier': [
-      'Hybrid Maize Seed 25kg', 'NPK Fertilizer 50kg', 'Organic Compost Blend', 'Foliar Spray 5L',
-      'Seed Dressing 1L', 'Urea Granules 50kg', 'Potassium Chloride 25kg', 'Bio-Stimulant 10L',
-      'Drip Tape 500m Roll', 'Cowpea Seed 10kg', 'Sorghum Seed 20kg', 'Groundnut Seed 15kg',
-    ],
-    equipment: [
-      'Solar Water Pump 3HP', 'Drip Irrigation Kit (1ha)', 'Hand Planter Pro', 'Tractor Plough 3-Furrow',
-      'Grain Mill Electric', 'Sprayer Backpack 20L', 'Borehole Pump Solar', 'Disc Harrow 16-Disc',
-      'Ox-Drawn Planter', 'Chaff Cutter Electric', 'Thresher Machine', 'Wheelbarrow Heavy Duty',
-    ],
-    logistics: [
-      'Cold Chain Transport', 'Grain Haulage (per ton)', 'Last-Mile Delivery', 'Warehouse Storage (monthly)',
-      'Cross-Border Permit', 'Container Freight', 'Refrigerated Van Hire', 'Customs Brokerage',
-    ],
-    processing: [
-      'Grain Cleaning Service', 'Flour Milling (per ton)', 'Oil Extraction Service', 'Packaging Service',
-      'Quality Testing', 'Moisture Testing', 'Grading Service', 'Fumigation Service',
-      'Hermetic Storage Bags', 'Metal Silo 5-Ton',
-    ],
-    technology: [
-      'IoT Soil Sensor Kit', 'Drone Mapping (per ha)', 'Farm Management App', 'Weather Station Pro',
-      'NDVI Analysis Report', 'GPS Field Mapping', 'Livestock Tracking Tags', 'Data Analytics Platform',
-    ],
-    'financial-services': [
-      'Crop Insurance Plan', 'Input Finance Package', 'Working Capital Loan', 'Savings Account',
-      'Mobile Money Integration', 'Equipment Lease', 'Invoice Financing',
-    ],
-  };
-
-  const safeCategory: SupplierCategory = category && category in productNames ? category : 'input-supplier';
-  const names = productNames[safeCategory];
-  const safeCount = Number.isFinite(count) && count > 0 ? count : 0;
-  const images = [
-    'https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=300&h=200&fit=crop',
-    'https://images.unsplash.com/photo-1530267981375-f0de937f5f13?w=300&h=200&fit=crop',
-    'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=300&h=200&fit=crop',
-    'https://images.unsplash.com/photo-1622383563227-04401ab4e5ea?w=300&h=200&fit=crop',
-    'https://images.unsplash.com/photo-1560693225-b8507d6f3aa9?w=300&h=200&fit=crop',
-    'https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=300&h=200&fit=crop',
-    'https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=300&h=200&fit=crop',
-    'https://images.unsplash.com/photo-1504370805625-d32c54b16100?w=300&h=200&fit=crop',
-  ];
-
-  return Array.from({ length: Math.min(safeCount, names.length) }).map((_, i) => {
-    const price = Math.round((50 + Math.random() * 500) * 10) / 10;
-    const discountPct = 5 + Math.floor(Math.random() * 15);
-    return {
-      id: `PRD-${String(i + 1).padStart(3, '0')}`,
-      name: names[i % names.length],
-      price,
-      memberPrice: Math.round(price * (1 - discountPct / 100) * 10) / 10,
-      discountPct,
-      image: images[i % images.length],
-      inStock: Math.random() > 0.15,
-      soldCount: Math.floor(Math.random() * 200 + 10),
-    };
-  });
+interface ProductRow {
+  id: string;
+  name: string;
+  price: number;
+  member_price: number | null;
+  discount_percent: number | null;
+  image_url: string | null;
+  in_stock: boolean;
+  sold_count: number;
 }
 
 function generateCommissionHistory(commissionRate: number | null | undefined, totalSales: number | null | undefined) {
@@ -325,10 +275,22 @@ export default function SupplierDetailPage() {
     () => (supplier ? generateMonthlySales(supplier.total_sales) : []),
     [supplier]
   );
-  const products = useMemo(
-    () => (supplier ? generateProducts(supplier.category, supplier.products_count) : []),
-    [supplier]
-  );
+  const [products, setProducts] = useState<ProductRow[]>([]);
+  useEffect(() => {
+    if (!supplier) return;
+    let cancelled = false;
+    (async () => {
+      const supabase = createClient();
+      const { data } = await supabase
+        .from('products')
+        .select('id, name, price, member_price, discount_percent, image_url, in_stock, sold_count')
+        .eq('supplier_id', supplier.id)
+        .order('created_at', { ascending: false })
+        .limit(50);
+      if (!cancelled && data) setProducts(data as ProductRow[]);
+    })();
+    return () => { cancelled = true; };
+  }, [supplier]);
   const commissionHistory = useMemo(
     () => (supplier ? generateCommissionHistory(supplier.commission_rate, supplier.total_sales) : []),
     [supplier]
@@ -395,7 +357,7 @@ export default function SupplierDetailPage() {
           <div className="flex items-start gap-4 flex-1">
             <div className="w-20 h-20 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-200">
               <img
-                src={supplier.logo_url || '/placeholder-logo.png'}
+                src={supplier.logo_url || '/placeholder-logo.svg'}
                 alt={supplier.company_name}
                 className="w-full h-full object-cover"
               />
@@ -677,18 +639,24 @@ export default function SupplierDetailPage() {
                         className="bg-cream rounded-xl overflow-hidden border border-gray-100 hover:shadow-md transition-shadow"
                       >
                         <div className="h-32 bg-gray-100">
-                          <img
-                            src={product.image}
-                            alt={product.name}
-                            className="w-full h-full object-cover"
-                          />
+                          {product.image_url ? (
+                            <img
+                              src={product.image_url}
+                              alt={product.name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <Package className="w-8 h-8 text-gray-300" />
+                            </div>
+                          )}
                         </div>
                         <div className="p-3">
                           <div className="flex items-start justify-between mb-1">
                             <h4 className="text-sm font-medium text-navy line-clamp-2 flex-1">
                               {product.name}
                             </h4>
-                            {product.inStock ? (
+                            {product.in_stock ? (
                               <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full font-medium ml-1 whitespace-nowrap">
                                 In Stock
                               </span>
@@ -699,13 +667,19 @@ export default function SupplierDetailPage() {
                             )}
                           </div>
                           <div className="flex items-baseline gap-2 mt-2">
-                            <span className="text-sm font-bold text-navy">${product.memberPrice.toFixed(2)}</span>
-                            <span className="text-xs text-gray-400 line-through">${product.price.toFixed(2)}</span>
-                            <span className="text-[10px] bg-teal/10 text-teal px-1.5 py-0.5 rounded-full font-medium">
-                              -{product.discountPct}%
+                            <span className="text-sm font-bold text-navy">
+                              ${(product.member_price ?? product.price).toFixed(2)}
                             </span>
+                            {product.member_price && product.member_price < product.price && (
+                              <>
+                                <span className="text-xs text-gray-400 line-through">${product.price.toFixed(2)}</span>
+                                <span className="text-[10px] bg-teal/10 text-teal px-1.5 py-0.5 rounded-full font-medium">
+                                  -{product.discount_percent ?? 0}%
+                                </span>
+                              </>
+                            )}
                           </div>
-                          <p className="text-xs text-gray-400 mt-1">{product.soldCount} sold</p>
+                          <p className="text-xs text-gray-400 mt-1">{product.sold_count} sold</p>
                         </div>
                       </motion.div>
                     ))}

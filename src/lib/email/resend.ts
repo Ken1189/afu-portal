@@ -151,5 +151,60 @@ export async function sendEmail(
     throw new Error(`Resend API error: ${error.message}`);
   }
 
-  return { success: true, messageId: data?.id ?? 'unknown' };
+  const messageId = data?.id ?? 'unknown';
+
+  // Log to unified inbox so admins can see sent emails
+  try {
+    const supabase = getAdminSupabase();
+
+    // Find or create a conversation for this recipient
+    const { data: existing } = await supabase
+      .from('conversations')
+      .select('id')
+      .eq('contact_email', to)
+      .order('last_message_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    let conversationId = existing?.id;
+    if (!conversationId) {
+      const { data: newConv } = await supabase
+        .from('conversations')
+        .insert({
+          contact_email: to,
+          contact_name: to.split('@')[0],
+          subject,
+          status: 'resolved',
+          unread_count: 0,
+        })
+        .select('id')
+        .single();
+      conversationId = newConv?.id;
+    } else {
+      await supabase
+        .from('conversations')
+        .update({ last_message_at: new Date().toISOString() })
+        .eq('id', conversationId);
+    }
+
+    if (conversationId) {
+      await supabase.from('conversation_messages').insert({
+        conversation_id: conversationId,
+        direction: 'outbound',
+        channel: 'email',
+        sender_name: 'AFU System',
+        sender_email: from,
+        subject,
+        body: html.replace(/<[^>]+>/g, '').slice(0, 2000),
+        html_body: html,
+        status: 'sent',
+        message_id: messageId,
+      });
+    }
+  } catch (logErr) {
+    // Don't fail the email send if logging fails
+    console.warn('[email] inbox log failed:', logErr);
+  }
+
+  return { success: true, messageId };
 }

@@ -201,6 +201,7 @@ const navGroups: NavGroup[] = [
       { href: '/admin/automations', label: 'Automations', icon: <Zap className={ICON_CLS} /> },
       { href: '/admin/advertising', label: 'Advertising', icon: <Megaphone className={ICON_CLS} /> },
       { href: '/admin/advertising/review', label: 'Ad Review', icon: <ScanEye className={ICON_CLS} /> },
+      { href: '/admin/promo-codes', label: 'Promo Codes', icon: <Tags className={ICON_CLS} /> },
       { href: '/admin/sponsor', label: 'Sponsor a Farmer', icon: <Heart className={ICON_CLS} /> },
       { href: '/admin/jobs', label: 'Jobs Board', icon: <Briefcase className={ICON_CLS} /> },
     ],

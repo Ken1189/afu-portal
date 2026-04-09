@@ -60,6 +60,7 @@ import { createClient } from '@/lib/supabase/client';
 import { useProducts, type ProductRow } from '@/lib/supabase/use-products';
 import { useAuth } from '@/lib/supabase/auth-context';
 import ImageUploader from '@/components/ui/ImageUploader';
+import CsvProductUpload from '@/components/ui/CsvProductUpload';
 
 // ── Animation variants ──────────────────────────────────────────────────────
 
@@ -148,6 +149,7 @@ interface ProductFormData {
   category: string;
   unit: string;
   image_url: string;
+  gallery_images: string[];
 }
 
 const emptyForm: ProductFormData = {
@@ -159,6 +161,7 @@ const emptyForm: ProductFormData = {
   category: 'seeds',
   unit: 'kg',
   image_url: '',
+  gallery_images: [],
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -307,6 +310,7 @@ export default function SupplierProductsPage() {
         category: 'seeds',
         unit: '10kg bag',
         image_url: '',
+        gallery_images: [],
       },
     },
     {
@@ -321,6 +325,7 @@ export default function SupplierProductsPage() {
         category: 'fertilizers',
         unit: '50kg bag',
         image_url: '',
+        gallery_images: [],
       },
     },
     {
@@ -335,6 +340,7 @@ export default function SupplierProductsPage() {
         category: 'tools',
         unit: 'unit',
         image_url: '',
+        gallery_images: [],
       },
     },
     {
@@ -349,6 +355,7 @@ export default function SupplierProductsPage() {
         category: 'pesticides',
         unit: '5L jerrycan',
         image_url: '',
+        gallery_images: [],
       },
     },
     {
@@ -363,6 +370,7 @@ export default function SupplierProductsPage() {
         category: 'tools',
         unit: 'kit',
         image_url: '',
+        gallery_images: [],
       },
     },
     {
@@ -377,6 +385,7 @@ export default function SupplierProductsPage() {
         category: 'tools',
         unit: 'unit',
         image_url: '',
+        gallery_images: [],
       },
     },
   ];
@@ -399,12 +408,13 @@ export default function SupplierProductsPage() {
       category: product.category,
       unit: product.unit,
       image_url: (product as any).image_url || product.image || '',
+      gallery_images: (product as any).images || [],
     });
     setFormError('');
     setShowModal(true);
   };
 
-  const handleFormChange = (field: keyof ProductFormData, value: string) => {
+  const handleFormChange = (field: keyof ProductFormData, value: string | string[]) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -429,6 +439,7 @@ export default function SupplierProductsPage() {
           unit: formData.unit,
           in_stock: Number(formData.stock_quantity) > 0,
           image_url: formData.image_url || null,
+          images: formData.gallery_images.length > 0 ? formData.gallery_images : null,
         } as any);
         if (error) { setFormError(error); return; }
       } else {
@@ -443,6 +454,7 @@ export default function SupplierProductsPage() {
           stock_quantity: Number(formData.stock_quantity) || 0,
           in_stock: Number(formData.stock_quantity) > 0,
           image_url: formData.image_url || undefined,
+          images: formData.gallery_images.length > 0 ? formData.gallery_images : undefined,
         } as any);
         if (error) { setFormError(error); return; }
       }
@@ -498,13 +510,16 @@ export default function SupplierProductsPage() {
             <p className="text-sm text-gray-500 mt-0.5">Manage your product listings and inventory</p>
           </div>
         </div>
-        <button
-          onClick={openAddModal}
-          className="inline-flex items-center gap-2 bg-[#8CB89C] hover:bg-[#729E82] text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors shadow-sm"
-        >
-          <Plus className="w-4 h-4" />
-          Add Product
-        </button>
+        <div className="flex items-center gap-3">
+          <CsvProductUpload onComplete={fetchProducts} />
+          <button
+            onClick={openAddModal}
+            className="inline-flex items-center gap-2 bg-[#8CB89C] hover:bg-[#729E82] text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors shadow-sm"
+          >
+            <Plus className="w-4 h-4" />
+            Add Product
+          </button>
+        </div>
       </motion.div>
 
       {/* ══════════════════════════════════════════════════════════════════
@@ -979,8 +994,40 @@ export default function SupplierProductsPage() {
                     folder="products"
                     value={formData.image_url}
                     onChange={(url) => handleFormChange('image_url', url)}
-                    label="Product Image"
+                    label="Main Product Image"
                   />
+                </div>
+
+                {/* Gallery images */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Additional Images ({formData.gallery_images.length}/5)
+                  </label>
+                  <div className="grid grid-cols-5 gap-2 mb-2">
+                    {formData.gallery_images.map((url, i) => (
+                      <div key={i} className="relative group">
+                        <img src={url} alt={`Gallery ${i + 1}`} className="w-full h-16 object-cover rounded-lg border border-gray-200" />
+                        <button
+                          type="button"
+                          onClick={() => handleFormChange('gallery_images', formData.gallery_images.filter((_, j) => j !== i))}
+                          className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
+                        >
+                          &times;
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  {formData.gallery_images.length < 5 && (
+                    <ImageUploader
+                      bucket="media"
+                      folder="products/gallery"
+                      value=""
+                      onChange={(url) => {
+                        if (url) handleFormChange('gallery_images', [...formData.gallery_images, url]);
+                      }}
+                      label=""
+                    />
+                  )}
                 </div>
               </div>
 

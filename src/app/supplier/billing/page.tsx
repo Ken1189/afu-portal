@@ -15,6 +15,7 @@ interface Plan {
   commission_rate: number;
   features: string[];
   display_order: number;
+  stripe_payment_link: string | null;
 }
 
 interface Subscription {
@@ -87,6 +88,7 @@ export default function SupplierBillingPage() {
           commission_rate: Number(p.commission_rate),
           features: Array.isArray(p.features) ? (p.features as string[]) : [],
           display_order: Number(p.display_order),
+          stripe_payment_link: (p.stripe_payment_link as string) || null,
         }))
       );
 
@@ -133,6 +135,13 @@ export default function SupplierBillingPage() {
   const handleSubscribe = async (slug: string) => {
     setActionLoading(`sub-${slug}`);
     try {
+      // Use Stripe Payment Link directly if configured (simpler flow)
+      const plan = plans.find((p) => p.slug === slug);
+      if (plan?.stripe_payment_link) {
+        window.location.href = plan.stripe_payment_link;
+        return;
+      }
+      // Fallback to API-created Checkout Session
       const res = await fetch('/api/supplier/subscriptions/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
