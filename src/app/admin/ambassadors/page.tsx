@@ -1763,23 +1763,29 @@ export default function AdminAmbassadorsPage() {
                 <div className="max-h-40 overflow-y-auto border border-gray-200 rounded-lg p-2 bg-gray-50">
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-1">
                     {AFRICAN_COUNTRIES.map((c) => {
-                      const checked = form.serves_countries.includes(c);
+                      const isGlobal = c === GLOBAL_OPTION;
+                      const allSelected = ALL_AFRICAN.every((ac) => form.serves_countries.includes(ac));
+                      const checked = isGlobal ? allSelected : form.serves_countries.includes(c);
                       return (
-                        <label key={c} className="flex items-center gap-2 text-xs cursor-pointer hover:bg-white rounded px-2 py-1">
+                        <label key={c} className={`flex items-center gap-2 text-xs cursor-pointer hover:bg-white rounded px-2 py-1 ${isGlobal ? 'col-span-full font-semibold text-[#5DB347] border-b border-gray-200 pb-1 mb-1' : ''}`}>
                           <input
                             type="checkbox"
                             checked={checked}
                             onChange={() => {
-                              setForm({
-                                ...form,
-                                serves_countries: checked
-                                  ? form.serves_countries.filter((x) => x !== c)
-                                  : [...form.serves_countries, c],
-                              });
+                              if (isGlobal) {
+                                setForm({ ...form, serves_countries: allSelected ? [] : [...ALL_AFRICAN] });
+                              } else {
+                                setForm({
+                                  ...form,
+                                  serves_countries: checked
+                                    ? form.serves_countries.filter((x) => x !== c)
+                                    : [...form.serves_countries, c],
+                                });
+                              }
                             }}
                             className="accent-[#5DB347]"
                           />
-                          <span>{c}</span>
+                          <span>{isGlobal ? 'Global (All African Countries)' : c}</span>
                         </label>
                       );
                     })}

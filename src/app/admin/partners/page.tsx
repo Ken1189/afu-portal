@@ -281,22 +281,32 @@ export default function AdminPartnersPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">African Markets Served</label>
                 <p className="text-xs text-gray-400 mb-2">Partners can be based anywhere. Select the African countries this partner operates in.</p>
                 <div className="max-h-40 overflow-y-auto border border-gray-200 rounded-lg p-3 grid grid-cols-2 gap-2 bg-gray-50/50">
-                  {AFRICAN_MARKETS.map((c) => (
-                    <label key={c} className="flex items-center gap-2 text-sm text-[#1B2A4A] cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={formData.serves_countries.includes(c)}
-                        onChange={() => {
-                          const next = formData.serves_countries.includes(c)
-                            ? formData.serves_countries.filter((x) => x !== c)
-                            : [...formData.serves_countries, c];
-                          setFormData({ ...formData, serves_countries: next });
-                        }}
-                        className="w-4 h-4 rounded border-gray-300"
-                      />
-                      {c}
-                    </label>
-                  ))}
+                  {AFRICAN_MARKETS.map((c) => {
+                    const isGlobal = c === GLOBAL_OPTION;
+                    const allAfricanSelected = ALL_AFRICAN_COUNTRIES.every((ac) => formData.serves_countries.includes(ac));
+                    const isChecked = isGlobal ? allAfricanSelected : formData.serves_countries.includes(c);
+                    return (
+                      <label key={c} className={`flex items-center gap-2 text-sm cursor-pointer ${isGlobal ? 'font-semibold text-[#5DB347] col-span-2 border-b border-gray-200 pb-2 mb-1' : 'text-[#1B2A4A]'}`}>
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={() => {
+                            if (isGlobal) {
+                              const next = allAfricanSelected ? [] : [...ALL_AFRICAN_COUNTRIES];
+                              setFormData({ ...formData, serves_countries: next });
+                            } else {
+                              const next = formData.serves_countries.includes(c)
+                                ? formData.serves_countries.filter((x) => x !== c)
+                                : [...formData.serves_countries, c];
+                              setFormData({ ...formData, serves_countries: next });
+                            }
+                          }}
+                          className="w-4 h-4 rounded border-gray-300"
+                        />
+                        {isGlobal ? 'Global (All African Countries)' : c}
+                      </label>
+                    );
+                  })}
                 </div>
                 {formData.serves_countries.length > 0 && (
                   <p className="text-xs text-gray-500 mt-1">{formData.serves_countries.length} selected</p>

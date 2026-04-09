@@ -409,21 +409,30 @@ export default function AmbassadorApplyPage() {
                 You can be based anywhere in the world. Select the African countries where you&apos;ll represent AFU.
               </p>
               <div className="max-h-48 overflow-y-auto border border-gray-200 rounded-xl p-3 grid grid-cols-2 sm:grid-cols-3 gap-2 bg-gray-50/50">
-                {AFRICAN_MARKETS.map((c) => (
-                  <label key={c} className="flex items-center gap-2 text-sm text-[#1B2A4A] cursor-pointer hover:text-[#5DB347]">
-                    <input
-                      type="checkbox"
-                      checked={servesCountries.includes(c)}
-                      onChange={() => {
-                        setServesCountries((prev) =>
-                          prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]
-                        );
-                      }}
-                      className="w-4 h-4 rounded border-gray-300"
-                    />
-                    {c}
-                  </label>
-                ))}
+                {AFRICAN_MARKETS.map((c) => {
+                  const isGlobal = c === GLOBAL_OPTION;
+                  const allSelected = ALL_AFRICAN_COUNTRIES.every((ac) => servesCountries.includes(ac));
+                  const checked = isGlobal ? allSelected : servesCountries.includes(c);
+                  return (
+                    <label key={c} className={`flex items-center gap-2 text-sm cursor-pointer hover:text-[#5DB347] ${isGlobal ? 'col-span-full font-semibold text-[#5DB347] border-b border-gray-200 pb-2 mb-1' : 'text-[#1B2A4A]'}`}>
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() => {
+                          if (isGlobal) {
+                            setServesCountries(allSelected ? [] : [...ALL_AFRICAN_COUNTRIES]);
+                          } else {
+                            setServesCountries((prev) =>
+                              prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]
+                            );
+                          }
+                        }}
+                        className="w-4 h-4 rounded border-gray-300"
+                      />
+                      {isGlobal ? 'Global (All African Countries)' : c}
+                    </label>
+                  );
+                })}
               </div>
               {servesCountries.length > 0 && (
                 <p className="text-xs text-gray-500 mt-1">

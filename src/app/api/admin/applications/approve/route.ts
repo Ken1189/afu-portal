@@ -137,6 +137,22 @@ export async function POST(request: Request) {
           return NextResponse.json({ success: false, error: 'Failed to update application: ' + updateError.message }, { status: 500 });
         }
 
+        // If this is a partner application, still create the managed_partners row
+        if (assignedRole === 'partner') {
+          const companyName = application.farm_name || application.full_name || 'Unnamed';
+          await svc.from('managed_partners').insert({
+            name: companyName,
+            website_url: null,
+            category: 'NGO',
+            country: application.country || null,
+            is_featured: false,
+            is_published: true,
+            display_order: 0,
+          }).then(({ error: pe }) => {
+            if (pe) console.error('[approve] managed_partners insert (existing user):', pe.message);
+          });
+        }
+
         // Still send a notification email
         const fn = escapeHtml(application.full_name?.split(' ')[0] || 'Member');
         try {
@@ -255,6 +271,25 @@ export async function POST(request: Request) {
         );
       }
       console.log('[approve] Supplier row created successfully for profile:', userId);
+
+      // Also create a managed_partners record so they appear in Partner Management
+      if (assignedRole === 'partner') {
+        const { error: partnerError } = await svc.from('managed_partners').insert({
+          name: companyName,
+          website_url: null,
+          category: 'NGO',
+          country: application.country || null,
+          is_featured: false,
+          is_published: true,
+          display_order: 0,
+        });
+        if (partnerError) {
+          console.error('[approve] Failed to create managed_partners row:', partnerError.message);
+          // Non-fatal — supplier record already created, admin can add to partners manually
+        } else {
+          console.log('[approve] managed_partners row created for:', companyName);
+        }
+      }
     }
 
     // Update the application status to approved
