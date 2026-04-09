@@ -33,7 +33,13 @@ interface PartnerFormData {
   serves_countries: string[];
 }
 
-const CATEGORIES = ['DFI', 'Bank', 'Insurance', 'Input Supplier', 'Technology', 'Government', 'NGO'];
+const CATEGORIES = [
+  'DFI', 'Bank', 'Insurance', 'Input Supplier', 'Technology', 'Government', 'NGO',
+  'Cooperative', 'Research Institute', 'University', 'Agribusiness', 'Logistics',
+  'Processing', 'Export Agency', 'Microfinance', 'Seed Company', 'Fertilizer',
+  'Equipment', 'Veterinary', 'Extension Services', 'Media', 'Telecoms',
+  'Energy', 'Water & Irrigation', 'Carbon & Climate', 'Legal', 'Consulting',
+];
 
 const EMPTY_FORM: PartnerFormData = {
   name: '', logo_url: '', website: '', category: 'Technology', featured: false, display_order: '0', serves_countries: [],
@@ -43,7 +49,17 @@ const CATEGORY_COLORS: Record<string, string> = {
   DFI: 'bg-blue-100 text-blue-700', Bank: 'bg-green-100 text-green-700',
   Insurance: 'bg-amber-100 text-amber-700', 'Input Supplier': 'bg-purple-100 text-purple-700',
   Technology: 'bg-cyan-100 text-cyan-700', Government: 'bg-red-100 text-red-700',
-  NGO: 'bg-emerald-100 text-emerald-700',
+  NGO: 'bg-emerald-100 text-emerald-700', Cooperative: 'bg-lime-100 text-lime-700',
+  'Research Institute': 'bg-indigo-100 text-indigo-700', University: 'bg-violet-100 text-violet-700',
+  Agribusiness: 'bg-orange-100 text-orange-700', Logistics: 'bg-slate-100 text-slate-700',
+  Processing: 'bg-yellow-100 text-yellow-700', 'Export Agency': 'bg-teal-100 text-teal-700',
+  Microfinance: 'bg-pink-100 text-pink-700', 'Seed Company': 'bg-green-100 text-green-800',
+  Fertilizer: 'bg-lime-100 text-lime-800', Equipment: 'bg-zinc-100 text-zinc-700',
+  Veterinary: 'bg-rose-100 text-rose-700', 'Extension Services': 'bg-sky-100 text-sky-700',
+  Media: 'bg-fuchsia-100 text-fuchsia-700', Telecoms: 'bg-blue-100 text-blue-800',
+  Energy: 'bg-amber-100 text-amber-800', 'Water & Irrigation': 'bg-cyan-100 text-cyan-800',
+  'Carbon & Climate': 'bg-emerald-100 text-emerald-800', Legal: 'bg-gray-100 text-gray-700',
+  Consulting: 'bg-purple-100 text-purple-800',
 };
 
 const _UNUSED_DEMO_PARTNERS: Partner[] = [

@@ -32,6 +32,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { useLivestock, useCreateLivestock, useUpdateLivestock, type LivestockRow } from '@/lib/supabase/use-livestock';
+import { useFarm } from '@/lib/farm-context';
 import { useAuth } from '@/lib/supabase/auth-context';
 import { createClient } from '@/lib/supabase/client';
 import ImageUploader from '@/components/ui/ImageUploader';
@@ -697,7 +698,8 @@ function adaptLivestockRow(row: LivestockRow): Animal {
 
 export default function LivestockPage() {
   // --- Live Supabase data (available when real data is entered) ---
-  const { livestock: liveLivestock, fetchLivestock } = useLivestock();
+  const { activeFarm } = useFarm();
+  const { livestock: liveLivestock, fetchLivestock } = useLivestock(undefined, activeFarm?.id);
   const { createLivestock } = useCreateLivestock();
   const { user } = useAuth();
 

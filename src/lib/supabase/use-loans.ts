@@ -101,6 +101,13 @@ export function useLoans() {
 
       if (!insertError && data) {
         setLoans(prev => [data as LoanRow, ...prev]);
+
+        // Fire server-side notifications (email + admin + automations)
+        fetch('/api/loans/notify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ loan_id: (data as LoanRow).id }),
+        }).catch(() => { /* best-effort */ });
       }
 
       return { data, error: insertError };

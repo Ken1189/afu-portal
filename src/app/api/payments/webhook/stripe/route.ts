@@ -4,7 +4,7 @@ import { getStripe } from '@/lib/stripe';
 import Stripe from 'stripe';
 import { Resend } from 'resend';
 import { emitEventAsync } from '@/lib/events/event-bus';
-import { sendWelcomeSeriesEmail } from '@/lib/email/lifecycle-emails';
+import { sendWelcomeSeriesEmail, sendMembershipPaymentConfirmationEmail } from '@/lib/email/lifecycle-emails';
 import {
   sendSubscriptionConfirmation,
   sendPaymentReceived,
@@ -467,12 +467,18 @@ export async function POST(request: NextRequest) {
               console.error('[webhook membership] commission handler error:', commissionErr);
             }
 
-            // Welcome email
+            // Welcome email + payment confirmation
             if (customerEmail) {
               try {
                 await sendWelcomeSeriesEmail(customerEmail, customerName, 1);
               } catch (e) {
                 console.error('[webhook membership] welcome email failed:', e);
+              }
+              try {
+                const amount = session.amount_total ? `$${(session.amount_total / 100).toFixed(2)}` : 'N/A';
+                await sendMembershipPaymentConfirmationEmail(customerEmail, customerName, tier, amount);
+              } catch (e) {
+                console.error('[webhook membership] payment confirmation failed:', e);
               }
             }
 

@@ -26,6 +26,7 @@ import {
 import { Wallet, ArrowDownToLine, Send, CreditCard } from 'lucide-react';
 import { useFarmPlots, type FarmPlotRow } from '@/lib/supabase/use-farm-plots';
 import { useFarmTransactions } from '@/lib/supabase/use-farm-transactions';
+import { useFarm } from '@/lib/farm-context';
 import { useAuth } from '@/lib/supabase/auth-context';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 import { createClient } from '@/lib/supabase/client';
@@ -336,7 +337,8 @@ export default function MoneyTrackerPage() {
   const { t } = useLanguage();
   const { user } = useAuth();
   const { transactions: dbTransactions, createTransaction: createDbTransaction, fetchTransactions: refetchDbTransactions } = useFarmTransactions(user?.id);
-  const { plots: livePlots } = useFarmPlots();
+  const { activeFarm } = useFarm();
+  const { plots: livePlots } = useFarmPlots(undefined, activeFarm?.id);
   const farmPlots = livePlots.length > 0 ? livePlots.map(adaptFarmPlot) : FALLBACK_FARM_PLOTS;
   const supabase = createClient();
 

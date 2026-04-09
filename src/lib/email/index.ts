@@ -19,4 +19,9 @@ export {
   sendMembershipExpiryWarningEmail,
   sendMembershipExpiredEmail,
   sendWelcomeSeriesEmail,
+  sendNewsletterConfirmationEmail,
+  sendMembershipPaymentConfirmationEmail,
+  sendTierDowngradeEmail,
+  sendJobApplicationReceivedEmail,
+  sendLoanApplicationReceivedEmail,
 } from './lifecycle-emails';

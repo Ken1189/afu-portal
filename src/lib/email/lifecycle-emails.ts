@@ -415,3 +415,186 @@ export async function sendWelcomeSeriesEmail(
     await logEmailError(`sendWelcomeSeriesEmail(#${emailNumber})`, err, memberEmail);
   }
 }
+
+// ---------------------------------------------------------------------------
+// 8. Newsletter Confirmation
+// ---------------------------------------------------------------------------
+
+export async function sendNewsletterConfirmationEmail(
+  email: string,
+): Promise<void> {
+  try {
+    const subject = 'Welcome to the AFU Newsletter';
+    const html = wrap(`
+      <h2 style="color:#1B2A4A;margin:0 0 16px;">You're subscribed!</h2>
+      <p style="color:#374151;line-height:1.6;">
+        Thank you for joining the African Farming Union newsletter. You'll receive updates on:
+      </p>
+      <ul style="color:#374151;line-height:1.8;padding-left:20px;">
+        <li>Market prices and commodity trends</li>
+        <li>New features and platform updates</li>
+        <li>Farming tips and best practices</li>
+        <li>Training opportunities and events</li>
+      </ul>
+      <p style="color:#374151;line-height:1.6;">
+        Want to do more? Join our community and unlock financing, inputs, and trade opportunities.
+      </p>
+      ${cta('Explore AFU', PORTAL_URL)}
+    `);
+    await sendEmail(email, subject, html, FROM);
+  } catch (err) {
+    await logEmailError('sendNewsletterConfirmationEmail', err, email);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 9. Membership Payment Confirmation (tier upgrade)
+// ---------------------------------------------------------------------------
+
+export async function sendMembershipPaymentConfirmationEmail(
+  email: string,
+  name: string,
+  tier: string,
+  amount: string,
+): Promise<void> {
+  try {
+    const subject = `Your ${tier} membership is confirmed`;
+    const html = wrap(`
+      <h2 style="color:#1B2A4A;margin:0 0 16px;">Payment Received</h2>
+      <p style="color:#374151;line-height:1.6;">
+        Hi ${name},
+      </p>
+      <p style="color:#374151;line-height:1.6;">
+        Your payment of <strong>${amount}</strong> for the <strong>${tier}</strong> membership tier has been processed successfully.
+      </p>
+      <table style="margin:16px 0;border-collapse:collapse;width:100%;">
+        <tr>
+          <td style="padding:8px 0;color:#6b7280;border-bottom:1px solid #e5e7eb;">Membership Tier</td>
+          <td style="padding:8px 0;font-weight:600;color:#1B2A4A;border-bottom:1px solid #e5e7eb;text-align:right;">${tier}</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 0;color:#6b7280;border-bottom:1px solid #e5e7eb;">Amount Paid</td>
+          <td style="padding:8px 0;font-weight:600;color:#1B2A4A;border-bottom:1px solid #e5e7eb;text-align:right;">${amount}</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 0;color:#6b7280;">Status</td>
+          <td style="padding:8px 0;font-weight:600;color:#2D7A1E;text-align:right;">Active</td>
+        </tr>
+      </table>
+      <p style="color:#374151;line-height:1.6;">
+        You now have full access to all ${tier}-tier features including financing, insurance, and marketplace benefits.
+      </p>
+      ${cta('Go to Dashboard', `${PORTAL_URL}/farm`)}
+    `);
+    await sendEmail(email, subject, html, FROM);
+  } catch (err) {
+    await logEmailError('sendMembershipPaymentConfirmationEmail', err, email);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 10. Tier Downgrade Notification
+// ---------------------------------------------------------------------------
+
+export async function sendTierDowngradeEmail(
+  email: string,
+  name: string,
+  previousTier: string,
+): Promise<void> {
+  try {
+    const subject = 'Your AFU membership has been downgraded';
+    const html = wrap(`
+      <h2 style="color:#1B2A4A;margin:0 0 16px;">Membership Update</h2>
+      <p style="color:#374151;line-height:1.6;">
+        Hi ${name},
+      </p>
+      <p style="color:#374151;line-height:1.6;">
+        Your <strong>${previousTier}</strong> membership expired more than 30 days ago and has been automatically downgraded to the <strong>Free</strong> tier.
+      </p>
+      <p style="color:#374151;line-height:1.6;">
+        As a Free member, you'll still have access to basic features, but some capabilities are now restricted:
+      </p>
+      <ul style="color:#374151;line-height:1.8;padding-left:20px;">
+        <li>Financing and loan applications</li>
+        <li>Insurance products</li>
+        <li>Full marketplace access</li>
+        <li>Export and trade finance tools</li>
+      </ul>
+      <p style="color:#374151;line-height:1.6;">
+        Renew your membership to regain full access to everything AFU offers.
+      </p>
+      ${cta('Renew Membership', `${PORTAL_URL}/memberships`)}
+    `);
+    await sendEmail(email, subject, html, FROM);
+  } catch (err) {
+    await logEmailError('sendTierDowngradeEmail', err, email);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 11. Job Application Received
+// ---------------------------------------------------------------------------
+
+export async function sendJobApplicationReceivedEmail(
+  email: string,
+  name: string,
+  jobTitle: string,
+): Promise<void> {
+  try {
+    const subject = `Application received: ${jobTitle}`;
+    const html = wrap(`
+      <h2 style="color:#1B2A4A;margin:0 0 16px;">We received your application</h2>
+      <p style="color:#374151;line-height:1.6;">
+        Hi ${name},
+      </p>
+      <p style="color:#374151;line-height:1.6;">
+        Thank you for applying for the <strong>${jobTitle}</strong> position at the African Farming Union.
+      </p>
+      <p style="color:#374151;line-height:1.6;">
+        Our team will review your application and get back to you within <strong>5-7 business days</strong>.
+        If your profile matches our needs, we'll reach out to schedule a conversation.
+      </p>
+      <p style="color:#374151;line-height:1.6;">
+        In the meantime, you can learn more about what we do on our website.
+      </p>
+      ${cta('Visit AFU', PORTAL_URL)}
+    `);
+    await sendEmail(email, subject, html, FROM);
+  } catch (err) {
+    await logEmailError('sendJobApplicationReceivedEmail', err, email);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 12. Loan Application Received (auto-reply)
+// ---------------------------------------------------------------------------
+
+export async function sendLoanApplicationReceivedEmail(
+  email: string,
+  name: string,
+  amount: number,
+): Promise<void> {
+  try {
+    const subject = 'Your loan application has been received';
+    const html = wrap(`
+      <h2 style="color:#1B2A4A;margin:0 0 16px;">Loan Application Received</h2>
+      <p style="color:#374151;line-height:1.6;">
+        Hi ${name},
+      </p>
+      <p style="color:#374151;line-height:1.6;">
+        We've received your loan application for <strong>$${amount.toLocaleString()}</strong>.
+      </p>
+      <p style="color:#374151;line-height:1.6;">
+        Our credit team will review your application, farming history, and membership standing.
+        You can expect a decision within <strong>3-5 business days</strong>.
+      </p>
+      <p style="color:#374151;line-height:1.6;">
+        You can check the status of your application any time in your dashboard.
+      </p>
+      ${cta('View Application Status', `${PORTAL_URL}/farm/financing`)}
+    `);
+    await sendEmail(email, subject, html, FROM);
+  } catch (err) {
+    await logEmailError('sendLoanApplicationReceivedEmail', err, email);
+  }
+}

@@ -16,6 +16,7 @@ import { createClient } from '@supabase/supabase-js';
 import {
   sendMembershipExpiryWarningEmail,
   sendMembershipExpiredEmail,
+  sendTierDowngradeEmail,
 } from '@/lib/email/lifecycle-emails';
 
 export const dynamic = 'force-dynamic';
@@ -125,7 +126,7 @@ export async function GET(request: NextRequest) {
 
     const { data: downgradeMembers } = await svc
       .from('members')
-      .select('id, profile_id, tier, expiry_date')
+      .select('id, profile_id, tier, expiry_date, email')
       .eq('status', 'expired')
       .neq('tier', 'free')
       .lt('expiry_date', downgradeCutoff.toISOString());
@@ -153,6 +154,15 @@ export async function GET(request: NextRequest) {
           });
 
           results.downgraded++;
+
+          // Notify member of downgrade
+          if (member.email) {
+            try {
+              await sendTierDowngradeEmail(member.email, member.email.split('@')[0], previousTier);
+            } catch {
+              // Don't fail cron if email fails
+            }
+          }
         } catch {
           results.errors++;
         }

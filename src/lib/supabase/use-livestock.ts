@@ -40,7 +40,7 @@ export interface LivestockHealthRecordRow {
 // useLivestock — fetch livestock for current member
 // ---------------------------------------------------------------------------
 
-export function useLivestock(memberId?: string) {
+export function useLivestock(memberId?: string, farmId?: string | null) {
   const supabase = useMemo(() => createClient(), []);
   const [livestock, setLivestock] = useState<LivestockRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -55,7 +55,12 @@ export function useLivestock(memberId?: string) {
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (memberId) query = query.eq('member_id', memberId);
+      // Filter by farm when available, fall back to member_id
+      if (farmId) {
+        query = query.eq('farm_id', farmId);
+      } else if (memberId) {
+        query = query.eq('member_id', memberId);
+      }
 
       const { data, error: fetchError } = await query;
 
@@ -73,7 +78,7 @@ export function useLivestock(memberId?: string) {
     } finally {
       setLoading(false);
     }
-  }, [supabase, memberId]);
+  }, [supabase, memberId, farmId]);
 
   useEffect(() => {
     fetchLivestock();

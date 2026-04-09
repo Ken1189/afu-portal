@@ -36,6 +36,7 @@ import {
 } from 'lucide-react';
 import { useFarmPlots, useFarmActivities, useFarmTransactions } from '@/lib/supabase/use-farm-plots';
 import type { FarmPlotRow } from '@/lib/supabase/use-farm-plots';
+import { useFarm } from '@/lib/farm-context';
 import { useAuth } from '@/lib/supabase/auth-context';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 import { QuickStartCard } from '@/components/farm/QuickStartCard';
@@ -383,7 +384,8 @@ const priorityBadge: Record<string, { bg: string; dot: string; label: string }> 
 export default function FarmDashboardPage() {
   const { t } = useLanguage();
   const { user, profile, hasCapability, refreshProfile } = useAuth();
-  const { plots: livePlots } = useFarmPlots(user?.id);
+  const { activeFarm } = useFarm();
+  const { plots: livePlots } = useFarmPlots(user?.id, activeFarm?.id);
   const { activities: liveActivities } = useFarmActivities();
   const { transactions: liveTransactions, income: liveIncome, expenses: liveExpenses } = useFarmTransactions(user?.id);
 

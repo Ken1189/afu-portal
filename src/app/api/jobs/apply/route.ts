@@ -1,9 +1,8 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { Resend } from 'resend';
-import { notifyAdmins } from '@/lib/email';
+import { notifyAdmins, sendEmail } from '@/lib/email';
+import { fireAutomations } from '@/lib/automations/executor';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM = 'African Farming Union <info@mail.africanfarmingunion.org>';
 
 // Brand colors
@@ -239,14 +238,21 @@ export async function POST(req: Request) {
 </div>`;
 
     try {
-      await resend.emails.send({
-        from: FROM,
-        to: email,
-        subject: `Application Received — ${job_title}`,
-        html: applicantHtml,
-      });
+      await sendEmail(email, `Application Received — ${job_title}`, applicantHtml, FROM);
     } catch (emailErr) {
       console.error('[applicant auto-reply email]', emailErr);
+    }
+
+    // Fire automations for job application
+    try {
+      await fireAutomations('job_application', {
+        name: full_name,
+        email,
+        country: country || '',
+        job_title,
+      });
+    } catch (autoErr) {
+      console.error('[job application automation]', autoErr);
     }
 
     return NextResponse.json({

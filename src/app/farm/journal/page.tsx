@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 import { useAuth } from '@/lib/supabase/auth-context';
+import { useFarm } from '@/lib/farm-context';
 import { createClient } from '@/lib/supabase/client';
 import ImageUploader from '@/components/ui/ImageUploader';
 import {
@@ -775,6 +776,7 @@ function PhotoViewer({ url, onClose }: { url: string; onClose: () => void }) {
 export default function FarmJournalPage() {
   const { t } = useLanguage();
   const { user } = useAuth();
+  const { activeFarm } = useFarm();
   const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
   const [farmPlots, setFarmPlots] = useState<FarmPlotOption[]>([]);
@@ -793,7 +795,8 @@ export default function FarmJournalPage() {
           .maybeSingle();
         const memberId = m?.id;
         let query = supabase.from('farm_plots').select('id, name, crop, variety');
-        if (memberId) query = query.eq('member_id', memberId);
+        if (activeFarm?.id) query = query.eq('farm_id', activeFarm.id);
+        else if (memberId) query = query.eq('member_id', memberId);
         const { data } = await query;
         if (data) {
           setFarmPlots(
@@ -807,7 +810,7 @@ export default function FarmJournalPage() {
         }
       } catch { /* leave empty */ }
     })();
-  }, [user]);
+  }, [user, activeFarm?.id]);
 
   useEffect(() => {
     const supabase = createClient();
@@ -824,7 +827,8 @@ export default function FarmJournalPage() {
           memberId = m?.id || null;
         }
         let query = supabase.from('farm_activities').select('*').order('date', { ascending: false });
-        if (memberId) query = query.eq('member_id', memberId);
+        if (activeFarm?.id) query = query.eq('farm_id', activeFarm.id);
+        else if (memberId) query = query.eq('member_id', memberId);
         else if (user) query = query.eq('member_id', user.id);
         const { data } = await query;
         if (data) {
@@ -849,7 +853,7 @@ export default function FarmJournalPage() {
       setDataLoading(false);
     };
     load();
-  }, [user]);
+  }, [user, activeFarm?.id]);
   const [showNewEntry, setShowNewEntry] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [plotFilter, setPlotFilter] = useState('all');
@@ -896,6 +900,7 @@ export default function FarmJournalPage() {
       }
       await supabase.from('farm_activities').insert({
         member_id: memberId,
+        farm_id: activeFarm?.id || null,
         plot_id: entry.plotId || null,
         type: entry.type,
         date: entry.date,

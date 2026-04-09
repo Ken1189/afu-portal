@@ -31,6 +31,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { useFarmPlots, useCreateFarmPlot, useUpdateFarmPlot, useCreateFarmActivity, type FarmPlotRow } from '@/lib/supabase/use-farm-plots';
+import { useFarm } from '@/lib/farm-context';
 import { useFarmActivities } from '@/lib/supabase/use-farm-activities';
 import { useAuth } from '@/lib/supabase/auth-context';
 import { createClient } from '@/lib/supabase/client';
@@ -1263,7 +1264,8 @@ function PlotCard({ plot, onEdit }: { plot: FarmPlot; onEdit?: () => void }) {
 export default function CropsPage() {
   const [addPlotOpen, setAddPlotOpen] = useState(false);
   const [editingPlot, setEditingPlot] = useState<FarmPlotRow | null>(null);
-  const { plots: livePlots, loading } = useFarmPlots();
+  const { activeFarm } = useFarm();
+  const { plots: livePlots, loading } = useFarmPlots(undefined, activeFarm?.id);
   const farmPlots: FarmPlot[] = livePlots.length > 0 ? livePlots.map(adaptFarmPlot) as FarmPlot[] : FALLBACK_FARM_PLOTS;
 
   const handleEdit = (plotId: string) => {

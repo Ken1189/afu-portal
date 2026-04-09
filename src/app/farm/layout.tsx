@@ -63,6 +63,8 @@ import {
   type FarmerTier,
 } from '@/lib/farmer-tiers';
 import { MembershipProvider } from '@/lib/membership-context';
+import { FarmProvider } from '@/lib/farm-context';
+import FarmSwitcher from '@/components/farm/FarmSwitcher';
 import PortalSwitcherDropdown from '@/components/PortalSwitcherDropdown';
 
 // ── Icon Lookup ──────────────────────────────────────────────────────────
@@ -114,7 +116,9 @@ const bottomNavLinks = [
 export default function FarmLayout({ children }: { children: React.ReactNode }) {
   return (
     <LanguageProvider>
-      <FarmLayoutInner>{children}</FarmLayoutInner>
+      <FarmProvider>
+        <FarmLayoutInner>{children}</FarmLayoutInner>
+      </FarmProvider>
     </LanguageProvider>
   );
 }
@@ -468,6 +472,12 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
           <PortalSwitcherDropdown variant="light" position="down" />
         </div>
 
+        {/* Farm Switcher */}
+        <div className="border-b border-gray-100">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 px-4 pt-2 mb-0.5">Active Farm</p>
+          <FarmSwitcher />
+        </div>
+
         {/* Sidebar Nav — grouped by tier */}
         <nav className="flex-1 p-3 overflow-y-auto">
           {TIER_ORDER.map((tier) => renderTierSection(tier))}
@@ -723,6 +733,12 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
                 <div className="px-3 pt-3 pb-2 border-b border-gray-100">
                   <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 px-1 mb-1.5">Portal</p>
                   <PortalSwitcherDropdown variant="light" position="down" />
+                </div>
+
+                {/* Farm Switcher in drawer */}
+                <div className="border-b border-gray-100">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 px-4 pt-2 mb-0.5">Active Farm</p>
+                  <FarmSwitcher />
                 </div>
 
                 {/* Drawer Nav — grouped by tier */}

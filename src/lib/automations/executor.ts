@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { sendEmail } from '@/lib/email/resend';
 
 const svc = () =>
   createClient(
@@ -85,19 +86,21 @@ async function executeAction(
   try {
     switch (rule.action_type) {
       case 'send_email': {
-        const { Resend } = await import('resend');
-        const resend = new Resend(process.env.RESEND_API_KEY);
         if (context.email) {
-          await resend.emails.send({
-            from: 'African Farming Union <noreply@mail.africanfarmingunion.org>',
-            to: context.email,
-            subject: interpolate((config.subject as string) || 'Message from AFU'),
-            html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
+          const subject = interpolate((config.subject as string) || 'Message from AFU');
+          const body = interpolate((config.body as string) || '');
+          const html = `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
               <div style="background:#1B2A4A;padding:24px;text-align:center"><h2 style="color:#5DB347;margin:0">African Farming Union</h2></div>
-              <div style="padding:24px;background:#f8faf6"><p style="color:#333;font-size:14px;line-height:1.6;white-space:pre-wrap">${interpolate((config.body as string) || '')}</p></div>
+              <div style="padding:24px;background:#f8faf6"><p style="color:#333;font-size:14px;line-height:1.6;white-space:pre-wrap">${body}</p></div>
               <div style="padding:12px;text-align:center;color:#999;font-size:12px">africanfarmingunion.org</div>
-            </div>`,
-          });
+            </div>`;
+          // Use centralized sendEmail so it appears in the unified inbox
+          await sendEmail(
+            context.email,
+            subject,
+            html,
+            'African Farming Union <noreply@mail.africanfarmingunion.org>',
+          );
         }
         break;
       }

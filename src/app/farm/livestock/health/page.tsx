@@ -29,6 +29,7 @@ import {
   ChevronUp,
 } from 'lucide-react';
 import { useLivestock } from '@/lib/supabase/use-livestock';
+import { useFarm } from '@/lib/farm-context';
 
 // ---------------------------------------------------------------------------
 // Inline fallback data (was @/lib/data/livestock)
@@ -452,7 +453,8 @@ function ScheduleItem({ record, isOverdue }: { record: VetRecord; isOverdue: boo
 
 export default function LivestockHealthPage() {
   // --- Live Supabase data (available when real data is entered) ---
-  const { livestock: liveLivestock } = useLivestock();
+  const { activeFarm } = useFarm();
+  const { livestock: liveLivestock } = useLivestock(undefined, activeFarm?.id);
 
   // --- Resolve data: prefer DB, fall back to mock ---
   const animals: Animal[] = liveLivestock.length > 0

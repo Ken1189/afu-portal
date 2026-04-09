@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
-import { notifyAdmins } from '@/lib/email';
+import { notifyAdmins, sendNewsletterConfirmationEmail } from '@/lib/email';
+import { fireAutomations } from '@/lib/automations/executor';
 
 export async function POST(req: NextRequest) {
   try {
@@ -38,6 +39,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Failed to subscribe. Please try again.' }, { status: 500 });
     }
 
+    // Send confirmation to subscriber
+    try {
+      await sendNewsletterConfirmationEmail(email.toLowerCase().trim());
+    } catch (confirmErr) {
+      console.error('[newsletter confirm]', confirmErr);
+    }
+
     // Notify all 3 admins + write to universal inbox
     try {
       await notifyAdmins({
@@ -51,6 +59,17 @@ export async function POST(req: NextRequest) {
       });
     } catch (notifyErr) {
       console.error('[newsletter notifyAdmins]', notifyErr);
+    }
+
+    // Fire automations for newsletter signup
+    try {
+      await fireAutomations('newsletter_subscribed', {
+        email: email.toLowerCase().trim(),
+        name: name || '',
+        country: country || '',
+      });
+    } catch (autoErr) {
+      console.error('[newsletter automation]', autoErr);
     }
 
     return NextResponse.json({ success: true, message: 'Thanks for subscribing!' });
