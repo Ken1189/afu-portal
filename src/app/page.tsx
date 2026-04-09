@@ -540,8 +540,9 @@ export default function Home() {
         const supabase = createClient();
         const { data } = await supabase
           .from('managed_partners')
-          .select('name, company_name, initials, brand_color, color, logo_url')
+          .select('name, company_name, initials, brand_color, color, logo_url, is_featured')
           .eq('is_published', true)
+          .order('is_featured', { ascending: false })
           .order('display_order', { ascending: true });
         if (data && data.length > 0) {
           setPartners(

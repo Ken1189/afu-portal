@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
 import { getStripe } from '@/lib/stripe';
 import Stripe from 'stripe';
-import { Resend } from 'resend';
 import { emitEventAsync } from '@/lib/events/event-bus';
+import { sendEmail } from '@/lib/email/resend';
 import { sendWelcomeSeriesEmail, sendMembershipPaymentConfirmationEmail } from '@/lib/email/lifecycle-emails';
 import {
   sendSubscriptionConfirmation,
@@ -130,7 +130,6 @@ async function upsertSupplierSubscription(
   return { supplierId, planSlug };
 }
 
-const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM = 'African Farming Union <noreply@mail.africanfarmingunion.org>';
 const NOTIFY_TO = ['peterw@africanfarmingunion.org', 'devonk@africanfarmingunion.org'];
 
@@ -435,11 +434,10 @@ export async function POST(request: NextRequest) {
                     const ambName = (amb as unknown as { name?: string }).name || 'Ambassador';
                     if (ambEmail) {
                       try {
-                        await resend.emails.send({
-                          from: FROM,
-                          to: ambEmail,
-                          subject: `You earned a $${commissionAmount.toFixed(2)} commission! 🎉`,
-                          html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
+                        await sendEmail(
+                          ambEmail,
+                          `You earned a $${commissionAmount.toFixed(2)} commission!`,
+                          `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
                             <div style="background:#1B2A4A;padding:24px;text-align:center">
                               <h1 style="color:#5DB347;margin:0;font-size:22px">New Commission Earned</h1>
                             </div>
@@ -455,7 +453,8 @@ export async function POST(request: NextRequest) {
                               <a href="https://africanfarmingunion.org/ambassador" style="display:inline-block;background:#5DB347;color:white;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:600">View Dashboard</a>
                             </div>
                           </div>`,
-                        });
+                          FROM
+                        );
                       } catch (emailErr) {
                         console.error('[webhook membership] ambassador email failed:', emailErr);
                       }
@@ -484,19 +483,17 @@ export async function POST(request: NextRequest) {
 
             // Admin notification
             try {
-              await resend.emails.send({
-                from: FROM,
-                to: NOTIFY_TO,
-                subject: `New ${tier} Member: ${customerName}`,
-                html: `<div style="font-family:Arial,sans-serif;padding:20px">
+              const adminHtml = `<div style="font-family:Arial,sans-serif;padding:20px">
                   <h2 style="color:#1B2A4A">New Paid Membership</h2>
                   <p><strong>${customerName}</strong> just signed up for the <strong>${tier}</strong> tier.</p>
                   <p>Email: ${customerEmail || 'N/A'}</p>
                   <p>User ID: ${userId || 'N/A'}</p>
                   <p>Stripe Subscription: ${subscriptionId || 'N/A'}</p>
                   <a href="https://africanfarmingunion.org/admin/members" style="display:inline-block;background:#5DB347;color:white;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600">View in Admin</a>
-                </div>`,
-              });
+                </div>`;
+              for (const adminEmail of NOTIFY_TO) {
+                await sendEmail(adminEmail, `New ${tier} Member: ${customerName}`, adminHtml, FROM);
+              }
             } catch (e) {
               console.error('[webhook membership] admin notification failed:', e);
             }
@@ -612,11 +609,10 @@ export async function POST(request: NextRequest) {
               const buyerName = session.customer_details?.name || 'Customer';
 
               if (supplier?.email) {
-                await resend.emails.send({
-                  from: FROM,
-                  to: supplier.email,
-                  subject: `New AFU Marketplace Order — $${orderTotal.toFixed(2)}`,
-                  html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
+                await sendEmail(
+                  supplier.email,
+                  `New AFU Marketplace Order — $${orderTotal.toFixed(2)}`,
+                  `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
                     <div style="background:#1B2A4A;padding:24px;text-align:center">
                       <h1 style="color:#5DB347;margin:0;font-size:22px">New Order Received</h1>
                     </div>
@@ -633,15 +629,15 @@ export async function POST(request: NextRequest) {
                       <a href="https://africanfarmingunion.org/supplier/orders" style="display:inline-block;background:#5DB347;color:white;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:600">View Order</a>
                     </div>
                   </div>`,
-                });
+                  FROM
+                );
               }
 
               if (buyerEmail) {
-                await resend.emails.send({
-                  from: FROM,
-                  to: buyerEmail,
-                  subject: `Order Confirmation — AFU Marketplace`,
-                  html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
+                await sendEmail(
+                  buyerEmail,
+                  `Order Confirmation — AFU Marketplace`,
+                  `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
                     <div style="background:#1B2A4A;padding:24px;text-align:center">
                       <h1 style="color:#5DB347;margin:0;font-size:22px">Thank you for your order!</h1>
                     </div>
@@ -652,7 +648,8 @@ export async function POST(request: NextRequest) {
                       <a href="https://africanfarmingunion.org/farmer/orders" style="display:inline-block;background:#5DB347;color:white;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:600">View My Orders</a>
                     </div>
                   </div>`,
-                });
+                  FROM
+                );
               }
             } catch (e) {
               console.error('[marketplace order] email send failed:', e);
@@ -671,11 +668,10 @@ export async function POST(request: NextRequest) {
           // Thank-you email to donor
           if (donorEmail) {
             try {
-              await resend.emails.send({
-                from: FROM,
-                to: donorEmail,
-                subject: 'Thank You for Your Donation to AFU! 🌾',
-                html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
+              await sendEmail(
+                donorEmail,
+                'Thank You for Your Donation to AFU!',
+                `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
                   <div style="background:#1B2A4A;padding:30px;text-align:center">
                     <h1 style="color:#5DB347;margin:0;font-size:24px">African Farming Union</h1>
                     <p style="color:#8CB89C;margin:8px 0 0;font-size:14px">Thank You</p>
@@ -696,23 +692,22 @@ export async function POST(request: NextRequest) {
                   </div>
                   <div style="padding:12px;text-align:center;color:#999;font-size:12px">African Farming Union | africanfarmingunion.org</div>
                 </div>`,
-              });
+                FROM
+              );
             } catch { /* non-critical */ }
           }
 
           // Notify Devon + Peter
           try {
-            await resend.emails.send({
-              from: FROM,
-              to: NOTIFY_TO,
-              subject: `New Donation: $${amount} from ${donorName}`,
-              html: `<div style="font-family:Arial,sans-serif;padding:20px">
+            const donationAdminHtml = `<div style="font-family:Arial,sans-serif;padding:20px">
                 <h2 style="color:#1B2A4A">New Donation Received</h2>
                 <p><strong>${donorName}</strong> donated <strong>$${amount}</strong>${isMonthly ? ' (monthly)' : ''} to ${program}</p>
                 <p>Email: ${donorEmail || 'N/A'}</p>
                 <a href="https://africanfarmingunion.org/admin/payments" style="display:inline-block;background:#5DB347;color:white;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600">View in Admin</a>
-              </div>`,
-            });
+              </div>`;
+            for (const adminEmail of NOTIFY_TO) {
+              await sendEmail(adminEmail, `New Donation: $${amount} from ${donorName}`, donationAdminHtml, FROM);
+            }
           } catch { /* non-critical */ }
         }
 

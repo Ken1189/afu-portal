@@ -132,6 +132,7 @@ export default function AdminPartnersPage() {
       website_url: formData.website || null,
       category: formData.category,
       is_featured: formData.featured,
+      is_published: true,
       display_order: parseInt(formData.display_order, 10) || 0,
       serves_countries: formData.serves_countries.length > 0 ? formData.serves_countries : null,
     };
