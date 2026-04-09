@@ -332,7 +332,7 @@ export default function InvestorDashboard() {
         // 1. Fetch investor profile
         const { data: ip } = await supabase
           .from('investor_profiles')
-          .select('*')
+          .select('id, user_id, company_name, total_committed, total_deployed, returns_to_date')
           .eq('user_id', user.id)
           .single();
 

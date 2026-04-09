@@ -446,7 +446,7 @@ export default function SupplierDashboard() {
       // 1. Fetch supplier profile linked to current user
       const { data: supplierRow } = await supabase
         .from('suppliers')
-        .select('*')
+        .select('id, company_name, contact_name, email, phone, country, region, category, status, join_date, created_at, logo_url, description, products_count, total_sales, total_orders, rating, review_count, member_discount_percent, commission_rate, is_founding, sponsorship_tier, verified, website, certifications')
         .eq('profile_id', user.id)
         .single();
 

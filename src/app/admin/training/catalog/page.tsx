@@ -40,7 +40,7 @@ const DEFAULT_CATALOG: Course[] = [
 
 const CATEGORIES = ['Agriculture', 'Business', 'Insurance', 'Environment', 'Technology', 'Compliance', 'Health'];
 const LEVELS = ['Beginner', 'Intermediate', 'Advanced'];
-const COUNTRIES = ['All', ...[...ALL_AFRICAN_COUNTRIES].sort()];
+const COUNTRIES = ['Global', ...ALL_AFRICAN_COUNTRIES];
 
 const CONFIG_KEY = 'training_catalog';
 

@@ -179,13 +179,17 @@ export const AFRICAN_COUNTRIES_FULL: Country[] = COUNTRY_DATA.filter((c) =>
 export const WORLD_COUNTRIES_FULL: Country[] = COUNTRY_DATA;
 
 // Backward-compatible string[] exports (used by 32+ files post-sweep)
+// All sorted alphabetically for consistent dropdowns
 export const AFU_COUNTRIES: string[] = COUNTRY_DATA.filter((c) => c.isAfuOperating).map(
   (c) => c.name,
-);
+).sort();
 
-export const ALL_AFRICAN_COUNTRIES: string[] = AFRICAN_COUNTRIES_FULL.map((c) => c.name);
+export const ALL_AFRICAN_COUNTRIES: string[] = AFRICAN_COUNTRIES_FULL.map((c) => c.name).sort();
 
-export const WORLD_COUNTRIES: string[] = COUNTRY_DATA.map((c) => c.name);
+export const WORLD_COUNTRIES: string[] = COUNTRY_DATA.map((c) => c.name).sort();
+
+// "Global" sentinel — use with spread: ['Global', ...ALL_AFRICAN_COUNTRIES]
+export const GLOBAL_OPTION = 'Global';
 
 // ============================================================================
 // Helper functions

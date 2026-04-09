@@ -7,17 +7,17 @@ import {
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import ImageUploader from '@/components/ui/ImageUploader';
-import { ALL_AFRICAN_COUNTRIES } from '@/lib/countries';
+import { ALL_AFRICAN_COUNTRIES, GLOBAL_OPTION } from '@/lib/countries';
 
-const AFRICAN_MARKETS = [...ALL_AFRICAN_COUNTRIES].sort();
+const AFRICAN_MARKETS = [GLOBAL_OPTION, ...ALL_AFRICAN_COUNTRIES];
 
 interface Partner {
   id: string;
   name: string;
   logo_url: string | null;
-  website: string | null;
+  website_url: string | null;
   category: string;
-  featured: boolean;
+  is_featured: boolean;
   display_order: number;
   serves_countries?: string[] | null;
   created_at: string;
@@ -47,9 +47,9 @@ const CATEGORY_COLORS: Record<string, string> = {
 };
 
 const _UNUSED_DEMO_PARTNERS: Partner[] = [
-  { id: 'demo-1', name: 'AfDB', logo_url: null, website: 'https://afdb.org', category: 'DFI', featured: true, display_order: 1, created_at: new Date().toISOString() },
-  { id: 'demo-2', name: 'World Bank', logo_url: null, website: 'https://worldbank.org', category: 'DFI', featured: true, display_order: 2, created_at: new Date().toISOString() },
-  { id: 'demo-3', name: 'Standard Bank', logo_url: null, website: 'https://standardbank.com', category: 'Bank', featured: false, display_order: 3, created_at: new Date().toISOString() },
+  { id: 'demo-1', name: 'AfDB', logo_url: null, website_url: 'https://afdb.org', category: 'DFI', is_featured: true, display_order: 1, created_at: new Date().toISOString() },
+  { id: 'demo-2', name: 'World Bank', logo_url: null, website_url: 'https://worldbank.org', category: 'DFI', is_featured: true, display_order: 2, created_at: new Date().toISOString() },
+  { id: 'demo-3', name: 'Standard Bank', logo_url: null, website_url: 'https://standardbank.com', category: 'Bank', is_featured: false, display_order: 3, created_at: new Date().toISOString() },
 ];
 
 function Toast({ message, type, onClose }: { message: string; type: 'success' | 'error'; onClose: () => void }) {
@@ -103,7 +103,7 @@ export default function AdminPartnersPage() {
 
   const openEdit = (p: Partner) => {
     setEditingId(p.id);
-    setFormData({ name: p.name, logo_url: p.logo_url || '', website: p.website || '', category: p.category, featured: p.featured, display_order: String(p.display_order), serves_countries: Array.isArray(p.serves_countries) ? p.serves_countries : [] });
+    setFormData({ name: p.name, logo_url: p.logo_url || '', website: p.website_url || '', category: p.category, featured: p.is_featured, display_order: String(p.display_order), serves_countries: Array.isArray(p.serves_countries) ? p.serves_countries : [] });
     setShowModal(true);
   };
 
@@ -113,9 +113,9 @@ export default function AdminPartnersPage() {
     const payload = {
       name: formData.name,
       logo_url: formData.logo_url || null,
-      website: formData.website || null,
+      website_url: formData.website || null,
       category: formData.category,
-      featured: formData.featured,
+      is_featured: formData.featured,
       display_order: parseInt(formData.display_order, 10) || 0,
       serves_countries: formData.serves_countries.length > 0 ? formData.serves_countries : null,
     };
@@ -148,9 +148,9 @@ export default function AdminPartnersPage() {
 
   const toggleFeatured = async (p: Partner) => {
     if (!p.id.startsWith('demo-')) {
-      await supabase.from('managed_partners').update({ featured: !p.featured }).eq('id', p.id);
+      await supabase.from('managed_partners').update({ is_featured: !p.is_featured }).eq('id', p.id);
     }
-    setPartners((prev) => prev.map((x) => x.id === p.id ? { ...x, featured: !x.featured } : x));
+    setPartners((prev) => prev.map((x) => x.id === p.id ? { ...x, is_featured: !x.is_featured } : x));
   };
 
   return (
@@ -172,7 +172,7 @@ export default function AdminPartnersPage() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
           { label: 'Total Partners', value: partners.length, color: '#1B2A4A' },
-          { label: 'Featured', value: partners.filter((p) => p.featured).length, color: '#5DB347' },
+          { label: 'Featured', value: partners.filter((p) => p.is_featured).length, color: '#5DB347' },
           { label: 'Categories', value: new Set(partners.map((p) => p.category)).size, color: '#3B82F6' },
           { label: 'With Logo', value: partners.filter((p) => p.logo_url).length, color: '#8B5CF6' },
         ].map((s) => (
@@ -213,17 +213,17 @@ export default function AdminPartnersPage() {
                 </div>
               </div>
 
-              {p.website && (
-                <a href={p.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-xs text-blue-500 hover:text-blue-600 mb-3">
-                  <Globe className="w-3 h-3" /> {p.website}
+              {p.website_url && (
+                <a href={p.website_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-xs text-blue-500 hover:text-blue-600 mb-3">
+                  <Globe className="w-3 h-3" /> {p.website_url}
                 </a>
               )}
 
               <div className="flex items-center justify-between pt-3 border-t border-gray-100">
                 <button onClick={() => toggleFeatured(p)}
-                  className={`flex items-center gap-1 text-xs font-medium transition-colors ${p.featured ? 'text-yellow-500' : 'text-gray-400 hover:text-yellow-500'}`}>
-                  {p.featured ? <Star className="w-3.5 h-3.5 fill-yellow-400" /> : <StarOff className="w-3.5 h-3.5" />}
-                  {p.featured ? 'Featured' : 'Feature'}
+                  className={`flex items-center gap-1 text-xs font-medium transition-colors ${p.is_featured ? 'text-yellow-500' : 'text-gray-400 hover:text-yellow-500'}`}>
+                  {p.is_featured ? <Star className="w-3.5 h-3.5 fill-yellow-400" /> : <StarOff className="w-3.5 h-3.5" />}
+                  {p.is_featured ? 'Featured' : 'Feature'}
                 </button>
                 <div className="flex gap-1">
                   <button onClick={() => openEdit(p)} className="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100"><Pencil className="w-3.5 h-3.5" /></button>

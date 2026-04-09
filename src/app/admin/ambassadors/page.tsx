@@ -25,8 +25,12 @@ import {
   Clock,
   ArrowUpRight,
   Link2,
+  Search,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import ImageUploader from '@/components/ui/ImageUploader';
 
 /* ─── Types ─── */
 
@@ -53,6 +57,8 @@ interface Ambassador {
   tier: string | null;
   total_earned: number;
   total_referrals: number;
+  email: string | null;
+  referral_code: string | null;
   created_at: string;
 }
 
@@ -136,9 +142,9 @@ const SECTORS = [
 
 // Ambassador can be based ANYWHERE in the world
 // They SERVE specific African countries (via the `regions` text[] column)
-import { WORLD_COUNTRIES, ALL_AFRICAN_COUNTRIES as ALL_AFRICAN } from '@/lib/countries';
+import { WORLD_COUNTRIES, ALL_AFRICAN_COUNTRIES as ALL_AFRICAN, GLOBAL_OPTION } from '@/lib/countries';
 const COUNTRIES = WORLD_COUNTRIES;
-const AFRICAN_COUNTRIES = [...ALL_AFRICAN].sort();
+const AFRICAN_COUNTRIES = [GLOBAL_OPTION, ...ALL_AFRICAN];
 
 const SECTOR_COLORS: Record<string, string> = {
   Investment: 'bg-emerald-100 text-emerald-700',
@@ -344,6 +350,11 @@ export default function AdminAmbassadorsPage() {
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
   const [updatingTier, setUpdatingTier] = useState<string | null>(null);
   const [updatingPayout, setUpdatingPayout] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [countryFilter, setCountryFilter] = useState<string>('all');
+  const ITEMS_PER_PAGE = 20;
+  const [currentPage, setCurrentPage] = useState(1);
 
   const supabase = createClient();
 
@@ -459,6 +470,42 @@ export default function AdminAmbassadorsPage() {
     });
     return { total, featured, pending, approved, sectorBreakdown };
   }, [ambassadors]);
+
+  const filteredAmbassadors = useMemo(() => {
+    let list = ambassadors;
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      list = list.filter(
+        (a) =>
+          a.full_name.toLowerCase().includes(q) ||
+          (a.email && a.email.toLowerCase().includes(q)) ||
+          (a.referral_code && a.referral_code.toLowerCase().includes(q)) ||
+          (a.country && a.country.toLowerCase().includes(q))
+      );
+    }
+    if (statusFilter !== 'all') {
+      list = list.filter((a) => a.status === statusFilter);
+    }
+    if (countryFilter !== 'all') {
+      list = list.filter((a) => a.country === countryFilter);
+    }
+    return list;
+  }, [ambassadors, searchQuery, statusFilter, countryFilter]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredAmbassadors.length / ITEMS_PER_PAGE));
+  const paginatedAmbassadors = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredAmbassadors.slice(start, start + ITEMS_PER_PAGE);
+  }, [filteredAmbassadors, currentPage]);
+
+  // Reset page when filters change
+  useEffect(() => { setCurrentPage(1); }, [searchQuery, statusFilter, countryFilter]);
+
+  // Unique countries for filter dropdown
+  const uniqueCountries = useMemo(
+    () => [...new Set(ambassadors.map((a) => a.country).filter(Boolean))].sort(),
+    [ambassadors]
+  );
 
   const payoutStats = useMemo(() => {
     const pendingAmt = payouts
@@ -842,6 +889,44 @@ export default function AdminAmbassadorsPage() {
             />
           </div>
 
+          {/* Search + Filters */}
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search by name, email, referral code, or country..."
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-2 focus:ring-green-200 focus:border-green-400 outline-none"
+              />
+            </div>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-2 focus:ring-green-200 focus:border-green-400 outline-none"
+            >
+              <option value="all">All Statuses</option>
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+            <select
+              value={countryFilter}
+              onChange={(e) => setCountryFilter(e.target.value)}
+              className="px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-2 focus:ring-green-200 focus:border-green-400 outline-none"
+            >
+              <option value="all">All Countries</option>
+              {uniqueCountries.map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+            <span className="text-xs text-gray-400 self-center whitespace-nowrap">
+              {filteredAmbassadors.length} result{filteredAmbassadors.length !== 1 ? 's' : ''}
+            </span>
+          </div>
+
           {/* Loading */}
           {loading && (
             <div className="bg-white rounded-xl border border-gray-100 p-12 text-center">
@@ -851,7 +936,7 @@ export default function AdminAmbassadorsPage() {
           )}
 
           {/* Empty state */}
-          {!loading && ambassadors.length === 0 && (
+          {!loading && filteredAmbassadors.length === 0 && (
             <div className="bg-white rounded-xl border border-gray-100 p-12 text-center">
               <Megaphone className="w-12 h-12 text-gray-300 mx-auto mb-3" />
               <h3 className="text-lg font-semibold text-[#1B2A4A]">
@@ -872,7 +957,7 @@ export default function AdminAmbassadorsPage() {
           )}
 
           {/* Table */}
-          {!loading && ambassadors.length > 0 && (
+          {!loading && filteredAmbassadors.length > 0 && (
             <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
@@ -908,7 +993,7 @@ export default function AdminAmbassadorsPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-50">
-                    {ambassadors.map((amb) => (
+                    {paginatedAmbassadors.map((amb) => (
                       <tr
                         key={amb.id}
                         className={`hover:bg-gray-50/50 transition-colors ${
@@ -1122,6 +1207,51 @@ export default function AdminAmbassadorsPage() {
                   </tbody>
                 </table>
               </div>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100">
+                  <span className="text-xs text-gray-500">
+                    Showing {((currentPage - 1) * ITEMS_PER_PAGE) + 1}–{Math.min(currentPage * ITEMS_PER_PAGE, filteredAmbassadors.length)} of {filteredAmbassadors.length}
+                  </span>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}
+                      className="p-1.5 rounded-lg hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+                    {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
+                      let page: number;
+                      if (totalPages <= 7) { page = i + 1; }
+                      else if (currentPage <= 4) { page = i + 1; }
+                      else if (currentPage >= totalPages - 3) { page = totalPages - 6 + i; }
+                      else { page = currentPage - 3 + i; }
+                      return (
+                        <button
+                          key={page}
+                          onClick={() => setCurrentPage(page)}
+                          className={`w-8 h-8 rounded-lg text-xs font-medium transition-colors ${
+                            currentPage === page
+                              ? 'bg-[#5DB347] text-white'
+                              : 'text-gray-600 hover:bg-gray-100'
+                          }`}
+                        >
+                          {page}
+                        </button>
+                      );
+                    })}
+                    <button
+                      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                      disabled={currentPage === totalPages}
+                      className="p-1.5 rounded-lg hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </>
@@ -1566,18 +1696,19 @@ export default function AdminAmbassadorsPage() {
                 />
               </div>
 
-              {/* Photo URL */}
+              {/* Photo Upload */}
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">
-                  Photo URL
+                  Profile Photo
                 </label>
-                <input
-                  value={form.photo_url}
-                  onChange={(e) =>
-                    setForm({ ...form, photo_url: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-green-200 focus:border-green-400 outline-none"
-                  placeholder="https://..."
+                <ImageUploader
+                  bucket="media"
+                  folder="ambassadors"
+                  value={form.photo_url || null}
+                  onChange={(url) => setForm({ ...form, photo_url: url })}
+                  label=""
+                  round
+                  maxSizeMB={5}
                 />
               </div>
 

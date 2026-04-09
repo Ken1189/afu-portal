@@ -511,7 +511,7 @@ export default function Home() {
         const supabase = createClient();
         const { data } = await supabase
           .from('testimonials')
-          .select('*')
+          .select('name, author_name, role, author_role, quote, content, img, avatar_url, photo_url, rating')
           .eq('is_featured', true)
           .order('display_order', { ascending: true })
           .limit(6);
@@ -540,7 +540,7 @@ export default function Home() {
         const supabase = createClient();
         const { data } = await supabase
           .from('managed_partners')
-          .select('*')
+          .select('name, company_name, initials, brand_color, color, logo_url')
           .eq('is_published', true)
           .order('display_order', { ascending: true });
         if (data && data.length > 0) {
@@ -567,7 +567,7 @@ export default function Home() {
         const supabase = createClient();
         const { count } = await supabase
           .from('profiles')
-          .select('*', { count: 'exact', head: true });
+          .select('id', { count: 'exact', head: true });
         if (count && count > 0) {
           setMemberCount(count);
         }
@@ -585,7 +585,7 @@ export default function Home() {
         const supabase = createClient();
         const { data } = await supabase
           .from('site_content')
-          .select('*')
+          .select('icon, title, description, content, link, url, image_url, img')
           .eq('section', 'homepage_services')
           .order('display_order', { ascending: true });
         if (data && data.length > 0) {
@@ -616,7 +616,7 @@ export default function Home() {
         const supabase = createClient();
         const { data } = await supabase
           .from('programs')
-          .select('*')
+          .select('title, country, crop, description, icon')
           .eq('status', 'active')
           .order('created_at', { ascending: false })
           .limit(6);

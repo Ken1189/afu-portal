@@ -243,7 +243,7 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
     try {
       const { data, error } = await supabase
         .from('farmer_tiers')
-        .select('*')
+        .select('current_tier, total_xp, total_courses_completed')
         .eq('user_id', user.id)
         .single();
 

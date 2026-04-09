@@ -20,9 +20,9 @@ import {
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/supabase/auth-context';
-import { WORLD_COUNTRIES, ALL_AFRICAN_COUNTRIES } from '@/lib/countries';
+import { WORLD_COUNTRIES, ALL_AFRICAN_COUNTRIES, GLOBAL_OPTION } from '@/lib/countries';
 
-const AFRICAN_MARKETS = [...ALL_AFRICAN_COUNTRIES].sort();
+const AFRICAN_MARKETS = [GLOBAL_OPTION, ...ALL_AFRICAN_COUNTRIES];
 
 // Ambassador categories — reflects real mix (most ambassadors aren't farmers)
 const SECTORS = [
@@ -43,7 +43,7 @@ const SECTORS = [
   { value: 'Other', label: 'Other' },
 ];
 
-const COUNTRIES = [...WORLD_COUNTRIES, 'Other'];
+const COUNTRIES = [...WORLD_COUNTRIES, 'Other'].sort();
 
 export default function AmbassadorApplyPage() {
   const { user } = useAuth();
