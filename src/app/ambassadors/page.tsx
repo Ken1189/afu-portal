@@ -994,6 +994,22 @@ export default function AmbassadorsPage() {
                 </label>
                 <p className="text-xs text-gray-400 mb-2">Select all that apply</p>
                 <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFormData((prev) => ({
+                        ...prev,
+                        regions: prev.regions.length === AFRICAN_REGIONS.length ? [] : [...AFRICAN_REGIONS],
+                      }));
+                    }}
+                    className={`px-4 py-2 rounded-lg text-sm font-bold transition-all border ${
+                      formData.regions.length === AFRICAN_REGIONS.length
+                        ? 'bg-[#1B2A4A] text-white border-[#1B2A4A]'
+                        : 'bg-white text-[#1B2A4A] border-[#1B2A4A]/30 hover:border-[#1B2A4A]'
+                    }`}
+                  >
+                    {formData.regions.length === AFRICAN_REGIONS.length ? '✓ ' : ''}All Countries
+                  </button>
                   {AFRICAN_REGIONS.map((region) => {
                     const selected = formData.regions.includes(region);
                     return (

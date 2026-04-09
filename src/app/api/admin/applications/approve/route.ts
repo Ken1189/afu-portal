@@ -313,7 +313,7 @@ export async function POST(request: Request) {
       data: { applicationId, userId, email: application.email, fullName: application.full_name },
     });
 
-    // Send welcome email with credentials
+    // Send welcome email with credentials (different template for suppliers/partners)
     const firstName = escapeHtml(application.full_name?.split(' ')[0] || 'Member');
     const safeFullName = escapeHtml(application.full_name || '');
     const tierNameRaw = application.requested_tier
@@ -324,66 +324,108 @@ export async function POST(request: Request) {
     const safeMemberId = escapeHtml(memberId);
     const safeTempPassword = escapeHtml(tempPassword);
     const safeCountry = escapeHtml(application.country || 'N/A');
+    const isSupplier = assignedRole === 'supplier' || assignedRole === 'partner';
+
+    const credentialsBlock = `
+      <div style="background:white;border:2px solid #5DB347;border-radius:12px;padding:20px;margin:20px 0">
+        <h3 style="color:#1B2A4A;margin-top:0;font-size:16px">Your Login Credentials</h3>
+        <table style="width:100%;font-size:14px">
+          <tr><td style="padding:8px 0;color:#64748b;width:120px">Login URL</td><td style="padding:8px 0"><a href="https://africanfarmingunion.org/login" style="color:#2563eb;font-weight:600">africanfarmingunion.org/login</a></td></tr>
+          <tr><td style="padding:8px 0;color:#64748b">Email</td><td style="padding:8px 0;color:#1B2A4A;font-weight:600">${safeEmail}</td></tr>
+          <tr><td style="padding:8px 0;color:#64748b">Password</td><td style="padding:8px 0;color:#1B2A4A;font-weight:600;font-family:monospace;font-size:16px">${safeTempPassword}</td></tr>
+          <tr><td style="padding:8px 0;color:#64748b">Member ID</td><td style="padding:8px 0;color:#1B2A4A;font-weight:600">${safeMemberId}</td></tr>
+        </table>
+        <p style="color:#EF4444;font-size:12px;margin-bottom:0">Please change your password after your first login.</p>
+      </div>`;
+
+    const supplierEmailHtml = `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
+      <div style="background:#1B2A4A;padding:30px;text-align:center">
+        <h1 style="color:#5DB347;margin:0;font-size:24px">African Farming Union</h1>
+        <p style="color:#8CB89C;margin:8px 0 0;font-size:14px">Partner Onboarding</p>
+      </div>
+      <div style="padding:30px;background:#f8faf6">
+        <h2 style="color:#1B2A4A;margin-top:0">Welcome, ${firstName}!</h2>
+        <p style="color:#333;font-size:15px;line-height:1.6">
+          Great news — your <strong>${tierName}</strong> partnership application has been <strong style="color:#5DB347">approved</strong>!
+          You now have access to the AFU Supplier Portal.
+        </p>
+
+        ${credentialsBlock}
+
+        <div style="background:white;border:1px solid #e5e7eb;border-radius:12px;padding:20px;margin:20px 0">
+          <h3 style="color:#1B2A4A;margin-top:0;font-size:16px">Your Supplier Portal</h3>
+          <p style="color:#333;font-size:14px;line-height:1.6">As a partner you get access to:</p>
+          <ul style="color:#333;font-size:14px;line-height:1.8;padding-left:20px">
+            <li><strong>Company Profile</strong> — Showcase your brand to thousands of African farmers</li>
+            <li><strong>Product Listings</strong> — List seeds, fertilizers, equipment & services</li>
+            <li><strong>Order Management</strong> — Receive and manage farmer orders</li>
+            <li><strong>Exchange</strong> — Post bulk supply offers and connect with buyers</li>
+            <li><strong>Analytics</strong> — Track sales, views, and customer engagement</li>
+            <li><strong>Sponsorship Tiers</strong> — Boost visibility with premium placement</li>
+          </ul>
+        </div>
+
+        <div style="background:#FFFBEB;border:1px solid #F59E0B;border-radius:12px;padding:20px;margin:20px 0">
+          <h3 style="color:#92400E;margin-top:0;font-size:16px">Next Steps</h3>
+          <ol style="color:#78350F;font-size:14px;line-height:1.8;padding-left:20px">
+            <li>Log in and complete your supplier profile</li>
+            <li>Our team will reach out with your tailored partnership pricing</li>
+            <li>Complete your subscription payment to unlock all features</li>
+            <li>Start listing products and connecting with farmers!</li>
+          </ol>
+        </div>
+
+        <div style="text-align:center;margin-top:24px">
+          <a href="https://africanfarmingunion.org/supplier" style="display:inline-block;background:#5DB347;color:white;padding:14px 32px;border-radius:10px;text-decoration:none;font-weight:700;font-size:15px">Go to Supplier Portal</a>
+        </div>
+      </div>
+      <div style="padding:16px;text-align:center;color:#999;font-size:12px">
+        African Farming Union | <a href="https://africanfarmingunion.org" style="color:#999">africanfarmingunion.org</a>
+      </div>
+    </div>`;
+
+    const farmerEmailHtml = `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
+      <div style="background:#1B2A4A;padding:30px;text-align:center">
+        <h1 style="color:#5DB347;margin:0;font-size:24px">African Farming Union</h1>
+        <p style="color:#8CB89C;margin:8px 0 0;font-size:14px">Welcome to the Family</p>
+      </div>
+      <div style="padding:30px;background:#f8faf6">
+        <h2 style="color:#1B2A4A;margin-top:0">Welcome, ${firstName}!</h2>
+        <p style="color:#333;font-size:15px;line-height:1.6">
+          Your <strong>${tierName}</strong> membership has been <strong style="color:#5DB347">approved</strong>.
+          You now have access to the AFU platform — financing, insurance, marketplace, training, and more.
+        </p>
+
+        ${credentialsBlock}
+
+        <div style="background:white;border:1px solid #e5e7eb;border-radius:12px;padding:20px;margin:20px 0">
+          <h3 style="color:#1B2A4A;margin-top:0;font-size:16px">What You Can Do Now</h3>
+          <ol style="color:#333;font-size:14px;line-height:1.8;padding-left:20px">
+            <li>Log into your <a href="https://africanfarmingunion.org/dashboard" style="color:#2563eb">Member Dashboard</a></li>
+            <li>Complete your farm profile</li>
+            <li>Browse the <a href="https://africanfarmingunion.org/marketplace" style="color:#2563eb">Marketplace</a> for seeds, fertilizer & equipment</li>
+            <li>Apply for <a href="https://africanfarmingunion.org/dashboard/financing" style="color:#2563eb">financing</a> and <a href="https://africanfarmingunion.org/farm/insurance" style="color:#2563eb">insurance</a></li>
+            <li>Access free <a href="https://africanfarmingunion.org/farm/training" style="color:#2563eb">training courses</a></li>
+          </ol>
+        </div>
+
+        <div style="text-align:center;margin-top:24px">
+          <a href="https://africanfarmingunion.org/dashboard" style="display:inline-block;background:#5DB347;color:white;padding:14px 32px;border-radius:10px;text-decoration:none;font-weight:700;font-size:15px">Go to Dashboard</a>
+        </div>
+      </div>
+      <div style="padding:16px;text-align:center;color:#999;font-size:12px">
+        African Farming Union | <a href="https://africanfarmingunion.org" style="color:#999">africanfarmingunion.org</a>
+      </div>
+    </div>`;
 
     try {
       await resend.emails.send({
         from: FROM,
         to: application.email,
-        subject: 'Welcome to African Farming Union! 🌾',
-        html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
-          <div style="background:#1B2A4A;padding:30px;text-align:center">
-            <h1 style="color:#5DB347;margin:0;font-size:24px">African Farming Union</h1>
-            <p style="color:#8CB89C;margin:8px 0 0;font-size:14px">Welcome to the Family</p>
-          </div>
-          <div style="padding:30px;background:#f8faf6">
-            <h2 style="color:#1B2A4A;margin-top:0">Welcome, ${firstName}!</h2>
-            <p style="color:#333;font-size:15px;line-height:1.6">
-              Your <strong>${tierName}</strong> membership has been <strong style="color:#5DB347">approved</strong>.
-              You now have access to the AFU platform — financing, insurance, marketplace, training, and more.
-            </p>
-
-            <div style="background:white;border:2px solid #5DB347;border-radius:12px;padding:20px;margin:20px 0">
-              <h3 style="color:#1B2A4A;margin-top:0;font-size:16px">Your Login Credentials</h3>
-              <table style="width:100%;font-size:14px">
-                <tr>
-                  <td style="padding:8px 0;color:#64748b;width:120px">Login URL</td>
-                  <td style="padding:8px 0"><a href="https://africanfarmingunion.org/login" style="color:#2563eb;font-weight:600">africanfarmingunion.org/login</a></td>
-                </tr>
-                <tr>
-                  <td style="padding:8px 0;color:#64748b">Email</td>
-                  <td style="padding:8px 0;color:#1B2A4A;font-weight:600">${safeEmail}</td>
-                </tr>
-                <tr>
-                  <td style="padding:8px 0;color:#64748b">Password</td>
-                  <td style="padding:8px 0;color:#1B2A4A;font-weight:600;font-family:monospace;font-size:16px">${safeTempPassword}</td>
-                </tr>
-                <tr>
-                  <td style="padding:8px 0;color:#64748b">Member ID</td>
-                  <td style="padding:8px 0;color:#1B2A4A;font-weight:600">${safeMemberId}</td>
-                </tr>
-              </table>
-              <p style="color:#EF4444;font-size:12px;margin-bottom:0">Please change your password after your first login.</p>
-            </div>
-
-            <div style="background:white;border:1px solid #e5e7eb;border-radius:12px;padding:20px;margin:20px 0">
-              <h3 style="color:#1B2A4A;margin-top:0;font-size:16px">What You Can Do Now</h3>
-              <ol style="color:#333;font-size:14px;line-height:1.8;padding-left:20px">
-                <li>Log into your <a href="https://africanfarmingunion.org/dashboard" style="color:#2563eb">Member Dashboard</a></li>
-                <li>Complete your farm profile</li>
-                <li>Browse the <a href="https://africanfarmingunion.org/marketplace" style="color:#2563eb">Marketplace</a> for seeds, fertilizer & equipment</li>
-                <li>Apply for <a href="https://africanfarmingunion.org/dashboard/financing" style="color:#2563eb">financing</a> and <a href="https://africanfarmingunion.org/farm/insurance" style="color:#2563eb">insurance</a></li>
-                <li>Access free <a href="https://africanfarmingunion.org/farm/training" style="color:#2563eb">training courses</a></li>
-              </ol>
-            </div>
-
-            <div style="text-align:center;margin-top:24px">
-              <a href="https://africanfarmingunion.org/dashboard" style="display:inline-block;background:#5DB347;color:white;padding:14px 32px;border-radius:10px;text-decoration:none;font-weight:700;font-size:15px">Go to Dashboard</a>
-            </div>
-          </div>
-          <div style="padding:16px;text-align:center;color:#999;font-size:12px">
-            African Farming Union | <a href="https://africanfarmingunion.org" style="color:#999">africanfarmingunion.org</a>
-          </div>
-        </div>`,
+        subject: isSupplier
+          ? 'Your AFU Partnership is Approved — Welcome Aboard!'
+          : 'Welcome to African Farming Union! 🌾',
+        html: isSupplier ? supplierEmailHtml : farmerEmailHtml,
       });
     } catch (emailErr) {
       console.error('Failed to send welcome email:', emailErr);
@@ -394,13 +436,16 @@ export async function POST(request: Request) {
       await resend.emails.send({
         from: FROM,
         to: ['peterw@africanfarmingunion.org', 'devonk@africanfarmingunion.org'],
-        subject: `Member Approved: ${application.full_name} (${tierNameRaw})`,
+        subject: isSupplier
+          ? `Partner Approved: ${application.full_name} (${tierNameRaw})`
+          : `Member Approved: ${application.full_name} (${tierNameRaw})`,
         html: `<div style="font-family:Arial,sans-serif;padding:20px">
-          <h2 style="color:#1B2A4A">Member Approved</h2>
+          <h2 style="color:#1B2A4A">${isSupplier ? 'Partner' : 'Member'} Approved</h2>
           <p><strong>${safeFullName}</strong> — ${tierName} tier</p>
           <p>Country: ${safeCountry} | Email: ${safeEmail}</p>
           <p>Member ID: ${safeMemberId}</p>
-          <a href="https://africanfarmingunion.org/admin/members" style="display:inline-block;background:#5DB347;color:white;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600">View in Admin</a>
+          ${isSupplier ? '<p style="color:#F59E0B;font-weight:600">Action needed: Send tailored partnership pricing to this supplier.</p>' : ''}
+          <a href="https://africanfarmingunion.org/admin/${isSupplier ? 'suppliers' : 'members'}" style="display:inline-block;background:#5DB347;color:white;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600">View in Admin</a>
         </div>`,
       });
     } catch { /* non-critical */ }
@@ -413,6 +458,18 @@ export async function POST(request: Request) {
       country: application.country || undefined,
       tier: application.requested_tier || undefined,
     }).catch(() => {});
+
+    // Fire supplier-specific automation if applicable
+    if (isSupplier) {
+      fireAutomations('supplier_activated', {
+        name: application.full_name,
+        email: application.email,
+        phone: application.phone || undefined,
+        country: application.country || undefined,
+        tier: application.requested_tier || undefined,
+        organization: application.farm_name || undefined,
+      }).catch(() => {});
+    }
 
     return NextResponse.json({
       success: true,

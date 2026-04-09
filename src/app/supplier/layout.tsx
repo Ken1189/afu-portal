@@ -27,6 +27,7 @@ import {
   ExternalLink,
   FileText,
   Wallet,
+  Video,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -44,6 +45,7 @@ const supplierLinks = [
   { href: '/supplier/estimates', label: 'Estimates', icon: FileText, section: 'Finance' },
   { href: '/supplier/discounts', label: 'Discounts', icon: BadgePercent, section: 'Finance' },
   { href: '/supplier/sponsorship', label: 'Sponsorship', icon: Award, section: 'Finance' },
+  { href: '/supplier/videos', label: 'Videos', icon: Video, section: 'Marketing' },
   { href: '/supplier/advertising', label: 'Advertising', icon: Megaphone, section: 'Marketing' },
   { href: '/supplier/analytics', label: 'Analytics', icon: BarChart3, section: 'Marketing' },
   { href: '/supplier/reviews', label: 'Reviews', icon: Star, section: 'Marketing' },

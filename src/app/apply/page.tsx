@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useApplications } from "@/lib/supabase/use-applications";
 import { createClient } from "@/lib/supabase/client";
-import { ALL_AFRICAN_COUNTRIES } from "@/lib/countries";
+import { ALL_AFRICAN_COUNTRIES, WORLD_COUNTRIES, GLOBAL_OPTION } from "@/lib/countries";
 import PromoCodeInput from "@/components/ui/PromoCodeInput";
 
 type Tier = "free" | "smallholder" | "commercial" | "enterprise" | "partner";
@@ -209,8 +209,19 @@ export default function ApplyPage() {
               <svg className="w-20 h-20 text-[#5DB347] mx-auto mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <h2 className="text-3xl font-bold text-[#1B2A4A] mb-4">Welcome to the Family!</h2>
-              {selectedTier === 'free' ? (
+              <h2 className="text-3xl font-bold text-[#1B2A4A] mb-4">
+                {selectedTier === 'partner' ? 'Application Received!' : 'Welcome to the Family!'}
+              </h2>
+              {selectedTier === 'partner' ? (
+                <>
+                  <p className="text-gray-600 mb-2">
+                    Thank you for your interest in partnering with African Farming Union. Our team is reviewing your application.
+                  </p>
+                  <p className="text-gray-500 mb-8">
+                    We&apos;ll send you a tailored partnership proposal with pricing and next steps via email within 3-5 business days. Once approved, you&apos;ll get full access to your Supplier Portal.
+                  </p>
+                </>
+              ) : selectedTier === 'free' ? (
                 <>
                   <p className="text-gray-600 mb-2">
                     Your <strong>Free</strong> membership is being set up. You can start exploring the platform right away.
@@ -371,10 +382,23 @@ export default function ApplyPage() {
                     <label className="block text-sm font-medium text-[#1B2A4A] mb-2">Country *</label>
                     <select required className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5DB347]/50 focus:border-[#5DB347] transition-shadow" value={formData.country} onChange={(e) => setFormData({ ...formData, country: e.target.value })}>
                       <option value="">Select country</option>
-                      {ALL_AFRICAN_COUNTRIES.map((c) => (
-                        <option key={c} value={c}>{c}</option>
-                      ))}
-                      <option value="Other">Other</option>
+                      {selectedTier === 'partner' ? (
+                        <>
+                          <option value={GLOBAL_OPTION}>{GLOBAL_OPTION}</option>
+                          <optgroup label="All Countries">
+                            {WORLD_COUNTRIES.map((c) => (
+                              <option key={c} value={c}>{c}</option>
+                            ))}
+                          </optgroup>
+                        </>
+                      ) : (
+                        <>
+                          {ALL_AFRICAN_COUNTRIES.map((c) => (
+                            <option key={c} value={c}>{c}</option>
+                          ))}
+                          <option value="Other">Other</option>
+                        </>
+                      )}
                     </select>
                   </div>
                   <div>
@@ -430,11 +454,13 @@ export default function ApplyPage() {
                   </label>
                 </div>
 
-                {/* Promo Code */}
-                <PromoCodeInput
-                  context={selectedTier === 'partner' ? 'supplier' : 'farmer'}
-                  onValidated={(p) => setPromoCode(p?.code ?? null)}
-                />
+                {/* Promo Code — hidden for partners (pricing is custom) */}
+                {selectedTier !== 'partner' && (
+                  <PromoCodeInput
+                    context={'farmer'}
+                    onValidated={(p) => setPromoCode(p?.code ?? null)}
+                  />
+                )}
 
                 {submitError && (
                   <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm mb-4">

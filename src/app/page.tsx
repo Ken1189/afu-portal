@@ -1171,7 +1171,7 @@ export default function Home() {
       </section>}
 
       {/* ─── PARTNER LOGOS MARQUEE ─── */}
-      {showSection('partners') && <section className="py-16 bg-cream border-y border-gray-100">
+      {partners.length > 0 && <section className="py-16 bg-cream border-y border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeInWhenVisible>
             <p className="text-center text-sm font-semibold text-gray-400 uppercase tracking-wider mb-10">
