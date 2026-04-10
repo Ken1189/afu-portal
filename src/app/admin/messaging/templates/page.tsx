@@ -51,7 +51,15 @@ export default function AdminTemplatesPage() {
     setLoading(true);
     try {
       const { data } = await supabase.from('message_templates').select('*').order('created_at', { ascending: false });
-      setTemplates(data && data.length > 0 ? (data as Template[]) : DEMO_TEMPLATES);
+      if (data && data.length > 0) {
+        setTemplates(data.map((t: any) => ({
+          ...t,
+          is_active: t.is_active === true || t.is_active === 'true' || t.is_active === 't',
+          variables: Array.isArray(t.variables) ? t.variables : [],
+        })) as Template[]);
+      } else {
+        setTemplates(DEMO_TEMPLATES);
+      }
     } catch (err) {
       console.error("[templates/page.tsx] fetch error:", err);
     } finally {
@@ -137,9 +145,9 @@ export default function AdminTemplatesPage() {
             <div key={t.id} className={`bg-white rounded-xl border ${t.is_active ? 'border-gray-100' : 'border-gray-200 opacity-60'} overflow-hidden hover:shadow-md transition-all`}>
               <div className="h-40 overflow-hidden bg-gray-50 relative">
                 {t.channel === 'email' ? (
-                  <div className="p-4 text-xs text-gray-600 overflow-hidden" dangerouslySetInnerHTML={{ __html: t.body.substring(0, 500) }} />
+                  <div className="p-4 text-xs text-gray-600 overflow-hidden" dangerouslySetInnerHTML={{ __html: (t.body || '').substring(0, 500) }} />
                 ) : (
-                  <div className="p-4 flex items-start gap-2"><div className="bg-green-100 rounded-2xl rounded-bl-md p-3 text-xs text-gray-700 max-w-[80%]">{t.body.substring(0, 200)}</div></div>
+                  <div className="p-4 flex items-start gap-2"><div className="bg-green-100 rounded-2xl rounded-bl-md p-3 text-xs text-gray-700 max-w-[80%]">{(t.body || '').substring(0, 200)}</div></div>
                 )}
                 <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-white to-transparent" />
               </div>
