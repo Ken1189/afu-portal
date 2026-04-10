@@ -16,12 +16,12 @@ import {
   Users,
 } from 'lucide-react';
 
-/* ─── Stats ─── */
-const STATS = [
-  { value: '50+', label: 'Expert Advisors', icon: UserCheck },
-  { value: '200+', label: 'Years Combined Experience', icon: Award },
-  { value: '9', label: 'Countries Covered', icon: Globe2 },
-  { value: '15+', label: 'Specializations', icon: BookOpen },
+/* ─── What We're Building ─── */
+const HIGHLIGHTS = [
+  { value: 'Mentorship', label: 'One-on-one farmer guidance', icon: UserCheck },
+  { value: 'Programs', label: 'Advisor-led training initiatives', icon: Award },
+  { value: '9 Countries', label: 'Pan-African coverage planned', icon: Globe2 },
+  { value: 'Apply Now', label: 'Expressions of interest open', icon: BookOpen },
 ];
 
 export default function AdvisorsPage() {
@@ -54,23 +54,23 @@ export default function AdvisorsPage() {
         </div>
       </section>
 
-      {/* ─── Stats ─── */}
+      {/* ─── What We're Building ─── */}
       <section className="py-12 border-b border-gray-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-            {STATS.map((stat) => (
+            {HIGHLIGHTS.map((item) => (
               <motion.div
-                key={stat.label}
+                key={item.label}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 className="text-center"
               >
                 <div className="w-12 h-12 rounded-xl bg-[#5DB347]/10 flex items-center justify-center mx-auto mb-3">
-                  <stat.icon className="h-6 w-6 text-[#5DB347]" />
+                  <item.icon className="h-6 w-6 text-[#5DB347]" />
                 </div>
-                <div className="text-2xl sm:text-3xl font-bold text-[#1B2A4A]">{stat.value}</div>
-                <div className="text-sm text-gray-500">{stat.label}</div>
+                <div className="text-xl sm:text-2xl font-bold text-[#1B2A4A]">{item.value}</div>
+                <div className="text-sm text-gray-500">{item.label}</div>
               </motion.div>
             ))}
           </div>

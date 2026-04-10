@@ -841,8 +841,49 @@ export default function SponsorPage() {
         </div>
       </section>
 
-      {/* ── Corporate CTA ── */}
+      {/* ── Meet Some Farmers ── */}
       <section className="bg-white py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl md:text-4xl font-bold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-[#1B2A4A] to-[#5DB347]">
+              Farmers Your Sponsorship Supports
+            </h2>
+            <p className="text-gray-500 text-lg">Real farmers across Africa benefiting from pooled sponsorship funds.</p>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+            {[
+              { name: 'Sipho D.', flag: '🇧🇼', country: 'Botswana', crop: 'Cattle', img: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=300&h=300&q=80&auto=format&fit=crop' },
+              { name: 'Joseph O.', flag: '🇹🇿', country: 'Tanzania', crop: 'Coffee', img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&q=80&auto=format&fit=crop' },
+              { name: 'Grace M.', flag: '🇿🇼', country: 'Zimbabwe', crop: 'Maize', img: 'https://images.unsplash.com/photo-1589923188651-268a9765e432?w=300&h=300&q=80&auto=format&fit=crop' },
+              { name: 'Watson G.', flag: '🇿🇼', country: 'Zimbabwe', crop: 'Blueberries', img: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&h=300&q=80&auto=format&fit=crop' },
+              { name: 'Watson S.', flag: '🇿🇼', country: 'Zimbabwe', crop: 'Cassava', img: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&h=300&q=80&auto=format&fit=crop' },
+              { name: 'Tatenda M.', flag: '🇿🇼', country: 'Zimbabwe', crop: 'Cattle', img: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=300&h=300&q=80&auto=format&fit=crop' },
+            ].map((farmer) => (
+              <div key={farmer.name} className="text-center group">
+                <div className="relative w-24 h-24 sm:w-28 sm:h-28 mx-auto rounded-2xl overflow-hidden mb-3 shadow-md group-hover:shadow-lg transition-shadow">
+                  <img
+                    src={farmer.img}
+                    alt={farmer.name}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                </div>
+                <h3 className="font-bold text-[#1B2A4A] text-sm">{farmer.name}</h3>
+                <p className="text-xs text-gray-500">{farmer.flag} {farmer.country}</p>
+                <p className="text-xs font-medium" style={{ color: '#5DB347' }}>{farmer.crop}</p>
+              </div>
+            ))}
+          </div>
+
+          <p className="text-center text-gray-400 text-sm mt-8">
+            Your contribution is distributed across all farmers in AFU programs — everyone benefits.
+          </p>
+        </div>
+      </section>
+
+      {/* ── Corporate CTA ── */}
+      <section className="bg-[#FAF8F3] py-16">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="w-12 h-12 rounded-xl bg-[#5DB347]/10 flex items-center justify-center mb-4 mx-auto"><Building2 className="w-6 h-6 text-[#5DB347]" /></div>
           <h2 className="text-3xl md:text-4xl font-bold text-navy mb-4">

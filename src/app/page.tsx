@@ -366,11 +366,11 @@ export default function Home() {
   type FarmerPreview = { name: string; country: string; flag: string; crop: string; img: string };
   const FALLBACK_FARMER_PREVIEW: FarmerPreview[] = [
     { name: 'Grace M.', country: 'Ghana', flag: '🇬🇭', crop: 'Maize', img: 'https://images.unsplash.com/photo-1589923188651-268a9765e432?w=300&h=300&q=80&auto=format&fit=crop' },
-    { name: 'Joseph O.', country: 'Tanzania', flag: '🇹🇿', crop: 'Coffee', img: 'https://images.unsplash.com/photo-1605000797499-95a51c5269ae?w=300&h=300&q=80&auto=format&fit=crop' },
-    { name: 'Amina H.', country: 'Kenya', flag: '🇰🇪', crop: 'Tea', img: 'https://images.unsplash.com/photo-1594708767771-a7502209ff51?w=300&h=300&q=80&auto=format&fit=crop' },
-    { name: 'Sipho D.', country: 'Botswana', flag: '🇧🇼', crop: 'Cattle', img: 'https://images.unsplash.com/photo-1516467508483-a7212febe31a?w=300&h=300&q=80&auto=format&fit=crop' },
-    { name: 'Fatima D.', country: 'Senegal', flag: '🇸🇳', crop: 'Tomatoes', img: 'https://images.unsplash.com/photo-1523741543316-beb7fc7023d8?w=300&h=300&q=80&auto=format&fit=crop' },
-    { name: 'Peter K.', country: 'Ethiopia', flag: '🇪🇹', crop: 'Teff', img: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=300&h=300&q=80&auto=format&fit=crop' },
+    { name: 'Joseph O.', country: 'Tanzania', flag: '🇹🇿', crop: 'Coffee', img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&q=80&auto=format&fit=crop' },
+    { name: 'Amina H.', country: 'Kenya', flag: '🇰🇪', crop: 'Tea', img: 'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=300&h=300&q=80&auto=format&fit=crop' },
+    { name: 'Sipho D.', country: 'Botswana', flag: '🇧🇼', crop: 'Cattle', img: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=300&h=300&q=80&auto=format&fit=crop' },
+    { name: 'Fatima D.', country: 'Senegal', flag: '🇸🇳', crop: 'Tomatoes', img: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=300&h=300&q=80&auto=format&fit=crop' },
+    { name: 'Peter K.', country: 'Ethiopia', flag: '🇪🇹', crop: 'Teff', img: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&h=300&q=80&auto=format&fit=crop' },
   ];
   const COUNTRY_FLAGS: Record<string, string> = {
     Zimbabwe: '🇿🇼', Tanzania: '🇹🇿', Kenya: '🇰🇪', Botswana: '🇧🇼',
