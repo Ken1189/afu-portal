@@ -589,7 +589,7 @@ export default function AdminExportsPage() {
 
   const compliantShipments = shipments.filter((s) => s.status !== 'cancelled' && s.documentsComplete === s.documentsTotal).length;
   const totalNonCancelled = shipments.filter((s) => s.status !== 'cancelled').length;
-  const complianceRate = Math.round((compliantShipments / totalNonCancelled) * 100);
+  const complianceRate = totalNonCancelled > 0 ? Math.round((compliantShipments / totalNonCancelled) * 100) : 0;
 
   // ── Filter unique values ──────────────────────────────────────────────
 
@@ -1211,7 +1211,7 @@ export default function AdminExportsPage() {
                 <div className="space-y-2">
                   {topProducts.map((product, i) => {
                     const maxVal = topProducts[0].value;
-                    const widthPct = (product.value / maxVal) * 100;
+                    const widthPct = maxVal > 0 ? (product.value / maxVal) * 100 : 0;
                     return (
                       <div key={product.product} className="flex items-center gap-3">
                         <span className="text-xs text-gray-400 w-4 text-right font-mono">{i + 1}</span>
