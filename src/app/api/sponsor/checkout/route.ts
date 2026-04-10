@@ -166,7 +166,7 @@ export async function POST(req: NextRequest) {
       await resend.emails.send({
         from: FROM,
         to: body.sponsor_email,
-        subject: 'Thank You for Sponsoring an African Farmer! 🌾',
+        subject: 'Thank You for Sponsoring an African Farmer!',
         html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
           <div style="background:#1B2A4A;padding:30px;text-align:center">
             <h1 style="color:#5DB347;margin:0;font-size:24px">African Farming Union</h1>

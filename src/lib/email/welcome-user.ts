@@ -376,7 +376,7 @@ export async function sendWelcomeEmail(params: SendWelcomeEmailParams) {
             </tr>
           </table>
           <p style="color:#EF4444;font-size:12px;margin:12px 0 0">
-            ⚠️ Please change your password after your first login.
+            Important: Please change your password after your first login.
           </p>
         </div>
 

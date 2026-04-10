@@ -17,7 +17,7 @@ import {
 const TIER_CONFIG = [
   {
     tier: 'seedling',
-    label: '🌱 Seedling',
+    label: 'Seedling',
     color: '#8CB89C',
     description: 'Getting started',
     items: [
@@ -29,7 +29,7 @@ const TIER_CONFIG = [
   },
   {
     tier: 'sprout',
-    label: '🌿 Sprout',
+    label: 'Sprout',
     color: '#5DB347',
     description: 'Farm records',
     items: [
@@ -40,7 +40,7 @@ const TIER_CONFIG = [
   },
   {
     tier: 'growth',
-    label: '🌳 Growth',
+    label: 'Growth',
     color: '#449933',
     description: 'Financial tools',
     items: [
@@ -51,7 +51,7 @@ const TIER_CONFIG = [
   },
   {
     tier: 'harvest',
-    label: '🌾 Harvest',
+    label: 'Harvest',
     color: '#2D7A1E',
     description: 'Digital agriculture',
     items: [
@@ -63,7 +63,7 @@ const TIER_CONFIG = [
   },
   {
     tier: 'pioneer',
-    label: '🏆 Pioneer',
+    label: 'Pioneer',
     color: '#1B5E14',
     description: 'Full access',
     items: [
@@ -110,7 +110,7 @@ export default function DemoLayout({ children }: { children: React.ReactNode }) 
               {isFarm ? 'Grace Moyo' : 'Simba Chikwanha'}
             </p>
             <p className="text-[10px] text-gray-500">
-              {isFarm ? '🌿 Sprout • Zimbabwe' : '🌳 Commercial • Zimbabwe'}
+              {isFarm ? 'Sprout \u2022 Zimbabwe' : 'Commercial \u2022 Zimbabwe'}
             </p>
           </div>
         </div>
@@ -218,7 +218,7 @@ export default function DemoLayout({ children }: { children: React.ReactNode }) 
       {/* Demo footer */}
       <div className="p-3 border-t border-gray-100 bg-gray-50">
         <p className="text-[10px] text-gray-400 text-center">
-          🎯 INVESTOR DEMO — Features unlock as farmers complete training
+          INVESTOR DEMO — Features unlock as farmers complete training
         </p>
       </div>
     </div>

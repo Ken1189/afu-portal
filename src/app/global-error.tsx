@@ -28,7 +28,7 @@ export default function GlobalError({
               margin: '0 auto 1.5rem',
               fontSize: '2rem',
             }}>
-              ⚠️
+              !
             </div>
             <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'white', marginBottom: '0.75rem' }}>
               Something Went Wrong

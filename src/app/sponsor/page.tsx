@@ -438,9 +438,7 @@ function TierCard({
       <ul className="space-y-2 flex-1 mb-6">
         {features.map((feature) => (
           <li key={feature} className="flex items-start gap-2 text-sm">
-            <span style={{ color: '#5DB347' }} className="mt-0.5 shrink-0">
-              ✓
-            </span>
+            <svg className="w-4 h-4 mt-0.5 shrink-0 text-[#5DB347]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
             <span className={isCorporate ? 'text-white/80' : 'text-gray-600'}>{feature}</span>
           </li>
         ))}

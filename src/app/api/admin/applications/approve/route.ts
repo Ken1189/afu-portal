@@ -159,7 +159,7 @@ export async function POST(request: Request) {
           await resend.emails.send({
             from: FROM,
             to: application.email,
-            subject: 'Your AFU Membership Has Been Approved! 🌾',
+            subject: 'Your AFU Membership Has Been Approved!',
             html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
               <div style="background:#1B2A4A;padding:30px;text-align:center">
                 <h1 style="color:#5DB347;margin:0;font-size:24px">African Farming Union</h1>
@@ -424,7 +424,7 @@ export async function POST(request: Request) {
         to: application.email,
         subject: isSupplier
           ? 'Your AFU Partnership is Approved — Welcome Aboard!'
-          : 'Welcome to African Farming Union! 🌾',
+          : 'Welcome to African Farming Union!',
         html: isSupplier ? supplierEmailHtml : farmerEmailHtml,
       });
     } catch (emailErr) {

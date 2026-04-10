@@ -187,7 +187,7 @@ export default function InputFinancePage() {
                 className="bg-cream rounded-2xl p-6 hover:shadow-md transition-all"
               >
                 <div className="w-10 h-10 bg-teal/10 rounded-xl flex items-center justify-center text-teal font-bold mb-4">
-                  {["$0", "📉", "✓", "🚛"][i]}
+                  {["$0", "%", "OK", "Go"][i]}
                 </div>
                 <h3 className="font-bold text-navy mb-2">{benefit.title}</h3>
                 <p className="text-gray-500 text-sm leading-relaxed">

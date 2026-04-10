@@ -1218,7 +1218,7 @@ export default function TrainingPage() {
                         backgroundColor: tierConfig ? `${tierConfig.color}20` : '#5DB34720',
                       }}
                     >
-                      {tierConfig?.emoji || '✓'}
+                      {tierConfig?.name?.charAt(0) || 'C'}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-white truncate">
@@ -1432,7 +1432,7 @@ export default function TrainingPage() {
                               transition={{ duration: 0.6, delay: 0.2 }}
                               className="text-5xl"
                             >
-                              🏆
+                              &#10003;
                             </motion.div>
                           </div>
                           <h3 className="text-2xl font-bold text-white mb-2">Course Complete!</h3>
@@ -1476,8 +1476,8 @@ export default function TrainingPage() {
                           exit={{ opacity: 0, y: -10 }}
                         >
                           <div className="flex items-center gap-2 mb-6">
-                            <div className="w-8 h-8 rounded-xl bg-amber-500/20 flex items-center justify-center text-sm">
-                              📝
+                            <div className="w-8 h-8 rounded-xl bg-amber-500/20 flex items-center justify-center text-sm text-amber-400 font-bold">
+                              Q
                             </div>
                             <div>
                               <h3 className="text-lg font-bold text-white">Final Quiz</h3>

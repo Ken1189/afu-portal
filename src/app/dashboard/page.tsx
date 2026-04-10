@@ -1268,7 +1268,7 @@ function ReferralCard() {
                 : 'bg-[#1B2A4A] text-white hover:bg-[#243556]'
             }`}
           >
-            {copied ? '✓ Copied!' : 'Copy Link'}
+            {copied ? 'Copied!' : 'Copy Link'}
           </button>
           <button
             onClick={() => {
@@ -1289,7 +1289,7 @@ function ReferralCard() {
 
       {referralData?.pending_earnings !== undefined && referralData.pending_earnings > 0 && (
         <div className="mt-3 text-xs text-gray-500">
-          💰 You have <span className="font-semibold text-[#5DB347]">${referralData.pending_earnings.toFixed(2)}</span> in pending earnings
+          You have <span className="font-semibold text-[#5DB347]">${referralData.pending_earnings.toFixed(2)}</span> in pending earnings
         </div>
       )}
     </motion.div>

@@ -17,19 +17,19 @@ export const SERVICE_DEFAULTS: Record<string, ServicePageConfig> = {
         title: 'Pre-export Working Capital',
         description:
           'Funds inputs, harvesting, packing, cold chain and transport. Tenor 90-180 days. Target pricing 12-18% APR + 1-2% origination fee.',
-        icon: '💰',
+        icon: 'WC',
       },
       {
         title: 'Export Invoice Finance',
         description:
           'Bridges the shipment-to-payment gap on buyer terms. Tenor 30-60 days. Target pricing 8-10% APR + ~1% fee.',
-        icon: '📄',
+        icon: 'IF',
       },
       {
         title: 'Tri-Party Escrow',
         description:
           'Buyer payments flow into AFU-controlled escrow. Waterfall pays AFU first, then suppliers, then producer.',
-        icon: '🔐',
+        icon: 'ES',
       },
     ],
     how_it_works: [
@@ -50,17 +50,17 @@ export const SERVICE_DEFAULTS: Record<string, ServicePageConfig> = {
       {
         title: 'Multi-Peril Crop',
         description: 'Fire, hail, drought and excessive rain coverage indexed to your planted area.',
-        icon: '🌾',
+        icon: 'MC',
       },
       {
         title: 'Livestock Cover',
         description: 'Mortality and theft cover with mobile claim filing and field-vet verification.',
-        icon: '🐄',
+        icon: 'LC',
       },
       {
         title: 'Parametric Weather',
         description: 'Automatic payouts triggered by satellite-verified rainfall and temperature thresholds.',
-        icon: '🛰️',
+        icon: 'PW',
       },
     ],
     how_it_works: [
@@ -81,17 +81,17 @@ export const SERVICE_DEFAULTS: Record<string, ServicePageConfig> = {
       {
         title: 'Good Agricultural Practice',
         description: 'Foundational GAP curriculum covering soil, water, inputs and harvest hygiene.',
-        icon: '📚',
+        icon: 'GA',
       },
       {
         title: 'GlobalGAP Certification',
         description: 'Group certification pathway including audit prep and corrective actions.',
-        icon: '🏅',
+        icon: 'GG',
       },
       {
         title: 'Post-Harvest & Cold Chain',
         description: 'Reduce losses with grading, packaging and cold-chain management training.',
-        icon: '❄️',
+        icon: 'CC',
       },
     ],
     how_it_works: [
@@ -112,17 +112,17 @@ export const SERVICE_DEFAULTS: Record<string, ServicePageConfig> = {
       {
         title: 'Field Vet Visits',
         description: 'Book a verified vet to your farm for diagnosis, treatment or routine check-ups.',
-        icon: '🩺',
+        icon: 'FV',
       },
       {
         title: 'Vaccination Programmes',
         description: 'Country-appropriate vaccine schedules with reminders and digital proof of cover.',
-        icon: '💉',
+        icon: 'VP',
       },
       {
         title: 'Herd Health Records',
         description: 'Digital records that move with your animals — useful for export and insurance.',
-        icon: '📋',
+        icon: 'HR',
       },
     ],
     how_it_works: [
@@ -146,37 +146,37 @@ export const SERVICE_DEFAULTS: Record<string, ServicePageConfig> = {
         title: 'Milling & Grinding',
         description:
           'State-of-the-art milling equipment for maize, wheat, rice, and sorghum. Produce flour, grits, and meal that meet commercial buyer specifications and retail packaging standards.',
-        icon: '🌾',
+        icon: 'MG',
       },
       {
         title: 'Solar Drying Systems',
         description:
           'Reduce moisture content to safe storage levels with our solar-hybrid dryers. Extend shelf life from weeks to months while preserving nutritional value and minimising energy costs.',
-        icon: '🌡️',
+        icon: 'SD',
       },
       {
         title: 'Cold Chain Infrastructure',
         description:
           'Solar-powered cold rooms and refrigerated logistics for perishables — fruits, vegetables, dairy, and fish. Maintain the cold chain from farm gate to final buyer.',
-        icon: '❄️',
+        icon: 'CC',
       },
       {
         title: 'Grading & Packaging',
         description:
           'Automated sorting, grading, and packaging lines. Products are labelled with traceability codes linking back to the originating farm, cooperative, and processing batch.',
-        icon: '📦',
+        icon: 'GP',
       },
       {
         title: 'Quality Certification',
         description:
           'On-site testing laboratories for aflatoxin, moisture, and microbiological analysis. We support HACCP, ISO 22000, GlobalG.A.P., and organic certification pathways.',
-        icon: '🏅',
+        icon: 'QC',
       },
       {
         title: 'Waste-to-Value',
         description:
           'Processing by-products are converted into animal feed, compost, and biochar. Nothing goes to waste — our circular model generates additional revenue streams for cooperatives.',
-        icon: '🍃',
+        icon: 'WV',
       },
     ],
     how_it_works: [
@@ -206,37 +206,37 @@ export const SERVICE_DEFAULTS: Record<string, ServicePageConfig> = {
         title: 'Pre-Season Contracts',
         description:
           'Binding offtake agreements signed before planting season. Farmers know exactly who will buy, at what price, and in what quantity before a single seed goes into the ground.',
-        icon: '📝',
+        icon: 'PC',
       },
       {
         title: 'Price Floor Guarantees',
         description:
           'Every contract includes a guaranteed minimum price. If market prices rise above the floor, farmers benefit from the upside. If prices fall, the floor protects their income.',
-        icon: '🛡️',
+        icon: 'PF',
       },
       {
         title: 'Export Market Access',
         description:
           'AFU connects cooperatives to buyers across 15 export markets in Europe, the Middle East, and Asia. We handle phytosanitary certification, customs documentation, and logistics.',
-        icon: '🌍',
+        icon: 'EX',
       },
       {
         title: 'Digital Marketplace',
         description:
           "Surplus production beyond contracted volumes can be listed on AFU's digital marketplace. Buyers bid in real-time, ensuring farmers capture the best available price.",
-        icon: '🏪',
+        icon: 'DM',
       },
       {
         title: 'Market Intelligence',
         description:
           'Real-time commodity pricing, demand forecasts, and seasonal trend analysis. Make informed planting decisions based on data, not guesswork.',
-        icon: '📈',
+        icon: 'MI',
       },
       {
         title: 'Traceability & Compliance',
         description:
           'Full farm-to-fork traceability for every consignment. Meet EU, UK, and US import requirements with digital documentation that tracks origin, handling, and quality at each stage.',
-        icon: '📊',
+        icon: 'TC',
       },
     ],
     how_it_works: [
@@ -266,37 +266,37 @@ export const SERVICE_DEFAULTS: Record<string, ServicePageConfig> = {
         title: 'Letters of Credit',
         description:
           'Bank-backed letters of credit issued through our partner financial institutions. Protect both buyer and seller with irrevocable payment guarantees recognised by banks worldwide.',
-        icon: '📄',
+        icon: 'LC',
       },
       {
         title: 'Pre-Export Financing',
         description:
           'Access working capital against confirmed export orders. Fund harvesting, processing, packing, and transport costs before the buyer pays — bridging the cash flow gap that kills deals.',
-        icon: '💵',
+        icon: 'PX',
       },
       {
         title: 'Export Guarantees',
         description:
           'Credit insurance and export guarantees that protect against buyer default, political risk, and currency inconvertibility. Trade with confidence into emerging and frontier markets.',
-        icon: '🛡️',
+        icon: 'EG',
       },
       {
         title: 'Forex Management',
         description:
           'Hedge currency risk with forward contracts and natural hedging strategies. Our treasury desk manages USD, EUR, GBP, and local currency exposures across all 9 operating countries.',
-        icon: '🔄',
+        icon: 'FX',
       },
       {
         title: 'Logistics & Customs',
         description:
           'End-to-end freight management from farm gate to destination port. Customs brokerage, fumigation certificates, bills of lading, and real-time shipment tracking — all in one platform.',
-        icon: '🚢',
+        icon: 'LG',
       },
       {
         title: 'Trade Corridor Access',
         description:
           'Leverage preferential tariff rates under COMESA, SADC, EAC, and AfCFTA trade agreements. Our compliance team ensures every shipment meets origin rules for duty-free or reduced-tariff entry.',
-        icon: '🌐',
+        icon: 'TA',
       },
     ],
     how_it_works: [
@@ -326,37 +326,37 @@ export const SERVICE_DEFAULTS: Record<string, ServicePageConfig> = {
         title: 'Land Rights & Tenure',
         description:
           'Secure your land. We help farmers navigate title deeds, customary land rights, lease agreements, and land dispute resolution. Our specialists understand both statutory and traditional tenure systems across Africa.',
-        icon: '📍',
+        icon: 'LR',
       },
       {
         title: 'Contract Review & Drafting',
         description:
           'Never sign a bad deal. Every offtake agreement, supply contract, equipment lease, and partnership MOU can be reviewed by our legal team before you commit. We also draft standard contracts tailored to your needs.',
-        icon: '📄',
+        icon: 'CR',
       },
       {
         title: 'Dispute Resolution',
         description:
           'Fast, fair outcomes. We provide mediation, arbitration, and where necessary, litigation support for disputes with buyers, suppliers, landlords, cooperatives, and government agencies.',
-        icon: '⚖️',
+        icon: 'DR',
       },
       {
         title: 'Regulatory Compliance',
         description:
           'Stay on the right side of the law. Export permits, phytosanitary certificates, tax obligations, environmental regulations, and labour law compliance — we guide you through every requirement.',
-        icon: '🛡️',
+        icon: 'RC',
       },
       {
         title: 'Cooperative Governance',
         description:
           'Build strong farmer organizations. We assist with cooperative registration, constitution drafting, governance frameworks, AGM procedures, and internal dispute resolution for farmer groups and associations.',
-        icon: '👥',
+        icon: 'CG',
       },
       {
         title: 'Intellectual Property',
         description:
           'Protect your innovations. From registering new seed varieties and organic certifications to trademarking your farm brand and protecting indigenous knowledge, we help farmers own their intellectual assets.',
-        icon: '📚',
+        icon: 'IP',
       },
     ],
     how_it_works: [
@@ -386,37 +386,37 @@ export const SERVICE_DEFAULTS: Record<string, ServicePageConfig> = {
         title: 'Guaranteed Prices',
         description:
           'Lock in prices before planting season. No more market volatility.',
-        icon: '💰',
+        icon: 'GP',
       },
       {
         title: 'Verified Buyers',
         description:
           'All off-takers are vetted and verified by AFU. Contracts are legally binding.',
-        icon: '✅',
+        icon: 'VB',
       },
       {
         title: 'Input Financing',
         description:
           'Access seed, fertiliser, and equipment financing tied to your forward contract.',
-        icon: '🌱',
+        icon: 'IN',
       },
       {
         title: 'Quality Standards',
         description:
           'Clear grading criteria so you know exactly what buyers expect.',
-        icon: '🏅',
+        icon: 'QS',
       },
       {
         title: 'Delivery Support',
         description:
           'AFU coordinates logistics, cold chain, and export compliance.',
-        icon: '🚚',
+        icon: 'DS',
       },
       {
         title: 'Multi-Currency Settlement',
         description:
           'Get paid in USD, EUR, GBP, ZAR, or local currency.',
-        icon: '🔄',
+        icon: 'FX',
       },
     ],
     how_it_works: [
@@ -443,17 +443,17 @@ export const SERVICE_DEFAULTS: Record<string, ServicePageConfig> = {
       {
         title: 'Approved Suppliers',
         description: 'Every supplier is KYC-verified and product quality is randomly audited.',
-        icon: '✅',
+        icon: 'AS',
       },
       {
         title: 'Group Buying',
         description: 'Cooperative bulk orders unlock significantly lower prices for smallholders.',
-        icon: '🤝',
+        icon: 'GB',
       },
       {
         title: 'Pay on Credit',
         description: 'Qualifying farmers can buy inputs against AFU working-capital lines.',
-        icon: '💳',
+        icon: 'PC',
       },
     ],
     how_it_works: [

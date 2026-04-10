@@ -801,7 +801,7 @@ export default function AdminMembersPage() {
                           } disabled:opacity-50`}
                         >
                           {isLoading && <Loader2 className="w-3 h-3 animate-spin" />}
-                          {on ? '✓ ' : '+ '}{cap.label}
+                          {cap.label}
                         </button>
                       );
                     })}
@@ -960,7 +960,7 @@ export default function AdminMembersPage() {
                             : 'bg-white text-gray-400 border-gray-200 hover:border-gray-300'
                         }`}
                       >
-                        {on ? '✓ ' : '+ '}{cap.label}
+                        {cap.label}
                       </button>
                     );
                   })}

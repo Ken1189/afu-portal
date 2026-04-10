@@ -271,7 +271,7 @@ function ApplyModal({ program, onClose, onSuccess }: ApplyModalProps) {
               <p className="text-xs font-semibold text-[#5DB347] uppercase tracking-wider mb-1">Apply to Join</p>
               <h2 className="text-lg font-bold text-white">{program.title}</h2>
               <p className="text-sm text-gray-300 mt-0.5">
-                {COUNTRY_FLAGS[program.country] || '🌍'} {program.country} · {program.crop}
+                {COUNTRY_FLAGS[program.country] || ''} {program.country} · {program.crop}
               </p>
             </div>
             <button onClick={onClose} className="text-white/60 hover:text-white transition-colors mt-0.5">
@@ -390,7 +390,7 @@ function ProgramCard({ program, onApply }: { program: Program; onApply: (p: Prog
   const filled = program.current_participants;
   const max    = program.max_participants || 1;
   const pct    = Math.min(100, Math.round((filled / max) * 100));
-  const flag   = COUNTRY_FLAGS[program.country] || '🌍';
+  const flag   = COUNTRY_FLAGS[program.country] || '';
   const isClosed = program.status === 'closed' || program.status === 'draft';
 
   return (
@@ -488,7 +488,7 @@ function EnrollmentCard({ enrollment }: { enrollment: Enrollment }) {
   if (!program) return null;
 
   const stageIndex = STAGES.findIndex((s) => s.key === enrollment.current_stage);
-  const flag       = COUNTRY_FLAGS[program.country] || '🌍';
+  const flag       = COUNTRY_FLAGS[program.country] || '';
 
   return (
     <motion.div
@@ -525,7 +525,7 @@ function EnrollmentCard({ enrollment }: { enrollment: Enrollment }) {
                                     'bg-gray-100 text-gray-400'
                       }`}
                     >
-                      {isDone ? '✓' : idx + 1}
+                      {isDone ? 'Done' : idx + 1}
                     </div>
                     <span className={`text-[10px] font-medium leading-none ${isCurrent ? 'text-navy' : isDone ? 'text-[#5DB347]' : 'text-gray-400'}`}>
                       {stage.label}

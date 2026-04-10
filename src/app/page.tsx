@@ -398,7 +398,7 @@ export default function Home() {
             return {
               name: shortName,
               country,
-              flag: COUNTRY_FLAGS[country] || '🌍',
+              flag: COUNTRY_FLAGS[country] || '',
               crop: (row.crops && row.crops[0]) || 'Mixed',
               img,
             };

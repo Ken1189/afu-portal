@@ -252,43 +252,18 @@ const COUNTRY_FLAGS: Record<string, string> = {
   Rwanda: '🇷🇼',
 };
 
-const CROP_EMOJI: Record<string, string> = {
-  Coffee: '☕',
-  Cashews: '🌰',
-  Maize: '🌽',
-  Rice: '🌾',
-  Tobacco: '🌿',
-  Cotton: '🪴',
-  Sunflower: '🌻',
-  Soybean: '🫘',
-  Groundnuts: '🥜',
-  Tea: '🍵',
-  Cocoa: '🍫',
-  Mango: '🥭',
-  Avocado: '🥑',
-  Cassava: '🍠',
-  Banana: '🍌',
-  Sugarcane: '🌱',
-  Wheat: '🌾',
-  Vegetables: '🥦',
-  Livestock: '🐄',
-  Poultry: '🐔',
-};
-
-function getCropEmoji(crop: string): string {
-  for (const [key, emoji] of Object.entries(CROP_EMOJI)) {
-    if (crop.toLowerCase().includes(key.toLowerCase())) return emoji;
-  }
-  return '🌱';
+// Crop initial letters used as visual labels
+function getCropInitial(crop: string): string {
+  return crop.charAt(0).toUpperCase();
 }
 
 const TIER_CONFIG: Record<
   Tier,
-  { label: string; emoji: string; monthlyPrice: number; color: string }
+  { label: string; badge: string; monthlyPrice: number; color: string }
 > = {
-  bronze: { label: 'Bronze', emoji: '🥉', monthlyPrice: 5, color: '#CD7F32' },
-  silver: { label: 'Silver', emoji: '🥈', monthlyPrice: 100, color: '#5DB347' },
-  gold: { label: 'Gold', emoji: '🥇', monthlyPrice: 500, color: '#C9A84C' },
+  bronze: { label: 'Bronze', badge: 'B', monthlyPrice: 5, color: '#CD7F32' },
+  silver: { label: 'Silver', badge: 'S', monthlyPrice: 100, color: '#5DB347' },
+  gold: { label: 'Gold', badge: 'G', monthlyPrice: 500, color: '#C9A84C' },
 };
 
 const COUNTRIES = [...WORLD_COUNTRIES].sort();
@@ -330,10 +305,12 @@ function FundingProgress({
 }
 
 /* ─── Farm stat item ─── */
-function FarmStat({ emoji, label, value }: { emoji: string; label: string; value: string }) {
+function FarmStat({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center gap-3 rounded-xl p-4" style={{ background: '#EBF7E5' }}>
-      <span className="text-2xl">{emoji}</span>
+      <div className="w-10 h-10 rounded-lg bg-[#5DB347]/20 flex items-center justify-center text-[#5DB347] font-bold text-sm">
+        {label.charAt(0)}
+      </div>
       <div>
         <p className="text-xs text-gray-500 uppercase tracking-wide font-semibold">{label}</p>
         <p className="font-bold text-navy text-sm">{value}</p>
@@ -521,7 +498,7 @@ export default function FarmerProfilePage({
     );
   }
 
-  const flag = COUNTRY_FLAGS[farmer.country] ?? '🌍';
+  const flag = COUNTRY_FLAGS[farmer.country] ?? '';
   const initials = farmer.display_name
     .split(' ')
     .map((w) => w[0])
@@ -559,7 +536,7 @@ export default function FarmerProfilePage({
             style={{ background: 'linear-gradient(135deg, #1B2A4A 0%, #5DB347 100%)' }}
           >
             {farmer.crops && farmer.crops.length > 0 ? (
-              <span className="text-8xl opacity-30">{getCropEmoji(farmer.crops[0])}</span>
+              <span className="text-8xl font-black opacity-20 text-white">{getCropInitial(farmer.crops[0])}</span>
             ) : (
               <span className="text-white text-8xl font-black opacity-20">{initials}</span>
             )}
@@ -582,7 +559,7 @@ export default function FarmerProfilePage({
                 className="inline-block text-white text-xs font-bold px-2.5 py-1 rounded-full mb-3"
                 style={{ background: '#C9A84C' }}
               >
-                ⭐ Featured Farmer
+                Featured Farmer
               </span>
             )}
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2">
@@ -599,7 +576,7 @@ export default function FarmerProfilePage({
                     key={crop}
                     className="inline-flex items-center gap-1.5 bg-white/15 border border-white/25 backdrop-blur-sm text-white text-sm font-medium px-3 py-1.5 rounded-full"
                   >
-                    {getCropEmoji(crop)} {crop}
+                    {crop}
                   </span>
                 ))}
               </div>
@@ -633,18 +610,16 @@ export default function FarmerProfilePage({
               )}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {farmer.farm_size_ha != null && (
-                  <FarmStat emoji="🗺️" label="Farm Size" value={`${farmer.farm_size_ha} ha`} />
+                  <FarmStat label="Farm Size" value={`${farmer.farm_size_ha} ha`} />
                 )}
                 {farmer.years_farming != null && (
                   <FarmStat
-                    emoji="🌱"
                     label="Years Farming"
                     value={`${farmer.years_farming} years`}
                   />
                 )}
                 {farmer.family_members_supported != null && (
                   <FarmStat
-                    emoji="👨‍👩‍👧‍👦"
                     label="Family Supported"
                     value={`${farmer.family_members_supported} members`}
                   />
@@ -738,7 +713,7 @@ export default function FarmerProfilePage({
                             : { borderColor: '#e5e7eb', color: '#9ca3af' }
                         }
                       >
-                        <span className="text-xl mb-1">{t.emoji}</span>
+                        <span className="text-xl mb-1 font-bold">{t.badge}</span>
                         <span>{t.label}</span>
                         <span className="font-bold text-navy">${t.monthlyPrice}/mo</span>
                       </button>

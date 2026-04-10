@@ -109,7 +109,7 @@ const featuredCrops = [
     name: "Coffee",
     slug: "coffee",
     image:
-      "https://images.unsplash.com/photo-1447933601403-56dc2df1ed5a?w=300&h=200&fit=crop",
+      "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=300&h=200&fit=crop",
     countries: ["Ethiopia", "Kenya", "Tanzania"],
   },
   {
@@ -144,7 +144,7 @@ const featuredCrops = [
     name: "Macadamia",
     slug: "macadamia",
     image:
-      "https://images.unsplash.com/photo-1604068549290-dea0e4a305ca?w=300&h=200&fit=crop",
+      "https://images.unsplash.com/photo-1597436878032-de8c687543b4?w=300&h=200&fit=crop",
     countries: ["South Africa", "Kenya", "Malawi"],
   },
   {
@@ -165,14 +165,14 @@ const featuredCrops = [
     name: "Tea",
     slug: "tea",
     image:
-      "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=300&h=200&fit=crop",
+      "https://images.unsplash.com/photo-1563911892437-0c0f44a0e453?w=300&h=200&fit=crop",
     countries: ["Kenya", "Malawi", "Tanzania"],
   },
   {
     name: "Tobacco",
     slug: "tobacco",
     image:
-      "https://images.unsplash.com/photo-1587049016823-69ef9d68f0b3?w=300&h=200&fit=crop",
+      "https://images.unsplash.com/photo-1416339306562-f3d12fefd36f?w=300&h=200&fit=crop",
     countries: ["Zimbabwe", "Malawi", "Mozambique"],
   },
 ];

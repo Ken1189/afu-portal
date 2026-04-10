@@ -1008,7 +1008,7 @@ export default function AmbassadorsPage() {
                         : 'bg-white text-[#1B2A4A] border-[#1B2A4A]/30 hover:border-[#1B2A4A]'
                     }`}
                   >
-                    {formData.regions.length === AFRICAN_REGIONS.length ? '✓ ' : ''}All Countries
+                    {formData.regions.length === AFRICAN_REGIONS.length ? 'Selected: ' : ''}All Countries
                   </button>
                   {AFRICAN_REGIONS.map((region) => {
                     const selected = formData.regions.includes(region);
