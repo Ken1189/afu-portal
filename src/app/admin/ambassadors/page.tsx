@@ -98,6 +98,12 @@ interface FormData {
   serves_countries: string[]; // backed by DB column `regions` (text[])
   is_featured: boolean;
   sort_order: string;
+  website: string;
+  facebook: string;
+  tiktok: string;
+  linkedin: string;
+  instagram: string;
+  twitter: string;
 }
 
 const emptyForm: FormData = {
@@ -116,6 +122,12 @@ const emptyForm: FormData = {
   serves_countries: [],
   is_featured: false,
   sort_order: '0',
+  website: '',
+  facebook: '',
+  tiktok: '',
+  linkedin: '',
+  instagram: '',
+  twitter: '',
 };
 
 /* ─── Constants ─── */
@@ -123,20 +135,53 @@ const emptyForm: FormData = {
 // Ambassador categories — reflects the REAL mix of ambassadors (most aren't farmers)
 // Kept as text (not enum) so admin can add new categories without a migration.
 const SECTORS = [
+  'Fundraising',
+  'Sponsorship',
+  'Social Impact',
   'Investment',
+  'Venture Capital',
+  'Private Equity',
+  'Development Finance',
+  'Impact Investing',
   'Academia',
   'Business Development',
+  'Sales & Marketing',
   'Agronomy',
   'Finance',
+  'Banking & Insurance',
   'Agribusiness',
+  'Food Processing',
   'Government & Policy',
+  'Diplomatic & Trade Relations',
   'NGO / Development',
+  'Humanitarian & Aid',
   'Technology',
+  'AgriTech',
+  'FinTech',
   'Media & Communications',
+  'Public Relations',
   'Legal',
+  'Compliance & Regulation',
   'Logistics & Trade',
+  'Supply Chain',
+  'Export & Import',
+  'Commodities Trading',
   'Farming',
   'Livestock',
+  'Forestry & Timber',
+  'Fisheries & Aquaculture',
+  'Mining & Resources',
+  'Real Estate & Land',
+  'Renewable Energy',
+  'Water & Irrigation',
+  'Healthcare',
+  'Education & Training',
+  'Tourism & Hospitality',
+  'Construction & Engineering',
+  'Retail & Distribution',
+  'Carbon Credits & Climate',
+  'Consulting',
+  'Diaspora & Remittances',
   'Other',
 ];
 
@@ -147,20 +192,53 @@ const COUNTRIES = WORLD_COUNTRIES;
 const AFRICAN_COUNTRIES = [GLOBAL_OPTION, ...ALL_AFRICAN];
 
 const SECTOR_COLORS: Record<string, string> = {
+  Fundraising: 'bg-emerald-100 text-emerald-700',
+  Sponsorship: 'bg-emerald-100 text-emerald-700',
+  'Social Impact': 'bg-rose-100 text-rose-700',
   Investment: 'bg-emerald-100 text-emerald-700',
+  'Venture Capital': 'bg-emerald-100 text-emerald-700',
+  'Private Equity': 'bg-emerald-100 text-emerald-700',
+  'Development Finance': 'bg-teal-100 text-teal-700',
+  'Impact Investing': 'bg-teal-100 text-teal-700',
   Academia: 'bg-indigo-100 text-indigo-700',
   'Business Development': 'bg-blue-100 text-blue-700',
+  'Sales & Marketing': 'bg-blue-100 text-blue-700',
   Agronomy: 'bg-green-100 text-green-700',
   Finance: 'bg-teal-100 text-teal-700',
+  'Banking & Insurance': 'bg-teal-100 text-teal-700',
   Agribusiness: 'bg-lime-100 text-lime-700',
+  'Food Processing': 'bg-lime-100 text-lime-700',
   'Government & Policy': 'bg-slate-100 text-slate-700',
+  'Diplomatic & Trade Relations': 'bg-slate-100 text-slate-700',
   'NGO / Development': 'bg-rose-100 text-rose-700',
+  'Humanitarian & Aid': 'bg-rose-100 text-rose-700',
   Technology: 'bg-cyan-100 text-cyan-700',
+  AgriTech: 'bg-cyan-100 text-cyan-700',
+  FinTech: 'bg-cyan-100 text-cyan-700',
   'Media & Communications': 'bg-pink-100 text-pink-700',
+  'Public Relations': 'bg-pink-100 text-pink-700',
   Legal: 'bg-purple-100 text-purple-700',
+  'Compliance & Regulation': 'bg-purple-100 text-purple-700',
   'Logistics & Trade': 'bg-orange-100 text-orange-700',
+  'Supply Chain': 'bg-orange-100 text-orange-700',
+  'Export & Import': 'bg-orange-100 text-orange-700',
+  'Commodities Trading': 'bg-orange-100 text-orange-700',
   Farming: 'bg-amber-100 text-amber-700',
   Livestock: 'bg-yellow-100 text-yellow-700',
+  'Forestry & Timber': 'bg-green-100 text-green-700',
+  'Fisheries & Aquaculture': 'bg-blue-100 text-blue-700',
+  'Mining & Resources': 'bg-stone-100 text-stone-700',
+  'Real Estate & Land': 'bg-amber-100 text-amber-700',
+  'Renewable Energy': 'bg-sky-100 text-sky-700',
+  'Water & Irrigation': 'bg-sky-100 text-sky-700',
+  Healthcare: 'bg-red-100 text-red-700',
+  'Education & Training': 'bg-indigo-100 text-indigo-700',
+  'Tourism & Hospitality': 'bg-fuchsia-100 text-fuchsia-700',
+  'Construction & Engineering': 'bg-stone-100 text-stone-700',
+  'Retail & Distribution': 'bg-violet-100 text-violet-700',
+  'Carbon Credits & Climate': 'bg-green-100 text-green-700',
+  Consulting: 'bg-gray-100 text-gray-700',
+  'Diaspora & Remittances': 'bg-indigo-100 text-indigo-700',
   Other: 'bg-gray-100 text-gray-700',
 };
 
@@ -655,6 +733,17 @@ export default function AdminAmbassadorsPage() {
       serves_countries: a.regions || [],
       is_featured: a.is_featured,
       sort_order: String(a.sort_order),
+      ...(() => {
+        const pd = (a as unknown as Record<string, unknown>).payout_details as Record<string, string> | null;
+        return {
+          website: pd?.website || '',
+          facebook: pd?.facebook || '',
+          tiktok: pd?.tiktok || '',
+          linkedin: pd?.linkedin || '',
+          instagram: pd?.instagram || '',
+          twitter: pd?.twitter || '',
+        };
+      })(),
     });
     setModalOpen(true);
   };
@@ -697,6 +786,14 @@ export default function AdminAmbassadorsPage() {
         form.serves_countries.length > 0 ? form.serves_countries : null,
       is_featured: form.is_featured,
       sort_order: parseInt(form.sort_order) || 0,
+      payout_details: {
+        website: form.website || '',
+        facebook: form.facebook || '',
+        tiktok: form.tiktok || '',
+        linkedin: form.linkedin || '',
+        instagram: form.instagram || '',
+        twitter: form.twitter || '',
+      },
     };
 
     let error;
@@ -975,6 +1072,9 @@ export default function AdminAmbassadorsPage() {
                       <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">
                         Country
                       </th>
+                      <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">
+                        Links
+                      </th>
                       <th className="text-right py-3 px-4 text-xs font-semibold text-gray-500 uppercase">
                         Referrals
                       </th>
@@ -1115,6 +1215,34 @@ export default function AdminAmbassadorsPage() {
                         {/* Country */}
                         <td className="py-3 px-4 text-gray-600">
                           {amb.country}
+                        </td>
+
+                        {/* Social Links */}
+                        <td className="py-3 px-4">
+                          {(() => {
+                            const pd = (amb as unknown as Record<string, unknown>).payout_details as Record<string, string> | null;
+                            if (!pd) return <span className="text-gray-300 text-xs">-</span>;
+                            const links = [
+                              { key: 'website', label: 'Web', color: 'text-gray-600' },
+                              { key: 'facebook', label: 'FB', color: 'text-[#1877F2]' },
+                              { key: 'tiktok', label: 'TT', color: 'text-black' },
+                              { key: 'linkedin', label: 'LI', color: 'text-[#0A66C2]' },
+                              { key: 'instagram', label: 'IG', color: 'text-[#E4405F]' },
+                              { key: 'twitter', label: 'X', color: 'text-black' },
+                            ].filter(l => pd[l.key]);
+                            if (links.length === 0) return <span className="text-gray-300 text-xs">-</span>;
+                            return (
+                              <div className="flex gap-1 flex-wrap">
+                                {links.map(l => (
+                                  <a key={l.key} href={pd[l.key]} target="_blank" rel="noopener noreferrer"
+                                    className={`px-1.5 py-0.5 rounded text-[10px] font-bold hover:opacity-70 bg-gray-50 ${l.color}`}
+                                    title={pd[l.key]}>
+                                    {l.label}
+                                  </a>
+                                ))}
+                              </div>
+                            );
+                          })()}
                         </td>
 
                         {/* Referrals */}
@@ -1877,6 +2005,33 @@ export default function AdminAmbassadorsPage() {
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-green-200 focus:border-green-400 outline-none resize-none"
                   placeholder="A short testimonial quote..."
                 />
+              </div>
+
+              {/* Social Links */}
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+                  Social Links & Web Presence
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <input value={form.website} onChange={(e) => setForm({ ...form, website: e.target.value })}
+                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-green-200 focus:border-green-400 outline-none"
+                    placeholder="Website URL" />
+                  <input value={form.facebook} onChange={(e) => setForm({ ...form, facebook: e.target.value })}
+                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-green-200 focus:border-green-400 outline-none"
+                    placeholder="Facebook URL" />
+                  <input value={form.tiktok} onChange={(e) => setForm({ ...form, tiktok: e.target.value })}
+                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-green-200 focus:border-green-400 outline-none"
+                    placeholder="TikTok URL" />
+                  <input value={form.linkedin} onChange={(e) => setForm({ ...form, linkedin: e.target.value })}
+                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-green-200 focus:border-green-400 outline-none"
+                    placeholder="LinkedIn URL" />
+                  <input value={form.instagram} onChange={(e) => setForm({ ...form, instagram: e.target.value })}
+                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-green-200 focus:border-green-400 outline-none"
+                    placeholder="Instagram URL" />
+                  <input value={form.twitter} onChange={(e) => setForm({ ...form, twitter: e.target.value })}
+                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-green-200 focus:border-green-400 outline-none"
+                    placeholder="X (Twitter) URL" />
+                </div>
               </div>
 
               {/* Achievements tags */}
