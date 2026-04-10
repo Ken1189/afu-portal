@@ -161,40 +161,73 @@ export default function AdminWalletPage() {
     setLoading(true);
     const failures: string[] = [];
     try {
-      // Fetch all wallets
+      // Fetch all wallets (simple query — join profiles separately)
       const { data: walletData, error: walletErr } = await supabase
         .from('wallet_accounts')
-        .select('*, ledger_accounts!wallet_accounts_ledger_account_id_fkey(balance), profiles!wallet_accounts_user_id_fkey(full_name, email)')
+        .select('*')
         .order('created_at', { ascending: false });
       if (walletErr) { console.error('[wallet] wallets', walletErr); failures.push('wallets'); }
-      setWallets((walletData || []).map((w: any) => ({
+
+      // Enrich wallets with profile names + ledger balances
+      const walletList = walletData || [];
+      const userIds = [...new Set(walletList.map((w: any) => w.user_id).filter(Boolean))];
+      const ledgerIds = [...new Set(walletList.map((w: any) => w.ledger_account_id).filter(Boolean))];
+
+      const profileMap: Record<string, { full_name: string; email: string }> = {};
+      const ledgerMap: Record<string, number> = {};
+
+      if (userIds.length > 0) {
+        const { data: profiles } = await supabase.from('profiles').select('id, full_name, email').in('id', userIds);
+        (profiles || []).forEach((p: any) => { profileMap[p.id] = { full_name: p.full_name || '', email: p.email || '' }; });
+      }
+      if (ledgerIds.length > 0) {
+        const { data: ledgers } = await supabase.from('ledger_accounts').select('id, balance').in('id', ledgerIds);
+        (ledgers || []).forEach((l: any) => { ledgerMap[l.id] = l.balance ?? 0; });
+      }
+
+      setWallets(walletList.map((w: any) => ({
         ...w,
-        balance: w.ledger_accounts?.balance ?? 0,
-        user_name: w.profiles?.full_name || 'Unknown',
-        user_email: w.profiles?.email || '',
+        balance: ledgerMap[w.ledger_account_id] ?? w.balance ?? 0,
+        user_name: profileMap[w.user_id]?.full_name || 'Unknown',
+        user_email: profileMap[w.user_id]?.email || '',
       })));
 
       // Fetch recent transactions
       const { data: txnData, error: txnErr } = await supabase
         .from('wallet_transactions')
-        .select('*, wallet_accounts!wallet_transactions_wallet_id_fkey(user_id, profiles!wallet_accounts_user_id_fkey(full_name, email))')
+        .select('*, wallet_accounts(user_id)')
         .order('created_at', { ascending: false })
         .limit(100);
       if (txnErr) { console.error('[wallet] transactions', txnErr); failures.push('transactions'); }
-      setTransactions((txnData || []).map((t: any) => ({
-        ...t,
-        user_name: t.wallet_accounts?.profiles?.full_name || 'Unknown',
-        user_email: t.wallet_accounts?.profiles?.email || '',
-      })));
+      setTransactions((txnData || []).map((t: any) => {
+        const uid = t.wallet_accounts?.user_id;
+        return {
+          ...t,
+          user_name: profileMap[uid]?.full_name || 'Unknown',
+          user_email: profileMap[uid]?.email || '',
+        };
+      }));
 
-      // Fetch flags
-      const { data: flagData, error: flagErr } = await supabase
-        .from('transaction_flags')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(20);
-      if (flagErr) { console.error('[wallet] flags', flagErr); failures.push('flags'); }
-      setFlags(flagData || []);
+      // Fetch flags (best-effort — table may have minimal columns)
+      try {
+        const { data: flagData, error: flagErr } = await supabase
+          .from('transaction_flags')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(20);
+        if (flagErr) { console.error('[wallet] flags', flagErr); failures.push('flags'); }
+        setFlags((flagData || []).map((f: any) => ({
+          id: f.id,
+          transaction_id: f.transaction_id || null,
+          wallet_txn_id: f.wallet_txn_id || null,
+          user_id: f.user_id || null,
+          flag_type: f.flag_type || 'unknown',
+          severity: f.severity || 'medium',
+          details: f.details || {},
+          status: f.status || f.resolved ? 'resolved' : 'pending',
+          created_at: f.created_at,
+        })));
+      } catch { setFlags([]); }
 
       if (failures.length > 0) {
         setToast({ message: `Failed to load: ${failures.join(', ')}`, type: 'error' });

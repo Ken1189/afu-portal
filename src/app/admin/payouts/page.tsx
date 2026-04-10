@@ -72,12 +72,20 @@ export default function AdminPayoutsPage() {
     setLoading(true);
     setError(null);
     try {
-      const { data, error: qErr } = await supabase
+      // Try with supplier join first, fall back to plain query
+      let result = await supabase
         .from('payouts')
         .select('*, supplier:suppliers(company_name, email)')
         .order('requested_at', { ascending: false });
-      if (qErr) throw qErr;
-      setPayouts((data as unknown as Payout[]) || []);
+      if (result.error) {
+        // FK join may fail — fall back to plain select
+        result = await supabase
+          .from('payouts')
+          .select('*')
+          .order('requested_at', { ascending: false });
+      }
+      if (result.error) throw result.error;
+      setPayouts((result.data as unknown as Payout[]) || []);
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Failed to load payouts';
       setError(msg);
