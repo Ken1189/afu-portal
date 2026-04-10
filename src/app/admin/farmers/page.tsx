@@ -549,6 +549,12 @@ function AllFarmersTab() {
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
+                          <Link
+                            href={`/admin/farmers/${f.id}`}
+                            className="px-2 py-1 bg-[#5DB347]/10 text-[#5DB347] rounded text-xs font-medium hover:bg-[#5DB347]/20 flex items-center gap-1"
+                          >
+                            <Eye className="w-3 h-3" /> View
+                          </Link>
                           <button
                             onClick={() => { setMessageModal(f); setMessageText(''); }}
                             className="px-2 py-1 bg-[#1B2A4A]/5 text-[#1B2A4A] rounded text-xs font-medium hover:bg-[#1B2A4A]/10 flex items-center gap-1"

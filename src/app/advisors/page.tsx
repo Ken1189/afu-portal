@@ -43,7 +43,7 @@ export default function AdvisorsPage() {
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <Link
-                href="/apply?tier=advisor"
+                href="/advisors/apply"
                 className="inline-flex items-center gap-2 bg-gradient-to-r from-[#5DB347] to-[#449933] text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl hover:from-[#449933] hover:to-[#387828] transition-all"
               >
                 Become an Advisor
@@ -117,7 +117,7 @@ export default function AdvisorsPage() {
             {/* Notify + Apply buttons */}
             <div className="flex flex-wrap justify-center gap-3">
               <Link
-                href="/apply?tier=advisor"
+                href="/advisors/apply"
                 className="inline-flex items-center gap-2 bg-gradient-to-r from-[#5DB347] to-[#449933] text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
               >
                 Apply as Advisor
@@ -198,7 +198,7 @@ export default function AdvisorsPage() {
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
-              href="/apply?tier=advisor"
+              href="/advisors/apply"
               className="inline-flex items-center gap-2 bg-gradient-to-r from-[#5DB347] to-[#449933] text-white px-8 py-4 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all"
             >
               Apply as Advisor

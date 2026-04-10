@@ -547,13 +547,13 @@ export default function Home() {
         const supabase = createClient();
         const { data } = await supabase
           .from('managed_partners')
-          .select('name, company_name, initials, brand_color, color, logo_url, is_featured')
+          .select('name, initials, brand_color, color, logo_url, is_featured')
           .order('is_featured', { ascending: false })
           .order('display_order', { ascending: true });
         if (data && data.length > 0) {
           setPartners(
             data.map((p: Record<string, unknown>) => ({
-              name: (p.name as string) || (p.company_name as string) || '',
+              name: (p.name as string) || '',
               initials: (p.initials as string) || ((p.name as string) || '').slice(0, 2).toUpperCase(),
               color: (p.brand_color as string) || (p.color as string) || '#5DB347',
               logo_url: (p.logo_url as string) || undefined,
@@ -1176,7 +1176,7 @@ export default function Home() {
         </div>
       </section>}
 
-      {/* ─── PARTNER LOGOS MARQUEE ─── */}
+      {/* ─── PARTNER LOGOS GRID ─── */}
       {partners.length > 0 && <section className="py-16 bg-cream border-y border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeInWhenVisible>
@@ -1184,35 +1184,31 @@ export default function Home() {
               Our Partners
             </p>
           </FadeInWhenVisible>
-          <div className="overflow-hidden relative">
-            <div className="absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-cream to-transparent z-10" />
-            <div className="absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-cream to-transparent z-10" />
-            <div className="animate-marquee flex gap-8 items-center whitespace-nowrap">
-              {[...partners, ...partners].map((partner, i) => (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
+            {partners.map((partner) => (
+              <div
+                key={partner.name}
+                className="flex items-center gap-3 px-5 py-4 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md hover:border-[#5DB347]/20 transition-all"
+              >
+                {partner.logo_url ? (
+                  <img
+                    src={partner.logo_url}
+                    alt={partner.name}
+                    className="h-10 w-auto max-w-[100px] object-contain"
+                    onError={(e) => { e.currentTarget.style.display = 'none'; if (e.currentTarget.nextElementSibling) (e.currentTarget.nextElementSibling as HTMLElement).classList.remove('hidden'); }}
+                  />
+                ) : null}
                 <div
-                  key={`${partner.name}-${i}`}
-                  className="flex-shrink-0 flex items-center gap-3 px-6 py-4 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md hover:border-[#5DB347]/20 transition-all"
+                  className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-sm ${partner.logo_url ? 'hidden' : ''}`}
+                  style={{ backgroundColor: partner.color }}
                 >
-                  {partner.logo_url ? (
-                    <img
-                      src={partner.logo_url}
-                      alt={partner.name}
-                      className="h-10 w-auto max-w-[140px] object-contain"
-                      onError={(e) => { e.currentTarget.style.display = 'none'; if (e.currentTarget.nextElementSibling) e.currentTarget.nextElementSibling.classList.remove('hidden'); }}
-                    />
-                  ) : null}
-                  <div
-                    className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-sm ${partner.logo_url ? 'hidden' : ''}`}
-                    style={{ backgroundColor: partner.color }}
-                  >
-                    <span className={`font-bold text-xs ${partner.color === '#FFCC00' ? 'text-[#1B2A4A]' : 'text-white'}`}>
-                      {partner.initials}
-                    </span>
-                  </div>
-                  <span className="text-navy/70 font-semibold text-sm">{partner.name}</span>
+                  <span className={`font-bold text-xs ${partner.color === '#FFCC00' ? 'text-[#1B2A4A]' : 'text-white'}`}>
+                    {partner.initials}
+                  </span>
                 </div>
-              ))}
-            </div>
+                <span className="text-navy/70 font-semibold text-sm">{partner.name}</span>
+              </div>
+            ))}
           </div>
         </div>
       </section>}
