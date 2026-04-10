@@ -109,7 +109,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
 
   const related = await getRelatedProducts(product.category, product.id);
 
-  const heroImage = product.image_url || product.image || 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=800';
+  const heroImage = product.image_url || product.image || 'https://images.unsplash.com/photo-1495107334309-fcf20504a5ab?w=800';
   const galleryImages = product.images && product.images.length > 0
     ? product.images
     : [heroImage];
@@ -302,7 +302,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
                 <div className="h-40 bg-gray-100 overflow-hidden">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={p.image_url || p.image || 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400'}
+                    src={p.image_url || p.image || 'https://images.unsplash.com/photo-1472396961693-142e6e269027?w=400'}
                     alt={p.name}
                     className="w-full h-full object-cover"
                   />

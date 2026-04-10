@@ -382,11 +382,12 @@ export default function ContentEditorPage() {
 
     if (field.type === 'textarea') {
       return (
-        <RichTextEditor
+        <AutoTextarea
           value={(value as string) || ''}
-          onChange={(html) => updateField(field.key, html)}
+          onChange={(val) => updateField(field.key, val)}
           placeholder={field.placeholder || `Enter ${field.label.toLowerCase()}...`}
-          minHeight="120px"
+          className={`${inputBase} leading-relaxed`}
+          minRows={3}
         />
       );
     }

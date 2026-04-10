@@ -304,7 +304,7 @@ const FALLBACK_COUNTRIES: CountryData[] = [
     slug: "ghana",
     flag: "",
     role: "West African Cocoa Belt",
-    heroImage: "https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=1600&q=80",
+    heroImage: "https://images.unsplash.com/photo-1521295121783-8a321d551ad2?w=1600&q=80",
     description:
       "Ghana is the world's second-largest cocoa producer and a beacon of democratic stability in West Africa. With a growing tech scene, strong agricultural traditions, and government-backed cocoa buying programmes, Ghana offers structured commodity trade and digital payment infrastructure.",
     stats: {
@@ -337,7 +337,7 @@ const FALLBACK_COUNTRIES: CountryData[] = [
     slug: "uganda",
     flag: "",
     role: "East African Breadbasket",
-    heroImage: "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=1600&q=80",
+    heroImage: "https://images.unsplash.com/photo-1535338454528-1b3b9e4b36d4?w=1600&q=80",
     description:
       "Uganda is East Africa's breadbasket and a major coffee exporter, with strong mobile money ecosystems driven by MTN and Airtel. The country's fertile soils, reliable rainfall, and strategic EAC position make it a cornerstone of AFU's East African food production network.",
     stats: {
@@ -569,7 +569,7 @@ const FALLBACK_COUNTRIES: CountryData[] = [
     slug: "guinea-bissau",
     flag: "",
     role: "Cashew Capital of West Africa",
-    heroImage: "https://images.unsplash.com/photo-1523805009345-7448845a9e53?w=1600&q=80",
+    heroImage: "https://images.unsplash.com/photo-1590523741831-ab7e8b8f9c7f?w=1600&q=80",
     description:
       "Guinea-Bissau is the world's fifth-largest cashew producer, with agriculture as the backbone of the economy. AFU sees significant potential for value-added cashew processing and rice production.",
     stats: {
@@ -664,7 +664,7 @@ const FALLBACK_COUNTRIES: CountryData[] = [
     slug: "ivory-coast",
     flag: "",
     role: "Global Cocoa & Cashew Leader",
-    heroImage: "https://images.unsplash.com/photo-1582719508461-905c673771fd?w=1600&q=80",
+    heroImage: "https://images.unsplash.com/photo-1572883454114-efb6b089b60d?w=1600&q=80",
     description:
       "Ivory Coast (Cote d'Ivoire) is the world's largest cocoa producer and a leading cashew exporter. As West Africa's economic powerhouse with the strongest agricultural GDP in the region, it anchors AFU's West African strategy.",
     stats: {

@@ -36,6 +36,8 @@ import {
   Sprout,
   ArrowLeftRight,
   Megaphone,
+  UserCheck,
+  Shield,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useAuth } from "@/lib/supabase/auth-context";
@@ -73,6 +75,7 @@ const moreServicesLinks: { label: string; href: string; icon: LucideIcon }[] = [
   { label: "Processing & Offtake", href: "/services/processing", icon: ShoppingBag },
   { label: "Legal Assistance", href: "/services/legal-assistance", icon: Scale },
   { label: "Veterinary", href: "/services/veterinary", icon: Stethoscope },
+  { label: "Farm Security", href: "/services/security", icon: Shield },
   { label: "Advertise with Us", href: "/services/advertising", icon: Megaphone },
 ];
 
@@ -90,6 +93,7 @@ const communityLinks: { label: string; href: string; desc: string; icon: LucideI
   { label: "Partners", href: "/partners", desc: "Our network", icon: Handshake },
   { label: "Programs", href: "/programs", desc: "Active farming programs", icon: Target },
   { label: "Young Farmers", href: "/young-farmers", desc: "Next generation", icon: GraduationCap },
+  { label: "Advisors", href: "/advisors", desc: "Expert guidance from industry leaders", icon: UserCheck },
   { label: "Sponsor a Farmer", href: "/sponsor", desc: "Change a life today", icon: Handshake },
 ];
 

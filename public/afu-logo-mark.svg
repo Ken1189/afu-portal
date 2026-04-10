@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 112" fill="none">
+  <!-- AFU Triangle Logo Mark -->
+  <!-- Left side of triangle (A leg) -->
+  <path d="M48 100L12 100L0 108L48 8L56 8L48 28L32 68L20 92L28 92L36 72L48 72L52 82L48 100Z" fill="#3CB043"/>
+  <!-- Right side of triangle (U leg) -->
+  <path d="M56 8L104 108L92 100L56 100L52 82L60 82L68 92L80 92L64 56L56 40L56 8Z" fill="#3CB043"/>
+  <!-- Center crossbar (F element) -->
+  <path d="M48 28L56 40L64 56L56 56L48 40L36 72L48 72L52 82L44 82L32 68L48 28Z" fill="#3CB043"/>
+  <!-- Overlap regions (woven look) -->
+  <path d="M48 72L36 72L40 62L48 62Z" fill="#2DA038" opacity="0.9"/>
+  <path d="M56 56L64 56L60 66L52 66Z" fill="#2DA038" opacity="0.9"/>
+</svg>

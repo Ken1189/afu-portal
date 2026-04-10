@@ -1006,6 +1006,93 @@ export const ADVERTISING_SCHEMA: PageSchema = {
 };
 
 // ───────────────────────────────────────────────────────────────────────
+// Advisors Chrome
+// ───────────────────────────────────────────────────────────────────────
+
+export const ADVISORS_CHROME_SCHEMA: PageSchema = {
+  id: 'page_chrome_advisors',
+  label: 'Advisors',
+  publishedKey: 'page_chrome_advisors',
+  draftKey: 'page_chrome_advisors_draft',
+  previewPath: '/advisors?preview=draft',
+  sections: [
+    {
+      id: 'hero',
+      title: 'Hero',
+      fields: [
+        { key: 'hero_badge', label: 'Hero Badge', type: 'text' },
+        { key: 'hero_title', label: 'Hero Title', type: 'text' },
+        { key: 'hero_subtitle', label: 'Hero Subtitle', type: 'textarea' },
+        { key: 'hero_cta_text', label: 'CTA Button Text', type: 'text' },
+      ],
+    },
+    {
+      id: 'stats',
+      title: 'Stats Bar',
+      fields: [
+        { key: 'stat1_value', label: 'Stat 1 Value', type: 'text' },
+        { key: 'stat1_label', label: 'Stat 1 Label', type: 'text' },
+        { key: 'stat2_value', label: 'Stat 2 Value', type: 'text' },
+        { key: 'stat2_label', label: 'Stat 2 Label', type: 'text' },
+        { key: 'stat3_value', label: 'Stat 3 Value', type: 'text' },
+        { key: 'stat3_label', label: 'Stat 3 Label', type: 'text' },
+        { key: 'stat4_value', label: 'Stat 4 Value', type: 'text' },
+        { key: 'stat4_label', label: 'Stat 4 Label', type: 'text' },
+      ],
+    },
+    {
+      id: 'sections',
+      title: 'Section Titles',
+      fields: [
+        { key: 'featured_title', label: 'Featured Section Title', type: 'text' },
+        { key: 'featured_subtitle', label: 'Featured Section Subtitle', type: 'textarea' },
+        { key: 'grid_title', label: 'All Advisors Title', type: 'text' },
+        { key: 'grid_subtitle', label: 'All Advisors Subtitle', type: 'textarea' },
+        { key: 'how_it_works_title', label: 'How It Works Title', type: 'text' },
+      ],
+    },
+    {
+      id: 'how_it_works',
+      title: 'How It Works Steps',
+      fields: [
+        {
+          key: 'how_it_works_steps',
+          label: 'Steps',
+          type: 'object-list',
+          itemFields: [
+            { key: 'step', label: 'Step Number', type: 'text' },
+            { key: 'title', label: 'Title', type: 'text' },
+            { key: 'desc', label: 'Description', type: 'textarea' },
+          ],
+          defaultItem: { step: '', title: '', desc: '' },
+        },
+      ],
+    },
+    {
+      id: 'specializations',
+      title: 'Filter Categories',
+      fields: [
+        {
+          key: 'specializations',
+          label: 'Specialization Options',
+          type: 'string-list',
+        },
+      ],
+    },
+    {
+      id: 'final_cta',
+      title: 'Final CTA',
+      fields: [
+        { key: 'cta_title', label: 'CTA Title', type: 'text' },
+        { key: 'cta_subtitle', label: 'CTA Subtitle', type: 'textarea' },
+        { key: 'cta_primary_text', label: 'Primary Button Text', type: 'text' },
+        { key: 'cta_secondary_text', label: 'Secondary Button Text', type: 'text' },
+      ],
+    },
+  ],
+};
+
+// ───────────────────────────────────────────────────────────────────────
 // Registry + grouping for the sidebar
 // ───────────────────────────────────────────────────────────────────────
 
@@ -1032,6 +1119,7 @@ export const ALL_SCHEMAS: PageSchema[] = [
   COUNTRIES_CHROME_SCHEMA,
   FAQ_CHROME_SCHEMA,
   CARBON_CHROME_SCHEMA,
+  ADVISORS_CHROME_SCHEMA,
 ];
 
 export const SCHEMA_GROUPS: SchemaGroup[] = [
@@ -1060,6 +1148,7 @@ export const SCHEMA_GROUPS: SchemaGroup[] = [
       'page_chrome_sponsor',
       'page_chrome_ambassadors',
       'page_chrome_partners',
+      'page_chrome_advisors',
     ],
   },
   {

@@ -91,7 +91,7 @@ export const CROPS: CropData[] = [
     name: 'Millet',
     slug: 'millet',
     category: 'Grains',
-    image: 'https://images.unsplash.com/photo-1517022812141-23620dba5c23?w=1200&q=80&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1595855759920-86faa35e4a4c?w=1200&q=80&auto=format&fit=crop',
     tagline: 'Ancient grain with modern nutritional value',
     description: 'One of humanity\'s oldest cultivated grains, millet is a nutritional powerhouse that thrives in Africa\'s most challenging growing environments.',
     overview: [
@@ -325,6 +325,32 @@ export const CROPS: CropData[] = [
     },
     topCountries: ['South Africa', 'Kenya', 'Tanzania', 'Mozambique'],
   },
+  {
+    name: 'Wine Grapes',
+    slug: 'wine-grapes',
+    category: 'Cash Crops',
+    image: 'https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?w=1200&q=80&auto=format&fit=crop',
+    tagline: 'Premium viticulture — Africa\'s world-class wine heritage',
+    description: 'South Africa is the 8th largest wine producer globally, and emerging wine regions in Kenya, Tanzania, and Ethiopia are gaining international recognition.',
+    overview: [
+      'Africa\'s wine industry is anchored by South Africa, which has over 350 years of winemaking heritage and produces approximately 1 billion litres of wine annually from the Western Cape, Stellenbosch, Franschhoek, and Paarl regions. South African wines, particularly Chenin Blanc, Pinotage, and premium Bordeaux-style blends, are exported to over 130 countries and compete with the finest wines globally.',
+      'Beyond South Africa, emerging wine regions are developing across the continent. Kenya\'s Rift Valley produces increasingly respected wines at altitude, Ethiopia\'s Rift Valley has attracted French and Italian investment in commercial vineyards, and Tanzania\'s Dodoma region has a small but growing wine industry. These emerging regions benefit from high-altitude terroir, strong sunlight, and cool nights that produce grapes with excellent flavour concentration.',
+      'AFU supports viticulture development through vineyard establishment financing, technical partnerships with established South African wine estates, training in canopy management and cellar operations, and market access programmes that connect emerging African wineries to international wine buyers and distributors. Our programmes also cover wine tourism development, which adds significant value to wine-growing regions.',
+    ],
+    growingConditions: {
+      climate: 'Mediterranean to subtropical, 15-25°C during growing season, requires cool winters',
+      soil: 'Well-drained granite, sandstone, or shale-derived soils with low fertility',
+      altitude: '200-2,000m — higher altitude preferred in tropical latitudes',
+      rainfall: '400-800mm or irrigated — drought stress improves grape quality',
+    },
+    regions: ['South Africa', 'Kenya', 'Tanzania', 'Ethiopia', 'Zimbabwe'],
+    marketData: {
+      avgYield: '6-12 tonnes/ha (varies by variety and style)',
+      priceRange: '$500-3,000 per tonne (premium varieties command highest prices)',
+      exportMarkets: ['EU (UK, Netherlands, Germany)', 'North America', 'China', 'Japan'],
+    },
+    topCountries: ['South Africa', 'Kenya', 'Tanzania', 'Ethiopia'],
+  },
 
   /* ═══════════════════════════════════════════════════════
      FRUITS & NUTS
@@ -489,7 +515,7 @@ export const CROPS: CropData[] = [
     name: 'Citrus',
     slug: 'citrus',
     category: 'Fruits & Nuts',
-    image: 'https://images.unsplash.com/photo-1547514701-42782101795e?w=1200&q=80&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1611080626919-7cf5a9dbab5b?w=1200&q=80&auto=format&fit=crop',
     tagline: 'From orchards to the world — Africa\'s citrus powerhouse',
     description: 'South Africa is the world\'s second-largest citrus exporter, and the sector is expanding across Zimbabwe, Kenya, and Mozambique.',
     overview: [
@@ -519,7 +545,7 @@ export const CROPS: CropData[] = [
     name: 'Tomatoes',
     slug: 'tomatoes',
     category: 'Vegetables',
-    image: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=1200&q=80&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1592841200221-a6898f307baa?w=1200&q=80&auto=format&fit=crop',
     tagline: 'Africa\'s most consumed vegetable — fresh and processed',
     description: 'Tomatoes are grown by virtually every farming community in Africa, providing essential nutrition and income from both fresh sales and processing.',
     overview: [
@@ -571,7 +597,7 @@ export const CROPS: CropData[] = [
     name: 'Potatoes',
     slug: 'potatoes',
     category: 'Vegetables',
-    image: 'https://images.unsplash.com/photo-1610276198568-eb6d0ff53e48?w=1200&q=80&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1518977676601-b53f82ebe228?w=1200&q=80&auto=format&fit=crop',
     tagline: 'Highland tuber crop with growing commercial demand',
     description: 'Potato production is expanding rapidly across Africa\'s highland regions, driven by urbanisation and the growth of fast-food and processing industries.',
     overview: [
@@ -627,7 +653,7 @@ export const CROPS: CropData[] = [
     name: 'Soya Beans',
     slug: 'soya-beans',
     category: 'Industrial Crops',
-    image: 'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=1200&q=80&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1599420186946-7b6fb4e297f0?w=1200&q=80&auto=format&fit=crop',
     tagline: 'Protein powerhouse — feeding livestock and industry',
     description: 'Soya is Africa\'s primary source of plant-based protein for animal feed, cooking oil, and industrial applications, with production growing rapidly.',
     overview: [
@@ -653,7 +679,7 @@ export const CROPS: CropData[] = [
     name: 'Groundnuts',
     slug: 'groundnuts',
     category: 'Industrial Crops',
-    image: 'https://images.unsplash.com/photo-1606914501449-5a96b6ce24ca?w=1200&q=80&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1567892320421-1c657571ea4a?w=1200&q=80&auto=format&fit=crop',
     tagline: 'Versatile legume — food, oil, and livestock feed',
     description: 'Groundnuts are one of Africa\'s most widely cultivated legumes, providing oil, protein, and income for millions of smallholder farmers.',
     overview: [
@@ -679,7 +705,7 @@ export const CROPS: CropData[] = [
     name: 'Sunflower',
     slug: 'sunflower',
     category: 'Industrial Crops',
-    image: 'https://images.unsplash.com/photo-1547514701-42782101795e?w=1200&q=80&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1597848212624-a19eb35e2651?w=1200&q=80&auto=format&fit=crop',
     tagline: 'Africa\'s preferred cooking oil crop',
     description: 'Sunflower oil is the cooking oil of choice in much of Eastern and Southern Africa, and domestic production is growing to meet rising demand.',
     overview: [
@@ -705,7 +731,7 @@ export const CROPS: CropData[] = [
     name: 'Sesame',
     slug: 'sesame',
     category: 'Industrial Crops',
-    image: 'https://images.unsplash.com/photo-1606914501449-5a96b6ce24ca?w=1200&q=80&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1515696955266-4f67e13219e8?w=1200&q=80&auto=format&fit=crop',
     tagline: 'High-value export oilseed with surging Asian demand',
     description: 'Sesame is one of Africa\'s most promising export crops, with demand from Japan, China, and Korea driving premium prices for quality seed.',
     overview: [

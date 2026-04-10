@@ -1,14 +1,23 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 56" fill="none">
-  <!-- Leaf/Shield icon -->
-  <g transform="translate(4, 4)">
-    <!-- Shield shape -->
-    <path d="M24 0C24 0 28 2 36 2C44 2 48 0 48 0C48 0 48 16 48 24C48 36 36 44 24 48C12 44 0 36 0 24C0 16 0 0 0 0C0 0 4 2 12 2C20 2 24 0 24 0Z" fill="#5DB347"/>
-    <!-- Leaf inside shield -->
-    <path d="M24 10C18 16 14 24 14 32C14 32 18 28 24 28C30 28 34 32 34 32C34 24 30 16 24 10Z" fill="white" opacity="0.95"/>
-    <path d="M24 18V36" stroke="white" stroke-width="1.5" opacity="0.7"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 64" fill="none">
+  <!-- AFU Triangle Logo Mark -->
+  <g transform="translate(4, 2) scale(0.52)">
+    <!-- Outer triangle shape with interwoven AFU letters -->
+    <!-- Left side of triangle (A leg) -->
+    <path d="M48 100L12 100L0 108L48 8L56 8L48 28L32 68L20 92L28 92L36 72L48 72L52 82L48 100Z" fill="#3CB043"/>
+    <!-- Right side of triangle (U leg) -->
+    <path d="M56 8L104 108L92 100L56 100L52 82L60 82L68 92L80 92L64 56L56 40L56 8Z" fill="#3CB043"/>
+    <!-- Center crossbar (F element) -->
+    <path d="M48 28L56 40L64 56L56 56L48 40L36 72L48 72L52 82L44 82L32 68L48 28Z" fill="#3CB043"/>
+    <!-- Overlap regions (create the woven look) -->
+    <path d="M48 72L36 72L40 62L48 62Z" fill="#2DA038" opacity="0.9"/>
+    <path d="M56 56L64 56L60 66L52 66Z" fill="#2DA038" opacity="0.9"/>
   </g>
-  <!-- AFU text -->
-  <text x="64" y="24" font-family="system-ui, -apple-system, Arial, sans-serif" font-size="22" font-weight="800" fill="#1B2A4A" letter-spacing="-0.5">AFU</text>
-  <!-- Full name -->
-  <text x="64" y="42" font-family="system-ui, -apple-system, Arial, sans-serif" font-size="11" font-weight="500" fill="#5DB347" letter-spacing="1.5">AFRICAN FARMING UNION</text>
+  <!-- AFRICAN FARMING UNION text -->
+  <text x="72" y="26" font-family="system-ui, -apple-system, 'Segoe UI', Arial, sans-serif" font-size="20" font-weight="800" fill="#3CB043" letter-spacing="0.5">AFRICAN FARMING UNION</text>
+  <!-- Tagline with lines -->
+  <g transform="translate(72, 44)">
+    <line x1="0" y1="0" x2="28" y2="0" stroke="#3CB043" stroke-width="1" opacity="0.5"/>
+    <text x="32" y="4" font-family="system-ui, -apple-system, 'Segoe UI', Arial, sans-serif" font-size="10" font-style="italic" fill="#3CB043" letter-spacing="0.5">Let's Grow Together</text>
+    <line x1="148" y1="0" x2="176" y2="0" stroke="#3CB043" stroke-width="1" opacity="0.5"/>
+  </g>
 </svg>
