@@ -39,7 +39,7 @@ export const CROPS: CropData[] = [
     name: 'Maize',
     slug: 'maize',
     category: 'Grains',
-    image: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=1200&q=80&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=1200&q=80&auto=format&fit=crop',
     tagline: 'Africa\'s staple grain — feeding a continent',
     description: 'The most widely grown cereal crop in Sub-Saharan Africa, maize is the primary food source for over 300 million people across the continent.',
     overview: [
@@ -65,7 +65,7 @@ export const CROPS: CropData[] = [
     name: 'Sorghum',
     slug: 'sorghum',
     category: 'Grains',
-    image: 'https://images.unsplash.com/photo-1568667256549-094345857637?w=1200&q=80&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1758356860542-a2df92aad294?w=1200&q=80&auto=format&fit=crop',
     tagline: 'Drought-resilient grain for dry-land farming',
     description: 'A drought-tolerant cereal that thrives in semi-arid conditions where maize cannot survive, sorghum is essential for food security in Africa\'s dryland regions.',
     overview: [
@@ -143,7 +143,7 @@ export const CROPS: CropData[] = [
     name: 'Wheat',
     slug: 'wheat',
     category: 'Grains',
-    image: 'https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=1200&q=80&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1543257580-7269da773bf5?w=1200&q=80&auto=format&fit=crop',
     tagline: 'Strategic grain for Africa\'s growing bakery and milling sector',
     description: 'A temperature-sensitive cereal grown in Africa\'s cooler highlands, wheat is critical for the continent\'s expanding bread, pasta, and biscuit industries.',
     overview: [
@@ -199,7 +199,7 @@ export const CROPS: CropData[] = [
     name: 'Cocoa',
     slug: 'cocoa',
     category: 'Cash Crops',
-    image: 'https://images.unsplash.com/photo-1511381939415-e44015466834?w=1200&q=80&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1573710661345-610f790e1218?w=1200&q=80&auto=format&fit=crop',
     tagline: 'The chocolate crop — West Africa\'s golden bean',
     description: 'West Africa produces over 70% of the world\'s cocoa, making it the most valuable agricultural export for countries like Ghana and Nigeria.',
     overview: [
@@ -225,7 +225,7 @@ export const CROPS: CropData[] = [
     name: 'Tea',
     slug: 'tea',
     category: 'Cash Crops',
-    image: 'https://images.unsplash.com/photo-1582793988951-9aed5509eb97?w=1200&q=80&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1433704334812-6c45b0b8784d?w=1200&q=80&auto=format&fit=crop',
     tagline: 'Highland plantations producing world-class black tea',
     description: 'Kenya is the world\'s largest exporter of black tea, and African tea from highland regions is renowned for its strong, bright liquor.',
     overview: [
@@ -251,7 +251,7 @@ export const CROPS: CropData[] = [
     name: 'Tobacco',
     slug: 'tobacco',
     category: 'Cash Crops',
-    image: 'https://images.unsplash.com/photo-1547514701-42782101795e?w=1200&q=80&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1708955029891-98738cd0361f?w=1200&q=80&auto=format&fit=crop',
     tagline: 'High-value leaf crop driving rural economies',
     description: 'Zimbabwe and Tanzania are major producers of premium flue-cured and burley tobacco, one of Africa\'s highest-earning export crops per hectare.',
     overview: [
@@ -277,7 +277,7 @@ export const CROPS: CropData[] = [
     name: 'Cotton',
     slug: 'cotton',
     category: 'Cash Crops',
-    image: 'https://images.unsplash.com/photo-1605000797499-95a51c5269ae?w=1200&q=80&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1502395809857-fd80069897d0?w=1200&q=80&auto=format&fit=crop',
     tagline: 'White gold — connecting African farms to global textile markets',
     description: 'African cotton is prized for its hand-picked quality, supplying textile industries across Asia and Europe with premium long-staple fibre.',
     overview: [
@@ -303,7 +303,7 @@ export const CROPS: CropData[] = [
     name: 'Sugarcane',
     slug: 'sugarcane',
     category: 'Cash Crops',
-    image: 'https://images.unsplash.com/photo-1610276198568-eb6d0ff53e48?w=1200&q=80&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1752010102949-083b83957fda?w=1200&q=80&auto=format&fit=crop',
     tagline: 'Sweet opportunity — sugar, ethanol, and energy from one crop',
     description: 'Sugarcane is a versatile crop producing sugar, ethanol, and electricity from bagasse, supporting large-scale agro-industrial operations across Africa.',
     overview: [
@@ -385,7 +385,7 @@ export const CROPS: CropData[] = [
     name: 'Macadamia',
     slug: 'macadamia',
     category: 'Fruits & Nuts',
-    image: 'https://images.unsplash.com/photo-1606914501449-5a96b6ce24ca?w=1200&q=80&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1579293675541-10fcb3725a19?w=1200&q=80&auto=format&fit=crop',
     tagline: 'The queen of nuts — Africa\'s premium tree crop',
     description: 'South Africa and Kenya are the world\'s largest macadamia producers, with the global nut commanding premium prices in Asian and Western markets.',
     overview: [
@@ -411,7 +411,7 @@ export const CROPS: CropData[] = [
     name: 'Cashew Nuts',
     slug: 'cashew-nuts',
     category: 'Fruits & Nuts',
-    image: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=1200&q=80&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1509912760195-4f6cfd8cce2c?w=1200&q=80&auto=format&fit=crop',
     tagline: 'East Africa\'s booming nut export',
     description: 'Tanzania and Mozambique are leading cashew producers, with the global market growing rapidly as demand for plant-based snacks surges.',
     overview: [
@@ -623,7 +623,7 @@ export const CROPS: CropData[] = [
     name: 'Cassava',
     slug: 'cassava',
     category: 'Vegetables',
-    image: 'https://images.unsplash.com/photo-1500595046743-cd271d694d30?w=1200&q=80&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1509099646481-33260a1c97a4?w=1200&q=80&auto=format&fit=crop',
     tagline: 'Africa\'s food security champion — resilient and versatile',
     description: 'Cassava is the ultimate resilience crop, growing in poor soils with minimal inputs and providing food security for over 500 million Africans.',
     overview: [
