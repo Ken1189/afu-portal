@@ -538,15 +538,12 @@ const FALLBACK_TIERS: SponsorTier[] = [
 
 /* ─── Main Page ─── */
 export default function SponsorPage() {
-  const [farmers, setFarmers] = useState<FarmerProfile[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedCountry, setSelectedCountry] = useState<string>('All');
   const [showAnnual, setShowAnnual] = useState(false);
   const [sponsorTiers, setSponsorTiers] = useState<SponsorTier[]>(FALLBACK_TIERS);
   const [chrome, setChrome] = useState<Record<string, unknown> | null>(null);
 
-  const farmersRef = useRef<HTMLDivElement>(null);
   const tiersRef = useRef<HTMLDivElement>(null);
+  const impactRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     async function fetchChrome() {
@@ -568,15 +565,14 @@ export default function SponsorPage() {
 
   const heroBadge = (chrome?.hero_badge as string) ?? 'Supporting African smallholder farmers';
   const heroTitle = (chrome?.hero_title as string) ?? null;
-  const heroSubtitle = (chrome?.hero_subtitle as string) ?? "Your monthly contribution funds a real farmer's inputs, insurance, and offtake — transforming a smallholder into a thriving agri-business.";
-  const heroCta1Text = (chrome?.hero_cta1_text as string) ?? 'Sponsor a Farmer →';
-  const heroCta2Text = (chrome?.hero_cta2_text as string) ?? 'Learn How It Works';
+  const heroSubtitle = (chrome?.hero_subtitle as string) ?? "Your sponsorship is pooled and distributed across farmers who need it most — funding inputs, insurance, and market access where the impact is greatest.";
+  const heroCta1Text = (chrome?.hero_cta1_text as string) ?? 'Start Sponsoring →';
+  const heroCta2Text = (chrome?.hero_cta2_text as string) ?? 'See How It Works';
   const howItWorksTitle = (chrome?.how_it_works_title as string) ?? 'How It Works';
   const tiersTitleText = (chrome?.tiers_title as string) ?? 'Sponsorship Tiers';
-  const farmersTitle = (chrome?.farmers_title as string) ?? 'Meet the Farmers';
   const impactTitle = (chrome?.impact_title as string) ?? 'Your Impact in Numbers';
   const impactStats = (chrome?.impact_stats as { value: string; label: string }[]) ?? [
-    { value: '847', label: 'Farmers waiting for a sponsor' },
+    { value: '847', label: 'Farmers supported this season' },
     { value: '$47', label: 'Average monthly contribution' },
     { value: '94%', label: 'Sponsored farmers complete their season' },
     { value: '3.2×', label: 'Average income increase after first program' },
@@ -584,26 +580,6 @@ export default function SponsorPage() {
   const finalCtaTitle = (chrome?.final_cta_title as string) ?? 'Watson & Fine and others are already making an impact';
   const finalCtaBody = (chrome?.final_cta_body as string) ?? 'Corporate sponsors partner with AFU to fund entire cohorts of farmers — 10 to 50 at a time. Get a branded CSR impact report, your logo on the AFU platform, and the knowledge that your company is transforming African agriculture at scale.';
 
-  useEffect(() => {
-    async function loadFarmers() {
-      try {
-        const res = await fetch('/api/sponsor/farmers');
-        if (res.ok) {
-          const data = await res.json();
-          const live = data.farmers ?? [];
-          // Use live data if available, otherwise fall back to dummy data
-          setFarmers(live.length > 0 ? live : FALLBACK_FARMERS);
-        } else {
-          setFarmers(FALLBACK_FARMERS);
-        }
-      } catch {
-        setFarmers(FALLBACK_FARMERS);
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadFarmers();
-  }, []);
 
   useEffect(() => {
     async function fetchSponsorTiers() {
@@ -636,11 +612,6 @@ export default function SponsorPage() {
     fetchSponsorTiers();
   }, []);
 
-  const countries = ['All', ...Array.from(new Set(farmers.map((f) => f.country))).sort()];
-
-  const filteredFarmers =
-    selectedCountry === 'All' ? farmers : farmers.filter((f) => f.country === selectedCountry);
-
   function scrollTo(ref: React.RefObject<HTMLDivElement | null>) {
     ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
@@ -656,12 +627,12 @@ export default function SponsorPage() {
             </div>
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold leading-tight mb-6">
               {heroTitle ?? (
-                <>Sponsor an{' '}
+                <>Support{' '}
                 <span
                   className="text-transparent bg-clip-text"
                   style={{ backgroundImage: 'linear-gradient(135deg, #6ABF4B, #5DB347, #449933)' }}
                 >
-                  African Farmer
+                  African Farmers
                 </span></>
               )}
             </h1>
@@ -672,7 +643,7 @@ export default function SponsorPage() {
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
               <button
-                onClick={() => scrollTo(farmersRef)}
+                onClick={() => scrollTo(tiersRef)}
                 className="w-full sm:w-auto text-white font-bold px-8 py-4 rounded-xl text-lg transition-all duration-300 shadow-lg shadow-[#5DB347]/30 hover:scale-105 hover:shadow-xl"
                 style={{ background: 'linear-gradient(135deg, #5DB347, #449933)' }}
                 onMouseEnter={(e) => (e.currentTarget.style.background = 'linear-gradient(135deg, #449933, #3A8829)')}
@@ -715,21 +686,21 @@ export default function SponsorPage() {
             {[
               {
                 step: '01',
-                Icon: Search,
-                title: 'Choose a Farmer',
-                desc: 'Browse real farmer profiles — read their story, see their farm, and learn what they need to succeed this season.',
+                Icon: CreditCard,
+                title: 'Choose Your Level',
+                desc: 'Pick a sponsorship tier that works for you — from $5/month to $500/month corporate programs. Every contribution is meaningful.',
               },
               {
                 step: '02',
-                Icon: CreditCard,
-                title: 'Pick Your Tier',
-                desc: 'From $5/month membership coverage to $500/month full program funding. Every contribution makes a measurable difference.',
+                Icon: Sprout,
+                title: 'We Distribute the Funds',
+                desc: 'Your sponsorship is pooled and allocated to farmers who need it most — covering inputs, insurance, and market access across AFU programs.',
               },
               {
                 step: '03',
-                Icon: Sprout,
-                title: 'Watch Them Grow',
-                desc: 'Receive monthly updates, harvest photos, and impact reports directly from your farmer. See your money at work.',
+                Icon: Search,
+                title: 'See Your Impact',
+                desc: 'Receive monthly impact reports showing where funds went, which farmers benefited, harvest outcomes, and measurable results from your contribution.',
               },
             ].map((item, i) => (
               <div key={i} className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 text-center relative overflow-hidden shadow-lg shadow-[#5DB347]/5 hover:-translate-y-1 hover:shadow-xl transition-all duration-300">
@@ -806,95 +777,36 @@ export default function SponsorPage() {
         </div>
       </section>
 
-      {/* ── Browse Farmers ── */}
-      <section ref={farmersRef} id="farmers" className="bg-white py-16">
+      {/* ── How Your Sponsorship is Distributed ── */}
+      <section ref={impactRef} id="impact" className="bg-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
-            <h2 className="text-3xl md:text-4xl font-bold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-[#1B2A4A] to-[#5DB347]">{farmersTitle}</h2>
-            <p className="text-gray-500 text-lg">Real people, real farms, real impact.</p>
+            <h2 className="text-3xl md:text-4xl font-bold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-[#1B2A4A] to-[#5DB347]">Where Your Funds Go</h2>
+            <p className="text-gray-500 text-lg max-w-2xl mx-auto">
+              Your sponsorship is pooled with other contributors and distributed across farmers who need it most. No single farmer is left behind.
+            </p>
           </div>
 
-          {/* Country filter */}
-          {!loading && farmers.length > 0 && (
-            <div className="flex flex-wrap justify-center gap-2 mb-10">
-              {countries.map((country) => (
-                <button
-                  key={country}
-                  onClick={() => setSelectedCountry(country)}
-                  className={`px-4 py-2 rounded-full text-sm font-semibold border transition-all ${
-                    selectedCountry === country
-                      ? 'text-white border-transparent'
-                      : 'bg-white text-navy border-gray-200'
-                  }`}
-                  style={
-                    selectedCountry === country
-                      ? { background: '#1B2A4A' }
-                      : undefined
-                  }
-                >
-                  {country === 'All'
-                    ? 'All Countries'
-                    : `${COUNTRY_FLAGS[country] ?? ''} ${country}`}
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* Loading skeleton */}
-          {loading && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="card-polished overflow-hidden animate-pulse">
-                  <div className="h-48 bg-gray-200" />
-                  <div className="p-5 space-y-3">
-                    <div className="h-5 bg-gray-200 rounded w-2/3" />
-                    <div className="h-4 bg-gray-100 rounded w-1/2" />
-                    <div className="h-16 bg-gray-100 rounded" />
-                    <div className="h-2 bg-gray-200 rounded-full" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Farmer grid */}
-          {!loading && filteredFarmers.length > 0 && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredFarmers.map((farmer) => (
-                <FarmerCard key={farmer.id} farmer={farmer} />
-              ))}
-            </div>
-          )}
-
-          {/* No results for filter */}
-          {!loading && farmers.length > 0 && filteredFarmers.length === 0 && (
-            <div className="text-center py-12">
-              <div className="w-12 h-12 rounded-xl bg-[#5DB347]/10 flex items-center justify-center mb-3 mx-auto"><Search className="w-6 h-6 text-[#5DB347]" /></div>
-              <p className="text-gray-500">
-                No farmers found in {selectedCountry} yet.{' '}
-                <button
-                  onClick={() => setSelectedCountry('All')}
-                  className="font-semibold underline"
-                  style={{ color: '#5DB347' }}
-                >
-                  View all countries
-                </button>
-              </p>
-            </div>
-          )}
-
-          {/* Empty state — no farmer public profiles yet */}
-          {!loading && farmers.length === 0 && (
-            <div className="text-center py-16">
-              <div className="w-16 h-16 rounded-2xl bg-[#5DB347]/10 flex items-center justify-center mb-4 mx-auto">
-                <Search className="w-8 h-8 text-[#5DB347]" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { pct: '35%', title: 'Farm Inputs', desc: 'Certified seed, fertiliser, and crop protection products delivered directly to farmers at the start of each season.', color: '#5DB347' },
+              { pct: '25%', title: 'Crop Insurance', desc: 'Weather-indexed and multi-peril insurance that protects farmers against drought, flooding, and pest damage.', color: '#449933' },
+              { pct: '25%', title: 'Market Access', desc: 'Offtake contracts, transport to markets, warehousing, and quality grading to maximise farmer prices.', color: '#6ABF4B' },
+              { pct: '15%', title: 'Training & Support', desc: 'Agronomic training, financial literacy, and ongoing mentorship through AFU programs.', color: '#3A8829' },
+            ].map((item) => (
+              <div key={item.title} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
+                <div className="text-4xl font-black mb-3" style={{ color: item.color }}>{item.pct}</div>
+                <h3 className="text-lg font-bold text-[#1B2A4A] mb-2">{item.title}</h3>
+                <p className="text-sm text-gray-500 leading-relaxed">{item.desc}</p>
               </div>
-              <h3 className="text-xl font-bold text-navy mb-2">Farmer profiles coming soon</h3>
-              <p className="text-gray-500 max-w-md mx-auto">
-                We&apos;re onboarding farmers across Africa. Check back soon to meet the farmers you can sponsor.
-              </p>
-            </div>
-          )}
+            ))}
+          </div>
+
+          <div className="mt-12 bg-[#FAF8F3] rounded-2xl p-8 text-center">
+            <p className="text-gray-600 max-w-2xl mx-auto leading-relaxed">
+              Every sponsor receives a <span className="font-semibold text-[#1B2A4A]">monthly impact report</span> showing exactly which programs their funds supported, how many farmers benefited, and the measurable outcomes achieved. Full transparency — always.
+            </p>
+          </div>
         </div>
       </section>
 

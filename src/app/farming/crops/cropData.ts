@@ -91,7 +91,7 @@ export const CROPS: CropData[] = [
     name: 'Millet',
     slug: 'millet',
     category: 'Grains',
-    image: 'https://images.unsplash.com/photo-1595855759920-86faa35e4a4c?w=1200&q=80&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1761724176863-1ab9c55dc923?w=1200&q=80&auto=format&fit=crop',
     tagline: 'Ancient grain with modern nutritional value',
     description: 'One of humanity\'s oldest cultivated grains, millet is a nutritional powerhouse that thrives in Africa\'s most challenging growing environments.',
     overview: [
@@ -329,7 +329,7 @@ export const CROPS: CropData[] = [
     name: 'Wine Grapes',
     slug: 'wine-grapes',
     category: 'Cash Crops',
-    image: 'https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?w=1200&q=80&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1416432969026-7e41a751ee1e?w=1200&q=80&auto=format&fit=crop',
     tagline: 'Premium viticulture — Africa\'s world-class wine heritage',
     description: 'South Africa is the 8th largest wine producer globally, and emerging wine regions in Kenya, Tanzania, and Ethiopia are gaining international recognition.',
     overview: [
@@ -597,7 +597,7 @@ export const CROPS: CropData[] = [
     name: 'Potatoes',
     slug: 'potatoes',
     category: 'Vegetables',
-    image: 'https://images.unsplash.com/photo-1518977676601-b53f82ebe228?w=1200&q=80&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1573196444577-af471298e034?w=1200&q=80&auto=format&fit=crop',
     tagline: 'Highland tuber crop with growing commercial demand',
     description: 'Potato production is expanding rapidly across Africa\'s highland regions, driven by urbanisation and the growth of fast-food and processing industries.',
     overview: [
@@ -653,7 +653,7 @@ export const CROPS: CropData[] = [
     name: 'Soya Beans',
     slug: 'soya-beans',
     category: 'Industrial Crops',
-    image: 'https://images.unsplash.com/photo-1599420186946-7b6fb4e297f0?w=1200&q=80&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1517160534501-6e52b687a1ad?w=1200&q=80&auto=format&fit=crop',
     tagline: 'Protein powerhouse — feeding livestock and industry',
     description: 'Soya is Africa\'s primary source of plant-based protein for animal feed, cooking oil, and industrial applications, with production growing rapidly.',
     overview: [
@@ -679,7 +679,7 @@ export const CROPS: CropData[] = [
     name: 'Groundnuts',
     slug: 'groundnuts',
     category: 'Industrial Crops',
-    image: 'https://images.unsplash.com/photo-1567892320421-1c657571ea4a?w=1200&q=80&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1549978113-29eb25c8177f?w=1200&q=80&auto=format&fit=crop',
     tagline: 'Versatile legume — food, oil, and livestock feed',
     description: 'Groundnuts are one of Africa\'s most widely cultivated legumes, providing oil, protein, and income for millions of smallholder farmers.',
     overview: [
@@ -731,7 +731,7 @@ export const CROPS: CropData[] = [
     name: 'Sesame',
     slug: 'sesame',
     category: 'Industrial Crops',
-    image: 'https://images.unsplash.com/photo-1515696955266-4f67e13219e8?w=1200&q=80&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1705026042359-2d5b761845f3?w=1200&q=80&auto=format&fit=crop',
     tagline: 'High-value export oilseed with surging Asian demand',
     description: 'Sesame is one of Africa\'s most promising export crops, with demand from Japan, China, and Korea driving premium prices for quality seed.',
     overview: [
