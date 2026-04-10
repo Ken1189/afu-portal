@@ -24,111 +24,23 @@ interface ResearchCentre {
 const FALLBACK_CENTRES: ResearchCentre[] = [
   {
     id: '1',
-    name: 'Harare Crop Science Lab',
-    description: 'Specialising in the development of drought-resistant and high-yield crop varieties suited to southern African growing conditions. The lab operates advanced greenhouses and open-field trial plots across 15 hectares.',
-    focus_areas: ['Crop Genetics & Breeding'],
+    name: 'Rusanzi Farms',
+    description: 'Rusanzi Farms is AFU\'s flagship agricultural research and demonstration centre, focused on sustainable farming innovation across crops, livestock, and agroforestry systems. Operating as both a working farm and a research hub, Rusanzi develops practical, scalable solutions that African farmers can adopt immediately — from drought-tolerant crop trials and regenerative soil practices to precision irrigation and integrated pest management.',
+    focus_areas: ['Sustainable Agriculture', 'Crop Research & Trials', 'Agroforestry', 'Livestock Innovation', 'Climate-Smart Farming'],
     country: 'Zimbabwe',
-    region: 'Harare',
-    photo_url: null,
+    region: null,
+    photo_url: '/images/rusanzi-logo.png',
     website: null,
-    established_year: 2019,
+    established_year: 2024,
     team_size: null,
     key_projects: [
-      'Developed 3 drought-resistant maize varieties now in commercial use',
-      'Published 12 peer-reviewed papers on crop genetics in tropical climates',
-      'Trained 200+ agricultural extension workers in seed selection techniques',
+      'Multi-crop trial programme testing drought-resistant varieties across diverse soil types',
+      'Regenerative agriculture pilot integrating cover cropping, composting, and reduced tillage',
+      'Agroforestry demonstration plots combining timber, fruit, and crop production systems',
+      'Farmer training programme delivering hands-on workshops in sustainable land management',
+      'Precision irrigation research reducing water usage while maintaining optimal crop yields',
     ],
-    partner_institutions: ['University of Zimbabwe', 'CIMMYT', 'Zimbabwe Agricultural Research Council'],
-  },
-  {
-    id: '2',
-    name: 'Gaborone Soil Research Institute',
-    description: 'Dedicated to understanding and improving soil health across semi-arid regions of southern Africa. The institute conducts large-scale soil mapping and develops sustainable fertilization strategies for degraded farmland.',
-    focus_areas: ['Soil Science & Fertility'],
-    country: 'Botswana',
-    region: 'Gaborone',
-    photo_url: null,
-    website: null,
-    established_year: 2020,
-    team_size: null,
-    key_projects: [
-      'Completed soil health mapping for 50,000 hectares across Botswana',
-      'Created an organic fertiliser blend that increased yields by 25% in trials',
-      'Established a soil testing service used by 800+ farmers annually',
-    ],
-    partner_institutions: ['University of Botswana', 'ICRISAT', 'Botswana Ministry of Agriculture'],
-  },
-  {
-    id: '3',
-    name: 'Dodoma Agricultural Innovation Centre',
-    description: 'A hub for agricultural technology development and adaptation, focusing on precision farming tools, mobile-based extension services, and data-driven farm management solutions for East African smallholders.',
-    focus_areas: ['Agricultural Technology'],
-    country: 'Tanzania',
-    region: 'Dodoma',
-    photo_url: null,
-    website: null,
-    established_year: 2021,
-    team_size: null,
-    key_projects: [
-      'Launched a mobile crop advisory platform reaching 15,000 farmers',
-      'Piloted drone-based crop monitoring across 5 districts in central Tanzania',
-      'Developed an SMS-based pest early warning system with 90% accuracy',
-    ],
-    partner_institutions: ['University of Dar es Salaam', 'Tanzania Agricultural Research Institute', 'Google.org'],
-  },
-  {
-    id: '4',
-    name: 'Masvingo Livestock Research Station',
-    description: 'Focused on improving livestock productivity through genetic research, disease prevention, and sustainable grazing management. The station maintains a herd of 500+ cattle for breeding trials and veterinary research.',
-    focus_areas: ['Livestock Genetics & Health'],
-    country: 'Zimbabwe',
-    region: 'Masvingo',
-    photo_url: null,
-    website: null,
-    established_year: 2020,
-    team_size: null,
-    key_projects: [
-      'Identified genetic markers for heat tolerance in indigenous cattle breeds',
-      'Reduced tick-borne disease incidence by 40% through integrated management protocols',
-      'Established a livestock semen bank serving 300+ commercial and smallholder farms',
-    ],
-    partner_institutions: ['Midlands State University', 'ILRI', 'Zimbabwe Herd Book Authority'],
-  },
-  {
-    id: '5',
-    name: 'Francistown Water Management Centre',
-    description: 'Researching and deploying water-efficient farming techniques for arid and semi-arid zones. The centre develops drip irrigation systems, rainwater harvesting infrastructure, and groundwater management protocols.',
-    focus_areas: ['Water Conservation & Irrigation'],
-    country: 'Botswana',
-    region: 'Francistown',
-    photo_url: null,
-    website: null,
-    established_year: 2022,
-    team_size: null,
-    key_projects: [
-      'Designed a low-cost drip irrigation kit reducing water use by 60%',
-      'Installed rainwater harvesting systems on 120 farms across northern Botswana',
-      'Published comprehensive groundwater mapping for the Tuli Block farming region',
-    ],
-    partner_institutions: ['Botswana University of Agriculture', 'IWMI', 'WaterAid Southern Africa'],
-  },
-  {
-    id: '6',
-    name: 'Arusha Climate Adaptation Lab',
-    description: 'Addressing the impact of climate change on East African agriculture through adaptive crop systems, carbon sequestration research, and climate risk modelling for farming communities in the Great Rift Valley corridor.',
-    focus_areas: ['Climate-Smart Agriculture'],
-    country: 'Tanzania',
-    region: 'Arusha',
-    photo_url: null,
-    website: null,
-    established_year: 2023,
-    team_size: null,
-    key_projects: [
-      'Developed a climate risk assessment tool used by 2,000+ farming households',
-      'Established 8 climate-smart demonstration farms across northern Tanzania',
-      'Initiated a carbon credit verification programme for agroforestry systems',
-    ],
-    partner_institutions: ['Nelson Mandela African Institution of Science and Technology', 'CCAFS', 'Tanzania Meteorological Authority'],
+    partner_institutions: ['African Farming Union', 'Local Agricultural Extension Services'],
   },
 ];
 
@@ -218,13 +130,23 @@ export default function ResearchCentresPage() {
                   className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 border-l-4 border-[#5DB347] shadow-lg shadow-[#5DB347]/5 hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
                 >
                   <div className="flex items-start justify-between mb-4">
-                    <div>
-                      <h3 className="text-xl font-bold text-[#1B2A4A]">
-                        {centre.name}
-                      </h3>
-                      <p className="text-gray-500 text-sm">
-                        {centre.region ? `${centre.region}, ` : ''}{centre.country}
-                      </p>
+                    <div className="flex items-center gap-4">
+                      {centre.photo_url && (
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img
+                          src={centre.photo_url}
+                          alt={centre.name}
+                          className="w-16 h-16 object-contain rounded-xl bg-white border border-gray-100 p-1"
+                        />
+                      )}
+                      <div>
+                        <h3 className="text-xl font-bold text-[#1B2A4A]">
+                          {centre.name}
+                        </h3>
+                        <p className="text-gray-500 text-sm">
+                          {centre.region ? `${centre.region}, ` : ''}{centre.country}
+                        </p>
+                      </div>
                     </div>
                     {centre.established_year && (
                       <span className="text-xs font-semibold px-3 py-1 rounded-full bg-[#EBF7E5] text-[#5DB347]">
