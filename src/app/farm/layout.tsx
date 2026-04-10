@@ -438,9 +438,7 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
         {/* Sidebar Header with Tier Progress */}
         <div className="bg-gradient-to-br from-navy to-[#5DB347] p-5 text-white">
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
-              <Sprout className="w-5 h-5" />
-            </div>
+            <img src="/logo-icon.svg" alt="AFU" className="w-8 h-8 rounded-lg bg-white/20 p-1 brightness-0 invert" />
             <span className="font-bold text-lg">Mkulima Hub</span>
           </div>
           <div className="flex items-center gap-3 mb-3">

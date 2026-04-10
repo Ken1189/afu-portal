@@ -177,9 +177,7 @@ export default function WarehouseLayout({ children }: { children: React.ReactNod
       <aside className="hidden lg:flex w-64 bg-[#1B2A4A] flex-col text-white fixed inset-y-0 left-0 z-30">
         <div className="p-5 border-b border-white/10">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 bg-[#5DB347] rounded-xl flex items-center justify-center">
-              <Package className="w-5 h-5 text-white" />
-            </div>
+            <img src="/logo-icon.svg" alt="AFU" className="w-10 h-10 rounded-xl bg-[#5DB347] p-1.5 brightness-0 invert" />
             <div>
               <h2 className="font-bold text-base">AFU Warehouse</h2>
               <p className="text-xs text-gray-400">Receiving Portal</p>
