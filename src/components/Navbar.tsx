@@ -72,7 +72,9 @@ const insuranceLinks = [
 const moreServicesLinks: { label: string; href: string; icon: LucideIcon }[] = [
   { label: "Training", href: "/services/training", icon: GraduationCap },
   { label: "Inputs & Equipment", href: "/services/inputs", icon: Wrench },
-  { label: "Processing & Offtake", href: "/services/processing", icon: ShoppingBag },
+  { label: "Processing Hubs", href: "/services/processing", icon: ShoppingBag },
+  { label: "Guaranteed Offtake", href: "/services/offtake", icon: ShieldCheck },
+  { label: "Forward Contracts", href: "/services/forward-contracts", icon: Handshake },
   { label: "Legal Assistance", href: "/services/legal-assistance", icon: Scale },
   { label: "Veterinary", href: "/services/veterinary", icon: Stethoscope },
   { label: "Farm Security", href: "/services/security", icon: Shield },

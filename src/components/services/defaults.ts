@@ -375,6 +375,66 @@ export const SERVICE_DEFAULTS: Record<string, ServicePageConfig> = {
     cta_link: '/apply',
   },
 
+  'forward-contracts': {
+    hero_title: 'Forward Growing Contracts',
+    hero_subtitle:
+      'Secure guaranteed buyers and prices before you plant. AFU connects farmers with verified off-takers through legally binding forward contracts, eliminating market uncertainty.',
+    hero_image:
+      'https://images.unsplash.com/photo-1504370805625-d32c54b16100?w=1920&h=1080&fit=crop',
+    features: [
+      {
+        title: 'Guaranteed Prices',
+        description:
+          'Lock in prices before planting season. No more market volatility.',
+        icon: '💰',
+      },
+      {
+        title: 'Verified Buyers',
+        description:
+          'All off-takers are vetted and verified by AFU. Contracts are legally binding.',
+        icon: '✅',
+      },
+      {
+        title: 'Input Financing',
+        description:
+          'Access seed, fertiliser, and equipment financing tied to your forward contract.',
+        icon: '🌱',
+      },
+      {
+        title: 'Quality Standards',
+        description:
+          'Clear grading criteria so you know exactly what buyers expect.',
+        icon: '🏅',
+      },
+      {
+        title: 'Delivery Support',
+        description:
+          'AFU coordinates logistics, cold chain, and export compliance.',
+        icon: '🚚',
+      },
+      {
+        title: 'Multi-Currency Settlement',
+        description:
+          'Get paid in USD, EUR, GBP, ZAR, or local currency.',
+        icon: '🔄',
+      },
+    ],
+    how_it_works: [
+      { step: 1, title: 'Register Your Farm', description: 'List your farm, available land, and crops you can grow.' },
+      { step: 2, title: 'Browse Off-taker Contracts', description: 'View available forward contracts from verified buyers with guaranteed prices.' },
+      { step: 3, title: 'Sign & Grow', description: 'Accept a contract, receive inputs financing, and grow with confidence.' },
+      { step: 4, title: 'Deliver & Get Paid', description: 'Deliver your harvest to the buyer and receive guaranteed payment.' },
+    ],
+    stats: [
+      { value: '$50M+', label: 'Contracted Value', sub: 'in forward contracts' },
+      { value: '200+', label: 'Active Buyers', sub: 'verified off-takers' },
+      { value: '15', label: 'Export Markets', sub: 'across 3 continents' },
+      { value: '100%', label: 'Payment Guarantee', sub: 'via escrow settlement' },
+    ],
+    cta_text: 'Get Started',
+    cta_link: '/farm/offtake',
+  },
+
   inputs: {
     hero_title: 'Farm Inputs',
     hero_subtitle:

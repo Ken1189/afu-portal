@@ -49,6 +49,7 @@ const FALLBACK_FOOTER_COLUMNS: FooterColumn[] = [
       { label: "Inputs & Equipment", href: "/services/inputs" },
       { label: "Processing Hubs", href: "/services/processing" },
       { label: "Guaranteed Offtake", href: "/services/offtake" },
+      { label: "Forward Contracts", href: "/services/forward-contracts" },
       { label: "Trade Finance", href: "/services/trade-finance" },
       { label: "Training", href: "/services/training" },
       { label: "Legal Assistance", href: "/services/legal-assistance" },

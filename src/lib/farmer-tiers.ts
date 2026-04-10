@@ -88,6 +88,7 @@ export const FARM_SIDEBAR_ITEMS = [
   { href: '/farm/exports', label: 'Exports', icon: 'Ship', tier: 'harvest' as FarmerTier, group: 'Advanced' },
 
   // Pioneer tier
+  { href: '/farm/offtake', label: 'Off-takers & Contracts', icon: 'Handshake', tier: 'pioneer' as FarmerTier, group: 'Trading' },
   { href: '/farm/trade', label: 'Trading', icon: 'ArrowLeftRight', tier: 'pioneer' as FarmerTier, group: 'Trading' },
   { href: '/farm/marketplace', label: 'Marketplace', icon: 'ShoppingBag', tier: 'pioneer' as FarmerTier, group: 'Trading' },
   { href: '/farm/exchange', label: 'Exchange', icon: 'Coins', tier: 'pioneer' as FarmerTier, group: 'Trading' },

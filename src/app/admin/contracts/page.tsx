@@ -55,6 +55,8 @@ const TYPE_ICONS: Record<string, React.ReactNode> = {
 const DOCUMENT_TYPES = [
   { value: 'contract', label: 'Contract' },
   { value: 'proposal', label: 'Business Proposal' },
+  { value: 'forward_growing', label: 'Forward Growing Contract' },
+  { value: 'offtake_agreement', label: 'Off-take Agreement' },
   { value: 'investor_pack', label: 'Investor Pack' },
   { value: 'partnership_agreement', label: 'Partnership Agreement' },
   { value: 'nda', label: 'Non-Disclosure Agreement' },
@@ -64,6 +66,8 @@ const DOCUMENT_TYPES = [
 const DOCUMENT_TYPE_LABELS: Record<string, string> = {
   contract: 'Contract',
   proposal: 'Proposal',
+  forward_growing: 'Forward Growing Contract',
+  offtake_agreement: 'Off-take Agreement',
   investor_pack: 'Investor Pack',
   partnership_agreement: 'Partnership Agreement',
   nda: 'NDA',
