@@ -339,7 +339,10 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
     if (!items || items.length === 0) return null;
 
     const config = FARMER_TIERS[tier];
-    const unlocked = isTierUnlocked(currentTier, tier);
+    // Admin and super_admin always see everything unlocked
+    const role = profile?.role as string | undefined;
+    const isAdmin = role === 'admin' || role === 'super_admin';
+    const unlocked = isAdmin || isTierUnlocked(currentTier, tier);
 
     return (
       <div key={tier} className="mb-1">
@@ -438,7 +441,7 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
         {/* Sidebar Header with Tier Progress */}
         <div className="bg-gradient-to-br from-navy to-[#5DB347] p-5 text-white">
           <div className="flex items-center gap-2 mb-3">
-            <img src="/logo-icon.svg" alt="AFU" className="w-8 h-8 rounded-lg bg-white/20 p-1 brightness-0 invert" />
+            <img src="/logo-icon.svg" alt="AFU" className="w-8 h-8 rounded-lg bg-white/90 p-1" />
             <span className="font-bold text-lg">Mkulima Hub</span>
           </div>
           <div className="flex items-center gap-3 mb-3">
