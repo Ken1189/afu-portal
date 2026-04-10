@@ -421,15 +421,15 @@ export default function EventMonitorPage() {
               <div>
                 <label className="text-xs font-medium text-gray-500 uppercase">Payload</label>
                 <pre className="mt-1 p-3 bg-gray-50 rounded-lg text-xs overflow-x-auto border border-gray-200">
-                  {JSON.stringify(selectedEvent.payload, null, 2)}
+                  {JSON.stringify(selectedEvent.payload ?? {}, null, 2)}
                 </pre>
               </div>
 
               <div>
                 <label className="text-xs font-medium text-gray-500 uppercase">Handlers Executed</label>
                 <div className="mt-1 flex flex-wrap gap-1">
-                  {selectedEvent.handlers_run.length > 0 ? (
-                    selectedEvent.handlers_run.map((h, i) => (
+                  {(selectedEvent.handlers_run ?? []).length > 0 ? (
+                    (selectedEvent.handlers_run ?? []).map((h, i) => (
                       <span
                         key={i}
                         className={`px-2 py-0.5 rounded text-xs font-medium ${

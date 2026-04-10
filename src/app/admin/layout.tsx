@@ -227,7 +227,6 @@ const navGroups: NavGroup[] = [
     superAdminOnly: true,
     links: [
       { href: '/admin/blockchain', label: 'Blockchain', icon: <Database className={ICON_CLS} />, superAdminOnly: true },
-      { href: '/admin/run-migration', label: 'Run Migrations', icon: <Database className={ICON_CLS} />, superAdminOnly: true },
     ],
   },
   // Switch Portal dropdown is now at the TOP of the sidebar (see PortalSwitcherDropdown component).
@@ -551,7 +550,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     if (p.startsWith('/admin/farm') || p.startsWith('/admin/crops') || p.startsWith('/admin/livestock') || p.startsWith('/admin/equipment') || p.startsWith('/admin/insurance') || p.startsWith('/admin/warehouse') || p.startsWith('/admin/cooperatives') || p.startsWith('/admin/veterinary') || p.startsWith('/admin/legal-services') || p.startsWith('/admin/map') || p.startsWith('/admin/training') || p.startsWith('/admin/programs') || p.startsWith('/admin/sponsor') || p.startsWith('/admin/jobs') || p.startsWith('/admin/exchange') || p.startsWith('/admin/suppliers') || p.startsWith('/admin/partnerships') || p.startsWith('/admin/contracts') || p.startsWith('/admin/advertising') || p.startsWith('/admin/testimonials')) return 'operations';
     if (p.startsWith('/admin/ambassadors')) return 'marketplace';
     if (p.startsWith('/admin/content') || p.startsWith('/admin/blog') || p.startsWith('/admin/announcements') || p.startsWith('/admin/partners') || p.startsWith('/admin/media') || p.startsWith('/admin/research') || p.startsWith('/admin/faq') || p.startsWith('/admin/legal') || p.startsWith('/admin/countries')) return 'content';
-    if (p.startsWith('/admin/users') || p.startsWith('/admin/audit') || p.startsWith('/admin/compliance') || p.startsWith('/admin/settings') || p.startsWith('/admin/system') || p.startsWith('/admin/events') || p.startsWith('/admin/blockchain') || p.startsWith('/admin/reports') || p.startsWith('/admin/notifications') || p.startsWith('/admin/run-migration')) return 'system';
+    if (p.startsWith('/admin/users') || p.startsWith('/admin/audit') || p.startsWith('/admin/compliance') || p.startsWith('/admin/settings') || p.startsWith('/admin/system') || p.startsWith('/admin/events') || p.startsWith('/admin/blockchain') || p.startsWith('/admin/reports') || p.startsWith('/admin/notifications')) return 'system';
     if (p === '/admin' || p === '/admin/') return 'all';
     return 'dashboard';
   }, [pathname]);
