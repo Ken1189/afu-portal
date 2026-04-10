@@ -178,8 +178,12 @@ export default function ResearchCentresPage() {
       {/* Hero */}
       <section className="bg-navy text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="inline-block bg-[#5DB347]/20 text-[#5DB347] px-4 py-1.5 rounded-full text-sm font-medium mb-4">
-            Education
+          <div className="flex items-center gap-4 mb-6">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/afu-logo.svg" alt="AFU" className="w-14 h-14 brightness-0 invert flex-shrink-0" />
+            <div className="inline-block bg-[#5DB347]/20 text-[#5DB347] px-4 py-1.5 rounded-full text-sm font-medium">
+              Education
+            </div>
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-[#5DB347] to-[#6ABF4B] bg-clip-text text-transparent">
             Research Centres
