@@ -35,6 +35,7 @@ import {
   Wheat,
   Sprout,
   ArrowLeftRight,
+  TrendingUp,
   Megaphone,
   UserCheck,
   Shield,
@@ -102,6 +103,7 @@ const communityLinks: { label: string; href: string; desc: string; icon: LucideI
 const exploreLinks: { label: string; href: string; desc: string; icon: LucideIcon }[] = [
   { label: "Farming Sectors", href: "/farming", desc: "Crops, livestock, forestry & more", icon: Wheat },
   { label: "Countries", href: "/countries", desc: "Explore by country", icon: FolderKanban },
+  { label: "Commodities Trading", href: "/commodities", desc: "Live prices & trade platform", icon: TrendingUp },
   { label: "Exchange", href: "/exchange", desc: "Trade with fellow farmers", icon: ArrowLeftRight },
   { label: "Carbon Credits", href: "/carbon", desc: "Offset your footprint", icon: Leaf },
   { label: "Blog", href: "/blog", desc: "News & insights", icon: Newspaper },
