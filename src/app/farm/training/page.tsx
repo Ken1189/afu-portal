@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/client';
 import { TierProgress } from '@/components/farm/TierProgress';
 import { FARMER_TIERS, TIER_ORDER, type FarmerTier } from '@/lib/farmer-tiers';
 import { Lock } from 'lucide-react';
+import VideoCard from '@/components/VideoCard';
 
 // ── Types ─────────────────────────────────────────────────────────────────
 
@@ -556,6 +557,19 @@ export default function TrainingPage() {
   const [quizSubmitted, setQuizSubmitted] = useState(false);
   const [showCertificate, setShowCertificate] = useState(false);
 
+  // ── Video lessons state ────────────────────────────────────────────────
+  const [trainingVideos, setTrainingVideos] = useState<Array<{title: string; url: string; thumbnail?: string; is_featured?: boolean; duration?: string}>>([]);
+
+  useEffect(() => {
+    supabase.from('site_config').select('value').eq('key', 'video_section').maybeSingle()
+      .then(({ data }) => {
+        if (data?.value) {
+          const vids = (typeof data.value === 'string' ? JSON.parse(data.value) : data.value) as any[];
+          setTrainingVideos(vids.filter((v: any) => v.url));
+        }
+      });
+  }, []);
+
   // ── Fetch courses: site_config → courses table → hardcoded fallback ───
 
   const fetchCourses = useCallback(async () => {
@@ -887,6 +901,31 @@ export default function TrainingPage() {
             totalCoursesCompleted={completions.length}
           />
         </motion.div>
+
+        {/* Video Lessons */}
+        {trainingVideos.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.15 }}
+            className="bg-white/5 backdrop-blur-xl rounded-3xl p-6 border border-white/10 shadow-xl shadow-black/10"
+          >
+            <h2 className="text-lg font-bold text-white mb-4">Video Lessons</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {trainingVideos.map((video, idx) => (
+                <div key={idx} className={idx === 0 ? 'md:col-span-3' : ''}>
+                  <VideoCard
+                    title={video.title}
+                    duration={video.duration || ''}
+                    thumbnailUrl={video.thumbnail || 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&h=400&fit=crop'}
+                    videoUrl={video.url}
+                    size={idx === 0 ? 'large' : 'small'}
+                  />
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
 
         {/* Loading State */}
         {loading && (

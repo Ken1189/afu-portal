@@ -60,6 +60,7 @@ import { createClient } from '@/lib/supabase/client';
 import { useProducts, type ProductRow } from '@/lib/supabase/use-products';
 import { useAuth } from '@/lib/supabase/auth-context';
 import ImageUploader from '@/components/ui/ImageUploader';
+import VideoCard from '@/components/VideoCard';
 import CsvProductUpload from '@/components/ui/CsvProductUpload';
 
 // ── Animation variants ──────────────────────────────────────────────────────
@@ -236,6 +237,19 @@ export default function SupplierProductsPage() {
   // Delete confirmation
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+
+  // Getting started videos for empty state
+  const [gettingStartedVideos, setGettingStartedVideos] = useState<Array<{title: string; url: string; thumbnail?: string; is_featured?: boolean; duration?: string}>>([]);
+
+  useEffect(() => {
+    supabase.from('site_config').select('value').eq('key', 'video_section').maybeSingle()
+      .then(({ data }) => {
+        if (data?.value) {
+          const vids = (typeof data.value === 'string' ? JSON.parse(data.value) : data.value) as any[];
+          setGettingStartedVideos(vids.filter((v: any) => v.url));
+        }
+      });
+  }, [supabase]);
 
   // Convert Supabase products to the UI shape if available
   const myProducts: SupplierProduct[] = useMemo(() => {
@@ -889,6 +903,30 @@ export default function SupplierProductsPage() {
                   ))}
                 </div>
               </div>
+
+              {/* Getting Started Videos */}
+              {gettingStartedVideos.length > 0 && (
+                <div className="mt-10 pt-8 border-t border-gray-100">
+                  <p className="text-xs font-bold uppercase tracking-wide text-gray-500 mb-1">
+                    Getting Started Videos
+                  </p>
+                  <p className="text-xs text-gray-400 mb-5">
+                    Watch these quick guides to learn how to list and manage your products.
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-2xl mx-auto">
+                    {gettingStartedVideos.slice(0, 2).map((video, idx) => (
+                      <VideoCard
+                        key={idx}
+                        title={video.title}
+                        duration={video.duration || ''}
+                        thumbnailUrl={video.thumbnail || 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&h=400&fit=crop'}
+                        videoUrl={video.url}
+                        size="small"
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
             </>
           )}
         </motion.div>

@@ -6,7 +6,7 @@ import { useAuth } from '@/lib/supabase/auth-context';
 import {
   FileText, Plus, X, Loader2, CheckCircle2, Clock, AlertTriangle,
   Search, Edit3, Trash2, Download, Calendar, DollarSign, Globe,
-  Users, Building2, Award, Shield, ChevronRight, RefreshCw,
+  Users, Building2, Award, Shield, ChevronRight, RefreshCw, Eye, Printer, PenLine,
 } from 'lucide-react';
 import { useConfirm } from '@/components/ui/useConfirm';
 import { ALL_AFRICAN_COUNTRIES } from '@/lib/countries';
@@ -19,6 +19,7 @@ interface Contract {
   party_name: string;
   party_email: string | null;
   contract_type: string;
+  document_type: string;
   title: string;
   description: string | null;
   commission_rate: number | null;
@@ -51,6 +52,24 @@ const TYPE_ICONS: Record<string, React.ReactNode> = {
   investor: <Shield className="w-4 h-4" />,
 };
 
+const DOCUMENT_TYPES = [
+  { value: 'contract', label: 'Contract' },
+  { value: 'proposal', label: 'Business Proposal' },
+  { value: 'investor_pack', label: 'Investor Pack' },
+  { value: 'partnership_agreement', label: 'Partnership Agreement' },
+  { value: 'nda', label: 'Non-Disclosure Agreement' },
+  { value: 'mou', label: 'Memorandum of Understanding' },
+];
+
+const DOCUMENT_TYPE_LABELS: Record<string, string> = {
+  contract: 'Contract',
+  proposal: 'Proposal',
+  investor_pack: 'Investor Pack',
+  partnership_agreement: 'Partnership Agreement',
+  nda: 'NDA',
+  mou: 'MOU',
+};
+
 const PAYMENT_TERMS = [
   { value: 'upfront', label: 'Upfront' },
   { value: 'on_delivery', label: 'On Delivery' },
@@ -63,6 +82,293 @@ const PAYMENT_TERMS = [
 
 const COUNTRIES = [...ALL_AFRICAN_COUNTRIES].sort();
 
+/* ─── Contract Preview Component ─── */
+function ContractPreview({
+  contract,
+  onClose,
+  onSign,
+}: {
+  contract: Contract;
+  onClose: () => void;
+  onSign: (id: string) => void;
+}) {
+  const docTypeCode = (contract.document_type || 'contract').toUpperCase().replace('_', '-');
+  const year = new Date(contract.created_at).getFullYear();
+  const refNumber = `AFU-${docTypeCode}-${year}-${contract.id.substring(0, 6).toUpperCase()}`;
+  const docDate = new Date(contract.created_at).toLocaleDateString('en-GB', {
+    day: 'numeric', month: 'long', year: 'numeric',
+  });
+
+  const handlePrint = () => {
+    window.print();
+  };
+
+  return (
+    <div className="fixed inset-0 z-[60] flex items-start justify-center bg-black/50 overflow-y-auto print:bg-white print:static print:overflow-visible">
+      {/* Print-specific styles */}
+      <style>{`
+        @media print {
+          body * { visibility: hidden !important; }
+          #contract-preview, #contract-preview * { visibility: visible !important; }
+          #contract-preview { position: absolute; left: 0; top: 0; width: 100%; }
+          .no-print { display: none !important; }
+        }
+      `}</style>
+
+      <div className="w-full max-w-4xl mx-4 my-8 print:my-0 print:mx-0 print:max-w-none">
+        {/* Toolbar */}
+        <div className="no-print flex items-center justify-between bg-[#1B2A4A] text-white rounded-t-xl px-6 py-3">
+          <h3 className="font-semibold text-sm">Document Preview</h3>
+          <div className="flex items-center gap-2">
+            {(contract.status === 'draft' || contract.status === 'pending_signature') && (
+              <button
+                onClick={() => onSign(contract.id)}
+                className="flex items-center gap-2 bg-[#5DB347] hover:bg-[#449933] text-white text-xs font-medium px-4 py-2 rounded-lg transition-colors"
+              >
+                <PenLine className="w-3.5 h-3.5" />
+                Sign Digitally
+              </button>
+            )}
+            <button
+              onClick={handlePrint}
+              className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white text-xs font-medium px-4 py-2 rounded-lg transition-colors"
+            >
+              <Printer className="w-3.5 h-3.5" />
+              Print
+            </button>
+            <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/10">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+
+        {/* Document */}
+        <div id="contract-preview" className="bg-white shadow-xl print:shadow-none">
+          {/* Letterhead */}
+          <div className="border-b-4 border-[#5DB347] px-12 pt-10 pb-6">
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-4">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/afu-logo.svg" alt="AFU Logo" className="w-16 h-16" />
+                <div>
+                  <h1 className="text-2xl font-bold text-[#1B2A4A]">African Farming Union</h1>
+                  <p className="text-xs text-gray-500 mt-1">Empowering African Agriculture | www.africanfarmersunion.com</p>
+                </div>
+              </div>
+              <div className="text-right text-xs text-gray-400">
+                <p>Cape Town, South Africa</p>
+                <p>info@africanfarmersunion.com</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Document Title */}
+          <div className="px-12 pt-8 pb-6 text-center">
+            <h2 className="text-xl font-bold text-[#1B2A4A] uppercase tracking-wide">{contract.title}</h2>
+            <p className="text-sm text-gray-400 mt-2">
+              {DOCUMENT_TYPE_LABELS[contract.document_type] || 'Contract'}
+            </p>
+          </div>
+
+          {/* Reference & Date */}
+          <div className="px-12 pb-6 flex justify-between text-sm">
+            <div>
+              <span className="text-gray-400">Reference: </span>
+              <span className="font-mono font-medium text-[#1B2A4A]">{refNumber}</span>
+            </div>
+            <div>
+              <span className="text-gray-400">Date: </span>
+              <span className="font-medium text-[#1B2A4A]">{docDate}</span>
+            </div>
+          </div>
+
+          {/* Parties */}
+          <div className="px-12 pb-6">
+            <div className="border border-gray-200 rounded-lg overflow-hidden">
+              <div className="bg-[#1B2A4A] text-white text-xs font-semibold px-4 py-2 uppercase tracking-wider">
+                Parties
+              </div>
+              <div className="grid grid-cols-2 divide-x divide-gray-200">
+                <div className="p-4">
+                  <p className="text-xs text-gray-400 mb-1">Between</p>
+                  <p className="font-semibold text-[#1B2A4A]">African Farming Union (AFU)</p>
+                  <p className="text-xs text-gray-500">Cape Town, South Africa</p>
+                </div>
+                <div className="p-4">
+                  <p className="text-xs text-gray-400 mb-1">And</p>
+                  <p className="font-semibold text-[#1B2A4A]">{contract.party_name}</p>
+                  {contract.party_email && (
+                    <p className="text-xs text-gray-500">{contract.party_email}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Key Terms Table */}
+          <div className="px-12 pb-6">
+            <div className="border border-gray-200 rounded-lg overflow-hidden">
+              <div className="bg-[#1B2A4A] text-white text-xs font-semibold px-4 py-2 uppercase tracking-wider">
+                Key Terms
+              </div>
+              <table className="w-full text-sm">
+                <tbody className="divide-y divide-gray-100">
+                  <tr>
+                    <td className="px-4 py-2.5 text-gray-400 font-medium w-1/3">Contract Type</td>
+                    <td className="px-4 py-2.5 text-[#1B2A4A] capitalize">{contract.contract_type}</td>
+                  </tr>
+                  <tr className="bg-gray-50/50">
+                    <td className="px-4 py-2.5 text-gray-400 font-medium">Payment Terms</td>
+                    <td className="px-4 py-2.5 text-[#1B2A4A]">
+                      {PAYMENT_TERMS.find(t => t.value === contract.payment_terms)?.label || contract.payment_terms || 'N/A'}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="px-4 py-2.5 text-gray-400 font-medium">Territory</td>
+                    <td className="px-4 py-2.5 text-[#1B2A4A]">
+                      {contract.territory?.length ? contract.territory.join(', ') : 'All territories'}
+                    </td>
+                  </tr>
+                  <tr className="bg-gray-50/50">
+                    <td className="px-4 py-2.5 text-gray-400 font-medium">Exclusivity</td>
+                    <td className="px-4 py-2.5 text-[#1B2A4A]">
+                      {contract.exclusivity ? (
+                        <span className="text-amber-600 font-medium">Exclusive</span>
+                      ) : 'Non-exclusive'}
+                    </td>
+                  </tr>
+                  {contract.commission_rate != null && (
+                    <tr>
+                      <td className="px-4 py-2.5 text-gray-400 font-medium">Commission Rate</td>
+                      <td className="px-4 py-2.5 text-[#1B2A4A]">{contract.commission_rate}%</td>
+                    </tr>
+                  )}
+                  {contract.minimum_order_value != null && (
+                    <tr className="bg-gray-50/50">
+                      <td className="px-4 py-2.5 text-gray-400 font-medium">Min Order Value</td>
+                      <td className="px-4 py-2.5 text-[#1B2A4A]">USD {contract.minimum_order_value.toLocaleString()}</td>
+                    </tr>
+                  )}
+                  {contract.discount_rate != null && (
+                    <tr>
+                      <td className="px-4 py-2.5 text-gray-400 font-medium">Discount Rate</td>
+                      <td className="px-4 py-2.5 text-[#1B2A4A]">{contract.discount_rate}%</td>
+                    </tr>
+                  )}
+                  <tr className="bg-gray-50/50">
+                    <td className="px-4 py-2.5 text-gray-400 font-medium">Start Date</td>
+                    <td className="px-4 py-2.5 text-[#1B2A4A]">
+                      {contract.start_date ? new Date(contract.start_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : 'TBD'}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="px-4 py-2.5 text-gray-400 font-medium">End Date</td>
+                    <td className="px-4 py-2.5 text-[#1B2A4A]">
+                      {contract.end_date ? new Date(contract.end_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Ongoing'}
+                    </td>
+                  </tr>
+                  <tr className="bg-gray-50/50">
+                    <td className="px-4 py-2.5 text-gray-400 font-medium">Auto Renewal</td>
+                    <td className="px-4 py-2.5 text-[#1B2A4A]">
+                      {contract.auto_renew ? (
+                        <span className="text-[#5DB347] font-medium">Yes</span>
+                      ) : 'No'}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Description / Notes */}
+          {(contract.description || contract.notes) && (
+            <div className="px-12 pb-6">
+              <div className="border border-gray-200 rounded-lg overflow-hidden">
+                <div className="bg-[#1B2A4A] text-white text-xs font-semibold px-4 py-2 uppercase tracking-wider">
+                  Description &amp; Notes
+                </div>
+                <div className="p-4 space-y-3 text-sm text-gray-700 leading-relaxed">
+                  {contract.description && <p>{contract.description}</p>}
+                  {contract.notes && (
+                    <div className="border-t border-gray-100 pt-3">
+                      <p className="text-xs text-gray-400 mb-1">Additional Notes</p>
+                      <p>{contract.notes}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Status Badge */}
+          <div className="px-12 pb-6 flex items-center gap-2">
+            <span className="text-xs text-gray-400">Current Status:</span>
+            <span className={`text-xs px-3 py-1 rounded-full font-semibold ${STATUS_COLORS[contract.status] || 'bg-gray-100 text-gray-600'}`}>
+              {contract.status.replace('_', ' ').toUpperCase()}
+            </span>
+          </div>
+
+          {/* Signature Block */}
+          <div className="px-12 pb-8">
+            <div className="border border-gray-200 rounded-lg overflow-hidden">
+              <div className="bg-[#1B2A4A] text-white text-xs font-semibold px-4 py-2 uppercase tracking-wider">
+                Signatures
+              </div>
+              <div className="grid grid-cols-2 divide-x divide-gray-200">
+                <div className="p-6">
+                  <p className="text-xs text-gray-400 mb-8">For African Farming Union (AFU)</p>
+                  {contract.signed_at ? (
+                    <div className="border-b-2 border-[#5DB347] pb-1 mb-2">
+                      <p className="text-[#5DB347] font-semibold text-sm italic">Digitally signed</p>
+                    </div>
+                  ) : (
+                    <div className="border-b-2 border-gray-300 pb-1 mb-2 h-8" />
+                  )}
+                  <p className="text-xs text-gray-400">
+                    Signature &mdash; Date: {contract.signed_at
+                      ? new Date(contract.signed_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+                      : '_______________'}
+                  </p>
+                </div>
+                <div className="p-6">
+                  <p className="text-xs text-gray-400 mb-8">For {contract.party_name}</p>
+                  {contract.signed_at ? (
+                    <div className="border-b-2 border-[#5DB347] pb-1 mb-2">
+                      <p className="text-[#5DB347] font-semibold text-sm italic">Digitally signed</p>
+                    </div>
+                  ) : (
+                    <div className="border-b-2 border-gray-300 pb-1 mb-2 h-8" />
+                  )}
+                  <p className="text-xs text-gray-400">
+                    Signature &mdash; Date: {contract.signed_at
+                      ? new Date(contract.signed_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+                      : '_______________'}
+                  </p>
+                </div>
+              </div>
+              {contract.signed_at && (
+                <div className="bg-green-50 border-t border-green-200 px-4 py-2 text-center">
+                  <p className="text-xs text-green-700 font-medium">
+                    Digitally signed on {new Date(contract.signed_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })} at {new Date(contract.signed_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="border-t-2 border-[#5DB347] px-12 py-4 bg-gray-50">
+            <p className="text-[10px] text-gray-400 text-center">
+              This document was generated by the African Farming Union platform. Document ID: {contract.id}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Main Page ─── */
 export default function AdminContractsPage() {
   const supabase = useMemo(() => createClient(), []);
   const { user } = useAuth();
@@ -83,6 +389,7 @@ export default function AdminContractsPage() {
     party_name: '',
     party_email: '',
     contract_type: 'supplier',
+    document_type: 'contract',
     title: '',
     description: '',
     commission_rate: '',
@@ -96,6 +403,9 @@ export default function AdminContractsPage() {
     auto_renew: false,
     notes: '',
   });
+
+  // Preview
+  const [previewContract, setPreviewContract] = useState<Contract | null>(null);
 
   const fetchContracts = useCallback(async () => {
     setLoading(true);
@@ -132,7 +442,7 @@ export default function AdminContractsPage() {
 
   const openCreate = () => {
     setEditing(null);
-    setForm({ party_type: 'supplier', party_name: '', party_email: '', contract_type: 'supplier', title: '', description: '', commission_rate: '', payment_terms: 'net_30', territory: [], exclusivity: false, minimum_order_value: '', discount_rate: '', start_date: '', end_date: '', auto_renew: false, notes: '' });
+    setForm({ party_type: 'supplier', party_name: '', party_email: '', contract_type: 'supplier', document_type: 'contract', title: '', description: '', commission_rate: '', payment_terms: 'net_30', territory: [], exclusivity: false, minimum_order_value: '', discount_rate: '', start_date: '', end_date: '', auto_renew: false, notes: '' });
     setShowModal(true);
   };
 
@@ -140,7 +450,7 @@ export default function AdminContractsPage() {
     setEditing(c);
     setForm({
       party_type: c.party_type, party_name: c.party_name, party_email: c.party_email || '',
-      contract_type: c.contract_type, title: c.title, description: c.description || '',
+      contract_type: c.contract_type, document_type: c.document_type || 'contract', title: c.title, description: c.description || '',
       commission_rate: c.commission_rate?.toString() || '', payment_terms: c.payment_terms || 'net_30',
       territory: c.territory || [], exclusivity: c.exclusivity, minimum_order_value: c.minimum_order_value?.toString() || '',
       discount_rate: c.discount_rate?.toString() || '', start_date: c.start_date || '', end_date: c.end_date || '',
@@ -157,6 +467,7 @@ export default function AdminContractsPage() {
       party_name: form.party_name,
       party_email: form.party_email || null,
       contract_type: form.contract_type,
+      document_type: form.document_type,
       title: form.title,
       description: form.description || null,
       commission_rate: form.commission_rate ? parseFloat(form.commission_rate) : null,
@@ -189,6 +500,24 @@ export default function AdminContractsPage() {
     setContracts(prev => prev.map(c => c.id === id ? { ...c, status, signed_at: status === 'active' ? new Date().toISOString() : c.signed_at } : c));
   };
 
+  const handleDigitalSign = async (id: string) => {
+    const contract = contracts.find(c => c.id === id);
+    if (!contract) return;
+
+    if (contract.status === 'draft') {
+      // draft -> pending_signature -> active
+      await updateStatus(id, 'pending_signature');
+      // Small delay then mark active
+      setTimeout(async () => {
+        await updateStatus(id, 'active');
+        setPreviewContract(prev => prev && prev.id === id ? { ...prev, status: 'active', signed_at: new Date().toISOString() } : prev);
+      }, 500);
+    } else if (contract.status === 'pending_signature') {
+      await updateStatus(id, 'active');
+      setPreviewContract(prev => prev && prev.id === id ? { ...prev, status: 'active', signed_at: new Date().toISOString() } : prev);
+    }
+  };
+
   const deleteContract = async (id: string) => {
     const ok = await confirm('Delete Contract', 'This will permanently delete this contract. Are you sure?');
     if (!ok) return;
@@ -201,7 +530,7 @@ export default function AdminContractsPage() {
       {ConfirmDialog}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-[#1B2A4A]">Contracts</h1>
+          <h1 className="text-2xl font-bold text-[#1B2A4A]">Proposals &amp; Contracts</h1>
           <p className="text-sm text-gray-500">Manage supplier, partner, and ambassador agreements</p>
         </div>
         <button onClick={openCreate} className="flex items-center gap-2 bg-[#5DB347] hover:bg-[#449933] text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-colors">
@@ -271,6 +600,11 @@ export default function AdminContractsPage() {
                     <span className="text-gray-400">{TYPE_ICONS[c.party_type] || <FileText className="w-4 h-4" />}</span>
                     <h3 className="font-semibold text-[#1B2A4A]">{c.title}</h3>
                     <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_COLORS[c.status] || 'bg-gray-100 text-gray-600'}`}>{c.status.replace('_', ' ')}</span>
+                    {c.document_type && c.document_type !== 'contract' && (
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 font-medium">
+                        {DOCUMENT_TYPE_LABELS[c.document_type] || c.document_type}
+                      </span>
+                    )}
                   </div>
                   <p className="text-sm text-gray-500 mb-2">{c.party_name}{c.party_email ? ` (${c.party_email})` : ''}</p>
 
@@ -305,6 +639,7 @@ export default function AdminContractsPage() {
                   {c.status === 'active' && (
                     <button onClick={() => updateStatus(c.id, 'terminated')} className="text-xs bg-red-50 text-red-600 px-3 py-1.5 rounded-lg hover:bg-red-100">Terminate</button>
                   )}
+                  <button onClick={() => setPreviewContract(c)} className="p-2 rounded-lg hover:bg-blue-50 text-gray-400 hover:text-blue-600" title="Preview"><Eye className="w-4 h-4" /></button>
                   <button onClick={() => openEdit(c)} className="p-2 rounded-lg hover:bg-gray-100 text-gray-400"><Edit3 className="w-4 h-4" /></button>
                   <button onClick={() => deleteContract(c.id)} className="p-2 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
                 </div>
@@ -312,6 +647,15 @@ export default function AdminContractsPage() {
             </div>
           ))}
         </div>
+      )}
+
+      {/* ═══ PREVIEW MODAL ═══ */}
+      {previewContract && (
+        <ContractPreview
+          contract={previewContract}
+          onClose={() => setPreviewContract(null)}
+          onSign={handleDigitalSign}
+        />
       )}
 
       {/* ═══ CREATE/EDIT MODAL ═══ */}
@@ -348,6 +692,15 @@ export default function AdminContractsPage() {
                   <input type="text" value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} placeholder="e.g. Supplier Agreement — Kalahari Seeds" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" />
                 </div>
               </div>
+
+              {/* Document Type - right after title */}
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Document Type</label>
+                <select value={form.document_type} onChange={e => setForm(p => ({ ...p, document_type: e.target.value }))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
+                  {DOCUMENT_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+                </select>
+              </div>
+
               <div>
                 <label className="block text-xs font-medium text-gray-500 mb-1">Description</label>
                 <textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} rows={2} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm resize-none" />

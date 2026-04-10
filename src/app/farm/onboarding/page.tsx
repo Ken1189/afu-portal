@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import {
   ArrowLeft,
   ArrowRight,
@@ -20,6 +21,8 @@ import { useAuth } from '@/lib/supabase/auth-context';
 import { createClient } from '@/lib/supabase/client';
 import { ALL_AFRICAN_COUNTRIES } from '@/lib/countries';
 import ImageUploader from '@/components/ui/ImageUploader';
+
+const LocationPicker = dynamic(() => import('@/components/map/LocationPicker'), { ssr: false });
 
 // ── Constants ────────────────────────────────────────────────────────────
 const NAVY = '#1B2A4A';
@@ -513,14 +516,15 @@ export default function OnboardingPage() {
                   <label className="block text-sm font-semibold mb-2" style={{ color: NAVY }}>
                     GPS coordinates (optional)
                   </label>
+                  <LocationPicker value={gps} onChange={setGps} />
                   <input
                     type="text"
                     value={gps}
                     onChange={(e) => setGps(e.target.value)}
                     placeholder="e.g. -1.2921, 36.8219"
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5DB347]"
+                    className="w-full mt-2 px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5DB347] text-sm"
                   />
-                  <p className="text-xs text-gray-400 mt-1">Format: latitude, longitude</p>
+                  <p className="text-xs text-gray-400 mt-1">Or type coordinates manually: latitude, longitude</p>
                 </div>
 
                 <div>

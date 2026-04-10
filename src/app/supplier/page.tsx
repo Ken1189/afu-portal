@@ -38,6 +38,7 @@ import {
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/supabase/auth-context';
+import VideoCard from '@/components/VideoCard';
 
 // ── Inline types ────────────────────────────────────────────────────────────
 
@@ -438,6 +439,19 @@ export default function SupplierDashboard() {
   // Live recent orders
   const [liveRecentOrders, setLiveRecentOrders] = useState<typeof FALLBACK_RECENT_ORDERS | null>(null);
   const [dbLoading, setDbLoading] = useState(true);
+
+  // Supplier resource videos
+  const [supplierVideos, setSupplierVideos] = useState<Array<{title: string; url: string; thumbnail?: string; is_featured?: boolean; duration?: string}>>([]);
+
+  useEffect(() => {
+    supabase.from('site_config').select('value').eq('key', 'video_section').maybeSingle()
+      .then(({ data }) => {
+        if (data?.value) {
+          const vids = (typeof data.value === 'string' ? JSON.parse(data.value) : data.value) as any[];
+          setSupplierVideos(vids.filter((v: any) => v.url));
+        }
+      });
+  }, []);
 
   const fetchLiveDashboard = useCallback(async () => {
     if (!user) { setDbLoading(false); return; }
@@ -1164,6 +1178,38 @@ export default function SupplierDashboard() {
           </div>
         </motion.div>
       </motion.div>
+
+      {/* ══════════════════════════════════════════════════════════════════
+          SUPPLIER RESOURCES VIDEOS
+      ═════════════════════════════════════════════════════════════════ */}
+      {supplierVideos.length > 0 && (
+        <motion.div variants={fadeUp} className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+          <div className="p-5 border-b border-gray-100 flex items-center justify-between">
+            <h3 className="font-semibold text-navy text-sm flex items-center gap-2">
+              <Eye className="w-4 h-4 text-[#8CB89C]" />
+              Supplier Resources
+            </h3>
+            <Link
+              href="/supplier/videos"
+              className="text-[#8CB89C] text-xs font-medium hover:text-[#729E82] flex items-center gap-1 transition-colors"
+            >
+              Manage Your Videos <ChevronRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+          <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-3">
+            {supplierVideos.slice(0, 2).map((video, idx) => (
+              <VideoCard
+                key={idx}
+                title={video.title}
+                duration={video.duration || ''}
+                thumbnailUrl={video.thumbnail || 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&h=400&fit=crop'}
+                videoUrl={video.url}
+                size="small"
+              />
+            ))}
+          </div>
+        </motion.div>
+      )}
     </motion.div>
   );
 }

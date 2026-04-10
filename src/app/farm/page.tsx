@@ -40,6 +40,8 @@ import { useFarm } from '@/lib/farm-context';
 import { useAuth } from '@/lib/supabase/auth-context';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 import { QuickStartCard } from '@/components/farm/QuickStartCard';
+import { createClient } from '@/lib/supabase/client';
+import VideoCard from '@/components/VideoCard';
 
 // ---------------------------------------------------------------------------
 // Types (inlined from @/lib/data/farm)
@@ -430,6 +432,20 @@ export default function FarmDashboardPage() {
       prev.map((task) => (task.id === id ? { ...task, completed: !task.completed } : task))
     );
   };
+
+  // Featured videos state
+  const [videos, setVideos] = useState<Array<{title: string; url: string; thumbnail?: string; is_featured?: boolean; duration?: string}>>([]);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.from('site_config').select('value').eq('key', 'video_section').maybeSingle()
+      .then(({ data }) => {
+        if (data?.value) {
+          const vids = (typeof data.value === 'string' ? JSON.parse(data.value) : data.value) as any[];
+          setVideos(vids.filter((v: any) => v.url));
+        }
+      });
+  }, []);
 
   // Weather popup state
   const [selectedWeatherDay, setSelectedWeatherDay] = useState<number | null>(null);
@@ -978,6 +994,36 @@ export default function FarmDashboardPage() {
           ))}
         </div>
       </motion.section>
+
+      {/* ================================================================= */}
+      {/* TRAINING & RESOURCES VIDEOS                                       */}
+      {/* ================================================================= */}
+      {videos.filter(v => v.is_featured).length > 0 && (
+        <motion.section variants={itemVariants} className="px-4 pb-2">
+          <div className="mb-3">
+            <h2 className="text-base font-bold text-[#1B2A4A]">Training &amp; Resources</h2>
+            <p className="text-xs text-gray-500 mt-0.5">Watch tutorials and success stories from the AFU community</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            {videos.filter(v => v.is_featured).slice(0, 3).map((video, idx) => (
+              <VideoCard
+                key={idx}
+                title={video.title}
+                duration={video.duration || ''}
+                thumbnailUrl={video.thumbnail || 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&h=400&fit=crop'}
+                videoUrl={video.url}
+                size="small"
+              />
+            ))}
+          </div>
+          <Link
+            href="/farm/training"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#5DB347] hover:text-[#449933] mt-3 transition-colors"
+          >
+            View All Videos <ArrowRight size={12} />
+          </Link>
+        </motion.section>
+      )}
 
       {/* ================================================================= */}
       {/* 7. AI TIP OF THE DAY                                              */}
