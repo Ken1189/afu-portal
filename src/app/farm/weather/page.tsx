@@ -91,6 +91,10 @@ const COUNTRY_COORDS: Record<string, { lat: number; lng: number; city: string }>
   MZ: { lat: -25.97, lng: 32.57, city: 'Maputo' },
   Botswana: { lat: -24.65, lng: 25.91, city: 'Gaborone' },
   BW: { lat: -24.65, lng: 25.91, city: 'Gaborone' },
+  Ethiopia: { lat: 9.0222, lng: 38.7468, city: 'Addis Ababa' },
+  ET: { lat: 9.0222, lng: 38.7468, city: 'Addis Ababa' },
+  'Sierra Leone': { lat: 8.4657, lng: -13.2317, city: 'Freetown' },
+  SL: { lat: 8.4657, lng: -13.2317, city: 'Freetown' },
 };
 
 const DEFAULT_COORDS = { lat: -24.65, lng: 25.91, city: 'Gaborone' };

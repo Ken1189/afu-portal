@@ -44,16 +44,58 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 };
 
 const SEED_DATA: ProductCategory[] = [
-  { name: 'Seeds & Seedlings', description: 'Crop seeds, seedlings, and planting materials', icon: 'Sprout', is_active: true },
+  // Crops & Seeds
+  { name: 'Seeds', description: 'Crop seeds and planting materials', icon: 'Sprout', is_active: true },
+  { name: 'Seedlings & Nursery', description: 'Seedlings, transplants, and nursery stock', icon: 'Sprout', is_active: true },
+  { name: 'Grain & Cereals', description: 'Maize, wheat, sorghum, millet, rice', icon: 'Sprout', is_active: true },
+  { name: 'Oilseeds', description: 'Sunflower, soya, groundnuts, sesame', icon: 'Sprout', is_active: true },
+  { name: 'Pulses & Legumes', description: 'Beans, cowpeas, chickpeas, lentils', icon: 'Sprout', is_active: true },
+  { name: 'Vegetables', description: 'Fresh vegetable seeds and transplants', icon: 'Sprout', is_active: true },
+  { name: 'Fruit & Orchards', description: 'Fruit trees, vines, and berry plants', icon: 'Sprout', is_active: true },
+  { name: 'Herbs & Spices', description: 'Culinary and medicinal herbs, spices', icon: 'Sprout', is_active: true },
+  { name: 'Flowers & Floriculture', description: 'Cut flowers, ornamental plants', icon: 'Sprout', is_active: true },
+  { name: 'Coffee & Tea', description: 'Coffee and tea planting materials', icon: 'Sprout', is_active: true },
+  { name: 'Nuts & Kernels', description: 'Macadamia, cashew, pecan', icon: 'Sprout', is_active: true },
+  // Inputs & Chemicals
   { name: 'Fertilisers', description: 'Organic and chemical fertilisers for crop nutrition', icon: 'Droplets', is_active: true },
-  { name: 'Pesticides & Herbicides', description: 'Pest and weed control products', icon: 'Bug', is_active: true },
-  { name: 'Farm Equipment', description: 'Tractors, ploughs, and large farming machinery', icon: 'Tractor', is_active: true },
+  { name: 'Pesticides', description: 'Insecticides and pest control products', icon: 'Bug', is_active: true },
+  { name: 'Herbicides', description: 'Weed control products', icon: 'Bug', is_active: true },
+  { name: 'Fungicides', description: 'Fungal disease control products', icon: 'Bug', is_active: true },
+  { name: 'Biological Inputs', description: 'Bio-pesticides, bio-fertilisers, beneficial insects', icon: 'Bug', is_active: true },
+  { name: 'Soil Amendments & Compost', description: 'Lime, gypsum, compost, mulch', icon: 'Droplets', is_active: true },
+  // Livestock & Animal
   { name: 'Animal Feed', description: 'Feed and supplements for livestock', icon: 'Beef', is_active: true },
   { name: 'Veterinary Products', description: 'Animal health and veterinary medicines', icon: 'Stethoscope', is_active: true },
-  { name: 'Irrigation Systems', description: 'Drip, sprinkler, and irrigation equipment', icon: 'CloudRain', is_active: true },
-  { name: 'Packaging Materials', description: 'Bags, crates, and packaging for produce', icon: 'BoxIcon', is_active: true },
-  { name: 'Farm Tools', description: 'Hand tools, hoes, shovels, and small implements', icon: 'Wrench', is_active: true },
-  { name: 'Safety Equipment', description: 'Protective gear and safety supplies', icon: 'HardHat', is_active: true },
+  { name: 'Livestock & Genetics', description: 'Breeding stock, semen, embryos', icon: 'Beef', is_active: true },
+  { name: 'Poultry', description: 'Day-old chicks, layers, broilers, feed', icon: 'Beef', is_active: true },
+  { name: 'Aquaculture & Fisheries', description: 'Fish fingerlings, pond equipment, feed', icon: 'Droplets', is_active: true },
+  { name: 'Dairy', description: 'Dairy equipment, cultures, supplies', icon: 'Beef', is_active: true },
+  { name: 'Beekeeping & Honey', description: 'Hives, extractors, bee suits', icon: 'Beef', is_active: true },
+  // Equipment & Machinery
+  { name: 'Farm Equipment & Machinery', description: 'Tractors, ploughs, harvesters', icon: 'Tractor', is_active: true },
+  { name: 'Irrigation Systems', description: 'Drip, sprinkler, and pivot irrigation', icon: 'CloudRain', is_active: true },
+  { name: 'Hand Tools & Implements', description: 'Hoes, shovels, machetes, shears', icon: 'Wrench', is_active: true },
+  { name: 'Spare Parts & Accessories', description: 'Replacement parts for farm machinery', icon: 'Wrench', is_active: true },
+  { name: 'Solar & Renewable Energy', description: 'Solar pumps, panels, battery systems', icon: 'Wrench', is_active: true },
+  { name: 'Greenhouses & Tunnels', description: 'Shade nets, poly tunnels, greenhouses', icon: 'BoxIcon', is_active: true },
+  { name: 'Drones & Precision Ag', description: 'Drones, sensors, GPS guidance', icon: 'Tractor', is_active: true },
+  // Processing & Post-Harvest
+  { name: 'Processing Equipment', description: 'Mills, presses, graders, sorters', icon: 'Tractor', is_active: true },
+  { name: 'Packaging Materials', description: 'Bags, crates, labels, shrink wrap', icon: 'BoxIcon', is_active: true },
+  { name: 'Storage & Silos', description: 'Grain bins, hermetic bags, silos', icon: 'BoxIcon', is_active: true },
+  { name: 'Cold Chain & Refrigeration', description: 'Cold rooms, refrigerated transport', icon: 'BoxIcon', is_active: true },
+  { name: 'Milling & Extraction', description: 'Flour mills, oil presses, juice extractors', icon: 'Tractor', is_active: true },
+  { name: 'Drying & Curing', description: 'Solar dryers, dehydrators, curing sheds', icon: 'Wrench', is_active: true },
+  // Technology & Services
+  { name: 'AgriTech & IoT', description: 'Smart sensors, weather stations, IoT devices', icon: 'Wrench', is_active: true },
+  { name: 'Farm Software & Apps', description: 'Farm management, ERP, record-keeping', icon: 'Wrench', is_active: true },
+  { name: 'Lab Testing & Soil Analysis', description: 'Soil, water, feed testing services', icon: 'Stethoscope', is_active: true },
+  { name: 'Training & Consulting', description: 'Agronomy, business planning, workshops', icon: 'HardHat', is_active: true },
+  { name: 'Safety Equipment', description: 'Protective gear, PPE, safety supplies', icon: 'HardHat', is_active: true },
+  { name: 'Logistics & Transport', description: 'Delivery, freight, farm-to-market transport', icon: 'Tractor', is_active: true },
+  { name: 'Insurance Products', description: 'Crop insurance, livestock insurance', icon: 'HardHat', is_active: true },
+  // Enterprise
+  { name: 'Enterprise (Custom)', description: 'Custom or bespoke product — contact supplier for details', icon: 'Package', is_active: true },
 ];
 
 const CONFIG_KEY = 'product_categories';

@@ -13,6 +13,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { ToastProvider } from "@/components/ui/Toast";
 import ChatWidget from "@/components/chat/ChatWidget";
 import ImpersonationBanner from "@/components/ui/ImpersonationBanner";
+import ReferralTracker from "@/components/ReferralTracker";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -103,6 +104,7 @@ export default function RootLayout({
           <ToastProvider>
           <ImpersonationBanner />
           <WebVitals />
+          <ReferralTracker />
           <ServiceWorkerRegister />
           <AnnouncementBanner />
           <SiteNavbar />

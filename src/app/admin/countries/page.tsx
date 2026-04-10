@@ -55,6 +55,8 @@ interface Country {
   key_programs?: string;
   contact_email?: string;
   country_image_url?: string;
+  team_name?: string;
+  team_lead?: string;
 }
 
 interface CountryFormData {
@@ -68,6 +70,8 @@ interface CountryFormData {
   key_programs: string;
   contact_email: string;
   country_image_url: string;
+  team_name: string;
+  team_lead: string;
 }
 
 const EMPTY_FORM: CountryFormData = {
@@ -81,6 +85,8 @@ const EMPTY_FORM: CountryFormData = {
   key_programs: '',
   contact_email: '',
   country_image_url: '',
+  team_name: '',
+  team_lead: '',
 };
 
 // ── Mock Data ──
@@ -214,6 +220,23 @@ function CountryModal({
               className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-[#1B2A4A] text-sm placeholder:text-gray-400 focus:border-[#5DB347] focus:outline-none" />
           </div>
 
+          {/* ── Country Team Section ── */}
+          <div className="border-t border-gray-200 pt-4 mt-2">
+            <p className="text-xs font-semibold text-[#1B2A4A] uppercase tracking-wider mb-3">Country Team</p>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">Team Name</label>
+                <input value={form.team_name} onChange={(e) => onChange({ ...form, team_name: e.target.value })} placeholder="AFU Zimbabwe"
+                  className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-[#1B2A4A] text-sm placeholder:text-gray-400 focus:border-[#5DB347] focus:outline-none" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">Team Lead</label>
+                <input value={form.team_lead} onChange={(e) => onChange({ ...form, team_lead: e.target.value })} placeholder="Full name"
+                  className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-[#1B2A4A] text-sm placeholder:text-gray-400 focus:border-[#5DB347] focus:outline-none" />
+              </div>
+            </div>
+          </div>
+
           <div>
             <label className="block text-sm font-medium text-gray-600 mb-1">Contact Email</label>
             <input type="email" value={form.contact_email} onChange={(e) => onChange({ ...form, contact_email: e.target.value })} placeholder="admin@africanfarmingunion.org"
@@ -281,6 +304,8 @@ export default function CountriesPage() {
                 key_programs: (setting.key_programs as string) || c.key_programs,
                 contact_email: (setting.contact_email as string) || c.contact_email,
                 country_image_url: (setting.country_image_url as string) || c.country_image_url,
+                team_name: (setting.team_name as string) || c.team_name,
+                team_lead: (setting.team_lead as string) || c.team_lead,
                 status: (setting.status as CountryStatus) || c.status,
               };
             }
@@ -358,6 +383,8 @@ export default function CountriesPage() {
       key_programs: country.key_programs || '',
       contact_email: country.contact_email || '',
       country_image_url: country.country_image_url || '',
+      team_name: country.team_name || '',
+      team_lead: country.team_lead || '',
     });
     setShowModal(true);
   };
@@ -387,6 +414,8 @@ export default function CountriesPage() {
       key_programs: formData.key_programs || null,
       contact_email: formData.contact_email || null,
       country_image_url: formData.country_image_url || null,
+      team_name: formData.team_name || null,
+      team_lead: formData.team_lead || null,
       payment_providers: existing?.paymentProviders || [],
       languages: existing?.languages || [],
     };
@@ -403,7 +432,7 @@ export default function CountriesPage() {
         setCountries((prev) =>
           prev.map((c) =>
             c.iso === editingIso
-              ? { ...c, flag: formData.flag || c.flag, currency: formData.currency || c.currency, status: formData.status, description: formData.description, key_crops: formData.key_crops, key_programs: formData.key_programs, contact_email: formData.contact_email, country_image_url: formData.country_image_url }
+              ? { ...c, flag: formData.flag || c.flag, currency: formData.currency || c.currency, status: formData.status, description: formData.description, key_crops: formData.key_crops, key_programs: formData.key_programs, contact_email: formData.contact_email, country_image_url: formData.country_image_url, team_name: formData.team_name, team_lead: formData.team_lead }
               : c
           )
         );
@@ -428,6 +457,8 @@ export default function CountriesPage() {
             key_programs: formData.key_programs,
             contact_email: formData.contact_email,
             country_image_url: formData.country_image_url,
+            team_name: formData.team_name,
+            team_lead: formData.team_lead,
           },
         ]);
         setToast({ message: 'Country added', type: 'success' });
@@ -548,6 +579,24 @@ export default function CountriesPage() {
                     <p className="text-[10px] text-gray-400 uppercase tracking-wider">Revenue</p>
                   </div>
                 </div>
+
+                {/* Country Team */}
+                {(country.team_name || country.team_lead || country.contact_email) && (
+                  <div className="mb-3 p-2.5 bg-[#1B2A4A]/5 rounded-lg border border-[#1B2A4A]/10">
+                    <p className="text-[10px] text-gray-400 uppercase tracking-wider mb-1.5 flex items-center gap-1">
+                      <Users className="w-3 h-3" /> Country Team
+                    </p>
+                    {country.team_name && (
+                      <p className="text-xs font-semibold text-[#1B2A4A]">{country.team_name}</p>
+                    )}
+                    {country.team_lead && (
+                      <p className="text-xs text-gray-500 mt-0.5">Lead: <span className="text-[#1B2A4A] font-medium">{country.team_lead}</span></p>
+                    )}
+                    {country.contact_email && (
+                      <p className="text-xs text-[#5DB347] mt-0.5">{country.contact_email}</p>
+                    )}
+                  </div>
+                )}
 
                 {/* Key Crops */}
                 {country.key_crops && (

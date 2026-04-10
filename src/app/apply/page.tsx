@@ -103,14 +103,15 @@ export default function ApplyPage() {
     }
   }, [tierParam]);
 
-  // Capture referral code from URL
+  // Capture referral code from URL or localStorage (set globally by ReferralTracker)
   useEffect(() => {
     if (refCode) {
       setReferredBy(refCode);
-      // Store in sessionStorage so it persists through the form
-      sessionStorage.setItem("afu_referral_code", refCode);
+      localStorage.setItem("afu_referral_code", refCode);
+      localStorage.setItem("afu_referral_ts", Date.now().toString());
     } else {
-      const stored = sessionStorage.getItem("afu_referral_code");
+      // Check localStorage first (global tracker), then sessionStorage (legacy)
+      const stored = localStorage.getItem("afu_referral_code") || sessionStorage.getItem("afu_referral_code");
       if (stored) setReferredBy(stored);
     }
   }, [refCode]);
@@ -139,7 +140,7 @@ export default function ApplyPage() {
       }
     }
 
-    const storedRef = referredBy || referralInput || sessionStorage.getItem("afu_referral_code") || undefined;
+    const storedRef = referredBy || referralInput || localStorage.getItem("afu_referral_code") || sessionStorage.getItem("afu_referral_code") || undefined;
 
     // Submit to Supabase — include about and referral_code
     const { error } = await submitApplication({
@@ -172,6 +173,9 @@ export default function ApplyPage() {
             referral_code: storedRef,
           }),
         }).catch(() => {}); // Fire and forget
+        // Clear referral code from all storage after successful submission
+        localStorage.removeItem("afu_referral_code");
+        localStorage.removeItem("afu_referral_ts");
         sessionStorage.removeItem("afu_referral_code");
       }
 

@@ -43,6 +43,8 @@ interface FormData {
   discount_value: string;
   currency: string;
   applies_to: string;
+  specific_member_id: string;
+  specific_member_name: string;
   max_uses: string;
   min_amount: string;
   starts_at: string;
@@ -57,6 +59,8 @@ const emptyForm: FormData = {
   discount_value: '10',
   currency: 'USD',
   applies_to: 'all',
+  specific_member_id: '',
+  specific_member_name: '',
   max_uses: '',
   min_amount: '0',
   starts_at: new Date().toISOString().slice(0, 16),
@@ -65,13 +69,29 @@ const emptyForm: FormData = {
 };
 
 const APPLIES_OPTIONS = [
-  { value: 'all', label: 'Everyone' },
-  { value: 'farmer', label: 'Farmers' },
-  { value: 'supplier', label: 'Suppliers' },
-  { value: 'ambassador', label: 'Ambassadors' },
-  { value: 'investor', label: 'Investors' },
-  { value: 'membership', label: 'Memberships' },
-  { value: 'subscription', label: 'Subscriptions' },
+  // General
+  { value: 'all', label: 'Everyone', group: 'General' },
+  // By Role
+  { value: 'farmer', label: 'Farmers', group: 'By Role' },
+  { value: 'supplier', label: 'Suppliers', group: 'By Role' },
+  { value: 'ambassador', label: 'Ambassadors', group: 'By Role' },
+  { value: 'investor', label: 'Investors', group: 'By Role' },
+  // Membership & Billing
+  { value: 'membership', label: 'Memberships', group: 'Membership & Billing' },
+  { value: 'subscription', label: 'Subscriptions', group: 'Membership & Billing' },
+  // Enterprise & Co-op
+  { value: 'enterprise', label: 'Enterprise Accounts', group: 'Enterprise & Co-op' },
+  { value: 'cooperative', label: 'Cooperatives', group: 'Enterprise & Co-op' },
+  { value: 'bulk-order', label: 'Bulk Orders', group: 'Enterprise & Co-op' },
+  // Special Offers
+  { value: 'marketing', label: 'Marketing Campaign', group: 'Special Offers' },
+  { value: 'referral', label: 'Referral Reward', group: 'Special Offers' },
+  { value: 'launch', label: 'Launch Promotion', group: 'Special Offers' },
+  { value: 'seasonal', label: 'Seasonal Offer', group: 'Special Offers' },
+  { value: 'loyalty', label: 'Loyalty Reward', group: 'Special Offers' },
+  { value: 'partner', label: 'Partner Exclusive', group: 'Special Offers' },
+  // Specific Member
+  { value: 'specific-member', label: 'Specific Member Only', group: 'Targeted' },
 ];
 
 function generateCode(): string {
@@ -79,6 +99,12 @@ function generateCode(): string {
   let code = 'AFU-';
   for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
   return code;
+}
+
+interface MemberResult {
+  id: string;
+  full_name: string | null;
+  email: string | null;
 }
 
 export default function PromoCodesPage() {
@@ -90,6 +116,7 @@ export default function PromoCodesPage() {
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<FormData>(emptyForm);
+  const [memberResults, setMemberResults] = useState<MemberResult[]>([]);
   const [viewRedemptions, setViewRedemptions] = useState<string | null>(null);
   const [redemptions, setRedemptions] = useState<Redemption[]>([]);
   const [loadingRedemptions, setLoadingRedemptions] = useState(false);
@@ -137,7 +164,7 @@ export default function PromoCodesPage() {
   const handleSave = async () => {
     if (!form.code.trim()) { flash('error', 'Code is required'); return; }
     setSaving(true);
-    const payload = {
+    const payload: Record<string, unknown> = {
       code: form.code.toUpperCase().trim(),
       description: form.description || null,
       discount_type: form.discount_type,
@@ -149,6 +176,7 @@ export default function PromoCodesPage() {
       starts_at: form.starts_at || null,
       expires_at: form.expires_at || null,
       is_active: form.is_active,
+      specific_member_id: form.applies_to === 'specific-member' ? (form.specific_member_id || null) : null,
     };
 
     let error;
@@ -206,6 +234,8 @@ export default function PromoCodesPage() {
       discount_value: String(c.discount_value),
       currency: c.currency,
       applies_to: c.applies_to,
+      specific_member_id: (c as unknown as Record<string, unknown>).specific_member_id as string || '',
+      specific_member_name: '',
       max_uses: c.max_uses != null ? String(c.max_uses) : '',
       min_amount: String(c.min_amount),
       starts_at: c.starts_at ? c.starts_at.slice(0, 16) : '',
@@ -508,14 +538,79 @@ export default function PromoCodesPage() {
                 <label className="block text-xs font-medium text-gray-600 mb-1">Applies To</label>
                 <select
                   value={form.applies_to}
-                  onChange={(e) => setForm({ ...form, applies_to: e.target.value })}
+                  onChange={(e) => setForm({ ...form, applies_to: e.target.value, specific_member_id: '', specific_member_name: '' })}
                   className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-teal/30 focus:border-teal outline-none"
                 >
-                  {APPLIES_OPTIONS.map((o) => (
-                    <option key={o.value} value={o.value}>{o.label}</option>
-                  ))}
+                  {(() => {
+                    const groups = [...new Set(APPLIES_OPTIONS.map((o) => o.group))];
+                    return groups.map((g) => (
+                      <optgroup key={g} label={g}>
+                        {APPLIES_OPTIONS.filter((o) => o.group === g).map((o) => (
+                          <option key={o.value} value={o.value}>{o.label}</option>
+                        ))}
+                      </optgroup>
+                    ));
+                  })()}
                 </select>
               </div>
+
+              {/* Specific member search — only shown when "specific-member" is selected */}
+              {form.applies_to === 'specific-member' && (
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Search Member</label>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Type name or email to search..."
+                      value={form.specific_member_name || ''}
+                      onChange={async (e) => {
+                        const q = e.target.value;
+                        setForm({ ...form, specific_member_name: q, specific_member_id: '' });
+                        if (q.length < 2) { setMemberResults([]); return; }
+                        const { data } = await supabase
+                          .from('profiles')
+                          .select('id, full_name, email')
+                          .or(`full_name.ilike.%${q}%,email.ilike.%${q}%`)
+                          .limit(8);
+                        setMemberResults((data || []) as MemberResult[]);
+                      }}
+                      className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-teal/30 focus:border-teal outline-none"
+                    />
+                  </div>
+                  {memberResults.length > 0 && !form.specific_member_id && (
+                    <div className="mt-1 border border-gray-200 rounded-xl overflow-hidden bg-white shadow-lg max-h-48 overflow-y-auto">
+                      {memberResults.map((m) => (
+                        <button
+                          key={m.id}
+                          type="button"
+                          onClick={() => {
+                            setForm({ ...form, specific_member_id: m.id, specific_member_name: `${m.full_name || 'No name'} (${m.email})` });
+                            setMemberResults([]);
+                          }}
+                          className="w-full text-left px-4 py-2.5 hover:bg-teal/5 text-sm border-b border-gray-50 last:border-0"
+                        >
+                          <span className="font-medium text-navy">{m.full_name || 'No name'}</span>
+                          <span className="text-gray-400 ml-2 text-xs">{m.email}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  {form.specific_member_id && (
+                    <div className="mt-2 flex items-center gap-2 bg-teal/5 border border-teal/20 rounded-xl px-3 py-2 text-sm">
+                      <Users className="w-4 h-4 text-teal" />
+                      <span className="font-medium text-navy flex-1">{form.specific_member_name}</span>
+                      <button
+                        type="button"
+                        onClick={() => setForm({ ...form, specific_member_id: '', specific_member_name: '' })}
+                        className="text-gray-400 hover:text-red-500"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Max uses + Min amount */}
               <div className="grid grid-cols-2 gap-3">

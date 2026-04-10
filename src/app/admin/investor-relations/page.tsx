@@ -22,6 +22,9 @@ import {
   X,
   Target,
   Megaphone,
+  Plus,
+  Pencil,
+  Trash2,
 } from 'lucide-react';
 import { SectionTabs } from '@/components/admin/SectionTabs';
 
@@ -200,6 +203,23 @@ export default function InvestorRelationsPage() {
   const [dbExpressions, setDbExpressions] = useState<Expression[]>([]);
   const [dbLoading, setDbLoading] = useState(true);
 
+  // ── CRUD Modal State ────────────────────────────────────────────────────────
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingExpr, setEditingExpr] = useState<Expression | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const emptyForm = {
+    investorName: '',
+    entityName: '',
+    email: '',
+    phone: '',
+    opportunity: '',
+    amount: 0,
+    status: 'Pending' as ExpressionStatus,
+    notes: '',
+  };
+  const [formData, setFormData] = useState(emptyForm);
+
   useEffect(() => {
     const supabase = createClient();
     async function fetchInterests() {
@@ -264,9 +284,129 @@ export default function InvestorRelationsPage() {
 
   const getStatus = (e: Expression): ExpressionStatus => localStatuses[e.id] || e.status;
 
-  const handleStatusChange = (id: string, newStatus: ExpressionStatus) => {
+  const handleStatusChange = async (id: string, newStatus: ExpressionStatus) => {
     setLocalStatuses((prev) => ({ ...prev, [id]: newStatus }));
     setStatusEditing(null);
+    // Persist status to DB
+    const supabase = createClient();
+    await supabase
+      .from('investor_interests')
+      .update({ status: newStatus.toLowerCase() })
+      .eq('id', id);
+  };
+
+  // ── CRUD Handlers ──────────────────────────────────────────────────────────
+  const openCreateModal = () => {
+    setEditingExpr(null);
+    setFormData(emptyForm);
+    setModalOpen(true);
+  };
+
+  const openEditModal = (expr: Expression) => {
+    setEditingExpr(expr);
+    setFormData({
+      investorName: expr.investorName,
+      entityName: expr.entityName,
+      email: expr.email,
+      phone: expr.phone,
+      opportunity: expr.opportunity,
+      amount: expr.amount,
+      status: getStatus(expr),
+      notes: expr.notes,
+    });
+    setModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+    setEditingExpr(null);
+    setFormData(emptyForm);
+  };
+
+  const handleFormChange = (field: string, value: string | number) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    const supabase = createClient();
+    const dbRow = {
+      investor_name: formData.investorName,
+      entity_name: formData.entityName,
+      email: formData.email,
+      phone: formData.phone,
+      opportunity: formData.opportunity,
+      amount: formData.amount,
+      status: formData.status.toLowerCase(),
+      notes: formData.notes,
+    };
+
+    try {
+      if (editingExpr) {
+        // UPDATE
+        const { error } = await supabase
+          .from('investor_interests')
+          .update(dbRow)
+          .eq('id', editingExpr.id);
+        if (!error) {
+          setDbExpressions((prev) =>
+            prev.map((e) =>
+              e.id === editingExpr.id
+                ? { ...e, ...formData, status: formData.status }
+                : e
+            )
+          );
+          // Sync localStatuses too
+          setLocalStatuses((prev) => {
+            const next = { ...prev };
+            delete next[editingExpr.id];
+            return next;
+          });
+        }
+      } else {
+        // INSERT
+        const { data, error } = await supabase
+          .from('investor_interests')
+          .insert(dbRow)
+          .select()
+          .single();
+        if (!error && data) {
+          const newExpr: Expression = {
+            id: data.id,
+            date: (data.created_at || new Date().toISOString()).slice(0, 10),
+            investorName: formData.investorName,
+            entityName: formData.entityName,
+            email: formData.email,
+            phone: formData.phone,
+            opportunity: formData.opportunity,
+            amount: formData.amount,
+            status: formData.status,
+            notes: formData.notes,
+          };
+          setDbExpressions((prev) => [newExpr, ...prev]);
+        }
+      }
+    } finally {
+      setSaving(false);
+      closeModal();
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    const supabase = createClient();
+    const { error } = await supabase
+      .from('investor_interests')
+      .delete()
+      .eq('id', id);
+    if (!error) {
+      setDbExpressions((prev) => prev.filter((e) => e.id !== id));
+      setLocalStatuses((prev) => {
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      });
+    }
+    setDeleteConfirmId(null);
   };
 
   return (
@@ -429,7 +569,16 @@ export default function InvestorRelationsPage() {
           <h2 className="text-sm font-semibold text-[#1B2A4A]">
             Expressions of Interest
           </h2>
-          <span className="text-xs text-gray-400">{filtered.length} results</span>
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-gray-400">{filtered.length} results</span>
+            <button
+              onClick={openCreateModal}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-[#5DB347] text-white rounded-lg hover:bg-[#4A9A38] transition-colors"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              Create Expression
+            </button>
+          </div>
         </div>
 
         {/* Desktop Table */}
@@ -532,6 +681,13 @@ export default function InvestorRelationsPage() {
                           >
                             <Eye className="w-4 h-4" />
                           </button>
+                          <button
+                            onClick={() => openEditModal(expr)}
+                            className="p-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-400 hover:text-[#1B2A4A]"
+                            title="Edit"
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </button>
                           <a
                             href={`mailto:${expr.email}?subject=Re: ${expr.opportunity} Investment Interest`}
                             className="p-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-400 hover:text-[#1B2A4A]"
@@ -539,6 +695,30 @@ export default function InvestorRelationsPage() {
                           >
                             <Send className="w-4 h-4" />
                           </a>
+                          {deleteConfirmId === expr.id ? (
+                            <div className="flex items-center gap-1 ml-1">
+                              <button
+                                onClick={() => handleDelete(expr.id)}
+                                className="px-2 py-1 text-xs font-medium bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                              >
+                                Confirm
+                              </button>
+                              <button
+                                onClick={() => setDeleteConfirmId(null)}
+                                className="px-2 py-1 text-xs font-medium bg-gray-200 text-gray-600 rounded-lg hover:bg-gray-300 transition-colors"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => setDeleteConfirmId(expr.id)}
+                              className="p-2 rounded-lg hover:bg-red-50 transition-colors text-gray-400 hover:text-red-600"
+                              title="Delete"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -656,12 +836,43 @@ export default function InvestorRelationsPage() {
                         <Eye className="w-4 h-4" />
                       )}
                     </button>
+                    <button
+                      onClick={() => openEditModal(expr)}
+                      className="p-2 rounded-lg hover:bg-gray-100 text-gray-400"
+                      title="Edit"
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </button>
                     <a
                       href={`mailto:${expr.email}`}
                       className="p-2 rounded-lg hover:bg-gray-100 text-gray-400"
                     >
                       <Send className="w-4 h-4" />
                     </a>
+                    {deleteConfirmId === expr.id ? (
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => handleDelete(expr.id)}
+                          className="px-2 py-1 text-xs font-medium bg-red-600 text-white rounded-lg"
+                        >
+                          Confirm
+                        </button>
+                        <button
+                          onClick={() => setDeleteConfirmId(null)}
+                          className="px-2 py-1 text-xs font-medium bg-gray-200 text-gray-600 rounded-lg"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setDeleteConfirmId(expr.id)}
+                        className="p-2 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-600"
+                        title="Delete"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
                 </div>
                 {isExpanded && (
@@ -691,6 +902,181 @@ export default function InvestorRelationsPage() {
           </div>
         )}
       </motion.div>
+
+      {/* ── Create / Edit Modal ──────────────────────────────────────────────── */}
+      <AnimatePresence>
+        {modalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+            onClick={closeModal}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 28 }}
+              className="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Modal Header */}
+              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                <h3 className="text-lg font-bold text-[#1B2A4A]">
+                  {editingExpr ? 'Edit Expression' : 'Create Expression'}
+                </h3>
+                <button
+                  onClick={closeModal}
+                  className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-[#1B2A4A] transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Modal Body */}
+              <div className="px-6 py-5 space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+                      Investor Name
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.investorName}
+                      onChange={(e) => handleFormChange('investorName', e.target.value)}
+                      className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347] text-[#1B2A4A]"
+                      placeholder="John Smith"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+                      Entity Name
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.entityName}
+                      onChange={(e) => handleFormChange('entityName', e.target.value)}
+                      className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347] text-[#1B2A4A]"
+                      placeholder="Acme Capital"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => handleFormChange('email', e.target.value)}
+                      className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347] text-[#1B2A4A]"
+                      placeholder="investor@example.com"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+                      Phone
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.phone}
+                      onChange={(e) => handleFormChange('phone', e.target.value)}
+                      className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347] text-[#1B2A4A]"
+                      placeholder="+1 555 000 0000"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+                      Opportunity
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.opportunity}
+                      onChange={(e) => handleFormChange('opportunity', e.target.value)}
+                      className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347] text-[#1B2A4A]"
+                      placeholder="AFU Debt Fund II"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+                      Amount ($)
+                    </label>
+                    <input
+                      type="number"
+                      value={formData.amount || ''}
+                      onChange={(e) => handleFormChange('amount', Number(e.target.value) || 0)}
+                      className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347] text-[#1B2A4A]"
+                      placeholder="250000"
+                      min={0}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+                    Status
+                  </label>
+                  <select
+                    value={formData.status}
+                    onChange={(e) => handleFormChange('status', e.target.value)}
+                    className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347] text-[#1B2A4A] bg-white"
+                  >
+                    <option value="Pending">Pending</option>
+                    <option value="In Discussion">In Discussion</option>
+                    <option value="Committed">Committed</option>
+                    <option value="Declined">Declined</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+                    Notes
+                  </label>
+                  <textarea
+                    value={formData.notes}
+                    onChange={(e) => handleFormChange('notes', e.target.value)}
+                    rows={3}
+                    className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347] text-[#1B2A4A] resize-none"
+                    placeholder="Additional notes..."
+                  />
+                </div>
+              </div>
+
+              {/* Modal Footer */}
+              <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100">
+                <button
+                  onClick={closeModal}
+                  className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSave}
+                  disabled={saving || !formData.investorName.trim()}
+                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-[#5DB347] rounded-xl hover:bg-[#4A9A38] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {saving ? (
+                    <>
+                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Saving...
+                    </>
+                  ) : editingExpr ? (
+                    'Save Changes'
+                  ) : (
+                    'Create Expression'
+                  )}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

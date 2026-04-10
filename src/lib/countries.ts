@@ -28,7 +28,7 @@ export interface Country {
   currencySymbol: string;  // display symbol
   phoneCode: string;       // international dial code e.g. "+254"
   region: CountryRegion;
-  isAfuOperating: boolean; // part of the 11 AFU operating countries
+  isAfuOperating: boolean; // part of the 12 AFU operating countries
 }
 
 // ============================================================================
@@ -36,7 +36,7 @@ export interface Country {
 // ============================================================================
 
 export const COUNTRY_DATA: Country[] = [
-  // ─── AFU operating (11) ───
+  // ─── AFU operating (12) ───
   { name: 'Zimbabwe',     code: 'ZW', code3: 'ZWE', flag: '🇿🇼', currency: 'USD', currencySymbol: '$',   phoneCode: '+263', region: 'Southern Africa', isAfuOperating: true },
   { name: 'Botswana',     code: 'BW', code3: 'BWA', flag: '🇧🇼', currency: 'BWP', currencySymbol: 'P',   phoneCode: '+267', region: 'Southern Africa', isAfuOperating: true },
   { name: 'Kenya',        code: 'KE', code3: 'KEN', flag: '🇰🇪', currency: 'KES', currencySymbol: 'KSh', phoneCode: '+254', region: 'East Africa',     isAfuOperating: true },
@@ -48,6 +48,7 @@ export const COUNTRY_DATA: Country[] = [
   { name: 'Zambia',       code: 'ZM', code3: 'ZMB', flag: '🇿🇲', currency: 'ZMW', currencySymbol: 'K',   phoneCode: '+260', region: 'Southern Africa', isAfuOperating: true },
   { name: 'Mozambique',   code: 'MZ', code3: 'MOZ', flag: '🇲🇿', currency: 'MZN', currencySymbol: 'MT',  phoneCode: '+258', region: 'Southern Africa', isAfuOperating: true },
   { name: 'Ethiopia',     code: 'ET', code3: 'ETH', flag: '🇪🇹', currency: 'ETB', currencySymbol: 'Br',  phoneCode: '+251', region: 'East Africa',     isAfuOperating: true },
+  { name: 'Sierra Leone', code: 'SL', code3: 'SLE', flag: '🇸🇱', currency: 'SLE', currencySymbol: 'Le',  phoneCode: '+232', region: 'West Africa',     isAfuOperating: true },
 
   // ─── Rest of Africa ───
   { name: 'Algeria',                  code: 'DZ', code3: 'DZA', flag: '🇩🇿', currency: 'DZD', currencySymbol: 'د.ج', phoneCode: '+213', region: 'North Africa',    isAfuOperating: false },
@@ -86,7 +87,6 @@ export const COUNTRY_DATA: Country[] = [
   { name: 'Rwanda',                   code: 'RW', code3: 'RWA', flag: '🇷🇼', currency: 'RWF', currencySymbol: 'FRw', phoneCode: '+250', region: 'East Africa',     isAfuOperating: false },
   { name: 'Senegal',                  code: 'SN', code3: 'SEN', flag: '🇸🇳', currency: 'XOF', currencySymbol: 'CFA', phoneCode: '+221', region: 'West Africa',     isAfuOperating: false },
   { name: 'Seychelles',               code: 'SC', code3: 'SYC', flag: '🇸🇨', currency: 'SCR', currencySymbol: '₨',   phoneCode: '+248', region: 'East Africa',     isAfuOperating: false },
-  { name: 'Sierra Leone',             code: 'SL', code3: 'SLE', flag: '🇸🇱', currency: 'SLE', currencySymbol: 'Le',  phoneCode: '+232', region: 'West Africa',     isAfuOperating: false },
   { name: 'Somalia',                  code: 'SO', code3: 'SOM', flag: '🇸🇴', currency: 'SOS', currencySymbol: 'Sh',  phoneCode: '+252', region: 'East Africa',     isAfuOperating: false },
   { name: 'South Sudan',              code: 'SS', code3: 'SSD', flag: '🇸🇸', currency: 'SSP', currencySymbol: '£',   phoneCode: '+211', region: 'East Africa',     isAfuOperating: false },
   { name: 'Sudan',                    code: 'SD', code3: 'SDN', flag: '🇸🇩', currency: 'SDG', currencySymbol: '£',   phoneCode: '+249', region: 'North Africa',    isAfuOperating: false },

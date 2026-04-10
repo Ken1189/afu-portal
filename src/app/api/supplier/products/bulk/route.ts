@@ -38,7 +38,18 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate & map
-    const validCategories = ['input-supplier', 'equipment', 'logistics', 'processing', 'technology', 'financial-services'];
+    const validCategories = [
+      // Legacy supplier types (still accepted)
+      'input-supplier', 'equipment', 'logistics', 'processing', 'technology', 'financial-services',
+      // Expanded product categories
+      'seeds', 'seedlings', 'grain', 'oilseeds', 'pulses', 'vegetables', 'fruit', 'herbs-spices', 'flowers', 'fodder', 'tobacco', 'cotton', 'coffee-tea', 'nuts',
+      'fertilizer', 'pesticides', 'herbicides', 'fungicides', 'bio-inputs', 'growth-regulators', 'soil-amendments',
+      'animal-feed', 'veterinary', 'livestock', 'poultry', 'aquaculture', 'dairy', 'apiculture',
+      'irrigation', 'tools', 'spare-parts', 'solar-energy', 'greenhouses', 'drones-precision',
+      'packaging', 'storage', 'cold-chain', 'milling', 'drying-curing',
+      'software', 'lab-testing', 'training-consulting', 'insurance',
+      'enterprise',
+    ];
     const toInsert = [];
     const errors: string[] = [];
 
@@ -53,7 +64,7 @@ export async function POST(request: NextRequest) {
         errors.push(`Row ${i + 1}: invalid price "${r.price}"`);
         continue;
       }
-      const category = validCategories.includes(r.category) ? r.category : 'input-supplier';
+      const category = validCategories.includes(r.category) ? r.category : 'seeds';
       const memberPrice = r.member_price ? parseFloat(r.member_price) : null;
       const discountPercent = memberPrice && memberPrice < price
         ? Math.round(((price - memberPrice) / price) * 100 * 100) / 100

@@ -97,22 +97,54 @@ const staticMyProducts = staticProducts.filter((p) => p.supplierId === 'SUP-001'
 // ── All categories ──────────────────────────────────────────────────────────
 
 const allCategories = [
-  'seeds', 'fertilizer', 'pesticides', 'equipment', 'irrigation',
-  'technology', 'packaging', 'storage', 'tools',
+  // Crops & Seeds
+  'seeds', 'seedlings', 'grain', 'oilseeds', 'pulses', 'vegetables', 'fruit', 'herbs-spices', 'flowers', 'fodder', 'tobacco', 'cotton', 'coffee-tea', 'nuts',
+  // Inputs & Chemicals
+  'fertilizer', 'pesticides', 'herbicides', 'fungicides', 'bio-inputs', 'growth-regulators', 'soil-amendments',
+  // Livestock & Animal
+  'animal-feed', 'veterinary', 'livestock', 'poultry', 'aquaculture', 'dairy', 'apiculture',
+  // Equipment & Machinery
+  'equipment', 'irrigation', 'tools', 'spare-parts', 'solar-energy', 'greenhouses', 'drones-precision',
+  // Processing & Post-Harvest
+  'processing', 'packaging', 'storage', 'cold-chain', 'milling', 'drying-curing',
+  // Technology & Services
+  'technology', 'software', 'lab-testing', 'training-consulting', 'logistics', 'financial-services', 'insurance',
+  // Enterprise (custom)
+  'enterprise',
 ];
 
 const categoryLabels: Record<string, string> = {
-  seeds: 'Seeds', fertilizer: 'Fertilizer', pesticides: 'Pesticides',
-  equipment: 'Equipment', irrigation: 'Irrigation', technology: 'Technology',
-  packaging: 'Packaging', storage: 'Storage', tools: 'Tools',
+  // Crops & Seeds
+  seeds: 'Seeds', seedlings: 'Seedlings & Nursery', grain: 'Grain & Cereals', oilseeds: 'Oilseeds', pulses: 'Pulses & Legumes', vegetables: 'Vegetables', fruit: 'Fruit & Orchards', 'herbs-spices': 'Herbs & Spices', flowers: 'Flowers & Floriculture', fodder: 'Fodder & Pastures', tobacco: 'Tobacco', cotton: 'Cotton & Fibre', 'coffee-tea': 'Coffee & Tea', nuts: 'Nuts & Kernels',
+  // Inputs & Chemicals
+  fertilizer: 'Fertiliser', pesticides: 'Pesticides', herbicides: 'Herbicides', fungicides: 'Fungicides', 'bio-inputs': 'Biological Inputs', 'growth-regulators': 'Growth Regulators', 'soil-amendments': 'Soil Amendments & Compost',
+  // Livestock & Animal
+  'animal-feed': 'Animal Feed', veterinary: 'Veterinary Products', livestock: 'Livestock & Genetics', poultry: 'Poultry', aquaculture: 'Aquaculture & Fisheries', dairy: 'Dairy', apiculture: 'Beekeeping & Honey',
+  // Equipment & Machinery
+  equipment: 'Farm Equipment & Machinery', irrigation: 'Irrigation Systems', tools: 'Hand Tools & Implements', 'spare-parts': 'Spare Parts & Accessories', 'solar-energy': 'Solar & Renewable Energy', greenhouses: 'Greenhouses & Tunnels', 'drones-precision': 'Drones & Precision Ag',
+  // Processing & Post-Harvest
+  processing: 'Processing Equipment', packaging: 'Packaging Materials', storage: 'Storage & Silos', 'cold-chain': 'Cold Chain & Refrigeration', milling: 'Milling & Extraction', 'drying-curing': 'Drying & Curing',
+  // Technology & Services
+  technology: 'AgriTech & IoT', software: 'Farm Software & Apps', 'lab-testing': 'Lab Testing & Soil Analysis', 'training-consulting': 'Training & Consulting', logistics: 'Logistics & Transport', 'financial-services': 'Financial Services', insurance: 'Insurance Products',
+  // Enterprise
+  enterprise: 'Enterprise (Custom)',
 };
 
 const categoryColors: Record<string, string> = {
-  seeds: 'bg-green-100 text-green-700', fertilizer: 'bg-amber-100 text-amber-700',
-  pesticides: 'bg-red-100 text-red-700', equipment: 'bg-blue-100 text-blue-700',
-  irrigation: 'bg-cyan-100 text-cyan-700', technology: 'bg-purple-100 text-purple-700',
-  packaging: 'bg-orange-100 text-orange-700', storage: 'bg-slate-100 text-slate-700',
-  tools: 'bg-indigo-100 text-indigo-700',
+  // Crops & Seeds — greens
+  seeds: 'bg-green-100 text-green-700', seedlings: 'bg-green-100 text-green-700', grain: 'bg-lime-100 text-lime-700', oilseeds: 'bg-yellow-100 text-yellow-700', pulses: 'bg-emerald-100 text-emerald-700', vegetables: 'bg-green-100 text-green-800', fruit: 'bg-pink-100 text-pink-700', 'herbs-spices': 'bg-teal-100 text-teal-700', flowers: 'bg-fuchsia-100 text-fuchsia-700', fodder: 'bg-lime-100 text-lime-800', tobacco: 'bg-amber-100 text-amber-800', cotton: 'bg-gray-100 text-gray-700', 'coffee-tea': 'bg-amber-100 text-amber-700', nuts: 'bg-orange-100 text-orange-800',
+  // Inputs & Chemicals — warm tones
+  fertilizer: 'bg-amber-100 text-amber-700', pesticides: 'bg-red-100 text-red-700', herbicides: 'bg-rose-100 text-rose-700', fungicides: 'bg-orange-100 text-orange-700', 'bio-inputs': 'bg-teal-100 text-teal-700', 'growth-regulators': 'bg-violet-100 text-violet-700', 'soil-amendments': 'bg-stone-100 text-stone-700',
+  // Livestock & Animal — earthy tones
+  'animal-feed': 'bg-yellow-100 text-yellow-800', veterinary: 'bg-red-100 text-red-600', livestock: 'bg-amber-100 text-amber-800', poultry: 'bg-orange-100 text-orange-700', aquaculture: 'bg-sky-100 text-sky-700', dairy: 'bg-blue-100 text-blue-600', apiculture: 'bg-yellow-100 text-yellow-700',
+  // Equipment & Machinery — blues
+  equipment: 'bg-blue-100 text-blue-700', irrigation: 'bg-cyan-100 text-cyan-700', tools: 'bg-indigo-100 text-indigo-700', 'spare-parts': 'bg-slate-100 text-slate-700', 'solar-energy': 'bg-yellow-100 text-yellow-600', greenhouses: 'bg-emerald-100 text-emerald-600', 'drones-precision': 'bg-violet-100 text-violet-600',
+  // Processing & Post-Harvest
+  processing: 'bg-purple-100 text-purple-700', packaging: 'bg-orange-100 text-orange-700', storage: 'bg-slate-100 text-slate-700', 'cold-chain': 'bg-sky-100 text-sky-600', milling: 'bg-stone-100 text-stone-600', 'drying-curing': 'bg-amber-100 text-amber-600',
+  // Technology & Services
+  technology: 'bg-purple-100 text-purple-700', software: 'bg-indigo-100 text-indigo-600', 'lab-testing': 'bg-cyan-100 text-cyan-600', 'training-consulting': 'bg-teal-100 text-teal-600', logistics: 'bg-blue-100 text-blue-700', 'financial-services': 'bg-emerald-100 text-emerald-700', insurance: 'bg-sky-100 text-sky-700',
+  // Enterprise
+  enterprise: 'bg-gradient-to-r from-purple-100 to-blue-100 text-purple-700',
 };
 
 const availabilityConfig: Record<string, { label: string; color: string }> = {
@@ -982,11 +1014,53 @@ export default function SupplierProductsPage() {
                     onChange={(e) => handleFormChange('category', e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] bg-white"
                   >
-                    {allCategories.map((cat) => (
-                      <option key={cat} value={cat}>{categoryLabels[cat]}</option>
-                    ))}
+                    <optgroup label="Crops & Seeds">
+                      {['seeds','seedlings','grain','oilseeds','pulses','vegetables','fruit','herbs-spices','flowers','fodder','tobacco','cotton','coffee-tea','nuts'].map((cat) => (
+                        <option key={cat} value={cat}>{categoryLabels[cat]}</option>
+                      ))}
+                    </optgroup>
+                    <optgroup label="Inputs & Chemicals">
+                      {['fertilizer','pesticides','herbicides','fungicides','bio-inputs','growth-regulators','soil-amendments'].map((cat) => (
+                        <option key={cat} value={cat}>{categoryLabels[cat]}</option>
+                      ))}
+                    </optgroup>
+                    <optgroup label="Livestock & Animal">
+                      {['animal-feed','veterinary','livestock','poultry','aquaculture','dairy','apiculture'].map((cat) => (
+                        <option key={cat} value={cat}>{categoryLabels[cat]}</option>
+                      ))}
+                    </optgroup>
+                    <optgroup label="Equipment & Machinery">
+                      {['equipment','irrigation','tools','spare-parts','solar-energy','greenhouses','drones-precision'].map((cat) => (
+                        <option key={cat} value={cat}>{categoryLabels[cat]}</option>
+                      ))}
+                    </optgroup>
+                    <optgroup label="Processing & Post-Harvest">
+                      {['processing','packaging','storage','cold-chain','milling','drying-curing'].map((cat) => (
+                        <option key={cat} value={cat}>{categoryLabels[cat]}</option>
+                      ))}
+                    </optgroup>
+                    <optgroup label="Technology & Services">
+                      {['technology','software','lab-testing','training-consulting','logistics','financial-services','insurance'].map((cat) => (
+                        <option key={cat} value={cat}>{categoryLabels[cat]}</option>
+                      ))}
+                    </optgroup>
+                    <optgroup label="Custom">
+                      <option value="enterprise">{categoryLabels['enterprise']}</option>
+                    </optgroup>
                   </select>
                 </div>
+
+                {/* Enterprise custom product note */}
+                {formData.category === 'enterprise' && (
+                  <div className="bg-purple-50 border border-purple-200 rounded-xl p-4">
+                    <p className="text-sm font-semibold text-purple-800 mb-1">Enterprise / Custom Product</p>
+                    <p className="text-xs text-purple-600 mb-2">This is a customised offering. Buyers will contact you directly for a tailored quote. Add detailed specifications in the description above.</p>
+                    <div className="flex items-center gap-2 text-xs text-purple-500">
+                      <Tag className="w-3.5 h-3.5" />
+                      <span>Pricing shown as &quot;starting from&quot; — final price negotiated per deal</span>
+                    </div>
+                  </div>
+                )}
 
                 <div>
                   <ImageUploader
