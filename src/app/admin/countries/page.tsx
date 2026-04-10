@@ -440,27 +440,21 @@ export default function CountriesPage() {
   };
 
   return (
-    <div className="min-h-screen p-6 md:p-8 space-y-8">
+    <div className="space-y-6">
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
-
-      {/* Back link */}
-      <Link href="/admin" className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-[#8CB89C] transition-colors">
-        <ArrowLeft className="w-4 h-4" />
-        Back to Admin
-      </Link>
 
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
         className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-            <Globe2 className="w-8 h-8 text-[#8CB89C]" />
+          <h1 className="text-2xl font-bold text-[#1B2A4A] flex items-center gap-3">
+            <Globe2 className="w-7 h-7 text-[#5DB347]" />
             Country Management
           </h1>
-          <p className="text-slate-400 mt-1">Manage AFU operating countries across Africa</p>
+          <p className="text-gray-500 text-sm mt-1">Manage AFU operating countries across Africa</p>
         </div>
         <button onClick={openAddModal}
-          className="flex items-center gap-2 px-4 py-2.5 bg-[#5DB347] text-white text-sm font-medium rounded-lg hover:bg-[#4a9a38] shadow-sm transition-all">
+          className="flex items-center gap-2 px-4 py-2.5 bg-[#5DB347] text-white text-sm font-medium rounded-xl hover:bg-[#4a9a38] shadow-sm transition-all">
           <Plus className="w-4 h-4" />
           Add Country
         </button>
@@ -471,12 +465,12 @@ export default function CountriesPage() {
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {summaryCards.map((card) => (
           <motion.div key={card.label} variants={cardVariants}
-            className="bg-[#1B2A4A]/60 backdrop-blur border border-white/5 rounded-xl p-5">
+            className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-sm text-slate-400">{card.label}</span>
+              <span className="text-sm text-gray-500">{card.label}</span>
               <card.icon className={`w-5 h-5 ${card.accent}`} />
             </div>
-            <p className="text-2xl font-bold text-white">{card.value}</p>
+            <p className="text-2xl font-bold text-[#1B2A4A]">{card.value}</p>
           </motion.div>
         ))}
       </motion.div>
@@ -484,18 +478,18 @@ export default function CountriesPage() {
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input type="text" placeholder="Search countries..." value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-[#1B2A4A]/60 border border-white/10 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:border-[#8CB89C]/50 transition-colors text-sm" />
+            className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-[#1B2A4A] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#5DB347]/40 focus:border-[#5DB347] transition-all text-sm" />
         </div>
         <div className="flex gap-2">
           {(['all', 'live', 'pilot', 'planned'] as const).map((s) => (
             <button key={s} onClick={() => setStatusFilter(s)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors border ${
+              className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors border ${
                 statusFilter === s
-                  ? 'bg-[#8CB89C]/20 border-[#8CB89C]/40 text-[#8CB89C]'
-                  : 'bg-[#1B2A4A]/40 border-white/5 text-slate-400 hover:text-white hover:border-white/10'
+                  ? 'bg-[#5DB347] border-[#5DB347] text-white'
+                  : 'bg-white border-gray-200 text-gray-500 hover:text-[#1B2A4A] hover:border-gray-300'
               }`}>
               {s === 'all' ? 'All' : s.charAt(0).toUpperCase() + s.slice(1)}
             </button>
@@ -510,18 +504,18 @@ export default function CountriesPage() {
           const st = statusConfig[country.status];
           return (
             <motion.div key={country.iso} variants={cardVariants}
-              className="bg-[#1B2A4A]/60 backdrop-blur border border-white/5 rounded-xl overflow-hidden hover:border-[#8CB89C]/20 transition-colors group">
+              className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:border-[#5DB347]/20 transition-all group">
               {/* Card Header */}
               <div className="p-5 pb-4">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
                     <span className="text-3xl">{country.flag}</span>
                     <div>
-                      <h3 className="text-lg font-semibold text-white">{country.name}</h3>
+                      <h3 className="text-lg font-semibold text-[#1B2A4A]">{country.name}</h3>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-xs font-mono text-slate-400 bg-slate-700/50 px-1.5 py-0.5 rounded">{country.iso}</span>
-                        <span className="text-xs text-slate-500">|</span>
-                        <span className="text-xs font-mono text-[#D4A843]">{country.currency}</span>
+                        <span className="text-xs font-mono text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">{country.iso}</span>
+                        <span className="text-xs text-gray-300">|</span>
+                        <span className="text-xs font-mono text-[#D4A843] font-semibold">{country.currency}</span>
                       </div>
                     </div>
                   </div>
@@ -533,69 +527,69 @@ export default function CountriesPage() {
 
                 {/* Description if present */}
                 {country.description && (
-                  <p className="text-xs text-slate-400 mb-3 line-clamp-2">{country.description}</p>
+                  <p className="text-xs text-gray-500 mb-3 line-clamp-2">{country.description}</p>
                 )}
 
                 {/* Stats Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
-                  <div className="text-center p-2.5 bg-white/[0.03] rounded-lg">
-                    <Users className="w-4 h-4 text-[#8CB89C] mx-auto mb-1" />
-                    <p className="text-sm font-semibold text-white">{country.members.toLocaleString()}</p>
-                    <p className="text-[10px] text-slate-500 uppercase tracking-wider">Members</p>
+                <div className="grid grid-cols-3 gap-3 mb-4">
+                  <div className="text-center p-2.5 bg-green-50 rounded-lg">
+                    <Users className="w-4 h-4 text-[#5DB347] mx-auto mb-1" />
+                    <p className="text-sm font-semibold text-[#1B2A4A]">{country.members.toLocaleString()}</p>
+                    <p className="text-[10px] text-gray-400 uppercase tracking-wider">Members</p>
                   </div>
-                  <div className="text-center p-2.5 bg-white/[0.03] rounded-lg">
+                  <div className="text-center p-2.5 bg-amber-50 rounded-lg">
                     <Banknote className="w-4 h-4 text-[#D4A843] mx-auto mb-1" />
-                    <p className="text-sm font-semibold text-white">{country.activeLoans}</p>
-                    <p className="text-[10px] text-slate-500 uppercase tracking-wider">Active Loans</p>
+                    <p className="text-sm font-semibold text-[#1B2A4A]">{country.activeLoans}</p>
+                    <p className="text-[10px] text-gray-400 uppercase tracking-wider">Active Loans</p>
                   </div>
-                  <div className="text-center p-2.5 bg-white/[0.03] rounded-lg">
-                    <TrendingUp className="w-4 h-4 text-emerald-400 mx-auto mb-1" />
-                    <p className="text-sm font-semibold text-white">{formatCurrency(country.revenueThisMonth)}</p>
-                    <p className="text-[10px] text-slate-500 uppercase tracking-wider">Revenue</p>
+                  <div className="text-center p-2.5 bg-emerald-50 rounded-lg">
+                    <TrendingUp className="w-4 h-4 text-emerald-600 mx-auto mb-1" />
+                    <p className="text-sm font-semibold text-[#1B2A4A]">{formatCurrency(country.revenueThisMonth)}</p>
+                    <p className="text-[10px] text-gray-400 uppercase tracking-wider">Revenue</p>
                   </div>
                 </div>
 
                 {/* Key Crops */}
                 {country.key_crops && (
                   <div className="mb-3">
-                    <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Key Crops</p>
-                    <p className="text-xs text-[#8CB89C]">{country.key_crops}</p>
+                    <p className="text-[10px] text-gray-400 uppercase tracking-wider mb-1">Key Crops</p>
+                    <p className="text-xs text-[#5DB347] font-medium">{country.key_crops}</p>
                   </div>
                 )}
 
                 {/* Payment Providers */}
                 <div className="mb-3">
-                  <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1.5 flex items-center gap-1">
+                  <p className="text-[10px] text-gray-400 uppercase tracking-wider mb-1.5 flex items-center gap-1">
                     <CreditCard className="w-3 h-3" /> Payment Providers
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {country.paymentProviders.map((p) => (
-                      <span key={p} className="text-xs px-2 py-0.5 rounded-full bg-[#8CB89C]/10 text-[#8CB89C] border border-[#8CB89C]/20">{p}</span>
+                      <span key={p} className="text-xs px-2 py-0.5 rounded-full bg-[#5DB347]/10 text-[#5DB347] border border-[#5DB347]/20">{p}</span>
                     ))}
                   </div>
                 </div>
 
                 {/* Languages */}
                 <div>
-                  <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1.5 flex items-center gap-1">
+                  <p className="text-[10px] text-gray-400 uppercase tracking-wider mb-1.5 flex items-center gap-1">
                     <Languages className="w-3 h-3" /> Languages
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {country.languages.map((l) => (
-                      <span key={l} className="text-xs px-2 py-0.5 rounded-full bg-[#D4A843]/10 text-[#D4A843] border border-[#D4A843]/20">{l}</span>
+                      <span key={l} className="text-xs px-2 py-0.5 rounded-full bg-amber-50 text-[#D4A843] border border-[#D4A843]/20">{l}</span>
                     ))}
                   </div>
                 </div>
               </div>
 
               {/* Card Footer */}
-              <div className="px-5 py-3 border-t border-white/5 bg-white/[0.02] flex items-center justify-between">
-                <span className="text-xs text-slate-500 flex items-center gap-1">
+              <div className="px-5 py-3 border-t border-gray-100 bg-gray-50/50 flex items-center justify-between">
+                <span className="text-xs text-gray-400 flex items-center gap-1">
                   <MapPin className="w-3 h-3" />
                   {country.status === 'live' ? 'Fully operational' : country.status === 'pilot' ? 'Pilot programme' : 'Coming soon'}
                 </span>
                 <button onClick={() => openEditModal(country)}
-                  className="flex items-center gap-1.5 text-xs text-[#8CB89C] hover:text-[#8CB89C]/80 font-medium transition-colors">
+                  className="flex items-center gap-1.5 text-xs text-[#5DB347] hover:text-[#4a9a38] font-medium transition-colors">
                   <Pencil className="w-3 h-3" />
                   Edit
                 </button>
@@ -606,7 +600,7 @@ export default function CountriesPage() {
       </motion.div>
 
       {filtered.length === 0 && (
-        <div className="text-center py-16 text-slate-500">
+        <div className="text-center py-16 text-gray-400">
           <Globe2 className="w-12 h-12 mx-auto mb-3 opacity-30" />
           <p>No countries match your filter.</p>
         </div>
