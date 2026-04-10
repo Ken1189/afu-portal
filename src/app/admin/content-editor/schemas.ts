@@ -6,7 +6,7 @@
  * The iframe loads `previewPath` (which should accept ?preview=draft).
  */
 
-export type FieldType = 'text' | 'textarea' | 'image' | 'string-list' | 'object-list';
+export type FieldType = 'text' | 'textarea' | 'richtext' | 'image' | 'string-list' | 'object-list';
 
 export interface ItemFieldDef {
   key: string;

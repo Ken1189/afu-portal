@@ -388,7 +388,7 @@ export default function AdminAdReviewPage() {
                       <div>
                         <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Ad Preview</h4>
                         <div className="rounded-lg border border-gray-200 overflow-hidden bg-white">
-                          <div className="bg-gradient-to-r from-[#8CB89C]/10 to-[#1B2A4A]/5 p-5">
+                          <div className="bg-gradient-to-r from-[#5DB347]/10 to-[#1B2A4A]/5 p-5">
                             <div className="flex items-start gap-3">
                               {ad.image_url ? (
                                 <img
@@ -398,8 +398,8 @@ export default function AdminAdReviewPage() {
                                   onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                                 />
                               ) : (
-                                <div className="w-24 h-16 bg-[#8CB89C]/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                                  <ImageIcon className="w-6 h-6 text-[#8CB89C]" />
+                                <div className="w-24 h-16 bg-[#5DB347]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                                  <ImageIcon className="w-6 h-6 text-[#5DB347]" />
                                 </div>
                               )}
                               <div>

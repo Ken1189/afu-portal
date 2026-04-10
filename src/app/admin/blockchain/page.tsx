@@ -55,7 +55,7 @@ function shortAddress(address: string) {
 // ── Static data ──
 const tokenomicsColors: Record<string, string> = {
   Presale: 'bg-[#1B2A4A]',
-  Staking: 'bg-[#8CB89C]',
+  Staking: 'bg-[#5DB347]',
   Liquidity: 'bg-[#D4A843]',
   Treasury: 'bg-blue-500',
   Marketing: 'bg-purple-500',
@@ -192,7 +192,7 @@ export default function AdminBlockchainPage() {
         {/* Total Staked */}
         <div className="bg-white rounded-xl p-5 border border-gray-100">
           <div className="flex items-center justify-between mb-3">
-            <div className="w-9 h-9 bg-[#8CB89C]/10 rounded-lg flex items-center justify-center text-[#8CB89C]">
+            <div className="w-9 h-9 bg-[#5DB347]/10 rounded-lg flex items-center justify-center text-[#5DB347]">
               <Lock className="w-5 h-5" />
             </div>
           </div>
@@ -260,7 +260,7 @@ export default function AdminBlockchainPage() {
           {/* EDSD Settlement Token */}
           <div className="bg-white rounded-xl border border-gray-100 p-5">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-[#8CB89C] rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-[#5DB347] rounded-xl flex items-center justify-center">
                 <span className="text-white text-xs font-bold">EDSD</span>
               </div>
               <div>
@@ -311,7 +311,7 @@ export default function AdminBlockchainPage() {
                     {stakingLockDays[tier.id]} days
                   </td>
                   <td className="py-3 pr-4">
-                    <span className="font-semibold text-[#8CB89C]">{stakingMonthlyReward[tier.id]}% / month</span>
+                    <span className="font-semibold text-[#5DB347]">{stakingMonthlyReward[tier.id]}% / month</span>
                   </td>
                   <td className="py-3 pr-4 text-gray-600">
                     {tier.minStake.toLocaleString()} EDM
@@ -470,7 +470,7 @@ export default function AdminBlockchainPage() {
             <p className="text-xs text-gray-400 mt-1">Assets Tokenized</p>
           </div>
           <div className="bg-gray-50 rounded-xl p-4 text-center">
-            <p className="text-2xl font-bold text-[#8CB89C]">$0</p>
+            <p className="text-2xl font-bold text-[#5DB347]">$0</p>
             <p className="text-xs text-gray-400 mt-1">Total Value (USD)</p>
           </div>
           <div className="bg-gray-50 rounded-xl p-4 text-center">

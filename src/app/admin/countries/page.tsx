@@ -151,73 +151,73 @@ function CountryModal({
 }) {
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-[#0F1A2E] border border-white/10 rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 space-y-5" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-white border border-gray-200 rounded-2xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 space-y-5" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-bold text-white">{isEdit ? 'Edit Country' : 'Add Country'}</h3>
-          <button onClick={onClose} className="p-2 rounded-lg hover:bg-white/10"><X className="w-5 h-5 text-gray-400" /></button>
+          <h3 className="text-lg font-bold text-[#1B2A4A]">{isEdit ? 'Edit Country' : 'Add Country'}</h3>
+          <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-50"><X className="w-5 h-5 text-gray-500" /></button>
         </div>
 
         <div className="space-y-4">
           {!isEdit && (
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">ISO Code *</label>
+                <label className="block text-sm font-medium text-gray-600 mb-1">ISO Code *</label>
                 <input value={form.iso} onChange={(e) => onChange({ ...form, iso: e.target.value.toUpperCase() })} maxLength={2} placeholder="ZW"
-                  className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm placeholder:text-slate-500 focus:border-[#8CB89C]/50 focus:outline-none" />
+                  className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-[#1B2A4A] text-sm placeholder:text-gray-400 focus:border-[#5DB347] focus:outline-none" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">Flag Emoji</label>
+                <label className="block text-sm font-medium text-gray-600 mb-1">Flag Emoji</label>
                 <input value={form.flag} onChange={(e) => onChange({ ...form, flag: e.target.value })} placeholder="Flag emoji"
-                  className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm placeholder:text-slate-500 focus:border-[#8CB89C]/50 focus:outline-none" />
+                  className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-[#1B2A4A] text-sm placeholder:text-gray-400 focus:border-[#5DB347] focus:outline-none" />
               </div>
             </div>
           )}
 
           <div className="grid grid-cols-2 gap-3">
             <div className={isEdit ? '' : ''}>
-              <label className="block text-sm font-medium text-gray-300 mb-1">Country Name *</label>
+              <label className="block text-sm font-medium text-gray-600 mb-1">Country Name *</label>
               <input value={form.name} onChange={(e) => onChange({ ...form, name: e.target.value })} placeholder="Country name"
-                className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm placeholder:text-slate-500 focus:border-[#8CB89C]/50 focus:outline-none" />
+                className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-[#1B2A4A] text-sm placeholder:text-gray-400 focus:border-[#5DB347] focus:outline-none" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">Currency</label>
+              <label className="block text-sm font-medium text-gray-600 mb-1">Currency</label>
               <input value={form.currency} onChange={(e) => onChange({ ...form, currency: e.target.value })} placeholder="USD"
-                className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm placeholder:text-slate-500 focus:border-[#8CB89C]/50 focus:outline-none" />
+                className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-[#1B2A4A] text-sm placeholder:text-gray-400 focus:border-[#5DB347] focus:outline-none" />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">Status</label>
+            <label className="block text-sm font-medium text-gray-600 mb-1">Status</label>
             <select value={form.status} onChange={(e) => onChange({ ...form, status: e.target.value as CountryStatus })}
-              className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:border-[#8CB89C]/50 focus:outline-none">
-              <option value="planned" className="bg-[#0F1A2E]">Planned</option>
-              <option value="pilot" className="bg-[#0F1A2E]">Pilot</option>
-              <option value="live" className="bg-[#0F1A2E]">Live</option>
+              className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-[#1B2A4A] text-sm focus:border-[#5DB347] focus:outline-none">
+              <option value="planned" className="bg-white">Planned</option>
+              <option value="pilot" className="bg-white">Pilot</option>
+              <option value="live" className="bg-white">Live</option>
             </select>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">Description</label>
+            <label className="block text-sm font-medium text-gray-600 mb-1">Description</label>
             <textarea value={form.description} onChange={(e) => onChange({ ...form, description: e.target.value })} rows={3} placeholder="Country description..."
-              className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm placeholder:text-slate-500 focus:border-[#8CB89C]/50 focus:outline-none resize-y" />
+              className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-[#1B2A4A] text-sm placeholder:text-gray-400 focus:border-[#5DB347] focus:outline-none resize-y" />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">Key Crops</label>
+            <label className="block text-sm font-medium text-gray-600 mb-1">Key Crops</label>
             <input value={form.key_crops} onChange={(e) => onChange({ ...form, key_crops: e.target.value })} placeholder="Maize, Sorghum, Groundnuts..."
-              className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm placeholder:text-slate-500 focus:border-[#8CB89C]/50 focus:outline-none" />
+              className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-[#1B2A4A] text-sm placeholder:text-gray-400 focus:border-[#5DB347] focus:outline-none" />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">Key Programs</label>
+            <label className="block text-sm font-medium text-gray-600 mb-1">Key Programs</label>
             <input value={form.key_programs} onChange={(e) => onChange({ ...form, key_programs: e.target.value })} placeholder="Seed distribution, crop insurance..."
-              className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm placeholder:text-slate-500 focus:border-[#8CB89C]/50 focus:outline-none" />
+              className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-[#1B2A4A] text-sm placeholder:text-gray-400 focus:border-[#5DB347] focus:outline-none" />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">Contact Email</label>
+            <label className="block text-sm font-medium text-gray-600 mb-1">Contact Email</label>
             <input type="email" value={form.contact_email} onChange={(e) => onChange({ ...form, contact_email: e.target.value })} placeholder="admin@africanfarmingunion.org"
-              className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm placeholder:text-slate-500 focus:border-[#8CB89C]/50 focus:outline-none" />
+              className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-[#1B2A4A] text-sm placeholder:text-gray-400 focus:border-[#5DB347] focus:outline-none" />
           </div>
 
           <div>
@@ -231,8 +231,8 @@ function CountryModal({
           </div>
         </div>
 
-        <div className="flex justify-end gap-3 pt-2 border-t border-white/10">
-          <button onClick={onClose} className="px-4 py-2 text-sm font-medium text-gray-400 border border-white/10 rounded-lg hover:bg-white/5">Cancel</button>
+        <div className="flex justify-end gap-3 pt-2 border-t border-gray-200">
+          <button onClick={onClose} className="px-4 py-2 text-sm font-medium text-gray-500 border border-gray-200 rounded-lg hover:bg-gray-50">Cancel</button>
           <button onClick={onSave} disabled={saving || !form.name.trim()}
             className="flex items-center gap-2 px-4 py-2 bg-[#5DB347] text-white text-sm font-medium rounded-lg hover:bg-[#4a9a38] disabled:opacity-50">
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}

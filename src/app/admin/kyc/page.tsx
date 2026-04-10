@@ -1,11 +1,9 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createClient } from '@/lib/supabase/client';
 import {
-  ArrowLeft,
   ShieldCheck,
   Clock,
   CheckCircle2,
@@ -416,36 +414,24 @@ export default function KycManagementPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* ── Top bar ── */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link
-              href="/admin"
-              className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-[#1B2A4A] transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Admin
-            </Link>
-            <span className="text-gray-300">/</span>
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="w-5 h-5 text-[#8CB89C]" />
-              <h1 className="text-lg font-semibold text-[#1B2A4A]">KYC Management</h1>
-            </div>
-          </div>
-          <button
-            onClick={handleRefresh}
-            disabled={refreshing}
-            className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-500 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
-          >
-            <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
-            Refresh
-          </button>
+    <div className="space-y-6">
+      {/* ── Page header ── */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <ShieldCheck className="w-5 h-5 text-[#5DB347]" />
+          <h1 className="text-2xl font-bold text-[#1B2A4A]">KYC Management</h1>
         </div>
+        <button
+          onClick={handleRefresh}
+          disabled={refreshing}
+          className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-500 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+        >
+          <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+          Refresh
+        </button>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-8 space-y-8">
+      <div className="space-y-6">
 
         {/* ── Stats cards ── */}
         <motion.div
@@ -507,10 +493,10 @@ export default function KycManagementPage() {
 
         {/* ── KYC Tiers info banner ── */}
         <motion.div variants={fadeUp} initial="hidden" animate="visible">
-          <div className="bg-[#1B2A4A] text-white rounded-xl p-5">
+          <div className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm">
             <div className="flex items-center gap-2 mb-4">
-              <Info className="w-4 h-4 text-[#8CB89C]" />
-              <span className="text-sm font-semibold text-[#8CB89C] uppercase tracking-wide">KYC Tier Requirements</span>
+              <Info className="w-4 h-4 text-[#5DB347]" />
+              <span className="text-sm font-semibold text-[#5DB347] uppercase tracking-wide">KYC Tier Requirements</span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {[
@@ -518,33 +504,33 @@ export default function KycManagementPage() {
                   tier: 'Tier 1',
                   limit: '< $500 / month',
                   reqs: ['Phone number verification', 'Full name'],
-                  color: 'border-blue-400 bg-blue-900/20',
+                  color: 'border-blue-200 bg-blue-50',
                   badge: 'bg-blue-500',
                 },
                 {
                   tier: 'Tier 2',
                   limit: '< $5,000 / month',
                   reqs: ['National ID or Passport', 'Selfie / liveness check'],
-                  color: 'border-purple-400 bg-purple-900/20',
+                  color: 'border-purple-200 bg-purple-50',
                   badge: 'bg-purple-500',
                 },
                 {
                   tier: 'Tier 3',
                   limit: '> $5,000 / month',
                   reqs: ['Government-issued ID', 'Proof of address', 'Source of funds declaration'],
-                  color: 'border-[#D4A843] bg-yellow-900/20',
+                  color: 'border-amber-200 bg-amber-50',
                   badge: 'bg-[#D4A843]',
                 },
               ].map((t) => (
                 <div key={t.tier} className={`rounded-lg border p-4 ${t.color}`}>
                   <div className="flex items-center gap-2 mb-2">
                     <span className={`text-xs font-bold px-2 py-0.5 rounded-full text-white ${t.badge}`}>{t.tier}</span>
-                    <span className="text-xs text-gray-300">{t.limit}</span>
+                    <span className="text-xs text-gray-500">{t.limit}</span>
                   </div>
                   <ul className="space-y-1">
                     {t.reqs.map((req) => (
-                      <li key={req} className="flex items-start gap-1.5 text-sm text-gray-200">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-[#8CB89C] mt-0.5 shrink-0" />
+                      <li key={req} className="flex items-start gap-1.5 text-sm text-gray-600">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-[#5DB347] mt-0.5 shrink-0" />
                         {req}
                       </li>
                     ))}
@@ -571,7 +557,7 @@ export default function KycManagementPage() {
                     placeholder="Search members…"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-8 pr-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C] w-52"
+                    className="pl-8 pr-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5DB347]/40 focus:border-[#5DB347] w-52"
                   />
                 </div>
               </div>
@@ -612,8 +598,8 @@ export default function KycManagementPage() {
                     onClick={() => setFilterTab(tab.key)}
                     className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
                       filterTab === tab.key
-                        ? 'bg-[#1B2A4A] text-white'
-                        : 'text-gray-500 hover:bg-gray-100'
+                        ? 'bg-[#5DB347] text-white border border-[#5DB347]'
+                        : 'bg-white border border-gray-200 text-gray-500 hover:bg-gray-50'
                     }`}
                   >
                     {tab.label}
@@ -702,7 +688,7 @@ export default function KycManagementPage() {
                             <div className="flex items-center gap-1.5">
                               <button
                                 onClick={(e) => { e.stopPropagation(); setSelectedRecord(record); }}
-                                className="p-1.5 rounded text-gray-400 hover:text-[#8CB89C] hover:bg-teal-50 transition-colors"
+                                className="p-1.5 rounded text-gray-400 hover:text-[#5DB347] hover:bg-[#5DB347]/5 transition-colors"
                                 title="Preview"
                               >
                                 <Eye className="w-3.5 h-3.5" />
@@ -832,8 +818,8 @@ export default function KycManagementPage() {
           {/* AML Screening Summary */}
           <div className="bg-white rounded-xl shadow-sm p-5">
             <div className="flex items-center gap-2 mb-5">
-              <div className="p-2 bg-[#1B2A4A]/10 rounded-lg">
-                <ScanLine className="w-4 h-4 text-[#1B2A4A]" />
+              <div className="p-2 bg-[#5DB347]/10 rounded-lg">
+                <ScanLine className="w-4 h-4 text-[#5DB347]" />
               </div>
               <h2 className="text-base font-semibold text-[#1B2A4A]">AML Screening Summary</h2>
             </div>
@@ -870,7 +856,7 @@ export default function KycManagementPage() {
               Last screening run: <span className="font-medium text-gray-600">2 hours ago</span>
             </div>
 
-            <button className="mt-3 w-full flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium border border-[#8CB89C] text-[#8CB89C] hover:bg-[#8CB89C]/5 transition-colors">
+            <button className="mt-3 w-full flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium border border-[#5DB347]/20 text-[#5DB347] hover:bg-[#5DB347]/5 transition-colors">
               <RefreshCw className="w-3.5 h-3.5" />
               Run Screening Now
             </button>
@@ -879,8 +865,8 @@ export default function KycManagementPage() {
           {/* Country Compliance Status */}
           <div className="lg:col-span-2 bg-white rounded-xl shadow-sm p-5">
             <div className="flex items-center gap-2 mb-5">
-              <div className="p-2 bg-[#8CB89C]/10 rounded-lg">
-                <ShieldCheck className="w-4 h-4 text-[#8CB89C]" />
+              <div className="p-2 bg-[#5DB347]/10 rounded-lg">
+                <ShieldCheck className="w-4 h-4 text-[#5DB347]" />
               </div>
               <h2 className="text-base font-semibold text-[#1B2A4A]">Country Compliance Status</h2>
             </div>
@@ -889,7 +875,7 @@ export default function KycManagementPage() {
               {COUNTRIES.map((country) => (
                 <div
                   key={country.code}
-                  className="border border-gray-100 rounded-xl p-3.5 hover:border-[#8CB89C]/30 hover:shadow-sm transition-all"
+                  className="border border-gray-100 rounded-xl p-3.5 hover:border-[#5DB347]/20 hover:shadow-sm transition-all"
                 >
                   <div className="flex items-center gap-2.5 mb-3">
                     <img
@@ -914,7 +900,7 @@ export default function KycManagementPage() {
                     </div>
                     <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
                       <div
-                        className={`h-full rounded-full ${country.compliance >= 80 ? 'bg-[#8CB89C]' : 'bg-amber-400'}`}
+                        className={`h-full rounded-full ${country.compliance >= 80 ? 'bg-[#5DB347]' : 'bg-amber-400'}`}
                         style={{ width: `${country.compliance}%` }}
                       />
                     </div>

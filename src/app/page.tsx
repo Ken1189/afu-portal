@@ -1190,8 +1190,8 @@ export default function Home() {
                     <img
                       src={partner.logo_url}
                       alt={partner.name}
-                      className="h-12 w-auto max-w-[180px] object-contain"
-                      onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.nextElementSibling?.classList.remove('hidden'); }}
+                      className="h-10 w-auto max-w-[140px] object-contain"
+                      onError={(e) => { e.currentTarget.style.display = 'none'; if (e.currentTarget.nextElementSibling) e.currentTarget.nextElementSibling.classList.remove('hidden'); }}
                     />
                   ) : null}
                   <div
@@ -1202,7 +1202,7 @@ export default function Home() {
                       {partner.initials}
                     </span>
                   </div>
-                  {!partner.logo_url && <span className="text-navy/70 font-semibold text-sm">{partner.name}</span>}
+                  <span className="text-navy/70 font-semibold text-sm">{partner.name}</span>
                 </div>
               ))}
             </div>
@@ -1503,89 +1503,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── COUNTRIES MAP / COVERAGE ─── */}
-      <section className="py-16 bg-cream">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <FadeInWhenVisible direction="right">
-              <div>
-                <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#5DB347' }}>Coverage</span>
-                <h2 className="text-3xl md:text-4xl font-bold text-navy mt-2 mb-6 text-gradient-green">
-                  Expanding Across Africa
-                </h2>
-                <p className="text-gray-500 mb-8 leading-relaxed">
-                  Starting with high-potential markets, AFU is building the playbook to scale
-                  the integrated agriculture platform across the continent.
-                </p>
-                <div className="space-y-6">
-                  {[
-                    {
-                      flag: '🇿🇼',
-                      name: 'Zimbabwe',
-                      crops: 'Blueberries, Macadamia, Maize',
-                      members: 98,
-                    },
-                    {
-                      flag: '🇧🇼',
-                      name: 'Botswana',
-                      crops: 'Sorghum, Sesame, Groundnuts',
-                      members: 82,
-                    },
-                    {
-                      flag: '🇹🇿',
-                      name: 'Tanzania',
-                      crops: 'Cassava, Sesame, Cashew',
-                      members: 67,
-                    },
-                    {
-                      flag: '🇪🇹',
-                      name: 'Ethiopia',
-                      crops: 'Coffee, Teff, Oilseeds',
-                      members: 54,
-                    },
-                  ].map((c) => (
-                    <div
-                      key={c.name}
-                      className="flex items-center gap-4 bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:border-[#5DB347]/20 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
-                    >
-                      <span className="text-3xl">{c.flag}</span>
-                      <div className="flex-1">
-                        <h3 className="text-navy font-bold text-sm">{c.name}</h3>
-                        <p className="text-gray-500 text-xs">{c.crops}</p>
-                      </div>
-                      <div className="text-right">
-                        <span className="font-bold text-lg" style={{ color: '#5DB347' }}>{c.members}</span>
-                        <p className="text-gray-400 text-xs">members</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <Link
-                  href="/countries"
-                  className="inline-flex items-center gap-2 mt-8 font-semibold hover:gap-3 transition-all"
-                  style={{ color: '#5DB347' }}
-                >
-                  View all countries
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
-            </FadeInWhenVisible>
-
-            <FadeInWhenVisible direction="left">
-              <div className="relative rounded-3xl overflow-hidden shadow-2xl">
-                <Image
-                  src="https://images.unsplash.com/photo-1605000797499-95a51c5269ae?w=800&q=80&auto=format&fit=crop"
-                  alt="African farmer in field"
-                  width={800}
-                  height={600}
-                  className="w-full h-auto"
-                />
-                <div className="absolute inset-0 bg-navy/20" />
-              </div>
-            </FadeInWhenVisible>
-          </div>
-        </div>
-      </section>
+      {/* Countries section removed — coverage info is on /countries page */}
 
       {/* ── Sponsor a Farmer Section ─────────────────────────────────── */}
       <section className="py-16 bg-cream">

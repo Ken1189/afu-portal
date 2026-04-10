@@ -291,7 +291,7 @@ export default function AdminTrainingPage() {
             <p className="text-gray-500 text-sm mt-0.5">Manage programs, enrollments, and certifications</p>
           </div>
         </div>
-        <button onClick={openAddCourse} className="flex items-center gap-2 px-5 py-2.5 bg-[#8CB89C] text-white rounded-lg text-sm font-semibold hover:bg-[#8CB89C]/90 transition-colors">
+        <button onClick={openAddCourse} className="flex items-center gap-2 px-5 py-2.5 bg-[#5DB347] text-white rounded-lg text-sm font-semibold hover:bg-[#4a9a38] transition-colors">
           <Plus className="w-4 h-4" /> Create Program
         </button>
       </motion.div>
@@ -300,7 +300,7 @@ export default function AdminTrainingPage() {
       <motion.div variants={cardVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { label: 'Active Programs', value: activePrograms, icon: <BookOpen className="w-5 h-5" />, color: 'text-[#1B2A4A]', iconBg: 'bg-[#1B2A4A]/10' },
-          { label: 'Enrolled Farmers', value: totalEnrolled, icon: <Users className="w-5 h-5" />, color: 'text-[#8CB89C]', iconBg: 'bg-[#8CB89C]/10' },
+          { label: 'Enrolled Farmers', value: totalEnrolled, icon: <Users className="w-5 h-5" />, color: 'text-[#5DB347]', iconBg: 'bg-[#5DB347]/10' },
           { label: 'Completion Rate', value: `${avgCompletion}%`, icon: <TrendingUp className="w-5 h-5" />, color: 'text-[#D4A843]', iconBg: 'bg-[#D4A843]/10' },
           { label: 'Certificates Issued', value: totalCerts, icon: <Award className="w-5 h-5" />, color: 'text-purple-600', iconBg: 'bg-purple-50' },
         ].map((stat, i) => (
@@ -343,7 +343,7 @@ export default function AdminTrainingPage() {
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-3">
                   <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                    prog.status === 'active' ? 'bg-[#8CB89C]/10 text-[#8CB89C]' :
+                    prog.status === 'active' ? 'bg-[#5DB347]/10 text-[#5DB347]' :
                     prog.status === 'upcoming' ? 'bg-blue-50 text-blue-600' :
                     'bg-gray-100 text-gray-400'
                   }`}>
@@ -390,7 +390,7 @@ export default function AdminTrainingPage() {
                   <div
                     className={`h-2 rounded-full transition-all ${
                       prog.completionRate >= 80 ? 'bg-green-500' :
-                      prog.completionRate >= 60 ? 'bg-[#8CB89C]' :
+                      prog.completionRate >= 60 ? 'bg-[#5DB347]' :
                       prog.completionRate >= 40 ? 'bg-[#D4A843]' :
                       'bg-red-400'
                     }`}
@@ -423,13 +423,13 @@ export default function AdminTrainingPage() {
                 placeholder="Search farmers..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/50 w-56"
+                className="pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#5DB347]/40 focus:border-[#5DB347] w-56"
               />
             </div>
             <select
               value={programFilter}
               onChange={(e) => setProgramFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/50"
+              className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#5DB347]/40 focus:border-[#5DB347]"
             >
               <option value="all">All Programs</option>
               {programs.map((p) => (
@@ -443,7 +443,7 @@ export default function AdminTrainingPage() {
                   onClick={() => setEnrollmentFilter(s)}
                   className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
                     enrollmentFilter === s
-                      ? 'bg-[#8CB89C] text-white'
+                      ? 'bg-[#5DB347] text-white'
                       : 'text-gray-500 hover:text-[#1B2A4A]'
                   }`}
                 >
@@ -480,7 +480,7 @@ export default function AdminTrainingPage() {
                             <div
                               className={`h-1.5 rounded-full ${
                                 enr.progress === 100 ? 'bg-green-500' :
-                                enr.progress >= 60 ? 'bg-[#8CB89C]' :
+                                enr.progress >= 60 ? 'bg-[#5DB347]' :
                                 'bg-[#D4A843]'
                               }`}
                               style={{ width: `${enr.progress}%` }}
@@ -506,7 +506,7 @@ export default function AdminTrainingPage() {
                         )}
                       </td>
                       <td className="px-6 py-3">
-                        <button className="text-xs font-medium text-[#8CB89C] hover:text-[#8CB89C]/80 transition-colors">
+                        <button className="text-xs font-medium text-[#5DB347] hover:text-[#5DB347]/80 transition-colors">
                           View
                         </button>
                       </td>
@@ -528,7 +528,7 @@ export default function AdminTrainingPage() {
             <div className="bg-white rounded-xl border border-gray-100 p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-semibold text-[#1B2A4A]">Total Certificates Issued</h3>
-                <span className="text-3xl font-bold text-[#8CB89C]">{totalCerts}</span>
+                <span className="text-3xl font-bold text-[#5DB347]">{totalCerts}</span>
               </div>
               <p className="text-xs text-gray-400">Across all programs since inception</p>
             </div>
@@ -545,7 +545,7 @@ export default function AdminTrainingPage() {
                     </div>
                     <div className="w-full bg-gray-100 rounded-full h-1.5">
                       <div
-                        className="h-1.5 rounded-full bg-[#8CB89C]"
+                        className="h-1.5 rounded-full bg-[#5DB347]"
                         style={{ width: `${(cp.count / certsByProgram[0].count) * 100}%` }}
                       />
                     </div>
@@ -580,7 +580,7 @@ export default function AdminTrainingPage() {
                       <td className="px-6 py-3 text-sm text-gray-400">{cert.issueDate}</td>
                       <td className="px-6 py-3">
                         <div className="flex gap-1.5">
-                          <button className="flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-[#8CB89C] bg-[#8CB89C]/10 rounded-md hover:bg-[#8CB89C]/20 transition-colors">
+                          <button className="flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-[#5DB347] bg-[#5DB347]/10 rounded-md hover:bg-[#5DB347]/20 transition-colors">
                             <Download className="w-3 h-3" /> Download
                           </button>
                           <button className="flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-[#1B2A4A] bg-gray-50 rounded-md hover:bg-gray-100 transition-colors">
@@ -614,23 +614,23 @@ export default function AdminTrainingPage() {
               <button onClick={() => setCourseModalOpen(false)} className="p-1 rounded-lg hover:bg-gray-100"><X className="w-5 h-5 text-gray-400" /></button>
             </div>
             <div className="p-5 space-y-4">
-              <div><label className="block text-xs font-semibold text-gray-600 mb-1">Title *</label><input value={courseForm.title} onChange={e => setCourseForm({ ...courseForm, title: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#8CB89C]/30 outline-none" placeholder="e.g. GlobalGAP Certification" /></div>
+              <div><label className="block text-xs font-semibold text-gray-600 mb-1">Title *</label><input value={courseForm.title} onChange={e => setCourseForm({ ...courseForm, title: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#5DB347]/30 outline-none" placeholder="e.g. GlobalGAP Certification" /></div>
               <div className="grid grid-cols-2 gap-3">
-                <div><label className="block text-xs font-semibold text-gray-600 mb-1">Category</label><input value={courseForm.category} onChange={e => setCourseForm({ ...courseForm, category: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#8CB89C]/30 outline-none" placeholder="Agriculture" /></div>
-                <div><label className="block text-xs font-semibold text-gray-600 mb-1">Duration</label><input value={courseForm.duration} onChange={e => setCourseForm({ ...courseForm, duration: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#8CB89C]/30 outline-none" placeholder="8 weeks" /></div>
+                <div><label className="block text-xs font-semibold text-gray-600 mb-1">Category</label><input value={courseForm.category} onChange={e => setCourseForm({ ...courseForm, category: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#5DB347]/30 outline-none" placeholder="Agriculture" /></div>
+                <div><label className="block text-xs font-semibold text-gray-600 mb-1">Duration</label><input value={courseForm.duration} onChange={e => setCourseForm({ ...courseForm, duration: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#5DB347]/30 outline-none" placeholder="8 weeks" /></div>
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <div><label className="block text-xs font-semibold text-gray-600 mb-1">Capacity</label><input type="number" value={courseForm.capacity} onChange={e => setCourseForm({ ...courseForm, capacity: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#8CB89C]/30 outline-none" /></div>
-                <div><label className="block text-xs font-semibold text-gray-600 mb-1">Instructor</label><input value={courseForm.instructor} onChange={e => setCourseForm({ ...courseForm, instructor: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#8CB89C]/30 outline-none" placeholder="Dr. Sarah Moyo" /></div>
+                <div><label className="block text-xs font-semibold text-gray-600 mb-1">Capacity</label><input type="number" value={courseForm.capacity} onChange={e => setCourseForm({ ...courseForm, capacity: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#5DB347]/30 outline-none" /></div>
+                <div><label className="block text-xs font-semibold text-gray-600 mb-1">Instructor</label><input value={courseForm.instructor} onChange={e => setCourseForm({ ...courseForm, instructor: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#5DB347]/30 outline-none" placeholder="Dr. Sarah Moyo" /></div>
               </div>
               <div><label className="block text-xs font-semibold text-gray-600 mb-1">Status</label>
-                <select value={courseForm.status} onChange={e => setCourseForm({ ...courseForm, status: e.target.value as ProgramStatus })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#8CB89C]/30 outline-none bg-white">
+                <select value={courseForm.status} onChange={e => setCourseForm({ ...courseForm, status: e.target.value as ProgramStatus })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#5DB347]/30 outline-none bg-white">
                   <option value="active">Active</option><option value="upcoming">Upcoming</option><option value="completed">Completed</option>
                 </select></div>
             </div>
             <div className="flex justify-end gap-3 p-5 border-t border-gray-100">
               <button onClick={() => setCourseModalOpen(false)} className="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100">Cancel</button>
-              <button onClick={handleSaveCourse} disabled={courseSaving} className="flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-semibold text-white bg-[#8CB89C] hover:bg-[#8CB89C]/90 disabled:opacity-50 transition-colors">
+              <button onClick={handleSaveCourse} disabled={courseSaving} className="flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-semibold text-white bg-[#5DB347] hover:bg-[#5DB347]/90 disabled:opacity-50 transition-colors">
                 {courseSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />} {editingCourseId ? 'Update' : 'Create'}
               </button>
             </div>

@@ -503,7 +503,7 @@ export default function AdminProgramDetailPage() {
 
               {/* Dates row */}
               {(program.planting_start || program.expected_harvest) && (
-                <div className="mt-4 flex flex-wrap gap-4 pt-4 border-t border-white/10">
+                <div className="mt-4 flex flex-wrap gap-4 pt-4 border-t border-gray-200">
                   {program.planting_start && (
                     <div className="flex items-center gap-2 text-white/70 text-xs">
                       <Calendar className="w-3.5 h-3.5" />
@@ -521,7 +521,7 @@ export default function AdminProgramDetailPage() {
               )}
 
               {/* Enrollment progress */}
-              <div className="mt-4 pt-4 border-t border-white/10">
+              <div className="mt-4 pt-4 border-t border-gray-200">
                 <div className="flex items-center justify-between mb-1.5 text-xs text-white/70">
                   <span className="flex items-center gap-1.5">
                     <Users className="w-3.5 h-3.5" />

@@ -642,21 +642,21 @@ export default function LoansPage() {
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: i * 0.08 }}
-              className={`rounded-xl p-4 ${col.lightColor} border border-white/80`}
+              className={`rounded-xl p-4 ${col.lightColor} border border-gray-200`}
             >
               {/* Colored top bar */}
               <div className={`h-1 w-full rounded-full ${col.color} mb-3`} />
               <p className={`text-3xl font-bold ${col.textColor}`}>{col.count}</p>
               <p className={`text-xs font-medium mt-1 ${col.textColor} opacity-80`}>{col.label}</p>
               {i < pipelineColumns.length - 1 && (
-                <div className="mt-3 pt-3 border-t border-white/50">
+                <div className="mt-3 pt-3 border-t border-gray-200">
                   <p className="text-[10px] text-gray-400">
                     {i === 0 ? 'Submitted applications' : i === 1 ? 'Credit assessment' : 'Ready to disburse'}
                   </p>
                 </div>
               )}
               {i === pipelineColumns.length - 1 && (
-                <div className="mt-3 pt-3 border-t border-white/50">
+                <div className="mt-3 pt-3 border-t border-gray-200">
                   <p className="text-[10px] text-gray-400">Active borrowers</p>
                 </div>
               )}
@@ -1121,7 +1121,7 @@ export default function LoansPage() {
       {/* Confirmation Modal */}
       {confirmAction && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl">
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl">
             <h3 className="text-lg font-bold text-[#1B2A4A] mb-2">Confirm Action</h3>
             <p className="text-gray-600 mb-6">{confirmAction.message}</p>
             <div className="flex gap-3 justify-end">

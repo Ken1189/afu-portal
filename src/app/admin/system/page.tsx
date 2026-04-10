@@ -84,9 +84,9 @@ const defaultStorageMetrics = [
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
 const statusStyles = {
-  operational: { label: 'Operational', color: 'text-emerald-400', dot: 'bg-emerald-400', bg: 'bg-emerald-500/10' },
-  degraded:    { label: 'Degraded',    color: 'text-amber-400',   dot: 'bg-amber-400',   bg: 'bg-amber-500/10' },
-  down:        { label: 'Down',        color: 'text-red-400',     dot: 'bg-red-400',     bg: 'bg-red-500/10' },
+  operational: { label: 'Operational', color: 'text-emerald-700', dot: 'bg-emerald-500', bg: 'bg-emerald-100' },
+  degraded:    { label: 'Degraded',    color: 'text-amber-700',   dot: 'bg-amber-500',   bg: 'bg-amber-100' },
+  down:        { label: 'Down',        color: 'text-red-700',     dot: 'bg-red-500',     bg: 'bg-red-100' },
 };
 
 function formatStorageValue(used: number, total: number, unit: string): string {
@@ -154,11 +154,11 @@ export default function SystemHealthPage() {
   ];
 
   return (
-    <div className="min-h-screen p-6 md:p-8 space-y-8">
+    <div className="space-y-6">
       {/* Back link */}
       <Link
         href="/admin"
-        className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-[#8CB89C] transition-colors"
+        className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-[#5DB347] transition-colors"
       >
         <ArrowLeft className="w-4 h-4" />
         Back to Admin
@@ -172,18 +172,18 @@ export default function SystemHealthPage() {
         className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
       >
         <div>
-          <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-            <Activity className="w-8 h-8 text-[#8CB89C]" />
+          <h1 className="text-3xl font-bold text-[#1B2A4A] flex items-center gap-3">
+            <Activity className="w-8 h-8 text-[#5DB347]" />
             System Health
           </h1>
-          <p className="text-slate-400 mt-1">Real-time infrastructure monitoring and diagnostics</p>
+          <p className="text-gray-500 mt-1">Real-time infrastructure monitoring and diagnostics</p>
         </div>
         <button
           onClick={handleRefresh}
           className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
             refreshing
-              ? 'bg-[#8CB89C]/20 border-[#8CB89C]/40 text-[#8CB89C]'
-              : 'bg-[#1B2A4A]/60 border-white/10 text-slate-300 hover:text-white hover:border-white/20'
+              ? 'bg-[#5DB347]/10 border-[#5DB347]/20 text-[#5DB347]'
+              : 'bg-white border-gray-200 text-gray-500 hover:text-[#1B2A4A] hover:border-gray-300'
           }`}
         >
           <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
@@ -193,7 +193,7 @@ export default function SystemHealthPage() {
 
       {/* Service Status Cards */}
       <section>
-        <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4 flex items-center gap-2">
           <Shield className="w-4 h-4" /> Service Status
         </h2>
         <motion.div
@@ -208,21 +208,21 @@ export default function SystemHealthPage() {
               <motion.div
                 key={svc.name}
                 variants={cardVariants}
-                className="bg-[#1B2A4A]/60 backdrop-blur border border-white/5 rounded-xl p-5 hover:border-[#8CB89C]/20 transition-colors"
+                className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm hover:border-[#5DB347]/20 transition-colors"
               >
                 <div className="flex items-center justify-between mb-4">
-                  <svc.icon className="w-5 h-5 text-[#8CB89C]" />
+                  <svc.icon className="w-5 h-5 text-[#5DB347]" />
                   <span className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full ${st.bg} ${st.color}`}>
                     <span className={`w-1.5 h-1.5 rounded-full ${st.dot} animate-pulse`} />
                     {st.label}
                   </span>
                 </div>
-                <h3 className="text-sm font-semibold text-white mb-3">{svc.name}</h3>
+                <h3 className="text-sm font-semibold text-[#1B2A4A] mb-3">{svc.name}</h3>
                 <div className="space-y-2">
                   {svc.metrics.map((m) => (
                     <div key={m.label} className="flex items-center justify-between text-xs">
-                      <span className="text-slate-500">{m.label}</span>
-                      <span className="text-slate-300 font-mono truncate ml-2 max-w-[140px]">{m.value}</span>
+                      <span className="text-gray-500">{m.label}</span>
+                      <span className="text-gray-700 font-mono truncate ml-2 max-w-[140px]">{m.value}</span>
                     </div>
                   ))}
                 </div>
@@ -234,7 +234,7 @@ export default function SystemHealthPage() {
 
       {/* Storage & Usage */}
       <section>
-        <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4 flex items-center gap-2">
           <HardDrive className="w-4 h-4" /> Storage &amp; Usage
         </h2>
         <motion.div
@@ -245,21 +245,21 @@ export default function SystemHealthPage() {
         >
           {storageMetrics.map((item) => {
             const pct = Math.round((item.used / item.total) * 100);
-            const barColor = pct > 80 ? 'bg-red-400' : pct > 60 ? 'bg-amber-400' : 'bg-[#8CB89C]';
+            const barColor = pct > 80 ? 'bg-red-400' : pct > 60 ? 'bg-amber-400' : 'bg-[#5DB347]';
             return (
               <motion.div
                 key={item.label}
                 variants={cardVariants}
-                className="bg-[#1B2A4A]/60 backdrop-blur border border-white/5 rounded-xl p-5"
+                className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm"
               >
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm text-slate-400">{item.label}</span>
-                  <item.icon className="w-4 h-4 text-slate-500" />
+                  <span className="text-sm text-gray-500">{item.label}</span>
+                  <item.icon className="w-4 h-4 text-gray-400" />
                 </div>
-                <p className="text-lg font-semibold text-white mb-2 font-mono">
+                <p className="text-lg font-semibold text-[#1B2A4A] mb-2 font-mono">
                   {formatStorageValue(item.used, item.total, item.unit)}
                 </p>
-                <div className="w-full h-2 bg-slate-700/50 rounded-full overflow-hidden">
+                <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${pct}%` }}
@@ -267,7 +267,7 @@ export default function SystemHealthPage() {
                     className={`h-full rounded-full ${barColor}`}
                   />
                 </div>
-                <p className="text-xs text-slate-500 mt-1.5 text-right">{pct}%</p>
+                <p className="text-xs text-gray-500 mt-1.5 text-right">{pct}%</p>
               </motion.div>
             );
           })}
@@ -276,13 +276,13 @@ export default function SystemHealthPage() {
 
       {/* All Systems Operational Banner */}
       <section>
-        <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-xl p-6 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center">
-            <CheckCircle2 className="w-6 h-6 text-emerald-400" />
+        <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-6 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center">
+            <CheckCircle2 className="w-6 h-6 text-emerald-500" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-white">All Systems Operational</h3>
-            <p className="text-sm text-slate-400">
+            <h3 className="text-lg font-semibold text-[#1B2A4A]">All Systems Operational</h3>
+            <p className="text-sm text-gray-500">
               {statsLoading ? 'Checking...' : `Connected to Supabase. ${(systemStats.totalUsers + systemStats.totalMembers + systemStats.totalLoans + systemStats.totalPayments).toLocaleString()} total records across core tables.`}
             </p>
           </div>

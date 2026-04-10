@@ -215,7 +215,7 @@ export default function AdPackagesConfig() {
 
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Advertising Packages</h1>
+          <h1 className="text-2xl font-bold text-[#1B2A4A]">Advertising Packages</h1>
           <p className="text-gray-500 mt-1">Manage ad packages available to suppliers</p>
         </div>
         <button
@@ -244,7 +244,7 @@ export default function AdPackagesConfig() {
                     <div className="p-2 bg-[#1B2A4A]/5 rounded-lg">
                       <Megaphone className="w-4 h-4 text-[#1B2A4A]" />
                     </div>
-                    <h3 className="font-semibold text-gray-900">{pkg.name}</h3>
+                    <h3 className="font-semibold text-[#1B2A4A]">{pkg.name}</h3>
                   </div>
                   <button onClick={() => toggleActive(pkg)}>
                     {pkg.is_active
@@ -313,7 +313,7 @@ export default function AdPackagesConfig() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 p-6 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-5">
-              <h2 className="text-lg font-semibold text-gray-900">
+              <h2 className="text-lg font-semibold text-[#1B2A4A]">
                 {editingId ? 'Edit Package' : 'Add Package'}
               </h2>
               <button onClick={() => setModalOpen(false)} className="p-1 text-gray-400 hover:text-gray-600">

@@ -300,3 +300,45 @@ html {
 /* RTL-aware border radius */
 .rounded-s-xl { border-start-start-radius: 0.75rem; border-end-start-radius: 0.75rem; }
 .rounded-e-xl { border-start-end-radius: 0.75rem; border-end-end-radius: 0.75rem; }
+
+/* ─── TipTap Rich Text Editor ─── */
+.tiptap {
+  outline: none;
+  min-height: inherit;
+}
+.tiptap p { margin: 0.375rem 0; }
+.tiptap h1 { font-size: 1.25rem; font-weight: 700; margin-top: 0.75rem; margin-bottom: 0.375rem; }
+.tiptap h2 { font-size: 1.125rem; font-weight: 600; margin-top: 0.625rem; margin-bottom: 0.25rem; }
+.tiptap h3 { font-size: 1rem; font-weight: 600; margin-top: 0.5rem; margin-bottom: 0.25rem; }
+.tiptap ul { list-style: disc; padding-left: 1.25rem; }
+.tiptap ol { list-style: decimal; padding-left: 1.25rem; }
+.tiptap li { margin: 0.125rem 0; }
+.tiptap blockquote {
+  border-left: 3px solid rgba(93, 179, 71, 0.4);
+  padding-left: 0.75rem;
+  font-style: italic;
+  color: #6b7280;
+  margin: 0.5rem 0;
+}
+.tiptap code {
+  background: #f3f4f6;
+  border-radius: 0.25rem;
+  padding: 0.125rem 0.25rem;
+  font-size: 0.875rem;
+}
+.tiptap hr {
+  border-color: #e5e7eb;
+  margin: 0.75rem 0;
+}
+.tiptap a {
+  color: #5DB347;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.tiptap p.is-editor-empty:first-child::before {
+  color: #9ca3af;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
