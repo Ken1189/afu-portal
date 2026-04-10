@@ -305,7 +305,7 @@ const FALLBACK_MEMBERSHIP_TIERS: HomepageMembershipTier[] = [
 const FALLBACK_PROGRAMS = [
   {
     name: 'Blueberry Export Program',
-    countries: 'Zimbabwe',
+    countries: 'Kenya, Tanzania',
     crop: 'Blueberries',
     desc: '25ha commercial blueberry operation targeting EU markets. Counter-seasonal advantage delivers premium pricing when Northern Hemisphere supply is low.',
     icon: Sprout,
@@ -319,7 +319,7 @@ const FALLBACK_PROGRAMS = [
   },
   {
     name: 'Sesame Export Program',
-    countries: 'Zimbabwe, Tanzania',
+    countries: 'Ethiopia, Tanzania',
     crop: 'Sesame',
     desc: 'High-demand oilseed for export markets. Contract farming model connecting smallholders to international commodity buyers.',
     icon: TrendingUp,
@@ -333,10 +333,17 @@ const FALLBACK_PROGRAMS = [
   },
   {
     name: 'Macadamia Development',
-    countries: 'Zimbabwe, Mozambique',
+    countries: 'Kenya, Mozambique',
     crop: 'Macadamia',
     desc: 'Premium nut export program. Long-term orchard development delivering high-margin returns in global snack and confectionery markets.',
     icon: Target,
+  },
+  {
+    name: 'Wine & Viticulture Program',
+    countries: 'Ethiopia, Tanzania',
+    crop: 'Wine Grapes',
+    desc: 'Premium wine grape cultivation and winery development. Tapping into Africa\'s emerging viticulture potential for both local and export markets.',
+    icon: Leaf,
   },
 ];
 
@@ -358,11 +365,11 @@ export default function Home() {
   /* ─── Sponsor-a-Farmer preview row (DB with hardcoded fallback) ─── */
   type FarmerPreview = { name: string; country: string; flag: string; crop: string; img: string };
   const FALLBACK_FARMER_PREVIEW: FarmerPreview[] = [
-    { name: 'Grace M.', country: 'Zimbabwe', flag: '🇿🇼', crop: 'Maize', img: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=300&h=300&q=80&auto=format&fit=crop' },
+    { name: 'Grace M.', country: 'Ghana', flag: '🇬🇭', crop: 'Maize', img: 'https://images.unsplash.com/photo-1589923188651-268a9765e432?w=300&h=300&q=80&auto=format&fit=crop' },
     { name: 'Joseph O.', country: 'Tanzania', flag: '🇹🇿', crop: 'Coffee', img: 'https://images.unsplash.com/photo-1605000797499-95a51c5269ae?w=300&h=300&q=80&auto=format&fit=crop' },
-    { name: 'Amina H.', country: 'Kenya', flag: '🇰🇪', crop: 'Rice', img: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=300&h=300&q=80&auto=format&fit=crop' },
-    { name: 'Sipho D.', country: 'Botswana', flag: '🇧🇼', crop: 'Cattle', img: 'https://images.unsplash.com/photo-1500595046743-cd271d694d30?w=300&h=300&q=80&auto=format&fit=crop' },
-    { name: 'Fatima D.', country: 'Ghana', flag: '🇬🇭', crop: 'Tomatoes', img: 'https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=300&h=300&q=80&auto=format&fit=crop' },
+    { name: 'Amina H.', country: 'Kenya', flag: '🇰🇪', crop: 'Tea', img: 'https://images.unsplash.com/photo-1594708767771-a7502209ff51?w=300&h=300&q=80&auto=format&fit=crop' },
+    { name: 'Sipho D.', country: 'Botswana', flag: '🇧🇼', crop: 'Cattle', img: 'https://images.unsplash.com/photo-1516467508483-a7212febe31a?w=300&h=300&q=80&auto=format&fit=crop' },
+    { name: 'Fatima D.', country: 'Senegal', flag: '🇸🇳', crop: 'Tomatoes', img: 'https://images.unsplash.com/photo-1523741543316-beb7fc7023d8?w=300&h=300&q=80&auto=format&fit=crop' },
     { name: 'Peter K.', country: 'Ethiopia', flag: '🇪🇹', crop: 'Teff', img: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=300&h=300&q=80&auto=format&fit=crop' },
   ];
   const COUNTRY_FLAGS: Record<string, string> = {
@@ -1516,7 +1523,7 @@ export default function Home() {
               {content.sponsor_title ? content.sponsor_title : (<>Turn <span className="text-gradient-green">$5 a Month</span> Into a Farm&apos;s Future</>)}
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              {c('sponsor_subtitle', "Real farmers. Real crops. Real impact. Sponsor an African farmer's membership, inputs, and program access — and get monthly updates as their season unfolds.")}
+              {c('sponsor_subtitle', "Real farmers. Real crops. Real impact. Your sponsorship is distributed across farmers who need it most — funding memberships, inputs, and program access. Get monthly updates as their seasons unfold.")}
             </p>
           </div>
 
@@ -1556,13 +1563,13 @@ export default function Home() {
               ))}
             </div>
             <p className="text-center text-sm text-gray-500 mt-6">
-              Real farmers from 11 countries — your sponsorship goes directly to them
+              Real farmers across Africa — your sponsorship is pooled and distributed to those who need it most
             </p>
           </div>
 
           <div className="text-center">
             <Link href="/sponsor" className="inline-flex items-center gap-2 text-white font-semibold px-8 py-4 rounded-xl transition-smooth shadow-lg hover:shadow-xl" style={{ background: '#5DB347' }} onMouseEnter={(e) => (e.currentTarget.style.background = '#449933')} onMouseLeave={(e) => (e.currentTarget.style.background = '#5DB347')}>
-              Meet the Farmers
+              Start Sponsoring
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>

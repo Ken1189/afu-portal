@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/supabase/auth-context';
 import { createClient } from '@/lib/supabase/client';
 import { TierProgress } from '@/components/farm/TierProgress';
 import { FARMER_TIERS, TIER_ORDER, type FarmerTier } from '@/lib/farmer-tiers';
+import { Lock } from 'lucide-react';
 
 // ── Types ─────────────────────────────────────────────────────────────────
 
@@ -1221,7 +1222,7 @@ export default function TrainingPage() {
             animate={{ opacity: 1 }}
             className="bg-white/5 backdrop-blur-xl rounded-3xl p-10 border border-white/10 text-center"
           >
-            <div className="text-4xl mb-4">🔒</div>
+            <div className="mb-4"><Lock className="h-10 w-10 text-gray-400 mx-auto" /></div>
             <h3 className="text-lg font-bold text-white mb-2">
               Sign in to track your progress
             </h3>

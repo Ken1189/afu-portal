@@ -3,6 +3,7 @@
 import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import { WORLD_COUNTRIES } from '@/lib/countries';
+import { Wheat, MailX, PartyPopper } from 'lucide-react';
 
 /* ─── Types ─── */
 
@@ -499,7 +500,7 @@ export default function FarmerProfilePage({
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="text-center max-w-md px-4">
-          <div className="text-6xl mb-4">🌾</div>
+          <div className="mb-4"><Wheat className="h-16 w-16 text-[#5DB347] mx-auto" /></div>
           <h2 className="text-2xl font-bold text-navy mb-3">
             {error === 'Farmer not found' ? 'Farmer Not Found' : 'Something Went Wrong'}
           </h2>
@@ -683,7 +684,7 @@ export default function FarmerProfilePage({
                 </div>
               ) : (
                 <div className="border border-gray-100 rounded-2xl p-8 text-center">
-                  <div className="text-4xl mb-3">📭</div>
+                  <div className="mb-3"><MailX className="h-10 w-10 text-gray-400 mx-auto" /></div>
                   <p className="text-gray-500">
                     No updates yet. Check back after this farmer begins their program.
                   </p>
@@ -793,7 +794,7 @@ export default function FarmerProfilePage({
                   className="border rounded-xl p-4 text-center"
                   style={{ background: '#EBF7E5', borderColor: '#5DB347' }}
                 >
-                  <div className="text-3xl mb-2">🎉</div>
+                  <div className="mb-2"><PartyPopper className="h-8 w-8 text-[#5DB347] mx-auto" /></div>
                   <p className="font-bold text-navy mb-1">
                     Thank you! You&apos;re now sponsoring {firstName}.
                   </p>

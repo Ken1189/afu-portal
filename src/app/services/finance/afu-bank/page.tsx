@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { DollarSign, Wheat, Smartphone, ArrowLeftRight } from "lucide-react";
 import LegalDisclaimer from "@/components/ui/LegalDisclaimer";
 
 export const metadata = {
@@ -175,7 +176,7 @@ export default function AFUBankPage() {
                 className="bg-white rounded-2xl p-6 border border-gray-100 hover:border-teal/20 hover:shadow-md transition-all"
               >
                 <div className="w-10 h-10 bg-teal/10 rounded-xl flex items-center justify-center text-teal font-bold mb-4">
-                  {["$", "🌾", "📱", "💱"][i]}
+                  {[<DollarSign key="d" className="h-5 w-5" />, <Wheat key="w" className="h-5 w-5" />, <Smartphone key="s" className="h-5 w-5" />, <ArrowLeftRight key="a" className="h-5 w-5" />][i]}
                 </div>
                 <h3 className="font-bold text-navy mb-2">{benefit.title}</h3>
                 <p className="text-gray-500 text-sm leading-relaxed">

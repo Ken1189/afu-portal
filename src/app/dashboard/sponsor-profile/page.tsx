@@ -16,6 +16,10 @@ import {
   ChevronLeft,
   X,
   Plus,
+  PartyPopper,
+  Sprout,
+  Tractor,
+  Wheat,
 } from 'lucide-react';
 
 // ── Supabase client ──
@@ -396,7 +400,7 @@ export default function SponsorProfilePage() {
     return (
       <div className="max-w-2xl mx-auto py-8 space-y-6">
         <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center space-y-5 shadow-sm">
-          <div className="text-5xl">🎉</div>
+          <div><PartyPopper className="h-12 w-12 text-[#5DB347] mx-auto" /></div>
           <h1 className="text-2xl font-bold" style={{ color: '#1B2A4A' }}>
             Your profile is now live!
           </h1>
@@ -674,8 +678,10 @@ export default function SponsorProfilePage() {
           {/* ── STEP 1: Opt In ── */}
           {wizardStep === 1 && (
             <div className="p-8 text-center space-y-6">
-              <div className="text-5xl space-x-1 leading-none">
-                <span>🌱</span><span>🚜</span><span>🌾</span>
+              <div className="flex justify-center gap-2">
+                <Sprout className="h-10 w-10 text-[#5DB347]" />
+                <Tractor className="h-10 w-10 text-[#5DB347]" />
+                <Wheat className="h-10 w-10 text-[#5DB347]" />
               </div>
               <div>
                 <h2 className="text-xl font-bold mb-3" style={{ color: '#1B2A4A' }}>

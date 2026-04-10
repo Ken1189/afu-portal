@@ -51,6 +51,12 @@ import {
   Clock,
   Sparkles,
   Activity,
+  Sun,
+  CloudRain,
+  Cherry,
+  Leaf,
+  Wheat,
+  Bean,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
@@ -63,15 +69,22 @@ import OnboardingChecklist from '@/components/dashboard/OnboardingChecklist';
 // Static data (inlined to remove @/lib/data/ mock imports)
 // ---------------------------------------------------------------------------
 
+// Weather icon mapping
+const weatherIconMap: Record<string, LucideIcon> = {
+  sunny: Sun,
+  partlyCloudy: CloudSun,
+  rain: CloudRain,
+};
+
 const DEFAULT_WEATHER = {
   location: 'Harare, Zimbabwe',
   current: { temp: 28, condition: 'Sunny', humidity: 45, wind: 12 },
   forecast: [
-    { day: 'Today', temp: 28, condition: 'Sunny', icon: '☀' },
-    { day: 'Tomorrow', temp: 26, condition: 'Partly Cloudy', icon: '⛅' },
-    { day: 'Thursday', temp: 22, condition: 'Rain', icon: '🌧' },
-    { day: 'Friday', temp: 25, condition: 'Sunny', icon: '☀' },
-    { day: 'Saturday', temp: 27, condition: 'Sunny', icon: '☀' },
+    { day: 'Today', temp: 28, condition: 'Sunny', icon: 'sunny' },
+    { day: 'Tomorrow', temp: 26, condition: 'Partly Cloudy', icon: 'partlyCloudy' },
+    { day: 'Thursday', temp: 22, condition: 'Rain', icon: 'rain' },
+    { day: 'Friday', temp: 25, condition: 'Sunny', icon: 'sunny' },
+    { day: 'Saturday', temp: 27, condition: 'Sunny', icon: 'sunny' },
   ],
 };
 
@@ -111,6 +124,16 @@ interface CommodityPrice {
   icon: string;
 }
 
+// Commodity icon mapping
+const commodityIconMap: Record<string, LucideIcon> = {
+  blueberries: Cherry,
+  cassava: Leaf,
+  sesame: Wheat,
+  maize: Wheat,
+  sorghum: Leaf,
+  groundnuts: Bean,
+};
+
 /** Market prices fallback with sparkline data.
  *  Live `currentPrice` is hydrated from the `market_prices` table at runtime
  *  (see useEffect below). The DB schema does not store sparkline arrays, so
@@ -119,27 +142,27 @@ interface CommodityPrice {
  *  a `history JSONB` column or build a separate price_history table. */
 const MARKET_PRICES: CommodityPrice[] = [
   {
-    crop: 'Blueberries', currentPrice: 12.50, currency: 'USD', unit: 'kg', change24h: 0.8, change7d: 3.2, icon: '\uD83E\uDED0',
+    crop: 'Blueberries', currentPrice: 12.50, currency: 'USD', unit: 'kg', change24h: 0.8, change7d: 3.2, icon: 'blueberries',
     prices: [11.20, 11.35, 11.50, 11.40, 11.60, 11.55, 11.70, 11.80, 11.75, 11.90, 12.00, 11.95, 12.10, 12.05, 12.20, 12.15, 12.30, 12.25, 12.10, 12.20, 12.35, 12.40, 12.30, 12.45, 12.50, 12.40, 12.55, 12.60, 12.45, 12.50],
   },
   {
-    crop: 'Cassava', currentPrice: 0.15, currency: 'USD', unit: 'kg', change24h: -0.3, change7d: -1.1, icon: '\uD83C\uDF3F',
+    crop: 'Cassava', currentPrice: 0.15, currency: 'USD', unit: 'kg', change24h: -0.3, change7d: -1.1, icon: 'cassava',
     prices: [0.16, 0.16, 0.16, 0.15, 0.16, 0.16, 0.15, 0.15, 0.16, 0.15, 0.15, 0.16, 0.15, 0.15, 0.15, 0.16, 0.15, 0.15, 0.15, 0.15, 0.16, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.15],
   },
   {
-    crop: 'Sesame', currentPrice: 2.80, currency: 'USD', unit: 'kg', change24h: 0.2, change7d: 0.5, icon: '\uD83C\uDF3E',
+    crop: 'Sesame', currentPrice: 2.80, currency: 'USD', unit: 'kg', change24h: 0.2, change7d: 0.5, icon: 'sesame',
     prices: [2.65, 2.68, 2.70, 2.67, 2.72, 2.70, 2.73, 2.75, 2.72, 2.74, 2.76, 2.73, 2.75, 2.78, 2.76, 2.74, 2.77, 2.75, 2.78, 2.76, 2.79, 2.77, 2.80, 2.78, 2.76, 2.79, 2.78, 2.80, 2.79, 2.80],
   },
   {
-    crop: 'Maize', currentPrice: 0.28, currency: 'USD', unit: 'kg', change24h: 0.5, change7d: 1.8, icon: '\uD83C\uDF3D',
+    crop: 'Maize', currentPrice: 0.28, currency: 'USD', unit: 'kg', change24h: 0.5, change7d: 1.8, icon: 'maize',
     prices: [0.25, 0.25, 0.26, 0.25, 0.26, 0.26, 0.26, 0.27, 0.26, 0.27, 0.27, 0.26, 0.27, 0.27, 0.27, 0.28, 0.27, 0.27, 0.28, 0.27, 0.28, 0.28, 0.27, 0.28, 0.28, 0.28, 0.28, 0.27, 0.28, 0.28],
   },
   {
-    crop: 'Sorghum', currentPrice: 0.32, currency: 'USD', unit: 'kg', change24h: -0.1, change7d: 0.3, icon: '\uD83C\uDF3F',
+    crop: 'Sorghum', currentPrice: 0.32, currency: 'USD', unit: 'kg', change24h: -0.1, change7d: 0.3, icon: 'sorghum',
     prices: [0.30, 0.30, 0.31, 0.30, 0.31, 0.31, 0.31, 0.31, 0.31, 0.32, 0.31, 0.31, 0.32, 0.31, 0.32, 0.32, 0.31, 0.32, 0.32, 0.32, 0.32, 0.31, 0.32, 0.32, 0.32, 0.32, 0.32, 0.32, 0.32, 0.32],
   },
   {
-    crop: 'Groundnuts', currentPrice: 1.45, currency: 'USD', unit: 'kg', change24h: 0.3, change7d: 1.2, icon: '\uD83E\uDD5C',
+    crop: 'Groundnuts', currentPrice: 1.45, currency: 'USD', unit: 'kg', change24h: 0.3, change7d: 1.2, icon: 'groundnuts',
     prices: [1.32, 1.33, 1.35, 1.34, 1.36, 1.35, 1.37, 1.36, 1.38, 1.37, 1.38, 1.39, 1.38, 1.40, 1.39, 1.40, 1.41, 1.40, 1.42, 1.41, 1.42, 1.43, 1.42, 1.43, 1.44, 1.43, 1.44, 1.45, 1.44, 1.45],
   },
 ];
@@ -428,7 +451,7 @@ export default function DashboardPage() {
         const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&daily=temperature_2m_max,weather_code&timezone=auto&forecast_days=5`);
         const d = await res.json();
         const codeToCondition = (c: number) => c <= 1 ? 'Sunny' : c <= 3 ? 'Partly Cloudy' : c <= 55 ? 'Cloudy' : c <= 67 ? 'Rain' : 'Stormy';
-        const codeToIcon = (c: number) => c <= 1 ? '☀' : c <= 3 ? '⛅' : c <= 55 ? '☁' : c <= 67 ? '🌧' : '⛈';
+        const codeToIcon = (c: number) => c <= 1 ? 'sunny' : c <= 3 ? 'partlyCloudy' : c <= 55 ? 'partlyCloudy' : c <= 67 ? 'rain' : 'rain';
         setLiveWeather({
           location: `${loc.city}, ${country}`,
           current: {
@@ -925,8 +948,8 @@ export default function DashboardPage() {
               <CloudSun className="w-5 h-5 text-gray-400" />
             </div>
             <div className="flex items-center gap-4 mb-4">
-              <div className="text-4xl">
-                {liveWeather.forecast[0].icon}
+              <div>
+                {(() => { const WeatherIcon = weatherIconMap[liveWeather.forecast[0].icon] || Sun; return <WeatherIcon className="h-10 w-10 text-[#D4A017]" />; })()}
               </div>
               <div>
                 <p className="text-3xl font-bold text-navy">{liveWeather.current.temp}&deg;C</p>
@@ -943,13 +966,16 @@ export default function DashboardPage() {
             </div>
             <div className="border-t border-gray-100 pt-3">
               <div className="grid grid-cols-5 gap-1">
-                {liveWeather.forecast.map((day) => (
-                  <div key={day.day} className="text-center">
-                    <p className="text-[10px] text-gray-400 mb-1">{day.day.slice(0, 3)}</p>
-                    <p className="text-lg leading-none mb-1">{day.icon}</p>
-                    <p className="text-xs font-semibold text-navy">{day.temp}&deg;</p>
-                  </div>
-                ))}
+                {liveWeather.forecast.map((day) => {
+                  const ForecastIcon = weatherIconMap[day.icon] || Sun;
+                  return (
+                    <div key={day.day} className="text-center">
+                      <p className="text-[10px] text-gray-400 mb-1">{day.day.slice(0, 3)}</p>
+                      <div className="flex justify-center mb-1"><ForecastIcon className="h-5 w-5 text-[#D4A017]" /></div>
+                      <p className="text-xs font-semibold text-navy">{day.temp}&deg;</p>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </motion.div>
@@ -974,7 +1000,7 @@ export default function DashboardPage() {
                     key={commodity.crop}
                     className="flex items-center gap-3 p-2 rounded-lg hover:bg-cream/50 transition-colors"
                   >
-                    <span className="text-xl w-8 text-center shrink-0">{commodity.icon}</span>
+                    <span className="w-8 text-center shrink-0 flex items-center justify-center">{(() => { const CropIcon = commodityIconMap[commodity.icon] || Leaf; return <CropIcon className="h-5 w-5 text-[#5DB347]" />; })()}</span>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-navy">{commodity.crop}</p>
                       <div className="flex items-center gap-2">

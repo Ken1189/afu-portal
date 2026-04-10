@@ -13,8 +13,14 @@ import {
   Loader2,
   Sprout,
   Wheat,
+  Leaf,
   ArrowRight,
+  ShieldCheck,
+  Handshake,
+  Coins,
+  ClipboardList,
 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/supabase/auth-context';
@@ -89,12 +95,12 @@ const COUNTRY_FLAGS: Record<string, string> = {
   Mozambique: '🇲🇿',
 };
 
-const INCLUSION_CHIPS: Record<string, { label: string; emoji: string; bg: string; text: string }> = {
-  inputs:    { label: 'Inputs',     emoji: '🌱', bg: 'bg-green-50',   text: 'text-green-700' },
-  insurance: { label: 'Insurance',  emoji: '🛡️', bg: 'bg-blue-50',    text: 'text-blue-700'  },
-  offtake:   { label: 'Offtake',    emoji: '🤝', bg: 'bg-amber-50',   text: 'text-amber-700' },
-  financing: { label: 'Financing',  emoji: '💰', bg: 'bg-purple-50',  text: 'text-purple-700'},
-  advisory:  { label: 'Advisory',   emoji: '📋', bg: 'bg-[#5DB347]/10',    text: 'text-[#449933]'  },
+const INCLUSION_CHIPS: Record<string, { label: string; icon: LucideIcon; bg: string; text: string }> = {
+  inputs:    { label: 'Inputs',     icon: Sprout,        bg: 'bg-green-50',        text: 'text-green-700' },
+  insurance: { label: 'Insurance',  icon: ShieldCheck,   bg: 'bg-blue-50',         text: 'text-blue-700'  },
+  offtake:   { label: 'Offtake',    icon: Handshake,     bg: 'bg-amber-50',        text: 'text-amber-700' },
+  financing: { label: 'Financing',  icon: Coins,         bg: 'bg-purple-50',       text: 'text-purple-700'},
+  advisory:  { label: 'Advisory',   icon: ClipboardList, bg: 'bg-[#5DB347]/10',    text: 'text-[#449933]'  },
 };
 
 const STAGES = [
@@ -167,7 +173,7 @@ function InclusionChips({ inclusions }: { inclusions?: ProgramInclusion[] }) {
         if (!chip) return null;
         return (
           <span key={type} className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full ${chip.bg} ${chip.text}`}>
-            {chip.emoji} {chip.label}
+            <chip.icon className="h-3 w-3" /> {chip.label}
           </span>
         );
       })}
@@ -731,7 +737,7 @@ export default function ProgramsPage() {
             <div className="absolute -right-8 -top-8 w-40 h-40 bg-white/5 rounded-full pointer-events-none" />
             <div className="absolute right-0 bottom-0 w-24 h-24 bg-[#5DB347]/10 rounded-full pointer-events-none" />
             <div className="relative z-10 flex flex-col sm:flex-row sm:items-center gap-3">
-              <div className="text-4xl">🌱</div>
+              <Sprout className="h-10 w-10 text-[#5DB347]" />
               <div>
                 <h2 className="text-lg font-bold text-white">AFU Crop Programs</h2>
                 <p className="text-sm text-gray-300 mt-0.5">
@@ -791,7 +797,7 @@ export default function ProgramsPage() {
               animate="visible"
               className="text-center py-16 text-gray-400"
             >
-              <div className="text-5xl mb-3">🌾</div>
+              <div className="mb-3"><Wheat className="h-12 w-12 text-[#5DB347] mx-auto" /></div>
               <p className="text-base font-semibold text-navy">No programs found</p>
               <p className="text-sm mt-1">Try adjusting your filters or check back soon for new programs.</p>
             </motion.div>
@@ -826,7 +832,11 @@ export default function ProgramsPage() {
               animate="visible"
               className="text-center py-20"
             >
-              <div className="text-6xl mb-4">🌱🌿🌾</div>
+              <div className="flex justify-center gap-2 mb-4">
+                <Sprout className="h-12 w-12 text-[#5DB347]" />
+                <Leaf className="h-12 w-12 text-[#5DB347]" />
+                <Wheat className="h-12 w-12 text-[#5DB347]" />
+              </div>
               <h3 className="text-lg font-bold text-navy mb-1">You haven&apos;t joined any programs yet</h3>
               <p className="text-sm text-gray-500 mb-5">Browse available programs and apply to get started with a fully supported growing season.</p>
               <button

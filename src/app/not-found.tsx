@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Home, Search, ArrowLeft, HelpCircle } from 'lucide-react';
+import { Home, Search, ArrowLeft, HelpCircle, Sprout } from 'lucide-react';
 import type { Metadata } from 'next';
 
 // S7.7: Metadata for 404 page
@@ -16,7 +16,7 @@ export default function NotFound() {
         {/* Logo */}
         <div className="mb-8">
           <div className="w-16 h-16 bg-[#5DB347]/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <span className="text-3xl">🌱</span>
+            <Sprout className="h-8 w-8 text-[#5DB347]" />
           </div>
         </div>
 

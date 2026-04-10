@@ -249,7 +249,7 @@ export default function ContentEditorPage() {
       );
       if (error) throw error;
       setPublishedContent(content);
-      setToast({ message: '🎉 Published live!', type: 'success' });
+      setToast({ message: 'Published live!', type: 'success' });
       setIframeKey((k) => k + 1);
     } catch {
       setToast({ message: 'Failed to publish', type: 'error' });

@@ -8,6 +8,7 @@ import {
   Clock, MapPin, Camera, Calendar, ChevronDown, ArrowLeft, Loader2,
   BadgeCheck, ShieldCheck, TreePine, Sprout as SproutIcon, Recycle,
   Wallet, Users, FileText, Plus, X, AlertCircle,
+  RefreshCw, Wheat, Flame, Beef, type LucideIcon,
 } from 'lucide-react';
 import { useAuth } from '@/lib/supabase/auth-context';
 import { createClient } from '@/lib/supabase/client';
@@ -76,17 +77,17 @@ interface FarmPlot {
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
-const PRACTICE_TYPES = [
-  { value: 'no_till', label: 'No-Till Farming', icon: '🌱' },
-  { value: 'cover_crops', label: 'Cover Crops', icon: '🌿' },
-  { value: 'crop_rotation', label: 'Crop Rotation', icon: '🔄' },
-  { value: 'agroforestry', label: 'Agroforestry', icon: '🌳' },
-  { value: 'tree_planting', label: 'Tree Planting', icon: '🌲' },
-  { value: 'composting', label: 'Composting', icon: '♻️' },
-  { value: 'organic_farming', label: 'Organic Farming', icon: '🌾' },
-  { value: 'biochar', label: 'Biochar', icon: '🔥' },
-  { value: 'rotational_grazing', label: 'Rotational Grazing', icon: '🐄' },
-  { value: 'mulching', label: 'Mulching', icon: '🍂' },
+const PRACTICE_TYPES: { value: string; label: string; icon: LucideIcon }[] = [
+  { value: 'no_till', label: 'No-Till Farming', icon: SproutIcon },
+  { value: 'cover_crops', label: 'Cover Crops', icon: Leaf },
+  { value: 'crop_rotation', label: 'Crop Rotation', icon: RefreshCw },
+  { value: 'agroforestry', label: 'Agroforestry', icon: TreePine },
+  { value: 'tree_planting', label: 'Tree Planting', icon: TreePine },
+  { value: 'composting', label: 'Composting', icon: Recycle },
+  { value: 'organic_farming', label: 'Organic Farming', icon: Wheat },
+  { value: 'biochar', label: 'Biochar', icon: Flame },
+  { value: 'rotational_grazing', label: 'Rotational Grazing', icon: Beef },
+  { value: 'mulching', label: 'Mulching', icon: Leaf },
 ];
 
 const TABS = [
@@ -487,7 +488,7 @@ export default function CarbonCreditsPage() {
                   >
                     <option value="">Select practice...</option>
                     {PRACTICE_TYPES.map(t => (
-                      <option key={t.value} value={t.value}>{t.icon} {t.label}</option>
+                      <option key={t.value} value={t.value}>{t.label}</option>
                     ))}
                   </select>
                 </div>
@@ -568,7 +569,7 @@ export default function CarbonCreditsPage() {
                     {practices.slice(0, 5).map(p => (
                       <div key={p.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl text-sm">
                         <div className="flex items-center gap-2">
-                          <span>{PRACTICE_TYPES.find(t => t.value === p.practice_type)?.icon || '🌱'}</span>
+                          {(() => { const Icon = PRACTICE_TYPES.find(t => t.value === p.practice_type)?.icon || SproutIcon; return <Icon className="h-4 w-4" />; })()}
                           <span className="font-medium">{PRACTICE_TYPES.find(t => t.value === p.practice_type)?.label || p.practice_type}</span>
                         </div>
                         <div className="flex items-center gap-3">
@@ -729,7 +730,7 @@ export default function CarbonCreditsPage() {
                             selected ? 'border-[#5DB347] bg-green-50 text-[#5DB347]' : 'border-gray-200 text-gray-600 hover:border-gray-300'
                           }`}
                         >
-                          <span>{pt?.icon || '🌱'}</span>
+                          {(() => { const Icon = pt?.icon || SproutIcon; return <Icon className="h-4 w-4" />; })()}
                           <span>{pt?.label || practice}</span>
                           {selected && <CheckCircle2 className="w-4 h-4 ml-auto" />}
                         </button>

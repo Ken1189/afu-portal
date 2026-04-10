@@ -84,11 +84,11 @@ type TxnFilter = 'all' | 'deposit' | 'withdrawal' | 'transfer' | 'payment';
 // ─── Constants ────────────────────────────────────────────────────────────
 
 const MOBILE_MONEY_METHODS = [
-  { id: 'mpesa', label: 'M-Pesa', icon: '🇰🇪', countries: 'Kenya, Tanzania' },
-  { id: 'ecocash', label: 'EcoCash', icon: '🇿🇼', countries: 'Zimbabwe' },
-  { id: 'mtn', label: 'MTN MoMo', icon: '🇺🇬', countries: 'Uganda, Ghana, Rwanda' },
-  { id: 'orange', label: 'Orange Money', icon: '🇸🇳', countries: 'Senegal, Mali, Cameroon' },
-  { id: 'bank', label: 'Bank Transfer', icon: '🏦', countries: 'All countries' },
+  { id: 'mpesa', label: 'M-Pesa', icon: '🇰🇪', lucideIcon: null as null | typeof Building2, countries: 'Kenya, Tanzania' },
+  { id: 'ecocash', label: 'EcoCash', icon: '🇿🇼', lucideIcon: null as null | typeof Building2, countries: 'Zimbabwe' },
+  { id: 'mtn', label: 'MTN MoMo', icon: '🇺🇬', lucideIcon: null as null | typeof Building2, countries: 'Uganda, Ghana, Rwanda' },
+  { id: 'orange', label: 'Orange Money', icon: '🇸🇳', lucideIcon: null as null | typeof Building2, countries: 'Senegal, Mali, Cameroon' },
+  { id: 'bank', label: 'Bank Transfer', icon: '', lucideIcon: Building2, countries: 'All countries' },
 ];
 
 const EXCHANGE_RATE = 0.92; // USD equivalent approximation
@@ -900,7 +900,7 @@ export default function WalletPage() {
                                   : 'border-gray-200 hover:border-gray-300'
                               }`}
                             >
-                              <span className="text-xl">{m.icon}</span>
+                              <span className="text-xl">{m.lucideIcon ? <m.lucideIcon className="h-5 w-5 text-[#1B2A4A]" /> : m.icon}</span>
                               <div>
                                 <p className="text-sm font-medium text-[#1B2A4A]">{m.label}</p>
                                 <p className="text-xs text-gray-400">{m.countries}</p>
@@ -1037,7 +1037,7 @@ export default function WalletPage() {
                                   : 'border-gray-200 hover:border-gray-300'
                               }`}
                             >
-                              <span className="text-xl">{m.icon}</span>
+                              <span className="text-xl">{m.lucideIcon ? <m.lucideIcon className="h-5 w-5 text-[#1B2A4A]" /> : m.icon}</span>
                               <div>
                                 <p className="text-sm font-medium text-[#1B2A4A]">{m.label}</p>
                                 <p className="text-xs text-gray-400">{m.countries}</p>

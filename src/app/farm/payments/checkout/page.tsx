@@ -39,14 +39,14 @@ interface PaymentFormData {
 /* ------------------------------------------------------------------ */
 /* Country config (provider display names + icons)                     */
 /* ------------------------------------------------------------------ */
-const PROVIDER_INFO: Record<string, { label: string; icon: string; color: string }> = {
-  stripe: { label: 'Card Payment', icon: '💳', color: 'bg-indigo-50 border-indigo-200' },
-  mpesa: { label: 'M-Pesa', icon: '📱', color: 'bg-green-50 border-green-200' },
-  ecocash: { label: 'EcoCash', icon: '📱', color: 'bg-blue-50 border-blue-200' },
-  'orange-money': { label: 'Orange Money', icon: '📱', color: 'bg-orange-50 border-orange-200' },
-  'mtn-momo': { label: 'MTN Mobile Money', icon: '📱', color: 'bg-yellow-50 border-yellow-200' },
-  'airtel-money': { label: 'Airtel Money', icon: '📱', color: 'bg-red-50 border-red-200' },
-  'bank-transfer': { label: 'Bank Transfer', icon: '🏦', color: 'bg-gray-50 border-gray-200' },
+const PROVIDER_INFO: Record<string, { label: string; icon: typeof CreditCard; color: string }> = {
+  stripe: { label: 'Card Payment', icon: CreditCard, color: 'bg-indigo-50 border-indigo-200' },
+  mpesa: { label: 'M-Pesa', icon: Smartphone, color: 'bg-green-50 border-green-200' },
+  ecocash: { label: 'EcoCash', icon: Smartphone, color: 'bg-blue-50 border-blue-200' },
+  'orange-money': { label: 'Orange Money', icon: Smartphone, color: 'bg-orange-50 border-orange-200' },
+  'mtn-momo': { label: 'MTN Mobile Money', icon: Smartphone, color: 'bg-yellow-50 border-yellow-200' },
+  'airtel-money': { label: 'Airtel Money', icon: Smartphone, color: 'bg-red-50 border-red-200' },
+  'bank-transfer': { label: 'Bank Transfer', icon: Building2, color: 'bg-gray-50 border-gray-200' },
 };
 
 const METHOD_ICONS = {
@@ -309,7 +309,7 @@ function CheckoutPageInner() {
                           <div className="mt-2 ml-13 space-y-2 pl-4 border-l-2 border-teal/20">
                             {providers.map((gw) => {
                               const providerKey = gw.provider.replace('_', '-');
-                              const info = PROVIDER_INFO[providerKey] || { label: gw.name, icon: '📱', color: 'bg-gray-50' };
+                              const info = PROVIDER_INFO[providerKey] || { label: gw.name, icon: Smartphone, color: 'bg-gray-50' };
                               const isProviderSelected = form.provider === gw.provider;
 
                               return (
@@ -322,7 +322,7 @@ function CheckoutPageInner() {
                                       : 'bg-white border-gray-100 hover:border-gray-200'
                                   }`}
                                 >
-                                  <span className="text-lg">{info.icon}</span>
+                                  <info.icon className="h-5 w-5" />
                                   <span className="font-medium text-navy">{info.label}</span>
                                   {isProviderSelected && <CheckCircle2 className="w-4 h-4 text-teal ml-auto" />}
                                 </button>

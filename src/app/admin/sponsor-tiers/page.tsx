@@ -354,7 +354,7 @@ export default function SponsorTiersAdmin() {
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-600 mb-1">Icon (emoji)</label>
-                  <input value={form.icon} onChange={(e) => setForm({ ...form, icon: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-center focus:ring-2 focus:ring-green-200 focus:border-green-400 outline-none" placeholder="🌾" />
+                  <input value={form.icon} onChange={(e) => setForm({ ...form, icon: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-center focus:ring-2 focus:ring-green-200 focus:border-green-400 outline-none" placeholder="e.g. Wheat, Sprout" />
                 </div>
               </div>
 

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Hospital, Pill, BedDouble, Baby, SmilePlus, Eye } from "lucide-react";
 
 export const metadata = {
   title: "Medical Insurance - AFU",
@@ -210,7 +211,7 @@ export default function MedicalInsurancePage() {
             {coverageAreas.map((area, i) => (
               <div key={i} className="bg-white rounded-2xl p-6 border border-gray-100">
                 <div className="w-10 h-10 bg-gold/10 rounded-xl flex items-center justify-center text-gold font-bold mb-4">
-                  {["🏥", "💊", "🛏️", "👶", "🦷", "👁️"][i]}
+                  {[<Hospital key="h" className="h-5 w-5" />, <Pill key="p" className="h-5 w-5" />, <BedDouble key="b" className="h-5 w-5" />, <Baby key="ba" className="h-5 w-5" />, <SmilePlus key="t" className="h-5 w-5" />, <Eye key="e" className="h-5 w-5" />][i]}
                 </div>
                 <h3 className="font-bold text-navy mb-2">{area.area}</h3>
                 <p className="text-gray-500 text-sm leading-relaxed">

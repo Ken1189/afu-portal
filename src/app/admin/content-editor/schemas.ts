@@ -276,7 +276,7 @@ function makeServiceSchema(slug: string, label: string): PageSchema {
               { key: 'description', label: 'Description', type: 'textarea' },
               { key: 'icon', label: 'Icon (emoji)', type: 'text' },
             ],
-            defaultItem: { title: 'New feature', description: '', icon: '✨' },
+            defaultItem: { title: 'New feature', description: '', icon: 'sparkles' },
           },
         ],
       },

@@ -21,6 +21,7 @@ import {
   Filter,
   DollarSign,
   Trash2,
+  Globe2,
 } from 'lucide-react';
 
 // ── Types ─────────────────────────────────────────────────────────────────
@@ -467,7 +468,7 @@ export default function AdminProgramsPage() {
                       {/* Country / Crop */}
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-2">
-                          <span className="text-lg">{COUNTRY_FLAGS[program.country] ?? '🌍'}</span>
+                          <span className="text-lg">{COUNTRY_FLAGS[program.country] ?? <Globe2 className="inline h-5 w-5 text-gray-400" />}</span>
                           <div>
                             <p className="font-medium text-navy text-xs">{program.country}</p>
                             <p className="text-gray-500 text-xs">{program.crop}{program.crop_variety ? ` · ${program.crop_variety}` : ''}</p>

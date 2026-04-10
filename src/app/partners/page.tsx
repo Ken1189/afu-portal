@@ -255,12 +255,12 @@ export default function PartnersPage() {
                   {/* Header with Logo + Name */}
                   <div className="flex items-start gap-4 mb-4">
                     {partner.logo_url ? (
-                      <div className="w-14 h-14 rounded-2xl bg-white border border-gray-100 flex items-center justify-center shrink-0 shadow-lg overflow-hidden p-1.5">
+                      <div className="w-20 h-20 rounded-2xl bg-white border border-gray-100 flex items-center justify-center shrink-0 shadow-lg overflow-hidden p-2">
                         <img src={partner.logo_url} alt={partner.name} className="w-full h-full object-contain" />
                       </div>
                     ) : (
                       <div
-                        className={`w-14 h-14 ${partner.color} rounded-2xl flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-lg`}
+                        className={`w-20 h-20 ${partner.color} rounded-2xl flex items-center justify-center text-white font-bold text-lg shrink-0 shadow-lg`}
                       >
                         {partner.initials}
                       </div>

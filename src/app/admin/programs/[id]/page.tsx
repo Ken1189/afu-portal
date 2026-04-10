@@ -24,6 +24,7 @@ import {
   AlertCircle,
   RefreshCw,
   Trash2,
+  Globe2,
 } from 'lucide-react';
 
 // ── Types ─────────────────────────────────────────────────────────────────
@@ -406,7 +407,7 @@ export default function AdminProgramDetailPage() {
             </span>
           </div>
           <p className="text-sm text-gray-500 mt-0.5">
-            {COUNTRY_FLAGS[program.country] ?? '🌍'} {program.country} · {program.crop}
+            {COUNTRY_FLAGS[program.country] ?? <Globe2 className="inline h-4 w-4 text-gray-300" />} {program.country} · {program.crop}
             {program.season_number ? ` · Season ${program.season_number}` : ''}
           </p>
         </div>
@@ -469,7 +470,7 @@ export default function AdminProgramDetailPage() {
               <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-2xl">{COUNTRY_FLAGS[program.country] ?? '🌍'}</span>
+                    <span className="text-2xl">{COUNTRY_FLAGS[program.country] ?? <Globe2 className="inline h-6 w-6 text-white/60" />}</span>
                     <span className="text-white/80 text-sm">{program.country}</span>
                     <span className="text-white/40">·</span>
                     <span className="text-white/80 text-sm">{program.crop}</span>

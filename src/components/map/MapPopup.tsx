@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { Sprout, Wrench, Home } from 'lucide-react';
 import type { MapDataPoint } from './FarmMap';
 
 /** Health bar component for farm popups. */
@@ -38,7 +39,7 @@ export default function MapPopup({ point }: MapPopupProps) {
     return (
       <div className="font-sans text-sm leading-relaxed min-w-[220px]">
         <div className="flex items-center gap-2 mb-1.5">
-          <span className="text-base">🌱</span>
+          <Sprout className="h-4 w-4 text-[#5DB347]" />
           <h3 className="font-bold text-[#1B2A4A] text-sm m-0">
             {point.farmerName || 'Unknown Farmer'}
           </h3>
@@ -127,7 +128,7 @@ export default function MapPopup({ point }: MapPopupProps) {
     return (
       <div className="font-sans text-sm leading-relaxed min-w-[220px]">
         <div className="flex items-center gap-2 mb-1.5">
-          <span className="text-base">🔧</span>
+          <Wrench className="h-4 w-4 text-[#3B82F6]" />
           <h3 className="font-bold text-[#1B2A4A] text-sm m-0">
             {point.equipmentName || 'Equipment'}
           </h3>
@@ -179,7 +180,7 @@ export default function MapPopup({ point }: MapPopupProps) {
   return (
     <div className="font-sans text-sm leading-relaxed min-w-[220px]">
       <div className="flex items-center gap-2 mb-1.5">
-        <span className="text-base">🏘️</span>
+        <Home className="h-4 w-4 text-[#1B2A4A]" />
         <h3 className="font-bold text-[#1B2A4A] text-sm m-0">
           {point.cooperativeName || 'Cooperative'}
         </h3>
