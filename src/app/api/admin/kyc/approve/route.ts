@@ -6,6 +6,7 @@ import { sendNotification } from '@/lib/notifications/engine';
 import { kycVerifiedTemplate } from '@/lib/notifications/templates';
 import { kycApproveSchema } from '@/lib/validation/schemas';
 import { emitEventAsync } from '@/lib/events/event-bus';
+import { fireAutomations } from '@/lib/automations/executor';
 import '@/lib/events/handlers';
 
 export async function POST(request: NextRequest) {
@@ -120,6 +121,21 @@ export async function POST(request: NextRequest) {
         body: `Your ${tierLabel} identity verification was not approved.${notes ? ` Reason: ${notes}` : ''} Please resubmit your documents.`,
         actionUrl: '/dashboard/kyc',
       }).catch(() => {});
+    }
+
+    // Fire automation rules for KYC
+    {
+      const { data: memberProfile } = await svc
+        .from('profiles')
+        .select('email, full_name')
+        .eq('id', memberId)
+        .single();
+      if (memberProfile) {
+        fireAutomations(action === 'approve' ? 'kyc_approved' : 'kyc_rejected', {
+          name: memberProfile.full_name || '',
+          email: memberProfile.email || '',
+        }).catch(() => {});
+      }
     }
 
     // S2.10: Emit KYC_APPROVED event for cross-system workflows

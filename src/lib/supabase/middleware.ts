@@ -170,7 +170,7 @@ export async function updateSession(request: NextRequest) {
         dest.pathname = '/warehouse';
         break;
       default:
-        dest.pathname = '/dashboard';
+        dest.pathname = '/farm';
     }
     return NextResponse.redirect(dest);
   }
@@ -184,7 +184,7 @@ export async function updateSession(request: NextRequest) {
   if (user && roleData && pathname.startsWith('/admin')) {
     if (!userHasAnyRole(roleData, ['admin', 'super_admin'])) {
       const forbiddenUrl = request.nextUrl.clone();
-      forbiddenUrl.pathname = '/dashboard';
+      forbiddenUrl.pathname = '/farm';
       return NextResponse.redirect(forbiddenUrl);
     }
   }
@@ -192,7 +192,7 @@ export async function updateSession(request: NextRequest) {
   if (user && roleData && pathname.startsWith('/supplier')) {
     if (!userHasAnyRole(roleData, ['supplier', 'admin', 'super_admin'])) {
       const forbiddenUrl = request.nextUrl.clone();
-      forbiddenUrl.pathname = '/dashboard';
+      forbiddenUrl.pathname = '/farm';
       return NextResponse.redirect(forbiddenUrl);
     }
   }
@@ -200,7 +200,7 @@ export async function updateSession(request: NextRequest) {
   if (user && roleData && pathname.startsWith('/investor')) {
     if (!userHasAnyRole(roleData, ['investor', 'admin', 'super_admin'])) {
       const forbiddenUrl = request.nextUrl.clone();
-      forbiddenUrl.pathname = '/dashboard';
+      forbiddenUrl.pathname = '/farm';
       return NextResponse.redirect(forbiddenUrl);
     }
   }
@@ -208,7 +208,7 @@ export async function updateSession(request: NextRequest) {
   if (user && roleData && pathname.startsWith('/ambassador')) {
     if (!userHasAnyRole(roleData, ['ambassador', 'admin', 'super_admin'])) {
       const forbiddenUrl = request.nextUrl.clone();
-      forbiddenUrl.pathname = '/dashboard';
+      forbiddenUrl.pathname = '/farm';
       return NextResponse.redirect(forbiddenUrl);
     }
   }
@@ -216,7 +216,7 @@ export async function updateSession(request: NextRequest) {
   if (user && roleData && pathname.startsWith('/warehouse')) {
     if (!userHasAnyRole(roleData, ['warehouse_operator', 'admin', 'super_admin'])) {
       const forbiddenUrl = request.nextUrl.clone();
-      forbiddenUrl.pathname = '/dashboard';
+      forbiddenUrl.pathname = '/farm';
       return NextResponse.redirect(forbiddenUrl);
     }
   }

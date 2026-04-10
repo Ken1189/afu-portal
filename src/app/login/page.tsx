@@ -146,11 +146,17 @@ export default function LoginPage() {
         case 'ambassador':
           router.push('/ambassador');
           break;
+        case 'warehouse_operator':
+          router.push('/warehouse');
+          break;
+        case 'farmer':
+          router.push('/farm');
+          break;
         default:
-          router.push('/dashboard');
+          router.push('/farm');
       }
     } catch {
-      router.push('/dashboard');
+      router.push('/farm');
     }
   }, [router]);
 

@@ -6,6 +6,7 @@ import { sendNotification } from '@/lib/notifications/engine';
 import { loanApprovedTemplate } from '@/lib/notifications/templates';
 import { loanApproveSchema } from '@/lib/validation/schemas';
 import { emitEventAsync } from '@/lib/events/event-bus';
+import { fireAutomations } from '@/lib/automations/executor';
 import '@/lib/events/handlers';
 
 export async function POST(request: NextRequest) {
@@ -97,6 +98,24 @@ export async function POST(request: NextRequest) {
           ? template.body
           : `Your loan application (${loan.loan_number || loanId}) has been rejected.${notes ? ` Reason: ${notes}` : ''}`,
       }).catch(() => {});
+    }
+
+    // Fire automation rules for loan approval/rejection
+    if (loan.member_id) {
+      const { data: memberProfile } = await svc
+        .from('profiles')
+        .select('email, full_name')
+        .eq('id', loan.member_id)
+        .single();
+      if (memberProfile) {
+        const triggerType = action === 'approve' ? 'loan_approved' : 'loan_rejected';
+        fireAutomations(triggerType, {
+          name: memberProfile.full_name || '',
+          email: memberProfile.email || '',
+          amount: String(loan.amount),
+          reason: notes || '',
+        }).catch(() => {});
+      }
     }
 
     // Emit cross-system event (fire-and-forget)

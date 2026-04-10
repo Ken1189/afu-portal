@@ -1,5 +1,20 @@
 import { createClient } from '@supabase/supabase-js';
 import { sendEmail } from '@/lib/email/resend';
+import {
+  sendWelcomeSeriesEmail,
+  sendLoanApplicationReceivedEmail,
+  sendLoanApprovalEmail,
+  sendLoanRejectionEmail,
+  sendLoanDisbursedEmail,
+  sendKycApprovalEmail,
+  sendOrderStatusEmail,
+  sendMembershipExpiryWarningEmail,
+  sendMembershipExpiredEmail,
+  sendMembershipPaymentConfirmationEmail,
+  sendTierDowngradeEmail,
+  sendNewsletterConfirmationEmail,
+  sendJobApplicationReceivedEmail,
+} from '@/lib/email/lifecycle-emails';
 
 const svc = () =>
   createClient(
@@ -163,6 +178,129 @@ async function executeAction(
             );
             await db.from('conversations').update({ tags: newTags }).eq('id', conv.id);
           }
+        }
+        break;
+      }
+
+      // ── Lifecycle email actions ──────────────────────────────────────
+      case 'send_welcome_series': {
+        if (context.email) {
+          const emailNum = Number(config.email_number) || 1;
+          await sendWelcomeSeriesEmail(context.email, context.name || 'Member', emailNum as 1 | 2 | 3);
+        }
+        break;
+      }
+
+      case 'send_loan_application_received': {
+        if (context.email) {
+          await sendLoanApplicationReceivedEmail(
+            context.email, context.name || 'Farmer',
+            Number(context.amount || config.amount || 0),
+          );
+        }
+        break;
+      }
+
+      case 'send_loan_approval': {
+        if (context.email) {
+          await sendLoanApprovalEmail(
+            context.email, context.name || 'Farmer',
+            Number(context.amount || 0), context.tier || 'member',
+          );
+        }
+        break;
+      }
+
+      case 'send_loan_rejection': {
+        if (context.email) {
+          await sendLoanRejectionEmail(
+            context.email, context.name || 'Farmer',
+            String(context.reason || config.reason || 'Does not meet eligibility criteria at this time'),
+          );
+        }
+        break;
+      }
+
+      case 'send_loan_disbursed': {
+        if (context.email) {
+          await sendLoanDisbursedEmail(
+            context.email, context.name || 'Farmer',
+            Number(context.amount || 0), String(context.currency || 'USD'),
+            Number(context.monthly_payment || 0), String(context.first_due_date || ''),
+          );
+        }
+        break;
+      }
+
+      case 'send_kyc_approval': {
+        if (context.email) {
+          await sendKycApprovalEmail(context.email, context.name || 'Member');
+        }
+        break;
+      }
+
+      case 'send_order_status': {
+        if (context.email) {
+          await sendOrderStatusEmail(
+            context.email, context.name || 'Customer',
+            String(context.order_id || ''), String(context.status || 'processing'),
+          );
+        }
+        break;
+      }
+
+      case 'send_membership_expiry_warning': {
+        if (context.email) {
+          await sendMembershipExpiryWarningEmail(
+            context.email, context.name || 'Member',
+            String(context.expiry_date || ''), context.tier || 'member',
+          );
+        }
+        break;
+      }
+
+      case 'send_membership_expired': {
+        if (context.email) {
+          await sendMembershipExpiredEmail(
+            context.email, context.name || 'Member', context.tier || 'member',
+          );
+        }
+        break;
+      }
+
+      case 'send_membership_payment_confirmation': {
+        if (context.email) {
+          await sendMembershipPaymentConfirmationEmail(
+            context.email, context.name || 'Member',
+            context.tier || 'member', String(context.amount || ''),
+          );
+        }
+        break;
+      }
+
+      case 'send_tier_downgrade': {
+        if (context.email) {
+          await sendTierDowngradeEmail(
+            context.email, context.name || 'Member',
+            String(context.previous_tier || config.previous_tier || 'premium'),
+          );
+        }
+        break;
+      }
+
+      case 'send_newsletter_confirmation': {
+        if (context.email) {
+          await sendNewsletterConfirmationEmail(context.email);
+        }
+        break;
+      }
+
+      case 'send_job_application_received': {
+        if (context.email) {
+          await sendJobApplicationReceivedEmail(
+            context.email, context.name || 'Applicant',
+            String(context.job_title || config.job_title || ''),
+          );
         }
         break;
       }
