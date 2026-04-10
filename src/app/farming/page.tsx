@@ -108,71 +108,61 @@ const featuredCrops = [
   {
     name: "Coffee",
     slug: "coffee",
-    image:
-      "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=300&h=200&fit=crop",
+    image: "/images/crops/coffee.jpg",
     countries: ["Ethiopia", "Kenya", "Tanzania"],
   },
   {
     name: "Maize",
     slug: "maize",
-    image:
-      "https://images.unsplash.com/photo-1601648764658-cf37e8c89b70?w=300&h=200&fit=crop",
+    image: "/images/crops/maize.jpg",
     countries: ["Zambia", "Zimbabwe", "Mozambique"],
   },
   {
     name: "Cashew Nuts",
     slug: "cashew-nuts",
-    image:
-      "https://images.unsplash.com/photo-1590165482129-1b8b27698780?w=300&h=200&fit=crop",
+    image: "/images/crops/cashew-nuts.jpg",
     countries: ["Mozambique", "Tanzania"],
   },
   {
     name: "Cocoa",
     slug: "cocoa",
-    image:
-      "https://images.unsplash.com/photo-1606312619070-d48b4c652a52?w=300&h=200&fit=crop",
+    image: "/images/crops/cocoa.jpg",
     countries: ["Ghana", "Cameroon"],
   },
   {
     name: "Blueberries",
     slug: "blueberries",
-    image:
-      "https://images.unsplash.com/photo-1498557850523-fd3d118b962e?w=300&h=200&fit=crop",
+    image: "/images/crops/blueberries.jpg",
     countries: ["South Africa", "Zimbabwe"],
   },
   {
     name: "Macadamia",
     slug: "macadamia",
-    image:
-      "https://images.unsplash.com/photo-1597436878032-de8c687543b4?w=300&h=200&fit=crop",
+    image: "/images/crops/macadamia.jpg",
     countries: ["South Africa", "Kenya", "Malawi"],
   },
   {
     name: "Soya",
     slug: "soya",
-    image:
-      "https://images.unsplash.com/photo-1593113630400-ea4288922497?w=300&h=200&fit=crop",
+    image: "/images/crops/soya.jpg",
     countries: ["Zambia", "Zimbabwe", "Malawi"],
   },
   {
     name: "Cotton",
     slug: "cotton",
-    image:
-      "https://images.unsplash.com/photo-1605000797499-95a51c5269ae?w=300&h=200&fit=crop",
+    image: "/images/crops/cotton.jpg",
     countries: ["Zimbabwe", "Mozambique", "Tanzania"],
   },
   {
     name: "Tea",
     slug: "tea",
-    image:
-      "https://images.unsplash.com/photo-1563911892437-0c0f44a0e453?w=300&h=200&fit=crop",
+    image: "/images/crops/tea.jpg",
     countries: ["Kenya", "Malawi", "Tanzania"],
   },
   {
     name: "Tobacco",
     slug: "tobacco",
-    image:
-      "https://images.unsplash.com/photo-1416339306562-f3d12fefd36f?w=300&h=200&fit=crop",
+    image: "/images/crops/tobacco.jpg",
     countries: ["Zimbabwe", "Malawi", "Mozambique"],
   },
 ];
