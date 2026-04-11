@@ -116,8 +116,9 @@ export class OrangeMoneyGateway implements PaymentGateway {
     const accessToken = await getAccessToken();
     const transactionId = generateTransactionId();
 
-    const notifUrl = process.env.ORANGE_MONEY_NOTIFY_URL || 'https://localhost/payments/orange/notify';
-    const returnUrl = request.returnUrl || process.env.ORANGE_MONEY_RETURN_URL || 'https://localhost/payments/orange/return';
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://africanfarmingunion.org';
+    const notifUrl = process.env.ORANGE_MONEY_NOTIFY_URL || `${baseUrl}/payments/orange/notify`;
+    const returnUrl = request.returnUrl || process.env.ORANGE_MONEY_RETURN_URL || `${baseUrl}/payments/orange/return`;
     const cancelUrl = process.env.ORANGE_MONEY_CANCEL_URL || returnUrl;
 
     // Map our currency to Orange Money's country code

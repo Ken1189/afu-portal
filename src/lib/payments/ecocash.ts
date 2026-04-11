@@ -92,8 +92,9 @@ export class EcoCashGateway implements PaymentGateway {
     const transactionId = generateTransactionId();
 
     // Paynow result and return URLs (your server endpoints)
-    const resultUrl = process.env.ECOCASH_RESULT_URL || 'https://localhost/payments/ecocash/result';
-    const returnUrl = request.returnUrl || process.env.ECOCASH_RETURN_URL || 'https://localhost/payments/ecocash/return';
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://africanfarmingunion.org';
+    const resultUrl = process.env.ECOCASH_RESULT_URL || `${baseUrl}/payments/ecocash/result`;
+    const returnUrl = request.returnUrl || process.env.ECOCASH_RETURN_URL || `${baseUrl}/payments/ecocash/return`;
 
     const values: Record<string, string> = {
       id: merchantId,

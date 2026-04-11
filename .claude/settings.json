@@ -1,0 +1,8 @@
+{
+  "hooks": {
+    "pre-commit": {
+      "command": "npx next lint",
+      "description": "Lint before every commit"
+    }
+  }
+}
