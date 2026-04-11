@@ -1093,6 +1093,245 @@ export const ADVISORS_CHROME_SCHEMA: PageSchema = {
 };
 
 // ───────────────────────────────────────────────────────────────────────
+// Forms Management — edit labels, placeholders, help text for platform forms
+// ───────────────────────────────────────────────────────────────────────
+
+function makeFormSchema(
+  slug: string,
+  label: string,
+  fields: { key: string; defaultLabel: string; defaultPlaceholder: string; defaultHelp: string }[]
+): PageSchema {
+  return {
+    id: `form_${slug}`,
+    label: `${label} Form`,
+    publishedKey: `form_${slug}`,
+    draftKey: `form_${slug}_draft`,
+    previewPath: `/${slug === 'contact' ? 'contact' : slug === 'registration' ? 'apply' : slug === 'loan_application' ? 'dashboard/loans/apply' : slug === 'membership' ? 'membership/apply' : slug}?preview=draft`,
+    sections: [
+      {
+        id: 'settings',
+        title: 'Form Settings',
+        fields: [
+          { key: 'form_title', label: 'Form Title', type: 'text' as const },
+          { key: 'form_subtitle', label: 'Form Subtitle', type: 'textarea' as const },
+          { key: 'submit_button_text', label: 'Submit Button Text', type: 'text' as const },
+          { key: 'success_title', label: 'Success Title', type: 'text' as const },
+          { key: 'success_message', label: 'Success Message', type: 'textarea' as const },
+          { key: 'error_message', label: 'Error Message', type: 'text' as const },
+        ],
+      },
+      {
+        id: 'fields',
+        title: 'Form Fields',
+        fields: [
+          {
+            key: 'form_fields',
+            label: 'Fields',
+            type: 'object-list' as const,
+            itemFields: [
+              { key: 'field_key', label: 'Field Key (internal)', type: 'text' as const },
+              { key: 'label', label: 'Label', type: 'text' as const },
+              { key: 'placeholder', label: 'Placeholder', type: 'text' as const },
+              { key: 'help_text', label: 'Help Text', type: 'text' as const },
+              { key: 'required', label: 'Required (true/false)', type: 'text' as const },
+              { key: 'field_type', label: 'Type (text/email/textarea/select/phone/number)', type: 'text' as const },
+            ],
+            defaultItem: { field_key: '', label: 'New Field', placeholder: '', help_text: '', required: 'false', field_type: 'text' },
+          },
+        ],
+      },
+      {
+        id: 'validation',
+        title: 'Validation Messages',
+        fields: [
+          { key: 'validation_required', label: 'Required Field Message', type: 'text' as const },
+          { key: 'validation_email', label: 'Invalid Email Message', type: 'text' as const },
+          { key: 'validation_phone', label: 'Invalid Phone Message', type: 'text' as const },
+          { key: 'validation_min_length', label: 'Min Length Message', type: 'text' as const },
+          { key: 'validation_max_length', label: 'Max Length Message', type: 'text' as const },
+        ],
+      },
+    ],
+  };
+}
+
+export const FORM_CONTACT_SCHEMA = makeFormSchema('contact', 'Contact', [
+  { key: 'name', defaultLabel: 'Full Name', defaultPlaceholder: 'Enter your name', defaultHelp: '' },
+  { key: 'email', defaultLabel: 'Email', defaultPlaceholder: 'you@example.com', defaultHelp: '' },
+  { key: 'subject', defaultLabel: 'Subject', defaultPlaceholder: 'What is this about?', defaultHelp: '' },
+  { key: 'message', defaultLabel: 'Message', defaultPlaceholder: 'Tell us how we can help...', defaultHelp: '' },
+]);
+
+export const FORM_REGISTRATION_SCHEMA = makeFormSchema('registration', 'Registration', [
+  { key: 'first_name', defaultLabel: 'First Name', defaultPlaceholder: 'Enter first name', defaultHelp: '' },
+  { key: 'last_name', defaultLabel: 'Last Name', defaultPlaceholder: 'Enter last name', defaultHelp: '' },
+  { key: 'email', defaultLabel: 'Email', defaultPlaceholder: 'you@example.com', defaultHelp: '' },
+  { key: 'phone', defaultLabel: 'Phone', defaultPlaceholder: '+234...', defaultHelp: '' },
+  { key: 'country', defaultLabel: 'Country', defaultPlaceholder: 'Select country', defaultHelp: '' },
+  { key: 'farm_size', defaultLabel: 'Farm Size (hectares)', defaultPlaceholder: 'e.g. 5', defaultHelp: '' },
+]);
+
+export const FORM_LOAN_APPLICATION_SCHEMA = makeFormSchema('loan_application', 'Loan Application', [
+  { key: 'loan_type', defaultLabel: 'Loan Type', defaultPlaceholder: 'Select loan type', defaultHelp: '' },
+  { key: 'amount', defaultLabel: 'Amount Requested', defaultPlaceholder: 'Enter amount', defaultHelp: '' },
+  { key: 'purpose', defaultLabel: 'Purpose', defaultPlaceholder: 'Describe the purpose of the loan', defaultHelp: '' },
+  { key: 'repayment_period', defaultLabel: 'Repayment Period', defaultPlaceholder: 'Select period', defaultHelp: '' },
+]);
+
+export const FORM_MEMBERSHIP_SCHEMA = makeFormSchema('membership', 'Membership Application', [
+  { key: 'membership_tier', defaultLabel: 'Membership Tier', defaultPlaceholder: 'Select tier', defaultHelp: '' },
+  { key: 'farm_type', defaultLabel: 'Farm Type', defaultPlaceholder: 'e.g. Crops, Livestock, Mixed', defaultHelp: '' },
+  { key: 'experience', defaultLabel: 'Years of Experience', defaultPlaceholder: 'e.g. 5', defaultHelp: '' },
+]);
+
+// ───────────────────────────────────────────────────────────────────────
+// Resources & Materials — manage downloadable resources
+// ───────────────────────────────────────────────────────────────────────
+
+export const RESOURCES_SCHEMA: PageSchema = {
+  id: 'resources',
+  label: 'Resources & Materials',
+  publishedKey: 'resources_content',
+  draftKey: 'resources_content_draft',
+  previewPath: '/resources?preview=draft',
+  sections: [
+    {
+      id: 'hero',
+      title: 'Resources Page Header',
+      fields: [
+        { key: 'hero_title', label: 'Page Title', type: 'text' },
+        { key: 'hero_subtitle', label: 'Page Subtitle', type: 'textarea' },
+        { key: 'hero_badge', label: 'Badge Text', type: 'text' },
+      ],
+    },
+    {
+      id: 'categories',
+      title: 'Resource Categories',
+      fields: [
+        {
+          key: 'categories',
+          label: 'Categories',
+          type: 'object-list',
+          itemFields: [
+            { key: 'slug', label: 'Slug (internal)', type: 'text' },
+            { key: 'name', label: 'Display Name', type: 'text' },
+            { key: 'description', label: 'Description', type: 'textarea' },
+            { key: 'icon', label: 'Icon (lucide name)', type: 'text' },
+          ],
+          defaultItem: { slug: '', name: 'New Category', description: '', icon: 'folder' },
+        },
+      ],
+    },
+    {
+      id: 'items',
+      title: 'Resource Items',
+      fields: [
+        {
+          key: 'resource_items',
+          label: 'Resources',
+          type: 'object-list',
+          itemFields: [
+            { key: 'title', label: 'Title', type: 'text' },
+            { key: 'description', label: 'Description', type: 'textarea' },
+            { key: 'category', label: 'Category Slug', type: 'text' },
+            { key: 'file_url', label: 'File URL', type: 'text' },
+            { key: 'file_type', label: 'File Type (pdf/doc/xlsx/video/link)', type: 'text' },
+            { key: 'visibility', label: 'Visibility (public/members/tier_gold/tier_platinum)', type: 'text' },
+            { key: 'language', label: 'Language (en/fr/pt/sw/am/ha/yo/ig/zu/ar/so/lg)', type: 'text' },
+          ],
+          defaultItem: { title: '', description: '', category: '', file_url: '', file_type: 'pdf', visibility: 'public', language: 'en' },
+        },
+      ],
+    },
+    {
+      id: 'empty_state',
+      title: 'Empty State',
+      fields: [
+        { key: 'empty_title', label: 'Empty State Title', type: 'text' },
+        { key: 'empty_body', label: 'Empty State Body', type: 'textarea' },
+      ],
+    },
+    {
+      id: 'cta',
+      title: 'Call to Action',
+      fields: [
+        { key: 'cta_title', label: 'CTA Title', type: 'text' },
+        { key: 'cta_body', label: 'CTA Body', type: 'textarea' },
+        { key: 'cta_button_text', label: 'CTA Button Text', type: 'text' },
+        { key: 'cta_button_link', label: 'CTA Button Link', type: 'text' },
+      ],
+    },
+  ],
+};
+
+// ───────────────────────────────────────────────────────────────────────
+// Email Templates — manage system email content
+// ───────────────────────────────────────────────────────────────────────
+
+function makeEmailSchema(slug: string, label: string, extraFields: { key: string; label: string; type: 'text' | 'textarea' }[] = []): PageSchema {
+  return {
+    id: `email_${slug}`,
+    label: `${label} Email`,
+    publishedKey: `email_template_${slug}`,
+    draftKey: `email_template_${slug}_draft`,
+    previewPath: `/admin/email-preview/${slug}?preview=draft`,
+    sections: [
+      {
+        id: 'content',
+        title: 'Email Content',
+        fields: [
+          { key: 'subject', label: 'Subject Line', type: 'text' },
+          { key: 'preview_text', label: 'Preview Text (inbox snippet)', type: 'text' },
+          { key: 'heading', label: 'Heading', type: 'text' },
+          { key: 'body', label: 'Body', type: 'richtext' },
+          ...extraFields,
+        ],
+      },
+      {
+        id: 'cta',
+        title: 'Call to Action',
+        fields: [
+          { key: 'cta_text', label: 'Button Text', type: 'text' },
+          { key: 'cta_url', label: 'Button URL', type: 'text' },
+        ],
+      },
+      {
+        id: 'footer',
+        title: 'Email Footer',
+        fields: [
+          { key: 'footer_text', label: 'Footer Text', type: 'textarea' },
+          { key: 'unsubscribe_text', label: 'Unsubscribe Text', type: 'text' },
+        ],
+      },
+    ],
+  };
+}
+
+export const EMAIL_WELCOME_SCHEMA = makeEmailSchema('welcome', 'Welcome');
+export const EMAIL_VERIFICATION_SCHEMA = makeEmailSchema('verification', 'Email Verification');
+export const EMAIL_PASSWORD_RESET_SCHEMA = makeEmailSchema('password_reset', 'Password Reset');
+export const EMAIL_LOAN_APPROVED_SCHEMA = makeEmailSchema('loan_approved', 'Loan Approved', [
+  { key: 'loan_details_label', label: 'Loan Details Label', type: 'text' },
+  { key: 'next_steps', label: 'Next Steps Text', type: 'textarea' },
+]);
+export const EMAIL_LOAN_REJECTED_SCHEMA = makeEmailSchema('loan_rejected', 'Loan Rejected', [
+  { key: 'reason_label', label: 'Reason Label', type: 'text' },
+  { key: 'reapply_text', label: 'Reapply Instructions', type: 'textarea' },
+]);
+export const EMAIL_PAYMENT_RECEIVED_SCHEMA = makeEmailSchema('payment_received', 'Payment Received', [
+  { key: 'amount_label', label: 'Amount Label', type: 'text' },
+  { key: 'receipt_text', label: 'Receipt Text', type: 'textarea' },
+]);
+export const EMAIL_MEMBERSHIP_CONFIRMED_SCHEMA = makeEmailSchema('membership_confirmed', 'Membership Confirmed', [
+  { key: 'tier_label', label: 'Tier Label', type: 'text' },
+  { key: 'benefits_text', label: 'Benefits Summary', type: 'textarea' },
+]);
+export const EMAIL_SPONSOR_UPDATE_SCHEMA = makeEmailSchema('sponsor_update', 'Sponsor Update', [
+  { key: 'farmer_name_label', label: 'Farmer Name Label', type: 'text' },
+  { key: 'progress_text', label: 'Progress Update', type: 'textarea' },
+]);
+
+// ───────────────────────────────────────────────────────────────────────
 // Default content — pre-fills the editor so the team sees actual text
 // ───────────────────────────────────────────────────────────────────────
 
@@ -1173,6 +1412,133 @@ export const DEFAULT_CONTENT: Record<string, Record<string, unknown>> = {
     success_title: 'Message Sent',
     success_body: "Thank you for reaching out. We'll get back to you within 24 hours.",
   },
+  form_contact: {
+    form_title: 'Contact Us',
+    form_subtitle: 'Send us a message and we will get back to you within 24 hours.',
+    submit_button_text: 'Send Message',
+    success_title: 'Message Sent!',
+    success_message: 'Thank you for reaching out. Our team will respond within 24 hours.',
+    error_message: 'Something went wrong. Please try again.',
+    form_fields: [
+      { field_key: 'name', label: 'Full Name', placeholder: 'Enter your full name', help_text: '', required: 'true', field_type: 'text' },
+      { field_key: 'email', label: 'Email Address', placeholder: 'you@example.com', help_text: '', required: 'true', field_type: 'email' },
+      { field_key: 'subject', label: 'Subject', placeholder: 'What is this about?', help_text: '', required: 'true', field_type: 'text' },
+      { field_key: 'message', label: 'Message', placeholder: 'Tell us how we can help...', help_text: '', required: 'true', field_type: 'textarea' },
+    ],
+    validation_required: 'This field is required',
+    validation_email: 'Please enter a valid email address',
+    validation_phone: 'Please enter a valid phone number',
+    validation_min_length: 'Must be at least {min} characters',
+    validation_max_length: 'Must be no more than {max} characters',
+  },
+  form_registration: {
+    form_title: 'Join Our Farming Family',
+    form_subtitle: 'Tell us about yourself and your farm. The first step to accessing finance, inputs, and guaranteed markets.',
+    submit_button_text: 'Submit Application',
+    success_title: 'Application Received!',
+    success_message: 'Welcome to the AFU family. We will review your application and be in touch within 48 hours.',
+    error_message: 'Something went wrong. Please try again.',
+    form_fields: [
+      { field_key: 'first_name', label: 'First Name', placeholder: 'Enter first name', help_text: '', required: 'true', field_type: 'text' },
+      { field_key: 'last_name', label: 'Last Name', placeholder: 'Enter last name', help_text: '', required: 'true', field_type: 'text' },
+      { field_key: 'email', label: 'Email Address', placeholder: 'you@example.com', help_text: '', required: 'true', field_type: 'email' },
+      { field_key: 'phone', label: 'Phone Number', placeholder: '+234...', help_text: 'Include country code', required: 'true', field_type: 'phone' },
+      { field_key: 'country', label: 'Country', placeholder: 'Select your country', help_text: '', required: 'true', field_type: 'select' },
+      { field_key: 'farm_size', label: 'Farm Size (hectares)', placeholder: 'e.g. 5', help_text: 'Approximate size in hectares', required: 'false', field_type: 'number' },
+    ],
+    validation_required: 'This field is required',
+    validation_email: 'Please enter a valid email address',
+    validation_phone: 'Please enter a valid phone number',
+    validation_min_length: 'Must be at least {min} characters',
+    validation_max_length: 'Must be no more than {max} characters',
+  },
+  form_loan_application: {
+    form_title: 'Apply for Financing',
+    form_subtitle: 'Access working capital, input finance, and equipment leasing tailored to your crop cycle.',
+    submit_button_text: 'Submit Loan Application',
+    success_title: 'Application Submitted!',
+    success_message: 'Your loan application is being reviewed. You will hear from our team within 5 business days.',
+    error_message: 'Something went wrong. Please try again or contact support.',
+    form_fields: [
+      { field_key: 'loan_type', label: 'Loan Type', placeholder: 'Select loan type', help_text: 'Choose the type of financing you need', required: 'true', field_type: 'select' },
+      { field_key: 'amount', label: 'Amount Requested (USD)', placeholder: 'Enter amount', help_text: 'The amount you need in USD', required: 'true', field_type: 'number' },
+      { field_key: 'purpose', label: 'Purpose of Loan', placeholder: 'Describe how you will use the funds...', help_text: 'Be specific about what the funds will be used for', required: 'true', field_type: 'textarea' },
+      { field_key: 'repayment_period', label: 'Preferred Repayment Period', placeholder: 'Select period', help_text: 'How long do you need to repay?', required: 'true', field_type: 'select' },
+    ],
+    validation_required: 'This field is required',
+    validation_email: 'Please enter a valid email address',
+    validation_phone: 'Please enter a valid phone number',
+    validation_min_length: 'Must be at least {min} characters',
+    validation_max_length: 'Must be no more than {max} characters',
+  },
+  form_membership: {
+    form_title: 'Become a Member',
+    form_subtitle: 'Join the African Farming Union and unlock access to financing, inputs, training, and guaranteed markets.',
+    submit_button_text: 'Apply for Membership',
+    success_title: 'Membership Application Received!',
+    success_message: 'Your application is under review. You will receive a confirmation email shortly.',
+    error_message: 'Something went wrong. Please try again.',
+    form_fields: [
+      { field_key: 'membership_tier', label: 'Membership Tier', placeholder: 'Select tier', help_text: 'Choose the membership level that fits your needs', required: 'true', field_type: 'select' },
+      { field_key: 'farm_type', label: 'Farm Type', placeholder: 'e.g. Crops, Livestock, Mixed', help_text: 'What type of farming do you do?', required: 'true', field_type: 'text' },
+      { field_key: 'experience', label: 'Years of Experience', placeholder: 'e.g. 5', help_text: 'How many years have you been farming?', required: 'false', field_type: 'number' },
+    ],
+    validation_required: 'This field is required',
+    validation_email: 'Please enter a valid email address',
+    validation_phone: 'Please enter a valid phone number',
+    validation_min_length: 'Must be at least {min} characters',
+    validation_max_length: 'Must be no more than {max} characters',
+  },
+  resources: {
+    hero_title: 'Resources & Materials',
+    hero_subtitle: 'Download guides, templates, training materials, and more to help you succeed.',
+    hero_badge: 'Knowledge Hub',
+    categories: [
+      { slug: 'guides', name: 'Farming Guides', description: 'Step-by-step guides for best practices', icon: 'book-open' },
+      { slug: 'templates', name: 'Templates', description: 'Ready-to-use business and farm templates', icon: 'file-text' },
+      { slug: 'training', name: 'Training Materials', description: 'Educational resources for skills development', icon: 'graduation-cap' },
+      { slug: 'policies', name: 'Policies & Compliance', description: 'Legal and policy documents', icon: 'shield' },
+      { slug: 'reports', name: 'Reports & Research', description: 'Market analysis and research papers', icon: 'bar-chart' },
+    ],
+    empty_title: 'No Resources Found',
+    empty_body: 'Check back soon for new materials.',
+    cta_title: 'Need Something Specific?',
+    cta_body: 'If you cannot find what you are looking for, our team is here to help.',
+    cta_button_text: 'Contact Us',
+    cta_button_link: '/contact',
+  },
+  email_welcome: {
+    subject: 'Welcome to the African Farming Union!',
+    preview_text: 'Your farming journey starts here',
+    heading: 'Welcome to AFU, {{first_name}}!',
+    body: '<p>Thank you for joining the African Farming Union. We are excited to have you as part of our growing family of farmers across Africa.</p><p>Here is what you can do next:</p><ul><li>Complete your farmer profile</li><li>Explore financing options</li><li>Browse training resources</li></ul>',
+    cta_text: 'Go to Dashboard',
+    cta_url: '/dashboard',
+    footer_text: 'African Farming Union - By Farmers, For Farmers',
+    unsubscribe_text: 'Unsubscribe from these emails',
+  },
+  email_verification: {
+    subject: 'Verify Your Email Address',
+    preview_text: 'Confirm your email to activate your account',
+    heading: 'Verify Your Email',
+    body: '<p>Please click the button below to verify your email address and activate your AFU account.</p>',
+    cta_text: 'Verify Email',
+    cta_url: '{{verification_url}}',
+    footer_text: 'African Farming Union - By Farmers, For Farmers',
+    unsubscribe_text: 'If you did not create this account, ignore this email.',
+  },
+  email_loan_approved: {
+    subject: 'Your Loan Has Been Approved!',
+    preview_text: 'Great news about your financing application',
+    heading: 'Congratulations, {{first_name}}!',
+    body: '<p>Your loan application has been approved. Review the details below and follow the next steps to receive your funds.</p>',
+    loan_details_label: 'Loan Details',
+    next_steps: 'Sign the loan agreement in your dashboard to proceed with disbursement.',
+    cta_text: 'View Loan Details',
+    cta_url: '/dashboard/loans',
+    footer_text: 'African Farming Union - By Farmers, For Farmers',
+    unsubscribe_text: 'Unsubscribe from these emails',
+  },
 };
 
 // ───────────────────────────────────────────────────────────────────────
@@ -1203,6 +1569,22 @@ export const ALL_SCHEMAS: PageSchema[] = [
   FAQ_CHROME_SCHEMA,
   CARBON_CHROME_SCHEMA,
   ADVISORS_CHROME_SCHEMA,
+  // Forms
+  FORM_CONTACT_SCHEMA,
+  FORM_REGISTRATION_SCHEMA,
+  FORM_LOAN_APPLICATION_SCHEMA,
+  FORM_MEMBERSHIP_SCHEMA,
+  // Resources
+  RESOURCES_SCHEMA,
+  // Email Templates
+  EMAIL_WELCOME_SCHEMA,
+  EMAIL_VERIFICATION_SCHEMA,
+  EMAIL_PASSWORD_RESET_SCHEMA,
+  EMAIL_LOAN_APPROVED_SCHEMA,
+  EMAIL_LOAN_REJECTED_SCHEMA,
+  EMAIL_PAYMENT_RECEIVED_SCHEMA,
+  EMAIL_MEMBERSHIP_CONFIRMED_SCHEMA,
+  EMAIL_SPONSOR_UPDATE_SCHEMA,
 ];
 
 export const SCHEMA_GROUPS: SchemaGroup[] = [
@@ -1237,5 +1619,26 @@ export const SCHEMA_GROUPS: SchemaGroup[] = [
   {
     title: 'Information Pages',
     schemaIds: ['page_chrome_countries', 'page_chrome_faq', 'page_chrome_carbon'],
+  },
+  {
+    title: 'Forms',
+    schemaIds: ['form_contact', 'form_registration', 'form_loan_application', 'form_membership'],
+  },
+  {
+    title: 'Resources & Materials',
+    schemaIds: ['resources'],
+  },
+  {
+    title: 'Email Templates',
+    schemaIds: [
+      'email_welcome',
+      'email_verification',
+      'email_password_reset',
+      'email_loan_approved',
+      'email_loan_rejected',
+      'email_payment_received',
+      'email_membership_confirmed',
+      'email_sponsor_update',
+    ],
   },
 ];
