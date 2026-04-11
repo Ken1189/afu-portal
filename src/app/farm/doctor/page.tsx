@@ -16,6 +16,20 @@ import {
   RotateCcw,
   Save,
   ChevronDown,
+  BookOpen,
+  Search,
+  ChevronRight,
+  Clock,
+  Stethoscope,
+  Thermometer,
+  Zap,
+  Shield,
+  MessageCircle,
+  History,
+  ArrowRight,
+  Sparkles,
+  FileText,
+  ExternalLink,
 } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 
@@ -187,6 +201,153 @@ const FALLBACK_DIAGNOSES: MockDiagnosis[] = [
       { name: 'Yellow Sticky Traps (pack of 20)', price: 12, unit: 'per pack' },
     ],
   },
+];
+
+// ---------------------------------------------------------------------------
+// Knowledge Base — Common Diseases & Pests
+// ---------------------------------------------------------------------------
+
+interface DiseaseEntry {
+  id: string;
+  name: string;
+  type: 'disease' | 'pest' | 'deficiency';
+  crops: string[];
+  severity: 'low' | 'medium' | 'high';
+  symptoms: string[];
+  treatment: string;
+  prevention: string;
+  image: string;
+}
+
+const KNOWLEDGE_BASE: DiseaseEntry[] = [
+  {
+    id: 'KB-001', name: 'Fall Armyworm', type: 'pest', crops: ['Maize', 'Sorghum', 'Millet'],
+    severity: 'high',
+    symptoms: ['Ragged holes in leaves', 'Sawdust-like frass in leaf whorls', 'Windowpane damage on young leaves', 'Larvae visible in whorls at dawn/dusk'],
+    treatment: 'Apply Emamectin benzoate 5% SG at first sign of damage. For organic farms, use Bt (Bacillus thuringiensis) spray.',
+    prevention: 'Early planting, intercrop with legumes, use pheromone traps for monitoring, maintain field hygiene after harvest.',
+    image: 'https://images.unsplash.com/photo-1598512752271-33f913a5af14?w=400&h=300&fit=crop',
+  },
+  {
+    id: 'KB-002', name: 'Cassava Mosaic Disease', type: 'disease', crops: ['Cassava'],
+    severity: 'high',
+    symptoms: ['Yellow/white mosaic pattern on leaves', 'Leaf curling and distortion', 'Stunted plant growth', 'Reduced tuber size'],
+    treatment: 'No chemical cure. Remove and burn infected plants immediately. Control whitefly vectors with Imidacloprid.',
+    prevention: 'Use certified virus-free planting material. Plant resistant varieties (TME 419, NASE 14). Control whitefly populations.',
+    image: 'https://images.unsplash.com/photo-1590682680695-43b964a3ae17?w=400&h=300&fit=crop',
+  },
+  {
+    id: 'KB-003', name: 'Maize Streak Virus', type: 'disease', crops: ['Maize'],
+    severity: 'high',
+    symptoms: ['Narrow chlorotic streaks along leaf veins', 'Stunted growth', 'Poor cob development', 'Young plants most susceptible'],
+    treatment: 'No chemical treatment available. Remove infected plants. Control leafhopper vectors.',
+    prevention: 'Plant resistant varieties, early planting to avoid peak leafhopper season, use Imidacloprid seed treatment.',
+    image: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400&h=300&fit=crop',
+  },
+  {
+    id: 'KB-004', name: 'Leaf Spot (Cercospora)', type: 'disease', crops: ['Sesame', 'Groundnuts', 'Cowpeas', 'Sorghum'],
+    severity: 'medium',
+    symptoms: ['Circular brown spots on leaves', 'Yellow halo around spots', 'Premature leaf drop', 'Dark lesions may merge'],
+    treatment: 'Apply copper oxychloride or mancozeb fungicide at first sign. Repeat every 10-14 days if conditions persist.',
+    prevention: 'Crop rotation, improve plant spacing for air circulation, avoid overhead irrigation, use resistant varieties.',
+    image: 'https://images.unsplash.com/photo-1595855759920-86582396756a?w=400&h=300&fit=crop',
+  },
+  {
+    id: 'KB-005', name: 'Nitrogen Deficiency', type: 'deficiency', crops: ['Maize', 'Sorghum', 'Vegetables', 'All crops'],
+    severity: 'medium',
+    symptoms: ['Yellowing starts from older/lower leaves', 'V-shaped yellowing pattern on maize', 'Stunted growth', 'Pale green overall appearance'],
+    treatment: 'Apply urea at 100-150kg/ha as top dressing. For quick response, use foliar nitrogen spray (2% urea solution).',
+    prevention: 'Soil testing before planting, proper basal fertilizer application, incorporate organic matter, use legume rotations.',
+    image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=400&h=300&fit=crop',
+  },
+  {
+    id: 'KB-006', name: 'Aphids', type: 'pest', crops: ['Cowpeas', 'Vegetables', 'Sesame', 'Cotton'],
+    severity: 'medium',
+    symptoms: ['Clusters of small soft-bodied insects on shoots', 'Sticky honeydew on leaves', 'Sooty mold on honeydew', 'Curled or distorted new growth'],
+    treatment: 'Spray neem oil or insecticidal soap for mild cases. Use Imidacloprid or Lambda-cyhalothrin for heavy infestations.',
+    prevention: 'Encourage natural predators (ladybirds, lacewings), avoid excessive nitrogen fertilization, use reflective mulches.',
+    image: 'https://images.unsplash.com/photo-1598030343246-eec71d0b4b8a?w=400&h=300&fit=crop',
+  },
+  {
+    id: 'KB-007', name: 'Phosphorus Deficiency', type: 'deficiency', crops: ['Maize', 'Groundnuts', 'All crops'],
+    severity: 'medium',
+    symptoms: ['Purple/reddish coloring of leaves and stems', 'Dark green older leaves', 'Poor root development', 'Delayed maturity'],
+    treatment: 'Apply Single Super Phosphate (SSP) or DAP at planting. For immediate effect, use foliar phosphate spray.',
+    prevention: 'Soil pH management (P is most available at pH 6.0-7.0), apply phosphate at planting, use mycorrhizal inoculants.',
+    image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=400&h=300&fit=crop',
+  },
+  {
+    id: 'KB-008', name: 'Stem Borer', type: 'pest', crops: ['Maize', 'Sorghum', 'Sugarcane'],
+    severity: 'high',
+    symptoms: ['Dead heart in young plants', 'Bore holes in stems', 'Sawdust-like frass at bore holes', 'Broken tassels', 'Lodged plants'],
+    treatment: 'Apply granular Carbofuran into the leaf whorl. For organic: inject Bt into bore holes. Remove and burn stubble after harvest.',
+    prevention: 'Early planting, intercrop with desmodium (push-pull), destroy crop residues, use resistant varieties.',
+    image: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400&h=300&fit=crop',
+  },
+];
+
+// ---------------------------------------------------------------------------
+// Symptom Checker Categories
+// ---------------------------------------------------------------------------
+
+interface SymptomCategory {
+  id: string;
+  label: string;
+  icon: 'leaf' | 'bug' | 'droplets' | 'thermometer' | 'zap';
+  symptoms: string[];
+  possibleCauses: string[];
+}
+
+const SYMPTOM_CATEGORIES: SymptomCategory[] = [
+  {
+    id: 'leaves', label: 'Leaf Problems', icon: 'leaf',
+    symptoms: ['Yellowing leaves', 'Brown spots', 'Curling leaves', 'Wilting', 'White powdery coating', 'Holes in leaves', 'Purple discoloration', 'Mosaic patterns'],
+    possibleCauses: ['Nutrient deficiency', 'Fungal disease', 'Viral infection', 'Pest damage', 'Water stress'],
+  },
+  {
+    id: 'pests', label: 'Visible Pests', icon: 'bug',
+    symptoms: ['Small insects on leaves', 'Caterpillars', 'Bore holes in stems', 'Webbing on plants', 'Frass/droppings visible', 'Chewed leaf edges', 'Galls on stems'],
+    possibleCauses: ['Aphids', 'Armyworm', 'Stem borer', 'Spider mites', 'Whitefly', 'Bollworm'],
+  },
+  {
+    id: 'water', label: 'Water Issues', icon: 'droplets',
+    symptoms: ['Drooping/wilting plants', 'Yellowing from bottom up', 'Root rot smell', 'Waterlogged soil', 'Cracking soil', 'Leaf scorch'],
+    possibleCauses: ['Overwatering', 'Underwatering', 'Poor drainage', 'Root disease', 'Salt buildup'],
+  },
+  {
+    id: 'growth', label: 'Growth Problems', icon: 'thermometer',
+    symptoms: ['Stunted growth', 'No flowering', 'Poor fruit set', 'Premature fruit drop', 'Thin/weak stems', 'Small leaves'],
+    possibleCauses: ['Nutrient deficiency', 'Temperature stress', 'Poor pollination', 'Root damage', 'Compacted soil'],
+  },
+  {
+    id: 'soil', label: 'Soil Issues', icon: 'zap',
+    symptoms: ['White crust on surface', 'Hard compacted soil', 'Poor water absorption', 'Unusual odors', 'White fungal growth on surface'],
+    possibleCauses: ['pH imbalance', 'Salt accumulation', 'Compaction', 'Poor organic matter', 'Fungal infection'],
+  },
+];
+
+// ---------------------------------------------------------------------------
+// Consultation History
+// ---------------------------------------------------------------------------
+
+interface ConsultationRecord {
+  id: string;
+  date: string;
+  plotName: string;
+  diagnosis: string;
+  severity: 'healthy' | 'moderate' | 'severe';
+  healthScore: number;
+  resolved: boolean;
+  followUpDate?: string;
+}
+
+const CONSULTATION_HISTORY: ConsultationRecord[] = [
+  { id: 'CON-001', date: '2026-04-08', plotName: 'Main Blueberry Field', diagnosis: 'Healthy - No Issues', severity: 'healthy', healthScore: 92, resolved: true },
+  { id: 'CON-002', date: '2026-04-05', plotName: 'Cassava Plot', diagnosis: 'Possible Cassava Mosaic - Early Signs', severity: 'moderate', healthScore: 72, resolved: false, followUpDate: '2026-04-12' },
+  { id: 'CON-003', date: '2026-04-02', plotName: 'Sesame Strip', diagnosis: 'Minor Leaf Spot (Cercospora)', severity: 'moderate', healthScore: 82, resolved: true },
+  { id: 'CON-004', date: '2026-03-28', plotName: 'Maize Field', diagnosis: 'Nitrogen Deficiency', severity: 'moderate', healthScore: 55, resolved: true },
+  { id: 'CON-005', date: '2026-03-22', plotName: 'Main Blueberry Field', diagnosis: 'Aphid Infestation (Minor)', severity: 'moderate', healthScore: 68, resolved: true },
+  { id: 'CON-006', date: '2026-03-15', plotName: 'Cassava Plot', diagnosis: 'Healthy Check', severity: 'healthy', healthScore: 88, resolved: true },
 ];
 
 // ---------------------------------------------------------------------------
@@ -414,6 +575,19 @@ function AnalysisStep({
 // Main Page
 // ---------------------------------------------------------------------------
 
+type DoctorTab = 'scan' | 'symptoms' | 'knowledge' | 'history';
+
+function getSymptomIcon(icon: string, size = 16) {
+  switch (icon) {
+    case 'leaf': return <Leaf size={size} />;
+    case 'bug': return <Bug size={size} />;
+    case 'droplets': return <Droplets size={size} />;
+    case 'thermometer': return <Thermometer size={size} />;
+    case 'zap': return <Zap size={size} />;
+    default: return <Leaf size={size} />;
+  }
+}
+
 export default function CropDoctorPage() {
   const { t } = useLanguage();
   const [pageState, setPageState] = useState<PageState>('capture');
@@ -422,6 +596,12 @@ export default function CropDoctorPage() {
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [analysisStep, setAnalysisStep] = useState(0);
   const [result, setResult] = useState<MockDiagnosis | null>(null);
+  const [activeTab, setActiveTab] = useState<DoctorTab>('scan');
+  const [kbSearch, setKbSearch] = useState('');
+  const [kbTypeFilter, setKbTypeFilter] = useState<'all' | 'disease' | 'pest' | 'deficiency'>('all');
+  const [expandedKb, setExpandedKb] = useState<string | null>(null);
+  const [expandedSymptom, setExpandedSymptom] = useState<string | null>(null);
+  const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
 
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
@@ -600,15 +780,54 @@ export default function CropDoctorPage() {
     t.cropDoctor.generatingRecs,
   ];
 
+  // Filtered knowledge base
+  const filteredKb = KNOWLEDGE_BASE.filter((entry) => {
+    const matchesSearch = kbSearch === '' ||
+      entry.name.toLowerCase().includes(kbSearch.toLowerCase()) ||
+      entry.crops.some(c => c.toLowerCase().includes(kbSearch.toLowerCase())) ||
+      entry.symptoms.some(s => s.toLowerCase().includes(kbSearch.toLowerCase()));
+    const matchesType = kbTypeFilter === 'all' || entry.type === kbTypeFilter;
+    return matchesSearch && matchesType;
+  });
+
   return (
     <div className="min-h-full">
+      {/* ================================================================== */}
+      {/* TAB NAVIGATION                                                     */}
+      {/* ================================================================== */}
+      {pageState === 'capture' && (
+        <div className="px-4 pt-3 pb-1">
+          <div className="flex gap-1 bg-gray-100 rounded-xl p-1">
+            {([
+              { key: 'scan' as DoctorTab, label: 'Scan', icon: <Camera size={14} /> },
+              { key: 'symptoms' as DoctorTab, label: 'Symptoms', icon: <Stethoscope size={14} /> },
+              { key: 'knowledge' as DoctorTab, label: 'Library', icon: <BookOpen size={14} /> },
+              { key: 'history' as DoctorTab, label: 'History', icon: <History size={14} /> },
+            ]).map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-xs font-semibold transition-all ${
+                  activeTab === tab.key
+                    ? 'bg-white text-[#1B2A4A] shadow-sm'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                {tab.icon}
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       <AnimatePresence mode="wait">
         {/* ================================================================== */}
-        {/* STATE 1: CAPTURE                                                   */}
+        {/* STATE 1: CAPTURE — SCAN TAB                                       */}
         {/* ================================================================== */}
-        {pageState === 'capture' && (
+        {pageState === 'capture' && activeTab === 'scan' && (
           <motion.div
-            key="capture"
+            key="capture-scan"
             {...pageTransition}
             className="p-4 space-y-5"
           >
@@ -812,6 +1031,492 @@ export default function CropDoctorPage() {
                 </div>
               </motion.div>
             )}
+          </motion.div>
+        )}
+
+        {/* ================================================================== */}
+        {/* STATE 1: CAPTURE — SYMPTOM CHECKER TAB                            */}
+        {/* ================================================================== */}
+        {pageState === 'capture' && activeTab === 'symptoms' && (
+          <motion.div
+            key="capture-symptoms"
+            {...pageTransition}
+            className="p-4 space-y-5"
+          >
+            <motion.div variants={fadeUp} initial="initial" animate="animate">
+              <div className="flex items-center gap-2 mb-1">
+                <Stethoscope className="w-5 h-5 text-[#5DB347]" />
+                <h2 className="text-lg font-bold text-[#1B2A4A]">Symptom Checker</h2>
+              </div>
+              <p className="text-sm text-gray-500">
+                Select the symptoms you are seeing on your crops to get possible diagnoses.
+              </p>
+            </motion.div>
+
+            {/* Selected symptoms count */}
+            {selectedSymptoms.length > 0 && (
+              <motion.div
+                variants={fadeUp}
+                initial="initial"
+                animate="animate"
+                className="bg-[#5DB347]/10 border border-[#5DB347]/30 rounded-xl p-3 flex items-center justify-between"
+              >
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-[#5DB347]" />
+                  <span className="text-sm font-semibold text-[#1B2A4A]">
+                    {selectedSymptoms.length} symptom{selectedSymptoms.length !== 1 ? 's' : ''} selected
+                  </span>
+                </div>
+                <button
+                  onClick={() => setSelectedSymptoms([])}
+                  className="text-xs text-gray-500 font-medium"
+                >
+                  Clear all
+                </button>
+              </motion.div>
+            )}
+
+            {/* Symptom Categories */}
+            <motion.div
+              variants={staggerContainer}
+              initial="initial"
+              animate="animate"
+              className="space-y-3"
+            >
+              {SYMPTOM_CATEGORIES.map((cat) => (
+                <motion.div
+                  key={cat.id}
+                  variants={fadeUp}
+                  className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm"
+                >
+                  <button
+                    onClick={() => setExpandedSymptom(expandedSymptom === cat.id ? null : cat.id)}
+                    className="w-full flex items-center gap-3 p-4 text-left"
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-[#5DB347]/10 flex items-center justify-center text-[#5DB347]">
+                      {getSymptomIcon(cat.icon, 20)}
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-bold text-[#1B2A4A]">{cat.label}</p>
+                      <p className="text-[11px] text-gray-500">{cat.symptoms.length} symptoms</p>
+                    </div>
+                    <motion.div
+                      animate={{ rotate: expandedSymptom === cat.id ? 90 : 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <ChevronRight size={16} className="text-gray-400" />
+                    </motion.div>
+                  </button>
+
+                  <AnimatePresence>
+                    {expandedSymptom === cat.id && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="px-4 pb-4 space-y-2">
+                          {cat.symptoms.map((symptom) => {
+                            const isSelected = selectedSymptoms.includes(symptom);
+                            return (
+                              <button
+                                key={symptom}
+                                onClick={() => {
+                                  setSelectedSymptoms(prev =>
+                                    isSelected
+                                      ? prev.filter(s => s !== symptom)
+                                      : [...prev, symptom]
+                                  );
+                                }}
+                                className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all ${
+                                  isSelected
+                                    ? 'bg-[#5DB347]/10 border border-[#5DB347]/40'
+                                    : 'bg-gray-50 border border-transparent hover:bg-gray-100'
+                                }`}
+                              >
+                                <span className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${
+                                  isSelected ? 'bg-[#5DB347] border-[#5DB347]' : 'border-gray-300'
+                                }`}>
+                                  {isSelected && <CheckCircle size={12} className="text-white" />}
+                                </span>
+                                <span className={`text-sm ${isSelected ? 'font-medium text-[#1B2A4A]' : 'text-gray-700'}`}>
+                                  {symptom}
+                                </span>
+                              </button>
+                            );
+                          })}
+
+                          {/* Possible causes */}
+                          <div className="mt-3 pt-3 border-t border-gray-100">
+                            <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-2">
+                              Possible Causes
+                            </p>
+                            <div className="flex flex-wrap gap-1.5">
+                              {cat.possibleCauses.map((cause) => (
+                                <span
+                                  key={cause}
+                                  className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-amber-50 text-amber-700"
+                                >
+                                  {cause}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              ))}
+            </motion.div>
+
+            {/* Get AI Diagnosis Button */}
+            {selectedSymptoms.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="pt-2"
+              >
+                <button
+                  onClick={() => {
+                    const symptomText = selectedSymptoms.join(', ');
+                    setPhotoPreview(null);
+                    setPageState('analyzing');
+                    setAnalysisStep(0);
+                  }}
+                  className="w-full h-14 bg-gradient-to-br from-[#5DB347] to-[#449933] text-white rounded-2xl flex items-center justify-center gap-2 font-bold shadow-lg shadow-[#5DB347]/20 active:scale-[0.98] transition-transform"
+                >
+                  <Sparkles className="w-5 h-5" />
+                  Get AI Diagnosis ({selectedSymptoms.length} symptom{selectedSymptoms.length !== 1 ? 's' : ''})
+                </button>
+              </motion.div>
+            )}
+          </motion.div>
+        )}
+
+        {/* ================================================================== */}
+        {/* STATE 1: CAPTURE — KNOWLEDGE BASE TAB                             */}
+        {/* ================================================================== */}
+        {pageState === 'capture' && activeTab === 'knowledge' && (
+          <motion.div
+            key="capture-knowledge"
+            {...pageTransition}
+            className="p-4 space-y-4"
+          >
+            <motion.div variants={fadeUp} initial="initial" animate="animate">
+              <div className="flex items-center gap-2 mb-1">
+                <BookOpen className="w-5 h-5 text-[#5DB347]" />
+                <h2 className="text-lg font-bold text-[#1B2A4A]">Disease and Pest Library</h2>
+              </div>
+              <p className="text-sm text-gray-500">
+                Common diseases, pests, and deficiencies in African agriculture.
+              </p>
+            </motion.div>
+
+            {/* Search */}
+            <motion.div variants={fadeUp} initial="initial" animate="animate">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="text"
+                  value={kbSearch}
+                  onChange={(e) => setKbSearch(e.target.value)}
+                  placeholder="Search diseases, pests, crops..."
+                  className="w-full bg-white border border-gray-200 rounded-xl pl-10 pr-4 py-3 text-sm text-[#1B2A4A] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347]"
+                />
+              </div>
+            </motion.div>
+
+            {/* Type Filter */}
+            <motion.div variants={fadeUp} initial="initial" animate="animate">
+              <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+                {([
+                  { key: 'all' as const, label: 'All', color: 'bg-[#1B2A4A]' },
+                  { key: 'disease' as const, label: 'Diseases', color: 'bg-red-500' },
+                  { key: 'pest' as const, label: 'Pests', color: 'bg-amber-500' },
+                  { key: 'deficiency' as const, label: 'Deficiencies', color: 'bg-purple-500' },
+                ]).map((filter) => (
+                  <button
+                    key={filter.key}
+                    onClick={() => setKbTypeFilter(filter.key)}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${
+                      kbTypeFilter === filter.key
+                        ? `${filter.color} text-white`
+                        : 'bg-gray-100 text-gray-600'
+                    }`}
+                  >
+                    {filter.key !== 'all' && (
+                      <span className={`w-1.5 h-1.5 rounded-full ${
+                        kbTypeFilter === filter.key ? 'bg-white' : filter.color
+                      }`} />
+                    )}
+                    {filter.label}
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* Results count */}
+            <p className="text-xs text-gray-500">{filteredKb.length} entries found</p>
+
+            {/* Knowledge Base Cards */}
+            <motion.div
+              variants={staggerContainer}
+              initial="initial"
+              animate="animate"
+              className="space-y-3"
+            >
+              {filteredKb.map((entry) => {
+                const isExpanded = expandedKb === entry.id;
+                return (
+                  <motion.div
+                    key={entry.id}
+                    variants={fadeUp}
+                    className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm"
+                  >
+                    <button
+                      onClick={() => setExpandedKb(isExpanded ? null : entry.id)}
+                      className="w-full flex items-center gap-3 p-3.5 text-left"
+                    >
+                      {/* Thumbnail */}
+                      <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100">
+                        <img src={entry.image} alt={entry.name} className="w-full h-full object-cover" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${
+                            entry.type === 'disease' ? 'bg-red-100 text-red-700' :
+                            entry.type === 'pest' ? 'bg-amber-100 text-amber-700' :
+                            'bg-purple-100 text-purple-700'
+                          }`}>
+                            {entry.type}
+                          </span>
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                            entry.severity === 'high' ? 'bg-red-50 text-red-600' :
+                            entry.severity === 'medium' ? 'bg-amber-50 text-amber-600' :
+                            'bg-green-50 text-green-600'
+                          }`}>
+                            {entry.severity} risk
+                          </span>
+                        </div>
+                        <p className="text-sm font-bold text-[#1B2A4A] truncate">{entry.name}</p>
+                        <p className="text-[11px] text-gray-500 truncate">
+                          Affects: {entry.crops.join(', ')}
+                        </p>
+                      </div>
+                      <motion.div
+                        animate={{ rotate: isExpanded ? 90 : 0 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <ChevronRight size={16} className="text-gray-400 shrink-0" />
+                      </motion.div>
+                    </button>
+
+                    <AnimatePresence>
+                      {isExpanded && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                          className="overflow-hidden"
+                        >
+                          <div className="px-4 pb-4 space-y-3 border-t border-gray-50 pt-3">
+                            {/* Symptoms */}
+                            <div>
+                              <p className="text-xs font-bold text-[#1B2A4A] mb-1.5 flex items-center gap-1.5">
+                                <AlertTriangle size={12} className="text-amber-500" />
+                                Symptoms
+                              </p>
+                              <ul className="space-y-1">
+                                {entry.symptoms.map((s, i) => (
+                                  <li key={i} className="text-xs text-gray-700 flex items-start gap-2">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 shrink-0" />
+                                    {s}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+
+                            {/* Treatment */}
+                            <div>
+                              <p className="text-xs font-bold text-[#1B2A4A] mb-1.5 flex items-center gap-1.5">
+                                <Shield size={12} className="text-[#5DB347]" />
+                                Treatment
+                              </p>
+                              <p className="text-xs text-gray-700 leading-relaxed">{entry.treatment}</p>
+                            </div>
+
+                            {/* Prevention */}
+                            <div>
+                              <p className="text-xs font-bold text-[#1B2A4A] mb-1.5 flex items-center gap-1.5">
+                                <Zap size={12} className="text-blue-500" />
+                                Prevention
+                              </p>
+                              <p className="text-xs text-gray-700 leading-relaxed">{entry.prevention}</p>
+                            </div>
+
+                            {/* Action buttons */}
+                            <div className="flex gap-2 pt-1">
+                              <button
+                                onClick={() => {
+                                  setActiveTab('scan');
+                                }}
+                                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-[#5DB347] text-white text-xs font-bold"
+                              >
+                                <Camera size={13} />
+                                Scan My Crop
+                              </button>
+                              <a
+                                href="/farm/marketplace"
+                                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-gray-200 text-[#1B2A4A] text-xs font-bold"
+                              >
+                                <ShoppingCart size={13} />
+                                Buy Treatment
+                              </a>
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                );
+              })}
+            </motion.div>
+          </motion.div>
+        )}
+
+        {/* ================================================================== */}
+        {/* STATE 1: CAPTURE — CONSULTATION HISTORY TAB                       */}
+        {/* ================================================================== */}
+        {pageState === 'capture' && activeTab === 'history' && (
+          <motion.div
+            key="capture-history"
+            {...pageTransition}
+            className="p-4 space-y-4"
+          >
+            <motion.div variants={fadeUp} initial="initial" animate="animate">
+              <div className="flex items-center gap-2 mb-1">
+                <History className="w-5 h-5 text-[#5DB347]" />
+                <h2 className="text-lg font-bold text-[#1B2A4A]">Consultation History</h2>
+              </div>
+              <p className="text-sm text-gray-500">
+                Track past diagnoses and follow-up on unresolved issues.
+              </p>
+            </motion.div>
+
+            {/* Stats Summary */}
+            <motion.div variants={fadeUp} initial="initial" animate="animate" className="grid grid-cols-3 gap-2.5">
+              <div className="bg-white rounded-xl border border-gray-100 p-3 text-center">
+                <p className="text-lg font-bold text-[#1B2A4A]">{CONSULTATION_HISTORY.length}</p>
+                <p className="text-[10px] text-gray-500 font-medium">Total Scans</p>
+              </div>
+              <div className="bg-white rounded-xl border border-gray-100 p-3 text-center">
+                <p className="text-lg font-bold text-[#5DB347]">{CONSULTATION_HISTORY.filter(c => c.resolved).length}</p>
+                <p className="text-[10px] text-gray-500 font-medium">Resolved</p>
+              </div>
+              <div className="bg-white rounded-xl border border-gray-100 p-3 text-center">
+                <p className="text-lg font-bold text-amber-500">{CONSULTATION_HISTORY.filter(c => !c.resolved).length}</p>
+                <p className="text-[10px] text-gray-500 font-medium">Follow-up</p>
+              </div>
+            </motion.div>
+
+            {/* Pending Follow-ups Alert */}
+            {CONSULTATION_HISTORY.filter(c => !c.resolved).length > 0 && (
+              <motion.div
+                variants={fadeUp}
+                initial="initial"
+                animate="animate"
+                className="bg-amber-50 border border-amber-200 rounded-xl p-3"
+              >
+                <div className="flex items-start gap-2">
+                  <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-xs font-bold text-amber-800">Follow-up Required</p>
+                    {CONSULTATION_HISTORY.filter(c => !c.resolved).map((c) => (
+                      <p key={c.id} className="text-[11px] text-amber-700 mt-1">
+                        {c.plotName}: {c.diagnosis}
+                        {c.followUpDate && (
+                          <span className="font-semibold"> -- due {c.followUpDate}</span>
+                        )}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {/* History List */}
+            <motion.div
+              variants={staggerContainer}
+              initial="initial"
+              animate="animate"
+              className="space-y-2.5"
+            >
+              {CONSULTATION_HISTORY.map((record) => {
+                const SIcon = severityIcon(record.severity);
+                return (
+                  <motion.div
+                    key={record.id}
+                    variants={fadeUp}
+                    className="bg-white rounded-xl border border-gray-100 p-3.5 shadow-sm"
+                  >
+                    <div className="flex items-start gap-3">
+                      {/* Health score circle */}
+                      <div
+                        className="w-12 h-12 rounded-xl flex flex-col items-center justify-center shrink-0"
+                        style={{ backgroundColor: `${severityColor(record.healthScore)}15` }}
+                      >
+                        <span
+                          className="text-sm font-bold"
+                          style={{ color: severityColor(record.healthScore) }}
+                        >
+                          {record.healthScore}
+                        </span>
+                        <span className="text-[8px] text-gray-400 font-medium">score</span>
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${severityBg(record.severity)}`}>
+                            {record.severity}
+                          </span>
+                          {record.resolved ? (
+                            <span className="text-[10px] font-semibold text-[#5DB347] flex items-center gap-0.5">
+                              <CheckCircle size={10} /> Resolved
+                            </span>
+                          ) : (
+                            <span className="text-[10px] font-semibold text-amber-600 flex items-center gap-0.5">
+                              <Clock size={10} /> Pending
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm font-bold text-[#1B2A4A] leading-tight">{record.diagnosis}</p>
+                        <p className="text-[11px] text-gray-500 mt-0.5">
+                          {record.plotName} -- {record.date}
+                        </p>
+                      </div>
+                    </div>
+
+                    {!record.resolved && record.followUpDate && (
+                      <div className="mt-2.5 flex items-center gap-2">
+                        <button
+                          onClick={() => {
+                            setActiveTab('scan');
+                          }}
+                          className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-[#5DB347] text-white text-xs font-bold"
+                        >
+                          <Camera size={12} />
+                          Re-scan Now
+                        </button>
+                      </div>
+                    )}
+                  </motion.div>
+                );
+              })}
+            </motion.div>
           </motion.div>
         )}
 

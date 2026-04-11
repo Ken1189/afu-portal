@@ -38,6 +38,13 @@ import {
   Frown,
   AlertCircle,
   ThumbsUp,
+  ChevronLeft,
+  ChevronRight,
+  FileText,
+  BarChart3,
+  ArrowRight,
+  Leaf,
+  Activity,
 } from 'lucide-react';
 import { type LucideIcon } from 'lucide-react';
 // ---------------------------------------------------------------------------
@@ -770,6 +777,267 @@ function PhotoViewer({ url, onClose }: { url: string; onClose: () => void }) {
 }
 
 // ---------------------------------------------------------------------------
+// Calendar View Component
+// ---------------------------------------------------------------------------
+
+function CalendarView({
+  entries,
+  onDateSelect,
+}: {
+  entries: JournalEntry[];
+  onDateSelect: (date: string) => void;
+}) {
+  const [currentMonth, setCurrentMonth] = useState(() => {
+    const now = new Date();
+    return { year: now.getFullYear(), month: now.getMonth() };
+  });
+
+  const daysInMonth = new Date(currentMonth.year, currentMonth.month + 1, 0).getDate();
+  const firstDayOfWeek = new Date(currentMonth.year, currentMonth.month, 1).getDay();
+  const monthName = new Date(currentMonth.year, currentMonth.month, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+  // Count entries per day
+  const entryCounts: Record<string, { count: number; types: Set<ActivityType> }> = {};
+  entries.forEach(e => {
+    const d = e.date;
+    if (!entryCounts[d]) entryCounts[d] = { count: 0, types: new Set() };
+    entryCounts[d].count++;
+    entryCounts[d].types.add(e.type);
+  });
+
+  const goToPrevMonth = () => {
+    setCurrentMonth(prev => {
+      if (prev.month === 0) return { year: prev.year - 1, month: 11 };
+      return { ...prev, month: prev.month - 1 };
+    });
+  };
+
+  const goToNextMonth = () => {
+    setCurrentMonth(prev => {
+      if (prev.month === 11) return { year: prev.year + 1, month: 0 };
+      return { ...prev, month: prev.month + 1 };
+    });
+  };
+
+  const days: (number | null)[] = [];
+  for (let i = 0; i < firstDayOfWeek; i++) days.push(null);
+  for (let i = 1; i <= daysInMonth; i++) days.push(i);
+
+  const todayStr = new Date().toISOString().slice(0, 10);
+
+  return (
+    <div className="px-4">
+      <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
+        {/* Month navigation */}
+        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-50">
+          <button onClick={goToPrevMonth} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors">
+            <ChevronLeft size={16} className="text-gray-600" />
+          </button>
+          <span className="text-sm font-bold text-[#1B2A4A]">{monthName}</span>
+          <button onClick={goToNextMonth} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors">
+            <ChevronRight size={16} className="text-gray-600" />
+          </button>
+        </div>
+
+        {/* Day headers */}
+        <div className="grid grid-cols-7 text-center px-2 pt-2">
+          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
+            <span key={d} className="text-[10px] font-semibold text-gray-400 uppercase py-1">{d}</span>
+          ))}
+        </div>
+
+        {/* Day grid */}
+        <div className="grid grid-cols-7 gap-0.5 px-2 pb-3">
+          {days.map((day, idx) => {
+            if (day === null) return <div key={idx} />;
+            const dateStr = `${currentMonth.year}-${String(currentMonth.month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const data = entryCounts[dateStr];
+            const isToday = dateStr === todayStr;
+
+            return (
+              <button
+                key={idx}
+                onClick={() => data?.count ? onDateSelect(dateStr) : undefined}
+                className={`relative flex flex-col items-center py-1.5 rounded-lg transition-colors min-h-[40px] ${
+                  isToday ? 'bg-[#5DB347]/10 ring-1 ring-[#5DB347]/30' :
+                  data?.count ? 'hover:bg-gray-50 cursor-pointer' : ''
+                }`}
+              >
+                <span className={`text-xs font-medium ${
+                  isToday ? 'text-[#5DB347] font-bold' :
+                  data?.count ? 'text-[#1B2A4A]' : 'text-gray-400'
+                }`}>
+                  {day}
+                </span>
+                {data?.count ? (
+                  <div className="flex gap-0.5 mt-0.5">
+                    {data.count <= 3 ? (
+                      Array.from({ length: Math.min(data.count, 3) }).map((_, i) => (
+                        <span key={i} className="w-1 h-1 rounded-full bg-[#5DB347]" />
+                      ))
+                    ) : (
+                      <span className="text-[8px] font-bold text-[#5DB347]">{data.count}</span>
+                    )}
+                  </div>
+                ) : null}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Crop Cycle Tracking Component
+// ---------------------------------------------------------------------------
+
+interface CropCycle {
+  id: string;
+  plotName: string;
+  crop: string;
+  variety: string;
+  plantingDate: string;
+  expectedHarvest: string;
+  currentStage: string;
+  stageProgress: number;
+  totalDays: number;
+  daysElapsed: number;
+  stages: { name: string; startDay: number; endDay: number; current: boolean }[];
+}
+
+const MOCK_CROP_CYCLES: CropCycle[] = [
+  {
+    id: 'CC-001', plotName: 'Main Blueberry Field', crop: 'Blueberries', variety: 'Duke',
+    plantingDate: '2025-09-15', expectedHarvest: '2026-04-20', currentStage: 'Fruiting',
+    stageProgress: 82, totalDays: 217, daysElapsed: 207,
+    stages: [
+      { name: 'Planted', startDay: 0, endDay: 30, current: false },
+      { name: 'Vegetative', startDay: 30, endDay: 90, current: false },
+      { name: 'Flowering', startDay: 90, endDay: 150, current: false },
+      { name: 'Fruiting', startDay: 150, endDay: 200, current: true },
+      { name: 'Harvest', startDay: 200, endDay: 217, current: false },
+    ],
+  },
+  {
+    id: 'CC-002', plotName: 'Cassava Plot', crop: 'Cassava', variety: 'TMS 30572',
+    plantingDate: '2025-12-01', expectedHarvest: '2026-09-30', currentStage: 'Vegetative',
+    stageProgress: 44, totalDays: 304, daysElapsed: 131,
+    stages: [
+      { name: 'Planted', startDay: 0, endDay: 14, current: false },
+      { name: 'Sprouting', startDay: 14, endDay: 45, current: false },
+      { name: 'Vegetative', startDay: 45, endDay: 180, current: true },
+      { name: 'Tuber Fill', startDay: 180, endDay: 270, current: false },
+      { name: 'Harvest', startDay: 270, endDay: 304, current: false },
+    ],
+  },
+  {
+    id: 'CC-003', plotName: 'Sesame Strip', crop: 'Sesame', variety: 'S42 White',
+    plantingDate: '2025-11-20', expectedHarvest: '2026-04-25', currentStage: 'Flowering',
+    stageProgress: 90, totalDays: 157, daysElapsed: 142,
+    stages: [
+      { name: 'Planted', startDay: 0, endDay: 10, current: false },
+      { name: 'Vegetative', startDay: 10, endDay: 50, current: false },
+      { name: 'Flowering', startDay: 50, endDay: 100, current: true },
+      { name: 'Maturing', startDay: 100, endDay: 140, current: false },
+      { name: 'Harvest', startDay: 140, endDay: 157, current: false },
+    ],
+  },
+  {
+    id: 'CC-004', plotName: 'Maize Field', crop: 'Maize', variety: 'SC 513',
+    plantingDate: '2026-03-01', expectedHarvest: '2026-07-15', currentStage: 'Germinating',
+    stageProgress: 30, totalDays: 136, daysElapsed: 40,
+    stages: [
+      { name: 'Planted', startDay: 0, endDay: 7, current: false },
+      { name: 'Germinating', startDay: 7, endDay: 21, current: true },
+      { name: 'Vegetative', startDay: 21, endDay: 60, current: false },
+      { name: 'Tasseling', startDay: 60, endDay: 80, current: false },
+      { name: 'Grain Fill', startDay: 80, endDay: 120, current: false },
+      { name: 'Harvest', startDay: 120, endDay: 136, current: false },
+    ],
+  },
+];
+
+function CropCycleTracker() {
+  return (
+    <div className="px-4 space-y-3">
+      <div className="flex items-center justify-between mb-1">
+        <h3 className="text-sm font-bold text-[#1B2A4A] flex items-center gap-1.5">
+          <Activity size={14} className="text-[#5DB347]" />
+          Crop Cycles
+        </h3>
+      </div>
+      {MOCK_CROP_CYCLES.map((cycle) => (
+        <div key={cycle.id} className="bg-white rounded-2xl border border-gray-100 p-3.5 shadow-sm">
+          <div className="flex items-start justify-between mb-2">
+            <div>
+              <p className="text-sm font-bold text-[#1B2A4A]">{cycle.crop} -- {cycle.variety}</p>
+              <p className="text-[11px] text-gray-500">{cycle.plotName}</p>
+            </div>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#5DB347]/10 text-[#5DB347]">
+              {cycle.currentStage}
+            </span>
+          </div>
+
+          {/* Stage progress bar */}
+          <div className="mt-3">
+            <div className="flex gap-0.5 mb-1.5">
+              {cycle.stages.map((stage, i) => {
+                const width = ((stage.endDay - stage.startDay) / cycle.totalDays) * 100;
+                const isPast = cycle.daysElapsed > stage.endDay;
+                const isCurrent = stage.current;
+                return (
+                  <div
+                    key={i}
+                    className="relative group"
+                    style={{ width: `${width}%` }}
+                  >
+                    <div className={`h-2 rounded-full transition-colors ${
+                      isPast ? 'bg-[#5DB347]' :
+                      isCurrent ? 'bg-[#5DB347]/60' :
+                      'bg-gray-200'
+                    }`} />
+                    {isCurrent && (
+                      <motion.div
+                        className="absolute top-0 h-2 rounded-full bg-[#5DB347]"
+                        style={{
+                          width: `${Math.min(100, ((cycle.daysElapsed - stage.startDay) / (stage.endDay - stage.startDay)) * 100)}%`
+                        }}
+                        initial={{ width: 0 }}
+                        animate={{
+                          width: `${Math.min(100, ((cycle.daysElapsed - stage.startDay) / (stage.endDay - stage.startDay)) * 100)}%`
+                        }}
+                        transition={{ duration: 1, ease: 'easeOut' }}
+                      />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Stage labels */}
+            <div className="flex justify-between">
+              <span className="text-[9px] text-gray-400">{cycle.stages[0]?.name}</span>
+              <span className="text-[9px] text-gray-400">{cycle.stages[cycle.stages.length - 1]?.name}</span>
+            </div>
+          </div>
+
+          {/* Info row */}
+          <div className="flex items-center gap-3 mt-2.5 text-[10px] text-gray-500">
+            <span>Day {cycle.daysElapsed}/{cycle.totalDays}</span>
+            <span className="w-1 h-1 rounded-full bg-gray-300" />
+            <span>{cycle.stageProgress}% complete</span>
+            <span className="w-1 h-1 rounded-full bg-gray-300" />
+            <span>Harvest: {cycle.expectedHarvest}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Main Page Component
 // ---------------------------------------------------------------------------
 
@@ -859,7 +1127,7 @@ export default function FarmJournalPage() {
   const [plotFilter, setPlotFilter] = useState('all');
   const [activityFilter, setActivityFilter] = useState<ActivityType | 'all'>('all');
   const [viewPhotoUrl, setViewPhotoUrl] = useState<string | null>(null);
-  const [showGallery, setShowGallery] = useState(false);
+  const [viewMode, setViewMode] = useState<'timeline' | 'gallery' | 'calendar'>('timeline');
 
   // Filter entries
   const filteredEntries = useMemo(() => {
@@ -919,15 +1187,36 @@ export default function FarmJournalPage() {
 
   return (
     <div className="space-y-4 pb-4">
-      {/* ─── New Entry Button ─── */}
-      <div className="px-4 pt-4">
+      {/* ─── New Entry + Export Buttons ─── */}
+      <div className="px-4 pt-4 flex gap-2">
         <motion.button
           whileTap={{ scale: 0.97 }}
           onClick={() => setShowNewEntry(true)}
-          className="w-full bg-gradient-to-r from-[#8CB89C] to-[#729E82] text-white py-3.5 rounded-2xl text-sm font-bold shadow-lg shadow-[#8CB89C]/25 active:shadow-md transition-shadow flex items-center justify-center gap-2 min-h-[48px]"
+          className="flex-1 bg-gradient-to-r from-[#8CB89C] to-[#729E82] text-white py-3.5 rounded-2xl text-sm font-bold shadow-lg shadow-[#8CB89C]/25 active:shadow-md transition-shadow flex items-center justify-center gap-2 min-h-[48px]"
         >
           <Plus className="w-5 h-5" />
           {t.farmJournal.whatDidYouDo}
+        </motion.button>
+        <motion.button
+          whileTap={{ scale: 0.97 }}
+          onClick={() => {
+            // Generate a basic CSV export
+            const header = 'Date,Time,Type,Plot,Title,Description,Cost\n';
+            const rows = entries.map(e =>
+              `${e.date},${e.time},${e.type},${e.plotName || ''},${e.title.replace(/,/g, ';')},${e.description.replace(/,/g, ';')},${e.cost || 0}`
+            ).join('\n');
+            const blob = new Blob([header + rows], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `farm-journal-${new Date().toISOString().slice(0, 10)}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+          }}
+          className="w-14 bg-white border-2 border-gray-200 text-[#1B2A4A] rounded-2xl flex items-center justify-center min-h-[48px] hover:border-[#5DB347] transition-colors"
+          title="Export Journal"
+        >
+          <FileText className="w-5 h-5" />
         </motion.button>
       </div>
 
@@ -943,31 +1232,39 @@ export default function FarmJournalPage() {
         farmPlots={farmPlots}
       />
 
-      {/* ─── View Toggle: Timeline / Gallery ─── */}
+      {/* ─── View Toggle: Timeline / Calendar / Gallery ─── */}
       <div className="px-4 flex gap-2">
-        <button
-          onClick={() => setShowGallery(false)}
-          className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold transition-colors min-h-[36px] ${
-            !showGallery ? 'bg-navy text-white' : 'bg-gray-100 text-gray-500 active:bg-gray-200'
-          }`}
-        >
-          <Calendar className="w-3.5 h-3.5" />
-          Timeline
-        </button>
-        <button
-          onClick={() => setShowGallery(true)}
-          className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold transition-colors min-h-[36px] ${
-            showGallery ? 'bg-navy text-white' : 'bg-gray-100 text-gray-500 active:bg-gray-200'
-          }`}
-        >
-          <ImageIcon className="w-3.5 h-3.5" />
-          {t.farmJournal.photos}
-        </button>
+        {([
+          { key: 'timeline' as const, label: 'Timeline', icon: <BookOpen className="w-3.5 h-3.5" /> },
+          { key: 'calendar' as const, label: 'Calendar', icon: <Calendar className="w-3.5 h-3.5" /> },
+          { key: 'gallery' as const, label: t.farmJournal.photos, icon: <ImageIcon className="w-3.5 h-3.5" /> },
+        ]).map((v) => (
+          <button
+            key={v.key}
+            onClick={() => setViewMode(v.key)}
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold transition-colors min-h-[36px] ${
+              viewMode === v.key ? 'bg-navy text-white' : 'bg-gray-100 text-gray-500 active:bg-gray-200'
+            }`}
+          >
+            {v.icon}
+            {v.label}
+          </button>
+        ))}
       </div>
 
       {/* ─── Main Content ─── */}
-      {showGallery ? (
+      {viewMode === 'gallery' ? (
         <PhotoGallery entries={filteredEntries} onPhotoTap={setViewPhotoUrl} />
+      ) : viewMode === 'calendar' ? (
+        <>
+          <CalendarView
+            entries={filteredEntries}
+            onDateSelect={() => {
+              setViewMode('timeline');
+            }}
+          />
+          <CropCycleTracker />
+        </>
       ) : (
         <>
           {/* Journal Timeline */}

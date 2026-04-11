@@ -33,6 +33,13 @@ import {
   X,
   Megaphone,
   Loader2,
+  BarChart3,
+  Wallet,
+  CreditCard,
+  Clock,
+  AlertCircle,
+  CalendarDays,
+  Banknote,
 } from 'lucide-react';
 import { useFarmPlots, useFarmActivities, useFarmTransactions } from '@/lib/supabase/use-farm-plots';
 import type { FarmPlotRow } from '@/lib/supabase/use-farm-plots';
@@ -232,6 +239,70 @@ const FALLBACK_FARM_TRANSACTIONS: FarmTransaction[] = [
   { id: 'TXN-010', type: 'expense', category: 'transport', amount: 25, currency: 'USD', date: '2026-03-07', description: 'Transport blueberries' },
   { id: 'TXN-011', type: 'income', category: 'harvest-sale', amount: 180, currency: 'USD', date: '2026-02-22', description: 'Cassava chips 300kg' },
   { id: 'TXN-012', type: 'expense', category: 'labor', amount: 48, currency: 'USD', date: '2026-02-20', description: 'Harvesting labor' },
+];
+
+// ---------------------------------------------------------------------------
+// Market Prices Data
+// ---------------------------------------------------------------------------
+
+interface MarketPrice {
+  commodity: string;
+  price: number;
+  currency: string;
+  unit: string;
+  change: number;
+  changePercent: number;
+  market: string;
+  updated: string;
+}
+
+const MARKET_PRICES: MarketPrice[] = [
+  { commodity: 'Maize (White)', price: 285, currency: 'USD', unit: 'per tonne', change: 12, changePercent: 4.4, market: 'SAFEX', updated: '2h ago' },
+  { commodity: 'Sorghum', price: 310, currency: 'USD', unit: 'per tonne', change: -5, changePercent: -1.6, market: 'Regional', updated: '3h ago' },
+  { commodity: 'Sesame', price: 1850, currency: 'USD', unit: 'per tonne', change: 45, changePercent: 2.5, market: 'Export FOB', updated: '1h ago' },
+  { commodity: 'Groundnuts', price: 980, currency: 'USD', unit: 'per tonne', change: 22, changePercent: 2.3, market: 'Local', updated: '4h ago' },
+  { commodity: 'Cassava (Chips)', price: 165, currency: 'USD', unit: 'per tonne', change: -3, changePercent: -1.8, market: 'Regional', updated: '2h ago' },
+  { commodity: 'Blueberries', price: 8200, currency: 'USD', unit: 'per tonne', change: 150, changePercent: 1.9, market: 'Export', updated: '1h ago' },
+  { commodity: 'Cowpeas', price: 520, currency: 'USD', unit: 'per tonne', change: 8, changePercent: 1.6, market: 'Local', updated: '5h ago' },
+  { commodity: 'Soybeans', price: 445, currency: 'USD', unit: 'per tonne', change: -12, changePercent: -2.6, market: 'SAFEX', updated: '2h ago' },
+];
+
+// ---------------------------------------------------------------------------
+// Financial Summary Data
+// ---------------------------------------------------------------------------
+
+interface LoanSummary {
+  id: string;
+  type: string;
+  provider: string;
+  totalAmount: number;
+  outstandingBalance: number;
+  nextPayment: number;
+  nextPaymentDate: string;
+  interestRate: number;
+  status: 'current' | 'overdue' | 'grace-period';
+}
+
+interface PaymentDue {
+  id: string;
+  description: string;
+  amount: number;
+  currency: string;
+  dueDate: string;
+  category: 'loan' | 'input-credit' | 'insurance' | 'membership';
+  status: 'upcoming' | 'due-today' | 'overdue';
+}
+
+const FALLBACK_LOANS: LoanSummary[] = [
+  { id: 'LN-001', type: 'Input Finance', provider: 'AFU MicroFinance', totalAmount: 2500, outstandingBalance: 1875, nextPayment: 312.50, nextPaymentDate: '2026-04-15', interestRate: 8.5, status: 'current' },
+  { id: 'LN-002', type: 'Equipment Lease', provider: 'Matopos Equipment Hire', totalAmount: 3800, outstandingBalance: 2850, nextPayment: 475, nextPaymentDate: '2026-05-01', interestRate: 12, status: 'current' },
+];
+
+const FALLBACK_PAYMENTS: PaymentDue[] = [
+  { id: 'PAY-001', description: 'Input Finance - Monthly', amount: 312.50, currency: 'USD', dueDate: '2026-04-15', category: 'loan', status: 'upcoming' },
+  { id: 'PAY-002', description: 'Crop Insurance Premium', amount: 45, currency: 'USD', dueDate: '2026-04-20', category: 'insurance', status: 'upcoming' },
+  { id: 'PAY-003', description: 'AFU Membership (Quarterly)', amount: 25, currency: 'USD', dueDate: '2026-04-30', category: 'membership', status: 'upcoming' },
+  { id: 'PAY-004', description: 'Equipment Lease - Monthly', amount: 475, currency: 'USD', dueDate: '2026-05-01', category: 'loan', status: 'upcoming' },
 ];
 
 function getFallbackFarmSummary() {
@@ -951,6 +1022,153 @@ export default function FarmDashboardPage() {
               <span className="text-xs font-normal text-gray-600">/100</span>
             </p>
           </motion.div>
+        </div>
+      </motion.section>
+
+      {/* ================================================================= */}
+      {/* 5b. MARKET PRICE TICKER                                           */}
+      {/* ================================================================= */}
+      <motion.section variants={itemVariants}>
+        <div className="px-4 mb-2 flex items-center justify-between">
+          <h3 className="text-sm font-bold text-navy flex items-center gap-1.5">
+            <BarChart3 size={14} className="text-[#5DB347]" />
+            Market Prices
+          </h3>
+          <Link
+            href="/farm/market-prices"
+            className="text-xs text-[#5DB347] font-medium flex items-center gap-0.5"
+          >
+            All Markets <ChevronRight size={14} />
+          </Link>
+        </div>
+
+        <div className="flex gap-2.5 overflow-x-auto px-4 pb-2 scrollbar-hide snap-x snap-mandatory">
+          {MARKET_PRICES.map((item) => (
+            <div
+              key={item.commodity}
+              className="shrink-0 snap-start w-[155px] rounded-2xl bg-white border border-gray-100 p-3 hover:border-gray-200 transition-colors"
+            >
+              <p className="text-xs font-bold text-navy truncate">{item.commodity}</p>
+              <p className="text-[10px] text-gray-500 mt-0.5">{item.market}</p>
+              <p className="text-lg font-bold text-navy mt-1.5">
+                ${item.price}
+              </p>
+              <p className="text-[10px] text-gray-500">{item.unit}</p>
+              <div className={`flex items-center gap-1 mt-1.5 ${item.change >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                {item.change >= 0 ? <TrendingUp size={11} /> : <TrendingDown size={11} />}
+                <span className="text-[11px] font-semibold">
+                  {item.change >= 0 ? '+' : ''}{item.changePercent}%
+                </span>
+              </div>
+              <p className="text-[9px] text-gray-400 mt-1">{item.updated}</p>
+            </div>
+          ))}
+        </div>
+      </motion.section>
+
+      {/* ================================================================= */}
+      {/* 5c. FINANCIAL SUMMARY                                             */}
+      {/* ================================================================= */}
+      <motion.section variants={itemVariants} className="px-4">
+        <div className="mb-2 flex items-center justify-between">
+          <h3 className="text-sm font-bold text-navy flex items-center gap-1.5">
+            <Wallet size={14} className="text-[#5DB347]" />
+            Financial Overview
+          </h3>
+          <Link
+            href="/farm/financing"
+            className="text-xs text-[#5DB347] font-medium flex items-center gap-0.5"
+          >
+            Details <ChevronRight size={14} />
+          </Link>
+        </div>
+
+        {/* Loan Cards */}
+        {FALLBACK_LOANS.length > 0 && (
+          <div className="space-y-2.5 mb-3">
+            {FALLBACK_LOANS.map((loan) => {
+              const repaidPercent = Math.round(((loan.totalAmount - loan.outstandingBalance) / loan.totalAmount) * 100);
+              return (
+                <div key={loan.id} className="rounded-2xl bg-white border border-gray-100 p-3">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 rounded-xl bg-[#1B2A4A]/5 flex items-center justify-center">
+                        <CreditCard size={16} className="text-[#1B2A4A]" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-navy">{loan.type}</p>
+                        <p className="text-[10px] text-gray-500">{loan.provider}</p>
+                      </div>
+                    </div>
+                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                      loan.status === 'current' ? 'bg-green-100 text-green-700' :
+                      loan.status === 'grace-period' ? 'bg-amber-100 text-amber-700' :
+                      'bg-red-100 text-red-700'
+                    }`}>
+                      {loan.status === 'current' ? 'Current' : loan.status === 'grace-period' ? 'Grace Period' : 'Overdue'}
+                    </span>
+                  </div>
+
+                  <div className="mt-3 flex items-center justify-between text-[11px]">
+                    <span className="text-gray-500">Outstanding</span>
+                    <span className="font-bold text-navy">${loan.outstandingBalance.toLocaleString()}</span>
+                  </div>
+
+                  <div className="mt-1.5">
+                    <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                      <motion.div
+                        className="h-full rounded-full bg-[#5DB347]"
+                        initial={{ width: 0 }}
+                        animate={{ width: `${repaidPercent}%` }}
+                        transition={{ duration: 1, ease: 'easeOut' }}
+                      />
+                    </div>
+                    <div className="flex justify-between mt-1 text-[10px] text-gray-400">
+                      <span>{repaidPercent}% repaid</span>
+                      <span>${loan.totalAmount.toLocaleString()} total</span>
+                    </div>
+                  </div>
+
+                  <div className="mt-2.5 flex items-center gap-2 p-2 rounded-lg bg-amber-50/80">
+                    <Clock size={12} className="text-amber-600 shrink-0" />
+                    <p className="text-[11px] text-amber-700">
+                      Next: <span className="font-semibold">${loan.nextPayment}</span> due {loan.nextPaymentDate}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Upcoming Payments */}
+        <div className="rounded-2xl bg-white border border-gray-100 overflow-hidden">
+          <div className="px-3 py-2.5 border-b border-gray-50 flex items-center gap-1.5">
+            <CalendarDays size={13} className="text-[#5DB347]" />
+            <span className="text-xs font-bold text-navy">Upcoming Payments</span>
+          </div>
+          <div className="divide-y divide-gray-50">
+            {FALLBACK_PAYMENTS.slice(0, 4).map((payment) => (
+              <div key={payment.id} className="flex items-center gap-3 px-3 py-2.5">
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                  payment.category === 'loan' ? 'bg-blue-50' :
+                  payment.category === 'insurance' ? 'bg-purple-50' :
+                  payment.category === 'membership' ? 'bg-[#5DB347]/10' :
+                  'bg-gray-50'
+                }`}>
+                  {payment.category === 'loan' ? <Banknote size={14} className="text-blue-600" /> :
+                   payment.category === 'insurance' ? <AlertCircle size={14} className="text-purple-600" /> :
+                   payment.category === 'membership' ? <Heart size={14} className="text-[#5DB347]" /> :
+                   <CreditCard size={14} className="text-gray-600" />}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-medium text-navy truncate">{payment.description}</p>
+                  <p className="text-[10px] text-gray-500 mt-0.5">{payment.dueDate}</p>
+                </div>
+                <span className="text-xs font-bold text-navy shrink-0">${payment.amount}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </motion.section>
 

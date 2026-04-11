@@ -28,6 +28,14 @@ import {
   ArrowRight,
   Loader2,
   CheckCircle,
+  Heart,
+  Truck,
+  Clock,
+  MapPin,
+  BadgeCheck,
+  Eye,
+  Share2,
+  ChevronRight,
 } from 'lucide-react';
 import { useProducts, type ProductRow } from '@/lib/supabase/use-products';
 import { useAuth } from '@/lib/supabase/auth-context';
@@ -244,6 +252,82 @@ const categoryGradients: Record<string, string> = {
 };
 
 // ---------------------------------------------------------------------------
+// Order Tracking Data
+// ---------------------------------------------------------------------------
+
+interface OrderTrack {
+  id: string;
+  orderNumber: string;
+  date: string;
+  supplier: string;
+  items: { name: string; qty: number; price: number }[];
+  total: number;
+  status: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered';
+  statusDate: string;
+  estimatedDelivery: string;
+  trackingSteps: { label: string; date: string; done: boolean }[];
+}
+
+const MOCK_ORDERS: OrderTrack[] = [
+  {
+    id: 'ORD-001', orderNumber: 'ORD-8K4F2M', date: '2026-04-05',
+    supplier: 'Kalahari Seeds Co.', total: 113,
+    items: [
+      { name: 'Drought-Resistant Sorghum (Macia)', qty: 2, price: 58.50 },
+    ],
+    status: 'shipped', statusDate: '2026-04-08',
+    estimatedDelivery: '2026-04-12',
+    trackingSteps: [
+      { label: 'Order Placed', date: 'Apr 5', done: true },
+      { label: 'Confirmed by Supplier', date: 'Apr 5', done: true },
+      { label: 'Processing', date: 'Apr 6', done: true },
+      { label: 'Shipped', date: 'Apr 8', done: true },
+      { label: 'Delivered', date: 'Est. Apr 12', done: false },
+    ],
+  },
+  {
+    id: 'ORD-002', orderNumber: 'ORD-9P3A7X', date: '2026-04-02',
+    supplier: 'Okavango Fertilizers', total: 204.75,
+    items: [
+      { name: 'NPK 15-15-15 Compound Fertilizer', qty: 5, price: 40.95 },
+    ],
+    status: 'delivered', statusDate: '2026-04-07',
+    estimatedDelivery: '2026-04-07',
+    trackingSteps: [
+      { label: 'Order Placed', date: 'Apr 2', done: true },
+      { label: 'Confirmed by Supplier', date: 'Apr 2', done: true },
+      { label: 'Processing', date: 'Apr 3', done: true },
+      { label: 'Shipped', date: 'Apr 4', done: true },
+      { label: 'Delivered', date: 'Apr 7', done: true },
+    ],
+  },
+  {
+    id: 'ORD-003', orderNumber: 'ORD-2L5N8Q', date: '2026-04-09',
+    supplier: 'Zambezi Agri-Supplies', total: 68.64,
+    items: [
+      { name: 'Groundnut Seed (Nyanda)', qty: 1, price: 68.64 },
+    ],
+    status: 'confirmed', statusDate: '2026-04-09',
+    estimatedDelivery: '2026-04-16',
+    trackingSteps: [
+      { label: 'Order Placed', date: 'Apr 9', done: true },
+      { label: 'Confirmed by Supplier', date: 'Apr 9', done: true },
+      { label: 'Processing', date: '', done: false },
+      { label: 'Shipped', date: '', done: false },
+      { label: 'Delivered', date: 'Est. Apr 16', done: false },
+    ],
+  },
+];
+
+const orderStatusConfig: Record<string, { bg: string; text: string; label: string }> = {
+  pending: { bg: 'bg-gray-100', text: 'text-gray-600', label: 'Pending' },
+  confirmed: { bg: 'bg-blue-100', text: 'text-blue-700', label: 'Confirmed' },
+  processing: { bg: 'bg-amber-100', text: 'text-amber-700', label: 'Processing' },
+  shipped: { bg: 'bg-purple-100', text: 'text-purple-700', label: 'Shipped' },
+  delivered: { bg: 'bg-green-100', text: 'text-green-700', label: 'Delivered' },
+};
+
+// ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
@@ -273,7 +357,7 @@ function getSavingsPercent(original: number, member: number): number {
 // Product Card Sub-Component
 // ---------------------------------------------------------------------------
 
-function ProductCard({ product }: { product: SupplierProduct }) {
+function ProductCard({ product, isWishlisted, onToggleWishlist }: { product: SupplierProduct; isWishlisted?: boolean; onToggleWishlist?: (id: string) => void }) {
   const { addItem } = useCartStore();
   const [quantity, setQuantity] = useState(product.minOrder);
   const [added, setAdded] = useState(false);
@@ -340,6 +424,19 @@ function ProductCard({ product }: { product: SupplierProduct }) {
             </span>
           </div>
         )}
+
+        {/* Wishlist heart button */}
+        {onToggleWishlist && (
+          <button
+            onClick={(e) => { e.stopPropagation(); onToggleWishlist(product.id); }}
+            className="absolute bottom-2.5 right-2.5 w-8 h-8 rounded-full bg-white/90 backdrop-blur flex items-center justify-center shadow-sm hover:bg-white transition-colors"
+          >
+            <Heart
+              size={16}
+              className={isWishlisted ? 'text-red-500 fill-red-500' : 'text-gray-500'}
+            />
+          </button>
+        )}
       </div>
 
       {/* Content */}
@@ -349,8 +446,11 @@ function ProductCard({ product }: { product: SupplierProduct }) {
           {product.name}
         </h3>
 
-        {/* Supplier */}
-        <p className="text-[11px] text-gray-400 mt-1 truncate">{product.supplierName}</p>
+        {/* Supplier with verified badge */}
+        <p className="text-[11px] text-gray-400 mt-1 truncate flex items-center gap-1">
+          {product.supplierName}
+          <BadgeCheck size={12} className="text-blue-500 shrink-0" />
+        </p>
 
         {/* Rating */}
         <div className="flex items-center gap-1.5 mt-2">
@@ -450,6 +550,8 @@ function ProductCard({ product }: { product: SupplierProduct }) {
 // Main Page Component
 // ---------------------------------------------------------------------------
 
+type MarketplaceTab = 'browse' | 'orders' | 'wishlist';
+
 export default function MarketplacePage() {
   useLanguage(); // keeps the language context active
 
@@ -469,11 +571,24 @@ export default function MarketplacePage() {
   const [sortKey, setSortKey] = useState<SortKey>('featured');
   const [showSort, setShowSort] = useState(false);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [marketplaceTab, setMarketplaceTab] = useState<MarketplaceTab>('browse');
+  const [wishlist, setWishlist] = useState<string[]>([]);
+  const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
 
   // Cart drawer state
   const [cartOpen, setCartOpen] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [checkoutSuccess, setCheckoutSuccess] = useState(false);
+
+  const toggleWishlist = (productId: string) => {
+    setWishlist(prev =>
+      prev.includes(productId)
+        ? prev.filter(id => id !== productId)
+        : [...prev, productId]
+    );
+  };
+
+  const wishlistProducts = supplierProducts.filter(p => wishlist.includes(p.id));
 
   const memberTotal = getMemberTotal();
   const savings = getSavings();
@@ -641,6 +756,202 @@ export default function MarketplacePage() {
       </motion.section>
 
       {/* ================================================================= */}
+      {/* TAB SWITCHER                                                      */}
+      {/* ================================================================= */}
+      <motion.section variants={itemVariants} className="px-4 lg:px-6">
+        <div className="flex gap-1 bg-gray-100 rounded-xl p-1">
+          {([
+            { key: 'browse' as MarketplaceTab, label: 'Browse', icon: <Package size={14} /> },
+            { key: 'orders' as MarketplaceTab, label: `Orders (${MOCK_ORDERS.length})`, icon: <Truck size={14} /> },
+            { key: 'wishlist' as MarketplaceTab, label: `Saved (${wishlist.length})`, icon: <Heart size={14} /> },
+          ]).map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setMarketplaceTab(tab.key)}
+              className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-xs font-semibold transition-all ${
+                marketplaceTab === tab.key
+                  ? 'bg-white text-[#1B2A4A] shadow-sm'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              {tab.icon}
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </motion.section>
+
+      {/* ================================================================= */}
+      {/* ORDER TRACKING TAB                                                */}
+      {/* ================================================================= */}
+      {marketplaceTab === 'orders' && (
+        <motion.section
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="px-4 lg:px-6 space-y-3"
+        >
+          {MOCK_ORDERS.length === 0 ? (
+            <div className="rounded-2xl bg-white border border-gray-100 py-16 px-6 flex flex-col items-center text-center">
+              <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mb-4">
+                <Truck size={28} className="text-gray-400" />
+              </div>
+              <h3 className="text-base font-bold text-[#1B2A4A] mb-1">No orders yet</h3>
+              <p className="text-sm text-gray-500">Your order history will appear here.</p>
+            </div>
+          ) : (
+            MOCK_ORDERS.map((order) => {
+              const statusCfg = orderStatusConfig[order.status];
+              const isExpanded = expandedOrder === order.id;
+              return (
+                <motion.div
+                  key={order.id}
+                  variants={cardVariants}
+                  className="rounded-2xl bg-white border border-gray-100 overflow-hidden shadow-sm"
+                >
+                  <button
+                    onClick={() => setExpandedOrder(isExpanded ? null : order.id)}
+                    className="w-full p-4 text-left"
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <p className="text-xs text-gray-500 font-mono">{order.orderNumber}</p>
+                        <p className="text-sm font-bold text-[#1B2A4A] mt-0.5">{order.supplier}</p>
+                      </div>
+                      <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full ${statusCfg.bg} ${statusCfg.text}`}>
+                        {statusCfg.label}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3 text-[11px] text-gray-500">
+                        <span className="flex items-center gap-1">
+                          <Clock size={11} /> {order.date}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Package size={11} /> {order.items.length} item{order.items.length !== 1 ? 's' : ''}
+                        </span>
+                      </div>
+                      <span className="text-sm font-bold text-[#1B2A4A]">${order.total.toFixed(2)}</span>
+                    </div>
+                  </button>
+
+                  <AnimatePresence>
+                    {isExpanded && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="px-4 pb-4 space-y-4 border-t border-gray-50 pt-3">
+                          {/* Order items */}
+                          <div className="space-y-2">
+                            {order.items.map((item, i) => (
+                              <div key={i} className="flex items-center justify-between text-xs">
+                                <span className="text-gray-700">{item.name} x{item.qty}</span>
+                                <span className="font-semibold text-[#1B2A4A]">${(item.price * item.qty).toFixed(2)}</span>
+                              </div>
+                            ))}
+                          </div>
+
+                          {/* Tracking Timeline */}
+                          <div>
+                            <p className="text-xs font-bold text-[#1B2A4A] mb-3">Tracking</p>
+                            <div className="space-y-0">
+                              {order.trackingSteps.map((step, i) => (
+                                <div key={i} className="flex items-start gap-3">
+                                  <div className="flex flex-col items-center">
+                                    <div className={`w-3 h-3 rounded-full border-2 ${
+                                      step.done
+                                        ? 'bg-[#5DB347] border-[#5DB347]'
+                                        : 'bg-white border-gray-300'
+                                    }`} />
+                                    {i < order.trackingSteps.length - 1 && (
+                                      <div className={`w-0.5 h-6 ${
+                                        step.done && order.trackingSteps[i + 1]?.done
+                                          ? 'bg-[#5DB347]'
+                                          : 'bg-gray-200'
+                                      }`} />
+                                    )}
+                                  </div>
+                                  <div className="pb-3 -mt-0.5">
+                                    <p className={`text-xs font-medium ${step.done ? 'text-[#1B2A4A]' : 'text-gray-400'}`}>
+                                      {step.label}
+                                    </p>
+                                    {step.date && (
+                                      <p className="text-[10px] text-gray-400">{step.date}</p>
+                                    )}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          {order.status !== 'delivered' && (
+                            <div className="bg-blue-50 rounded-xl p-3 flex items-center gap-2">
+                              <MapPin size={14} className="text-blue-600 shrink-0" />
+                              <p className="text-xs text-blue-700">
+                                Estimated delivery: <span className="font-bold">{order.estimatedDelivery}</span>
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              );
+            })
+          )}
+        </motion.section>
+      )}
+
+      {/* ================================================================= */}
+      {/* WISHLIST TAB                                                      */}
+      {/* ================================================================= */}
+      {marketplaceTab === 'wishlist' && (
+        <motion.section
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="px-4 lg:px-6 space-y-3"
+        >
+          {wishlistProducts.length === 0 ? (
+            <div className="rounded-2xl bg-white border border-gray-100 py-16 px-6 flex flex-col items-center text-center">
+              <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mb-4">
+                <Heart size={28} className="text-gray-400" />
+              </div>
+              <h3 className="text-base font-bold text-[#1B2A4A] mb-1">No saved items</h3>
+              <p className="text-sm text-gray-500 max-w-xs leading-relaxed">
+                Tap the heart icon on any product to save it for later.
+              </p>
+              <button
+                onClick={() => setMarketplaceTab('browse')}
+                className="mt-4 px-4 py-2 rounded-xl bg-[#5DB347] text-white text-sm font-semibold hover:bg-[#449933] active:scale-[0.97] transition-all"
+              >
+                Browse Products
+              </button>
+            </div>
+          ) : (
+            <>
+              <p className="text-xs text-gray-500">{wishlistProducts.length} saved item{wishlistProducts.length !== 1 ? 's' : ''}</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {wishlistProducts.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+            </>
+          )}
+        </motion.section>
+      )}
+
+      {/* ================================================================= */}
+      {/* SEARCH BAR (browse tab only)                                      */}
+      {/* ================================================================= */}
+      {marketplaceTab !== 'browse' ? null : (
+      <>
+      {/* ================================================================= */}
       {/* SEARCH BAR                                                        */}
       {/* ================================================================= */}
       <motion.section variants={itemVariants} className="px-4 lg:px-6">
@@ -764,7 +1075,12 @@ export default function MarketplacePage() {
         >
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <ProductCard
+                key={product.id}
+                product={product}
+                isWishlisted={wishlist.includes(product.id)}
+                onToggleWishlist={toggleWishlist}
+              />
             ))}
           </div>
         </motion.section>
@@ -795,6 +1111,9 @@ export default function MarketplacePage() {
             </button>
           </div>
         </motion.section>
+      )}
+
+      </>
       )}
 
       {/* ================================================================= */}
