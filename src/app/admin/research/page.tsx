@@ -13,6 +13,7 @@ import {
   Globe,
   Users,
   Calendar,
+  ImageIcon,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
@@ -29,6 +30,8 @@ interface ResearchCentre {
   team_size: number | null;
   key_projects: string[];
   partner_institutions: string[];
+  is_active: boolean;
+  sort_order: number;
   created_at: string;
 }
 
@@ -46,7 +49,43 @@ const emptyForm: FormData = {
   team_size: null,
   key_projects: [],
   partner_institutions: [],
+  is_active: true,
+  sort_order: 0,
 };
+
+// Fallback data shown when the database is empty or unreachable
+const FALLBACK_CENTRES: ResearchCentre[] = [
+  {
+    id: 'fallback-rusanzi',
+    name: 'Rusanzi Farms',
+    description:
+      "Rusanzi Farms is AFU's flagship agricultural research and demonstration centre, focused on sustainable farming innovation across crops, livestock, and agroforestry systems.",
+    focus_areas: [
+      'Sustainable Agriculture',
+      'Crop Research & Trials',
+      'Agroforestry',
+      'Livestock Innovation',
+      'Climate-Smart Farming',
+    ],
+    country: 'Zimbabwe',
+    region: null,
+    photo_url: '/images/rusanzi-logo.png',
+    website: null,
+    established_year: 2024,
+    team_size: null,
+    key_projects: [
+      'Multi-crop trial programme',
+      'Regenerative agriculture pilot',
+      'Agroforestry demonstration plots',
+      'Farmer training programme',
+      'Precision irrigation research',
+    ],
+    partner_institutions: ['African Farming Union', 'Local Agricultural Extension Services'],
+    is_active: true,
+    sort_order: 0,
+    created_at: new Date().toISOString(),
+  },
+];
 
 export default function AdminResearchPage() {
   const supabase = createClient();
@@ -75,14 +114,20 @@ export default function AdminResearchPage() {
       const { data, error } = await supabase
         .from('research_centres')
         .select('*')
+        .order('sort_order', { ascending: true })
         .order('created_at', { ascending: false });
       if (error) {
         showToast('Failed to load research centres', 'error');
+        setCentres(FALLBACK_CENTRES);
+      } else if (data && data.length > 0) {
+        setCentres(data);
       } else {
-        setCentres(data || []);
+        // Database is empty — show fallback
+        setCentres(FALLBACK_CENTRES);
       }
     } catch (err) {
-      console.error("[research/page.tsx] fetch error:", err);
+      console.error('[research/page.tsx] fetch error:', err);
+      setCentres(FALLBACK_CENTRES);
     } finally {
       setLoading(false);
     }
@@ -114,6 +159,8 @@ export default function AdminResearchPage() {
       team_size: c.team_size,
       key_projects: c.key_projects || [],
       partner_institutions: c.partner_institutions || [],
+      is_active: c.is_active ?? true,
+      sort_order: c.sort_order ?? 0,
     });
     setEditingId(c.id);
     setFocusInput('');
@@ -137,9 +184,7 @@ export default function AdminResearchPage() {
         if (error) throw error;
         showToast('Research centre updated');
       } else {
-        const { error } = await supabase
-          .from('research_centres')
-          .insert(form);
+        const { error } = await supabase.from('research_centres').insert(form);
         if (error) throw error;
         showToast('Research centre created');
       }
@@ -163,7 +208,11 @@ export default function AdminResearchPage() {
     }
   };
 
-  const addTag = (field: 'focus_areas' | 'key_projects' | 'partner_institutions', value: string, setter: (v: string) => void) => {
+  const addTag = (
+    field: 'focus_areas' | 'key_projects' | 'partner_institutions',
+    value: string,
+    setter: (v: string) => void
+  ) => {
     const trimmed = value.trim();
     if (!trimmed) return;
     if (!form[field].includes(trimmed)) {
@@ -172,7 +221,10 @@ export default function AdminResearchPage() {
     setter('');
   };
 
-  const removeTag = (field: 'focus_areas' | 'key_projects' | 'partner_institutions', index: number) => {
+  const removeTag = (
+    field: 'focus_areas' | 'key_projects' | 'partner_institutions',
+    index: number
+  ) => {
     setForm({ ...form, [field]: form[field].filter((_, i) => i !== index) });
   };
 
@@ -188,7 +240,9 @@ export default function AdminResearchPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-[#1B2A4A]">Research Centres</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Manage AFU research centres across Africa</p>
+          <p className="text-sm text-gray-500 mt-0.5">
+            Manage AFU research centres across Africa
+          </p>
         </div>
         <button
           onClick={openAdd}
@@ -219,7 +273,10 @@ export default function AdminResearchPage() {
               <h2 className="text-lg font-bold text-[#1B2A4A]">
                 {editingId ? 'Edit Research Centre' : 'Add Research Centre'}
               </h2>
-              <button onClick={() => setShowForm(false)} className="p-2 rounded-lg hover:bg-gray-100">
+              <button
+                onClick={() => setShowForm(false)}
+                className="p-2 rounded-lg hover:bg-gray-100"
+              >
                 <X className="w-5 h-5 text-gray-500" />
               </button>
             </div>
@@ -269,14 +326,66 @@ export default function AdminResearchPage() {
                 </div>
               </div>
 
+              {/* Photo URL with preview */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Photo / Logo URL
+                </label>
+                <div className="flex items-start gap-4">
+                  <div className="flex-1">
+                    <input
+                      type="text"
+                      value={form.photo_url || ''}
+                      onChange={(e) => setForm({ ...form, photo_url: e.target.value || null })}
+                      placeholder="/images/rusanzi-logo.png or https://..."
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347]"
+                    />
+                    <p className="text-xs text-gray-400 mt-1">
+                      Enter a path (e.g. /images/logo.png) or full URL
+                    </p>
+                  </div>
+                  {form.photo_url ? (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img
+                      src={form.photo_url}
+                      alt="Preview"
+                      className="w-16 h-16 object-contain rounded-xl border border-gray-200 bg-white p-1 shrink-0"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 rounded-xl border border-dashed border-gray-300 bg-gray-50 flex items-center justify-center shrink-0">
+                      <ImageIcon className="w-5 h-5 text-gray-300" />
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Website */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Website</label>
+                <input
+                  type="url"
+                  value={form.website || ''}
+                  onChange={(e) => setForm({ ...form, website: e.target.value || null })}
+                  placeholder="https://..."
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347]"
+                />
+              </div>
+
               {/* Year + Team size */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Established Year</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Established Year
+                  </label>
                   <input
                     type="number"
                     value={form.established_year || ''}
-                    onChange={(e) => setForm({ ...form, established_year: e.target.value ? parseInt(e.target.value) : null })}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        established_year: e.target.value ? parseInt(e.target.value) : null,
+                      })
+                    }
                     className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347]"
                   />
                 </div>
@@ -285,31 +394,49 @@ export default function AdminResearchPage() {
                   <input
                     type="number"
                     value={form.team_size || ''}
-                    onChange={(e) => setForm({ ...form, team_size: e.target.value ? parseInt(e.target.value) : null })}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        team_size: e.target.value ? parseInt(e.target.value) : null,
+                      })
+                    }
                     className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347]"
                   />
                 </div>
               </div>
 
-              {/* Photo + Website */}
+              {/* Sort Order + Active toggle */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Photo URL</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Sort Order</label>
                   <input
-                    type="url"
-                    value={form.photo_url || ''}
-                    onChange={(e) => setForm({ ...form, photo_url: e.target.value || null })}
+                    type="number"
+                    value={form.sort_order}
+                    onChange={(e) =>
+                      setForm({ ...form, sort_order: e.target.value ? parseInt(e.target.value) : 0 })
+                    }
                     className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347]"
                   />
+                  <p className="text-xs text-gray-400 mt-1">Lower numbers appear first</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Website</label>
-                  <input
-                    type="url"
-                    value={form.website || ''}
-                    onChange={(e) => setForm({ ...form, website: e.target.value || null })}
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347]"
-                  />
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                  <button
+                    type="button"
+                    onClick={() => setForm({ ...form, is_active: !form.is_active })}
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-medium transition-colors w-full ${
+                      form.is_active
+                        ? 'bg-[#EBF7E5] border-[#5DB347]/30 text-[#5DB347]'
+                        : 'bg-gray-50 border-gray-200 text-gray-500'
+                    }`}
+                  >
+                    <span
+                      className={`w-3 h-3 rounded-full ${
+                        form.is_active ? 'bg-[#5DB347]' : 'bg-gray-300'
+                      }`}
+                    />
+                    {form.is_active ? 'Active — visible on public site' : 'Inactive — hidden from public site'}
+                  </button>
                 </div>
               </div>
 
@@ -318,9 +445,17 @@ export default function AdminResearchPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Focus Areas</label>
                 <div className="flex flex-wrap gap-2 mb-2">
                   {form.focus_areas.map((t, i) => (
-                    <span key={i} className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#EBF7E5] text-[#5DB347] text-xs font-medium">
+                    <span
+                      key={i}
+                      className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#EBF7E5] text-[#5DB347] text-xs font-medium"
+                    >
                       {t}
-                      <button onClick={() => removeTag('focus_areas', i)} className="hover:text-red-500"><X className="w-3 h-3" /></button>
+                      <button
+                        onClick={() => removeTag('focus_areas', i)}
+                        className="hover:text-red-500"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
                     </span>
                   ))}
                 </div>
@@ -329,7 +464,10 @@ export default function AdminResearchPage() {
                     type="text"
                     value={focusInput}
                     onChange={(e) => setFocusInput(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag('focus_areas', focusInput, setFocusInput))}
+                    onKeyDown={(e) =>
+                      e.key === 'Enter' &&
+                      (e.preventDefault(), addTag('focus_areas', focusInput, setFocusInput))
+                    }
                     placeholder="Type and press Enter"
                     className="flex-1 px-4 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347]"
                   />
@@ -347,9 +485,17 @@ export default function AdminResearchPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Key Projects</label>
                 <div className="flex flex-wrap gap-2 mb-2">
                   {form.key_projects.map((t, i) => (
-                    <span key={i} className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-medium">
+                    <span
+                      key={i}
+                      className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-medium"
+                    >
                       {t}
-                      <button onClick={() => removeTag('key_projects', i)} className="hover:text-red-500"><X className="w-3 h-3" /></button>
+                      <button
+                        onClick={() => removeTag('key_projects', i)}
+                        className="hover:text-red-500"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
                     </span>
                   ))}
                 </div>
@@ -358,7 +504,11 @@ export default function AdminResearchPage() {
                     type="text"
                     value={projectInput}
                     onChange={(e) => setProjectInput(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag('key_projects', projectInput, setProjectInput))}
+                    onKeyDown={(e) =>
+                      e.key === 'Enter' &&
+                      (e.preventDefault(),
+                      addTag('key_projects', projectInput, setProjectInput))
+                    }
                     placeholder="Type and press Enter"
                     className="flex-1 px-4 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347]"
                   />
@@ -373,12 +523,22 @@ export default function AdminResearchPage() {
 
               {/* Partner Institutions Tags */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Partner Institutions</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Partner Institutions
+                </label>
                 <div className="flex flex-wrap gap-2 mb-2">
                   {form.partner_institutions.map((t, i) => (
-                    <span key={i} className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-purple-50 text-purple-700 text-xs font-medium">
+                    <span
+                      key={i}
+                      className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-purple-50 text-purple-700 text-xs font-medium"
+                    >
                       {t}
-                      <button onClick={() => removeTag('partner_institutions', i)} className="hover:text-red-500"><X className="w-3 h-3" /></button>
+                      <button
+                        onClick={() => removeTag('partner_institutions', i)}
+                        className="hover:text-red-500"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
                     </span>
                   ))}
                 </div>
@@ -387,7 +547,11 @@ export default function AdminResearchPage() {
                     type="text"
                     value={partnerInput}
                     onChange={(e) => setPartnerInput(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag('partner_institutions', partnerInput, setPartnerInput))}
+                    onKeyDown={(e) =>
+                      e.key === 'Enter' &&
+                      (e.preventDefault(),
+                      addTag('partner_institutions', partnerInput, setPartnerInput))
+                    }
                     placeholder="Type and press Enter"
                     className="flex-1 px-4 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30 focus:border-[#5DB347]"
                   />
@@ -414,7 +578,11 @@ export default function AdminResearchPage() {
                 disabled={saving}
                 className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#5DB347] text-white text-sm font-medium hover:bg-[#4ea03c] transition-colors disabled:opacity-50"
               >
-                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                {saving ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Save className="w-4 h-4" />
+                )}
                 {editingId ? 'Update' : 'Create'}
               </button>
             </div>
@@ -435,34 +603,72 @@ export default function AdminResearchPage() {
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {filtered.map((c) => (
-            <div key={c.id} className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+            <div
+              key={c.id}
+              className={`bg-white rounded-2xl p-5 border shadow-sm hover:shadow-md transition-shadow ${
+                c.is_active === false
+                  ? 'border-gray-200 opacity-60'
+                  : 'border-gray-100'
+              }`}
+            >
               <div className="flex items-start justify-between mb-3">
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-[#1B2A4A] text-sm">{c.name}</h3>
-                  <div className="flex items-center gap-2 mt-1 text-xs text-gray-500">
-                    <Globe className="w-3.5 h-3.5" />
-                    <span>{c.region ? `${c.region}, ` : ''}{c.country}</span>
-                    {c.established_year && (
-                      <>
-                        <span className="text-gray-300">|</span>
-                        <Calendar className="w-3.5 h-3.5" />
-                        <span>Est. {c.established_year}</span>
-                      </>
-                    )}
-                    {c.team_size && (
-                      <>
-                        <span className="text-gray-300">|</span>
-                        <Users className="w-3.5 h-3.5" />
-                        <span>{c.team_size} team</span>
-                      </>
-                    )}
+                <div className="flex items-start gap-3 flex-1 min-w-0">
+                  {/* Thumbnail */}
+                  {c.photo_url ? (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img
+                      src={c.photo_url}
+                      alt={c.name}
+                      className="w-12 h-12 object-contain rounded-xl border border-gray-100 bg-white p-0.5 shrink-0"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center shrink-0">
+                      <FlaskConical className="w-5 h-5 text-gray-300" />
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-semibold text-[#1B2A4A] text-sm">{c.name}</h3>
+                      {c.is_active === false && (
+                        <span className="px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 text-[10px] font-medium">
+                          Inactive
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 mt-1 text-xs text-gray-500">
+                      <Globe className="w-3.5 h-3.5" />
+                      <span>
+                        {c.region ? `${c.region}, ` : ''}
+                        {c.country}
+                      </span>
+                      {c.established_year && (
+                        <>
+                          <span className="text-gray-300">|</span>
+                          <Calendar className="w-3.5 h-3.5" />
+                          <span>Est. {c.established_year}</span>
+                        </>
+                      )}
+                      {c.team_size && (
+                        <>
+                          <span className="text-gray-300">|</span>
+                          <Users className="w-3.5 h-3.5" />
+                          <span>{c.team_size} team</span>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
-                  <button onClick={() => openEdit(c)} className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-[#5DB347]">
+                  <button
+                    onClick={() => openEdit(c)}
+                    className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-[#5DB347]"
+                  >
                     <Pencil className="w-4 h-4" />
                   </button>
-                  <button onClick={() => handleDelete(c.id)} className="p-2 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500">
+                  <button
+                    onClick={() => handleDelete(c.id)}
+                    className="p-2 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500"
+                  >
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
@@ -475,17 +681,53 @@ export default function AdminResearchPage() {
               {c.focus_areas && c.focus_areas.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 mb-2">
                   {c.focus_areas.map((fa, i) => (
-                    <span key={i} className="px-2.5 py-0.5 rounded-full bg-[#EBF7E5] text-[#5DB347] text-[11px] font-medium">
+                    <span
+                      key={i}
+                      className="px-2.5 py-0.5 rounded-full bg-[#EBF7E5] text-[#5DB347] text-[11px] font-medium"
+                    >
                       {fa}
                     </span>
                   ))}
                 </div>
               )}
 
+              {c.key_projects && c.key_projects.length > 0 && (
+                <div className="mb-2">
+                  <ul className="space-y-1">
+                    {c.key_projects.slice(0, 3).map((p, i) => (
+                      <li key={i} className="flex items-start gap-1.5 text-[11px] text-gray-500">
+                        <svg
+                          className="w-3 h-3 text-[#5DB347] mt-0.5 shrink-0"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                        {p}
+                      </li>
+                    ))}
+                    {c.key_projects.length > 3 && (
+                      <li className="text-[11px] text-gray-400 pl-4">
+                        +{c.key_projects.length - 3} more
+                      </li>
+                    )}
+                  </ul>
+                </div>
+              )}
+
               {c.partner_institutions && c.partner_institutions.length > 0 && (
                 <div className="flex flex-wrap gap-1.5">
                   {c.partner_institutions.map((p, i) => (
-                    <span key={i} className="px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-600 text-[11px] font-medium">
+                    <span
+                      key={i}
+                      className="px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-600 text-[11px] font-medium"
+                    >
                       {p}
                     </span>
                   ))}
@@ -499,9 +741,11 @@ export default function AdminResearchPage() {
       {/* Toast */}
       {toast && (
         <div className="fixed bottom-6 right-6 z-50">
-          <div className={`flex items-center gap-2 px-4 py-3 rounded-xl shadow-lg text-sm font-medium ${
-            toast.type === 'success' ? 'bg-[#5DB347] text-white' : 'bg-red-500 text-white'
-          }`}>
+          <div
+            className={`flex items-center gap-2 px-4 py-3 rounded-xl shadow-lg text-sm font-medium ${
+              toast.type === 'success' ? 'bg-[#5DB347] text-white' : 'bg-red-500 text-white'
+            }`}
+          >
             {toast.message}
           </div>
         </div>

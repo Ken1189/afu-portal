@@ -449,6 +449,11 @@ export default function Home() {
       if (e.data?.type === 'preview-update' && e.data?.content) {
         setContent(e.data.content as HomepageContent);
       }
+      // Section jump — scroll to a section when editor requests it
+      if (e.data?.type === 'scroll-to-section' && e.data?.sectionId) {
+        const el = document.getElementById(`section-${e.data.sectionId}`);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     };
     window.addEventListener('message', handler);
     return () => window.removeEventListener('message', handler);
@@ -721,7 +726,7 @@ export default function Home() {
   return (
     <>
       {/* ─── HERO ─── */}
-      {showSection('hero') && <section className="relative min-h-[92vh] flex items-center overflow-hidden">
+      {showSection('hero') && <section id="section-hero" className="relative min-h-[92vh] flex items-center overflow-hidden">
         {/* Background image */}
         <div className="absolute inset-0">
           <Image
@@ -800,7 +805,7 @@ export default function Home() {
       </section>}
 
       {/* ─── IMPACT STATS (Animated counters) ─── */}
-      {showSection('stats') && <section className="py-16 bg-gradient-to-b from-white via-[#f8fdf6] to-white relative overflow-hidden">
+      {showSection('stats') && <section id="section-stats" className="py-16 bg-gradient-to-b from-white via-[#f8fdf6] to-white relative overflow-hidden">
         <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#5DB347]/30 to-transparent" />
         <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, #5DB347 1px, transparent 0)', backgroundSize: '40px 40px' }} />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -839,7 +844,7 @@ export default function Home() {
       </section>}
 
       {/* ─── WHAT AFU PROVIDES (Services Grid) ─── */}
-      {showSection('services') && <section className="py-16 bg-cream">
+      {showSection('services') && <section id="section-services" className="py-16 bg-cream">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeInWhenVisible>
             <div className="text-center mb-14">
@@ -898,7 +903,7 @@ export default function Home() {
       </section>}
 
       {/* ─── OUR PROGRAMS ─── */}
-      {showSection('programs') && <section className="py-16 bg-white relative overflow-hidden">
+      {showSection('programs') && <section id="section-programs" className="py-16 bg-white relative overflow-hidden">
         <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, #5DB347 1px, transparent 0)', backgroundSize: '40px 40px' }} />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <FadeInWhenVisible>
@@ -950,7 +955,7 @@ export default function Home() {
       </section>}
 
       {/* ─── THE AFU FLYWHEEL ─── */}
-      <section className="py-16 bg-navy text-white overflow-hidden">
+      <section id="section-flywheel" className="py-16 bg-navy text-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeInWhenVisible>
             <div className="text-center mb-16">
@@ -1010,7 +1015,7 @@ export default function Home() {
       </section>
 
       {/* ─── HOW IT WORKS ─── */}
-      <section className="py-16 bg-white relative">
+      <section id="section-how_it_works" className="py-16 bg-white relative">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#f8fdf6]/50 to-transparent" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <FadeInWhenVisible>
@@ -1058,7 +1063,7 @@ export default function Home() {
 
 
       {/* ─── IMAGE FEATURE SPLIT ─── */}
-      <section className="py-16 bg-cream overflow-hidden">
+      <section id="section-ai" className="py-16 bg-cream overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             {/* Image */}
@@ -1321,7 +1326,7 @@ export default function Home() {
       </section>}
 
       {/* ─── INVESTOR SECTION ─── */}
-      <section className="py-16 bg-gradient-to-br from-navy-dark via-navy to-[#1e3a5f] text-white overflow-hidden relative">
+      <section id="section-investor" className="py-16 bg-gradient-to-br from-navy-dark via-navy to-[#1e3a5f] text-white overflow-hidden relative">
         {/* Subtle pattern overlay */}
         <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'1\' fill-rule=\'evenodd\'%3E%3Ccircle cx=\'30\' cy=\'30\' r=\'1.5\'/%3E%3C/g%3E%3C/svg%3E")' }} />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
@@ -1509,7 +1514,7 @@ export default function Home() {
       {/* Countries section removed — coverage info is on /countries page */}
 
       {/* ── Sponsor a Farmer Section ─────────────────────────────────── */}
-      <section className="py-16 bg-cream">
+      <section id="section-sponsor" className="py-16 bg-cream">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
             <span className="inline-block bg-[#5DB347]/10 text-sm font-semibold px-4 py-1.5 rounded-full mb-4" style={{ color: '#5DB347' }}>
@@ -1575,7 +1580,7 @@ export default function Home() {
       </section>
 
       {/* ─── OUR PROMISE ─── */}
-      <section className="py-16 bg-white relative">
+      <section id="section-promise" className="py-16 bg-white relative">
         <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#5DB347]/20 to-transparent" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeInWhenVisible>
@@ -1636,7 +1641,7 @@ export default function Home() {
       </section>
 
       {/* ─── WE DON'T JUST FINANCE — WE SHOW UP ─── */}
-      <section className="py-16 bg-gradient-to-b from-[#f8fdf6] to-white relative overflow-hidden">
+      <section id="section-showup" className="py-16 bg-gradient-to-b from-[#f8fdf6] to-white relative overflow-hidden">
         <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, #5DB347 1px, transparent 0)', backgroundSize: '40px 40px' }} />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <FadeInWhenVisible>
@@ -1677,7 +1682,7 @@ export default function Home() {
       </section>
 
       {/* ─── FINAL CTA ─── */}
-      {showSection('cta') && <section className="relative py-32 overflow-hidden">
+      {showSection('cta') && <section id="section-final_cta" className="relative py-32 overflow-hidden">
         <div className="absolute inset-0">
           <Image
             src="https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=1920&q=80&auto=format&fit=crop"

@@ -1093,6 +1093,89 @@ export const ADVISORS_CHROME_SCHEMA: PageSchema = {
 };
 
 // ───────────────────────────────────────────────────────────────────────
+// Default content — pre-fills the editor so the team sees actual text
+// ───────────────────────────────────────────────────────────────────────
+
+export const DEFAULT_CONTENT: Record<string, Record<string, unknown>> = {
+  homepage: {
+    hero_headline: "Let's Grow Together",
+    hero_subtitle: 'By farmers, for farmers. Run by Africans, for Africans. We bring the financing, inputs, processing, and guaranteed buyers — you bring the land and the passion. Together, we turn your harvest into real, sustainable income.',
+    hero_cta_text: 'Join Our Farming Family',
+    hero_cta_link: '/apply',
+    hero_badge_text: 'Active across 9 African countries',
+    stats_eyebrow: 'The Africa Agriculture Paradox',
+    stats_title: 'The Opportunity is Enormous',
+    stats_subtitle: "Africa has the land, labor, and demand. What's missing is the integrated infrastructure and finance to unlock it.",
+    services_eyebrow: 'Our Services',
+    services_title: 'One Platform, Complete Value Chain',
+    services_subtitle: "A vertically integrated agriculture development platform — the specialized agri dev bank and execution engine Africa has been missing.",
+    programs_eyebrow: 'Active Programs',
+    programs_title: 'Our Programs',
+    programs_subtitle: 'Real farming programs generating real revenue. From blueberries bound for Europe to castor oil feeding global biofuel demand.',
+    flywheel_eyebrow: 'The Model',
+    flywheel_title: 'The AFU Flywheel',
+    flywheel_subtitle: 'Most players only do one piece. AFU ties the full loop together — capital flows in, crops flow out, cash recycles.',
+    flywheel_labels: ['Capital', 'Inputs', 'Production', 'Processing', 'Offtake', 'Trade Finance', 'Cash Recycle'],
+    flywheel_recycle_text: "That's the compounding flywheel — cash recycles back into capital",
+    how_it_works_eyebrow: 'Getting Started',
+    how_it_works_title: 'Four Steps to Growth',
+    how_it_works_subtitle: 'From your first conversation to export income — we walk the journey with you, every step of the way.',
+    how_it_works_steps: [
+      { step: '01', title: 'Tell Us Your Story', desc: 'Tell us about you and your vision. Share your farming story, your land, your dreams. We want to understand what makes your farm unique.' },
+      { step: '02', title: 'Get Financed', desc: 'Access working capital, input finance, and equipment leasing tailored to your crop cycle.' },
+      { step: '03', title: 'Grow & Process', desc: 'Use premium inputs, expert training, and processing hubs to maximize yields and value.' },
+      { step: '04', title: 'Sell & Scale', desc: 'Guaranteed offtake contracts and trade finance turn your harvest into predictable cash flows.' },
+    ],
+    ai_eyebrow: 'Technology Advantage',
+    ai_title: 'AI-Powered Agriculture for Smarter Farming',
+    ai_body: 'Our Amara AI assistant helps farmers with crop diagnostics, market pricing, weather alerts, and personalized recommendations — accessible via the portal or WhatsApp.',
+    ai_features: [
+      'Crop health scanner with photo-based diagnosis',
+      'AI credit scoring for faster loan decisions',
+      'Real-time market prices and trend alerts',
+      'Satellite monitoring and weather forecasts',
+    ],
+    ai_link_text: 'Learn more about our technology',
+    investor_eyebrow: 'Investment Opportunity',
+    investor_title_pre: "Invest in Africa's Agricultural",
+    investor_title_highlight: 'Transformation',
+    investor_body: "AFU is raising a multi-million dollar funding round to build Africa's first vertically integrated agriculture development bank and operating platform. Trade finance, input lending, and offtake — tapping into Africa's growing agricultural market.",
+    promise_eyebrow: 'What Makes Us Different',
+    promise_title: 'Our Promise',
+    promise_subtitle: "We're not a bank in a boardroom. We're farmers who built a platform to solve the problems we lived through ourselves.",
+    showup_eyebrow: 'Our People On Your Farm',
+    showup_title: "We Don't Just Finance — We Show Up",
+    showup_subtitle: 'Our network of commercial farmers, agronomists, and specialists come to your farm to help you succeed. These are real people with real experience — not just software.',
+    sponsor_eyebrow: 'Sponsor a Farmer',
+    sponsor_title: "Turn $5 a Month Into a Farm's Future",
+    sponsor_subtitle: "Real farmers. Real crops. Real impact. Your sponsorship is distributed across farmers who need it most — funding memberships, inputs, and program access. Get monthly updates as their seasons unfold.",
+    final_cta_title: 'Ready to Grow With Us?',
+    final_cta_body: "Whether you farm two hectares or two thousand, we're here to help. Tell us your story, share your vision, and let's build something extraordinary together.",
+    final_cta_primary_text: 'Join Our Farming Family',
+    final_cta_primary_link: '/apply',
+    final_cta_secondary_text: "We're Here to Help",
+    final_cta_secondary_link: '/contact',
+  },
+  footer: {
+    mission: 'By Farmers, For Farmers. AFU is building the integrated agricultural infrastructure that Africa needs — connecting farmers to finance, inputs, processing, and markets across the continent.',
+  },
+  about: {
+    hero_title: 'About AFU',
+    hero_subtitle: 'By Farmers, For Farmers',
+    hero_body: "The African Farming Union is a vertically integrated agriculture development platform — combining financing, insurance, inputs, processing, and guaranteed offtake into one ecosystem. We're not a bank, not an NGO, and not a tech startup. We're farmers who built what Africa's agricultural sector has been missing.",
+    mission_title: 'Our Mission',
+    mission_body: "To empower African farmers with the finance, inputs, technology, and market access they need to build sustainable, profitable farms. We believe that when farmers thrive, communities thrive, and Africa's agricultural potential is finally unlocked.",
+  },
+  page_chrome_contact: {
+    hero_title: 'Get In Touch',
+    hero_subtitle: "Have a question, a partnership proposal, or just want to chat about farming? We'd love to hear from you.",
+    form_title: 'Send Us a Message',
+    success_title: 'Message Sent',
+    success_body: "Thank you for reaching out. We'll get back to you within 24 hours.",
+  },
+};
+
+// ───────────────────────────────────────────────────────────────────────
 // Registry + grouping for the sidebar
 // ───────────────────────────────────────────────────────────────────────
 

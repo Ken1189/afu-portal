@@ -53,6 +53,7 @@ import {
   ALL_SCHEMAS,
   SCHEMA_GROUPS,
   HOMEPAGE_SCHEMA,
+  DEFAULT_CONTENT,
   type FieldDef,
   type PageSchema,
 } from './schemas';
@@ -168,7 +169,14 @@ export default function ContentEditorPage() {
 
         if (!cancelled) {
           setPublishedContent(parsedPub);
-          setContent(parsedDraft || parsedPub || {});
+          // If both draft and published are empty, pre-fill from defaults
+          const resolved = parsedDraft || parsedPub || {};
+          const defaults = DEFAULT_CONTENT[activeSchema.id];
+          if (Object.keys(resolved).length === 0 && defaults) {
+            setContent({ ...defaults } as Content);
+          } else {
+            setContent(resolved);
+          }
         }
       } catch {
         if (!cancelled) {
@@ -609,6 +617,35 @@ export default function ContentEditorPage() {
     return () => clearTimeout(t);
   }, [toast]);
 
+  // Jump to section in preview iframe
+  const scrollToSection = (sectionId: string) => {
+    if (!iframeRef.current?.contentWindow) return;
+    try {
+      iframeRef.current.contentWindow.postMessage(
+        { type: 'scroll-to-section', sectionId },
+        window.location.origin
+      );
+    } catch { /* ignore */ }
+  };
+
+  // Load defaults for current schema
+  const loadDefaults = () => {
+    const defaults = DEFAULT_CONTENT[activeSchema.id];
+    if (!defaults) return;
+    // Merge defaults with existing content (don't overwrite what's already filled)
+    const merged = { ...defaults };
+    for (const [key, val] of Object.entries(content)) {
+      if (val && (typeof val === 'string' ? val.trim() : true)) {
+        merged[key] = val;
+      }
+    }
+    setContent(merged as Content);
+    setHasUnsavedChanges(true);
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(() => persistDraft(merged as Content), 800);
+    setToast({ message: 'Default content loaded — edit and publish when ready', type: 'success' });
+  };
+
   // Construct preview URL
   const previewSrc = useMemo(() => {
     const path = activeSchema.previewPath || '/';
@@ -848,6 +885,15 @@ export default function ContentEditorPage() {
                     >
                       Collapse all
                     </button>
+                    {DEFAULT_CONTENT[activeSchema.id] && (
+                      <button
+                        onClick={loadDefaults}
+                        className="rounded-md px-2 py-1 text-[10px] font-medium text-[#5DB347] hover:bg-[#5DB347]/10"
+                        title="Load default content for this page"
+                      >
+                        Load defaults
+                      </button>
+                    )}
                     <button
                       onClick={() => setShowPreview((v) => !v)}
                       className="hidden items-center gap-1 rounded-md px-2 py-1 text-[10px] font-medium text-gray-500 hover:bg-gray-100 lg:flex"
@@ -888,6 +934,20 @@ export default function ContentEditorPage() {
                         <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-medium text-white/70">
                           {filledCount}/{section.fields.length}
                         </span>
+                        {showPreview && (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              scrollToSection(section.id);
+                            }}
+                            className="rounded-md bg-white/10 px-1.5 py-0.5 text-[9px] font-medium text-white/60 hover:bg-white/20 hover:text-white transition-colors"
+                            title="Jump to this section in preview"
+                          >
+                            <Eye className="h-3 w-3 inline mr-0.5" />
+                            Locate
+                          </button>
+                        )}
                       </header>
                       {!isCollapsed && (
                         <div className="space-y-4 p-4">
