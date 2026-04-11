@@ -351,11 +351,22 @@ function ContractPreview({
               </button>
             )}
             <button
+              onClick={() => {
+                navigator.clipboard.writeText(`${window.location.origin}/admin/contracts?preview=${contract.id}`);
+                const btn = document.activeElement as HTMLButtonElement;
+                if (btn) { btn.textContent = 'Copied!'; setTimeout(() => { btn.textContent = ''; }, 1500); }
+              }}
+              className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white text-xs font-medium px-4 py-2.5 rounded-xl transition-colors"
+            >
+              <Copy className="w-3.5 h-3.5" />
+              Copy Link
+            </button>
+            <button
               onClick={() => window.print()}
               className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white text-xs font-medium px-4 py-2.5 rounded-xl transition-colors"
             >
               <Printer className="w-3.5 h-3.5" />
-              Print
+              Print / PDF
             </button>
             <button onClick={onClose} className="p-2 rounded-xl hover:bg-white/10 ml-1">
               <X className="w-5 h-5" />
@@ -498,6 +509,36 @@ function ContractPreview({
             </div>
           )}
 
+          {/* Investor-pack specific: investment structure */}
+          {contract.document_type === 'investor_pack' && (
+            <div className="px-12 pb-8">
+              <div className="border border-emerald-200 bg-emerald-50 rounded-xl p-5">
+                <p className="text-xs font-bold text-emerald-800 uppercase tracking-wider mb-2">Investment Structure</p>
+                <p className="text-sm text-emerald-700 leading-relaxed">
+                  This Investment Pack outlines the proposed terms for investment into African Farming Union.
+                  The terms herein are subject to due diligence, legal review, and the execution of definitive
+                  agreements. AFU reserves the right to modify terms prior to closing. All investments carry
+                  inherent risk and past performance does not guarantee future returns.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Forward-growing specific: crop insurance notice */}
+          {contract.document_type === 'forward_growing' && (
+            <div className="px-12 pb-8">
+              <div className="border border-green-200 bg-green-50 rounded-xl p-5">
+                <p className="text-xs font-bold text-green-800 uppercase tracking-wider mb-2">Crop Risk &amp; Insurance</p>
+                <p className="text-sm text-green-700 leading-relaxed">
+                  Both parties acknowledge that agricultural production is subject to weather, pest, and disease
+                  risks. Where applicable, AFU will facilitate crop insurance coverage. In the event of verified
+                  crop failure beyond the farmer&apos;s control, the parties agree to renegotiate delivery terms
+                  in good faith. Force majeure provisions apply as outlined in the General Provisions below.
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* MOU-specific: non-binding notice */}
           {contract.document_type === 'mou' && (
             <div className="px-12 pb-8">
@@ -550,11 +591,51 @@ function ContractPreview({
             </div>
           </div>
 
+          {/* Standard Legal Clauses */}
+          <div className="px-12 pb-8">
+            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-[0.15em] mb-4">General Provisions</h3>
+            <div className="space-y-4 text-[11px] text-slate-500 leading-relaxed border border-slate-200 rounded-xl p-6 bg-slate-50/50">
+              <div>
+                <p className="font-semibold text-slate-600 text-xs mb-1">1. Governing Law</p>
+                <p>This agreement shall be governed by and construed in accordance with the laws of the Republic of South Africa, without regard to its conflict of laws provisions.</p>
+              </div>
+              <div>
+                <p className="font-semibold text-slate-600 text-xs mb-1">2. Dispute Resolution</p>
+                <p>Any dispute arising out of or in connection with this agreement shall first be referred to mediation. If unresolved within 30 days, the dispute shall be submitted to binding arbitration in Cape Town, South Africa under the rules of the Arbitration Foundation of Southern Africa (AFSA).</p>
+              </div>
+              <div>
+                <p className="font-semibold text-slate-600 text-xs mb-1">3. Force Majeure</p>
+                <p>Neither party shall be liable for any failure or delay in performing their obligations where such failure or delay results from circumstances beyond the reasonable control of that party, including but not limited to natural disasters, drought, flood, government actions, war, or pandemic.</p>
+              </div>
+              <div>
+                <p className="font-semibold text-slate-600 text-xs mb-1">4. Entire Agreement</p>
+                <p>This document constitutes the entire agreement between the parties with respect to the subject matter hereof and supersedes all prior negotiations, representations, warranties, commitments, offers, and agreements in respect of the subject matter.</p>
+              </div>
+              <div>
+                <p className="font-semibold text-slate-600 text-xs mb-1">5. Amendment</p>
+                <p>No amendment, modification, or waiver of any provision of this agreement shall be effective unless in writing and signed by both parties.</p>
+              </div>
+              {contract.document_type !== 'nda' && contract.document_type !== 'mou' && (
+                <div>
+                  <p className="font-semibold text-slate-600 text-xs mb-1">6. Termination</p>
+                  <p>Either party may terminate this agreement by giving 90 days written notice to the other party. In the event of material breach, the non-breaching party may terminate immediately upon written notice, provided a 14-day cure period has elapsed without remedy.</p>
+                </div>
+              )}
+              <div>
+                <p className="font-semibold text-slate-600 text-xs mb-1">{contract.document_type !== 'nda' && contract.document_type !== 'mou' ? '7' : '6'}. Notices</p>
+                <p>All notices under this agreement shall be in writing and delivered to the addresses specified above, or to such other address as either party may designate in writing.</p>
+              </div>
+            </div>
+          </div>
+
           {/* Footer */}
           <div className="bg-gradient-to-r from-[#1B2A4A] to-[#223350] px-12 py-5">
             <div className="flex items-center justify-between">
               <p className="text-[10px] text-white/30">African Farming Union | Confidential</p>
-              <p className="text-[10px] text-white/30 font-mono">ID: {contract.id}</p>
+              <div className="flex items-center gap-4">
+                <p className="text-[10px] text-white/30">Page 1 of 1</p>
+                <p className="text-[10px] text-white/30 font-mono">{refNumber}</p>
+              </div>
             </div>
           </div>
         </div>
