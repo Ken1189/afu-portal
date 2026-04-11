@@ -1,36 +1,32 @@
 'use client';
 
-import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createClient } from '@/lib/supabase/client';
 import {
   Search,
-  ShoppingCart,
   Star,
   SlidersHorizontal,
-  Tag,
   Leaf,
-  Bug,
   Wrench,
-  Droplets,
-  Cpu,
-  Box,
-  Warehouse,
-  Hammer,
-  Filter,
+  Package,
   X,
   ArrowRight,
-  Package,
-  ChevronDown,
   Users,
   Shield,
   Truck,
   Award,
+  MessageCircle,
+  ChevronDown,
+  Beaker,
+  Tractor,
+  Apple,
+  Handshake,
+  ArrowUpDown,
 } from 'lucide-react';
 
-/* ─── Types ─── */
+/* --- Types --- */
 
 interface Product {
   id: string;
@@ -50,123 +46,344 @@ interface Product {
   featured: boolean;
 }
 
-/* ─── Static products REMOVED — 12 hardcoded fake products deleted.
-     Page now fetches from products table only. ─── */
+/* --- Fallback products --- */
 
-const PRODUCTS: Product[] = [];
-const _UNUSED_PRODUCTS: Product[] = [
-  { id: 'P001', supplierName: 'Kalahari Seeds Co.', name: 'Drought-Resistant Sorghum (Macia)', description: 'Early-maturing white sorghum variety for semi-arid conditions. 25kg bag.', category: 'seeds', price: 65, memberPrice: 58.50, currency: 'USD', unit: 'per 25kg bag', image: 'https://images.unsplash.com/photo-1595855759920-86582396756a?w=400&h=300&fit=crop', availability: 'in-stock', rating: 4.7, reviewCount: 89, tags: ['drought-resistant', 'sorghum'], featured: true },
-  { id: 'P002', supplierName: 'Kalahari Seeds Co.', name: 'Hybrid Maize Seed (PAN 4M-21)', description: 'High-yielding hybrid maize with drought tolerance. 10kg bag treats 1 hectare.', category: 'seeds', price: 48, memberPrice: 43.20, currency: 'USD', unit: 'per 10kg bag', image: 'https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=400&h=300&fit=crop', availability: 'in-stock', rating: 4.6, reviewCount: 134, tags: ['maize', 'hybrid'], featured: true },
-  { id: 'P003', supplierName: 'Victoria Falls Seed Bank', name: 'Cowpea Seeds (IT18)', description: 'Improved cowpea variety with pest resistance. Dual-purpose grain and fodder. 5kg pack.', category: 'seeds', price: 22, memberPrice: 20.24, currency: 'USD', unit: 'per 5kg pack', image: 'https://images.unsplash.com/photo-1590682680695-43b964a3ae17?w=400&h=300&fit=crop', availability: 'in-stock', rating: 4.5, reviewCount: 67, tags: ['cowpea', 'legume'], featured: false },
-  { id: 'P004', supplierName: 'Zambezi Agri-Supplies', name: 'Groundnut Seed (Nyanda)', description: 'Virginia-type groundnut with large kernels. Excellent for oil extraction and confectionery. 25kg bag.', category: 'seeds', price: 78, memberPrice: 68.64, currency: 'USD', unit: 'per 25kg bag', image: 'https://images.unsplash.com/photo-1587049016823-69ef9d68f0b3?w=400&h=300&fit=crop', availability: 'in-stock', rating: 4.8, reviewCount: 98, tags: ['groundnut', 'export-quality'], featured: true },
-  { id: 'P005', supplierName: 'Okavango Fertilizers', name: 'NPK 15-15-15 Compound Fertilizer', description: 'Balanced compound fertilizer for a wide range of crops at planting. 50kg bag.', category: 'fertilizer', price: 45, memberPrice: 40.95, currency: 'USD', unit: 'per 50kg bag', image: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop', availability: 'in-stock', rating: 4.4, reviewCount: 156, tags: ['NPK', 'compound'], featured: false },
-  { id: 'P006', supplierName: 'Okavango Fertilizers', name: 'Urea (46-0-0) Top Dressing', description: 'High-nitrogen granular urea for top-dressing cereals. 46% nitrogen content. 50kg bag.', category: 'fertilizer', price: 38, memberPrice: 34.58, currency: 'USD', unit: 'per 50kg bag', image: 'https://images.unsplash.com/photo-1563514227147-6d2ff665a6a0?w=400&h=300&fit=crop', availability: 'in-stock', rating: 4.3, reviewCount: 112, tags: ['urea', 'nitrogen'], featured: false },
-  { id: 'P007', supplierName: 'Kilimanjaro Organic Inputs', name: 'Organic Compost Blend (Kilimanjaro Mix)', description: 'Premium organic compost from coffee husks, banana stems, and cattle manure. 25kg bag.', category: 'fertilizer', price: 18, memberPrice: 16.56, currency: 'USD', unit: 'per 25kg bag', image: 'https://images.unsplash.com/photo-1585336261022-680e295ce3fe?w=400&h=300&fit=crop', availability: 'in-stock', rating: 4.6, reviewCount: 78, tags: ['organic', 'compost'], featured: true },
-  { id: 'P008', supplierName: 'Tswana Agri-Chem', name: 'Lambda-Cyhalothrin 5EC Insecticide', description: 'Broad-spectrum pyrethroid insecticide for bollworm, stem borer, and aphid control. 1L bottle.', category: 'pesticides', price: 24, memberPrice: 22.08, currency: 'USD', unit: 'per liter', image: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=400&h=300&fit=crop', availability: 'in-stock', rating: 4.4, reviewCount: 89, tags: ['insecticide', 'pyrethroid'], featured: false },
-  { id: 'P009', supplierName: 'Kilimanjaro Organic Inputs', name: 'Neem Oil Organic Pesticide', description: 'Cold-pressed neem oil for organic pest management. Controls over 200 pest species. 1L bottle.', category: 'pesticides', price: 18, memberPrice: 16.56, currency: 'USD', unit: 'per liter', image: 'https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=400&h=300&fit=crop', availability: 'in-stock', rating: 4.6, reviewCount: 56, tags: ['organic', 'neem'], featured: true },
-  { id: 'P010', supplierName: 'Matopos Equipment Hire', name: 'Walk-Behind Tractor (15HP Diesel)', description: 'Heavy-duty two-wheel tractor with plough, ridger, and trailer. Ideal for farms up to 5 hectares.', category: 'equipment', price: 3800, memberPrice: 3230, currency: 'USD', unit: 'per unit', image: 'https://images.unsplash.com/photo-1530267981375-f0de937f5f13?w=400&h=300&fit=crop', availability: 'in-stock', rating: 4.6, reviewCount: 45, tags: ['tractor', 'smallholder'], featured: true },
-  { id: 'P011', supplierName: 'Matopos Equipment Hire', name: 'Maize Sheller (Manual)', description: 'Hand-operated maize sheller, 100kg/hour. Reduces labour costs by 80%.', category: 'equipment', price: 185, memberPrice: 157.25, currency: 'USD', unit: 'per unit', image: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=400&h=300&fit=crop', availability: 'in-stock', rating: 4.4, reviewCount: 89, tags: ['maize', 'post-harvest'], featured: false },
-  { id: 'P012', supplierName: 'Nairobi Drip Systems', name: 'Drip Irrigation Kit (1 Hectare)', description: 'Complete drip irrigation system with mainline, laterals, emitters, and filter. Gravity-fed option.', category: 'irrigation', price: 850, memberPrice: 722.50, currency: 'USD', unit: 'per kit', image: 'https://images.unsplash.com/photo-1622383563227-04401ab4e5ea?w=400&h=300&fit=crop', availability: 'in-stock', rating: 4.7, reviewCount: 34, tags: ['drip', 'water-saving'], featured: true },
+const FALLBACK_PRODUCTS: Product[] = [
+  {
+    id: 'P001',
+    supplierName: 'Kalahari Seeds Co.',
+    name: 'Drought-Resistant Sorghum (Macia)',
+    description: 'Early-maturing white sorghum variety for semi-arid conditions. 25 kg bag.',
+    category: 'seeds',
+    price: 65,
+    memberPrice: 58.50,
+    currency: 'USD',
+    unit: 'per 25 kg bag',
+    image: 'https://images.unsplash.com/photo-1595855759920-86582396756a?w=400&h=300&fit=crop',
+    availability: 'in-stock',
+    rating: 4.7,
+    reviewCount: 89,
+    tags: ['drought-resistant', 'sorghum'],
+    featured: true,
+  },
+  {
+    id: 'P002',
+    supplierName: 'Kalahari Seeds Co.',
+    name: 'Hybrid Maize Seed (PAN 4M-21)',
+    description: 'High-yielding hybrid maize with drought tolerance. 10 kg bag treats 1 hectare.',
+    category: 'seeds',
+    price: 48,
+    memberPrice: 43.20,
+    currency: 'USD',
+    unit: 'per 10 kg bag',
+    image: 'https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=400&h=300&fit=crop',
+    availability: 'in-stock',
+    rating: 4.6,
+    reviewCount: 134,
+    tags: ['maize', 'hybrid'],
+    featured: true,
+  },
+  {
+    id: 'P003',
+    supplierName: 'Victoria Falls Seed Bank',
+    name: 'Cowpea Seedlings (IT18)',
+    description: 'Improved cowpea variety with pest resistance. Dual-purpose grain and fodder. 5 kg pack.',
+    category: 'seeds',
+    price: 22,
+    memberPrice: 20.24,
+    currency: 'USD',
+    unit: 'per 5 kg pack',
+    image: 'https://images.unsplash.com/photo-1590682680695-43b964a3ae17?w=400&h=300&fit=crop',
+    availability: 'in-stock',
+    rating: 4.5,
+    reviewCount: 67,
+    tags: ['cowpea', 'legume'],
+    featured: false,
+  },
+  {
+    id: 'P004',
+    supplierName: 'Zambezi Agri-Supplies',
+    name: 'Groundnut Seed (Nyanda)',
+    description: 'Virginia-type groundnut with large kernels. Excellent for oil extraction and confectionery. 25 kg bag.',
+    category: 'seeds',
+    price: 78,
+    memberPrice: 68.64,
+    currency: 'USD',
+    unit: 'per 25 kg bag',
+    image: 'https://images.unsplash.com/photo-1587049016823-69ef9d68f0b3?w=400&h=300&fit=crop',
+    availability: 'in-stock',
+    rating: 4.8,
+    reviewCount: 98,
+    tags: ['groundnut', 'export-quality'],
+    featured: true,
+  },
+  {
+    id: 'P005',
+    supplierName: 'Okavango Fertilisers',
+    name: 'NPK 15-15-15 Compound Fertiliser',
+    description: 'Balanced compound fertiliser for a wide range of crops at planting. 50 kg bag.',
+    category: 'fertilisers',
+    price: 45,
+    memberPrice: 40.95,
+    currency: 'USD',
+    unit: 'per 50 kg bag',
+    image: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop',
+    availability: 'in-stock',
+    rating: 4.4,
+    reviewCount: 156,
+    tags: ['NPK', 'compound'],
+    featured: false,
+  },
+  {
+    id: 'P006',
+    supplierName: 'Okavango Fertilisers',
+    name: 'Urea (46-0-0) Top Dressing',
+    description: 'High-nitrogen granular urea for top-dressing cereals. 46% nitrogen content. 50 kg bag.',
+    category: 'fertilisers',
+    price: 38,
+    memberPrice: 34.58,
+    currency: 'USD',
+    unit: 'per 50 kg bag',
+    image: 'https://images.unsplash.com/photo-1563514227147-6d2ff665a6a0?w=400&h=300&fit=crop',
+    availability: 'in-stock',
+    rating: 4.3,
+    reviewCount: 112,
+    tags: ['urea', 'nitrogen'],
+    featured: false,
+  },
+  {
+    id: 'P007',
+    supplierName: 'Kilimanjaro Organic Inputs',
+    name: 'Organic Compost Blend (Kilimanjaro Mix)',
+    description: 'Premium organic compost from coffee husks, banana stems, and cattle manure. 25 kg bag.',
+    category: 'fertilisers',
+    price: 18,
+    memberPrice: 16.56,
+    currency: 'USD',
+    unit: 'per 25 kg bag',
+    image: 'https://images.unsplash.com/photo-1585336261022-680e295ce3fe?w=400&h=300&fit=crop',
+    availability: 'in-stock',
+    rating: 4.6,
+    reviewCount: 78,
+    tags: ['organic', 'compost'],
+    featured: true,
+  },
+  {
+    id: 'P008',
+    supplierName: 'Tswana Agri-Chem',
+    name: 'Lambda-Cyhalothrin 5EC Insecticide',
+    description: 'Broad-spectrum pyrethroid insecticide for bollworm, stem borer, and aphid control. 1 L bottle.',
+    category: 'fertilisers',
+    price: 24,
+    memberPrice: 22.08,
+    currency: 'USD',
+    unit: 'per litre',
+    image: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=400&h=300&fit=crop',
+    availability: 'in-stock',
+    rating: 4.4,
+    reviewCount: 89,
+    tags: ['insecticide', 'pyrethroid'],
+    featured: false,
+  },
+  {
+    id: 'P009',
+    supplierName: 'Matopos Equipment Hire',
+    name: 'Walk-Behind Tractor (15HP Diesel)',
+    description: 'Heavy-duty two-wheel tractor with plough, ridger, and trailer. Ideal for farms up to 5 hectares.',
+    category: 'equipment',
+    price: 3800,
+    memberPrice: 3230,
+    currency: 'USD',
+    unit: 'per unit',
+    image: 'https://images.unsplash.com/photo-1530267981375-f0de937f5f13?w=400&h=300&fit=crop',
+    availability: 'in-stock',
+    rating: 4.6,
+    reviewCount: 45,
+    tags: ['tractor', 'smallholder'],
+    featured: true,
+  },
+  {
+    id: 'P010',
+    supplierName: 'Matopos Equipment Hire',
+    name: 'Maize Sheller (Manual)',
+    description: 'Hand-operated maize sheller, 100 kg/hour. Reduces labour costs by 80%.',
+    category: 'equipment',
+    price: 185,
+    memberPrice: 157.25,
+    currency: 'USD',
+    unit: 'per unit',
+    image: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=400&h=300&fit=crop',
+    availability: 'in-stock',
+    rating: 4.4,
+    reviewCount: 89,
+    tags: ['maize', 'post-harvest'],
+    featured: false,
+  },
+  {
+    id: 'P011',
+    supplierName: 'Nairobi Drip Systems',
+    name: 'Drip Irrigation Kit (1 Hectare)',
+    description: 'Complete drip irrigation system with mainline, laterals, emitters, and filter. Gravity-fed option.',
+    category: 'equipment',
+    price: 850,
+    memberPrice: 722.50,
+    currency: 'USD',
+    unit: 'per kit',
+    image: 'https://images.unsplash.com/photo-1622383563227-04401ab4e5ea?w=400&h=300&fit=crop',
+    availability: 'in-stock',
+    rating: 4.7,
+    reviewCount: 34,
+    tags: ['drip', 'water-saving'],
+    featured: true,
+  },
+  {
+    id: 'P012',
+    supplierName: 'Limpopo Livestock Auctions',
+    name: 'Brahman Heifers (Lot of 5)',
+    description: 'Quality Brahman heifers, 18 months old, vaccinated and dewormed. Ideal for breeding stock.',
+    category: 'livestock',
+    price: 4500,
+    memberPrice: 3825,
+    currency: 'USD',
+    unit: 'per lot',
+    image: 'https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?w=400&h=300&fit=crop',
+    availability: 'limited',
+    rating: 4.8,
+    reviewCount: 23,
+    tags: ['brahman', 'breeding'],
+    featured: true,
+  },
+  {
+    id: 'P013',
+    supplierName: 'Rift Valley Produce',
+    name: 'Fresh Avocados (Export Grade)',
+    description: 'Hass avocados, export grade, sourced from smallholder farms in central Kenya. 20 kg crate.',
+    category: 'produce',
+    price: 35,
+    memberPrice: 31.50,
+    currency: 'USD',
+    unit: 'per 20 kg crate',
+    image: 'https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?w=400&h=300&fit=crop',
+    availability: 'in-stock',
+    rating: 4.5,
+    reviewCount: 42,
+    tags: ['avocado', 'export'],
+    featured: false,
+  },
+  {
+    id: 'P014',
+    supplierName: 'Kampala Farm Services',
+    name: 'Soil Testing & Analysis Service',
+    description: 'Comprehensive soil testing with pH, NPK, micro-nutrients, and recommendations report. Per sample.',
+    category: 'services',
+    price: 25,
+    memberPrice: 22.50,
+    currency: 'USD',
+    unit: 'per sample',
+    image: 'https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=400&h=300&fit=crop',
+    availability: 'in-stock',
+    rating: 4.9,
+    reviewCount: 61,
+    tags: ['soil', 'testing'],
+    featured: false,
+  },
+  {
+    id: 'P015',
+    supplierName: 'Zambezi Agri-Supplies',
+    name: 'Neem Oil Organic Pesticide',
+    description: 'Cold-pressed neem oil for organic pest management. Controls over 200 pest species. 1 L bottle.',
+    category: 'fertilisers',
+    price: 18,
+    memberPrice: 16.56,
+    currency: 'USD',
+    unit: 'per litre',
+    image: 'https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=400&h=300&fit=crop',
+    availability: 'in-stock',
+    rating: 4.6,
+    reviewCount: 56,
+    tags: ['organic', 'neem'],
+    featured: false,
+  },
+  {
+    id: 'P016',
+    supplierName: 'Harare Agronomy Consultants',
+    name: 'Crop Advisory Service (Season Plan)',
+    description: 'Full-season crop advisory plan including variety selection, input scheduling, and pest management.',
+    category: 'services',
+    price: 120,
+    memberPrice: 102,
+    currency: 'USD',
+    unit: 'per season',
+    image: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400&h=300&fit=crop',
+    availability: 'in-stock',
+    rating: 4.7,
+    reviewCount: 38,
+    tags: ['advisory', 'agronomy'],
+    featured: false,
+  },
 ];
 
 const CATEGORIES = [
   { key: 'all', label: 'All Products', icon: Package },
-  { key: 'seeds', label: 'Seeds', icon: Leaf },
-  { key: 'fertilizer', label: 'Fertilizer', icon: Tag },
-  { key: 'pesticides', label: 'Pesticides', icon: Bug },
-  { key: 'equipment', label: 'Equipment', icon: Wrench },
-  { key: 'irrigation', label: 'Irrigation', icon: Droplets },
-  { key: 'technology', label: 'Technology', icon: Cpu },
-  { key: 'packaging', label: 'Packaging', icon: Box },
-  { key: 'storage', label: 'Storage', icon: Warehouse },
-  { key: 'tools', label: 'Tools', icon: Hammer },
+  { key: 'seeds', label: 'Seeds & Seedlings', icon: Leaf },
+  { key: 'fertilisers', label: 'Fertilisers & Chemicals', icon: Beaker },
+  { key: 'equipment', label: 'Equipment & Tools', icon: Wrench },
+  { key: 'livestock', label: 'Livestock', icon: Tractor },
+  { key: 'produce', label: 'Produce', icon: Apple },
+  { key: 'services', label: 'Services', icon: Handshake },
 ];
 
-const AVAILABILITY_LABELS: Record<string, { text: string; color: string }> = {
-  'in-stock': { text: 'In Stock', color: 'bg-green-100 text-green-700' },
-  limited: { text: 'Limited', color: 'bg-amber-100 text-amber-700' },
-  'pre-order': { text: 'Pre-Order', color: 'bg-blue-100 text-blue-700' },
-  'out-of-stock': { text: 'Sold Out', color: 'bg-red-100 text-red-600' },
+const SORT_OPTIONS = [
+  { key: 'featured', label: 'Featured' },
+  { key: 'price-asc', label: 'Price: Low to High' },
+  { key: 'price-desc', label: 'Price: High to Low' },
+  { key: 'rating', label: 'Highest Rated' },
+  { key: 'name', label: 'Name A-Z' },
+];
+
+const AVAILABILITY_LABELS: Record<string, { text: string; colour: string }> = {
+  'in-stock': { text: 'In Stock', colour: 'bg-green-100 text-green-700' },
+  limited: { text: 'Limited', colour: 'bg-amber-100 text-amber-700' },
+  'pre-order': { text: 'Pre-Order', colour: 'bg-blue-100 text-blue-700' },
+  'out-of-stock': { text: 'Sold Out', colour: 'bg-red-100 text-red-600' },
 };
 
-/* ─── Component ─── */
+/* --- Component --- */
 
 export default function PublicMarketplacePage() {
-  const router = useRouter();
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('all');
+  const [sortBy, setSortBy] = useState('featured');
   const [showFilters, setShowFilters] = useState(false);
-  const [products, setProducts] = useState<Product[]>(PRODUCTS);
-  const [buyModalProduct, setBuyModalProduct] = useState<Product | null>(null);
-  const [buyQty, setBuyQty] = useState(1);
-  const [buyAddress, setBuyAddress] = useState('');
-  const [buyNotes, setBuyNotes] = useState('');
-  const [buySubmitting, setBuySubmitting] = useState(false);
-  const [buyError, setBuyError] = useState<string | null>(null);
+  const [showSort, setShowSort] = useState(false);
+  const [products, setProducts] = useState<Product[]>(FALLBACK_PRODUCTS);
 
-  const handleBuyClick = useCallback(async (product: Product) => {
-    const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      router.push('/login?redirect=/marketplace');
-      return;
-    }
-    setBuyModalProduct(product);
-    setBuyQty(1);
-    setBuyAddress('');
-    setBuyNotes('');
-    setBuyError(null);
-  }, [router]);
-
-  const handleBuySubmit = useCallback(async () => {
-    if (!buyModalProduct) return;
-    setBuySubmitting(true);
-    setBuyError(null);
-    try {
-      const res = await fetch('/api/marketplace/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          productId: buyModalProduct.id,
-          quantity: buyQty,
-          deliveryAddress: buyAddress,
-          deliveryNotes: buyNotes,
-        }),
-      });
-      const json = await res.json();
-      if (!res.ok) {
-        setBuyError(json.error || 'Checkout failed');
-      } else if (json.url) {
-        window.location.href = json.url;
-      }
-    } catch (e) {
-      setBuyError(e instanceof Error ? e.message : 'Checkout failed');
-    } finally {
-      setBuySubmitting(false);
-    }
-  }, [buyModalProduct, buyQty, buyAddress, buyNotes]);
-
-  // Fetch real products from DB
+  // Fetch real products from DB — fall back to static data if none found
   useEffect(() => {
     const supabase = createClient();
-    async function fetch() {
+    async function load() {
       const { data } = await supabase.from('products').select('*').eq('in_stock', true).order('name');
       if (data && data.length > 0) {
         setProducts(data.map((p: Record<string, unknown>) => ({
-          id: String(p.id), supplierName: String(p.supplier_name || p.brand || 'AFU Supplier'),
-          name: String(p.name), description: String(p.description || ''),
-          category: String(p.category || 'seeds'), price: Number(p.price || 0),
+          id: String(p.id),
+          supplierName: String(p.supplier_name || p.brand || 'AFU Supplier'),
+          name: String(p.name),
+          description: String(p.description || ''),
+          category: String(p.category || 'seeds'),
+          price: Number(p.price || 0),
           memberPrice: Number(p.member_price || (Number(p.price || 0) * 0.9)),
-          currency: 'USD', unit: String(p.unit || 'per unit'),
+          currency: 'USD',
+          unit: String(p.unit || 'per unit'),
           image: String(p.image_url || p.image || 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400&h=300&fit=crop'),
           availability: (p.in_stock !== false ? 'in-stock' : 'out-of-stock') as Product['availability'],
-          rating: Number(p.rating || 4.5), reviewCount: Number(p.review_count || 0),
-          tags: Array.isArray(p.tags) ? p.tags as string[] : [], featured: Boolean(p.featured),
+          rating: Number(p.rating || 4.5),
+          reviewCount: Number(p.review_count || 0),
+          tags: Array.isArray(p.tags) ? p.tags as string[] : [],
+          featured: Boolean(p.featured),
         })));
       }
-      // If no DB products, keep PRODUCTS fallback
     }
-    fetch();
+    load();
   }, []);
 
   const filtered = useMemo(() => {
@@ -182,10 +399,27 @@ export default function PublicMarketplacePage() {
           p.tags.some((t) => t.toLowerCase().includes(q))
       );
     }
+    // Sort
+    switch (sortBy) {
+      case 'price-asc':
+        list = [...list].sort((a, b) => a.price - b.price);
+        break;
+      case 'price-desc':
+        list = [...list].sort((a, b) => b.price - a.price);
+        break;
+      case 'rating':
+        list = [...list].sort((a, b) => b.rating - a.rating);
+        break;
+      case 'name':
+        list = [...list].sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case 'featured':
+      default:
+        list = [...list].sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
+        break;
+    }
     return list;
-  }, [search, category]);
-
-  // featured products removed — fetched from DB when populated
+  }, [search, category, sortBy, products]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -199,24 +433,30 @@ export default function PublicMarketplacePage() {
           <div className="absolute -bottom-32 -left-32 w-[500px] h-[500px] rounded-full opacity-5 bg-[#5DB347]" />
         </div>
         <div className="max-w-7xl mx-auto text-center relative z-10">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#5DB347]/20 text-[#5DB347] text-sm font-semibold mb-6 border border-[#5DB347]/30">
-            <ShoppingCart className="w-4 h-4" />
-            AFU Marketplace
-          </div>
-          <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-6 tracking-tight">
-            Agricultural Inputs<br />& Equipment
-          </h1>
-          <p className="text-lg md:text-xl text-white/70 max-w-3xl mx-auto mb-10">
-            Browse seeds, fertilizers, equipment, and more from verified African suppliers.
-            Members get up to 15% off every purchase.
-          </p>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#5DB347]/20 text-[#5DB347] text-sm font-semibold mb-6 border border-[#5DB347]/30">
+              <Package className="w-4 h-4" />
+              AFU Marketplace
+            </div>
+            <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-6 tracking-tight">
+              Agricultural Inputs<br />& Equipment
+            </h1>
+            <p className="text-lg md:text-xl text-white/70 max-w-3xl mx-auto mb-10">
+              Browse seeds, fertilisers, equipment, and more from verified African suppliers.
+              Members get up to 15% off every purchase.
+            </p>
+          </motion.div>
 
           {/* Search */}
           <div className="max-w-2xl mx-auto relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
-              placeholder="Search seeds, fertilizer, equipment..."
+              placeholder="Search seeds, fertiliser, equipment..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full pl-12 pr-4 py-4 rounded-xl text-gray-900 bg-white shadow-lg text-lg focus:outline-none focus:ring-2 focus:ring-[#5DB347]"
@@ -251,13 +491,13 @@ export default function PublicMarketplacePage() {
           <div className="flex gap-3">
             <Link
               href="/memberships"
-              className="px-5 py-2 rounded-lg bg-white text-[#5DB347] font-bold text-sm hover:bg-gray-100 transition-colors"
+              className="px-5 py-2 rounded-lg bg-white text-[#5DB347] font-bold text-sm hover:bg-gray-100 transition-colours"
             >
               View Plans
             </Link>
             <Link
               href="/apply?tier=free"
-              className="px-5 py-2 rounded-lg bg-white/20 text-white font-bold text-sm hover:bg-white/30 transition-colors border border-white/30"
+              className="px-5 py-2 rounded-lg bg-white/20 text-white font-bold text-sm hover:bg-white/30 transition-colours border border-white/30"
             >
               Sign Up Free
             </Link>
@@ -329,40 +569,62 @@ export default function PublicMarketplacePage() {
             <h2 className="text-2xl font-bold text-[#1B2A4A]">
               {category === 'all' ? 'All Products' : CATEGORIES.find((c) => c.key === category)?.label}
             </h2>
-            <p className="text-sm text-gray-400 mt-1">{filtered.length} products</p>
+            <p className="text-sm text-gray-400 mt-1">{filtered.length} product{filtered.length !== 1 ? 's' : ''}</p>
           </div>
-          {search && (
-            <button onClick={() => setSearch('')} className="text-sm text-gray-400 hover:text-gray-600 flex items-center gap-1">
-              <X className="w-4 h-4" /> Clear search
-            </button>
-          )}
+          <div className="flex items-center gap-3">
+            {search && (
+              <button onClick={() => setSearch('')} className="text-sm text-gray-400 hover:text-gray-600 flex items-center gap-1">
+                <X className="w-4 h-4" /> Clear search
+              </button>
+            )}
+            {/* Sort dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setShowSort(!showSort)}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 bg-white text-sm text-gray-600 hover:border-[#5DB347]/40 transition-colours"
+              >
+                <ArrowUpDown className="w-4 h-4" />
+                <span className="hidden sm:inline">{SORT_OPTIONS.find(s => s.key === sortBy)?.label}</span>
+                <ChevronDown className="w-3 h-3" />
+              </button>
+              {showSort && (
+                <>
+                  <div className="fixed inset-0 z-10" onClick={() => setShowSort(false)} />
+                  <div className="absolute right-0 top-full mt-1 z-20 bg-white rounded-lg shadow-lg border border-gray-100 py-1 min-w-[180px]">
+                    {SORT_OPTIONS.map((opt) => (
+                      <button
+                        key={opt.key}
+                        onClick={() => { setSortBy(opt.key); setShowSort(false); }}
+                        className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 ${
+                          sortBy === opt.key ? 'text-[#5DB347] font-semibold' : 'text-gray-600'
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
         </div>
 
-        {products.length === 0 ? (
-          <div className="text-center py-20 max-w-md mx-auto">
-            <div className="w-16 h-16 rounded-2xl bg-[#5DB347]/10 flex items-center justify-center mb-4 mx-auto">
-              <Package className="w-8 h-8 text-[#5DB347]" />
-            </div>
-            <h3 className="text-xl font-bold text-navy mb-2">Marketplace launching soon</h3>
-            <p className="text-gray-500 mb-6">Be the first to list your products. Join as a supplier to sell to farmers across Africa.</p>
-            <Link href="/apply?tier=supplier" className="inline-flex items-center gap-2 bg-[#5DB347] text-white px-6 py-3 rounded-full font-semibold hover:bg-[#449933] transition-colors">
-              Become a supplier <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-        ) : filtered.length === 0 ? (
+        {filtered.length === 0 ? (
           <div className="text-center py-20">
             <Package className="w-12 h-12 text-gray-300 mx-auto mb-3" />
             <p className="text-gray-500">No products found. Try adjusting your search or filters.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filtered.map((product) => {
+            {filtered.map((product, idx) => {
               const avail = AVAILABILITY_LABELS[product.availability] || AVAILABILITY_LABELS['in-stock'];
               return (
-                <Link
+                <motion.div
                   key={product.id}
-                  href={`/marketplace/${product.id}`}
-                  className="block bg-white rounded-xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-lg transition-all hover:-translate-y-1 group"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: idx * 0.03 }}
+                  className="bg-white rounded-xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-lg transition-all hover:-translate-y-1 group"
                 >
                   {/* Image */}
                   <div className="relative h-48 overflow-hidden bg-gray-100">
@@ -376,7 +638,7 @@ export default function PublicMarketplacePage() {
                         Featured
                       </div>
                     )}
-                    <div className={`absolute top-3 right-3 px-2 py-1 rounded-md text-[10px] font-bold ${avail.color}`}>
+                    <div className={`absolute top-3 right-3 px-2 py-1 rounded-md text-[10px] font-bold ${avail.colour}`}>
                       {avail.text}
                     </div>
                   </div>
@@ -405,17 +667,16 @@ export default function PublicMarketplacePage() {
                           Member: ${product.memberPrice.toFixed(2)}
                         </p>
                       </div>
-                      <button
-                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleBuyClick(product); }}
-                        disabled={product.availability === 'out-of-stock'}
-                        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#5DB347] text-white text-xs font-bold hover:bg-[#449933] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                      <Link
+                        href={`/apply?enquiry=${encodeURIComponent(product.name)}`}
+                        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#5DB347] text-white text-xs font-bold hover:bg-[#449933] transition-colours"
                       >
-                        <ShoppingCart className="w-4 h-4" />
-                        Buy Now
-                      </button>
+                        <MessageCircle className="w-4 h-4" />
+                        Enquire
+                      </Link>
                     </div>
                   </div>
-                </Link>
+                </motion.div>
               );
             })}
           </div>
@@ -449,93 +710,6 @@ export default function PublicMarketplacePage() {
           </div>
         </div>
       </section>
-
-      {/* Buy Now modal */}
-      <AnimatePresence>
-        {buyModalProduct && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-            onClick={() => !buySubmitting && setBuyModalProduct(null)}
-          >
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <h3 className="text-lg font-bold text-[#1B2A4A]">Buy {buyModalProduct.name}</h3>
-                  <p className="text-xs text-gray-500">{buyModalProduct.supplierName}</p>
-                </div>
-                <button
-                  onClick={() => setBuyModalProduct(null)}
-                  disabled={buySubmitting}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-xs font-semibold text-gray-600 mb-1">Quantity</label>
-                  <input
-                    type="number"
-                    min={1}
-                    value={buyQty}
-                    onChange={(e) => setBuyQty(Math.max(1, parseInt(e.target.value) || 1))}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5DB347]"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-gray-600 mb-1">Delivery Address</label>
-                  <textarea
-                    rows={2}
-                    value={buyAddress}
-                    onChange={(e) => setBuyAddress(e.target.value)}
-                    placeholder="Street, city, region, country"
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5DB347]"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-gray-600 mb-1">Delivery Notes (optional)</label>
-                  <textarea
-                    rows={2}
-                    value={buyNotes}
-                    onChange={(e) => setBuyNotes(e.target.value)}
-                    placeholder="Landmarks, contact phone, etc."
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5DB347]"
-                  />
-                </div>
-
-                <div className="bg-gray-50 rounded-lg p-3 flex items-center justify-between">
-                  <span className="text-sm text-gray-500">Total</span>
-                  <span className="text-lg font-extrabold text-[#1B2A4A]">
-                    ${(buyModalProduct.price * buyQty).toFixed(2)}
-                  </span>
-                </div>
-
-                {buyError && (
-                  <p className="text-sm text-red-600 bg-red-50 rounded p-2">{buyError}</p>
-                )}
-
-                <button
-                  onClick={handleBuySubmit}
-                  disabled={buySubmitting || !buyAddress.trim() || buyQty < 1}
-                  className="w-full py-3 rounded-lg bg-[#5DB347] text-white font-bold hover:bg-[#449933] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-                >
-                  {buySubmitting ? 'Redirecting to checkout…' : 'Proceed to Payment'}
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

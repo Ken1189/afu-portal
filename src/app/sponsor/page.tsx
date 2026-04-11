@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { Search, CreditCard, Sprout, Building2 } from 'lucide-react';
+import { Search, CreditCard, Sprout, Building2, Heart, Users, Baby, Utensils } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { createClient } from '@/lib/supabase/client';
 
 /* ─── Types ─── */
@@ -772,6 +773,144 @@ export default function SponsorPage() {
               />
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ── Donate: Feed Families, Empower Farmers ── */}
+      <section id="donate" className="bg-white py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            className="text-center mb-14"
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-60px' }}
+            transition={{ duration: 0.6 }}
+          >
+            <div
+              className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium mb-5"
+              style={{ background: '#EBF7E5', color: '#5DB347' }}
+            >
+              <Heart className="w-4 h-4" />
+              <span>Nourish Communities, Grow Futures</span>
+            </div>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-[#1B2A4A] to-[#5DB347]">
+              Donate to African Farming Communities
+            </h2>
+            <p className="text-gray-500 text-lg max-w-3xl mx-auto leading-relaxed">
+              Behind every farm is a family. Your donation goes beyond sponsorship — it feeds children,
+              empowers women farmers, and strengthens the communities that grow Africa&apos;s food.
+              Every contribution makes a measurable difference.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              {
+                Icon: Baby,
+                title: 'Feed a Child',
+                price: 10,
+                period: 'month',
+                colour: '#5DB347',
+                lightBg: '#EBF7E5',
+                description:
+                  'Provide a child in a farming household with a nutritious daily meal programme. Your donation covers porridge, vegetables, and protein sourced from local AFU farms — keeping children healthy and in school.',
+              },
+              {
+                Icon: Utensils,
+                title: 'Feed a Family',
+                price: 25,
+                period: 'month',
+                colour: '#449933',
+                lightBg: '#E2F2DC',
+                description:
+                  'Supply a farming family of five with a monthly food parcel of maize meal, cooking oil, beans, and fresh produce. Families that are food-secure farm better — your support breaks the cycle of hunger and underproduction.',
+              },
+              {
+                Icon: Users,
+                title: 'Support a Woman Farmer',
+                price: 50,
+                period: 'month',
+                colour: '#1B2A4A',
+                lightBg: '#E8EBF0',
+                description:
+                  'Fund a woman smallholder with seeds, fertiliser, training, and access to AFU market programmes. Women reinvest 90% of their income back into their families — this is the highest-impact donation you can make.',
+              },
+              {
+                Icon: Sprout,
+                title: 'Sponsor a Full Farm',
+                price: 100,
+                period: 'month',
+                colour: '#3A8829',
+                lightBg: '#DAF0D2',
+                description:
+                  'Cover the complete cost of running a smallholder farm for one month — inputs, insurance, market access, and family nutrition. You receive a personalised quarterly impact report showing exactly how your funds were used.',
+              },
+            ].map((tier, i) => (
+              <motion.div
+                key={tier.title}
+                className="relative bg-white rounded-3xl border border-gray-100 shadow-lg shadow-[#5DB347]/5 p-6 flex flex-col hover:-translate-y-1 hover:shadow-xl transition-all duration-300 overflow-hidden"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-40px' }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+              >
+                {/* decorative corner arc */}
+                <div
+                  className="absolute -top-10 -right-10 w-28 h-28 rounded-full opacity-10"
+                  style={{ background: tier.colour }}
+                />
+
+                <div
+                  className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
+                  style={{ background: tier.lightBg }}
+                >
+                  <tier.Icon className="w-6 h-6" style={{ color: tier.colour }} />
+                </div>
+
+                <h3 className="text-xl font-bold text-[#1B2A4A] mb-1">{tier.title}</h3>
+
+                <div className="mb-3">
+                  <span className="text-3xl font-bold" style={{ color: tier.colour }}>
+                    ${tier.price}
+                  </span>
+                  <span className="text-sm text-gray-400 ml-1">/{tier.period}</span>
+                </div>
+
+                <p className="text-sm text-gray-500 leading-relaxed flex-1 mb-6">
+                  {tier.description}
+                </p>
+
+                <Link
+                  href="/contact"
+                  className="block text-center text-white font-semibold py-3 rounded-xl transition-all duration-300 hover:scale-105 shadow-md"
+                  style={{ background: tier.colour }}
+                  onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.9')}
+                  onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
+                >
+                  Donate ${tier.price}/month
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* bottom trust line */}
+          <motion.div
+            className="mt-12 bg-[#FAF8F3] rounded-2xl p-8 text-center"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+          >
+            <div className="flex items-center justify-center gap-2 mb-3">
+              <Heart className="w-5 h-5 text-[#5DB347]" />
+              <span className="font-semibold text-[#1B2A4A]">100% of donations go to the field</span>
+            </div>
+            <p className="text-gray-500 max-w-2xl mx-auto leading-relaxed text-sm">
+              AFU operational costs are covered separately by our corporate partners and grant funders.
+              When you donate, every dollar reaches farmers and their families — no overheads deducted,
+              no admin fees, full transparency.
+            </p>
+          </motion.div>
         </div>
       </section>
 
