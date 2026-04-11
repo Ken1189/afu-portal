@@ -219,8 +219,8 @@ export default function AdminTrainingPage() {
   }, []);
 
   const tabs: { key: TabKey; label: string }[] = [
-    { key: 'programs', label: 'Programs' },
-    { key: 'enrollments', label: 'Enrollments' },
+    { key: 'programs', label: 'Programmes' },
+    { key: 'enrollments', label: 'Enrolments' },
     { key: 'certificates', label: 'Certificates' },
   ];
 
@@ -288,18 +288,18 @@ export default function AdminTrainingPage() {
           </div>
           <div>
             <h1 className="text-2xl font-bold text-[#1B2A4A]">Training Management</h1>
-            <p className="text-gray-500 text-sm mt-0.5">Manage programs, enrollments, and certifications</p>
+            <p className="text-gray-500 text-sm mt-0.5">Manage programmes, enrolments, and certifications</p>
           </div>
         </div>
         <button onClick={openAddCourse} className="flex items-center gap-2 px-5 py-2.5 bg-[#5DB347] text-white rounded-lg text-sm font-semibold hover:bg-[#4a9a38] transition-colors">
-          <Plus className="w-4 h-4" /> Create Program
+          <Plus className="w-4 h-4" /> Create Programme
         </button>
       </motion.div>
 
       {/* ── Stats Row ── */}
       <motion.div variants={cardVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'Active Programs', value: activePrograms, icon: <BookOpen className="w-5 h-5" />, color: 'text-[#1B2A4A]', iconBg: 'bg-[#1B2A4A]/10' },
+          { label: 'Active Programmes', value: activePrograms, icon: <BookOpen className="w-5 h-5" />, color: 'text-[#1B2A4A]', iconBg: 'bg-[#1B2A4A]/10' },
           { label: 'Enrolled Farmers', value: totalEnrolled, icon: <Users className="w-5 h-5" />, color: 'text-[#5DB347]', iconBg: 'bg-[#5DB347]/10' },
           { label: 'Completion Rate', value: `${avgCompletion}%`, icon: <TrendingUp className="w-5 h-5" />, color: 'text-[#D4A843]', iconBg: 'bg-[#D4A843]/10' },
           { label: 'Certificates Issued', value: totalCerts, icon: <Award className="w-5 h-5" />, color: 'text-purple-600', iconBg: 'bg-purple-50' },
@@ -431,7 +431,7 @@ export default function AdminTrainingPage() {
               onChange={(e) => setProgramFilter(e.target.value)}
               className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#5DB347]/40 focus:border-[#5DB347]"
             >
-              <option value="all">All Programs</option>
+              <option value="all">All Programmes</option>
               {programs.map((p) => (
                 <option key={p.id} value={p.title}>{p.title}</option>
               ))}
@@ -460,7 +460,7 @@ export default function AdminTrainingPage() {
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Farmer Name</th>
-                    <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Program</th>
+                    <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Programme</th>
                     <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Start Date</th>
                     <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Progress</th>
                     <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Status</th>
@@ -530,12 +530,12 @@ export default function AdminTrainingPage() {
                 <h3 className="text-sm font-semibold text-[#1B2A4A]">Total Certificates Issued</h3>
                 <span className="text-3xl font-bold text-[#5DB347]">{totalCerts}</span>
               </div>
-              <p className="text-xs text-gray-400">Across all programs since inception</p>
+              <p className="text-xs text-gray-400">Across all programmes since inception</p>
             </div>
 
             {/* By Program Breakdown */}
             <div className="bg-white rounded-xl border border-gray-100 p-6">
-              <h3 className="text-sm font-semibold text-[#1B2A4A] mb-4">Certificates by Program</h3>
+              <h3 className="text-sm font-semibold text-[#1B2A4A] mb-4">Certificates by Programme</h3>
               <div className="space-y-2">
                 {certsByProgram.map((cp, i) => (
                   <div key={i}>
@@ -566,7 +566,7 @@ export default function AdminTrainingPage() {
                   <tr>
                     <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Certificate ID</th>
                     <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Farmer Name</th>
-                    <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Program</th>
+                    <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Programme</th>
                     <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Issue Date</th>
                     <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Actions</th>
                   </tr>

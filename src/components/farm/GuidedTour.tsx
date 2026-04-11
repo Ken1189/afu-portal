@@ -74,7 +74,7 @@ const TOUR_STEPS: TourStep[] = [
     title: 'AI Farm Assistant',
     description:
       'Your 24/7 farming advisor. Ask about pests, diseases, planting times, or any farming question.',
-    tip: 'Try asking "What should I do today?" for personalized daily tasks',
+    tip: 'Try asking "What should I do today?" for personalised daily tasks',
     gradient: 'from-violet-500 to-purple-600',
   },
   {

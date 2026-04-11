@@ -36,7 +36,7 @@ const SPECIALIZATIONS = [
   'Farm Mechanization & Technology',
   'Post-Harvest Processing',
   'Export Markets & Trade',
-  'Cooperatives & Farmer Organizations',
+  'Cooperatives & Farmer Organisations',
   'Carbon Credits & Sustainability',
   'Other',
 ];
@@ -150,7 +150,7 @@ export default function AdvisorApplyPage() {
           phone: form.phone,
           country: form.country,
           type: 'Advisor Application',
-          message: `Specializations: ${form.specializations.join(', ')}\nExperience: ${form.years_experience} years\nRole: ${form.current_role} at ${form.organization}\nCV: ${cvUrl || 'Not uploaded'}`,
+          message: `Specialisations: ${form.specializations.join(', ')}\nExperience: ${form.years_experience} years\nRole: ${form.current_role} at ${form.organization}\nCV: ${cvUrl || 'Not uploaded'}`,
         }),
       }).catch(() => {});
 
@@ -285,7 +285,7 @@ export default function AdvisorApplyPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Organization</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Organisation</label>
                 <input
                   type="text" name="organization" value={form.organization} onChange={handleChange}
                   className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5DB347]/50 focus:border-[#5DB347] outline-none"

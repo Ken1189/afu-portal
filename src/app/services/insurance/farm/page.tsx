@@ -274,7 +274,7 @@ export default function FarmInsurancePage() {
           </h2>
           <p className="text-gray-300 mb-8 max-w-2xl mx-auto">
             One comprehensive policy for your buildings, equipment, produce, and
-            liability. Get a personalized quote in minutes.
+            liability. Get a personalised quote in minutes.
           </p>
           <Link
             href="/join?feature=insurance"

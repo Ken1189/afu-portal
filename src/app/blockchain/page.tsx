@@ -68,7 +68,7 @@ const roadmap = [
     status: "future",
     title: "DeFi Lending Pool & Governance",
     items: [
-      "Decentralized lending pool for agricultural capital",
+      "Decentralised lending pool for agricultural capital",
       "AFU governance tokens for community-driven decisions",
       "Yield opportunities for token holders",
       "Full composability with the broader DeFi ecosystem",
@@ -160,7 +160,7 @@ export default function BlockchainPage() {
               </h2>
               <p className="text-gray-600 mb-6 leading-relaxed">
                 EDMA is an Ethereum Layer-2 blockchain purpose-built for Real-World Assets (RWAs). Their
-                Proof-of-Verification protocol ensures that every asset tokenized on-chain corresponds to a
+                Proof-of-Verification protocol ensures that every asset tokenised on-chain corresponds to a
                 verified, auditable real-world asset.
               </p>
               <div className="space-y-4">

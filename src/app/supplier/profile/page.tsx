@@ -46,7 +46,7 @@ const fallbackSupplier = {
   status: 'active' as const,
   joinDate: '2024-06-15',
   description:
-    'Leading agricultural input supplier across Southern Africa. Specializing in certified seeds, fertilizers, and crop protection products for commercial and smallholder farmers.',
+    'Leading agricultural input supplier across Southern Africa. Specialising in certified seeds, fertilizers, and crop protection products for commercial and smallholder farmers.',
   productsCount: 38,
   totalSales: 1847320,
   totalOrders: 4215,
@@ -899,7 +899,7 @@ export default function SupplierProfilePage() {
         <div className="mt-4 bg-amber-50 rounded-lg p-3 flex items-start gap-2">
           <Shield className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
           <p className="text-xs text-amber-700">
-            Banking details are encrypted and only visible to authorized AFU finance administrators.
+            Banking details are encrypted and only visible to authorised AFU finance administrators.
             Changes require verification.
           </p>
         </div>

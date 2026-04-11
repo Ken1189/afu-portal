@@ -34,7 +34,7 @@ const demoCredit = {
 };
 
 const farmerStories = [
-  { region: 'Chobe District', country: 'Botswana', hectares: 5, practice: 'conservation tillage', quote: 'Since joining the program, my soil has become richer and I earn extra income from carbon credits.' },
+  { region: 'Chobe District', country: 'Botswana', hectares: 5, practice: 'conservation tillage', quote: 'Since joining the programme, my soil has become richer and I earn extra income from carbon credits.' },
   { region: 'Mashonaland', country: 'Zimbabwe', hectares: 3, practice: 'agroforestry', quote: 'I planted fruit trees between my maize rows. Now I have shade, fruit, and carbon income.' },
   { region: 'Kilimanjaro', country: 'Tanzania', hectares: 2, practice: 'shade-grown coffee', quote: 'The shade trees protect my coffee plants and give me carbon credits too.' },
 ];

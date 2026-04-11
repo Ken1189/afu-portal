@@ -33,7 +33,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Subject too long (max 200)' }, { status: 400 });
     }
     if (organization && String(organization).length > 200) {
-      return NextResponse.json({ error: 'Organization too long (max 200)' }, { status: 400 });
+      return NextResponse.json({ error: 'Organisation too long (max 200)' }, { status: 400 });
     }
 
     const safeName = escapeHtml(name);

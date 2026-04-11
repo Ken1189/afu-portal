@@ -705,7 +705,7 @@ export default function AdminInsuranceProductsPage() {
         <div>
           <h1 className="text-2xl font-bold text-[#1B2A4A]">Insurance Products</h1>
           <p className="text-sm text-gray-500 mt-1">
-            Manage insurance product catalog for AFU members
+            Manage insurance product catalogue for AFU members
           </p>
         </div>
         <button

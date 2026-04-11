@@ -254,7 +254,7 @@ export default function FarmerDemoPage() {
                 <p className="text-xs text-gray-400 mt-1">Photo captured via mobile app</p>
               </div>
               <div className="absolute top-3 right-3 bg-[#5DB347] text-white text-xs font-bold px-2 py-1 rounded-full">
-                AI Analyzed
+                AI Analysed
               </div>
             </div>
 

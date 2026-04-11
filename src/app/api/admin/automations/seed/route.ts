@@ -198,7 +198,7 @@ export async function POST(request: Request) {
       action_type: 'send_email',
       action_config: {
         subject: 'We miss you, {{name}}!',
-        body: 'Hi {{name}},\n\nIt\'s been a while since you visited AFU. Here\'s what\'s new:\n- Updated market prices for your region\n- New loan products available\n- Seasonal insurance options open for enrollment\n\nLog in at africanfarmingunion.org to check it out.',
+        body: 'Hi {{name}},\n\nIt\'s been a while since you visited AFU. Here\'s what\'s new:\n- Updated market prices for your region\n- New loan products available\n- Seasonal insurance options open for enrolment\n\nLog in at africanfarmingunion.org to check it out.',
       },
       delay_minutes: 0,
       is_active: true,

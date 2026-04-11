@@ -190,7 +190,7 @@ export default function AmbassadorLayout({ children }: { children: React.ReactNo
             </div>
             <div>
               <h2 className="font-bold text-base">Ambassador Portal</h2>
-              <p className="text-xs text-gray-400">AFU Referral Program</p>
+              <p className="text-xs text-gray-400">AFU Referral Programme</p>
             </div>
           </div>
           <div className="flex items-center gap-3 bg-white/5 rounded-xl px-3 py-2.5">
@@ -305,7 +305,7 @@ export default function AmbassadorLayout({ children }: { children: React.ReactNo
             </Link>
             <div>
               <h2 className="text-lg font-semibold text-[#1B2A4A]">Ambassador Portal</h2>
-              <p className="text-xs text-gray-400">AFU Referral Program</p>
+              <p className="text-xs text-gray-400">AFU Referral Programme</p>
             </div>
           </div>
           <div className="flex items-center gap-3">

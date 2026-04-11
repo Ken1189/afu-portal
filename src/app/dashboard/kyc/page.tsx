@@ -32,7 +32,7 @@ import { Phone, UserCheck, Users } from 'lucide-react';
 const DOCUMENT_CONFIG: Record<DocumentType, { label: string; icon: typeof FileText; description: string; tier: 1 | 2 | 3 }> = {
   national_id: { label: 'National ID', icon: CreditCard, description: 'Government-issued national identity card', tier: 2 },
   passport: { label: 'Passport', icon: FileText, description: 'Valid passport (bio page)', tier: 2 },
-  drivers_license: { label: "Driver's License", icon: CreditCard, description: 'Valid driving license', tier: 2 },
+  drivers_license: { label: "Driver's Licence", icon: CreditCard, description: 'Valid driving licence', tier: 2 },
   proof_of_address: { label: 'Proof of Address', icon: MapPin, description: 'Utility bill or bank statement (< 3 months)', tier: 2 },
   bank_statement: { label: 'Bank Statement', icon: Building2, description: 'Recent bank statement showing account details', tier: 3 },
   farm_registration: { label: 'Farm Registration', icon: FileText, description: 'Land title, lease, or cooperative membership proof', tier: 2 },

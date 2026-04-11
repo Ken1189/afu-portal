@@ -127,7 +127,7 @@ export default function SupplierBillingPage() {
       setToast('Subscription activated! Welcome aboard.');
       setTimeout(() => setToast(null), 5000);
     } else if (canceledFlag === '1') {
-      setToast('Checkout canceled. You can subscribe any time.');
+      setToast('Checkout cancelled. You can subscribe any time.');
       setTimeout(() => setToast(null), 5000);
     }
   }, [successFlag, canceledFlag]);

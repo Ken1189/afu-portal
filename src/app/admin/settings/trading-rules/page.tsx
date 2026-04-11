@@ -213,7 +213,7 @@ export default function TradingRulesPage() {
           <p className="text-2xl font-bold text-[#1B2A4A]">{rules.length}</p>
         </div>
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-          <div className="flex items-center gap-2 text-gray-500 text-xs font-medium mb-1"><ShieldAlert size={14} /> License Required</div>
+          <div className="flex items-center gap-2 text-gray-500 text-xs font-medium mb-1"><ShieldAlert size={14} /> Licence Required</div>
           <p className="text-2xl font-bold text-orange-600">{rules.filter((r) => r.export_license_required).length}</p>
         </div>
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
@@ -251,12 +251,12 @@ export default function TradingRulesPage() {
           </div>
           <div className="grid grid-cols-2 gap-4 mb-3">
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">Export License Required</label>
+              <label className="block text-xs font-medium text-gray-500 mb-1">Export Licence Required</label>
               <button
                 onClick={() => setNewForm({ ...newForm, export_license_required: !newForm.export_license_required })}
                 className={`w-full px-3 py-2 rounded-lg text-sm font-medium border transition ${newForm.export_license_required ? 'bg-orange-50 border-orange-200 text-orange-700' : 'bg-green-50 border-green-200 text-green-700'}`}
               >
-                {newForm.export_license_required ? 'Yes - License Required' : 'No - Free Export'}
+                {newForm.export_license_required ? 'Yes - Licence Required' : 'No - Free Export'}
               </button>
             </div>
             <div>
@@ -312,12 +312,12 @@ export default function TradingRulesPage() {
               </div>
               <div className="grid grid-cols-2 gap-4 mb-3">
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">Export License Required</label>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">Export Licence Required</label>
                   <button
                     onClick={() => setEditForm({ ...editForm, export_license_required: !editForm.export_license_required })}
                     className={`w-full px-3 py-2 rounded-lg text-sm font-medium border transition ${editForm.export_license_required ? 'bg-orange-50 border-orange-200 text-orange-700' : 'bg-green-50 border-green-200 text-green-700'}`}
                   >
-                    {editForm.export_license_required ? 'Yes - License Required' : 'No - Free Export'}
+                    {editForm.export_license_required ? 'Yes - Licence Required' : 'No - Free Export'}
                   </button>
                 </div>
                 <div>
@@ -358,7 +358,7 @@ export default function TradingRulesPage() {
                     <div className="flex items-center gap-3 mt-0.5">
                       <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${rule.export_license_required ? 'bg-orange-50 text-orange-700' : 'bg-green-50 text-green-700'}`}>
                         <ShieldAlert size={11} />
-                        {rule.export_license_required ? 'License Required' : 'Free Export'}
+                        {rule.export_license_required ? 'Licence Required' : 'Free Export'}
                       </span>
                       <span className="text-xs text-gray-500">Tax: {rule.tax_rate_percent}%</span>
                       <span className="text-xs text-gray-500">Max: {rule.max_export_quantity_tons.toLocaleString()} tons</span>

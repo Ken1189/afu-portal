@@ -164,7 +164,7 @@ const FALLBACK_INVESTORS: InvestorsContent = {
     eyebrow: 'The Opportunity',
     title: "Africa's Agriculture Paradox",
     intro:
-      "The world's largest untapped agricultural opportunity. The land, labor, and demand exist — what's missing is the infrastructure to connect them.",
+      "The world's largest untapped agricultural opportunity. The land, labour, and demand exist — what's missing is the infrastructure to connect them.",
     stats: [
       { value: '$1T', label: 'African agri market by 2030' },
       { value: '$50B+', label: 'Annual food import gap across Africa' },

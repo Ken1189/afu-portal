@@ -123,7 +123,7 @@ export default function FinanceHubPage() {
               Our Finance Products
             </h2>
             <p className="text-gray-500 max-w-2xl mx-auto">
-              Seven specialized products covering every financial need in
+              Seven specialised products covering every financial need in
               agriculture. Each is tailored to the realities of African farming
               cycles and markets.
             </p>

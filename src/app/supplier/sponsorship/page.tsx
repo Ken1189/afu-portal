@@ -86,7 +86,7 @@ const FALLBACK_SUPPLIERS: Supplier[] = [
     status: 'active',
     joinDate: '2024-06-15',
     logo: 'https://images.unsplash.com/photo-1560693225-b8507d6f3aa9?w=400&h=300&fit=crop',
-    description: 'Leading agricultural input supplier across Southern Africa. Specializing in certified seeds, fertilizers, and crop protection products for commercial and smallholder farmers.',
+    description: 'Leading agricultural input supplier across Southern Africa. Specialising in certified seeds, fertilizers, and crop protection products for commercial and smallholder farmers.',
     productsCount: 38,
     totalSales: 1847320,
     totalOrders: 4215,

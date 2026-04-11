@@ -80,7 +80,7 @@ const FALLBACK_CASES: DemoCase[] = [
     status: 'In Progress',
     date: '2026-02-14',
     description:
-      'Dispute over boundary markers between Plot 4 and neighboring farm. Survey team has been dispatched and mediation is scheduled.',
+      'Dispute over boundary markers between Plot 4 and neighbouring farm. Survey team has been dispatched and mediation is scheduled.',
     firm: 'Greenfield & Associates',
   },
   {
@@ -213,7 +213,7 @@ export default function FarmLegalPage() {
           </div>
           <p className="text-gray-500 ml-[52px]">
             Get expert legal support for land rights, contracts, regulatory matters, and more.
-            Our partner law firms specialize in agricultural and rural issues.
+            Our partner law firms specialise in agricultural and rural issues.
           </p>
         </motion.div>
 

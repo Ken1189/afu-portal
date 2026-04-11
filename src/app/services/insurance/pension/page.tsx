@@ -7,7 +7,7 @@ const plans = [
   {
     name: "Farmer Retirement Savings",
     description:
-      "A dedicated retirement fund for farmers. Contribute monthly and build a nest egg that grows with AFU's capital program returns.",
+      "A dedicated retirement fund for farmers. Contribute monthly and build a nest egg that grows with AFU's capital programme returns.",
     icon: Landmark,
     minContribution: "From $10/month",
   },
@@ -36,7 +36,7 @@ const plans = [
 
 const benefits = [
   "Contributions as low as $10 per month",
-  "Returns boosted through AFU's agricultural capital program",
+  "Returns boosted through AFU's agricultural capital programme",
   "Automatic contributions from your membership fee",
   "Flexible withdrawal options at retirement age",
   "Tax-efficient savings where applicable",

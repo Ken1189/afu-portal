@@ -205,7 +205,7 @@ const FALLBACK_PARTNERS = [
 const FALLBACK_HOW_IT_WORKS = [
   { step: '01', title: 'Tell Us Your Story', desc: 'Tell us about you and your vision. Share your farming story, your land, your dreams. We want to understand what makes your farm unique.' },
   { step: '02', title: 'Get Financed', desc: 'Access working capital, input finance, and equipment leasing tailored to your crop cycle.' },
-  { step: '03', title: 'Grow & Process', desc: 'Use premium inputs, expert training, and processing hubs to maximize yields and value.' },
+  { step: '03', title: 'Grow & Process', desc: 'Use premium inputs, expert training, and processing hubs to maximise yields and value.' },
   { step: '04', title: 'Sell & Scale', desc: 'Guaranteed offtake contracts and trade finance turn your harvest into predictable cash flows.' },
 ];
 const HOW_IT_WORKS_ICONS = [Users, Banknote, Leaf, TrendingUp];
@@ -816,7 +816,7 @@ export default function Home() {
                 {c('stats_title', 'The Opportunity is Enormous')}
               </h2>
               <p className="text-gray-500 max-w-2xl mx-auto">
-                {c('stats_subtitle', "Africa has the land, labor, and demand. What's missing is the integrated infrastructure and finance to unlock it.")}
+                {c('stats_subtitle', "Africa has the land, labour, and demand. What's missing is the integrated infrastructure and finance to unlock it.")}
               </p>
             </div>
           </FadeInWhenVisible>
@@ -825,7 +825,7 @@ export default function Home() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             <FadeInWhenVisible delay={0.2}>
               <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border-l-4 border-[#5DB347] shadow-lg shadow-[#5DB347]/5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                <CountStat target={memberCount > 0 ? memberCount : 500} suffix="+" label="farmers across Africa" />
+                <CountStat target={1.5} suffix="M+" label="farmers across Africa" decimals={1} />
               </div>
             </FadeInWhenVisible>
             {homepageStats.map((stat, i) => (
@@ -853,7 +853,7 @@ export default function Home() {
                 {c('services_title', 'One Platform, Complete Value Chain')}
               </h2>
               <p className="text-gray-500 max-w-2xl mx-auto">
-                {c('services_subtitle', 'A vertically integrated agriculture development platform — the specialized agri dev bank and execution engine Africa has been missing.')}
+                {c('services_subtitle', 'A vertically integrated agriculture development platform — the specialised agri dev bank and execution engine Africa has been missing.')}
               </p>
             </div>
           </FadeInWhenVisible>
@@ -1098,7 +1098,7 @@ export default function Home() {
                   {c('ai_title', 'AI-Powered Agriculture for Smarter Farming')}
                 </h2>
                 <p className="text-gray-500 mb-8 leading-relaxed">
-                  {c('ai_body', 'Our Amara AI assistant helps farmers with crop diagnostics, market pricing, weather alerts, and personalized recommendations — accessible via the portal or WhatsApp.')}
+                  {c('ai_body', 'Our Amara AI assistant helps farmers with crop diagnostics, market pricing, weather alerts, and personalised recommendations — accessible via the portal or WhatsApp.')}
                 </p>
                 <div className="space-y-4">
                   {(content.ai_features && content.ai_features.length > 0 ? content.ai_features : [
@@ -1181,7 +1181,7 @@ export default function Home() {
         </div>
       </section>}
 
-      {/* ─── PARTNER LOGOS GRID ─── */}
+      {/* ─── PARTNER LOGOS — SCROLLING MARQUEE ─── */}
       {partners.length > 0 && <section className="py-16 bg-cream border-y border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeInWhenVisible>
@@ -1189,31 +1189,38 @@ export default function Home() {
               Our Partners
             </p>
           </FadeInWhenVisible>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
-            {partners.map((partner) => (
-              <div
-                key={partner.name}
-                className="flex items-center gap-3 px-5 py-4 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md hover:border-[#5DB347]/20 transition-all"
-              >
-                {partner.logo_url ? (
-                  <img
-                    src={partner.logo_url}
-                    alt={partner.name}
-                    className="h-10 w-auto max-w-[100px] object-contain"
-                    onError={(e) => { e.currentTarget.style.display = 'none'; if (e.currentTarget.nextElementSibling) (e.currentTarget.nextElementSibling as HTMLElement).classList.remove('hidden'); }}
-                  />
-                ) : null}
+          {/* Infinite scroll container */}
+          <div className="relative overflow-hidden">
+            {/* Fade edges */}
+            <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-[#FDFAF5] to-transparent z-10 pointer-events-none" />
+            <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[#FDFAF5] to-transparent z-10 pointer-events-none" />
+            <div className="flex animate-scroll-partners gap-6 w-max">
+              {/* Duplicate partner list for seamless loop */}
+              {[...partners, ...partners].map((partner, idx) => (
                 <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-sm ${partner.logo_url ? 'hidden' : ''}`}
-                  style={{ backgroundColor: partner.color }}
+                  key={`${partner.name}-${idx}`}
+                  className="flex items-center gap-3 px-6 py-4 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md hover:border-[#5DB347]/20 transition-all shrink-0 min-w-[220px]"
                 >
-                  <span className={`font-bold text-xs ${partner.color === '#FFCC00' ? 'text-[#1B2A4A]' : 'text-white'}`}>
-                    {partner.initials}
-                  </span>
+                  {partner.logo_url ? (
+                    <img
+                      src={partner.logo_url}
+                      alt={partner.name}
+                      className="h-10 w-auto max-w-[100px] object-contain"
+                      onError={(e) => { e.currentTarget.style.display = 'none'; if (e.currentTarget.nextElementSibling) (e.currentTarget.nextElementSibling as HTMLElement).classList.remove('hidden'); }}
+                    />
+                  ) : null}
+                  <div
+                    className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-sm ${partner.logo_url ? 'hidden' : ''}`}
+                    style={{ backgroundColor: partner.color }}
+                  >
+                    <span className={`font-bold text-xs ${partner.color === '#FFCC00' ? 'text-[#1B2A4A]' : 'text-white'}`}>
+                      {partner.initials}
+                    </span>
+                  </div>
+                  <span className="text-navy/70 font-semibold text-sm">{partner.name}</span>
                 </div>
-                <span className="text-navy/70 font-semibold text-sm">{partner.name}</span>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </section>}
@@ -1524,7 +1531,7 @@ export default function Home() {
               {content.sponsor_title ? content.sponsor_title : (<>Turn <span className="text-gradient-green">$5 a Month</span> Into a Farm&apos;s Future</>)}
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              {c('sponsor_subtitle', "Real farmers. Real crops. Real impact. Your sponsorship is distributed across farmers who need it most — funding memberships, inputs, and program access. Get monthly updates as their seasons unfold.")}
+              {c('sponsor_subtitle', "Real farmers. Real crops. Real impact. Your sponsorship is distributed across farmers who need it most — funding memberships, inputs, and programme access. Get monthly updates as their seasons unfold.")}
             </p>
           </div>
 
@@ -1533,7 +1540,7 @@ export default function Home() {
             {[
               { tierColor: 'text-amber-600', tier: 'Bronze', price: '$5/mo', desc: 'Cover a farmer\'s AFU membership and give them platform access', color: 'border-amber-600' },
               { tierColor: 'text-gray-400', tier: 'Silver', price: '$100/mo', desc: 'Fund a full season of crop inputs — seeds, fertiliser, pest control', color: 'border-gray-400', featured: true },
-              { tierColor: 'text-yellow-500', tier: 'Gold', price: '$500/mo', desc: 'Full program sponsorship — inputs, insurance, and working capital', color: 'border-yellow-500' },
+              { tierColor: 'text-yellow-500', tier: 'Gold', price: '$500/mo', desc: 'Full programme sponsorship — inputs, insurance, and working capital', color: 'border-yellow-500' },
             ].map((item) => (
               <div key={item.tier} className={`bg-white rounded-2xl p-6 border-t-4 ${item.color} relative shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300`}>
                 {item.featured && (

@@ -537,7 +537,7 @@ export default function CommercialDemoPage() {
               <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center mx-auto mb-3">
                 <FileText className="w-6 h-6 text-amber-600" />
               </div>
-              <p className="text-sm font-bold text-[#1B2A4A]">ZIMRA Export License</p>
+              <p className="text-sm font-bold text-[#1B2A4A]">ZIMRA Export Licence</p>
               <div className="flex items-center justify-center gap-1.5 mt-2">
                 <Loader2 className="w-4 h-4 text-amber-600" />
                 <span className="text-sm font-semibold text-amber-600">Pending</span>

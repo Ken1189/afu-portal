@@ -23,7 +23,7 @@ const articles = [
     date: '10 Feb 2026',
     readTime: '7 min read',
     excerpt:
-      'A step-by-step guide to building a seasonal farm budget. Covers input cost estimation, labor planning, yield projections, revenue forecasting, and the break-even analysis every farmer needs before planting.',
+      'A step-by-step guide to building a seasonal farm budget. Covers input cost estimation, labour planning, yield projections, revenue forecasting, and the break-even analysis every farmer needs before planting.',
   },
   {
     title: 'Crop Insurance Explained: Protecting Your Harvest and Income',

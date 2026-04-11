@@ -70,7 +70,7 @@ const FALLBACK_UPDATES: InvestorUpdate[] = [
   {
     id: '1',
     title: 'Q1 2026 Quarterly Report Published',
-    body: 'Fund I delivered 3.5% quarterly return, bringing YTD IRR to 14.2%. Zimbabwe blueberry program exceeded export targets by 15%. The loan portfolio maintained a 96.1% repayment rate with PAR30 improving to 3.9%. Total AUM reached $12.4M with new capital deployments into Kenya maize and Uganda coffee value chains.',
+    body: 'Fund I delivered 3.5% quarterly return, bringing YTD IRR to 14.2%. Zimbabwe blueberry programme exceeded export targets by 15%. The loan portfolio maintained a 96.1% repayment rate with PAR30 improving to 3.9%. Total AUM reached $12.4M with new capital deployments into Kenya maize and Uganda coffee value chains.',
     update_type: 'quarterly_report',
     published_at: '2026-03-15T00:00:00Z',
     metrics_snapshot: { 'Quarterly Return': '3.5%', 'YTD IRR': '14.2%', 'Repayment Rate': '96.1%' },

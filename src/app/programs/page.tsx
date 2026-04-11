@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/client';
 /* ─── Fallback program data ─── */
 const fallbackPrograms = [
   {
-    name: 'Blueberry Export Program',
+    name: 'Blueberry Export Programme',
     countries: 'Zimbabwe',
     crop: 'Blueberries',
     status: 'Active',
@@ -16,7 +16,7 @@ const fallbackPrograms = [
     highlights: ['25ha commercial operation', 'EU market focus', 'Counter-seasonal pricing advantage', '200+ jobs created'],
   },
   {
-    name: 'Maize & Soya Staples Program',
+    name: 'Maize & Soya Staples Programme',
     countries: 'Multi-country (All 10 AFU countries)',
     crop: 'Maize & Soya',
     status: 'Active',
@@ -25,7 +25,7 @@ const fallbackPrograms = [
     highlights: ['Multiple countries', 'Food security focus', '5,000+ smallholder target', 'Domestic & regional markets'],
   },
   {
-    name: 'Sesame Export Program',
+    name: 'Sesame Export Programme',
     countries: 'Zimbabwe, Tanzania',
     crop: 'Sesame',
     status: 'Active',
@@ -34,7 +34,7 @@ const fallbackPrograms = [
     highlights: ['2,000 farmers targeted', 'International export routes', 'Contract farming model', 'India, Japan & EU buyers'],
   },
   {
-    name: 'Castor Oil Program',
+    name: 'Castor Oil Programme',
     countries: 'Multi-country',
     crop: 'Castor',
     status: 'Active',
@@ -48,7 +48,7 @@ const fallbackPrograms = [
     crop: 'Macadamia',
     status: 'In Development',
     description:
-      'Premium nut export program targeting global snack and confectionery markets. Long-term orchard development delivering high-margin returns. Macadamia is the highest-value tree nut globally with structural undersupply.',
+      'Premium nut export programme targeting global snack and confectionery markets. Long-term orchard development delivering high-margin returns. Macadamia is the highest-value tree nut globally with structural undersupply.',
     highlights: ['50ha orchard development', 'Premium export product', 'Highest-value tree nut', '7-year maturity cycle'],
   },
 ];

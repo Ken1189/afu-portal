@@ -4,8 +4,8 @@ import { createPageMetadata } from '@/lib/seo/metadata';
 import { createClient } from "@supabase/supabase-js";
 
 export const metadata = createPageMetadata({
-  title: 'Young Farmers Program',
-  description: 'Inspiring the future of African agriculture. Youth incubators, training programs, school partnerships, and mentorship for young farmers.',
+  title: 'Young Farmers Programme',
+  description: 'Inspiring the future of African agriculture. Youth incubators, training programmes, school partnerships, and mentorship for young farmers.',
   path: '/young-farmers',
 });
 
@@ -16,12 +16,12 @@ const FALLBACK_PROGRAMS: { iconName: string; title: string; description: string;
     iconName: "Rocket",
     title: "Young Farmer Incubator",
     description:
-      "Our Shark Tank-style pitch program where young entrepreneurs present their agricultural business ideas to a panel of AFU mentors and investors. The best ideas receive seed funding, operational support, and access to AFU's full network to turn their vision into reality.",
+      "Our Shark Tank-style pitch programme where young entrepreneurs present their agricultural business ideas to a panel of AFU mentors and investors. The best ideas receive seed funding, operational support, and access to AFU's full network to turn their vision into reality.",
     highlight: "Seed funding for winning ideas",
   },
   {
     iconName: "Sprout",
-    title: "Junior Training Program",
+    title: "Junior Training Programme",
     description:
       "Age-appropriate farming education modules covering soil science, crop management, livestock care, basic business skills, and sustainable practices. Designed for ages 10 to 18 with hands-on learning experiences.",
     highlight: "Ages 10-18",
@@ -37,12 +37,12 @@ const FALLBACK_PROGRAMS: { iconName: string; title: string; description: string;
     iconName: "Trophy",
     title: "Youth Entrepreneurship Awards",
     description:
-      "Annual awards recognizing outstanding young agricultural innovators across Africa. Categories include Best Young Farmer, Most Innovative Agritech Idea, Community Impact, and Sustainability Champion.",
+      "Annual awards recognising outstanding young agricultural innovators across Africa. Categories include Best Young Farmer, Most Innovative Agritech Idea, Community Impact, and Sustainability Champion.",
     highlight: "Annual awards ceremony",
   },
   {
     iconName: "Handshake",
-    title: "Mentorship Program",
+    title: "Mentorship Programme",
     description:
       "Connecting young farmers with experienced AFU ambassadors and commercial farmers. One-on-one mentorship covering everything from crop planning to business management, with regular farm visits and quarterly reviews.",
     highlight: "1-on-1 guidance",
@@ -53,7 +53,7 @@ const FALLBACK_STATS = [
   { value: "Growing", label: "Young farmers community" },
   { value: "Growing", label: "Partner schools" },
   { value: "20", label: "Countries active" },
-  { value: "Launching", label: "Seed funding program" },
+  { value: "Launching", label: "Seed funding programme" },
 ];
 
 /* ─── ICON MAP ─── */

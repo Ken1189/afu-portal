@@ -94,7 +94,7 @@ export async function getChatResponse(
   // --- Sponsorship ---
   if (/sponsor|donate|support.*farmer|give|help.*farmer|philanthropy/.test(lowerMessage)) {
     return {
-      text: "You can support African farmers through AFU's sponsorship program. Contributions help cover membership, inputs, and program access for smallholder farmers across our operating countries.\n\nVisit /sponsor to learn more, or /contact to get in touch with our team.",
+      text: "You can support African farmers through AFU's sponsorship programme. Contributions help cover membership, inputs, and programme access for smallholder farmers across our operating countries.\n\nVisit /sponsor to learn more, or /contact to get in touch with our team.",
       suggestions: ['Sponsor a farmer', 'Our countries', 'Contact us'],
     };
   }

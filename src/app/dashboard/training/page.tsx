@@ -378,7 +378,7 @@ export default function TrainingPage() {
     if (courses.length < 4) return [];
     return [
       { course: courses[Math.min(4, courses.length - 1)], reason: 'Based on your farm profile — reduce post-harvest losses' },
-      { course: courses[Math.min(3, courses.length - 1)], reason: 'Recommended for your region — optimize water usage in dry season' },
+      { course: courses[Math.min(3, courses.length - 1)], reason: 'Recommended for your region — optimise water usage in dry season' },
       { course: courses[Math.min(6, courses.length - 1)], reason: 'You completed financial courses — take your planning to the next level' },
     ];
   }, [courses]);

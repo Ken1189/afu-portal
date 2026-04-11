@@ -13,7 +13,7 @@ const LABELS: Record<string, string> = {
   financial: 'Financial', banking: 'Banking', wallet: 'Wallet', trading: 'Trading',
   carbon: 'Carbon', insurance: 'Insurance', crops: 'Crops', livestock: 'Livestock',
   equipment: 'Equipment', cooperatives: 'Cooperatives', training: 'Training',
-  programs: 'Programs', jobs: 'Jobs', suppliers: 'Suppliers', contracts: 'Contracts',
+  programs: 'Programmes', jobs: 'Jobs', suppliers: 'Suppliers', contracts: 'Contracts',
   exchange: 'Exchange', advertising: 'Advertising', blog: 'Blog', content: 'Content',
   media: 'Media', faq: 'FAQ', legal: 'Legal', countries: 'Countries',
   users: 'Users', settings: 'Settings', reports: 'Reports', messaging: 'Messaging',

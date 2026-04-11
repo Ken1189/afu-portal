@@ -23,7 +23,7 @@ const SELF_SERVICE: Array<{
   {
     key: 'investor',
     label: 'Investor',
-    description: 'Access investment opportunities across AFU programs.',
+    description: 'Access investment opportunities across AFU programmes.',
     Icon: TrendingUp,
   },
   {

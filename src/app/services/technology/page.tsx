@@ -24,7 +24,7 @@ const techOfferings = [
   {
     title: "Precision Farming",
     description:
-      "Satellite imagery, soil sensors, and drone mapping to optimize every hectare. Know exactly where to plant, irrigate, and apply inputs for maximum yield.",
+      "Satellite imagery, soil sensors, and drone mapping to optimise every hectare. Know exactly where to plant, irrigate, and apply inputs for maximum yield.",
     icon: Satellite,
     features: ["Satellite imagery", "Soil sensors", "Drone mapping", "Variable rate application"],
   },

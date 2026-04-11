@@ -61,10 +61,10 @@ export function ProgramBanner({ programs, onDismiss }: ProgramBannerProps) {
         {/* Text */}
         <div className="flex-1 min-w-0 relative z-10">
           <p className="text-sm font-bold text-white leading-snug">
-            New Programs Available in {countryLabel}
+            New Programmes Available in {countryLabel}
           </p>
           <p className="text-xs text-gray-300 mt-0.5">
-            {activePrograms.length} program{activePrograms.length !== 1 ? 's' : ''} open for enrollment
+            {activePrograms.length} programme{activePrograms.length !== 1 ? 's' : ''} open for enrolment
           </p>
         </div>
 
@@ -74,7 +74,7 @@ export function ProgramBanner({ programs, onDismiss }: ProgramBannerProps) {
             href="/dashboard/programs"
             className="inline-flex items-center gap-1.5 bg-teal text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold hover:bg-teal/90 transition-colors whitespace-nowrap"
           >
-            View Programs
+            View Programmes
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
           <button

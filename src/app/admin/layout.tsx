@@ -152,6 +152,7 @@ const navGroups: NavGroup[] = [
     defaultOpen: false,
     links: [
       { href: '/admin/farm-overview', label: 'Farm Operations', icon: <Gauge className={ICON_CLS} /> },
+      { href: '/admin/farm-showcase', label: 'Farm Showcase', icon: <Sprout className={ICON_CLS} /> },
       { href: '/admin/equipment', label: 'Equipment', icon: <Wrench className={ICON_CLS} /> },
       { href: '/admin/insurance', label: 'Insurance', icon: <Shield className={ICON_CLS} /> },
       { href: '/admin/crops', label: 'Crops', icon: <Sprout className={ICON_CLS} /> },
@@ -176,7 +177,7 @@ const navGroups: NavGroup[] = [
       { href: '/admin/faq', label: 'FAQ', icon: <HelpCircle className={ICON_CLS} /> },
       { href: '/admin/announcements', label: 'Announcements', icon: <Bell className={ICON_CLS} /> },
       { href: '/admin/training', label: 'Training', icon: <GraduationCap className={ICON_CLS} /> },
-      { href: '/admin/training/catalog', label: 'Training Catalog', icon: <GraduationCap className={ICON_CLS} /> },
+      { href: '/admin/training/catalog', label: 'Training Catalogue', icon: <GraduationCap className={ICON_CLS} /> },
       { href: '/admin/legal', label: 'Legal Pages', icon: <Scale className={ICON_CLS} /> },
       { href: '/admin/legal-services', label: 'Legal Services', icon: <Scale className={ICON_CLS} /> },
       { href: '/admin/testimonials', label: 'Testimonials', icon: <MessageSquare className={ICON_CLS} /> },
@@ -399,7 +400,7 @@ function NavSection({
                       ? 'opacity-100 text-yellow-400 hover:text-yellow-300'
                       : 'opacity-0 group-hover/link:opacity-100 text-gray-500 hover:text-yellow-400'
                   }`}
-                  title={isFav ? 'Unpin from favorites' : 'Pin to favorites'}
+                  title={isFav ? 'Unpin from favourites' : 'Pin to favourites'}
                 >
                   <Star className="w-3 h-3" fill={isFav ? 'currentColor' : 'none'} />
                 </button>
@@ -467,7 +468,7 @@ function FavoritesSection({
     <div className="pb-1">
       <div className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-yellow-400/70 flex items-center gap-1">
         <Star className="w-3 h-3" fill="currentColor" />
-        <span>Favorites</span>
+        <span>Favourites</span>
       </div>
       <div className="space-y-0.5">
         {favLinks.map((link) => {
@@ -491,7 +492,7 @@ function FavoritesSection({
               <button
                 onClick={() => onToggleFavorite(link.href)}
                 className="absolute right-1 top-1/2 -translate-y-1/2 p-1 rounded opacity-100 text-yellow-400 hover:text-yellow-300 transition-opacity duration-150"
-                title="Unpin from favorites"
+                title="Unpin from favourites"
               >
                 <Star className="w-3 h-3" fill="currentColor" />
               </button>

@@ -117,7 +117,7 @@ export async function PATCH(
       .single();
 
     if (fetchError || !existing) {
-      return NextResponse.json({ error: 'Enrollment not found' }, { status: 404 });
+      return NextResponse.json({ error: 'Enrolment not found' }, { status: 404 });
     }
 
     const validStatuses = ['applied', 'approved', 'active', 'completed', 'rejected', 'withdrawn'];

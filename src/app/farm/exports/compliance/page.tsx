@@ -363,7 +363,7 @@ const AUDIT_RECORDS: AuditRecord[] = [
     findings: [
       'Minor: Calibration records for weighing scale WS-04 overdue by 2 weeks',
       'Positive: Excellent traceability system implementation with QR codes',
-      'Positive: Strong supplier verification program',
+      'Positive: Strong supplier verification programme',
     ],
     correctiveActions: [
       'Recalibrate WS-04 and update calibration schedule - IN PROGRESS',

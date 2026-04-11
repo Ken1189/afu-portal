@@ -289,7 +289,7 @@ export default function AssetInsurancePage() {
             Protect Your Equipment Today
           </h2>
           <p className="text-gray-300 mb-8 max-w-2xl mx-auto">
-            Get a personalized asset insurance quote in under 5 minutes. Coverage
+            Get a personalised asset insurance quote in under 5 minutes. Coverage
             starts the same day your premium is paid.
           </p>
           <Link

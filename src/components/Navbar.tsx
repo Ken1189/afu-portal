@@ -90,11 +90,11 @@ const educationLinks = [
 
 const communityLinks: { label: string; href: string; desc: string; icon: LucideIcon }[] = [
   { label: "Jobs Board", href: "/jobs", desc: "Agricultural positions", icon: Briefcase },
-  { label: "Ambassadors", href: "/ambassadors", desc: "Join our ambassador program", icon: Award },
+  { label: "Ambassadors", href: "/ambassadors", desc: "Join our ambassador programme", icon: Award },
   { label: "Marketplace", href: "/marketplace", desc: "Buy & sell agricultural products", icon: ShoppingCart },
   { label: "Partner Farms", href: "/farms", desc: "Showcase farms", icon: Sprout },
   { label: "Partners", href: "/partners", desc: "Our network", icon: Handshake },
-  { label: "Programs", href: "/programs", desc: "Active farming programs", icon: Target },
+  { label: "Programmes", href: "/programs", desc: "Active farming programmes", icon: Target },
   { label: "Young Farmers", href: "/young-farmers", desc: "Next generation", icon: GraduationCap },
   { label: "Advisors", href: "/advisors", desc: "Expert guidance from industry leaders", icon: UserCheck },
   { label: "Sponsor a Farmer", href: "/sponsor", desc: "Change a life today", icon: Handshake },

@@ -148,9 +148,9 @@ const COURSE_LESSON_CONTENT: Record<string, CourseContent> = {
         title: 'Why Farm Records Matter',
         content: [
           'Farm record keeping is the practice of writing down everything that happens on your farm: what you plant, what you spend, what you earn, and what you harvest. Many African farmers rely on memory alone, but as operations grow beyond subsistence, accurate records become essential for making profitable decisions.',
-          'Records help you understand which crops are profitable and which are not. Without written data, a farmer might continue growing a crop that actually costs more to produce than it earns. With records, you can compare the cost of seeds, fertilizer, and labor against revenue from sales to see your true profit or loss for each enterprise.',
-          'Banks and microfinance institutions require records before approving agricultural loans. They want to see evidence that your farm generates income and that you manage money responsibly. A farmer with six months of organized income and expense records has a much stronger loan application than one who can only estimate figures from memory.',
-          'Start simple. Use a notebook with columns for date, description, money in, and money out. Record every transaction the day it happens. Even mobile phone notes work. The key is consistency. Within one season of recording, you will have clear visibility into your farm business that most of your neighbors lack.',
+          'Records help you understand which crops are profitable and which are not. Without written data, a farmer might continue growing a crop that actually costs more to produce than it earns. With records, you can compare the cost of seeds, fertilizer, and labour against revenue from sales to see your true profit or loss for each enterprise.',
+          'Banks and microfinance institutions require records before approving agricultural loans. They want to see evidence that your farm generates income and that you manage money responsibly. A farmer with six months of organised income and expense records has a much stronger loan application than one who can only estimate figures from memory.',
+          'Start simple. Use a notebook with columns for date, description, money in, and money out. Record every transaction the day it happens. Even mobile phone notes work. The key is consistency. Within one season of recording, you will have clear visibility into your farm business that most of your neighbours lack.',
         ],
         keyTakeaways: [
           'Records reveal which crops are truly profitable versus which ones lose money',
@@ -163,7 +163,7 @@ const COURSE_LESSON_CONTENT: Record<string, CourseContent> = {
         title: 'Income and Expense Tracking',
         content: [
           'Income tracking captures all money flowing into your farm. This includes crop sales, livestock sales, eggs, milk, honey, value-added products, government subsidies, and any services you provide to other farmers. Record the date, item sold, quantity, price per unit, total received, and buyer name for every transaction.',
-          'Expense tracking captures everything you spend. Common farm expenses include seeds, fertilizer, pesticides, fuel, equipment rental, hired labor, transport, veterinary costs, land rent, and loan repayments. Record the date, item purchased, quantity, unit cost, total paid, and supplier for each expense.',
+          'Expense tracking captures everything you spend. Common farm expenses include seeds, fertilizer, pesticides, fuel, equipment rental, hired labour, transport, veterinary costs, land rent, and loan repayments. Record the date, item purchased, quantity, unit cost, total paid, and supplier for each expense.',
           'Separate your farm expenses from your household expenses. Many smallholder farmers mix the two, making it impossible to know whether the farm itself is profitable. Keep a separate notebook or account for farm transactions only. If you use farm produce at home, record it as a withdrawal at market value.',
           'At the end of each month, total your income and expenses. The difference is your monthly cash flow. Positive cash flow means your farm earned more than it spent. Negative cash flow means you need to investigate why costs exceeded revenue. Track this monthly pattern over a full year to see seasonal trends and plan your cash needs in advance.',
         ],
@@ -178,9 +178,9 @@ const COURSE_LESSON_CONTENT: Record<string, CourseContent> = {
         title: 'Calculating Profit per Hectare',
         content: [
           'Profit per hectare is the most important metric for comparing crop performance on your farm. It tells you how much money each unit of land actually earns after all costs are deducted. Without this number, you cannot make rational decisions about what to plant next season.',
-          'To calculate profit per hectare, first total all income from that hectare of crop: the harvest quantity multiplied by the selling price. Then total all costs: land preparation, seeds, fertilizer, pesticides, labor for planting, weeding, and harvesting, plus transport and storage. Subtract total costs from total income to get your net profit per hectare.',
+          'To calculate profit per hectare, first total all income from that hectare of crop: the harvest quantity multiplied by the selling price. Then total all costs: land preparation, seeds, fertilizer, pesticides, labour for planting, weeding, and harvesting, plus transport and storage. Subtract total costs from total income to get your net profit per hectare.',
           'Compare profit per hectare across your different crops. You might find that a "low-value" crop like beans actually generates higher profit per hectare than a "high-value" crop like tomatoes, because tomatoes have much higher input costs and post-harvest losses. These insights only become visible when you calculate systematically.',
-          'Use this metric to plan your next season. Allocate more land to crops with higher profit per hectare, while maintaining some diversity for food security and risk management. Also factor in labor intensity: a crop that earns slightly less per hectare but requires half the labor might be the smarter choice if labor is your biggest constraint.',
+          'Use this metric to plan your next season. Allocate more land to crops with higher profit per hectare, while maintaining some diversity for food security and risk management. Also factor in labour intensity: a crop that earns slightly less per hectare but requires half the labour might be the smarter choice if labour is your biggest constraint.',
         ],
         keyTakeaways: [
           'Profit per hectare = total income from crop minus total costs on that land',
@@ -193,9 +193,9 @@ const COURSE_LESSON_CONTENT: Record<string, CourseContent> = {
         title: 'Preparing for Loan Applications',
         content: [
           'Agricultural loans can transform a farm by funding irrigation equipment, improved seeds, storage facilities, or land expansion. However, African smallholder farmers are often rejected because they cannot demonstrate creditworthiness. Preparing a strong application starts months before you walk into the bank.',
-          'Gather at least six months of organized farm records showing consistent income. Prepare a simple one-page farm profile: your name, location, farm size, crops grown, average seasonal revenue, and main buyers. Add a brief plan explaining what you will do with the loan and how it will increase your income. For example, buying a water pump will extend your growing season and generate an estimated additional revenue that covers the loan repayment.',
-          'Understand the loan terms before applying. Key factors include the interest rate (annual percentage), repayment schedule (monthly, quarterly, or after harvest), collateral requirements (land title, group guarantee, or savings), and penalties for late payment. Compare offers from multiple institutions: commercial banks, microfinance organizations, savings cooperatives (SACCOs), and mobile lending platforms.',
-          'Consider starting with smaller loans to build a repayment track record. Successful repayment of a small loan makes you eligible for larger amounts in subsequent cycles. Many cooperative-based lending programs offer lower rates and flexible repayment terms aligned with harvest seasons, which can be a better fit for smallholder farmers than standard monthly bank repayments.',
+          'Gather at least six months of organised farm records showing consistent income. Prepare a simple one-page farm profile: your name, location, farm size, crops grown, average seasonal revenue, and main buyers. Add a brief plan explaining what you will do with the loan and how it will increase your income. For example, buying a water pump will extend your growing season and generate an estimated additional revenue that covers the loan repayment.',
+          'Understand the loan terms before applying. Key factors include the interest rate (annual percentage), repayment schedule (monthly, quarterly, or after harvest), collateral requirements (land title, group guarantee, or savings), and penalties for late payment. Compare offers from multiple institutions: commercial banks, microfinance organisations, savings cooperatives (SACCOs), and mobile lending platforms.',
+          'Consider starting with smaller loans to build a repayment track record. Successful repayment of a small loan makes you eligible for larger amounts in subsequent cycles. Many cooperative-based lending programmes offer lower rates and flexible repayment terms aligned with harvest seasons, which can be a better fit for smallholder farmers than standard monthly bank repayments.',
         ],
         keyTakeaways: [
           'Prepare six-plus months of farm records and a simple farm profile before applying',
@@ -208,7 +208,7 @@ const COURSE_LESSON_CONTENT: Record<string, CourseContent> = {
       {
         question: 'What is the most important reason to keep farm records?',
         options: [
-          'To impress your neighbors',
+          'To impress your neighbours',
           'To know which crops are truly profitable',
           'Government requires it by law',
           'To track the weather',
@@ -217,7 +217,7 @@ const COURSE_LESSON_CONTENT: Record<string, CourseContent> = {
       },
       {
         question: 'What should you calculate to compare performance across different crops?',
-        options: ['Total farm income', 'Profit per hectare', 'Total seeds planted', 'Number of laborers'],
+        options: ['Total farm income', 'Profit per hectare', 'Total seeds planted', 'Number of labourers'],
         correctIndex: 1,
       },
       {
@@ -236,7 +236,7 @@ const COURSE_LESSON_CONTENT: Record<string, CourseContent> = {
         content: [
           'Drip irrigation delivers water directly to the root zone of each plant through a network of tubes, pipes, and emitters. Unlike flood irrigation, which wastes 40 to 60 percent of water to evaporation and runoff, drip systems can achieve 90 to 95 percent water efficiency. For African farmers facing increasing water scarcity, this technology is transformative.',
           'A basic drip system consists of a water source (tank, borehole, or river), a filter to prevent clogging, a main supply line, sub-main lines running along crop rows, and drip emitters or drip tape that release water slowly at each plant. Low-pressure systems using elevated tanks (gravity-fed) are affordable and require no electricity, making them ideal for off-grid smallholder farms.',
-          'The cost of a basic gravity-fed drip system for a quarter-hectare plot ranges from $100 to $300 USD depending on the region. While this is a significant investment for smallholders, the savings in water, reduced labor for watering, and increased yields typically pay back the investment within one to two seasons, especially for high-value vegetables and fruits.',
+          'The cost of a basic gravity-fed drip system for a quarter-hectare plot ranges from $100 to $300 USD depending on the region. While this is a significant investment for smallholders, the savings in water, reduced labour for watering, and increased yields typically pay back the investment within one to two seasons, especially for high-value vegetables and fruits.',
           'Maintenance is critical for drip system longevity. Flush the lines weekly to prevent sediment buildup. Check emitters monthly for clogs, cleaning them with a thin wire or replacing them. Use filtration appropriate to your water source: mesh filters for clean borehole water, disc or sand filters for river water. A well-maintained system lasts five to ten years.',
         ],
         keyTakeaways: [
@@ -346,7 +346,7 @@ const COURSE_LESSON_CONTENT: Record<string, CourseContent> = {
         id: 'at-3',
         title: 'Integrated Pest Management (IPM)',
         content: [
-          'Integrated Pest Management is a sustainable approach that combines multiple strategies to manage pests while minimizing chemical use, cost, and environmental harm. IPM does not reject chemicals entirely, but positions them as a last resort after other methods have been tried. This approach is particularly suited to African smallholder farming where chemical inputs are expensive and often misused.',
+          'Integrated Pest Management is a sustainable approach that combines multiple strategies to manage pests while minimising chemical use, cost, and environmental harm. IPM does not reject chemicals entirely, but positions them as a last resort after other methods have been tried. This approach is particularly suited to African smallholder farming where chemical inputs are expensive and often misused.',
           'The IPM pyramid has four levels. The base is prevention: choose resistant varieties, practice crop rotation, maintain healthy soil, and plant at optimal timing to avoid peak pest seasons. The second level is monitoring: regularly scout your fields to detect pests early and identify whether they have reached levels that justify action (the economic threshold).',
           'The third level is biological and cultural control. Encourage natural predators like ladybugs, lacewings, parasitic wasps, and spiders by maintaining field margins with flowering plants. Use trap crops to lure pests away from your main crop. Practice push-pull technology, developed in East Africa, which uses Napier grass (pull) and Desmodium (push) to manage stem borers and Striga weed in maize simultaneously.',
           'Chemical control sits at the top of the pyramid, used only when other methods are insufficient and pest damage exceeds the economic threshold. When chemicals are necessary, use targeted products (not broad-spectrum), apply at the correct dosage and timing, rotate chemical classes to prevent resistance, and always follow safety guidelines including protective equipment. Never apply pesticides within the pre-harvest interval for your crop.',
@@ -362,9 +362,9 @@ const COURSE_LESSON_CONTENT: Record<string, CourseContent> = {
         title: 'When to Use Chemical vs Organic Treatment',
         content: [
           'The decision between chemical and organic disease and pest treatment depends on several factors: the severity of the problem, the crop value, available resources, market requirements, and long-term soil health goals. There is no single right answer; successful farmers learn when each approach is appropriate.',
-          'Organic treatments should be your first line of defense for most situations. Neem oil and neem leaf extracts are effective against a wide range of insect pests and some fungal diseases. Wood ash mixed with water controls some soft-bodied insects. Chili-garlic sprays repel many pests. Trichoderma (a beneficial fungus) applied to soil prevents several root diseases. These treatments are low-cost, locally available, and safe for the environment.',
+          'Organic treatments should be your first line of defence for most situations. Neem oil and neem leaf extracts are effective against a wide range of insect pests and some fungal diseases. Wood ash mixed with water controls some soft-bodied insects. Chili-garlic sprays repel many pests. Trichoderma (a beneficial fungus) applied to soil prevents several root diseases. These treatments are low-cost, locally available, and safe for the environment.',
           'Chemical treatments become necessary when organic methods cannot contain a rapidly spreading epidemic that threatens significant yield loss, when you are dealing with regulated quarantine pests that must be eradicated, or when the economic value of the crop justifies the additional expense. Commercial export crops often require chemical treatments to meet international phytosanitary standards.',
-          'If you choose chemical treatment, always positively identify the pest or disease first. Using the wrong chemical wastes money and may worsen the problem by killing beneficial organisms. Buy from licensed dealers, check expiry dates, read and follow label instructions precisely, wear protective clothing, and store chemicals safely away from food, water, and children. Keep records of all chemical applications, as buyers and certification programs increasingly require spray records.',
+          'If you choose chemical treatment, always positively identify the pest or disease first. Using the wrong chemical wastes money and may worsen the problem by killing beneficial organisms. Buy from licensed dealers, check expiry dates, read and follow label instructions precisely, wear protective clothing, and store chemicals safely away from food, water, and children. Keep records of all chemical applications, as buyers and certification programmes increasingly require spray records.',
         ],
         keyTakeaways: [
           'Organic treatments (neem, wood ash, chili-garlic, Trichoderma) should be the first approach',
@@ -375,7 +375,7 @@ const COURSE_LESSON_CONTENT: Record<string, CourseContent> = {
     ],
     quiz: [
       {
-        question: 'What is the primary defense against plant viral diseases?',
+        question: 'What is the primary defence against plant viral diseases?',
         options: [
           'Fungicide spray',
           'Prevention (certified seed, vector control, removing infected plants)',

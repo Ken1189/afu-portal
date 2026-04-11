@@ -43,7 +43,7 @@ const _UNUSED_FALLBACK_REVENUE_TREND = [
 ];
 
 const _UNUSED_FALLBACK_ACTIVITY = [
-  { type: 'enrollment', text: 'New enrollment in Chobe Agroforestry Initiative', time: '2 hours ago' },
+  { type: 'enrollment', text: 'New enrolment in Chobe Agroforestry Initiative', time: '2 hours ago' },
   { type: 'practice', text: 'Practice logged: No-till farming (3ha)', time: '4 hours ago' },
   { type: 'credit', text: '12.5 credits issued for Makgadikgadi Soil Carbon', time: '1 day ago' },
   { type: 'purchase', text: '50 credits purchased by GreenFuture Corp ($925)', time: '1 day ago' },

@@ -63,7 +63,7 @@ const COUNTRY_TEAMS: CountryTeam[] = [
     tagline: 'Dryland agriculture innovation hub',
     members: [
       { name: 'Kgosi Morapedi', title: 'Country Director', bio: 'Former deputy director at Botswana Agricultural Marketing Board with 15 years in dryland farming policy.' },
-      { name: 'Naledi Tau', title: 'Agricultural Officer', bio: 'Agronomist specializing in drought-resistant crop systems across the Kalahari basin.' },
+      { name: 'Naledi Tau', title: 'Agricultural Officer', bio: 'Agronomist specialising in drought-resistant crop systems across the Kalahari basin.' },
       { name: 'Mpho Kgathi', title: 'Finance & Operations', bio: 'Chartered accountant with experience in SADC development fund management.' },
     ],
   },
@@ -73,10 +73,10 @@ const COUNTRY_TEAMS: CountryTeam[] = [
     flag: '\ud83c\uddff\ud83c\uddfc',
     tagline: 'Restoring Africa\'s former breadbasket',
     members: [
-      { name: 'Tendai Moyo', title: 'Country Director', bio: 'Agricultural economist who led the Zimbabwe National Farmers Union modernization program.' },
+      { name: 'Tendai Moyo', title: 'Country Director', bio: 'Agricultural economist who led the Zimbabwe National Farmers Union modernisation programme.' },
       { name: 'Rumbidzai Chikwanha', title: 'Agricultural Officer', bio: 'Crop scientist focused on tobacco diversification and climate-smart horticulture.' },
       { name: 'Tapiwa Mhaka', title: 'Finance & Operations', bio: 'Operations leader with background in multi-currency treasury management.' },
-      { name: 'Chiedza Nyambuya', title: 'Community Liaison', bio: 'Grassroots organizer connecting 200+ smallholder cooperatives across Mashonaland.' },
+      { name: 'Chiedza Nyambuya', title: 'Community Liaison', bio: 'Grassroots organiser connecting 200+ smallholder cooperatives across Mashonaland.' },
     ],
   },
   {
@@ -100,7 +100,7 @@ const COUNTRY_TEAMS: CountryTeam[] = [
       { name: 'James Otieno', title: 'Country Director', bio: 'Fintech and agri-lending veteran who built mobile credit products reaching 50,000 farmers.' },
       { name: 'Wanjiku Njeri', title: 'Agricultural Officer', bio: 'Horticulture export specialist with deep ties to the Naivasha flower and vegetable corridor.' },
       { name: 'Daniel Kipchoge', title: 'Finance & Operations', bio: 'Former auditor at a Big Four firm, now focused on agricultural cooperative financial systems.' },
-      { name: 'Akinyi Odhiambo', title: 'Community Liaison', bio: 'Leads youth-in-agriculture programs across western Kenya and the Rift Valley.' },
+      { name: 'Akinyi Odhiambo', title: 'Community Liaison', bio: 'Leads youth-in-agriculture programmes across western Kenya and the Rift Valley.' },
     ],
   },
   {
@@ -110,7 +110,7 @@ const COUNTRY_TEAMS: CountryTeam[] = [
     tagline: 'Scaling Africa\'s largest farm economy',
     members: [
       { name: 'Emeka Okafor', title: 'Country Director', bio: 'Agribusiness executive who managed large-scale rice and cassava processing operations in the North.' },
-      { name: 'Folake Adeyemi', title: 'Agricultural Officer', bio: 'Extension specialist coordinating maize and soybean programs across the Middle Belt.' },
+      { name: 'Folake Adeyemi', title: 'Agricultural Officer', bio: 'Extension specialist coordinating maize and soybean programmes across the Middle Belt.' },
       { name: 'Chukwuemeka Nwosu', title: 'Finance & Operations', bio: 'Investment banker turned agri-finance director managing a portfolio of commodity-backed facilities.' },
       { name: 'Hauwa Ibrahim', title: 'Community Liaison', bio: 'Community development expert bridging northern pastoral and southern crop-farming networks.' },
     ],
@@ -158,7 +158,7 @@ const COUNTRY_TEAMS: CountryTeam[] = [
       { name: 'Kwame Asante', title: 'Country Director', bio: 'Agricultural trade negotiator with experience across ECOWAS commodity protocols.' },
       { name: 'Abena Mensah', title: 'Agricultural Officer', bio: 'Cocoa sustainability expert integrating climate-smart practices into smallholder production.' },
       { name: 'Yaw Boateng', title: 'Finance & Operations', bio: 'Development finance analyst managing agricultural credit guarantee facilities.' },
-      { name: 'Esi Owusu', title: 'Community Liaison', bio: 'Cooperative governance specialist strengthening farmer-based organizations across the Ashanti region.' },
+      { name: 'Esi Owusu', title: 'Community Liaison', bio: 'Cooperative governance specialist strengthening farmer-based organisations across the Ashanti region.' },
     ],
   },
   {

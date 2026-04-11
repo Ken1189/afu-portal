@@ -108,61 +108,61 @@ const featuredCrops = [
   {
     name: "Coffee",
     slug: "coffee",
-    image: "/images/crops/coffee.jpg",
+    image: "https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=600&h=400&fit=crop",
     countries: ["Ethiopia", "Kenya", "Tanzania"],
   },
   {
     name: "Maize",
     slug: "maize",
-    image: "/images/crops/maize.jpg",
+    image: "https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=600&h=400&fit=crop",
     countries: ["Zambia", "Zimbabwe", "Mozambique"],
   },
   {
     name: "Cashew Nuts",
     slug: "cashew-nuts",
-    image: "/images/crops/cashew-nuts.jpg",
+    image: "https://images.unsplash.com/photo-1590165482129-1b8b27698780?w=600&h=400&fit=crop",
     countries: ["Mozambique", "Tanzania"],
   },
   {
     name: "Cocoa",
     slug: "cocoa",
-    image: "/images/crops/cocoa.jpg",
+    image: "https://images.unsplash.com/photo-1599599810694-b5b37304c041?w=600&h=400&fit=crop",
     countries: ["Ghana", "Cameroon"],
   },
   {
     name: "Blueberries",
     slug: "blueberries",
-    image: "/images/crops/blueberries.jpg",
+    image: "https://images.unsplash.com/photo-1498557850523-fd3d118b962e?w=600&h=400&fit=crop",
     countries: ["South Africa", "Zimbabwe"],
   },
   {
     name: "Macadamia",
     slug: "macadamia",
-    image: "/images/crops/macadamia.jpg",
+    image: "https://images.unsplash.com/photo-1608797178974-15b35a64ede9?w=600&h=400&fit=crop",
     countries: ["South Africa", "Kenya", "Malawi"],
   },
   {
     name: "Soya",
     slug: "soya",
-    image: "/images/crops/soya.jpg",
+    image: "https://images.unsplash.com/photo-1599708153386-62bf3f035c78?w=600&h=400&fit=crop",
     countries: ["Zambia", "Zimbabwe", "Malawi"],
   },
   {
     name: "Cotton",
     slug: "cotton",
-    image: "/images/crops/cotton.jpg",
+    image: "https://images.unsplash.com/photo-1594897030264-ab7d87efc473?w=600&h=400&fit=crop",
     countries: ["Zimbabwe", "Mozambique", "Tanzania"],
   },
   {
     name: "Tea",
     slug: "tea",
-    image: "/images/crops/tea.jpg",
+    image: "https://images.unsplash.com/photo-1564890369478-c89ca6d9cde9?w=600&h=400&fit=crop",
     countries: ["Kenya", "Malawi", "Tanzania"],
   },
   {
     name: "Tobacco",
     slug: "tobacco",
-    image: "/images/crops/tobacco.jpg",
+    image: "https://images.unsplash.com/photo-1631379578550-7038263db699?w=600&h=400&fit=crop",
     countries: ["Zimbabwe", "Malawi", "Mozambique"],
   },
 ];
@@ -214,7 +214,7 @@ const stats = [
   { value: "20", label: "Countries Active", icon: Globe },
   { value: "50+", label: "Crop Types Supported", icon: Sprout },
   { value: "15+", label: "Livestock Species", icon: Beef },
-  { value: "5,000+", label: "Farmers in Network", icon: Users },
+  { value: "1.5M+", label: "Farmers in Network", icon: Users },
 ];
 
 /* ─── Page Component ─── */
@@ -295,10 +295,11 @@ export default function FarmingPage() {
       ═══════════════════════════════════════════════ */}
       <section id="sectors" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
         <div className="text-center mb-14">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          <span className="text-sm font-semibold uppercase tracking-wider text-[#5DB347]">Core Sectors</span>
+          <h2 className="text-3xl md:text-4xl font-bold text-[#1B2A4A] mt-2 mb-4">
             Our Farming Sectors
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-gray-500 max-w-2xl mx-auto">
             AFU organises agricultural support across four core sectors, each
             with dedicated programmes, specialists, and market channels.
           </p>
@@ -311,7 +312,7 @@ export default function FarmingPage() {
               <Link
                 key={sector.title}
                 href={sector.href}
-                className="group block rounded-2xl border border-gray-200 overflow-hidden bg-white shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                className="group block rounded-2xl border border-gray-100 overflow-hidden bg-white shadow-sm hover:shadow-xl hover:border-[#5DB347]/20 transition-all duration-300 hover:-translate-y-1"
               >
                 {/* Card image */}
                 <div className="relative h-52 overflow-hidden">
@@ -322,8 +323,8 @@ export default function FarmingPage() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                   <div
-                    className="absolute top-4 left-4 w-12 h-12 rounded-xl flex items-center justify-center"
-                    style={{ backgroundColor: sector.accentBg }}
+                    className="absolute top-4 left-4 w-12 h-12 rounded-xl flex items-center justify-center backdrop-blur-sm"
+                    style={{ backgroundColor: 'rgba(255,255,255,0.9)' }}
                   >
                     <Icon className="w-6 h-6" style={{ color: sector.accent }} />
                   </div>
@@ -331,15 +332,14 @@ export default function FarmingPage() {
 
                 {/* Card body */}
                 <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-green-700 transition-colors">
+                  <h3 className="text-xl font-bold text-[#1B2A4A] mb-2 group-hover:text-[#5DB347] transition-colors">
                     {sector.title}
                   </h3>
-                  <p className="text-gray-600 leading-relaxed mb-4">
+                  <p className="text-gray-500 leading-relaxed mb-4">
                     {sector.description}
                   </p>
                   <span
-                    className="inline-flex items-center gap-1.5 font-semibold text-sm"
-                    style={{ color: sector.accent }}
+                    className="inline-flex items-center gap-1.5 font-semibold text-sm text-[#5DB347]"
                   >
                     Explore {sector.title}
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -354,13 +354,14 @@ export default function FarmingPage() {
       {/* ═══════════════════════════════════════════════
           WHY FARM WITH AFU — STATS
       ═══════════════════════════════════════════════ */}
-      <section className="bg-gray-50 py-16 md:py-24">
+      <section className="bg-[#f8fdf6] py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            <span className="text-sm font-semibold uppercase tracking-wider text-[#5DB347]">Our Impact</span>
+            <h2 className="text-3xl md:text-4xl font-bold text-[#1B2A4A] mt-2 mb-4">
               Why Farm with AFU
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-gray-500 max-w-2xl mx-auto">
               Numbers that reflect our growing impact across Africa&apos;s
               agricultural landscape.
             </p>
@@ -372,7 +373,7 @@ export default function FarmingPage() {
               return (
                 <div
                   key={stat.label}
-                  className="bg-white rounded-2xl p-6 text-center shadow-sm border border-gray-100"
+                  className="bg-white rounded-2xl p-6 text-center shadow-sm border border-gray-100 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
                 >
                   <div
                     className="w-14 h-14 rounded-xl flex items-center justify-center mx-auto mb-4"
@@ -380,7 +381,7 @@ export default function FarmingPage() {
                   >
                     <Icon className="w-7 h-7" style={{ color: "#5DB347" }} />
                   </div>
-                  <p className="text-3xl md:text-4xl font-bold text-gray-900 mb-1">
+                  <p className="text-3xl md:text-4xl font-bold text-[#1B2A4A] mb-1">
                     {stat.value}
                   </p>
                   <p className="text-sm text-gray-500 font-medium">
@@ -394,8 +395,8 @@ export default function FarmingPage() {
           <div className="text-center mt-10">
             <Link
               href="/join"
-              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-lg text-white font-semibold transition-all hover:brightness-110"
-              style={{ backgroundColor: "#5DB347" }}
+              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl text-white font-semibold shadow-lg shadow-[#5DB347]/20 hover:-translate-y-0.5 transition-all"
+              style={{ background: 'linear-gradient(135deg, #5DB347, #449933)' }}
             >
               Join AFU
               <ArrowRight className="w-5 h-5" />
@@ -407,53 +408,63 @@ export default function FarmingPage() {
       {/* ═══════════════════════════════════════════════
           FEATURED CROPS GRID
       ═══════════════════════════════════════════════ */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
-        <div className="text-center mb-14">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Featured Crops
-          </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Africa grows some of the world&apos;s most sought-after
-            agricultural commodities. Here are the crops our farmers cultivate
-            across the continent.
-          </p>
-        </div>
+      <section className="py-16 md:py-24 bg-gradient-to-b from-white to-[#f8fdf6]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-14">
+            <span className="text-sm font-semibold uppercase tracking-wider text-[#5DB347]">What We Grow</span>
+            <h2 className="text-3xl md:text-4xl font-bold text-[#1B2A4A] mt-2 mb-4">
+              Featured Crops
+            </h2>
+            <p className="text-gray-500 max-w-2xl mx-auto">
+              Africa grows some of the world&apos;s most sought-after
+              agricultural commodities. Here are the crops our farmers cultivate
+              across the continent.
+            </p>
+          </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
-          {featuredCrops.map((crop) => (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
+            {featuredCrops.map((crop) => (
+              <Link
+                key={crop.slug}
+                href={`/farming/crops/${crop.slug}`}
+                className="group block rounded-2xl overflow-hidden bg-white border border-gray-100 shadow-sm hover:shadow-xl hover:border-[#5DB347]/20 hover:-translate-y-1 transition-all duration-300"
+              >
+                <div className="relative h-36 overflow-hidden">
+                  <img
+                    src={crop.image}
+                    alt={crop.name}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
+                  <div className="absolute bottom-2 left-2">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/90 backdrop-blur-sm text-[10px] font-semibold text-[#1B2A4A]">
+                      <Leaf className="w-2.5 h-2.5 text-[#5DB347]" />
+                      {crop.countries.length} {crop.countries.length === 1 ? 'country' : 'countries'}
+                    </span>
+                  </div>
+                </div>
+                <div className="p-4">
+                  <h3 className="font-bold text-[#1B2A4A] text-sm mb-1.5 group-hover:text-[#5DB347] transition-colors">
+                    {crop.name}
+                  </h3>
+                  <p className="text-xs text-gray-400 leading-snug">
+                    {crop.countries.join(", ")}
+                  </p>
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          <div className="text-center mt-12">
             <Link
-              key={crop.slug}
-              href={`/farming/crops/${crop.slug}`}
-              className="group block rounded-xl border border-gray-200 overflow-hidden bg-white shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+              href="/farming/crops"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-white text-sm font-semibold shadow-lg shadow-[#5DB347]/20 hover:-translate-y-0.5 transition-all"
+              style={{ background: 'linear-gradient(135deg, #5DB347, #449933)' }}
             >
-              <div className="relative h-32 overflow-hidden">
-                <img
-                  src={crop.image}
-                  alt={crop.name}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-              </div>
-              <div className="p-3">
-                <h3 className="font-semibold text-gray-900 text-sm mb-1 group-hover:text-green-700 transition-colors">
-                  {crop.name}
-                </h3>
-                <p className="text-xs text-gray-500 leading-snug">
-                  {crop.countries.join(", ")}
-                </p>
-              </div>
+              View All Crops
+              <ArrowRight className="w-4 h-4" />
             </Link>
-          ))}
-        </div>
-
-        <div className="text-center mt-10">
-          <Link
-            href="/farming/crops"
-            className="inline-flex items-center gap-2 text-green-700 font-semibold hover:text-green-800 transition-colors"
-          >
-            View All Crops
-            <ArrowRight className="w-4 h-4" />
-          </Link>
+          </div>
         </div>
       </section>
 
@@ -466,10 +477,11 @@ export default function FarmingPage() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            <span className="text-sm font-semibold uppercase tracking-wider text-[#5DB347]">Full Value Chain</span>
+            <h2 className="text-3xl md:text-4xl font-bold text-[#1B2A4A] mt-2 mb-4">
               How AFU Supports Farmers
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-gray-500 max-w-2xl mx-auto">
               End-to-end support for every stage of the farming value chain —
               from pre-season planning to post-harvest sales.
             </p>
@@ -481,7 +493,7 @@ export default function FarmingPage() {
               return (
                 <div
                   key={service.title}
-                  className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
+                  className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-lg hover:-translate-y-0.5 hover:border-[#5DB347]/20 transition-all duration-300"
                 >
                   <div
                     className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
@@ -489,10 +501,10 @@ export default function FarmingPage() {
                   >
                     <Icon className="w-6 h-6" style={{ color: "#5DB347" }} />
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">
+                  <h3 className="text-lg font-bold text-[#1B2A4A] mb-2">
                     {service.title}
                   </h3>
-                  <p className="text-gray-600 leading-relaxed text-sm">
+                  <p className="text-gray-500 leading-relaxed text-sm">
                     {service.description}
                   </p>
                 </div>
@@ -508,14 +520,14 @@ export default function FarmingPage() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-50 text-green-700 text-sm font-medium mb-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#5DB347]/10 text-[#5DB347] text-sm font-medium mb-4">
               <Leaf className="w-4 h-4" />
               Sustainability
             </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+            <h2 className="text-3xl md:text-4xl font-bold text-[#1B2A4A] mb-6">
               Farming That Builds the Future
             </h2>
-            <p className="text-gray-600 leading-relaxed mb-6">
+            <p className="text-gray-500 leading-relaxed mb-6">
               At AFU, every sector is guided by sustainable practices. Our
               farmers implement conservation agriculture, integrated pest
               management, rotational grazing, and responsible forestry — all
@@ -554,7 +566,7 @@ export default function FarmingPage() {
             </ul>
             <Link
               href="/carbon"
-              className="inline-flex items-center gap-2 text-green-700 font-semibold hover:text-green-800 transition-colors"
+              className="inline-flex items-center gap-2 text-[#5DB347] font-semibold hover:text-[#449933] transition-colors"
             >
               Learn about Carbon Credits
               <ArrowRight className="w-4 h-4" />

@@ -99,11 +99,11 @@ export async function sendSubscriptionCanceled(
     const endStr = endDate ? new Date(endDate).toLocaleDateString() : 'the end of your billing period';
     await sendEmail(
       to,
-      'Your AFU subscription has been canceled',
+      'Your AFU subscription has been cancelled',
       wrap(
-        'Subscription Canceled',
+        'Subscription Cancelled',
         `<p>Hello ${companyName},</p>
-         <p>Your <strong>${planName}</strong> subscription has been canceled and will end on <strong>${endStr}</strong>.</p>
+         <p>Your <strong>${planName}</strong> subscription has been cancelled and will end on <strong>${endStr}</strong>.</p>
          <p>You'll continue to have full access until then. If you change your mind, you can reactivate any time.</p>
          <p><a href="${SITE}/supplier/billing" style="display:inline-block;background:#5DB347;color:white;padding:10px 18px;border-radius:8px;text-decoration:none;font-weight:600">Manage Subscription</a></p>`
       ),

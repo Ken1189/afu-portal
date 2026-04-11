@@ -19,7 +19,7 @@ import {
 /* ─── What We're Building ─── */
 const HIGHLIGHTS = [
   { value: 'Mentorship', label: 'One-on-one farmer guidance', icon: UserCheck },
-  { value: 'Programs', label: 'Advisor-led training initiatives', icon: Award },
+  { value: 'Programmes', label: 'Advisor-led training initiatives', icon: Award },
   { value: '20 Countries', label: 'Pan-African coverage planned', icon: Globe2 },
   { value: 'Apply Now', label: 'Expressions of interest open', icon: BookOpen },
 ];
@@ -100,7 +100,7 @@ export default function AdvisorsPage() {
             {/* What to expect */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
               {[
-                { icon: Target, title: 'Program Matching', desc: 'Advisors matched to programs by expertise' },
+                { icon: Target, title: 'Programme Matching', desc: 'Advisors matched to programmes by expertise' },
                 { icon: Sprout, title: 'Farmer Mentorship', desc: 'Field visits, workshops, and guidance' },
                 { icon: TrendingUp, title: 'Impact Tracking', desc: 'Measurable outcomes across the network' },
               ].map((item) => (
@@ -147,8 +147,8 @@ export default function AdvisorsPage() {
             {[
               {
                 step: '01',
-                title: 'Program Assignment',
-                desc: 'Advisors are matched to AFU programs based on their expertise, ensuring every initiative has seasoned guidance.',
+                title: 'Programme Assignment',
+                desc: 'Advisors are matched to AFU programmes based on their expertise, ensuring every initiative has seasoned guidance.',
                 icon: Target,
               },
               {

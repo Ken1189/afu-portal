@@ -75,7 +75,7 @@ const FALLBACK_METADATA: Record<string, FallbackConfig> = {
   '/partners': {
     title: 'Partners',
     description:
-      'Meet the organizations partnering with the African Farming Union to support farmers across Africa.',
+      'Meet the organisations partnering with the African Farming Union to support farmers across Africa.',
   },
   '/jobs': {
     title: 'Jobs',

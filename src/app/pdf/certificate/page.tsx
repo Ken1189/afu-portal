@@ -81,7 +81,7 @@ export default function CertificatePdfPage() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <p className="text-red-600 font-semibold">Error</p>
-          <p className="text-gray-600 mt-1">{error || 'Enrollment not found'}</p>
+          <p className="text-gray-600 mt-1">{error || 'Enrolment not found'}</p>
         </div>
       </div>
     );

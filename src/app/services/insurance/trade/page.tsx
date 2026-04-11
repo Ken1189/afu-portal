@@ -32,8 +32,8 @@ const coverageTypes = [
   {
     title: "Political Risk Insurance",
     description:
-      "Protection against government actions that prevent contract fulfillment or payment transfer. Essential for trading into higher-risk markets.",
-    covers: ["Import/export bans", "Currency controls", "License cancellation", "War and civil unrest", "Government expropriation"],
+      "Protection against government actions that prevent contract fulfilment or payment transfer. Essential for trading into higher-risk markets.",
+    covers: ["Import/export bans", "Currency controls", "Licence cancellation", "War and civil unrest", "Government expropriation"],
     icon: Landmark,
   },
 ];
@@ -104,7 +104,7 @@ export default function TradeInsurancePage() {
               Coverage Types
             </h2>
             <p className="text-gray-500 max-w-2xl mx-auto">
-              Four specialized trade insurance products covering every risk in
+              Four specialised trade insurance products covering every risk in
               the agricultural export chain.
             </p>
           </div>

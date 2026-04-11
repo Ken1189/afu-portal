@@ -100,13 +100,13 @@ const contracts = [
   },
   {
     name: 'Referral',
-    description: '10% cashback referral program',
+    description: '10% cashback referral programme',
     address: REFERRAL_CONTRACT.address,
     icon: <Gift className="w-4 h-4" />,
   },
   {
     name: 'Commodity Token (ERC-1155)',
-    description: 'Real-world asset tokenization',
+    description: 'Real-world asset tokenisation',
     address: COMMODITY_TOKEN.address,
     icon: <Package className="w-4 h-4" />,
   },
@@ -161,7 +161,7 @@ export default function AdminBlockchainPage() {
             </div>
             <div>
               <h1 className="text-2xl font-bold text-[#1B2A4A]">EDMA Blockchain</h1>
-              <p className="text-gray-500 text-sm mt-0.5">Token, staking, referral & RWA tokenization</p>
+              <p className="text-gray-500 text-sm mt-0.5">Token, staking, referral & RWA tokenisation</p>
             </div>
           </div>
         </div>
@@ -482,7 +482,7 @@ export default function AdminBlockchainPage() {
         <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-xl border border-blue-100">
           <AlertCircle className="w-4 h-4 text-blue-400 flex-shrink-0" />
           <p className="text-xs text-blue-600">
-            RWA tokenization via the ERC-1155 Commodity Token contract will be available once the EDMA L2
+            RWA tokenisation via the ERC-1155 Commodity Token contract will be available once the EDMA L2
             network and contracts are deployed. Tokenized assets will include agricultural commodities,
             minerals, and trade receivables.
           </p>

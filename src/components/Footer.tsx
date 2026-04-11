@@ -28,15 +28,15 @@ interface FooterConfig {
   columns?: FooterColumn[];
   social_links?: FooterSocialLink[];
   mission?: string;
-  countries?: { flag: string; name: string }[];
+  countries?: { flag?: string; name: string }[];
 }
 
 const FALLBACK_MISSION = "Africa's Agriculture Development Bank + Operating Platform. Financing, Inputs, Processing, Offtake, Trade Finance & Training.";
 const FALLBACK_COUNTRIES = [
-  { flag: '\ud83c\uddff\ud83c\uddfc', name: 'Zimbabwe (Export Lane)' },
-  { flag: '\ud83c\udde7\ud83c\uddfc', name: 'Botswana (Bank Base)' },
-  { flag: '\ud83c\uddf9\ud83c\uddff', name: 'Tanzania (Scale Lane)' },
-  { flag: '\ud83c\uddea\ud83c\uddf9', name: 'Ethiopia (East Africa Lane)' },
+  { name: 'Zimbabwe (Export Lane)' },
+  { name: 'Botswana (Bank Base)' },
+  { name: 'Tanzania (Scale Lane)' },
+  { name: 'Ethiopia (East Africa Lane)' },
 ];
 
 /* ─── Hardcoded fallback data ─── */
@@ -299,7 +299,10 @@ export default function Footer() {
             </h4>
             <div className="flex flex-col gap-1.5 text-gray-400 text-sm">
               {countries.map((c, i) => (
-                <span key={i}>{c.flag} {c.name}</span>
+                <span key={i} className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#5DB347] shrink-0" />
+                  {c.name}
+                </span>
               ))}
             </div>
           </div>

@@ -73,7 +73,7 @@ const FALLBACK_CROP_SCANS: CropScan[] = [
     id: 'SCN-002', plotId: 'PLT-002', plotName: 'Cassava Plot', date: '2026-03-10',
     image: 'https://images.unsplash.com/photo-1590682680695-43b964a3ae17?w=400&h=300&fit=crop',
     diagnosis: 'Possible Cassava Mosaic — Early Signs', healthScore: 72, severity: 'moderate', confidence: 78, affectedArea: 12,
-    recommendations: ['Remove and destroy affected plants immediately', 'Apply Imidacloprid for whitefly control', 'Check neighboring plants within 3-meter radius', 'Consider resistant variety for next planting'],
+    recommendations: ['Remove and destroy affected plants immediately', 'Apply Imidacloprid for whitefly control', 'Check neighbouring plants within 3-metre radius', 'Consider resistant variety for next planting'],
     treatments: [{ name: 'Imidacloprid 200SL', price: 28, unit: 'per liter' }, { name: 'Neem Oil Organic', price: 18, unit: 'per liter' }],
   },
   {
@@ -662,7 +662,7 @@ export default function CropDoctorPage() {
         if (cancelled) return;
 
         if (!res.ok) {
-          throw new Error(data.error || 'Failed to analyze');
+          throw new Error(data.error || 'Failed to analyse');
         }
 
         // Parse AI response into our MockDiagnosis structure
@@ -1549,7 +1549,7 @@ export default function CropDoctorPage() {
               {photoPreview && (
                 <img
                   src={photoPreview}
-                  alt="Crop photo being analyzed"
+                  alt="Crop photo being analysed"
                   className="w-full h-full object-cover"
                 />
               )}

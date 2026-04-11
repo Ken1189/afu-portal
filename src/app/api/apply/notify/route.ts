@@ -30,7 +30,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'About text too long (max 5000)' }, { status: 400 });
     }
     if (organization && String(organization).length > 200) {
-      return NextResponse.json({ error: 'Organization too long (max 200)' }, { status: 400 });
+      return NextResponse.json({ error: 'Organisation too long (max 200)' }, { status: 400 });
     }
     if (crops && String(crops).length > 500) {
       return NextResponse.json({ error: 'Crops field too long (max 500)' }, { status: 400 });

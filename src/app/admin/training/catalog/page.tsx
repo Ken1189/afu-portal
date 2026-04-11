@@ -33,7 +33,7 @@ const DEFAULT_CATALOG: Course[] = [
   { name: 'Agricultural Best Practices', description: 'Learn modern farming techniques for improved yields and sustainability.', category: 'Agriculture', duration_hours: 12, price: 0, is_free: true, level: 'Beginner', country: 'All' },
   { name: 'Financial Literacy', description: 'Understand budgeting, savings, credit management and farm accounting.', category: 'Business', duration_hours: 8, price: 0, is_free: true, level: 'Beginner', country: 'All' },
   { name: 'Insurance 101', description: 'Introduction to crop and livestock insurance products for smallholder farmers.', category: 'Insurance', duration_hours: 4, price: 15, is_free: false, level: 'Beginner', country: 'All' },
-  { name: 'Carbon Credits Basics', description: 'How to participate in carbon credit programs and earn from sustainable practices.', category: 'Environment', duration_hours: 6, price: 20, is_free: false, level: 'Intermediate', country: 'All' },
+  { name: 'Carbon Credits Basics', description: 'How to participate in carbon credit programmes and earn from sustainable practices.', category: 'Environment', duration_hours: 6, price: 20, is_free: false, level: 'Intermediate', country: 'All' },
   { name: 'Livestock Management', description: 'Best practices for animal husbandry, feeding, health and breeding.', category: 'Agriculture', duration_hours: 16, price: 0, is_free: true, level: 'Intermediate', country: 'All' },
   { name: 'Digital Tools Training', description: 'Using mobile apps, GPS mapping and digital record-keeping for farm management.', category: 'Technology', duration_hours: 6, price: 0, is_free: true, level: 'Beginner', country: 'All' },
 ];
@@ -106,7 +106,7 @@ export default function TrainingCatalogConfigPage() {
         if (error) throw error;
       }
       setCourses(updated);
-      showToast('success', 'Training catalog saved successfully.');
+      showToast('success', 'Training catalogue saved successfully.');
     } catch {
       showToast('error', 'Failed to save. Please try again.');
     } finally {
@@ -172,7 +172,7 @@ export default function TrainingCatalogConfigPage() {
             <BookOpen className="w-6 h-6" style={{ color: '#5DB347' }} />
           </div>
           <div>
-            <h1 className="text-2xl font-bold" style={{ color: '#1B2A4A' }}>Training Course Catalog</h1>
+            <h1 className="text-2xl font-bold" style={{ color: '#1B2A4A' }}>Training Course Catalogue</h1>
             <p className="text-sm text-gray-500">Manage available training courses for farmers</p>
           </div>
         </div>

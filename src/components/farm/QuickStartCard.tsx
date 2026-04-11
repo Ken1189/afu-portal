@@ -33,7 +33,7 @@ const QUICK_ACTIONS = [
   {
     icon: Bot,
     title: 'Ask the AI Assistant',
-    description: 'Get personalized farming advice 24/7.',
+    description: 'Get personalised farming advice 24/7.',
     href: '/farm/assistant',
     color: 'text-violet-500',
     bg: 'bg-violet-50',

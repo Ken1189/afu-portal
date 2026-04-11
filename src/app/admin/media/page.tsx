@@ -519,7 +519,7 @@ export default function AdminMediaPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-[#1B2A4A]">Media Library</h1>
-          <p className="text-sm text-gray-500 mt-1">Drag files onto folders to organize them</p>
+          <p className="text-sm text-gray-500 mt-1">Drag files onto folders to organise them</p>
         </div>
         <div className="flex gap-2 flex-wrap">
           <input ref={fileInput} type="file" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" onChange={handleUpload} className="hidden" />
@@ -909,7 +909,7 @@ export default function AdminMediaPage() {
       {/* Drag hint when there are files but no drag has happened */}
       {!loading && files.length > 0 && folders.length > 0 && !someSelected && (
         <p className="text-center text-xs text-gray-400 mt-2">
-          Tip: Drag files onto folders to organize them, or select multiple files for bulk actions
+          Tip: Drag files onto folders to organise them, or select multiple files for bulk actions
         </p>
       )}
 

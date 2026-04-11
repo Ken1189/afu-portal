@@ -204,7 +204,7 @@ const communityPrograms = [
   {
     title: 'Young Farmers',
     stat: '280 youth enrolled',
-    detail: 'Incubator programs with mentorship & land access',
+    detail: 'Incubator programmes with mentorship & land access',
     icon: GraduationCap,
     color: 'text-purple-600',
     bg: 'bg-purple-50',
@@ -549,9 +549,9 @@ export default function InvestorImpactPage() {
       <motion.div variants={cardVariants} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
         <div className="flex items-center gap-2 mb-2">
           <Heart className="w-5 h-5 text-pink-500" />
-          <h2 className="text-lg font-bold text-[#1B2A4A]">Community Programs</h2>
+          <h2 className="text-lg font-bold text-[#1B2A4A]">Community Programmes</h2>
         </div>
-        <p className="text-sm text-gray-500 mb-6">10% of profits dedicated to community programs</p>
+        <p className="text-sm text-gray-500 mb-6">10% of profits dedicated to community programmes</p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {communityPrograms.map((item) => {
             const Icon = item.icon;

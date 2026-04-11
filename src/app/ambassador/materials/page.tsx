@@ -43,7 +43,7 @@ const FALLBACK_ASSETS: MaterialAsset[] = [
   { id: '5', name: 'Facebook Post Template', type: 'image', format: 'PNG', size: '320 KB', category: 'Social Media' },
   { id: '6', name: 'WhatsApp Share Card', type: 'image', format: 'JPG', size: '95 KB', category: 'Messaging' },
   { id: '7', name: 'AFU Membership Benefits Guide', type: 'pdf', format: 'PDF', size: '2.1 MB', category: 'Educational' },
-  { id: '8', name: 'Ambassador Program Overview', type: 'pdf', format: 'PDF', size: '890 KB', category: 'Educational' },
+  { id: '8', name: 'Ambassador Programme Overview', type: 'pdf', format: 'PDF', size: '890 KB', category: 'Educational' },
   { id: '9', name: 'Twitter/X Header Image', type: 'image', format: 'PNG', size: '150 KB', category: 'Social Media' },
   { id: '10', name: 'Email Signature Badge', type: 'image', format: 'PNG', size: '45 KB', category: 'Email' },
 ];

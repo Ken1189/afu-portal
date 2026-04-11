@@ -67,7 +67,7 @@ const FALLBACK_INSURANCE_PRODUCTS: InsuranceProduct[] = [
     premiumRange: { min: 15, max: 45 },
     coverageRange: { min: 500, max: 5000 },
     deductible: 10,
-    waitingPeriod: '14 days after enrollment',
+    waitingPeriod: '14 days after enrolment',
     claimProcess: 'Submit photos + agronomist verification within 7 days of incident',
     eligibility: [
       'AFU member in good standing',
@@ -93,7 +93,7 @@ const FALLBACK_INSURANCE_PRODUCTS: InsuranceProduct[] = [
     premiumRange: { min: 35, max: 90 },
     coverageRange: { min: 2000, max: 15000 },
     deductible: 5,
-    waitingPeriod: '7 days after enrollment',
+    waitingPeriod: '7 days after enrolment',
     claimProcess: 'Submit photos + AFU field officer visit within 14 days',
     eligibility: [
       'AFU member for 6+ months',
@@ -119,7 +119,7 @@ const FALLBACK_INSURANCE_PRODUCTS: InsuranceProduct[] = [
     premiumRange: { min: 20, max: 80 },
     coverageRange: { min: 300, max: 10000 },
     deductible: 15,
-    waitingPeriod: '21 days after enrollment',
+    waitingPeriod: '21 days after enrolment',
     claimProcess: 'Vet report + photos within 48 hours of incident',
     eligibility: [
       'AFU member in good standing',
@@ -145,7 +145,7 @@ const FALLBACK_INSURANCE_PRODUCTS: InsuranceProduct[] = [
     premiumRange: { min: 25, max: 120 },
     coverageRange: { min: 500, max: 25000 },
     deductible: 10,
-    waitingPeriod: '7 days after enrollment',
+    waitingPeriod: '7 days after enrolment',
     claimProcess: 'Photos + repair estimate from authorized mechanic',
     eligibility: [
       'AFU member in good standing',
@@ -197,7 +197,7 @@ const FALLBACK_INSURANCE_PRODUCTS: InsuranceProduct[] = [
     premiumRange: { min: 60, max: 200 },
     coverageRange: { min: 5000, max: 50000 },
     deductible: 5,
-    waitingPeriod: '7 days after enrollment',
+    waitingPeriod: '7 days after enrolment',
     claimProcess: 'Priority processing — dedicated officer assigned within 24 hours',
     eligibility: [
       'AFU member for 12+ months',
@@ -265,7 +265,7 @@ export default function ProductsPage() {
             premiumRange: p.premium_range || { min: 10, max: 100 },
             coverageRange: { min: 500, max: 50000 },
             deductible: p.deductible_percent || 10,
-            waitingPeriod: `${p.waiting_period_days || 14} days after enrollment`,
+            waitingPeriod: `${p.waiting_period_days || 14} days after enrolment`,
             claimProcess: 'Submit photos + verification within 14 days',
             eligibility: p.eligibility || ['AFU member in good standing'],
             popular: false,

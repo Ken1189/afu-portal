@@ -223,7 +223,7 @@ export default function AdminProgramsPage() {
         prev.map(p => (p.id === program.id ? { ...p, status: cfg.next! } : p))
       );
     } catch {
-      showToast('Failed to update program status', 'error');
+      showToast('Failed to update programme status', 'error');
     } finally {
       setTogglingId(null);
     }
@@ -236,13 +236,13 @@ export default function AdminProgramsPage() {
       const res = await fetch(`/api/programs/${programId}`, { method: 'DELETE' });
       if (!res.ok) {
         const data = await res.json();
-        showToast(data.error ?? 'Failed to delete program', 'error');
+        showToast(data.error ?? 'Failed to delete programme', 'error');
         return;
       }
       setPrograms(prev => prev.filter(p => p.id !== programId));
-      showToast('Program deleted');
+      showToast('Programme deleted');
     } catch {
-      showToast('Failed to delete program', 'error');
+      showToast('Failed to delete programme', 'error');
     } finally {
       setDeletingId(null);
       setConfirmDeleteId(null);
@@ -280,9 +280,9 @@ export default function AdminProgramsPage() {
   }), [programs]);
 
   const statCards = [
-    { label: 'Total Programs', value: stats.total, icon: <Sprout className="w-5 h-5" />, color: 'text-teal', bg: 'bg-teal/10' },
-    { label: 'Active Programs', value: stats.active, icon: <CheckCircle2 className="w-5 h-5" />, color: 'text-green-600', bg: 'bg-green-50' },
-    { label: 'Total Enrollments', value: stats.totalEnrollments, icon: <Users className="w-5 h-5" />, color: 'text-navy', bg: 'bg-navy/10' },
+    { label: 'Total Programmes', value: stats.total, icon: <Sprout className="w-5 h-5" />, color: 'text-teal', bg: 'bg-teal/10' },
+    { label: 'Active Programmes', value: stats.active, icon: <CheckCircle2 className="w-5 h-5" />, color: 'text-green-600', bg: 'bg-green-50' },
+    { label: 'Total Enrolments', value: stats.totalEnrollments, icon: <Users className="w-5 h-5" />, color: 'text-navy', bg: 'bg-navy/10' },
     { label: 'Countries Covered', value: stats.countries, icon: <Globe className="w-5 h-5" />, color: 'text-amber-600', bg: 'bg-amber-50' },
   ];
 
@@ -291,8 +291,8 @@ export default function AdminProgramsPage() {
       {/* ── Header ────────────────────────────────────────────────────── */}
       <motion.div variants={fadeUp} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-navy">Programs</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Manage agricultural programs across all countries</p>
+          <h1 className="text-2xl font-bold text-navy">Programmes</h1>
+          <p className="text-sm text-gray-500 mt-0.5">Manage agricultural programmes across all countries</p>
         </div>
         <Link
           href="/admin/programs/new"
@@ -391,7 +391,7 @@ export default function AdminProgramsPage() {
           <div className="flex items-center gap-2">
             <BarChart3 className="w-4 h-4 text-teal" />
             <h3 className="font-semibold text-navy text-sm">
-              {loading ? 'Loading...' : `${filtered.length} Program${filtered.length !== 1 ? 's' : ''}`}
+              {loading ? 'Loading...' : `${filtered.length} Programme${filtered.length !== 1 ? 's' : ''}`}
             </h3>
           </div>
         </div>
@@ -414,9 +414,9 @@ export default function AdminProgramsPage() {
               <thead>
                 <tr className="border-b border-gray-50 bg-gray-50/50">
                   <th className="text-left py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Country / Crop</th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Program</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Programme</th>
                   <th className="text-left py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Enrollment</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Enrolment</th>
                   <th className="text-left py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Financing</th>
                   <th className="text-left py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Created</th>
                   <th className="text-right py-3 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Actions</th>
@@ -432,10 +432,10 @@ export default function AdminProgramsPage() {
                         <div className="w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center">
                           <Sprout className="w-7 h-7 text-gray-300" />
                         </div>
-                        <p className="text-gray-500 font-medium">No programs found</p>
+                        <p className="text-gray-500 font-medium">No programmes found</p>
                         <p className="text-gray-400 text-xs">
                           {programs.length === 0
-                            ? 'Create your first program to get started.'
+                            ? 'Create your first programme to get started.'
                             : 'Try adjusting your filters.'}
                         </p>
                         {programs.length === 0 && (
@@ -583,7 +583,7 @@ export default function AdminProgramsPage() {
       {confirmDeleteId && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setConfirmDeleteId(null)}>
           <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 space-y-4" onClick={e => e.stopPropagation()}>
-            <h3 className="text-lg font-bold text-navy">Delete Program</h3>
+            <h3 className="text-lg font-bold text-navy">Delete Programme</h3>
             <p className="text-sm text-gray-600">
               Are you sure you want to delete this program? This will also remove all enrollments and inclusions. This action cannot be undone.
             </p>

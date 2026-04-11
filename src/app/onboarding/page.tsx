@@ -629,15 +629,15 @@ export default function OnboardingPage() {
         >
           <h3 className="font-semibold text-[#1B2A4A] flex items-center gap-2">
             <Users className="w-5 h-5 text-[#8CB89C]" />
-            Organization Details
+            Organisation Details
           </h3>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Organization Name</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Organisation Name</label>
             <input
               type="text"
               value={data.organizationName}
               onChange={(e) => update('organizationName', e.target.value)}
-              placeholder="Your organization"
+              placeholder="Your organisation"
               className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C] focus:border-transparent"
             />
           </div>

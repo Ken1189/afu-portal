@@ -294,7 +294,7 @@ export default function ContactPage() {
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <label className="block text-sm font-medium text-[#1B2A4A] mb-2">Organization</label>
+                        <label className="block text-sm font-medium text-[#1B2A4A] mb-2">Organisation</label>
                         <input
                           type="text"
                           className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5DB347]/50 focus:border-[#5DB347] transition-shadow"

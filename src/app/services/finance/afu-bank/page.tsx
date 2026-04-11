@@ -5,7 +5,7 @@ import LegalDisclaimer from "@/components/ui/LegalDisclaimer";
 export const metadata = {
   title: "AFU Bank - Agricultural Banking Services - AFU",
   description:
-    "AFU Bank provides specialized banking for farmers: savings accounts, fixed deposits, mobile banking with EcoCash and M-Pesa integration, and multi-currency support.",
+    "AFU Bank provides specialised banking for farmers: savings accounts, fixed deposits, mobile banking with EcoCash and M-Pesa integration, and multi-currency support.",
 };
 
 const features = [

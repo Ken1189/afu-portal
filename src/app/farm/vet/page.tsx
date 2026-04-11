@@ -539,7 +539,7 @@ export default function FarmVetPage() {
                 <p className="text-sm font-medium" style={{ color: '#1B2A4A' }}>
                   Feed Calculator
                 </p>
-                <p className="text-xs text-gray-400">Optimize feed for your herd</p>
+                <p className="text-xs text-gray-400">Optimise feed for your herd</p>
               </div>
               <ChevronRight className="ml-auto h-4 w-4 text-gray-300" />
             </div>

@@ -381,7 +381,7 @@ export default function SupplierDetailPage() {
               <p className="text-sm text-gray-500 mt-1">{supplier.contact_name}</p>
               <div className="flex flex-wrap items-center gap-3 mt-2">
                 <span className={`inline-block text-xs px-2.5 py-0.5 rounded-full font-medium ${categoryColors[supplier.category] || 'bg-gray-100 text-gray-700'}`}>
-                  {categoryLabels[supplier.category] || supplier.category || 'Uncategorized'}
+                  {categoryLabels[supplier.category] || supplier.category || 'Uncategorised'}
                 </span>
                 <span className={`inline-flex items-center gap-1 text-xs px-2.5 py-0.5 rounded-full font-medium ${statusColors[supplier.status] || 'bg-gray-100 text-gray-700'}`}>
                   {supplier.status ? supplier.status.charAt(0).toUpperCase() + supplier.status.slice(1) : 'Unknown'}
@@ -832,7 +832,7 @@ export default function SupplierDetailPage() {
                   <div className="bg-cream rounded-lg p-4">
                     <div className="flex items-center gap-2 text-green-600 mb-1">
                       <Package className="w-4 h-4" />
-                      <span className="text-xs text-gray-500">Fulfillment Rate</span>
+                      <span className="text-xs text-gray-500">Fulfilment Rate</span>
                     </div>
                     <p className="text-lg font-bold text-navy">
                       {supplier.total_orders > 0 ? '97.2%' : '0%'}

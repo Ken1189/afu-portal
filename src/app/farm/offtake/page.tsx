@@ -110,7 +110,7 @@ const FALLBACK_OFFTAKERS: OffTaker[] = [
   { id: 'BUY-004', name: 'Woolworths SA', crops: ['Fresh Produce', 'Berries'], minVolume: 5000, priceRange: 'R150-200/kg', currency: 'ZAR', incoterm: 'EXW', description: 'South Africa\'s premium retailer, direct farm-to-shelf', rating: 4.7 },
   { id: 'BUY-005', name: 'Carrefour Africa', crops: ['Cassava', 'Maize'], minVolume: 100000, priceRange: '$0.15-0.25/kg', currency: 'USD', incoterm: 'DDP', description: 'Pan-African retail network, high volume staple crops', rating: 4.3 },
   { id: 'BUY-006', name: 'Metro AG', crops: ['Spices', 'Sesame'], minVolume: 20000, priceRange: '\u20ac2.80-3.50/kg', currency: 'EUR', incoterm: 'CIF', description: 'German wholesale giant, long-term partnership focus', rating: 4.4 },
-  { id: 'BUY-007', name: 'Tesco Direct', crops: ['Berries', 'Avocado'], minVolume: 10000, priceRange: '\u00a312-16/kg', currency: 'GBP', incoterm: 'DDP', description: 'UK supermarket chain, growing African sourcing program', rating: 4.5 },
+  { id: 'BUY-007', name: 'Tesco Direct', crops: ['Berries', 'Avocado'], minVolume: 10000, priceRange: '\u00a312-16/kg', currency: 'GBP', incoterm: 'DDP', description: 'UK supermarket chain, growing African sourcing programme', rating: 4.5 },
   { id: 'BUY-008', name: 'Marks & Spencer', crops: ['Premium Berries'], minVolume: 5000, priceRange: '\u00a313-15/kg', currency: 'GBP', incoterm: 'CIF', description: 'Premium UK retailer, strict quality standards, premium pricing', rating: 4.9 },
 ];
 

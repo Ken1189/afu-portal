@@ -126,10 +126,10 @@ export const PERMISSION_GROUPS: PermissionGroup[] = [
     ],
   },
   {
-    label: 'Programs & Training',
+    label: 'Programmes & Training',
     permissions: [
-      { key: 'view_programs', label: 'View Programs' },
-      { key: 'create_programs', label: 'Create Programs' },
+      { key: 'view_programs', label: 'View Programmes' },
+      { key: 'create_programs', label: 'Create Programmes' },
       { key: 'manage_training', label: 'Manage Training' },
       { key: 'manage_sponsors', label: 'Manage Sponsors' },
       { key: 'manage_jobs', label: 'Manage Jobs' },

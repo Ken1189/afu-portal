@@ -230,12 +230,12 @@ export default function AdminProgramDetailPage() {
           router.push('/admin/programs');
           return;
         }
-        throw new Error('Failed to fetch program');
+        throw new Error('Failed to fetch programme');
       }
       const data = await res.json();
       setProgram(data.program);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load program');
+      setError(err instanceof Error ? err.message : 'Failed to load programme');
     } finally {
       setProgramLoading(false);
     }
@@ -291,7 +291,7 @@ export default function AdminProgramDetailPage() {
 
       await fetchEnrollments();
     } catch {
-      showToast('Failed to update enrollment', 'error');
+      showToast('Failed to update enrolment', 'error');
     } finally {
       setActionLoading(null);
     }
@@ -327,12 +327,12 @@ export default function AdminProgramDetailPage() {
       const res = await fetch(`/api/programs/${programId}`, { method: 'DELETE' });
       if (!res.ok) {
         const data = await res.json();
-        showToast(data.error ?? 'Failed to delete program', 'error');
+        showToast(data.error ?? 'Failed to delete programme', 'error');
         return;
       }
       router.push('/admin/programs');
     } catch {
-      showToast('Failed to delete program', 'error');
+      showToast('Failed to delete programme', 'error');
     } finally {
       setDeletingProgram(false);
       setConfirmDelete(false);
@@ -526,7 +526,7 @@ export default function AdminProgramDetailPage() {
                 <div className="flex items-center justify-between mb-1.5 text-xs text-white/70">
                   <span className="flex items-center gap-1.5">
                     <Users className="w-3.5 h-3.5" />
-                    Enrollment
+                    Enrolment
                   </span>
                   <span className="tabular-nums">
                     {program.current_participants}

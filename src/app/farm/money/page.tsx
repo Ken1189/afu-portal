@@ -79,7 +79,7 @@ const FALLBACK_FARM_TRANSACTIONS: FarmTransaction[] = [
   { id: 'TXN-001', type: 'income', category: 'harvest-sale', amount: 960, currency: 'USD', date: '2026-03-07', description: 'Blueberries 120kg @ $8/kg — FreshPack Exports', plotId: 'PLT-001', plotName: 'Main Blueberry Field', buyer: 'FreshPack Exports', quantity: 120, unit: 'kg', pricePerUnit: 8 },
   { id: 'TXN-002', type: 'income', category: 'contract-payment', amount: 500, currency: 'USD', date: '2026-03-01', description: 'Advance payment — March sesame delivery contract', plotId: 'PLT-003', plotName: 'Sesame Strip', buyer: 'SesaMe Trading' },
   { id: 'TXN-003', type: 'expense', category: 'fertilizer', amount: 45, currency: 'USD', date: '2026-03-12', description: 'Sulfur-based soil acidifier — 25kg bag', plotId: 'PLT-001', plotName: 'Main Blueberry Field' },
-  { id: 'TXN-004', type: 'expense', category: 'labor', amount: 36, currency: 'USD', date: '2026-03-10', description: '3 laborers x 4 hours weeding @ $3/hr', plotId: 'PLT-002', plotName: 'Cassava Plot' },
+  { id: 'TXN-004', type: 'expense', category: 'labor', amount: 36, currency: 'USD', date: '2026-03-10', description: '3 labourers x 4 hours weeding @ $3/hr', plotId: 'PLT-002', plotName: 'Cassava Plot' },
   { id: 'TXN-005', type: 'expense', category: 'pesticides', amount: 18, currency: 'USD', date: '2026-03-11', description: 'Neem oil organic pesticide — 1 liter', plotId: 'PLT-003', plotName: 'Sesame Strip' },
   { id: 'TXN-006', type: 'expense', category: 'seeds', amount: 85, currency: 'USD', date: '2026-03-01', description: 'SC 513 maize seed — 10kg bag', plotId: 'PLT-004', plotName: 'Maize Field' },
   { id: 'TXN-007', type: 'expense', category: 'fertilizer', amount: 90, currency: 'USD', date: '2026-03-05', description: 'NPK 15-15-15 — 2 x 50kg bags', plotId: 'PLT-002', plotName: 'Cassava Plot' },
@@ -87,7 +87,7 @@ const FALLBACK_FARM_TRANSACTIONS: FarmTransaction[] = [
   { id: 'TXN-009', type: 'income', category: 'subsidy', amount: 200, currency: 'USD', date: '2026-02-28', description: 'AFU member input subsidy — Q1 2026' },
   { id: 'TXN-010', type: 'expense', category: 'transport', amount: 25, currency: 'USD', date: '2026-03-07', description: 'Transport blueberries to FreshPack collection point', plotId: 'PLT-001', plotName: 'Main Blueberry Field' },
   { id: 'TXN-011', type: 'income', category: 'harvest-sale', amount: 180, currency: 'USD', date: '2026-02-22', description: 'Cassava chips 300kg @ $0.60/kg — local market', plotId: 'PLT-002', plotName: 'Cassava Plot', buyer: 'Gaborone Market', quantity: 300, unit: 'kg', pricePerUnit: 0.6 },
-  { id: 'TXN-012', type: 'expense', category: 'labor', amount: 48, currency: 'USD', date: '2026-02-20', description: '4 laborers x 4 hours harvesting cassava @ $3/hr', plotId: 'PLT-002', plotName: 'Cassava Plot' },
+  { id: 'TXN-012', type: 'expense', category: 'labor', amount: 48, currency: 'USD', date: '2026-02-20', description: '4 labourers x 4 hours harvesting cassava @ $3/hr', plotId: 'PLT-002', plotName: 'Cassava Plot' },
 ];
 
 const FALLBACK_FARM_PLOTS: FarmPlot[] = [

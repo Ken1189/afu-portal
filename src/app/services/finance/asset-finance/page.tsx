@@ -40,7 +40,7 @@ const assets = [
   { name: "Solar Panels & Energy", desc: "Off-grid solar installations, battery storage, and solar-powered pumping systems.", icon: Sun },
   { name: "Processing Equipment", desc: "Milling machines, drying systems, packaging lines, and food processing machinery.", icon: Factory },
   { name: "Cold Storage", desc: "Walk-in coolers, refrigerated containers, and cold chain transport units.", icon: Snowflake },
-  { name: "Farm Vehicles", desc: "Pickup trucks, delivery vehicles, and specialized agricultural transport.", icon: Truck },
+  { name: "Farm Vehicles", desc: "Pickup trucks, delivery vehicles, and specialised agricultural transport.", icon: Truck },
 ];
 
 const terms = [

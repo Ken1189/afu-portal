@@ -87,7 +87,7 @@ export default function EquipmentCatalogConfigPage() {
         if (error) throw error;
       }
       setItems(updated);
-      showToast('success', 'Equipment catalog saved successfully.');
+      showToast('success', 'Equipment catalogue saved successfully.');
     } catch {
       showToast('error', 'Failed to save. Please try again.');
     } finally {
@@ -155,7 +155,7 @@ export default function EquipmentCatalogConfigPage() {
             <Wrench className="w-6 h-6" style={{ color: '#5DB347' }} />
           </div>
           <div>
-            <h1 className="text-2xl font-bold" style={{ color: '#1B2A4A' }}>Equipment Catalog</h1>
+            <h1 className="text-2xl font-bold" style={{ color: '#1B2A4A' }}>Equipment Catalogue</h1>
             <p className="text-sm text-gray-500">Manage equipment available for rent or purchase</p>
           </div>
         </div>

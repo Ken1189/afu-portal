@@ -349,7 +349,7 @@ export const SERVICE_DEFAULTS: Record<string, ServicePageConfig> = {
       {
         title: 'Cooperative Governance',
         description:
-          'Build strong farmer organizations. We assist with cooperative registration, constitution drafting, governance frameworks, AGM procedures, and internal dispute resolution for farmer groups and associations.',
+          'Build strong farmer organisations. We assist with cooperative registration, constitution drafting, governance frameworks, AGM procedures, and internal dispute resolution for farmer groups and associations.',
         icon: 'CG',
       },
       {

@@ -656,7 +656,7 @@ export default function ProgramsPage() {
     fetch('/api/programs')
       .then((r) => r.json())
       .then((data) => { setPrograms(data.programs || []); })
-      .catch(() => { setError('Could not load programs. Please try again.'); })
+      .catch(() => { setError('Could not load programmes. Please try again.'); })
       .finally(() => { setLoading(false); });
   }, []);
 
@@ -701,8 +701,8 @@ export default function ProgramsPage() {
     <div className="space-y-6">
       {/* Page header */}
       <motion.div variants={fadeInUp} initial="hidden" animate="visible">
-        <h1 className="text-2xl font-bold text-navy">Crop Programs</h1>
-        <p className="text-sm text-gray-500 mt-0.5">Fully supported farming programs — inputs, insurance & guaranteed offtake bundled.</p>
+        <h1 className="text-2xl font-bold text-navy">Crop Programmes</h1>
+        <p className="text-sm text-gray-500 mt-0.5">Fully supported farming programmes — inputs, insurance & guaranteed offtake bundled.</p>
       </motion.div>
 
       {/* Tabs */}
@@ -717,7 +717,7 @@ export default function ProgramsPage() {
                 : 'text-gray-500 hover:text-navy'
             }`}
           >
-            {tab === 'available' ? 'Available Programs' : `My Programs${enrollments.length > 0 ? ` (${enrollments.length})` : ''}`}
+            {tab === 'available' ? 'Available Programmes' : `My Programmes${enrollments.length > 0 ? ` (${enrollments.length})` : ''}`}
           </button>
         ))}
       </motion.div>
@@ -739,9 +739,9 @@ export default function ProgramsPage() {
             <div className="relative z-10 flex flex-col sm:flex-row sm:items-center gap-3">
               <Sprout className="h-10 w-10 text-[#5DB347]" />
               <div>
-                <h2 className="text-lg font-bold text-white">AFU Crop Programs</h2>
+                <h2 className="text-lg font-bold text-white">AFU Crop Programmes</h2>
                 <p className="text-sm text-gray-300 mt-0.5">
-                  Join a fully supported farming program. Inputs, insurance &amp; guaranteed offtake — all bundled for you.
+                  Join a fully supported farming programme. Inputs, insurance &amp; guaranteed offtake — all bundled for you.
                 </p>
               </div>
             </div>
@@ -798,8 +798,8 @@ export default function ProgramsPage() {
               className="text-center py-16 text-gray-400"
             >
               <div className="mb-3"><Wheat className="h-12 w-12 text-[#5DB347] mx-auto" /></div>
-              <p className="text-base font-semibold text-navy">No programs found</p>
-              <p className="text-sm mt-1">Try adjusting your filters or check back soon for new programs.</p>
+              <p className="text-base font-semibold text-navy">No programmes found</p>
+              <p className="text-sm mt-1">Try adjusting your filters or check back soon for new programmes.</p>
             </motion.div>
           ) : (
             <motion.div
@@ -837,8 +837,8 @@ export default function ProgramsPage() {
                 <Leaf className="h-12 w-12 text-[#5DB347]" />
                 <Wheat className="h-12 w-12 text-[#5DB347]" />
               </div>
-              <h3 className="text-lg font-bold text-navy mb-1">You haven&apos;t joined any programs yet</h3>
-              <p className="text-sm text-gray-500 mb-5">Browse available programs and apply to get started with a fully supported growing season.</p>
+              <h3 className="text-lg font-bold text-navy mb-1">You haven&apos;t joined any programmes yet</h3>
+              <p className="text-sm text-gray-500 mb-5">Browse available programmes and apply to get started with a fully supported growing season.</p>
               <button
                 onClick={() => setActiveTab('available')}
                 className="inline-flex items-center gap-2 gradient-navy text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity"

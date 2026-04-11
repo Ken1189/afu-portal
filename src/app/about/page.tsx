@@ -86,7 +86,7 @@ const FALLBACK_HERO = {
   title: 'About AFU',
   subtitle: 'By Farmers, For Farmers',
   body:
-    'The African Farming Union is a vertically integrated agriculture development platform — By Farmers, For Farmers — building toward becoming a specialized agri development platform and full-stack execution engine for African farmers. Our model includes trade finance instruments such as SBLCs, Letters of Credit, and export pre-financing designed to unlock international markets.',
+    'The African Farming Union is a vertically integrated agriculture development platform — By Farmers, For Farmers — building toward becoming a specialised agri development platform and full-stack execution engine for African farmers. Our model includes trade finance instruments such as SBLCs, Letters of Credit, and export pre-financing designed to unlock international markets.',
   image:
     'https://images.unsplash.com/photo-1589923188651-268a9765e432?w=1920&h=700&fit=crop',
 };
@@ -448,7 +448,7 @@ export default async function AboutPage() {
                     className="inline-flex items-center justify-center gap-2 bg-[#5DB347] hover:bg-[#449933] text-white text-sm font-semibold px-6 py-3 rounded-full transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[#5DB347]/25"
                   >
                     <Heart className="w-4 h-4" />
-                    Donate to This Program
+                    Donate to This Programme
                   </Link>
                 </div>
               );

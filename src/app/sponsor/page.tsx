@@ -520,7 +520,7 @@ const FALLBACK_TIERS: SponsorTier[] = [
     name: "Gold",
     label: "Gold",
     monthlyPrice: 500,
-    description: "Full program sponsorship. Inputs + insurance + working capital for the season.",
+    description: "Full programme sponsorship. Inputs + insurance + working capital for the season.",
     features: ["Everything in Silver", "Working Capital", "Offtake Support", "Quarterly Report", "Named Recognition"],
     annualSaving: 1000,
   },
@@ -574,7 +574,7 @@ export default function SponsorPage() {
     { value: '847', label: 'Farmers supported this season' },
     { value: '$47', label: 'Average monthly contribution' },
     { value: '94%', label: 'Sponsored farmers complete their season' },
-    { value: '3.2×', label: 'Average income increase after first program' },
+    { value: '3.2×', label: 'Average income increase after first programme' },
   ];
   const finalCtaTitle = (chrome?.final_cta_title as string) ?? 'Watson & Fine and others are already making an impact';
   const finalCtaBody = (chrome?.final_cta_body as string) ?? 'Corporate sponsors partner with AFU to fund entire cohorts of farmers — 10 to 50 at a time. Get a branded CSR impact report, your logo on the AFU platform, and the knowledge that your company is transforming African agriculture at scale.';
@@ -962,7 +962,7 @@ export default function SponsorPage() {
               { value: impactStats[0]?.value ?? '847', label: impactStats[0]?.label ?? 'Farmers waiting for a sponsor', color: '#6ABF4B' },
               { value: impactStats[1]?.value ?? '$47', label: impactStats[1]?.label ?? 'Average monthly contribution', color: '#C9A84C' },
               { value: impactStats[2]?.value ?? '94%', label: impactStats[2]?.label ?? 'Sponsored farmers complete their season', color: '#6ABF4B' },
-              { value: impactStats[3]?.value ?? '3.2×', label: impactStats[3]?.label ?? 'Average income increase after first program', color: '#C9A84C' },
+              { value: impactStats[3]?.value ?? '3.2×', label: impactStats[3]?.label ?? 'Average income increase after first programme', color: '#C9A84C' },
             ].map((stat) => (
               <div
                 key={stat.label}

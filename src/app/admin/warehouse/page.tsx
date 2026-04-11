@@ -340,7 +340,7 @@ function OverviewTab({ receipts, warehouses, financing, dispatches }: {
           <div>
             <h3 className="font-semibold text-[#1B2A4A]">Warehouse Capacity Dashboard</h3>
             <p className="text-xs text-gray-400 mt-0.5">
-              Network total: {totalStored.toLocaleString()}t of {totalCapacity.toLocaleString()}t ({Math.round((totalStored / totalCapacity) * 100)}% utilized)
+              Network total: {totalStored.toLocaleString()}t of {totalCapacity.toLocaleString()}t ({Math.round((totalStored / totalCapacity) * 100)}% utilised)
             </p>
           </div>
           <div className="text-right">

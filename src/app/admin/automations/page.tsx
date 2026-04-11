@@ -122,7 +122,7 @@ const AUTOMATION_TEMPLATES: AutomationTemplate[] = [
         trigger_type: 'incomplete_profile',
         trigger_config: { hours: '24' },
         action_type: 'send_email',
-        action_config: { subject: 'Complete your AFU profile, {{name}}', body: 'Hi {{name}},\n\nWe noticed your profile is not yet complete. A complete profile helps you:\n- Get matched with relevant opportunities\n- Connect with the right partners\n- Access personalized recommendations\n\nIt only takes a few minutes. Log in now to finish!' },
+        action_config: { subject: 'Complete your AFU profile, {{name}}', body: 'Hi {{name}},\n\nWe noticed your profile is not yet complete. A complete profile helps you:\n- Get matched with relevant opportunities\n- Connect with the right partners\n- Access personalised recommendations\n\nIt only takes a few minutes. Log in now to finish!' },
         delay_minutes: 0,
       },
     ],

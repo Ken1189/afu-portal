@@ -197,7 +197,7 @@ const FALLBACK_DIAGNOSES: Diagnosis[] = [
       'Apply systemic insecticide (Imidacloprid 17.8% SL) as a drench or spray',
       'Introduce beneficial insects (ladybugs or lacewings) for biological control',
       'Spray neem oil solution (5ml/L) on affected areas as an organic alternative',
-      'Monitor neighboring crops for signs of aphid migration',
+      'Monitor neighbouring crops for signs of aphid migration',
     ],
     products: [
       { name: 'Imidacloprid 17.8% SL Insecticide', price: '$28/L', category: 'Insecticide' },
@@ -240,7 +240,7 @@ const FALLBACK_DIAGNOSES: Diagnosis[] = [
     scoreTrackColor: '#fef3c7',
     icon: <Droplets className="w-6 h-6 text-amber-600" />,
     description:
-      'Wilting and leaf curl suggest drought stress. Leaves are showing inward rolling, a classic defense mechanism to reduce water loss. Some lower leaves show premature senescence (browning edges). The soil appears dry and cracked around the plant base.',
+      'Wilting and leaf curl suggest drought stress. Leaves are showing inward rolling, a classic defence mechanism to reduce water loss. Some lower leaves show premature senescence (browning edges). The soil appears dry and cracked around the plant base.',
     affectedArea: '~35% of visible leaf area',
     confidence: 82,
     recommendations: [
@@ -295,7 +295,7 @@ const FALLBACK_RECENT_SCANS: RecentScan[] = [
 // ---------------------------------------------------------------------------
 const analysisSteps = [
   { label: 'Uploading image...', duration: 600 },
-  { label: 'Analyzing leaf patterns...', duration: 900 },
+  { label: 'Analysing leaf patterns...', duration: 900 },
   { label: 'Identifying issues...', duration: 800 },
   { label: 'Generating recommendations...', duration: 700 },
 ];
@@ -491,7 +491,7 @@ export default function CropScannerPage() {
         const data = await res.json();
 
         if (!res.ok) {
-          throw new Error(data.error || 'Failed to analyze');
+          throw new Error(data.error || 'Failed to analyse');
         }
 
         const aiText: string = data.response || '';
@@ -690,7 +690,7 @@ export default function CropScannerPage() {
               </div>
             </div>
             <p className="text-gray-500 text-sm mt-2 max-w-xl">
-              Upload a photo of your crop and our AI will analyze it for diseases, pests,
+              Upload a photo of your crop and our AI will analyse it for diseases, pests,
               and nutrient deficiencies. Get instant diagnosis with treatment recommendations.
             </p>
           </div>
@@ -802,7 +802,7 @@ export default function CropScannerPage() {
                           className="flex-1 bg-teal hover:bg-teal/90 text-white py-3 px-6 rounded-xl font-semibold text-sm transition-colors flex items-center justify-center gap-2"
                         >
                           <Zap className="w-4 h-4" />
-                          Analyze Crop
+                          Analyse Crop
                         </button>
                         <button
                           onClick={removeImage}
@@ -847,7 +847,7 @@ export default function CropScannerPage() {
                     </div>
                   </div>
 
-                  <h3 className="text-lg font-bold text-navy mb-2">Analyzing Your Crop</h3>
+                  <h3 className="text-lg font-bold text-navy mb-2">Analysing Your Crop</h3>
                   <p className="text-sm text-gray-500 mb-8">
                     Our AI is examining the image for signs of disease, pests, and deficiencies.
                   </p>

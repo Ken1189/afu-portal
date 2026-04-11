@@ -237,7 +237,7 @@ const TIERS = [
 ];
 
 const HOW_IT_WORKS_STEPS = [
-  { icon: UserPlus, title: 'Sign Up', description: 'Apply to join the ambassador program and get approved within 48 hours' },
+  { icon: UserPlus, title: 'Sign Up', description: 'Apply to join the ambassador programme and get approved within 48 hours' },
   { icon: Share2, title: 'Share Your Link', description: 'Get a unique referral link and share it with farmers, suppliers, and investors' },
   { icon: Users, title: 'Farmers Join', description: 'When people sign up through your link, they are tracked to your account' },
   { icon: DollarSign, title: 'Earn Commissions', description: 'Get paid for every signup, transaction, and milestone your referrals achieve' },
@@ -591,7 +591,7 @@ export default function AmbassadorsPage() {
               Commission Structure
             </h2>
             <p className="text-gray-500 max-w-2xl mx-auto">
-              Multiple revenue streams to maximize your earnings
+              Multiple revenue streams to maximise your earnings
             </p>
           </div>
 

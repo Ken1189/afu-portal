@@ -91,7 +91,7 @@ const DUMMY_FARMERS: FarmProfile[] = [
     id: 'dummy-4',
     slug: 'sipho-dlamini',
     display_name: 'Sipho Dlamini',
-    story: 'I run a diversified livestock operation in the Central District of Botswana. I breed Brahman cattle and Boer goats for the local and export market. AFU\'s livestock health program helped me eliminate foot-and-mouth disease from my herd.',
+    story: 'I run a diversified livestock operation in the Central District of Botswana. I breed Brahman cattle and Boer goats for the local and export market. AFU\'s livestock health programme helped me eliminate foot-and-mouth disease from my herd.',
     hero_photo_url: 'https://images.unsplash.com/photo-1500595046743-cd271d694d30?w=1200&h=600&fit=crop',
     country: 'Botswana',
     region: 'Central District',

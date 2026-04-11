@@ -260,7 +260,7 @@ export default function AmbassadorDashboard() {
         <h1 className="text-2xl font-bold text-[#1B2A4A]">
           Welcome back, {profile?.full_name?.split(' ')[0] || 'Ambassador'}
         </h1>
-        <p className="text-gray-500 text-sm mt-1">Track your referrals, commissions, and program progress.</p>
+        <p className="text-gray-500 text-sm mt-1">Track your referrals, commissions, and programme progress.</p>
       </div>
 
       {/* KPI Cards */}
@@ -408,7 +408,7 @@ export default function AmbassadorDashboard() {
           <Zap className="w-5 h-5 text-[#5DB347]" />
           <h2 className="text-lg font-semibold">Your Referral Link</h2>
         </div>
-        <p className="text-sm text-gray-300 mb-4">Share this link with farmers and organizations to earn commissions on their activity.</p>
+        <p className="text-sm text-gray-300 mb-4">Share this link with farmers and organisations to earn commissions on their activity.</p>
         <div className="flex items-center gap-3">
           <div className="flex-1 bg-white/10 rounded-xl px-4 py-3 text-sm font-mono truncate">
             {referralLink}

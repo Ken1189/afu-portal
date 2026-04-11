@@ -1361,10 +1361,10 @@ export default function EquipmentHirePage() {
     if (user) {
       if (savedIds.has(id)) {
         await supabase.from('equipment_favorites').delete().eq('user_id', user.id).eq('equipment_id', id);
-        setToastMsg('Removed from favorites');
+        setToastMsg('Removed from favourites');
       } else {
         await supabase.from('equipment_favorites').insert({ user_id: user.id, equipment_id: id });
-        setToastMsg('Added to favorites');
+        setToastMsg('Added to favourites');
       }
     }
   };

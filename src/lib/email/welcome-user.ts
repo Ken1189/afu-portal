@@ -237,10 +237,10 @@ export function getUserAccess(
 
   if (capabilities.includes('sponsor')) {
     add({
-      portal: 'Sponsor a Program',
+      portal: 'Sponsor a Programme',
       url: `${BASE_URL}/supplier/sponsorships`,
       features: [
-        'Browse Programs',
+        'Browse Programmes',
         'Sponsor Tiers',
         'Active Sponsorships',
         'Impact Tracking',

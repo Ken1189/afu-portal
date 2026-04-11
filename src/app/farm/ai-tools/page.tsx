@@ -144,7 +144,7 @@ function AIResponseDisplay({
     return (
       <div className="text-center py-8">
         <Loader2 className={`w-10 h-10 text-${accentColor}-600 mx-auto mb-3 animate-spin`} />
-        <p className="text-sm font-medium text-[#1B2A4A]">Analyzing with Amara AI...</p>
+        <p className="text-sm font-medium text-[#1B2A4A]">Analysing with Amara AI...</p>
         <p className="text-xs text-gray-400 mt-1">This may take a few seconds</p>
       </div>
     );
@@ -232,7 +232,7 @@ const aiTools: AITool[] = [
   },
   {
     id: 'soil-analyzer',
-    name: 'Soil Analyzer',
+    name: 'Soil Analyser',
     description: 'Smart fertilizer and soil amendment recommendations',
     icon: Layers,
     color: 'text-amber-700',
@@ -393,7 +393,7 @@ ${symptoms ? `Farmer's description of symptoms: ${symptoms}` : 'The farmer has u
         className="w-full py-2.5 bg-green-600 text-white rounded-xl text-sm font-medium hover:bg-green-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <Sparkles className="w-4 h-4" />
-        Analyze with AI
+        Analyse with AI
       </button>
     </div>
   );
@@ -625,7 +625,7 @@ Provide practical advice suitable for smallholder farmers in Africa.`;
         loading={loading}
         error={error}
         onReset={() => { setResponse(null); setError(null); }}
-        resetLabel="Analyze new sample"
+        resetLabel="Analyse new sample"
         accentColor="orange"
       />
     );
@@ -654,7 +654,7 @@ Provide practical advice suitable for smallholder farmers in Africa.`;
       </div>
       <button onClick={handleAnalyze} className="w-full py-2.5 bg-amber-700 text-white rounded-xl text-sm font-medium hover:bg-amber-800 transition-colors flex items-center justify-center gap-2">
         <Sparkles className="w-4 h-4" />
-        Analyze Soil with AI
+        Analyse Soil with AI
       </button>
     </div>
   );

@@ -406,7 +406,7 @@ export default function ApplyPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-[#1B2A4A] mb-2">Your Farm or Organization Name</label>
+                    <label className="block text-sm font-medium text-[#1B2A4A] mb-2">Your Farm or Organisation Name</label>
                     <input type="text" className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5DB347]/50 focus:border-[#5DB347] transition-shadow" value={formData.organization} onChange={(e) => setFormData({ ...formData, organization: e.target.value })} />
                   </div>
                 </div>

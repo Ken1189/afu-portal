@@ -73,7 +73,7 @@ const DUMMY_FARMERS: FarmerProfile[] = [
         id: 'u1a',
         title: 'Planting season underway',
         content:
-          'With the first rains in November I planted 3 hectares of hybrid maize. Germination is excellent — 94% stand. The certified seed from AFU Inputs Program is visibly better than what I was using before. Thank you to my sponsors!',
+          'With the first rains in November I planted 3 hectares of hybrid maize. Germination is excellent — 94% stand. The certified seed from AFU Inputs Programme is visibly better than what I was using before. Thank you to my sponsors!',
         photo_urls: ['https://images.unsplash.com/photo-1535303311164-664fc9ec6532?w=800&h=500&fit=crop'],
         program_stage: 'Planting',
         created_at: '2025-11-20T09:00:00Z',
@@ -118,7 +118,7 @@ const DUMMY_FARMERS: FarmerProfile[] = [
         id: 'u2a',
         title: 'Avocado export shipment dispatched',
         content:
-          '4.2 tonnes of Grade A Hass avocados loaded at Mombasa port for the Netherlands. First international export through AFU Offtake Program! Payment received within 14 days — $3,150 net to the farm.',
+          '4.2 tonnes of Grade A Hass avocados loaded at Mombasa port for the Netherlands. First international export through AFU Offtake Programme! Payment received within 14 days — $3,150 net to the farm.',
         photo_urls: ['https://images.unsplash.com/photo-1606312619070-d48b4c652a52?w=800&h=500&fit=crop'],
         program_stage: 'Offtake',
         created_at: '2025-12-03T14:30:00Z',
@@ -153,7 +153,7 @@ const DUMMY_FARMERS: FarmerProfile[] = [
     slug: 'sipho-dlamini',
     display_name: 'Sipho Dlamini',
     story:
-      'I run a diversified livestock operation in the Central District of Botswana. I breed Brahman cattle and Boer goats for the local and export market. AFU\'s livestock health program helped me eliminate foot-and-mouth disease from my herd.\n\nI am working towards Botswana Meat Commission Grade A certification, which will open the European export market.',
+      'I run a diversified livestock operation in the Central District of Botswana. I breed Brahman cattle and Boer goats for the local and export market. AFU\'s livestock health programme helped me eliminate foot-and-mouth disease from my herd.\n\nI am working towards Botswana Meat Commission Grade A certification, which will open the European export market.',
     farm_description:
       'A 120-hectare cattle post with borehole water supply and 6 paddocks under rotational grazing. Herd size: 84 cattle and 230 goats. A solar-powered pump supplies water to all paddocks.',
     photo_urls: [

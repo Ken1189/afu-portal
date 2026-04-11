@@ -745,7 +745,7 @@ export default function CarbonCreditsPage() {
                   className="w-full py-3 rounded-xl text-white font-medium text-sm transition hover:opacity-90 disabled:opacity-50"
                   style={{ background: 'linear-gradient(135deg, #5DB347, #449933)' }}
                 >
-                  {enrolling ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Confirm Enrollment'}
+                  {enrolling ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Confirm Enrolment'}
                 </button>
               </div>
             </motion.div>

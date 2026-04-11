@@ -223,12 +223,12 @@ export default function AdminNewProgramPage() {
 
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.error ?? 'Failed to create program');
+        throw new Error(data.error ?? 'Failed to create programme');
       }
 
       router.push('/admin/programs');
     } catch (err) {
-      showToast(err instanceof Error ? err.message : 'Failed to save program', 'error');
+      showToast(err instanceof Error ? err.message : 'Failed to save programme', 'error');
     } finally {
       setSaving(false);
     }
@@ -251,7 +251,7 @@ export default function AdminNewProgramPage() {
         </Link>
         <div>
           <h1 className="text-2xl font-bold text-navy">Create Program</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Set up a new agricultural program</p>
+          <p className="text-sm text-gray-500 mt-0.5">Set up a new agricultural programme</p>
         </div>
       </motion.div>
 
@@ -339,7 +339,7 @@ export default function AdminNewProgramPage() {
                 value={description}
                 onChange={e => setDescription(e.target.value)}
                 rows={4}
-                placeholder="Describe the program goals, what members can expect, and key details..."
+                placeholder="Describe the programme goals, what members can expect, and key details..."
                 className={`${inputClass} resize-none`}
               />
             </div>
