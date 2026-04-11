@@ -89,7 +89,7 @@ export default function CropsPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             {[
               { value: `${CROPS.length}+`, label: 'Crops Supported' },
-              { value: '9', label: 'Countries' },
+              { value: '20', label: 'Countries' },
               { value: '5', label: 'Crop Categories' },
               { value: '$50B+', label: 'Annual African Market Value' },
             ].map(({ value, label }) => (

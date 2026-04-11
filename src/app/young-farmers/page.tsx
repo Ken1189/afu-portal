@@ -52,7 +52,7 @@ const FALLBACK_PROGRAMS: { iconName: string; title: string; description: string;
 const FALLBACK_STATS = [
   { value: "Growing", label: "Young farmers community" },
   { value: "Growing", label: "Partner schools" },
-  { value: "9", label: "Countries active" },
+  { value: "20", label: "Countries active" },
   { value: "Launching", label: "Seed funding program" },
 ];
 

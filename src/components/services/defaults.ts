@@ -283,7 +283,7 @@ export const SERVICE_DEFAULTS: Record<string, ServicePageConfig> = {
       {
         title: 'Forex Management',
         description:
-          'Hedge currency risk with forward contracts and natural hedging strategies. Our treasury desk manages USD, EUR, GBP, and local currency exposures across all 9 operating countries.',
+          'Hedge currency risk with forward contracts and natural hedging strategies. Our treasury desk manages USD, EUR, GBP, and local currency exposures across all 20 operating countries.',
         icon: 'FX',
       },
       {

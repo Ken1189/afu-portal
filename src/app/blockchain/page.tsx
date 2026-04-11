@@ -16,7 +16,7 @@ const whyCards: { icon: LucideIcon; title: string; desc: string }[] = [
   {
     icon: Zap,
     title: "Efficiency",
-    desc: "Cross-border payments in seconds, not days. Stablecoin settlement eliminates FX friction across 9 African countries.",
+    desc: "Cross-border payments in seconds, not days. Stablecoin settlement eliminates FX friction across 20 African countries.",
   },
   {
     icon: ShieldCheck,

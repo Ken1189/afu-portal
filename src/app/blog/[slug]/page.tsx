@@ -206,7 +206,7 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
         {/* CTA */}
         <div className="mt-12 bg-gradient-to-r from-[#1B2A4A] to-[#2A3F6A] rounded-2xl p-8 text-center">
           <h3 className="text-xl font-bold text-white mb-2">Join the African Farming Union</h3>
-          <p className="text-white/60 text-sm mb-6">Access financing, insurance, marketplace, and training across 9 African countries.</p>
+          <p className="text-white/60 text-sm mb-6">Access financing, insurance, marketplace, and training across 20 African countries.</p>
           <Link href="/apply?tier=free" className="inline-flex px-6 py-3 bg-[#5DB347] hover:bg-[#449933] text-white font-semibold rounded-xl transition-colors">
             Get Started Free
           </Link>

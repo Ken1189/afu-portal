@@ -181,7 +181,7 @@ const stats = [
   { value: "8", label: "Species Supported", icon: BarChart3 },
   { value: "50K+", label: "Livestock Insured", icon: Shield },
   { value: "200+", label: "Veterinary Partners", icon: Stethoscope },
-  { value: "9", label: "Countries Active", icon: MapPin },
+  { value: "20", label: "Countries Active", icon: MapPin },
 ];
 
 export default function LivestockFarmingPage() {

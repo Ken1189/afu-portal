@@ -70,7 +70,7 @@ export async function getChatResponse(
   // --- How AFU works ---
   if (/how.*work|what.*do|what.*afu|about.*afu|tell.*more/.test(lowerMessage)) {
     return {
-      text: "AFU is building Africa's integrated agriculture platform. We're developing services to connect farmers with what they need:\n\n\u2022 **Financing** \u2014 Working capital and input finance\n\u2022 **Inputs & Equipment** \u2014 Seeds, fertilizer, machinery\n\u2022 **Insurance** \u2014 Crop, livestock, and equipment cover (in development)\n\u2022 **Market Access** \u2014 Connecting farmers to buyers\n\u2022 **Training** \u2014 Capacity building and AI advisory\n\u2022 **Veterinary & Legal** \u2014 Professional support services\n\u2022 **Trade Finance** \u2014 SBLCs and Letters of Credit (operating model)\n\nWe operate across 9 African countries. Visit /services to learn more.",
+      text: "AFU is building Africa's integrated agriculture platform. We're developing services to connect farmers with what they need:\n\n\u2022 **Financing** \u2014 Working capital and input finance\n\u2022 **Inputs & Equipment** \u2014 Seeds, fertilizer, machinery\n\u2022 **Insurance** \u2014 Crop, livestock, and equipment cover (in development)\n\u2022 **Market Access** \u2014 Connecting farmers to buyers\n\u2022 **Training** \u2014 Capacity building and AI advisory\n\u2022 **Veterinary & Legal** \u2014 Professional support services\n\u2022 **Trade Finance** \u2014 SBLCs and Letters of Credit (operating model)\n\nWe operate across 20 African countries. Visit /services to learn more.",
       suggestions: ['Membership options', 'Our services', 'Which countries?', 'Apply now'],
     };
   }
@@ -157,7 +157,7 @@ export async function getChatResponse(
 
   // --- Default ---
   return {
-    text: "I can help you learn about AFU. Here are some topics:\n\n\u2022 How AFU works\n\u2022 Membership tiers and pricing\n\u2022 Our services (financing, insurance, training, market access)\n\u2022 Trade finance model\n\u2022 Our 9 operating countries across Africa\n\u2022 Sponsoring a farmer\n\u2022 Jobs marketplace\n\nWhat would you like to know?",
+    text: "I can help you learn about AFU. Here are some topics:\n\n\u2022 How AFU works\n\u2022 Membership tiers and pricing\n\u2022 Our services (financing, insurance, training, market access)\n\u2022 Trade finance model\n\u2022 Our 20 operating countries across Africa\n\u2022 Sponsoring a farmer\n\u2022 Jobs marketplace\n\nWhat would you like to know?",
     suggestions: ['How does AFU work?', 'Membership options', 'Our services', 'Our countries', 'Contact us'],
   };
 }

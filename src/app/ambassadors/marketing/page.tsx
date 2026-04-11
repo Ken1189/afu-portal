@@ -164,7 +164,7 @@ I'm an AFU Ambassador, and I can connect you directly with the team. Whether you
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
               {[
                 { value: 'our growing community of', label: 'Farmers Served' },
-                { value: '9', label: 'Countries' },
+                { value: '20', label: 'Countries' },
                 { value: '$50B', label: 'Market Size' },
                 { value: '1M+', label: 'Hectares Managed' },
               ].map((stat) => (

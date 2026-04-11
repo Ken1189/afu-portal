@@ -27,7 +27,7 @@ const countries = [
 ];
 
 const benefits: { icon: LucideIcon; title: string; desc: string }[] = [
-  { icon: TrendingUp, title: "Market Price Alerts", desc: "Weekly commodity prices across 9 African markets — know when to sell." },
+  { icon: TrendingUp, title: "Market Price Alerts", desc: "Weekly commodity prices across 20 African markets — know when to sell." },
   { icon: Sprout, title: "Seasonal Farming Tips", desc: "Expert advice on planting calendars, soil management, and pest control." },
   { icon: Megaphone, title: "New Program Announcements", desc: "Be the first to know about new financing programs, training, and partnerships." },
   { icon: Trophy, title: "Success Stories", desc: "Real stories from AFU farmers who are growing their businesses." },

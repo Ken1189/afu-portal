@@ -148,7 +148,7 @@ export default function TradeFinancePage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             {[
               { value: "15+", label: "African Currencies Supported" },
-              { value: "9", label: "Countries Covered" },
+              { value: "20", label: "Countries Covered" },
               { value: "UCP 600", label: "International Standards" },
               { value: "5-10 Days", label: "Instrument Issuance" },
             ].map((stat, i) => (

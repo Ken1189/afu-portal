@@ -20,7 +20,7 @@ import {
 const HIGHLIGHTS = [
   { value: 'Mentorship', label: 'One-on-one farmer guidance', icon: UserCheck },
   { value: 'Programs', label: 'Advisor-led training initiatives', icon: Award },
-  { value: '9 Countries', label: 'Pan-African coverage planned', icon: Globe2 },
+  { value: '20 Countries', label: 'Pan-African coverage planned', icon: Globe2 },
   { value: 'Apply Now', label: 'Expressions of interest open', icon: BookOpen },
 ];
 

@@ -27,13 +27,13 @@ const FEATURES: Record<string, { icon: typeof Shield; title: string; description
     icon: ShoppingCart,
     title: 'Agricultural Marketplace',
     description: 'Buy seeds, fertilizer, equipment, and more from verified suppliers with member discounts.',
-    benefits: ['Up to 15% member discount', 'Verified suppliers only', 'Delivery across 9 countries', 'Input finance available'],
+    benefits: ['Up to 15% member discount', 'Verified suppliers only', 'Delivery across 20 countries', 'Input finance available'],
   },
   default: {
     icon: Sprout,
     title: 'AFU Platform Access',
     description: 'Join the African Farming Union to access financing, insurance, marketplace, training, and trading services.',
-    benefits: ['Free tier available', 'No commitment required', 'Access from any device', 'Support across 9 countries'],
+    benefits: ['Free tier available', 'No commitment required', 'Access from any device', 'Support across 20 countries'],
   },
 };
 

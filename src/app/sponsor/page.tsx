@@ -661,7 +661,7 @@ export default function SponsorPage() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-0 divide-x divide-white/10 border border-white/10 rounded-2xl overflow-hidden bg-white/5">
               {[
                 { value: 'Growing', label: 'Farmers' },
-                { value: '9', label: 'Countries' },
+                { value: '20', label: 'Countries' },
                 { value: '3', label: 'Sponsorship Tiers' },
                 { value: 'Yes', label: 'Monthly Impact Reports' },
               ].map((stat) => (

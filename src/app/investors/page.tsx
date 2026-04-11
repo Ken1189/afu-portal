@@ -189,7 +189,7 @@ const FALLBACK_INVESTORS: InvestorsContent = {
         desc: 'AFU controls the full value chain — financing, inputs, processing, and offtake — creating compounding returns at every stage. No one else does this.',
       },
       {
-        title: '9 Countries, One Platform',
+        title: '20 Countries, One Platform',
         desc: 'Multi-country diversification de-risks exposure to any single market. Same playbook, different geographies, shared infrastructure.',
       },
       {

@@ -314,7 +314,7 @@ const FALLBACK_PROGRAMS = [
     name: 'Maize & Soya Staples Program',
     countries: 'Multi-country',
     crop: 'Maize & Soya',
-    desc: 'Food security crops cultivated across all 9 AFU countries. Building reliable staple supply chains from smallholder to market.',
+    desc: 'Food security crops cultivated across all 20 AFU countries. Building reliable staple supply chains from smallholder to market.',
     icon: Leaf,
   },
   {
@@ -720,7 +720,7 @@ export default function Home() {
       HERO_DEFAULTS.hero_bg_image,
     hero_badge_text:
       (typeof content.hero_badge_text === 'string' && content.hero_badge_text) ||
-      'Active across 9 African countries',
+      'Active across 20 African countries',
   };
 
   return (
@@ -788,7 +788,7 @@ export default function Home() {
             <div className="mt-12 flex flex-wrap items-center gap-4 text-sm">
               <div className="flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/10 px-4 py-2 rounded-full text-white/70">
                 <Globe2 className="w-4 h-4 text-[#5DB347]" />
-                <span>9 Countries Active</span>
+                <span>20 Countries Active</span>
               </div>
               <div className="flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/10 px-4 py-2 rounded-full text-white/70">
                 <Users className="w-4 h-4 text-[#5DB347]" />

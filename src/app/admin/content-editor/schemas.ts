@@ -1341,7 +1341,7 @@ export const DEFAULT_CONTENT: Record<string, Record<string, unknown>> = {
     hero_subtitle: 'By farmers, for farmers. Run by Africans, for Africans. We bring the financing, inputs, processing, and guaranteed buyers — you bring the land and the passion. Together, we turn your harvest into real, sustainable income.',
     hero_cta_text: 'Join Our Farming Family',
     hero_cta_link: '/apply',
-    hero_badge_text: 'Active across 9 African countries',
+    hero_badge_text: 'Active across 20 African countries',
     stats_eyebrow: 'The Africa Agriculture Paradox',
     stats_title: 'The Opportunity is Enormous',
     stats_subtitle: "Africa has the land, labor, and demand. What's missing is the integrated infrastructure and finance to unlock it.",

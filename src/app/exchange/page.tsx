@@ -239,7 +239,7 @@ export default function ExchangePage() {
               { label: 'Total Listings', value: '1,247', icon: ShoppingBag },
               { label: 'Active Trades', value: '386', icon: TrendingUp },
               { label: 'Credits Circulating', value: '2.4M', icon: Coins },
-              { label: 'Countries', value: '9', icon: Globe },
+              { label: 'Countries', value: '20', icon: Globe },
             ].map((stat) => {
               const Icon = stat.icon;
               return (
