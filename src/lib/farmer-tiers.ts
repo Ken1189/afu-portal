@@ -51,49 +51,50 @@ export type FarmerTier = keyof typeof FARMER_TIERS;
 export const TIER_ORDER: FarmerTier[] = ['seedling', 'sprout', 'growth', 'harvest', 'pioneer'];
 
 // All sidebar items with their tier requirements
+// NOTE: Keep sidebar simple — only show core working features.
+// Everything else goes under "Coming Soon" (/farm/coming-soon)
 export const FARM_SIDEBAR_ITEMS = [
-  // Seedling tier (always visible)
+  // Core — always visible, these features work today
   { href: '/farm', label: 'My Farm', icon: 'Home', tier: 'seedling' as FarmerTier },
   { href: '/farm/weather', label: 'Weather', icon: 'CloudSun', tier: 'seedling' as FarmerTier },
   { href: '/farm/market-prices', label: 'Market Prices', icon: 'BarChart3', tier: 'seedling' as FarmerTier },
   { href: '/farm/training', label: 'Training Hub', icon: 'GraduationCap', tier: 'seedling' as FarmerTier },
 
-  // Sprout tier
-  { href: '/farm/agriculture', label: 'Agriculture', icon: 'Wheat', tier: 'sprout' as FarmerTier, section: 'Farming Sectors', group: 'Farming Sectors' },
-  { href: '/farm/forestry', label: 'Forestry', icon: 'TreePine', tier: 'sprout' as FarmerTier, section: 'Farming Sectors', group: 'Farming Sectors' },
-  { href: '/farm/game-farming', label: 'Game Farming', icon: 'Rabbit', tier: 'sprout' as FarmerTier, section: 'Farming Sectors', group: 'Farming Sectors' },
+  // Farm Management — working features
   { href: '/farm/farms', label: 'My Farms', icon: 'Tractor', tier: 'sprout' as FarmerTier, group: 'Farm Management' },
-  { href: '/farm/journal', label: 'Farm Journal', icon: 'BookOpen', tier: 'sprout' as FarmerTier, group: 'Farm Management' },
   { href: '/farm/crops', label: 'My Crops', icon: 'Sprout', tier: 'sprout' as FarmerTier, group: 'Farm Management' },
-  { href: '/farm/cooperatives', label: 'Cooperatives', icon: 'UsersRound', tier: 'sprout' as FarmerTier, group: 'Farm Management' },
-  { href: '/farm/cooperatives/dashboard', label: 'My Cooperative', icon: 'UsersRound', tier: 'sprout' as FarmerTier, group: 'Farm Management' },
-  { href: '/farm/orders', label: 'My Orders', icon: 'ShoppingBag', tier: 'sprout' as FarmerTier, group: 'Farm Management' },
-  { href: '/farm/reviews', label: 'My Reviews', icon: 'Star', tier: 'sprout' as FarmerTier, group: 'Farm Management' },
+  { href: '/farm/journal', label: 'Farm Journal', icon: 'BookOpen', tier: 'sprout' as FarmerTier, group: 'Farm Management' },
+  { href: '/farm/doctor', label: 'Crop Doctor', icon: 'Camera', tier: 'sprout' as FarmerTier, group: 'Farm Management' },
 
-  // Growth tier
+  // Finance — working features
   { href: '/farm/financing', label: 'Financing', icon: 'Wallet', tier: 'growth' as FarmerTier, group: 'Finance' },
-  { href: '/farm/insurance', label: 'Insurance', icon: 'Shield', tier: 'growth' as FarmerTier, group: 'Finance' },
-  { href: '/farm/insurance/parametric', label: 'Parametric', icon: 'Zap', tier: 'growth' as FarmerTier, group: 'Finance' },
-  { href: '/farm/payments', label: 'Payments', icon: 'CreditCard', tier: 'growth' as FarmerTier, group: 'Finance' },
-  { href: '/farm/trade-finance', label: 'Trade Finance', icon: 'Ship', tier: 'growth' as FarmerTier, group: 'Finance' },
-  { href: '/farm/legal', label: 'Legal Help', icon: 'Scale', tier: 'growth' as FarmerTier, group: 'Support' },
-  { href: '/farm/vet', label: 'Vet Services', icon: 'Stethoscope', tier: 'growth' as FarmerTier, group: 'Support' },
-  { href: '/farm/warehouse', label: 'Warehouse', icon: 'Warehouse', tier: 'growth' as FarmerTier, group: 'Support' },
+  { href: '/farm/money', label: 'Money', icon: 'CreditCard', tier: 'growth' as FarmerTier, group: 'Finance' },
 
-  // Harvest tier
-  { href: '/farm/ai-tools', label: 'AI Tools', icon: 'Brain', tier: 'harvest' as FarmerTier, group: 'Advanced' },
-  { href: '/farm/doctor', label: 'Crop Doctor', icon: 'Camera', tier: 'harvest' as FarmerTier, group: 'Advanced' },
-  { href: '/farm/sustainability', label: 'Sustainability', icon: 'Leaf', tier: 'harvest' as FarmerTier, group: 'Advanced' },
-  { href: '/farm/sustainability/credits', label: 'Carbon Credits', icon: 'Leaf', tier: 'harvest' as FarmerTier, group: 'Advanced' },
-  { href: '/farm/exports', label: 'Exports', icon: 'Ship', tier: 'harvest' as FarmerTier, group: 'Advanced' },
+  // Coming Soon — single link to the full roadmap
+  { href: '/farm/coming-soon', label: 'Coming Soon', icon: 'Zap', tier: 'seedling' as FarmerTier, group: 'More' },
+];
 
-  // Pioneer tier
-  { href: '/farm/offtake', label: 'Off-takers & Contracts', icon: 'Handshake', tier: 'pioneer' as FarmerTier, group: 'Trading' },
-  { href: '/farm/trade', label: 'Trading', icon: 'ArrowLeftRight', tier: 'pioneer' as FarmerTier, group: 'Trading' },
-  { href: '/farm/marketplace', label: 'Marketplace', icon: 'ShoppingBag', tier: 'pioneer' as FarmerTier, group: 'Trading' },
-  { href: '/farm/exchange', label: 'Exchange', icon: 'Coins', tier: 'pioneer' as FarmerTier, group: 'Trading' },
-  { href: '/farm/logistics', label: 'Logistics', icon: 'Truck', tier: 'pioneer' as FarmerTier, group: 'Trading' },
-  { href: '/farm/tokenize', label: 'Tokenize', icon: 'Coins', tier: 'pioneer' as FarmerTier, group: 'Trading' },
+// Features listed on the Coming Soon page (not in sidebar)
+export const COMING_SOON_FEATURES = [
+  { label: 'Agriculture', icon: 'Wheat', description: 'Detailed crop management and precision agriculture tools', href: '/farm/agriculture' },
+  { label: 'Forestry', icon: 'TreePine', description: 'Timber tracking, agroforestry management, and carbon measurement', href: '/farm/forestry' },
+  { label: 'Game Farming', icon: 'Rabbit', description: 'Wildlife management, breeding records, and conservation tracking', href: '/farm/game-farming' },
+  { label: 'Cooperatives', icon: 'UsersRound', description: 'Join and manage cooperative memberships and group orders', href: '/farm/cooperatives' },
+  { label: 'Orders', icon: 'ShoppingBag', description: 'Track your input orders and delivery status', href: '/farm/orders' },
+  { label: 'Insurance', icon: 'Shield', description: 'Crop, livestock, and farm insurance with parametric options', href: '/farm/insurance' },
+  { label: 'Payments', icon: 'CreditCard', description: 'Digital payments, mobile money, and payment history', href: '/farm/payments' },
+  { label: 'Trade Finance', icon: 'Ship', description: 'Pre-export and post-harvest trade financing', href: '/farm/trade-finance' },
+  { label: 'Legal Help', icon: 'Scale', description: 'Legal assistance for contracts, land rights, and disputes', href: '/farm/legal' },
+  { label: 'Vet Services', icon: 'Stethoscope', description: 'On-demand veterinary consultations and livestock health', href: '/farm/vet' },
+  { label: 'Warehouse', icon: 'Warehouse', description: 'Warehouse receipts and inventory management', href: '/farm/warehouse' },
+  { label: 'AI Tools', icon: 'Brain', description: 'AI-powered farm recommendations and yield predictions', href: '/farm/ai-tools' },
+  { label: 'Sustainability', icon: 'Leaf', description: 'Carbon credit tracking and sustainable farming practices', href: '/farm/sustainability' },
+  { label: 'Exports', icon: 'Ship', description: 'Export documentation, compliance, and logistics', href: '/farm/exports' },
+  { label: 'Marketplace', icon: 'ShoppingBag', description: 'Buy and sell agricultural products and equipment', href: '/farm/marketplace' },
+  { label: 'Exchange', icon: 'Coins', description: 'Credit-based exchange for farming goods and services', href: '/farm/exchange' },
+  { label: 'Trading', icon: 'ArrowLeftRight', description: 'Commodity trading with live prices and order matching', href: '/farm/trade' },
+  { label: 'Off-take Contracts', icon: 'Handshake', description: 'Secure forward contracts and off-take agreements', href: '/farm/offtake' },
+  { label: 'Logistics', icon: 'Truck', description: 'Transport coordination and delivery tracking', href: '/farm/logistics' },
 ];
 
 /** Check if a required tier is unlocked given the user's current tier */
