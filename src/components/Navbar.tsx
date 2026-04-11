@@ -39,8 +39,6 @@ import {
   Megaphone,
   UserCheck,
   Shield,
-  Code2,
-  BarChart3,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useAuth } from "@/lib/supabase/auth-context";
@@ -111,8 +109,6 @@ const exploreLinks: { label: string; href: string; desc: string; icon: LucideIco
   { label: "Blog", href: "/blog", desc: "News & insights", icon: Newspaper },
   { label: "FAQ", href: "/faq", desc: "Common questions", icon: HelpCircle },
   { label: "Newsletter", href: "/newsletter", desc: "Weekly intelligence", icon: Mail },
-  { label: "Impact Dashboard", href: "/impact", desc: "Our measurable impact", icon: BarChart3 },
-  { label: "Developers", href: "/developers", desc: "API docs & integration", icon: Code2 },
 ];
 
 /* ─── Navbar config types (from site_config DB) ─── */
