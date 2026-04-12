@@ -100,6 +100,7 @@ export default function AmbassadorApplyPage() {
   });
   const [servesCountries, setServesCountries] = useState<string[]>([]);
   const [honeypot, setHoneypot] = useState('');
+  const [formLoadedAt] = useState(() => Date.now());
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
@@ -160,6 +161,16 @@ export default function AmbassadorApplyPage() {
 
     // Honeypot — bots that fill the hidden field get silently rejected
     if (honeypot) return;
+
+    // Timing check — reject submissions faster than 5 seconds
+    if (Date.now() - formLoadedAt < 5000) return;
+
+    // Gibberish detection
+    const gibberishPattern = /^[A-Za-z]{15,}$/;
+    if ([form.fullName, form.bio].some(f => f && gibberishPattern.test(f.trim()))) {
+      setError('Please enter valid information.');
+      return;
+    }
 
     setError('');
 

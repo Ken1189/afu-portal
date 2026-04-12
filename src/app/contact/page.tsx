@@ -68,6 +68,7 @@ export default function ContactPage() {
   const successBody = (chrome?.success_body as string) ?? 'Thank you for reaching out. Our team will get back to you within 48 hours.';
 
   const [honeypot, setHoneypot] = useState("");
+  const [formLoadedAt] = useState(() => Date.now());
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -95,6 +96,16 @@ export default function ContactPage() {
 
     // Honeypot — bots that fill the hidden field get silently rejected
     if (honeypot) return;
+
+    // Timing check — reject submissions faster than 3 seconds
+    if (Date.now() - formLoadedAt < 3000) return;
+
+    // Gibberish detection
+    const gibberishPattern = /^[A-Za-z]{15,}$/;
+    if ([formData.name, formData.subject].some(f => gibberishPattern.test(f.trim()))) {
+      setError('Please enter valid information.');
+      return;
+    }
 
     setError(null);
 

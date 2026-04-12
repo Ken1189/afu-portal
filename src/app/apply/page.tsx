@@ -28,6 +28,7 @@ export default function ApplyPage() {
   const [referralInput, setReferralInput] = useState("");
   const [honeypot, setHoneypot] = useState("");
   const [promoCode, setPromoCode] = useState<string | null>(null);
+  const [formLoadedAt] = useState(() => Date.now());
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -121,6 +122,31 @@ export default function ApplyPage() {
 
     // Honeypot — bots that fill the hidden field get silently rejected
     if (honeypot) return;
+
+    // Timing check — reject submissions faster than 5 seconds (bots)
+    if (Date.now() - formLoadedAt < 5000) return;
+
+    // Gibberish detection — reject random character strings
+    const gibberishPattern = /^[A-Za-z]{15,}$/; // 15+ consecutive letters with no spaces
+    const fieldsToCheck = [formData.firstName, formData.lastName, formData.email];
+    if (fieldsToCheck.some(f => gibberishPattern.test(f.trim()))) {
+      setSubmitError('Please enter valid information.');
+      return;
+    }
+
+    // Name validation — must contain at least one space or be reasonable length
+    const fullName = `${formData.firstName} ${formData.lastName}`.trim();
+    if (fullName.length < 3 || fullName.length > 100) {
+      setSubmitError('Please enter a valid name.');
+      return;
+    }
+
+    // Email validation — stricter than browser default
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(formData.email)) {
+      setSubmitError('Please enter a valid email address.');
+      return;
+    }
 
     setSubmitting(true);
     setSubmitError(null);
