@@ -34,10 +34,26 @@ interface FooterConfig {
 
 const FALLBACK_MISSION = "Africa's Agriculture Development Bank + Operating Platform. Financing, Inputs, Processing, Offtake, Trade Finance & Training.";
 const FALLBACK_COUNTRIES = [
-  { name: 'Zimbabwe (Export Lane)' },
-  { name: 'Botswana (Bank Base)' },
-  { name: 'Tanzania (Scale Lane)' },
-  { name: 'Ethiopia (East Africa Lane)' },
+  { name: 'Zimbabwe' },
+  { name: 'Botswana' },
+  { name: 'Tanzania' },
+  { name: 'Kenya' },
+  { name: 'Uganda' },
+  { name: 'South Africa' },
+  { name: 'Zambia' },
+  { name: 'Malawi' },
+  { name: 'Mozambique' },
+  { name: 'Namibia' },
+  { name: 'Ethiopia' },
+  { name: 'Ghana' },
+  { name: 'Nigeria' },
+  { name: 'Senegal' },
+  { name: 'Ivory Coast' },
+  { name: 'Rwanda' },
+  { name: 'Lesotho' },
+  { name: 'Eswatini' },
+  { name: 'Angola' },
+  { name: 'Chad' },
 ];
 
 /* ─── Hardcoded fallback data ─── */
@@ -296,9 +312,9 @@ export default function Footer() {
             )}
 
             <h4 className="font-semibold text-sm uppercase tracking-wider text-white mb-3 mt-4">
-              Phase 1 Countries
+              Operating Countries
             </h4>
-            <div className="flex flex-col gap-1.5 text-gray-400 text-sm">
+            <div className="grid grid-cols-2 gap-x-6 gap-y-1.5 text-gray-400 text-sm">
               {countries.map((c, i) => (
                 <span key={i} className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#5DB347] shrink-0" />

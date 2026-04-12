@@ -79,7 +79,7 @@ const FALLBACK_COUNTRIES = [
   {
     flag: "🇹🇿",
     country: "Tanzania",
-    role: "Scale Lane (Cassava, Sesame, Cashews & Coffee)",
+    role: "Cassava, Sesame, Cashews & Coffee",
     desc: "Cassava for food security + processing potential. Sesame and cashews as export commodities. Growing coffee and avocado sectors with fast turnover.",
     highlights: ["Cassava processing", "Sesame & cashew exports", "Coffee & avocado production", "Food security impact", "Fast capital turnover"],
     stat: "Scale",
@@ -103,7 +103,7 @@ const FALLBACK_COUNTRIES = [
   {
     flag: "🇿🇼",
     country: "Zimbabwe",
-    role: "Export Lane (Blueberries)",
+    role: "Blueberries, Maize & Tobacco",
     desc: "High-value export crop with structured buyer demand. Ideal for escrow-based repayment + invoice finance.",
     highlights: ["Blueberry export focus", "Structured buyer demand", "Escrow-based repayment", "Invoice finance ready"],
     stat: "Export",
@@ -128,7 +128,7 @@ const FALLBACK_COUNTRIES = [
   {
     flag: "🇪🇹",
     country: "Ethiopia",
-    role: "Strategic East Africa Lane",
+    role: "Coffee, Teff & Oilseeds",
     desc: "Africa's coffee origin and second-most populous country, with vast highland farming and major export crops including coffee, teff, and oilseeds.",
     highlights: ["Coffee origin (world's 5th largest producer)", "Major teff & cereals exporter", "Highland & rift valley agroecology", "Growing horticulture sector", "60+ million in agriculture"],
     stat: "East Africa",

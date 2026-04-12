@@ -53,7 +53,7 @@ interface CountryTeam {
   members: TeamMember[];
 }
 
-/* ─── Data: 10 active countries, 3-4 members each ─── */
+/* ─── Data: 20 active countries ─── */
 
 const COUNTRY_TEAMS: CountryTeam[] = [
   {
@@ -170,6 +170,102 @@ const COUNTRY_TEAMS: CountryTeam[] = [
       { name: 'Ronald Mugisha', title: 'Country Director', bio: 'Former senior advisor to Uganda Coffee Development Authority with export market expertise.' },
       { name: 'Prossy Nakamya', title: 'Agricultural Officer', bio: 'Dairy and livestock specialist working with pastoral communities in the cattle corridor.' },
       { name: 'Ivan Ssempijja', title: 'Finance & Operations', bio: 'Financial systems manager experienced in warehouse receipt financing and commodity exchanges.' },
+    ],
+  },
+  {
+    code: 'ET',
+    name: 'Ethiopia',
+    tagline: 'Coffee origin and teff production powerhouse',
+    members: [
+      { name: 'Abebe Tadesse', title: 'Country Director', bio: 'Coffee export specialist with deep connections across Ethiopian commodity exchanges.' },
+      { name: 'Meron Hailu', title: 'Agricultural Officer', bio: 'Teff and cereals expert supporting highland farming communities.' },
+    ],
+  },
+  {
+    code: 'SL',
+    name: 'Sierra Leone',
+    tagline: 'Rice and cocoa production recovery',
+    members: [
+      { name: 'Mohamed Kamara', title: 'Country Director', bio: 'Agricultural recovery specialist focused on smallholder rice and cocoa production.' },
+      { name: 'Isatu Sesay', title: 'Community Liaison', bio: 'Cooperative development expert working with rural farming communities.' },
+    ],
+  },
+  {
+    code: 'MW',
+    name: 'Malawi',
+    tagline: 'Tobacco, tea and legumes hub',
+    members: [
+      { name: 'Chimwemwe Banda', title: 'Country Director', bio: 'Tobacco and tea trade specialist with smallholder financing experience.' },
+      { name: 'Tionge Phiri', title: 'Agricultural Officer', bio: 'Legume and groundnut production expert supporting crop diversification.' },
+    ],
+  },
+  {
+    code: 'NA',
+    name: 'Namibia',
+    tagline: 'Livestock and dryland agriculture',
+    members: [
+      { name: 'Jonas Shikongo', title: 'Country Director', bio: 'Livestock and rangeland management specialist in arid zone agriculture.' },
+      { name: 'Maria Hamutenya', title: 'Operations Manager', bio: 'Supply chain expert connecting Namibian producers to regional markets.' },
+    ],
+  },
+  {
+    code: 'SN',
+    name: 'Senegal',
+    tagline: 'Groundnuts, rice and horticulture',
+    members: [
+      { name: 'Ousmane Diallo', title: 'Country Director', bio: 'West African agribusiness leader with groundnut and rice trade expertise.' },
+      { name: 'Aminata Ndiaye', title: 'Market Development', bio: 'Horticulture export specialist connecting farmers to European markets.' },
+    ],
+  },
+  {
+    code: 'CI',
+    name: 'Ivory Coast',
+    tagline: 'Cocoa and cashew production leader',
+    members: [
+      { name: 'Kouame Yao', title: 'Country Director', bio: 'Cocoa value chain expert with cooperative management experience across West Africa.' },
+      { name: 'Aya Coulibaly', title: 'Agricultural Officer', bio: 'Cashew and rubber production specialist working with smallholder farmers.' },
+    ],
+  },
+  {
+    code: 'RW',
+    name: 'Rwanda',
+    tagline: 'Specialty coffee and tea excellence',
+    members: [
+      { name: 'Jean-Pierre Habimana', title: 'Country Director', bio: 'Specialty coffee trade expert with connections to premium buyers worldwide.' },
+      { name: 'Claudine Uwimana', title: 'Training Officer', bio: 'Agricultural extension specialist focused on modern farming techniques.' },
+    ],
+  },
+  {
+    code: 'LS',
+    name: 'Lesotho',
+    tagline: 'Highland agriculture and wool production',
+    members: [
+      { name: 'Thabo Molapo', title: 'Country Director', bio: 'Highland agriculture and livestock specialist focused on wool and mohair value chains.' },
+    ],
+  },
+  {
+    code: 'SZ',
+    name: 'Eswatini',
+    tagline: 'Sugar cane and citrus production',
+    members: [
+      { name: 'Sipho Dlamini', title: 'Country Director', bio: 'Sugar cane and citrus trade specialist with regional market expertise.' },
+    ],
+  },
+  {
+    code: 'AO',
+    name: 'Angola',
+    tagline: 'Agricultural revival and coffee rehabilitation',
+    members: [
+      { name: 'Manuel dos Santos', title: 'Country Director', bio: 'Agricultural development leader focused on coffee sector rehabilitation and food security.' },
+      { name: 'Ana Fernandes', title: 'Finance Officer', bio: 'Agricultural finance specialist experienced in post-conflict farming recovery.' },
+    ],
+  },
+  {
+    code: 'TD',
+    name: 'Chad',
+    tagline: 'Cotton, gum arabic and livestock',
+    members: [
+      { name: 'Ibrahim Mahamat', title: 'Country Director', bio: 'Cotton and gum arabic trade specialist with pastoral community connections.' },
     ],
   },
 ];

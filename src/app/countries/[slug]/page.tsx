@@ -65,7 +65,7 @@ const FALLBACK_COUNTRIES: CountryData[] = [
     name: "Zimbabwe",
     slug: "zimbabwe",
     flag: "",
-    role: "Export Lane (Blueberries)",
+    role: "Blueberries, Maize & Tobacco",
     heroImage: "https://images.unsplash.com/photo-1591019479261-1a103585c559?w=1600&q=80",
     description:
       "Zimbabwe is AFU's high-value export lane, focused on blueberry production with structured buyer demand. The country offers ideal conditions for escrow-based repayment and invoice finance, making it the cornerstone of our export-driven model.",
@@ -98,7 +98,7 @@ const FALLBACK_COUNTRIES: CountryData[] = [
     name: "Tanzania",
     slug: "tanzania",
     flag: "",
-    role: "Scale Lane (Cassava + Sesame)",
+    role: "Cassava, Sesame & Coffee",
     heroImage: "https://images.unsplash.com/photo-1504432842672-1a79f78e4084?w=1600&q=80",
     description:
       "Tanzania is AFU's scale lane, leveraging cassava for food security and processing potential alongside sesame as a high-value export commodity. With a large farming population and growing agri-tech adoption, Tanzania offers fast capital turnover and massive impact potential.",
@@ -437,7 +437,7 @@ const FALLBACK_COUNTRIES: CountryData[] = [
     name: "Ethiopia",
     slug: "ethiopia",
     flag: "\uD83C\uDDEA\uD83C\uDDF9",
-    role: "Strategic East Africa Lane",
+    role: "Coffee, Teff & Oilseeds",
     heroImage: "https://images.unsplash.com/photo-1447933601403-56dc2df1ed5a?w=1600&q=80",
     description:
       "Ethiopia is the birthplace of coffee and Africa's second most populous nation. With a massive smallholder farming base and growing commercial agriculture sector, Ethiopia offers enormous scale potential for AFU's integrated platform.",
