@@ -7,7 +7,7 @@ import {
   ArrowLeft, Mail, Phone, MapPin, Globe, Calendar, Shield, Banknote,
   Leaf, TrendingUp, Users, Eye, Send, X, AlertTriangle, CheckCircle2,
   Clock, CreditCard, FileText, User, Award, Loader2, ExternalLink,
-  MessageSquare, ChevronRight, Hash, Languages, Bell, Copy,
+  MessageSquare, ChevronRight, Hash, Languages, Bell, Copy, Pencil, Save,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createClient } from '@/lib/supabase/client';
@@ -180,6 +180,69 @@ export default function FarmerDetailPage() {
     setTimeout(() => setToast(null), 4000);
   };
 
+  /* ── Edit Profile State ── */
+  const AFU_COUNTRIES = [
+    'Zimbabwe', 'Botswana', 'Tanzania', 'Kenya', 'Uganda', 'South Africa',
+    'Zambia', 'Malawi', 'Mozambique', 'Namibia', 'Ethiopia', 'Ghana',
+    'Nigeria', 'Senegal', 'Ivory Coast', 'Rwanda', 'Lesotho', 'Eswatini',
+    'Angola', 'Chad',
+  ];
+  const TIERS = ['free', 'smallholder', 'commercial', 'enterprise', 'partner'];
+  const STATUSES = ['active', 'pending', 'suspended', 'inactive'];
+
+  const [editing, setEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [editForm, setEditForm] = useState({
+    fullName: '', email: '', phone: '', country: '', region: '', tier: '', status: '',
+  });
+
+  const openEditForm = () => {
+    if (!profile) return;
+    setEditForm({
+      fullName: profile.full_name || '',
+      email: profile.email || '',
+      phone: profile.phone || '',
+      country: profile.country || '',
+      region: profile.region || '',
+      tier: profile.membership_tier || 'free',
+      status: profile.status || 'active',
+    });
+    setEditing(true);
+  };
+
+  const handleSaveProfile = async () => {
+    if (!profile) return;
+    setSaving(true);
+    try {
+      const { error: profileErr } = await supabase.from('profiles').update({
+        full_name: editForm.fullName,
+        email: editForm.email,
+        phone: editForm.phone,
+        country: editForm.country,
+        region: editForm.region,
+        membership_tier: editForm.tier,
+        status: editForm.status,
+      }).eq('id', profile.id);
+
+      if (profileErr) throw profileErr;
+
+      // Also update members table for tier/status
+      await supabase.from('members').update({
+        tier: editForm.tier,
+        status: editForm.status,
+      }).eq('profile_id', profile.id);
+
+      showToast('Profile updated successfully');
+      setEditing(false);
+      fetchAll();
+    } catch (err) {
+      console.error('[farmer-detail] save error:', err);
+      showToast('Failed to save profile', 'error');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const fetchAll = useCallback(async () => {
     setLoading(true);
     try {
@@ -321,6 +384,10 @@ export default function FarmerDetailPage() {
             </div>
             {/* Actions */}
             <div className="flex gap-2 shrink-0">
+              <button onClick={openEditForm}
+                className="px-4 py-2 bg-white/10 text-white rounded-lg text-sm font-medium hover:bg-white/20 flex items-center gap-1.5">
+                <Pencil className="w-4 h-4" /> Edit
+              </button>
               <button onClick={() => { setMessageOpen(true); setMessageText(''); }}
                 className="px-4 py-2 bg-white/10 text-white rounded-lg text-sm font-medium hover:bg-white/20 flex items-center gap-1.5">
                 <MessageSquare className="w-4 h-4" /> Message
@@ -739,6 +806,97 @@ export default function FarmerDetailPage() {
           )}
         </div>
       </div>
+
+      {/* Edit Profile Modal */}
+      <AnimatePresence>
+        {editing && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+            <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }}
+              className="bg-white rounded-2xl p-6 w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between mb-5">
+                <h3 className="text-lg font-bold text-[#1B2A4A] flex items-center gap-2">
+                  <Pencil className="w-5 h-5 text-[#5DB347]" /> Edit Profile
+                </h3>
+                <button onClick={() => setEditing(false)} className="text-gray-400 hover:text-gray-600"><X className="w-5 h-5" /></button>
+              </div>
+
+              <div className="space-y-4">
+                {/* Full Name */}
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">Full Name</label>
+                  <input type="text" value={editForm.fullName}
+                    onChange={e => setEditForm(f => ({ ...f, fullName: e.target.value }))}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30" />
+                </div>
+                {/* Email */}
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">Email</label>
+                  <input type="email" value={editForm.email}
+                    onChange={e => setEditForm(f => ({ ...f, email: e.target.value }))}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30" />
+                </div>
+                {/* Phone */}
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">Phone</label>
+                  <input type="tel" value={editForm.phone}
+                    onChange={e => setEditForm(f => ({ ...f, phone: e.target.value }))}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30" />
+                </div>
+                {/* Country */}
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">Country</label>
+                  <select value={editForm.country}
+                    onChange={e => setEditForm(f => ({ ...f, country: e.target.value }))}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30 bg-white">
+                    <option value="">Select country</option>
+                    {AFU_COUNTRIES.map(c => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </div>
+                {/* Region */}
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">Region</label>
+                  <input type="text" value={editForm.region}
+                    onChange={e => setEditForm(f => ({ ...f, region: e.target.value }))}
+                    placeholder="e.g. Mashonaland East"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30" />
+                </div>
+                {/* Tier & Status side by side */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 mb-1">Membership Tier</label>
+                    <select value={editForm.tier}
+                      onChange={e => setEditForm(f => ({ ...f, tier: e.target.value }))}
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30 bg-white">
+                      {TIERS.map(t => <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 mb-1">Status</label>
+                    <select value={editForm.status}
+                      onChange={e => setEditForm(f => ({ ...f, status: e.target.value }))}
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#5DB347]/30 bg-white">
+                      {STATUSES.map(s => <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-3 mt-6">
+                <button onClick={() => setEditing(false)}
+                  className="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm font-medium hover:bg-gray-50">
+                  Cancel
+                </button>
+                <button onClick={handleSaveProfile} disabled={saving || !editForm.fullName.trim() || !editForm.email.trim()}
+                  className="flex-1 py-2.5 bg-[#5DB347] text-white rounded-xl text-sm font-medium hover:bg-[#4a9a39] disabled:opacity-50 flex items-center justify-center gap-2">
+                  {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                  {saving ? 'Saving...' : 'Save Changes'}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Send Message Modal */}
       <AnimatePresence>

@@ -45,6 +45,7 @@ interface KycDocument {
   type: string;
   uploadedDate: string;
   verified: boolean;
+  file_url?: string;
 }
 
 interface KycRecord {
@@ -233,6 +234,7 @@ export default function KycManagementPage() {
   const [selectedRecord, setSelectedRecord] = useState<KycRecord | null>(null);
   const [reviewNotes, setReviewNotes] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+  const [previewDoc, setPreviewDoc] = useState<{ url: string; type: string; name: string } | null>(null);
 
   const showSuccess = useCallback((msg: string) => {
     setSuccessMsg(msg);
@@ -358,7 +360,7 @@ export default function KycManagementPage() {
             {TABS.map((tab) => (
               <button
                 key={tab.value}
-                onClick={() => { setActiveTab(tab.value); setSelectedRecord(null); }}
+                onClick={() => { setActiveTab(tab.value); setSelectedRecord(null); setPreviewDoc(null); }}
                 className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${activeTab === tab.value ? 'bg-[#5DB347] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
               >
                 {tab.label}
@@ -400,7 +402,7 @@ export default function KycManagementPage() {
               <motion.div key={record.id} variants={cardVariants}>
                 <div
                   className={`p-4 hover:bg-gray-50/50 transition-colors cursor-pointer ${isSelected ? 'bg-blue-50/50 ring-1 ring-[#5DB347]/20' : ''}`}
-                  onClick={() => { setSelectedRecord(isSelected ? null : record); setReviewNotes(''); }}
+                  onClick={() => { setSelectedRecord(isSelected ? null : record); setReviewNotes(''); setPreviewDoc(null); }}
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                     {/* User info */}
@@ -447,15 +449,34 @@ export default function KycManagementPage() {
                             <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Documents</h4>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                               {record.documents.map((doc, i) => (
-                                <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 border border-gray-100">
+                                <div
+                                  key={i}
+                                  className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${
+                                    previewDoc?.url === doc.file_url && previewDoc?.name === doc.name
+                                      ? 'bg-blue-50 border-[#5DB347]/30 ring-1 ring-[#5DB347]/20'
+                                      : 'bg-gray-50 border-gray-100 hover:bg-gray-100'
+                                  }`}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    if (doc.file_url) {
+                                      setPreviewDoc({ url: doc.file_url, type: doc.type, name: doc.name });
+                                    }
+                                  }}
+                                >
                                   <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${doc.verified ? 'bg-emerald-100' : 'bg-amber-100'}`}>
                                     <FileImage className={`w-5 h-5 ${doc.verified ? 'text-emerald-600' : 'text-amber-600'}`} />
                                   </div>
                                   <div className="flex-1 min-w-0">
                                     <p className="text-sm font-medium text-gray-700">{doc.name}</p>
-                                    <p className="text-[10px] text-gray-400">Uploaded {doc.uploadedDate}</p>
+                                    <p className="text-[10px] text-gray-400">
+                                      Uploaded {doc.uploadedDate}
+                                      {!doc.file_url && <span className="ml-1 text-gray-300">(no file)</span>}
+                                    </p>
                                   </div>
-                                  <div>
+                                  <div className="flex items-center gap-2">
+                                    {doc.file_url && (
+                                      <Eye className="w-3.5 h-3.5 text-gray-400" />
+                                    )}
                                     {doc.verified ? (
                                       <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-100 text-emerald-700">
                                         <CheckCircle2 className="w-2.5 h-2.5" /> Verified
@@ -470,12 +491,87 @@ export default function KycManagementPage() {
                               ))}
                             </div>
 
-                            {/* Document preview placeholder */}
-                            <div className="mt-3 p-6 rounded-xl border-2 border-dashed border-gray-200 bg-gray-50/50 text-center">
-                              <Eye className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-                              <p className="text-xs text-gray-400">Document preview will appear here</p>
-                              <p className="text-[10px] text-gray-300 mt-1">Click a document above to preview</p>
-                            </div>
+                            {/* Document viewer */}
+                            {previewDoc ? (
+                              <div className="mt-3 rounded-xl border border-gray-200 bg-white overflow-hidden">
+                                <div className="flex items-center justify-between px-4 py-2.5 bg-gray-50 border-b border-gray-100">
+                                  <div className="flex items-center gap-2">
+                                    <Eye className="w-4 h-4 text-gray-500" />
+                                    <span className="text-sm font-medium text-gray-700">{previewDoc.name}</span>
+                                    <span className="text-[10px] text-gray-400 bg-gray-200 px-1.5 py-0.5 rounded">{previewDoc.type}</span>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <a
+                                      href={previewDoc.url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      onClick={(e) => e.stopPropagation()}
+                                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#1B2A4A] text-white rounded-lg text-xs font-medium hover:bg-[#1B2A4A]/90 transition-colors"
+                                    >
+                                      <Download className="w-3.5 h-3.5" />
+                                      Download
+                                    </a>
+                                    <button
+                                      onClick={(e) => { e.stopPropagation(); setPreviewDoc(null); }}
+                                      className="inline-flex items-center gap-1 px-2 py-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg text-xs transition-colors"
+                                    >
+                                      <XCircle className="w-3.5 h-3.5" />
+                                    </button>
+                                  </div>
+                                </div>
+                                <div className="p-4">
+                                  {(() => {
+                                    const url = previewDoc.url;
+                                    const ext = url.split('.').pop()?.toLowerCase().split('?')[0] || '';
+                                    const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext);
+                                    const isPdf = ext === 'pdf';
+
+                                    if (isImage) {
+                                      return (
+                                        // eslint-disable-next-line @next/next/no-img-element
+                                        <img
+                                          src={url}
+                                          alt={previewDoc.name}
+                                          className="w-full max-h-[500px] object-contain rounded-xl"
+                                        />
+                                      );
+                                    }
+                                    if (isPdf) {
+                                      return (
+                                        <iframe
+                                          src={url}
+                                          title={previewDoc.name}
+                                          className="w-full h-96 rounded-xl border border-gray-100"
+                                        />
+                                      );
+                                    }
+                                    return (
+                                      <div className="text-center py-8">
+                                        <FileText className="w-10 h-10 text-gray-300 mx-auto mb-3" />
+                                        <p className="text-sm text-gray-500 mb-3">
+                                          Preview not available for this file type
+                                        </p>
+                                        <a
+                                          href={url}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          onClick={(e) => e.stopPropagation()}
+                                          className="inline-flex items-center gap-2 px-4 py-2 bg-[#1B2A4A] text-white rounded-xl text-sm font-medium hover:bg-[#1B2A4A]/90 transition-colors"
+                                        >
+                                          <Download className="w-4 h-4" />
+                                          Open File
+                                        </a>
+                                      </div>
+                                    );
+                                  })()}
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="mt-3 p-6 rounded-xl border-2 border-dashed border-gray-200 bg-gray-50/50 text-center">
+                                <Eye className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                                <p className="text-xs text-gray-400">Click a document above to preview</p>
+                              </div>
+                            )}
                           </div>
 
                           {/* Review panel */}

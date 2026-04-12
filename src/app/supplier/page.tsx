@@ -356,6 +356,9 @@ export default function SupplierDashboard() {
   } | null>(null);
   // Live recent orders
   const [liveRecentOrders, setLiveRecentOrders] = useState<typeof FALLBACK_RECENT_ORDERS | null>(null);
+  const [liveCommissions, setLiveCommissions] = useState<any[]>([]);
+  const [liveTopProducts, setLiveTopProducts] = useState<any[]>([]);
+  const [liveSalesTrend, setLiveSalesTrend] = useState<{ month: string; sales: number }[]>([]);
   const [dbLoading, setDbLoading] = useState(true);
 
   // Supplier resource videos
@@ -419,7 +422,7 @@ export default function SupplierDashboard() {
       const [orderItemsRes, productsRes] = await Promise.all([
         supabase
           .from('order_items')
-          .select('order_id, total_price, order:orders(status)')
+          .select('order_id, total_price, order:orders(status, created_at)')
           .eq('supplier_id', supplierId),
         supabase
           .from('products')
@@ -481,7 +484,57 @@ export default function SupplierDashboard() {
           }))
         );
       }
-    } catch {
+
+      // 4. Fetch commissions for this supplier
+      try {
+        const { data: commData } = await supabase
+          .from('commission_entries')
+          .select('id, amount, status, created_at, description')
+          .eq('supplier_id', supplierId)
+          .order('created_at', { ascending: false })
+          .limit(10);
+        if (commData && commData.length > 0) {
+          setLiveCommissions(commData);
+        }
+      } catch { /* silent */ }
+
+      // 5. Fetch top products by order count
+      try {
+        const { data: topProds } = await supabase
+          .from('products')
+          .select('id, name, price, status')
+          .eq('supplier_id', supplierId)
+          .order('created_at', { ascending: false })
+          .limit(5);
+        if (topProds && topProds.length > 0) {
+          setLiveTopProducts(topProds);
+        }
+      } catch { /* silent */ }
+
+      // 6. Build sales trend from order_items (group by month)
+      try {
+        if (orderItems.length > 0) {
+          const monthMap: Record<string, number> = {};
+          for (const oi of orderItems) {
+            const created = (oi as any).order?.created_at;
+            if (!created) continue;
+            const monthKey = new Date(created).toISOString().slice(0, 7); // YYYY-MM
+            monthMap[monthKey] = (monthMap[monthKey] || 0) + (Number(oi.total_price) || 0);
+          }
+          const sorted = Object.entries(monthMap)
+            .sort(([a], [b]) => a.localeCompare(b))
+            .slice(-12)
+            .map(([key, val]) => ({
+              month: new Date(key + '-01').toLocaleString('en-US', { month: 'short', year: '2-digit' }),
+              sales: val,
+            }));
+          if (sorted.length > 0) {
+            setLiveSalesTrend(sorted);
+          }
+        }
+      } catch { /* silent */ }
+    } catch (err) {
+      console.error('[SupplierDashboard] fetchLiveDashboard error:', err);
       // On any error, fallback data will be used (liveSupplier stays null)
     } finally {
       setDbLoading(false);
@@ -522,14 +575,50 @@ export default function SupplierDashboard() {
   const totalRevenue = liveStats?.totalRevenue ?? FALLBACK_TOTAL_REVENUE;
   const activeProductsCount = liveStats?.activeProducts ?? FALLBACK_ACTIVE_PRODUCTS;
   const pendingOrdersCount = liveStats?.pendingOrders ?? FALLBACK_PENDING_ORDERS;
-  const commissionBalance = FALLBACK_COMMISSION_BALANCE; // commissions not yet in DB — keep fallback
+  const commissionBalance = liveCommissions.length > 0
+    ? liveCommissions.filter((c: any) => c.status === 'pending').reduce((sum: number, c: any) => sum + (Number(c.amount) || 0), 0)
+    : FALLBACK_COMMISSION_BALANCE;
   const totalAdImpressions = FALLBACK_AD_IMPRESSIONS;    // ads not yet in DB — keep fallback
   const memberReach = FALLBACK_MEMBER_REACH;
   const displayRecentOrders = liveRecentOrders || FALLBACK_RECENT_ORDERS;
-  const commissionDonutData = FALLBACK_COMMISSION_DONUT;
-  const commissionTotal = FALLBACK_COMMISSION_TOTAL;
+  // Commission donut: compute from live data if available
+  const commissionDonutData = liveCommissions.length > 0
+    ? [
+        { name: 'Paid', value: liveCommissions.filter((c: any) => c.status === 'paid').reduce((s: number, c: any) => s + (Number(c.amount) || 0), 0), color: '#8CB89C' },
+        { name: 'Approved', value: liveCommissions.filter((c: any) => c.status === 'approved').reduce((s: number, c: any) => s + (Number(c.amount) || 0), 0), color: '#D4A843' },
+        { name: 'Pending', value: liveCommissions.filter((c: any) => c.status === 'pending').reduce((s: number, c: any) => s + (Number(c.amount) || 0), 0), color: '#1B2A4A' },
+      ]
+    : FALLBACK_COMMISSION_DONUT;
+  const commissionTotal = commissionDonutData.reduce((s, d) => s + d.value, 0);
   const activeAds = FALLBACK_ACTIVE_ADS;
-  const supplierCommissionsForMonth = FALLBACK_COMMISSIONS;
+  const supplierCommissionsForMonth = liveCommissions.length > 0
+    ? liveCommissions.map((c: any) => ({
+        id: c.id,
+        supplierId: '',
+        supplierName: '',
+        orderId: '',
+        productName: c.description || '',
+        buyerName: '',
+        buyerType: 'smallholder' as const,
+        orderAmount: 0,
+        commissionRate: 0,
+        commissionAmount: Number(c.amount) || 0,
+        status: c.status,
+        orderDate: c.created_at || '',
+        paymentDate: null,
+      }))
+    : FALLBACK_COMMISSIONS;
+
+  // Top products: map live DB products to display shape, or use fallback
+  const displayTopProducts: typeof FALLBACK_TOP_PRODUCTS = liveTopProducts.length > 0
+    ? liveTopProducts.map((p: any) => ({
+        name: p.name || 'Product',
+        unitsSold: 0,
+        revenue: Number(p.price) || 0,
+        rating: 0,
+        trend: 'up' as const,
+      }))
+    : FALLBACK_TOP_PRODUCTS;
 
   // ── Top-level stat cards data ───────────────────────────────────────────
   const statCards: { label: string; value: string; change: string | null; changeType: 'up' | 'down' | 'neutral'; icon: React.ReactNode; color: string; bgColor: string }[] = [
@@ -762,7 +851,7 @@ export default function SupplierDashboard() {
         </div>
         <div className="h-72">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={FALLBACK_SALES_TREND} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
+            <AreaChart data={liveSalesTrend.length > 0 ? liveSalesTrend : FALLBACK_SALES_TREND} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="salesGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#8CB89C" stopOpacity={0.3} />
@@ -880,7 +969,7 @@ export default function SupplierDashboard() {
             <h3 className="font-semibold text-navy text-sm">Top Products</h3>
           </div>
           <div className="divide-y divide-gray-50">
-            {FALLBACK_TOP_PRODUCTS.map((product, i) => (
+            {displayTopProducts.map((product, i) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, x: 10 }}
@@ -928,7 +1017,7 @@ export default function SupplierDashboard() {
                     <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
                       <motion.div
                         initial={{ width: 0 }}
-                        animate={{ width: `${FALLBACK_TOP_PRODUCTS.length > 0 ? (product.revenue / FALLBACK_TOP_PRODUCTS[0].revenue) * 100 : 0}%` }}
+                        animate={{ width: `${displayTopProducts.length > 0 ? (product.revenue / displayTopProducts[0].revenue) * 100 : 0}%` }}
                         transition={{ duration: 0.4 }}
                         className="h-1.5 rounded-full bg-[#8CB89C]"
                       />
