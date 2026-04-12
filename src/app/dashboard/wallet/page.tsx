@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Wallet,
@@ -84,6 +85,7 @@ type TxnFilter = 'all' | 'deposit' | 'withdrawal' | 'transfer' | 'payment';
 // ─── Constants ────────────────────────────────────────────────────────────
 
 const MOBILE_MONEY_METHODS = [
+  { id: 'card', label: 'Card Payment', icon: '', lucideIcon: CreditCard, countries: 'Visa, Mastercard — All countries' },
   { id: 'mpesa', label: 'M-Pesa', icon: '🇰🇪', lucideIcon: null as null | typeof Building2, countries: 'Kenya, Tanzania' },
   { id: 'ecocash', label: 'EcoCash', icon: '🇿🇼', lucideIcon: null as null | typeof Building2, countries: 'Zimbabwe' },
   { id: 'mtn', label: 'MTN MoMo', icon: '🇺🇬', lucideIcon: null as null | typeof Building2, countries: 'Uganda, Ghana, Rwanda' },
@@ -190,6 +192,7 @@ function QRCodeSVG({ data, size = 180 }: { data: string; size?: number }) {
 export default function WalletPage() {
   const { user } = useAuth();
   const supabase = createClient();
+  const searchParams = useSearchParams();
 
   // ── State ─────────────────────────────────────────────────────────────
   const [wallet, setWallet] = useState<WalletAccount | null>(null);
@@ -205,7 +208,7 @@ export default function WalletPage() {
   const [copied, setCopied] = useState(false);
 
   // Modal form state
-  const [depositMethod, setDepositMethod] = useState('mpesa');
+  const [depositMethod, setDepositMethod] = useState('card');
   const [depositAmount, setDepositAmount] = useState('');
   const [depositStep, setDepositStep] = useState<'form' | 'confirm' | 'instructions'>('form');
   const [withdrawMethod, setWithdrawMethod] = useState('mpesa');
@@ -312,6 +315,22 @@ export default function WalletPage() {
 
   useEffect(() => { fetchWalletData(); }, [fetchWalletData]);
 
+  // Detect return from Stripe checkout
+  useEffect(() => {
+    const depositStatus = searchParams.get('deposit');
+    if (depositStatus === 'success') {
+      showToast('Deposit completed successfully! Your balance will update shortly.');
+      // Clean URL without reload
+      window.history.replaceState({}, '', '/dashboard/wallet');
+      // Refresh wallet data to pick up the new balance
+      setTimeout(() => fetchWalletData(), 2000);
+    } else if (depositStatus === 'cancelled') {
+      showToast('Deposit cancelled.', 'error');
+      window.history.replaceState({}, '', '/dashboard/wallet');
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
   // ── Filtered Transactions ─────────────────────────────────────────────
   const filteredTxns = useMemo(() => {
     let result = transactions;
@@ -345,7 +364,7 @@ export default function WalletPage() {
 
   const resetModals = () => {
     setDepositAmount('');
-    setDepositMethod('mpesa');
+    setDepositMethod('card');
     setDepositStep('form');
     setWithdrawAmount('');
     setWithdrawMethod('mpesa');
@@ -373,6 +392,35 @@ export default function WalletPage() {
     if (!wallet || !depositAmount) return;
     setModalLoading(true);
     const amt = parseFloat(depositAmount);
+
+    // ── Card deposit via Stripe Checkout ──
+    if (depositMethod === 'card') {
+      try {
+        const res = await fetch('/api/payments/wallet-deposit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            amount: amt,
+            currency: wallet.currency?.toLowerCase() || 'usd',
+            wallet_id: wallet.id,
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to create checkout session');
+        if (data.url) {
+          // Redirect to Stripe Checkout
+          window.location.href = data.url;
+          return;
+        }
+        throw new Error('No checkout URL returned');
+      } catch (err) {
+        showToast((err as Error).message || 'Card deposit failed. Please try again.', 'error');
+        setModalLoading(false);
+      }
+      return;
+    }
+
+    // ── Mobile money / bank transfer deposit (existing flow) ──
     const ref = genRef();
     const method = MOBILE_MONEY_METHODS.find((m) => m.id === depositMethod)?.label || 'Deposit';
     try {
@@ -1003,7 +1051,7 @@ export default function WalletPage() {
                           className="flex-1 py-3 bg-[#5DB347] hover:bg-[#4ea03d] disabled:bg-gray-300 text-white rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
                         >
                           {modalLoading && <Loader2 className="w-4 h-4 animate-spin" />}
-                          Confirm Deposit
+                          {depositMethod === 'card' ? 'Pay with Card' : 'Confirm Deposit'}
                         </button>
                       </div>
                     </div>

@@ -6,6 +6,7 @@ import {
   File, FileImage, FileText, Grid, List, Search, Info, Folder, FolderOpen, FolderPlus,
   ChevronRight, Home, Layers, Camera, Check, MoveRight, GripVertical,
 } from 'lucide-react';
+import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 
 interface MediaFile {
@@ -778,9 +779,9 @@ export default function AdminMediaPage() {
                     <GripVertical className="w-4 h-4 text-gray-500" />
                   </div>
 
-                  <div className="aspect-square bg-gray-50 flex items-center justify-center overflow-hidden">
+                  <div className="aspect-square bg-gray-50 flex items-center justify-center overflow-hidden relative">
                     {isImage(f.type) ? (
-                      <img src={f.url} alt={f.name} className="w-full h-full object-cover" draggable={false} />
+                      <Image src={f.url} alt={f.name} fill className="object-cover" draggable={false} unoptimized />
                     ) : (
                       getFileIcon(f.type)
                     )}
@@ -882,7 +883,7 @@ export default function AdminMediaPage() {
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-3">
                         {isImage(f.type) ? (
-                          <img src={f.url} alt="" className="w-8 h-8 rounded object-cover" draggable={false} />
+                          <Image src={f.url} alt="" width={32} height={32} className="w-8 h-8 rounded object-cover" draggable={false} unoptimized />
                         ) : (
                           <div className="w-8 h-8 flex items-center justify-center">{getFileIcon(f.type)}</div>
                         )}

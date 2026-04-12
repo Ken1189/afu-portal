@@ -17,6 +17,7 @@ import {
   MessageSquare,
   GripVertical,
 } from 'lucide-react';
+import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 import ImageUploader from '@/components/ui/ImageUploader';
 import { COUNTRY_DATA } from '@/lib/countries';
@@ -309,9 +310,9 @@ export default function TestimonialsAdmin() {
 
               {/* Avatar + Name */}
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-11 h-11 rounded-full bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center text-green-700 font-bold text-sm flex-shrink-0">
+                <div className="w-11 h-11 rounded-full bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center text-green-700 font-bold text-sm flex-shrink-0 relative">
                   {t.photo_url ? (
-                    <img src={t.photo_url} alt={t.name} loading="lazy" className="w-full h-full rounded-full object-cover" />
+                    <Image src={t.photo_url} alt={t.name} fill className="rounded-full object-cover" unoptimized />
                   ) : (
                     t.name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()
                   )}

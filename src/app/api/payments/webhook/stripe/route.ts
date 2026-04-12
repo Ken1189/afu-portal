@@ -223,6 +223,37 @@ export async function POST(request: NextRequest) {
             .eq('status', 'pending');
         }
 
+        // ── Wallet deposit checkout completed ──
+        if (paymentType === 'wallet_deposit') {
+          try {
+            const walletId = meta.wallet_id;
+            const depositUserId = meta.user_id;
+            const depositAmount = parseFloat(meta.amount || '0');
+            const depositCurrency = meta.currency || 'USD';
+
+            if (walletId && depositAmount > 0) {
+              // Import WalletService dynamically to avoid circular deps
+              const { WalletService } = await import('@/lib/banking');
+              const walletService = new WalletService(adminClient);
+
+              await walletService.deposit({
+                wallet_id: walletId,
+                amount: depositAmount,
+                description: `Card deposit via Stripe`,
+                reference: `STRIPE-${session.id}`,
+                operator_id: depositUserId || undefined,
+              });
+
+              console.log(`[wallet_deposit] Credited $${depositAmount} ${depositCurrency} to wallet ${walletId}`);
+            } else {
+              console.warn('[wallet_deposit] Missing wallet_id or invalid amount in metadata:', meta);
+            }
+          } catch (e) {
+            console.error('[wallet_deposit] handler error:', e);
+          }
+          break;
+        }
+
         // ── Supplier subscription checkout completed ──
         if (paymentType === 'supplier_subscription') {
           try {

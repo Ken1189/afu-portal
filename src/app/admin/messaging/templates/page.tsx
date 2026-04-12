@@ -4,9 +4,10 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import {
   FileText, Plus, X, Loader2, Search, Edit3, Trash2, Save,
-  Mail, MessageSquare, Phone, Image, Video, Eye, Copy,
+  Mail, MessageSquare, Phone, Image as LucideImage, Video, Eye, Copy,
   RefreshCw, Upload, Palette,
 } from 'lucide-react';
+import Image from 'next/image';
 
 /* ─── Types ─── */
 interface Template {
@@ -193,7 +194,7 @@ export default function AdminTemplatesPage() {
                       <label className="text-xs font-medium text-gray-500">Body {form.channel === 'email' ? '(HTML)' : ''}</label>
                       {form.channel === 'email' && (
                         <div className="flex gap-1">
-                          <button type="button" onClick={() => { fetchMedia(); setShowMediaPicker(true); }} className="flex items-center gap-1 text-[10px] text-gray-400 hover:text-[#5DB347] px-2 py-1 rounded border border-gray-200"><Image className="w-3 h-3" /> Image</button>
+                          <button type="button" onClick={() => { fetchMedia(); setShowMediaPicker(true); }} className="flex items-center gap-1 text-[10px] text-gray-400 hover:text-[#5DB347] px-2 py-1 rounded border border-gray-200"><LucideImage className="w-3 h-3" /> Image</button>
                           <button type="button" onClick={() => { fetchMedia(); setShowMediaPicker(true); }} className="flex items-center gap-1 text-[10px] text-gray-400 hover:text-[#5DB347] px-2 py-1 rounded border border-gray-200"><Video className="w-3 h-3" /> Video</button>
                           <button type="button" onClick={() => setForm(p => ({ ...p, body: p.body + '\n<a href="https://africanfarmingunion.org" style="display:inline-block;background:#5DB347;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600">Button Text</a>\n' }))} className="flex items-center gap-1 text-[10px] text-gray-400 hover:text-[#5DB347] px-2 py-1 rounded border border-gray-200"><Palette className="w-3 h-3" /> Button</button>
                         </div>
@@ -237,12 +238,12 @@ export default function AdminTemplatesPage() {
             </div>
             <div className="flex-1 overflow-y-auto p-4">
               {mediaLoading ? <div className="flex items-center justify-center py-12"><Loader2 className="w-5 h-5 animate-spin text-[#5DB347]" /></div> : mediaFiles.length === 0 ? (
-                <div className="text-center py-12"><Image className="w-10 h-10 text-gray-200 mx-auto mb-3" /><p className="text-sm text-gray-400">No media files. Upload images or videos.</p></div>
+                <div className="text-center py-12"><LucideImage className="w-10 h-10 text-gray-200 mx-auto mb-3" /><p className="text-sm text-gray-400">No media files. Upload images or videos.</p></div>
               ) : (
                 <div className="grid grid-cols-3 gap-3">
                   {mediaFiles.map(f => (
                     <button key={f.name} onClick={() => insertMedia(f.url, f.type)} className="relative rounded-xl overflow-hidden border border-gray-200 hover:border-[#5DB347] hover:shadow-md aspect-square group">
-                      {f.type === 'video' ? <div className="w-full h-full bg-gray-100 flex items-center justify-center"><Video className="w-8 h-8 text-gray-400" /></div> : <img src={f.url} alt={f.name} className="w-full h-full object-cover" />}
+                      {f.type === 'video' ? <div className="w-full h-full bg-gray-100 flex items-center justify-center"><Video className="w-8 h-8 text-gray-400" /></div> : <Image src={f.url} alt={f.name} fill className="object-cover" unoptimized />}
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 flex items-center justify-center"><span className="text-white text-xs font-medium opacity-0 group-hover:opacity-100 bg-[#5DB347] px-3 py-1.5 rounded-lg">Insert</span></div>
                       <p className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-[9px] px-2 py-1 truncate">{f.name}</p>
                     </button>

@@ -5,6 +5,7 @@ import {
   Handshake, Plus, Pencil, Trash2, Star, StarOff, Save,
   Loader2, X, CheckCircle2, AlertCircle, Globe,
 } from 'lucide-react';
+import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 import ImageUploader from '@/components/ui/ImageUploader';
 import { ALL_AFRICAN_COUNTRIES, GLOBAL_OPTION } from '@/lib/countries';
@@ -212,7 +213,7 @@ export default function AdminPartnersPage() {
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-3">
                   {p.logo_url ? (
-                    <img src={p.logo_url} alt={p.name} className="w-12 h-12 rounded-lg object-contain bg-gray-50 p-1 border border-gray-100" />
+                    <Image src={p.logo_url} alt={p.name} width={48} height={48} className="w-12 h-12 rounded-lg object-contain bg-gray-50 p-1 border border-gray-100" unoptimized />
                   ) : (
                     <div className="w-12 h-12 rounded-lg bg-[#1B2A4A]/10 flex items-center justify-center">
                       <Handshake className="w-6 h-6 text-[#1B2A4A]" />

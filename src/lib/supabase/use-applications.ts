@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from './client';
 import type { MembershipTier, ApplicationStatus } from './types';
+import { captureError } from '@/lib/capture-error';
 
 export interface ApplicationRow {
   id: string;
@@ -57,7 +58,7 @@ export function useApplications(page = 1, pageSize = 50) {
         .range((page - 1) * pageSize, page * pageSize - 1);
 
       if (fetchError) {
-        console.error('[useApplications] fetch error:', fetchError);
+        captureError('useApplications.fetch', fetchError);
         setError(fetchError.message);
         setApplications([]);
         setTotalCount(0);
@@ -66,7 +67,7 @@ export function useApplications(page = 1, pageSize = 50) {
         setTotalCount(count ?? 0);
       }
     } catch (err) {
-      console.error('[useApplications] exception:', err);
+      captureError('useApplications.exception', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
       setApplications([]);
       setTotalCount(0);
@@ -101,7 +102,7 @@ export function useApplications(page = 1, pageSize = 50) {
       await fetchApplications();
       return { error: null };
     } catch (err) {
-      console.error('[useApplications] approveApplication exception:', err);
+      captureError('useApplications.approveApplication', err);
       return { error: err instanceof Error ? err.message : 'Unknown error' };
     }
   };
@@ -121,7 +122,7 @@ export function useApplications(page = 1, pageSize = 50) {
       await fetchApplications();
       return { error: null };
     } catch (err) {
-      console.error('[useApplications] rejectApplication exception:', err);
+      captureError('useApplications.rejectApplication', err);
       return { error: err instanceof Error ? err.message : 'Unknown error' };
     }
   };
@@ -152,7 +153,7 @@ export function useApplications(page = 1, pageSize = 50) {
       await fetchApplications();
       return { data: data as ApplicationRow | null, error: null };
     } catch (err) {
-      console.error('[useApplications] submitApplication exception:', err);
+      captureError('useApplications.submitApplication', err);
       return { data: null, error: err instanceof Error ? err.message : 'Unknown error' };
     }
   };

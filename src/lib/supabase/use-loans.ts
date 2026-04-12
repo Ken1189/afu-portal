@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from './client';
 import { useAuth } from './auth-context';
+import { captureError } from '@/lib/capture-error';
 
 export interface LoanRow {
   id: string;
@@ -45,14 +46,14 @@ export function useLoans() {
         .order('created_at', { ascending: false });
 
       if (fetchError) {
-        console.error('[useLoans] fetch error:', fetchError);
+        captureError('useLoans.fetch', fetchError);
         setError(fetchError.message);
         setLoans([]);
       } else {
         setLoans((data || []) as LoanRow[]);
       }
     } catch (err) {
-      console.error('[useLoans] exception:', err);
+      captureError('useLoans.exception', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
       setLoans([]);
     } finally {
@@ -112,7 +113,7 @@ export function useLoans() {
 
       return { data, error: insertError };
     } catch (err) {
-      console.error('[useLoans] applyForLoan exception:', err);
+      captureError('useLoans.applyForLoan', err);
       return { data: null, error: { message: err instanceof Error ? err.message : 'Unknown error' } };
     }
   }, [supabase, user]);

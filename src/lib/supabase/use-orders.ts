@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from './client';
 import type { OrderStatus } from './types';
+import { captureError } from '@/lib/capture-error';
 
 export interface OrderRow {
   id: string;
@@ -46,14 +47,14 @@ export function useOrders(memberId?: string) {
         .eq('member_id', memberId)
         .order('created_at', { ascending: false });
       if (fetchError) {
-        console.error('[useOrders] fetch error:', fetchError);
+        captureError('useOrders.fetch', fetchError);
         setError(fetchError.message);
         setOrders([]);
       } else {
         setOrders((data || []) as OrderRow[]);
       }
     } catch (err) {
-      console.error('[useOrders] exception:', err);
+      captureError('useOrders.exception', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
       setOrders([]);
     } finally {
@@ -138,7 +139,7 @@ export function useOrders(memberId?: string) {
       await fetchOrders();
       return { data: order as OrderRow, error: null };
     } catch (err) {
-      console.error('[useOrders] createOrder exception:', err);
+      captureError('useOrders.createOrder', err);
       return { data: null, error: err instanceof Error ? err.message : 'Unknown error' };
     }
   };

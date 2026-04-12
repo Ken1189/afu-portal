@@ -6,6 +6,7 @@ import {
   Loader2, X, CheckCircle2, AlertCircle, MapPin, Ruler,
   Leaf, Eye, EyeOff, GripVertical, Image as ImageIcon,
 } from 'lucide-react';
+import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 
 /* ─── Types ─── */
@@ -363,7 +364,7 @@ export default function FarmShowcaseAdmin() {
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         {farm.hero_photo_url ? (
-                          <img src={farm.hero_photo_url} alt="" className="w-10 h-10 rounded-lg object-cover" />
+                          <Image src={farm.hero_photo_url} alt="" width={40} height={40} className="w-10 h-10 rounded-lg object-cover" unoptimized />
                         ) : (
                           <div className="w-10 h-10 rounded-lg bg-[#5DB347]/10 flex items-center justify-center">
                             <Sprout className="w-5 h-5 text-[#5DB347]" />
@@ -556,7 +557,7 @@ export default function FarmShowcaseAdmin() {
                   placeholder="https://images.unsplash.com/..."
                 />
                 {form.hero_photo_url && (
-                  <img src={form.hero_photo_url} alt="Preview" className="mt-2 h-32 w-full object-cover rounded-lg" />
+                  <Image src={form.hero_photo_url} alt="Preview" width={600} height={128} className="mt-2 h-32 w-full object-cover rounded-lg" unoptimized />
                 )}
               </div>
 

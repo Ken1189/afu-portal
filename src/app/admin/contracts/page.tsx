@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/supabase/auth-context';
 import {
@@ -380,8 +381,7 @@ function ContractPreview({
           <div className="bg-gradient-to-r from-[#1B2A4A] to-[#223350] px-12 pt-10 pb-8">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-5">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/afu-logo.svg" alt="AFU Logo" className="w-16 h-16 brightness-0 invert" />
+                <Image src="/afu-logo.svg" alt="AFU Logo" width={64} height={64} className="w-16 h-16 brightness-0 invert" />
                 <div>
                   <h1 className="text-2xl font-bold text-white tracking-tight">African Farming Union</h1>
                   <p className="text-white/40 text-xs mt-1.5 tracking-wide">Empowering African Agriculture</p>

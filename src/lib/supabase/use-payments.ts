@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from './client';
+import { captureError } from '@/lib/capture-error';
 
 export interface PaymentRow {
   id: string;
@@ -70,14 +71,14 @@ export function usePayments(filters?: { status?: string; purpose?: string }) {
       const { data, error: fetchError } = await query;
 
       if (fetchError) {
-        console.error('[usePayments] fetch error:', fetchError);
+        captureError('usePayments.fetch', fetchError);
         setError(fetchError.message);
         setPayments([]);
       } else {
         setPayments((data || []) as PaymentRow[]);
       }
     } catch (err) {
-      console.error('[usePayments] exception:', err);
+      captureError('usePayments.exception', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
       setPayments([]);
     } finally {
@@ -108,20 +109,20 @@ export function usePaymentDetail(paymentId: string | null) {
       ]);
 
       if (paymentRes.error) {
-        console.error('[usePaymentDetail] payment fetch error:', paymentRes.error);
+        captureError('usePaymentDetail.paymentFetch', paymentRes.error);
         setError(paymentRes.error.message);
       } else if (paymentRes.data) {
         setPayment(paymentRes.data as PaymentRow);
       }
 
       if (attemptsRes.error) {
-        console.error('[usePaymentDetail] attempts fetch error:', attemptsRes.error);
+        captureError('usePaymentDetail.attemptsFetch', attemptsRes.error);
         setError(attemptsRes.error.message);
       } else if (attemptsRes.data) {
         setAttempts((attemptsRes.data || []) as PaymentAttemptRow[]);
       }
     } catch (err) {
-      console.error('[usePaymentDetail] exception:', err);
+      captureError('usePaymentDetail.exception', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
       setLoading(false);
@@ -153,14 +154,14 @@ export function usePaymentGateways(country?: string) {
 
       const { data, error: fetchError } = await query;
       if (fetchError) {
-        console.error('[usePaymentGateways] fetch error:', fetchError);
+        captureError('usePaymentGateways.fetch', fetchError);
         setError(fetchError.message);
         setGateways([]);
       } else {
         setGateways((data || []) as PaymentGatewayRow[]);
       }
     } catch (err) {
-      console.error('[usePaymentGateways] exception:', err);
+      captureError('usePaymentGateways.exception', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
       setGateways([]);
     } finally {

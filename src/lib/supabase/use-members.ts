@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from './client';
 import type { MembershipTier, MemberStatus } from './types';
+import { captureError } from '@/lib/capture-error';
 
 export interface MemberRow {
   id: string;
@@ -49,14 +50,14 @@ export function useMembers() {
         .order('created_at', { ascending: false });
 
       if (fetchError) {
-        console.error('[useMembers] fetch error:', fetchError);
+        captureError('useMembers.fetch', fetchError);
         setError(fetchError.message);
         setMembers([]);
       } else {
         setMembers((data || []) as MemberRow[]);
       }
     } catch (err) {
-      console.error('[useMembers] exception:', err);
+      captureError('useMembers.exception', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
       setMembers([]);
     } finally {
@@ -73,7 +74,7 @@ export function useMembers() {
       await fetchMembers();
       return { error: null };
     } catch (err) {
-      console.error('[useMembers] updateMember exception:', err);
+      captureError('useMembers.updateMember', err);
       return { error: err instanceof Error ? err.message : 'Unknown error' };
     }
   };

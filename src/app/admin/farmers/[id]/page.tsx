@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import {
   ArrowLeft, Mail, Phone, MapPin, Globe, Calendar, Shield, Banknote,
@@ -356,9 +357,9 @@ export default function FarmerDetailPage() {
         <div className="bg-gradient-to-r from-[#1B2A4A] to-[#2A3A5C] px-6 py-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
             {/* Avatar */}
-            <div className="w-20 h-20 rounded-2xl bg-white/10 border-2 border-white/20 flex items-center justify-center overflow-hidden shrink-0">
+            <div className="w-20 h-20 rounded-2xl bg-white/10 border-2 border-white/20 flex items-center justify-center overflow-hidden shrink-0 relative">
               {profile.avatar_url ? (
-                <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
+                <Image src={profile.avatar_url} alt="" fill className="object-cover" unoptimized />
               ) : (
                 <span className="text-2xl font-bold text-white/80">
                   {profile.full_name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
@@ -743,7 +744,7 @@ export default function FarmerDetailPage() {
               </div>
               <div className="px-5 py-4 space-y-3 text-sm">
                 {publicProfile.hero_photo_url && (
-                  <img src={publicProfile.hero_photo_url} alt="" className="w-full h-32 object-cover rounded-lg" />
+                  <Image src={publicProfile.hero_photo_url} alt="" width={400} height={128} className="w-full h-32 object-cover rounded-lg" unoptimized />
                 )}
                 <p className="font-semibold text-[#1B2A4A]">{publicProfile.display_name}</p>
                 {publicProfile.story && (

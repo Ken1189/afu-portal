@@ -5,6 +5,7 @@ import {
   PenSquare, Plus, Pencil, Trash2, Save, Loader2, X, CheckCircle2, AlertCircle,
   Eye, Calendar, User, Tag, Star,
 } from 'lucide-react';
+import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 import ImageUploader from '@/components/ui/ImageUploader';
 
@@ -413,7 +414,7 @@ export default function AdminBlogPage() {
               <button onClick={() => setPreviewPost(null)} className="p-2 rounded-lg hover:bg-gray-100"><X className="w-5 h-5 text-gray-400" /></button>
             </div>
             {previewPost.featured_image && (
-              <img src={previewPost.featured_image} alt={`Featured image for ${previewPost.title}`} className="w-full h-48 object-cover rounded-xl" />
+              <Image src={previewPost.featured_image} alt={`Featured image for ${previewPost.title}`} width={700} height={192} className="w-full h-48 object-cover rounded-xl" unoptimized />
             )}
             <div>
               <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${CATEGORY_COLORS[previewPost.category] || 'bg-gray-100 text-gray-600'}`}>{previewPost.category}</span>
