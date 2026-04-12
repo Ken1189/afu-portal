@@ -8,6 +8,7 @@ import {
   ChevronDown, ChevronUp, MapPin, Leaf, TrendingUp, Globe,
   Send, Shield, BarChart3, X, Filter, MessageSquare, Banknote,
 } from 'lucide-react';
+import Pagination from '@/components/admin/Pagination';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createClient } from '@/lib/supabase/client';
 
@@ -211,6 +212,9 @@ function AllFarmersTab() {
   const [farmPlots, setFarmPlots] = useState<FarmPlot[]>([]);
   const [loans, setLoans] = useState<Loan[]>([]);
   const [insurance, setInsurance] = useState<InsurancePolicy[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 50;
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCountry, setFilterCountry] = useState('all');
   const [filterTier, setFilterTier] = useState('all');
@@ -224,22 +228,27 @@ function AllFarmersTab() {
     setTimeout(() => setToast(null), 4000);
   };
 
-  const fetchFarmers = useCallback(async () => {
+  const fetchFarmers = useCallback(async (pg: number = 1) => {
     setLoading(true);
+    const from = (pg - 1) * PAGE_SIZE;
+    const to = from + PAGE_SIZE - 1;
     try {
       const failures: string[] = [];
 
-      // Each query is independent — if one table is missing, others still load
+      // Paginate profiles — the heaviest query
       try {
-        const { data: profileData, error: profileErr } = await supabase
+        const { data: profileData, error: profileErr, count } = await supabase
           .from('profiles')
-          .select('*')
+          .select('*', { count: 'exact' })
           .in('role', ['member', 'farmer'])
-          .order('created_at', { ascending: false });
+          .order('created_at', { ascending: false })
+          .range(from, to);
         if (profileErr) { console.error('[farmers] profiles', profileErr); failures.push('farmers'); }
         setFarmers(profileData || []);
+        setTotalCount(count ?? 0);
       } catch (err) { console.error('[farmers] profiles exception', err); setFarmers([]); }
 
+      // These lookup tables are lighter — keep as full fetch for now
       try {
         const { data: plotData, error: plotErr } = await supabase.from('farm_plots').select('*');
         if (plotErr) { console.error('[farmers] farm_plots', plotErr); }
@@ -258,7 +267,6 @@ function AllFarmersTab() {
         setInsurance(insData || []);
       } catch { setInsurance([]); }
 
-      // Only toast on failure for the critical farmers query
       if (failures.length > 0) {
         showToast(`Failed to load farmers — check console`, 'error');
       }
@@ -269,7 +277,7 @@ function AllFarmersTab() {
     }
   }, [supabase]);
 
-  useEffect(() => { fetchFarmers(); }, [fetchFarmers]);
+  useEffect(() => { fetchFarmers(page); }, [fetchFarmers, page]);
 
   // Stats
   const totalFarmers = farmers.length;
@@ -655,8 +663,14 @@ function AllFarmersTab() {
             </tbody>
           </table>
         </div>
+        <Pagination
+          page={page}
+          pageSize={PAGE_SIZE}
+          totalCount={totalCount}
+          onPageChange={(p) => { setPage(p); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+        />
         <div className="px-4 py-3 bg-gray-50 border-t border-gray-100 text-xs text-gray-400">
-          Showing {filtered.length} of {totalFarmers} farmers
+          Showing {filtered.length} of {totalCount.toLocaleString()} farmers (page {page})
         </div>
       </div>
 

@@ -54,20 +54,22 @@ export interface SupplierInsert {
 
 // ── Hook: useSuppliers ────────────────────────────────────────────────────
 
-export function useSuppliers() {
+export function useSuppliers(page = 1, pageSize = 50) {
   const supabase = useMemo(() => createClient(), []);
   const [suppliers, setSuppliers] = useState<SupplierRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [totalCount, setTotalCount] = useState(0);
 
   const fetchSuppliers = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const { data, error: fetchError } = await supabase
+      const { data, error: fetchError, count } = await supabase
         .from('suppliers')
-        .select('*')
-        .order('company_name');
+        .select('*', { count: 'exact' })
+        .order('company_name')
+        .range((page - 1) * pageSize, page * pageSize - 1);
 
       if (fetchError) {
         console.error('[useSuppliers] fetch error:', fetchError);
@@ -75,6 +77,7 @@ export function useSuppliers() {
         setSuppliers([]);
       } else {
         setSuppliers((data || []) as SupplierRow[]);
+        setTotalCount(count ?? 0);
       }
     } catch (err) {
       console.error('[useSuppliers] exception:', err);
@@ -83,7 +86,7 @@ export function useSuppliers() {
     } finally {
       setLoading(false);
     }
-  }, [supabase]);
+  }, [supabase, page, pageSize]);
 
   useEffect(() => {
     fetchSuppliers();
@@ -143,7 +146,7 @@ export function useSuppliers() {
   // ── Summary stats ──────────────────────────────────────────────────────
 
   const stats = {
-    total: suppliers.length,
+    total: totalCount,
     active: suppliers.filter((s) => s.status === 'active').length,
     pending: suppliers.filter((s) => s.status === 'pending').length,
     suspended: suppliers.filter((s) => s.status === 'suspended').length,
@@ -155,6 +158,7 @@ export function useSuppliers() {
     loading,
     error,
     stats,
+    totalCount,
     fetchSuppliers,
     refetch: fetchSuppliers,
     addSupplier,

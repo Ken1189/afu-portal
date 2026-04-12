@@ -73,6 +73,7 @@ const FALLBACK_PAYMENTS: PaymentRecord[] = [
 ];
 
 import { createClient } from '@/lib/supabase/client';
+import Pagination from '@/components/admin/Pagination';
 
 // ── Animation variants ──────────────────────────────────────────────────────
 
@@ -271,20 +272,25 @@ export default function PaymentsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [payments, setPayments] = useState<PaymentRecord[]>(FALLBACK_PAYMENTS);
   const [isLoading, setIsLoading] = useState(true);
+  const [totalCount, setTotalCount] = useState(0);
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 50;
 
   // Fetch live payments from Supabase
   useEffect(() => {
     const supabase = createClient();
     (async () => {
       try {
-        const { data, error } = await supabase
+        const { data, error, count } = await supabase
           .from('payments')
-          .select('id, order_id, member_id, amount, currency, method, status, reference, created_at, profiles:member_id(full_name)')
-          .order('created_at', { ascending: false });
+          .select('id, order_id, member_id, amount, currency, method, status, reference, created_at, profiles:member_id(full_name)', { count: 'exact' })
+          .order('created_at', { ascending: false })
+          .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
 
         if (error || !data || data.length === 0) {
           setPayments(FALLBACK_PAYMENTS);
         } else {
+          setTotalCount(count ?? 0);
           const mapped: PaymentRecord[] = data.map((row: Record<string, unknown>) => {
             const profile = row.profiles as Record<string, unknown> | null;
             return {
@@ -311,7 +317,7 @@ export default function PaymentsPage() {
         setIsLoading(false);
       }
     })();
-  }, []);
+  }, [page]);
 
   // Update payment status in Supabase (approve / refund)
   const updatePaymentStatus = async (paymentId: string, newStatus: string) => {
@@ -845,42 +851,12 @@ export default function PaymentsPage() {
         </div>
 
         {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between px-5 py-3 border-t border-gray-100">
-            <p className="text-xs text-gray-400">
-              Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1}–{Math.min(currentPage * ITEMS_PER_PAGE, filteredPayments.length)} of {filteredPayments.length}
-            </p>
-            <div className="flex items-center gap-1">
-              <button
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                disabled={currentPage === 1}
-                className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-              >
-                <ChevronLeft className="w-4 h-4 text-gray-600" />
-              </button>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                <button
-                  key={page}
-                  onClick={() => setCurrentPage(page)}
-                  className={`w-8 h-8 rounded-lg text-xs font-medium transition-colors ${
-                    page === currentPage
-                      ? 'bg-navy text-white'
-                      : 'text-gray-600 hover:bg-gray-100'
-                  }`}
-                >
-                  {page}
-                </button>
-              ))}
-              <button
-                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                disabled={currentPage === totalPages}
-                className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-              >
-                <ChevronRight className="w-4 h-4 text-gray-600" />
-              </button>
-            </div>
-          </div>
-        )}
+        <Pagination
+          page={page}
+          pageSize={PAGE_SIZE}
+          totalCount={totalCount}
+          onPageChange={(p) => { setPage(p); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+        />
       </motion.div>
 
       {/* Refund modal */}

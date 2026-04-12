@@ -10,6 +10,7 @@ import {
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/supabase/auth-context';
 import { startImpersonation } from '@/components/ui/ImpersonationBanner';
+import Pagination from '@/components/admin/Pagination';
 
 interface ProfileRow {
   id: string;
@@ -94,6 +95,9 @@ export default function AdminMembersPage() {
   const router = useRouter();
   const [profiles, setProfiles] = useState<ProfileRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [totalCount, setTotalCount] = useState(0);
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 50;
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
   const [countryFilter, setCountryFilter] = useState('all');
@@ -140,21 +144,26 @@ export default function AdminMembersPage() {
     setTimeout(() => setErrorMsg(null), 4000);
   };
 
-  const fetchProfiles = useCallback(async () => {
+  const fetchProfiles = useCallback(async (pg: number = 1) => {
     setLoading(true);
+    const from = (pg - 1) * PAGE_SIZE;
+    const to = from + PAGE_SIZE - 1;
     try {
       // Try with capabilities first; gracefully fall back if column doesn't exist
-      let { data, error } = await supabase
+      let { data, error, count } = await supabase
         .from('profiles')
-        .select('id, full_name, email, role, country, region, capabilities, created_at, members(tier)')
-        .order('created_at', { ascending: false });
+        .select('id, full_name, email, role, country, region, capabilities, created_at, members(tier)', { count: 'exact' })
+        .order('created_at', { ascending: false })
+        .range(from, to);
       if (error && /capabilities/i.test(error.message)) {
         const fallback = await supabase
           .from('profiles')
-          .select('id, full_name, email, role, country, region, created_at, members(tier)')
-          .order('created_at', { ascending: false });
+          .select('id, full_name, email, role, country, region, created_at, members(tier)', { count: 'exact' })
+          .order('created_at', { ascending: false })
+          .range(from, to);
         data = (fallback.data as unknown) as typeof data;
         error = fallback.error;
+        count = fallback.count;
       }
       if (error) {
         console.error('[admin/members] fetch error', error);
@@ -163,6 +172,7 @@ export default function AdminMembersPage() {
         setProfiles([]);
       } else {
         setProfiles((data || []) as ProfileRow[]);
+        setTotalCount(count ?? 0);
       }
     } catch (err) {
       console.error('[admin/members] exception', err);
@@ -172,7 +182,7 @@ export default function AdminMembersPage() {
     }
   }, [supabase]);
 
-  useEffect(() => { fetchProfiles(); }, [fetchProfiles]);
+  useEffect(() => { fetchProfiles(page); }, [fetchProfiles, page]);
 
   const getTier = (p: ProfileRow): string | null => {
     if (!p.members) return null;
@@ -595,7 +605,7 @@ export default function AdminMembersPage() {
           </div>
         </div>
         <p className="text-xs text-gray-400 mt-3">
-          Showing {filtered.length} of {profiles.length} people
+          Showing {filtered.length} of {totalCount.toLocaleString()} people (page {page})
         </p>
       </div>
 
@@ -719,6 +729,13 @@ export default function AdminMembersPage() {
               </p>
             </div>
           )}
+
+          <Pagination
+            page={page}
+            pageSize={PAGE_SIZE}
+            totalCount={totalCount}
+            onPageChange={(p) => { setPage(p); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+          />
         </div>
       )}
 

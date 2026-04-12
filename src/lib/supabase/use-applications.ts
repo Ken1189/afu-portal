@@ -39,9 +39,10 @@ export interface ApplicationInsert {
   notes?: string;
 }
 
-export function useApplications() {
+export function useApplications(page = 1, pageSize = 50) {
   const supabase = useMemo(() => createClient(), []);
   const [applications, setApplications] = useState<ApplicationRow[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -49,26 +50,30 @@ export function useApplications() {
     setLoading(true);
     setError(null);
     try {
-      const { data, error: fetchError } = await supabase
+      const { data, count, error: fetchError } = await supabase
         .from('membership_applications')
-        .select('*')
-        .order('created_at', { ascending: false });
+        .select('*', { count: 'exact' })
+        .order('created_at', { ascending: false })
+        .range((page - 1) * pageSize, page * pageSize - 1);
 
       if (fetchError) {
         console.error('[useApplications] fetch error:', fetchError);
         setError(fetchError.message);
         setApplications([]);
+        setTotalCount(0);
       } else {
         setApplications((data || []) as ApplicationRow[]);
+        setTotalCount(count ?? 0);
       }
     } catch (err) {
       console.error('[useApplications] exception:', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
       setApplications([]);
+      setTotalCount(0);
     } finally {
       setLoading(false);
     }
-  }, [supabase]);
+  }, [supabase, page, pageSize]);
 
   useEffect(() => { fetchApplications(); }, [fetchApplications]);
 
@@ -139,12 +144,12 @@ export function useApplications() {
   };
 
   const stats = {
-    total: applications.length,
+    total: totalCount,
     pending: applications.filter(a => a.status === 'pending').length,
     underReview: applications.filter(a => a.status === 'under_review').length,
     approved: applications.filter(a => a.status === 'approved').length,
     rejected: applications.filter(a => a.status === 'rejected').length,
   };
 
-  return { applications, loading, error, stats, fetchApplications, refetch: fetchApplications, approveApplication, rejectApplication, submitApplication };
+  return { applications, loading, error, stats, totalCount, fetchApplications, refetch: fetchApplications, approveApplication, rejectApplication, submitApplication };
 }

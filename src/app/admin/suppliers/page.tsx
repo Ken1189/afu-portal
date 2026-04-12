@@ -37,6 +37,7 @@ import {
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { useSuppliers, type SupplierRow } from '@/lib/supabase/use-suppliers';
+import Pagination from '@/components/admin/Pagination';
 import type { SupplierCategory, SponsorshipTier } from '@/lib/supabase/types';
 
 // ── Animation variants ────────────────────────────────────────────────────
@@ -484,7 +485,9 @@ function SupplierDetailPanel({ supplier, onCommissionUpdate }: { supplier: Suppl
 // ═══════════════════════════════════════════════════════════════════════════
 
 export default function AdminSuppliersPage() {
-  const { suppliers, loading, stats, approveSupplier, suspendSupplier, activateSupplier, rejectSupplier, updateSupplier } = useSuppliers();
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 50;
+  const { suppliers, loading, stats, totalCount, approveSupplier, suspendSupplier, activateSupplier, rejectSupplier, updateSupplier } = useSuppliers(page, PAGE_SIZE);
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [countryFilter, setCountryFilter] = useState<string>('all');
@@ -1309,6 +1312,16 @@ export default function AdminSuppliersPage() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <Pagination
+        page={page}
+        pageSize={PAGE_SIZE}
+        totalCount={totalCount}
+        onPageChange={(p) => {
+          setPage(p);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+      />
     </motion.div>
   );
 }

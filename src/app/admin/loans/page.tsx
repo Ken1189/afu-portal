@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
+import Pagination from '@/components/admin/Pagination';
 import FilterBar, { LOAN_STATUS_FILTER, COUNTRY_FILTER, DATE_RANGE_FILTER } from '@/components/admin/FilterBar';
 import type { FilterValues } from '@/components/admin/FilterBar';
 import CaseDetailPanel from '@/components/admin/CaseDetailPanel';
@@ -338,6 +339,9 @@ export default function LoansPage() {
   const [disbursedIds, setDisbursedIds] = useState<Set<string>>(new Set());
   const [realLoans, setRealLoans] = useState<LoanApplication[]>([]);
   const [dbLoading, setDbLoading] = useState(true);
+  const [totalCount, setTotalCount] = useState(0);
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 50;
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [filterValues, setFilterValues] = useState<FilterValues>({
     search: '',
@@ -354,16 +358,18 @@ export default function LoansPage() {
   const fetchLoans = useCallback(async () => {
     setDbLoading(true);
     const supabase = createClient();
-    const { data, error } = await supabase
+    const { data, error, count } = await supabase
       .from('loans')
-      .select('*, members!inner(id, profile_id, profiles!inner(full_name, email))')
-      .order('created_at', { ascending: false });
+      .select('*, members!inner(id, profile_id, profiles!inner(full_name, email))', { count: 'exact' })
+      .order('created_at', { ascending: false })
+      .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
 
     if (error) {
       console.error('[loans] fetch failed', error);
       showToast(`Failed to load loans: ${error.message || 'unknown error'}`, 'error');
       setRealLoans([]);
     } else {
+      setTotalCount(count ?? 0);
       setRealLoans((data || []).map((loan: Record<string, unknown>) => {
         const members = loan.members as Record<string, unknown> | null;
         const profiles = members?.profiles as Record<string, unknown> | null;
@@ -380,7 +386,7 @@ export default function LoansPage() {
       }));
     }
     setDbLoading(false);
-  }, []);
+  }, [page]);
 
   useEffect(() => { fetchLoans(); }, [fetchLoans]);
 
@@ -875,6 +881,13 @@ export default function LoansPage() {
             </tbody>
           </table>
         </div>
+
+        <Pagination
+          page={page}
+          pageSize={PAGE_SIZE}
+          totalCount={totalCount}
+          onPageChange={(p) => { setPage(p); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+        />
       </motion.div>
 
       {/* ── Bottom Grid: Credit Score Distribution + Disbursement Queue ──── */}

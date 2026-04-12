@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { useApplications, type ApplicationRow } from '@/lib/supabase/use-applications';
 import type { ApplicationStatus } from '@/lib/supabase/types';
+import Pagination from '@/components/admin/Pagination';
 
 // ── Status styling ──────────────────────────────────────────────────────────
 
@@ -83,15 +84,19 @@ function formatDate(dateStr: string): string {
 //  MAIN COMPONENT
 // ═════════════════════════════════════════════════════════════════════════════
 
+const PAGE_SIZE = 50;
+
 export default function AdminApplicationsPage() {
+  const [page, setPage] = useState(1);
   const {
     applications,
     loading,
     error,
     stats,
+    totalCount,
     approveApplication,
     rejectApplication,
-  } = useApplications();
+  } = useApplications(page, PAGE_SIZE);
 
   const [activeTab, setActiveTab] = useState<FilterTab>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -567,6 +572,17 @@ export default function AdminApplicationsPage() {
               </p>
             </div>
           )}
+
+          {/* Pagination */}
+          <Pagination
+            page={page}
+            pageSize={PAGE_SIZE}
+            totalCount={totalCount}
+            onPageChange={(p) => {
+              setPage(p);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+          />
         </div>
       )}
 
