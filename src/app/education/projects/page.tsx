@@ -1,109 +1,25 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { createClient } from '@/lib/supabase/client';
+import { Loader2, Beaker } from 'lucide-react';
 
 const categories = ['All', 'Agronomy', 'Livestock', 'Technology', 'Climate'];
 
-const projects = [
-  {
-    name: 'Drought-Resistant Maize Varieties',
-    category: 'Agronomy',
-    status: 'Active',
-    duration: '2024-2026',
-    funding: '$420,000',
-    lead: 'Dr. Tendai Moyo',
-    partners: ['CIMMYT', 'University of Zimbabwe', 'Seed Co International'],
-    description:
-      'Developing and field-testing three new drought-resistant maize varieties adapted for southern African conditions. Trials are conducted across 12 sites in Zimbabwe and Botswana with over 300 participating farmers.',
-    progress: 65,
-  },
-  {
-    name: 'Precision Farming Pilot Programme',
-    category: 'Technology',
-    status: 'Active',
-    duration: '2024-2027',
-    funding: '$780,000',
-    lead: 'Eng. Amina Kibali',
-    partners: ['Google.org', 'Vodacom Tanzania', 'Sokoine University'],
-    description:
-      'Deploying satellite imagery, drone monitoring, and IoT soil sensors across 50 farms in Tanzania and Botswana. The programme aims to demonstrate that precision agriculture can boost smallholder yields by 30% while reducing input costs.',
-    progress: 35,
-  },
-  {
-    name: 'Livestock Genetics Improvement',
-    category: 'Livestock',
-    status: 'Active',
-    duration: '2023-2026',
-    funding: '$350,000',
-    lead: 'Dr. Farai Chikwanha',
-    partners: ['ILRI', 'Midlands State University', 'Zimbabwe Herd Book Authority'],
-    description:
-      'Identifying and propagating heat-tolerant, high-yield cattle genetics suitable for southern African rangelands. The project includes AI-assisted breeding selection and a regional semen distribution programme serving 300+ farms.',
-    progress: 72,
-  },
-  {
-    name: 'National Soil Mapping Initiative',
-    category: 'Agronomy',
-    status: 'Active',
-    duration: '2023-2025',
-    funding: '$290,000',
-    lead: 'Dr. Kelebogile Phatudi',
-    partners: ['ICRISAT', 'University of Botswana', 'FAO'],
-    description:
-      'Comprehensive soil health mapping programme covering 50,000 hectares across Botswana, creating detailed fertility maps and generating customised fertilisation recommendations for each soil zone.',
-    progress: 88,
-  },
-  {
-    name: 'Rainwater Harvesting at Scale',
-    category: 'Climate',
-    status: 'Active',
-    duration: '2024-2026',
-    funding: '$510,000',
-    lead: 'Eng. Joseph Mwakasege',
-    partners: ['IWMI', 'WaterAid', 'Tanzania Ministry of Water'],
-    description:
-      'Designing, deploying, and evaluating low-cost rainwater harvesting systems for smallholder farms in semi-arid northern Tanzania. Target of 500 installations with integrated drip irrigation kits.',
-    progress: 42,
-  },
-  {
-    name: 'Mobile Extension Services Network',
-    category: 'Technology',
-    status: 'Completed',
-    duration: '2022-2024',
-    funding: '$180,000',
-    lead: 'Ms. Grace Ndlovu',
-    partners: ['Econet Wireless', 'University of Dar es Salaam', 'AGRA'],
-    description:
-      'Built and launched an SMS and USSD-based agricultural extension platform delivering crop advisories, weather alerts, and market prices to 15,000 farmers across Zimbabwe and Tanzania in local languages.',
-    progress: 100,
-  },
-  {
-    name: 'Carbon Credit Verification System',
-    category: 'Climate',
-    status: 'Planning',
-    duration: '2026-2028',
-    funding: '$650,000',
-    lead: 'Dr. Blessing Tawanda',
-    partners: ['Verra', 'Climate Focus', 'AfDB'],
-    description:
-      'Developing a standardised methodology and digital MRV (Monitoring, Reporting, Verification) platform for agricultural carbon credits in sub-Saharan Africa, enabling smallholder farmers to access voluntary carbon markets.',
-    progress: 10,
-  },
-  {
-    name: 'Post-Harvest Loss Reduction',
-    category: 'Agronomy',
-    status: 'Active',
-    duration: '2024-2026',
-    funding: '$320,000',
-    lead: 'Dr. Rehema Saidi',
-    partners: ['APHLIS', 'Tanzania Agricultural Research Institute', 'USAID'],
-    description:
-      'Tackling the estimated 30-40% post-harvest losses in grain crops through improved storage solutions, hermetic bags, solar dryers, and farmer training on harvest handling best practices across central Tanzania.',
-    progress: 55,
-  },
-];
+interface Project {
+  id: string;
+  name: string;
+  category: string;
+  status: string;
+  duration: string;
+  funding: string;
+  lead: string;
+  partners: string[];
+  description: string;
+  progress: number;
+}
 
 const statusColors: Record<string, string> = {
   Active: 'bg-[#EBF7E5] text-[#5DB347]',
@@ -120,6 +36,24 @@ const categoryColors: Record<string, string> = {
 
 export default function ProjectsPage() {
   const [activeFilter, setActiveFilter] = useState('All');
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const supabase = createClient();
+    (async () => {
+      const { data, error } = await supabase
+        .from('education_projects')
+        .select('id, name, category, status, duration, funding, lead, partners, description, progress')
+        .eq('visible', true)
+        .order('display_order', { ascending: true });
+
+      if (!error && data) {
+        setProjects(data as Project[]);
+      }
+      setLoading(false);
+    })();
+  }, []);
 
   const filtered =
     activeFilter === 'All'
@@ -163,91 +97,123 @@ export default function ProjectsPage() {
             ))}
           </div>
 
+          {/* Loading */}
+          {loading && (
+            <div className="flex items-center justify-center py-20">
+              <Loader2 className="w-6 h-6 animate-spin text-[#5DB347]" />
+            </div>
+          )}
+
+          {/* Empty State */}
+          {!loading && projects.length === 0 && (
+            <div className="text-center py-20">
+              <Beaker className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-[#1B2A4A] mb-2">Projects coming soon</h3>
+              <p className="text-gray-500 max-w-md mx-auto">
+                Our research and development projects are being finalised. Check back soon for updates on our agricultural innovation initiatives.
+              </p>
+            </div>
+          )}
+
           {/* Projects Grid */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeFilter}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: 0.2 }}
-              className="grid grid-cols-1 lg:grid-cols-2 gap-8"
-            >
-              {filtered.map((project, i) => (
-                <div
-                  key={i}
-                  className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 border-l-4 border-[#5DB347] shadow-lg shadow-[#5DB347]/5 hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
-                >
-                  {/* Header */}
-                  <div className="flex items-start justify-between gap-4 mb-4">
-                    <h3 className="text-lg font-bold text-[#1B2A4A]">
-                      {project.name}
-                    </h3>
-                    <div className="flex gap-2 shrink-0">
-                      <span
-                        className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
-                          categoryColors[project.category]
-                        }`}
-                      >
-                        {project.category}
-                      </span>
-                      <span
-                        className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
-                          statusColors[project.status]
-                        }`}
-                      >
-                        {project.status}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Meta */}
-                  <div className="flex flex-wrap gap-4 text-sm text-gray-500 mb-4">
-                    <span>{project.duration}</span>
-                    <span className="font-medium text-[#5DB347]">
-                      {project.funding}
-                    </span>
-                    <span>Lead: {project.lead}</span>
-                  </div>
-
-                  {/* Description */}
-                  <p className="text-gray-600 text-sm mb-5 leading-relaxed">
-                    {project.description}
-                  </p>
-
-                  {/* Partners */}
-                  <div className="mb-5">
-                    <div className="flex flex-wrap gap-2">
-                      {project.partners.map((p, j) => (
+          {!loading && projects.length > 0 && (
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeFilter}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -12 }}
+                transition={{ duration: 0.2 }}
+                className="grid grid-cols-1 lg:grid-cols-2 gap-8"
+              >
+                {filtered.map((project, i) => (
+                  <div
+                    key={project.id || i}
+                    className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 border-l-4 border-[#5DB347] shadow-lg shadow-[#5DB347]/5 hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
+                  >
+                    {/* Header */}
+                    <div className="flex items-start justify-between gap-4 mb-4">
+                      <h3 className="text-lg font-bold text-[#1B2A4A]">
+                        {project.name}
+                      </h3>
+                      <div className="flex gap-2 shrink-0">
                         <span
-                          key={j}
-                          className="bg-[#EBF7E5] text-[#1B2A4A] text-xs font-medium px-3 py-1 rounded-full border border-[#5DB347]/20"
+                          className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
+                            categoryColors[project.category] || 'bg-gray-100 text-gray-600'
+                          }`}
                         >
-                          {p}
+                          {project.category}
                         </span>
-                      ))}
+                        <span
+                          className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
+                            statusColors[project.status] || 'bg-gray-100 text-gray-600'
+                          }`}
+                        >
+                          {project.status}
+                        </span>
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Progress Bar */}
-                  <div>
-                    <div className="flex items-center justify-between text-sm mb-2">
-                      <span className="text-gray-500">Progress</span>
-                      <span className="font-semibold text-[#5DB347]">
-                        {project.progress}%
-                      </span>
+                    {/* Meta */}
+                    <div className="flex flex-wrap gap-4 text-sm text-gray-500 mb-4">
+                      {project.duration && <span>{project.duration}</span>}
+                      {project.funding && (
+                        <span className="font-medium text-[#5DB347]">
+                          {project.funding}
+                        </span>
+                      )}
+                      {project.lead && <span>Lead: {project.lead}</span>}
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2.5">
-                      <div
-                        className="bg-gradient-to-r from-[#5DB347] to-[#6ABF4B] rounded-full h-2.5 transition-all duration-500"
-                        style={{ width: `${project.progress}%` }}
-                      />
+
+                    {/* Description */}
+                    {project.description && (
+                      <p className="text-gray-600 text-sm mb-5 leading-relaxed">
+                        {project.description}
+                      </p>
+                    )}
+
+                    {/* Partners */}
+                    {project.partners && project.partners.length > 0 && (
+                      <div className="mb-5">
+                        <div className="flex flex-wrap gap-2">
+                          {project.partners.map((p, j) => (
+                            <span
+                              key={j}
+                              className="bg-[#EBF7E5] text-[#1B2A4A] text-xs font-medium px-3 py-1 rounded-full border border-[#5DB347]/20"
+                            >
+                              {p}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Progress Bar */}
+                    <div>
+                      <div className="flex items-center justify-between text-sm mb-2">
+                        <span className="text-gray-500">Progress</span>
+                        <span className="font-semibold text-[#5DB347]">
+                          {project.progress}%
+                        </span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2.5">
+                        <div
+                          className="bg-gradient-to-r from-[#5DB347] to-[#6ABF4B] rounded-full h-2.5 transition-all duration-500"
+                          style={{ width: `${project.progress}%` }}
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </motion.div>
-          </AnimatePresence>
+                ))}
+
+                {filtered.length === 0 && (
+                  <div className="col-span-2 text-center py-12">
+                    <p className="text-gray-500">No projects in this category yet.</p>
+                  </div>
+                )}
+              </motion.div>
+            </AnimatePresence>
+          )}
         </div>
       </section>
 

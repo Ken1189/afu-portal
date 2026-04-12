@@ -182,6 +182,7 @@ const navGroups: NavGroup[] = [
       { href: '/admin/legal-services', label: 'Legal Services', icon: <Scale className={ICON_CLS} /> },
       { href: '/admin/testimonials', label: 'Testimonials', icon: <MessageSquare className={ICON_CLS} /> },
       { href: '/admin/research', label: 'Research', icon: <FlaskConical className={ICON_CLS} /> },
+      { href: '/admin/education-projects', label: 'Education Projects', icon: <FlaskConical className={ICON_CLS} /> },
       { href: '/admin/countries', label: 'Countries', icon: <Globe className={ICON_CLS} /> },
     ],
   },

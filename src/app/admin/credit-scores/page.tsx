@@ -44,7 +44,7 @@ type FilterTab = 'All' | 'Excellent' | 'Good' | 'Fair' | 'Poor';
 type SortKey = 'score' | 'name';
 type SortDir = 'asc' | 'desc';
 
-// ── Mock Data ───────────────────────────────────────────────────
+// ── Scoring Model Reference ─────────────────────────────────────
 
 const scoringFactors = [
   { name: 'Payment History',       weight: 30, color: 'bg-[#1B2A4A]' },
@@ -56,14 +56,12 @@ const scoringFactors = [
   { name: 'Collateral',            weight: 5,  color: 'bg-rose-400' },
 ];
 
-const scoreDistribution = [
-  { label: 'Excellent', range: '800–1000', count: 84,  color: 'bg-green-500',        text: 'text-green-700',  badge: 'bg-green-100 text-green-700' },
-  { label: 'Good',      range: '600–799',  count: 101, color: 'bg-[#5DB347]',         text: 'text-[#5DB347]',  badge: 'bg-teal-100 text-teal-700' },
-  { label: 'Fair',      range: '400–599',  count: 45,  color: 'bg-[#D4A843]',         text: 'text-amber-700',  badge: 'bg-amber-100 text-amber-700' },
-  { label: 'Poor',      range: '0–399',    count: 17,  color: 'bg-red-500',           text: 'text-red-700',    badge: 'bg-red-100 text-red-700' },
+const distributionMeta = [
+  { label: 'Excellent', range: '800–1000', color: 'bg-green-500',  text: 'text-green-700', badge: 'bg-green-100 text-green-700' },
+  { label: 'Good',      range: '600–799',  color: 'bg-[#5DB347]',  text: 'text-[#5DB347]', badge: 'bg-teal-100 text-teal-700' },
+  { label: 'Fair',      range: '400–599',  color: 'bg-[#D4A843]',  text: 'text-amber-700', badge: 'bg-amber-100 text-amber-700' },
+  { label: 'Poor',      range: '0–399',    color: 'bg-red-500',    text: 'text-red-700',   badge: 'bg-red-100 text-red-700' },
 ];
-
-const totalScored = scoreDistribution.reduce((s, d) => s + d.count, 0);
 
 interface Member {
   rank: number;
@@ -77,41 +75,9 @@ interface Member {
   lastUpdated: string;
 }
 
-const fallback_members: Member[] = [
-  { rank: 1,  name: 'Amara Diallo',      country: 'Kenya',      score: 948, tier: 'Excellent', trend: 'up',   paymentHistory: 98, farmProductivity: 91, lastUpdated: '2026-03-18' },
-  { rank: 2,  name: 'Chidi Okonkwo',     country: 'Nigeria',    score: 921, tier: 'Excellent', trend: 'up',   paymentHistory: 96, farmProductivity: 88, lastUpdated: '2026-03-18' },
-  { rank: 3,  name: 'Fatima Nkosi',      country: 'Zimbabwe',   score: 887, tier: 'Excellent', trend: 'flat', paymentHistory: 94, farmProductivity: 82, lastUpdated: '2026-03-18' },
-  { rank: 4,  name: 'Kwame Asante',      country: 'Ghana',      score: 854, tier: 'Excellent', trend: 'up',   paymentHistory: 92, farmProductivity: 80, lastUpdated: '2026-03-17' },
-  { rank: 5,  name: 'Zanele Dlamini',    country: 'Botswana',   score: 736, tier: 'Good',      trend: 'up',   paymentHistory: 85, farmProductivity: 74, lastUpdated: '2026-03-18' },
-  { rank: 6,  name: 'Tendai Moyo',       country: 'Zimbabwe',   score: 692, tier: 'Good',      trend: 'up',   paymentHistory: 88, farmProductivity: 70, lastUpdated: '2026-03-18' },
-  { rank: 7,  name: 'Aisha Kamara',      country: 'Tanzania',   score: 645, tier: 'Good',      trend: 'down', paymentHistory: 80, farmProductivity: 65, lastUpdated: '2026-03-17' },
-  { rank: 8,  name: 'Sipho Ndlovu',      country: 'Zimbabwe',   score: 538, tier: 'Fair',      trend: 'flat', paymentHistory: 72, farmProductivity: 58, lastUpdated: '2026-03-16' },
-  { rank: 9,  name: 'Miriam Owusu',      country: 'Uganda',     score: 471, tier: 'Fair',      trend: 'down', paymentHistory: 65, farmProductivity: 51, lastUpdated: '2026-03-17' },
-  { rank: 10, name: 'Babajide Adeyemi',  country: 'Nigeria',    score: 352, tier: 'Poor',      trend: 'down', paymentHistory: 42, farmProductivity: 38, lastUpdated: '2026-03-15' },
-];
+const fallback_members: Member[] = [];
 
-const fallback_recentOverrides = [
-  {
-    id: 1,
-    member: 'Tendai Moyo',
-    country: 'Zimbabwe',
-    from: 450,
-    to: 600,
-    reason: 'Seasonal crop failure; strong repayment history prior to drought period.',
-    admin: 'Admin: Grace Mutema',
-    date: '2026-03-12',
-  },
-  {
-    id: 2,
-    member: 'Aisha Kamara',
-    country: 'Tanzania',
-    from: 580,
-    to: 645,
-    reason: 'Farm productivity data updated after co-op audit confirmed higher yield records.',
-    admin: 'Admin: James Kariuki',
-    date: '2026-03-08',
-  },
-];
+const fallback_recentOverrides: { id: number; member: string; country: string; from: number; to: number; reason: string; admin: string; date: string }[] = [];
 
 // ── Helpers ─────────────────────────────────────────────────────
 
@@ -178,6 +144,14 @@ export default function CreditScoresPage() {
     }
     fetchData();
   }, []);
+
+  // ── Compute distribution from real data ──
+  const scoreDistribution = distributionMeta.map((meta) => {
+    const count = members.filter((m) => getTier(m.score) === meta.label).length;
+    return { ...meta, count };
+  });
+  const totalScored = members.length;
+  const safeDivisor = totalScored || 1; // prevent divide by zero
 
   // ── Filtering & Sorting ──
   const filtered = members
@@ -338,12 +312,12 @@ export default function CreditScoresPage() {
           {/* Stacked horizontal bar */}
           <div className="w-full h-9 rounded-xl overflow-hidden flex mb-6">
             {scoreDistribution.map((seg, i) => {
-              const pct = ((seg.count / totalScored) * 100).toFixed(1);
+              const pct = ((seg.count / safeDivisor) * 100).toFixed(1);
               return (
                 <motion.div
                   key={i}
                   className={`${seg.color} flex items-center justify-center relative group`}
-                  style={{ width: `${(seg.count / totalScored) * 100}%` }}
+                  style={{ width: `${(seg.count / safeDivisor) * 100}%` }}
                   initial={{ scaleX: 0, originX: 0 }}
                   animate={{ scaleX: 1 }}
                   transition={{ delay: i * 0.1, duration: 0.5, ease: 'easeOut' }}
@@ -360,7 +334,7 @@ export default function CreditScoresPage() {
           {/* Legend rows */}
           <div className="space-y-3">
             {scoreDistribution.map((seg, i) => {
-              const pct = ((seg.count / totalScored) * 100).toFixed(1);
+              const pct = ((seg.count / safeDivisor) * 100).toFixed(1);
               return (
                 <div key={i} className="flex items-center gap-3">
                   <div className={`w-3 h-3 rounded-sm flex-shrink-0 ${seg.color}`} />
@@ -378,7 +352,7 @@ export default function CreditScoresPage() {
                       <motion.div
                         className={`h-1.5 rounded-full ${seg.color}`}
                         initial={{ width: 0 }}
-                        animate={{ width: `${(seg.count / totalScored) * 100}%` }}
+                        animate={{ width: `${(seg.count / safeDivisor) * 100}%` }}
                         transition={{ delay: 0.3 + i * 0.08, duration: 0.5 }}
                       />
                     </div>
