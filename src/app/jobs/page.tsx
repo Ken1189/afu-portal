@@ -461,7 +461,7 @@ export default function JobsPage() {
             Ready to Transform African Agriculture?
           </h2>
           <p className="text-white/80 mb-6 max-w-lg mx-auto">
-            Join the ground floor of a $500M-backed agritech platform. Equity participation, cutting-edge technology, and direct impact on millions of farmers.
+            Join the ground floor of Africa&apos;s leading agritech platform. Competitive compensation, cutting-edge technology, and direct impact on millions of farmers.
           </p>
           <Link
             href="/contact?subject=careers"

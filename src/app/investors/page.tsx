@@ -310,7 +310,7 @@ const FALLBACK_INVESTORS: InvestorsContent = {
           'Quarterly distributions',
           'Investor portal access',
           'Board seat',
-          'Equity participation option',
+          'Profit share participation',
           'Dedicated relationship manager',
           'Off-take participation options',
           'Marketing rights across AFU member network',

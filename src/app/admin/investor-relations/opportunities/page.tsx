@@ -86,7 +86,7 @@ const EMPTY_FORM: OpportunityFormData = {
 
 /* ─── Constants ─── */
 
-const FUND_TYPES = ['Debt Fund', 'Debt', 'Equity', 'Insurance', 'Trade Finance', 'Blended'];
+const FUND_TYPES = ['Debt Fund', 'Debt', 'Profit Share', 'Insurance', 'Trade Finance', 'Blended'];
 const STATUSES = ['Open', 'Fully Subscribed', 'Closed', 'Coming Soon'];
 const RISK_LEVELS = ['Low', 'Medium', 'Medium-High', 'High'];
 const SECTORS = [
@@ -140,7 +140,7 @@ const RISK_BADGES: Record<string, string> = {
 const TYPE_BADGES: Record<string, string> = {
   'Debt Fund': 'bg-blue-100 text-blue-700',
   Debt: 'bg-blue-100 text-blue-700',
-  Equity: 'bg-purple-100 text-purple-700',
+  'Profit Share': 'bg-amber-100 text-amber-700',
   Insurance: 'bg-teal-100 text-teal-700',
   'Trade Finance': 'bg-indigo-100 text-indigo-700',
   Blended: 'bg-pink-100 text-pink-700',
@@ -169,7 +169,7 @@ const FALLBACK_OPPORTUNITIES: Opportunity[] = [
   {
     id: 'fallback-2',
     name: 'Zimbabwe Blueberry Expansion',
-    type: 'Equity',
+    type: 'Profit Share',
     description: 'Expand blueberry operation from 25ha to 100ha. EU export contracts secured. $18/kg farm-gate price.',
     target: 2000000,
     min_investment: 250000,

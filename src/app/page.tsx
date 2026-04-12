@@ -1351,7 +1351,7 @@ export default function Home() {
                 </span>
               </h2>
               <p className="text-gray-300 max-w-3xl mx-auto text-lg">
-                {c('investor_body', "AFU is raising a multi-million dollar funding round to build Africa's first vertically integrated agriculture development bank and operating platform. Trade finance, input lending, and offtake — tapping into Africa's growing agricultural market.")}
+                {c('investor_body', "AFU is raising a multi-million dollar funding round to build Africa's first vertically integrated agriculture development bank and operating platform. Invest through Debt Funds, Profit Share, and Insurance-Backed structures — all backed by real assets with guaranteed offtake across 20 African countries.")}
               </p>
             </div>
           </FadeInWhenVisible>
@@ -1453,7 +1453,7 @@ export default function Home() {
                     tier: 'Strategic Partner',
                     min: '$5,000,000+',
                     returns: 'Custom structure',
-                    features: ['Board observer rights', 'Country exclusivity options', 'Joint venture structures', 'Equity participation option', 'Dedicated relationship manager'],
+                    features: ['Board observer rights', 'Country exclusivity options', 'Joint venture structures', 'Profit share participation', 'Dedicated relationship manager'],
                     color: 'border-purple-400/40 bg-purple-500/5',
                     badge: 'bg-purple-500/20 text-purple-300',
                   },
