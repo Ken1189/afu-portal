@@ -624,7 +624,7 @@ export default function InvestorDashboard() {
       <motion.div initial="hidden" animate="visible" custom={1.5} variants={fadeIn} className="bg-gradient-to-r from-[#1B2A4A] to-[#2A3F6A] rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="text-white">
           <h3 className="font-bold text-lg">Interested in investing?</h3>
-          <p className="text-white/60 text-sm">Explore Debt Funds, Equity &amp; Profit Share, and Insurance-Backed Investments &mdash; or schedule a call with our team.</p>
+          <p className="text-white/60 text-sm">Explore Debt Funds, Profit Share, and Insurance-Backed Investments &mdash; or schedule a call with our team.</p>
         </div>
         <div className="flex gap-3">
           <a href="/investor/opportunities" className="px-6 py-3 bg-[#5DB347] hover:bg-[#449933] text-white rounded-xl font-semibold text-sm transition-colors">View Opportunities</a>

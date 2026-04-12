@@ -24,7 +24,7 @@ import { createClient } from '@/lib/supabase/client';
 interface Investment {
   id: string;
   name: string;
-  type: 'Debt' | 'Equity' | 'Insurance';
+  type: 'Debt' | 'Insurance' | 'Profit Share';
   committed: number;
   deployed: number;
   returns: number;
@@ -59,8 +59,8 @@ const statusStyle: Record<string, string> = {
 
 const typeStyle: Record<string, string> = {
   Debt: 'bg-blue-50 text-blue-700 border border-blue-200',
-  Equity: 'bg-purple-50 text-purple-700 border border-purple-200',
   Insurance: 'bg-teal-50 text-teal-700 border border-teal-200',
+  'Profit Share': 'bg-amber-50 text-amber-700 border border-amber-200',
 };
 
 const ALLOCATION_COLORS = ['#1B2A4A', '#5DB347', '#3B82F6', '#8B5CF6', '#F59E0B', '#EF4444', '#06B6D4', '#EC4899'];
@@ -459,7 +459,7 @@ export default function PortfolioPage() {
 
 function normalizeType(raw: string): Investment['type'] {
   const lower = raw.toLowerCase();
-  if (lower.includes('equity')) return 'Equity';
+  if (lower.includes('profit') || lower.includes('share')) return 'Profit Share';
   if (lower.includes('insurance')) return 'Insurance';
   return 'Debt';
 }

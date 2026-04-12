@@ -23,7 +23,7 @@ import LegalDisclaimer from '@/components/ui/LegalDisclaimer';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
-type OpportunityType = 'Debt Fund' | 'Equity' | 'Insurance' | 'Debt' | 'Profit Share';
+type OpportunityType = 'Debt Fund' | 'Insurance' | 'Debt' | 'Profit Share';
 type OpportunityStatus = 'Open' | 'Fully Subscribed';
 
 interface Opportunity {
@@ -67,7 +67,6 @@ function formatCurrencyFull(value: number): string {
 const typeBadgeStyles: Record<OpportunityType, string> = {
   'Debt Fund': 'bg-blue-100 text-blue-700',
   Debt: 'bg-blue-100 text-blue-700',
-  Equity: 'bg-purple-100 text-purple-700',
   Insurance: 'bg-teal-100 text-teal-700',
   'Profit Share': 'bg-amber-100 text-amber-700',
 };
@@ -259,7 +258,7 @@ export default function InvestorOpportunities() {
         </h1>
         <p className="text-gray-500 text-sm mt-1 max-w-2xl">
           Deploy capital into Africa&apos;s agricultural transformation through Debt Funds,
-          Equity &amp; Profit Share, and Insurance-Backed Investments &mdash; all backed by real
+          Profit Share, and Insurance-Backed Investments &mdash; all backed by real
           assets with guaranteed offtake.
         </p>
 

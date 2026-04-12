@@ -48,7 +48,7 @@ interface TeamMember {
 interface CountryTeam {
   code: string;
   name: string;
-  flag: string;
+  flag?: string;
   tagline: string;
   members: TeamMember[];
 }
