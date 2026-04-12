@@ -65,7 +65,7 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+              "script-src 'self' 'unsafe-inline' https://js.stripe.com https://*.sentry.io",
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: blob: https://images.unsplash.com https://*.supabase.co https://flagcdn.com https://ui-avatars.com https://lh3.googleusercontent.com https://cdnjs.cloudflare.com https://*.tile.openstreetmap.org",
               "font-src 'self' data:",
