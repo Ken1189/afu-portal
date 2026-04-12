@@ -641,7 +641,7 @@ function BookingContent() {
             country: e.country || '',
             owner: e.owner_id || '',
             condition: 'good' as const,
-            image: e.image_url || '',
+            image: e.photo_url || e.image_url || '',
             rating: 4.0,
             reviewCount: 0,
             minBookingDays: 1,

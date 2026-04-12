@@ -18,7 +18,8 @@ export interface EquipmentRow {
   location: string | null;
   country: string | null;
   status: string;
-  image_url: string | null;
+  photo_url: string | null;
+  image_url?: string | null;
   specifications: Record<string, unknown> | null;
   created_at: string;
   updated_at: string;

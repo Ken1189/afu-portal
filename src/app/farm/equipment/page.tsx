@@ -703,7 +703,7 @@ function mapRowToEquipment(row: EquipmentRow): Equipment {
     owner: 'AFU Equipment Pool',
     condition: 'good',
     image:
-      row.image_url ||
+      row.photo_url || row.image_url ||
       'https://images.unsplash.com/photo-1530267981375-f0de937f5f13?w=400&h=300&fit=crop',
     rating: 4.5,
     reviewCount: 0,
@@ -1206,7 +1206,7 @@ export default function EquipmentHirePage() {
               country: (e.country as string) || '',
               owner: (e.owner as string) || '',
               condition: ((e.condition as string) || 'good') as Equipment['condition'],
-              image: (e.image as string) || (e.image_url as string) || '',
+              image: (e.image as string) || (e.photo_url as string) || (e.image_url as string) || '',
               rating: Number(e.rating ?? 4),
               reviewCount: Number(e.reviewCount ?? e.review_count ?? 0),
               minBookingDays: Number(e.minBookingDays ?? e.min_booking_days ?? 1),
