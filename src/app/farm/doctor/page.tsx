@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Camera,
@@ -1282,7 +1283,7 @@ export default function CropDoctorPage() {
                     >
                       {/* Thumbnail */}
                       <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100">
-                        <img src={entry.image} alt={entry.name} className="w-full h-full object-cover" />
+                        <Image src={entry.image} alt={entry.name} width={56} height={56} className="w-full h-full object-cover" unoptimized />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-0.5">

@@ -279,8 +279,7 @@ export default function MyFarmsPage() {
                 {/* Photo */}
                 <div className="relative h-40 bg-gradient-to-br from-[#5DB347]/20 to-[#1B2A4A]/10">
                   {farm.photo_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={farm.photo_url} alt={farm.name} className="w-full h-full object-cover" />
+                    <Image src={farm.photo_url} alt={farm.name} fill className="object-cover" unoptimized />
                   ) : (
                     <div className="absolute inset-0 flex items-center justify-center">
                       <Tractor className="w-12 h-12 text-[#5DB347]/40" />

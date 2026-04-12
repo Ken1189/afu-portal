@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
@@ -164,15 +165,13 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
         {/* Image gallery */}
         <div>
           <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden mb-3">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={heroImage} alt={product.name} className="w-full h-[400px] object-cover" />
+            <Image src={heroImage} alt={product.name} className="w-full h-[400px] object-cover" width={800} height={400} unoptimized />
           </div>
           {galleryImages.length > 1 && (
             <div className="grid grid-cols-4 gap-2">
               {galleryImages.slice(0, 4).map((img, i) => (
-                <div key={i} className="bg-white rounded-xl border border-gray-100 overflow-hidden h-20">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={img} alt={`${product.name} ${i + 1}`} className="w-full h-full object-cover" />
+                <div key={i} className="relative bg-white rounded-xl border border-gray-100 overflow-hidden h-20">
+                  <Image src={img} alt={`${product.name} ${i + 1}`} className="w-full h-full object-cover" fill unoptimized />
                 </div>
               ))}
             </div>
@@ -237,8 +236,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
               <h2 className="text-sm font-bold text-[#1B2A4A] mb-3">Sold by</h2>
               <div className="flex items-center gap-3">
                 {supplier?.logo_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={supplier.logo_url} alt={supplier.company_name || ''} className="w-12 h-12 rounded-xl object-cover" />
+                  <Image src={supplier.logo_url} alt={supplier.company_name || ''} className="w-12 h-12 rounded-xl object-cover" width={48} height={48} unoptimized />
                 ) : (
                   <div className="w-12 h-12 rounded-xl bg-[#5DB347]/10 flex items-center justify-center">
                     <Award className="w-6 h-6 text-[#5DB347]" />
@@ -299,12 +297,13 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
                 href={`/marketplace/${p.id}`}
                 className="bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-md transition-shadow"
               >
-                <div className="h-40 bg-gray-100 overflow-hidden">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                <div className="relative h-40 bg-gray-100 overflow-hidden">
+                  <Image
                     src={p.image_url || p.image || 'https://images.unsplash.com/photo-1472396961693-142e6e269027?w=400'}
                     alt={p.name}
                     className="w-full h-full object-cover"
+                    fill
+                    unoptimized
                   />
                 </div>
                 <div className="p-4">

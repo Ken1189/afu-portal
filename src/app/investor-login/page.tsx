@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import {
@@ -160,10 +161,12 @@ export default function InvestorLoginPage() {
           {/* Top: Logo */}
           <div>
             <Link href="/" className="inline-flex items-center gap-3 group">
-              <img
+              <Image
                 src="/afu-logo.svg"
                 alt="African Farming Union"
                 className="h-14 w-auto object-contain rounded-lg bg-white/95 p-1.5"
+                width={56}
+                height={56}
               />
               <div>
                 <span className="block text-white/40 text-xs tracking-[0.25em] uppercase font-medium">
@@ -253,7 +256,7 @@ export default function InvestorLoginPage() {
           {/* Mobile-only logo */}
           <motion.div variants={formItem} className="text-center mb-8 lg:hidden">
             <Link href="/" className="inline-flex items-center gap-2.5">
-              <img src="/afu-logo.svg" alt="African Farming Union" className="h-12 w-auto object-contain" />
+              <Image src="/afu-logo.svg" alt="African Farming Union" className="h-12 w-auto object-contain" width={48} height={48} />
             </Link>
             <p className="text-xs text-gray-400 tracking-widest uppercase mt-2">Investor Portal</p>
           </motion.div>

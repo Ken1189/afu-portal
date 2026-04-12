@@ -259,7 +259,7 @@ export default function LoginPage() {
           {/* Top: Logo + brand */}
           <div>
             <Link href="/" className="inline-flex items-center gap-3 group">
-              <img src="/afu-logo.svg" alt="African Farming Union" className="h-14 w-auto object-contain rounded-lg bg-white/95 p-1.5" />
+              <Image src="/afu-logo.svg" alt="African Farming Union" className="h-14 w-auto object-contain rounded-lg bg-white/95 p-1.5" width={56} height={56} />
               <div>
                 <span className="text-white font-bold text-lg tracking-tight sr-only">
                   African Farming Union
@@ -344,7 +344,7 @@ export default function LoginPage() {
           {/* Mobile-only logo */}
           <div className="text-center mb-8 lg:hidden">
             <Link href="/" className="inline-flex items-center gap-2.5">
-              <img src="/afu-logo.svg" alt="African Farming Union" className="h-12 w-auto object-contain" />
+              <Image src="/afu-logo.svg" alt="African Farming Union" className="h-12 w-auto object-contain" width={48} height={48} />
             </Link>
           </div>
 

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -550,7 +551,7 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-16">
           {/* ── Logo ── */}
           <Link href="/" className="flex items-center gap-2.5 shrink-0">
-            <img src="/afu-logo.svg" alt="African Farming Union" className="h-10 w-auto object-contain" />
+            <Image src="/afu-logo.svg" alt="African Farming Union" className="h-10 w-auto object-contain" width={40} height={40} />
           </Link>
 
           {/* ── Desktop Nav ── */}

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import {
@@ -443,7 +444,7 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
         {/* Sidebar Header with Tier Progress */}
         <div className="bg-gradient-to-br from-navy to-[#5DB347] p-5 text-white">
           <div className="flex items-center gap-2 mb-3">
-            <img src="/logo-icon.svg" alt="AFU" className="w-8 h-8 rounded-lg bg-white/90 p-1" />
+            <Image src="/logo-icon.svg" alt="AFU" width={32} height={32} className="w-8 h-8 rounded-lg bg-white/90 p-1" />
             <span className="font-bold text-lg">Mkulima Hub</span>
           </div>
           <div className="flex items-center gap-3 mb-3">

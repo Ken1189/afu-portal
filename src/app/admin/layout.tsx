@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import PortalSwitcherDropdown from '@/components/PortalSwitcherDropdown';
@@ -72,7 +73,7 @@ import {
   ImageIcon,
   Palette,
   Layers,
-  Image,
+  Image as LucideImage,
   Play,
   Tags,
   Cloud,
@@ -1129,7 +1130,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <Link href="/admin/profile" className="flex items-center gap-2 hover:bg-gray-50 rounded-lg px-2 py-1 transition-colors" title="My Profile">
                 <div className="w-8 h-8 bg-navy rounded-full flex items-center justify-center overflow-hidden">
                   {profile?.avatar_url ? (
-                    <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
+                    <Image src={profile.avatar_url} alt="" width={32} height={32} className="w-full h-full object-cover" unoptimized />
                   ) : (
                     <span className="text-white text-xs font-bold">{initials}</span>
                   )}

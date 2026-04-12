@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/supabase/auth-context';
 import ImageUploader from '@/components/ui/ImageUploader';
@@ -296,7 +297,7 @@ export default function SupplierVideosPage() {
                   onClick={() => setPreviewUrl(v.youtube_url || v.video_url || null)}
                 >
                   {thumb ? (
-                    <img src={thumb} alt={v.title} className="w-full h-full object-cover" />
+                    <Image src={thumb} alt={v.title} fill className="object-cover" unoptimized />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
                       <Film className="w-12 h-12 text-gray-300" />
@@ -457,10 +458,13 @@ export default function SupplierVideosPage() {
                   className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#5DB347]/40 focus:border-[#5DB347]"
                 />
                 {form.youtube_url && youTubeThumbnail(form.youtube_url) && (
-                  <img
+                  <Image
                     src={youTubeThumbnail(form.youtube_url)!}
                     alt="YouTube preview"
+                    width={240}
+                    height={135}
                     className="mt-2 rounded-lg w-full max-w-[240px] border border-gray-100"
+                    unoptimized
                   />
                 )}
               </div>

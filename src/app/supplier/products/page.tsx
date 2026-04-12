@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Package,
@@ -688,7 +689,7 @@ export default function SupplierProductsPage() {
               className="bg-white rounded-xl border border-gray-100 overflow-hidden group"
             >
               <div className="relative h-[200px] overflow-hidden">
-                <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <Image src={product.image} alt={product.name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" unoptimized />
                 {product.featured && (
                   <div className="absolute top-3 left-3 inline-flex items-center gap-1 bg-[#D4A843] text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm">
                     <Star className="w-3 h-3 fill-white" /> Featured
@@ -794,7 +795,7 @@ export default function SupplierProductsPage() {
                   >
                     <td className="py-3 px-4">
                       <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
-                        <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                        <Image src={product.image} alt={product.name} width={48} height={48} className="w-full h-full object-cover" unoptimized />
                       </div>
                     </td>
                     <td className="py-3 px-4">
@@ -1118,7 +1119,7 @@ export default function SupplierProductsPage() {
                   <div className="grid grid-cols-5 gap-2 mb-2">
                     {formData.gallery_images.map((url, i) => (
                       <div key={i} className="relative group">
-                        <img src={url} alt={`Gallery ${i + 1}`} className="w-full h-16 object-cover rounded-lg border border-gray-200" />
+                        <Image src={url} alt={`Gallery ${i + 1}`} width={100} height={64} className="w-full h-16 object-cover rounded-lg border border-gray-200" unoptimized />
                         <button
                           type="button"
                           onClick={() => handleFormChange('gallery_images', formData.gallery_images.filter((_, j) => j !== i))}

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/supabase/auth-context';
@@ -554,7 +555,7 @@ export default function SupplierProfilePage() {
           <div className="flex flex-col items-start gap-2">
             <div className="w-24 h-24 rounded-2xl bg-[#5DB347] flex items-center justify-center text-white text-3xl font-bold shadow-lg overflow-hidden">
               {logoUrl || profile?.avatar_url ? (
-                <img src={logoUrl || profile?.avatar_url || ''} alt="Logo" className="w-full h-full object-cover" />
+                <Image src={logoUrl || profile?.avatar_url || ''} alt="Logo" width={96} height={96} className="w-full h-full object-cover" unoptimized />
               ) : (
                 companyInitials
               )}

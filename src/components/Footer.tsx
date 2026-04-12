@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -215,7 +216,7 @@ export default function Footer() {
           {/* Brand + Logo */}
           <div className="lg:col-span-2">
             <div className="flex items-center gap-3 mb-5">
-              <img src="/afu-logo.svg" alt="African Farming Union" className="h-14 w-auto object-contain brightness-0 invert" />
+              <Image src="/afu-logo.svg" alt="African Farming Union" className="h-14 w-auto object-contain brightness-0 invert" width={56} height={56} />
             </div>
             <p className="text-gray-400 text-sm leading-relaxed mb-6 max-w-sm">
               {mission}

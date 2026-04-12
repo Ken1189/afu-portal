@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -256,7 +257,7 @@ export default function PartnersPage() {
                   <div className="flex items-start gap-4 mb-4">
                     {partner.logo_url ? (
                       <div className="w-20 h-20 rounded-2xl bg-white border border-gray-100 flex items-center justify-center shrink-0 shadow-lg overflow-hidden p-2">
-                        <img src={partner.logo_url} alt={partner.name} className="w-full h-full object-contain" />
+                        <Image src={partner.logo_url} alt={partner.name} className="w-full h-full object-contain" width={80} height={80} unoptimized />
                       </div>
                     ) : (
                       <div

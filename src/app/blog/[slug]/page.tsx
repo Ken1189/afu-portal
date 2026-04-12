@@ -2,6 +2,7 @@
 
 import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 import { ArrowLeft, Calendar, User, Tag, Clock, Share2, Loader2 } from 'lucide-react';
 
@@ -95,7 +96,7 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
       {/* Hero */}
       {post.cover_image && (
         <div className="relative h-64 md:h-96 overflow-hidden">
-          <img src={post.cover_image} alt={post.title} className="w-full h-full object-cover" />
+          <Image src={post.cover_image} alt={post.title} className="w-full h-full object-cover" fill unoptimized />
           <div className="absolute inset-0 bg-gradient-to-t from-[#1B2A4A]/80 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 p-6 md:p-12">
             <div className="max-w-3xl mx-auto">
@@ -191,8 +192,8 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
               {relatedPosts.map(rp => (
                 <Link key={rp.id} href={`/blog/${rp.slug}`} className="block group">
                   {rp.cover_image && (
-                    <div className="h-32 rounded-xl overflow-hidden mb-3">
-                      <img src={rp.cover_image} alt={rp.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                    <div className="relative h-32 rounded-xl overflow-hidden mb-3">
+                      <Image src={rp.cover_image} alt={rp.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" fill unoptimized />
                     </div>
                   )}
                   <h3 className="font-semibold text-[#1B2A4A] text-sm group-hover:text-[#5DB347] transition-colors line-clamp-2">{rp.title}</h3>

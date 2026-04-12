@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
@@ -177,7 +178,7 @@ export default function WarehouseLayout({ children }: { children: React.ReactNod
       <aside className="hidden lg:flex w-64 bg-[#1B2A4A] flex-col text-white fixed inset-y-0 left-0 z-30">
         <div className="p-5 border-b border-white/10">
           <div className="flex items-center gap-3 mb-4">
-            <img src="/logo-icon.svg" alt="AFU" className="w-10 h-10 rounded-xl bg-[#5DB347] p-1.5 brightness-0 invert" />
+            <Image src="/logo-icon.svg" alt="AFU" width={40} height={40} className="w-10 h-10 rounded-xl bg-[#5DB347] p-1.5 brightness-0 invert" />
             <div>
               <h2 className="font-bold text-base">AFU Warehouse</h2>
               <p className="text-xs text-gray-400">Receiving Portal</p>
@@ -185,7 +186,7 @@ export default function WarehouseLayout({ children }: { children: React.ReactNod
           </div>
           <div className="flex items-center gap-3 bg-white/5 rounded-xl px-3 py-2.5">
             {profile?.avatar_url ? (
-              <img src={profile.avatar_url} alt="" className="w-9 h-9 rounded-full object-cover" />
+              <Image src={profile.avatar_url} alt="" width={36} height={36} className="w-9 h-9 rounded-full object-cover" unoptimized />
             ) : (
               <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#1B2A4A] to-[#2A3F6A] flex items-center justify-center text-white text-xs font-bold">
                 {initials}
@@ -311,7 +312,7 @@ export default function WarehouseLayout({ children }: { children: React.ReactNod
             )}
             <NotificationBell />
             {profile?.avatar_url ? (
-              <img src={profile.avatar_url} alt="" className="w-8 h-8 rounded-full object-cover" />
+              <Image src={profile.avatar_url} alt="" width={32} height={32} className="w-8 h-8 rounded-full object-cover" unoptimized />
             ) : (
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#1B2A4A] to-[#2A3F6A] flex items-center justify-center text-white text-xs font-bold">
                 {initials}

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 import {
   Shield,
@@ -241,8 +242,7 @@ export default function SecurityPage() {
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 items-start">
                   <div className="bg-white border border-gray-200 rounded-xl p-3">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={qrCode} alt="2FA QR code" className="w-40 h-40" />
+                    <Image src={qrCode} alt="2FA QR code" width={160} height={160} className="w-40 h-40" unoptimized />
                   </div>
                   <div className="flex-1 text-xs">
                     <p className="font-semibold text-gray-700 mb-1">Can&apos;t scan?</p>

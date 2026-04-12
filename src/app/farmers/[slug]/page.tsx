@@ -2,6 +2,7 @@
 
 import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { WORLD_COUNTRIES } from '@/lib/countries';
 import { Wheat, MailX, PartyPopper } from 'lucide-react';
 
@@ -348,7 +349,7 @@ function UpdateCard({ update }: { update: FarmerUpdate }) {
               key={i}
               className="relative w-20 h-20 rounded-lg overflow-hidden bg-gray-100"
             >
-              <img src={url} alt={`Farm update photo ${i + 1}`} loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
+              <Image src={url} alt={`Farm update photo ${i + 1}`} className="absolute inset-0 w-full h-full object-cover" fill unoptimized />
             </div>
           ))}
         </div>

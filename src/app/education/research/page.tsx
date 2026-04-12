@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import LegalDisclaimer from '@/components/ui/LegalDisclaimer';
@@ -91,8 +92,7 @@ export default function ResearchCentresPage() {
       <section className="bg-navy text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-4 mb-6">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/afu-logo.svg" alt="AFU" className="w-14 h-14 brightness-0 invert flex-shrink-0" />
+            <Image src="/afu-logo.svg" alt="AFU" className="w-14 h-14 brightness-0 invert flex-shrink-0" width={56} height={56} />
             <div className="inline-block bg-[#5DB347]/20 text-[#5DB347] px-4 py-1.5 rounded-full text-sm font-medium">
               Education
             </div>
@@ -132,11 +132,13 @@ export default function ResearchCentresPage() {
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-4">
                       {centre.photo_url && (
-                        /* eslint-disable-next-line @next/next/no-img-element */
-                        <img
+                        <Image
                           src={centre.photo_url}
                           alt={centre.name}
                           className="w-16 h-16 object-contain rounded-xl bg-white border border-gray-100 p-1"
+                          width={64}
+                          height={64}
+                          unoptimized
                         />
                       )}
                       <div>
