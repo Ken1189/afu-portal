@@ -47,25 +47,10 @@ interface ExchangeTransaction {
   country: string;
 }
 
-// ── Demo data ──
-const DEMO_LISTINGS: ExchangeListing[] = [
-  { id: 'L001', title: 'John Deere Tractor — Available for Hire', seller: 'Tendai Moyo', category: 'Equipment', price: 500, priceType: '/day', status: 'active', views: 42, country: 'Zimbabwe', created_at: '2026-03-20' },
-  { id: 'L002', title: 'Surplus Maize — 2 Tonnes', seller: 'Grace Kamau', category: 'Produce', price: 3000, priceType: '', status: 'active', views: 28, country: 'Zimbabwe', created_at: '2026-03-19' },
-  { id: 'L003', title: 'Irrigation Pump Rental', seller: 'James Okello', category: 'Equipment', price: 200, priceType: '/day', status: 'featured', views: 65, country: 'Uganda', created_at: '2026-03-18' },
-  { id: 'L004', title: 'Farm Labour — Planting Crew', seller: 'Anna Mushi', category: 'Services', price: 150, priceType: '/day', status: 'active', views: 18, country: 'Tanzania', created_at: '2026-03-17' },
-  { id: 'L005', title: 'Warehouse Storage — 50sqm', seller: 'Peter Ncube', category: 'Storage', price: 100, priceType: '/month', status: 'pending', views: 8, country: 'Zimbabwe', created_at: '2026-03-22' },
-  { id: 'L006', title: 'Brahman Bull — Breeding Stock', seller: 'David Sithole', category: 'Livestock', price: 15000, priceType: '', status: 'active', views: 94, country: 'Zimbabwe', created_at: '2026-03-15' },
-  { id: 'L007', title: 'Certified Maize Seed — 50kg', seller: 'Mary Wanjiru', category: 'Seeds', price: 800, priceType: '', status: 'active', views: 37, country: 'Kenya', created_at: '2026-03-14' },
-  { id: 'L008', title: 'Agronomist Consultation — 2 Hours', seller: 'John Mwangi', category: 'Knowledge', price: 300, priceType: '', status: 'removed', views: 12, country: 'Kenya', created_at: '2026-03-10' },
-];
+// ── Demo data (empty — real data comes from Supabase) ──
+const DEMO_LISTINGS: ExchangeListing[] = [];
 
-const DEMO_TRANSACTIONS: ExchangeTransaction[] = [
-  { id: 'T001', buyer: 'Grace Kamau', seller: 'Tendai Moyo', listing: 'Tractor Hire — 1 Day', amount: 500, status: 'completed', date: '2026-03-22', country: 'Zimbabwe' },
-  { id: 'T002', buyer: 'Peter Ncube', seller: 'Grace Kamau', listing: 'Surplus Maize — 500kg', amount: 1500, status: 'completed', date: '2026-03-21', country: 'Zimbabwe' },
-  { id: 'T003', buyer: 'Anna Mushi', seller: 'James Okello', listing: 'Irrigation Pump — 3 Days', amount: 600, status: 'pending', date: '2026-03-23', country: 'Uganda' },
-  { id: 'T004', buyer: 'David Sithole', seller: 'Mary Wanjiru', listing: 'Certified Maize Seed — 25kg', amount: 400, status: 'completed', date: '2026-03-20', country: 'Kenya' },
-  { id: 'T005', buyer: 'John Mwangi', seller: 'Tendai Moyo', listing: 'Tractor Hire — 2 Days', amount: 1000, status: 'disputed', date: '2026-03-19', country: 'Zimbabwe' },
-];
+const DEMO_TRANSACTIONS: ExchangeTransaction[] = [];
 
 // ── Filter configs ──
 const LISTING_STATUS_FILTER: FilterConfig = {
