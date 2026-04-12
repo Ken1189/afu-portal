@@ -62,176 +62,86 @@ interface InvestmentRow {
   product_type?: string;
 }
 
-// ── Fallback Demo Data ─────────────────────────────────────────────────────
+// ── Empty Defaults (no fake data) ──────────────────────────────────────────
 
 const FALLBACK_STATS = {
-  totalCommitted: 2500000,
-  totalDeployed: 1850000,
-  returnsToDate: 312000,
-  activeProjects: 8,
+  totalCommitted: 0,
+  totalDeployed: 0,
+  returnsToDate: 0,
+  activeProjects: 0,
 };
 
-const FALLBACK_UPDATES: InvestorUpdate[] = [
-  {
-    id: '1',
-    title: 'Q4 2025 Portfolio Performance Report',
-    body: 'Strong performance across all asset classes with 12.4% annualized returns driven by bumper maize harvests in Zimbabwe.',
-    update_type: 'report',
-    published_at: '2025-12-15T00:00:00Z',
-  },
-  {
-    id: '2',
-    title: 'New Partnership: Stanbic Bank Tanzania',
-    body: 'AFU has partnered with Stanbic Bank Tanzania to co-finance smallholder input loans, expanding our reach to 15,000 additional farmers.',
-    update_type: 'announcement',
-    published_at: '2025-11-28T00:00:00Z',
-  },
-  {
-    id: '3',
-    title: 'ESG Impact Assessment Published',
-    body: 'Our annual ESG impact assessment shows significant improvements in farmer livelihoods, with average income increases of 35% among AFU members.',
-    update_type: 'impact',
-    published_at: '2025-11-10T00:00:00Z',
-  },
-];
+const FALLBACK_UPDATES: InvestorUpdate[] = [];
 
 const FALLBACK_KEY_METRICS = [
   {
-    label: 'Target AUM',
-    value: '$12.5M',
-    badge: 'Projected',
-    badgeColor: 'bg-amber-100 text-amber-700',
+    label: 'Total AUM',
+    value: '$0',
+    badge: null as string | null,
+    badgeColor: '',
     icon: DollarSign,
     iconBg: 'bg-[#5DB347]',
   },
   {
-    label: 'Target Deployment',
-    value: '$8.2M',
-    badge: '65.6% of AUM',
-    badgeColor: 'bg-blue-100 text-blue-700',
+    label: 'Capital Deployed',
+    value: '$0',
+    badge: null as string | null,
+    badgeColor: '',
     icon: PieChart,
     iconBg: 'bg-[#1B2A4A]',
   },
   {
-    label: 'Projected IRR',
-    value: '14.2%',
-    badge: 'Target: 12-16%',
-    badgeColor: 'bg-amber-100 text-amber-700',
+    label: 'Net Returns',
+    value: '0%',
+    badge: null as string | null,
+    badgeColor: '',
     icon: TrendingUp,
     iconBg: 'bg-emerald-600',
   },
   {
-    label: 'Target Repayment',
-    value: '94.2%',
-    badge: 'Projected',
-    badgeColor: 'bg-amber-100 text-amber-700',
+    label: 'Repayment Rate',
+    value: '--',
+    badge: null as string | null,
+    badgeColor: '',
     icon: ShieldCheck,
     iconBg: 'bg-sky-600',
   },
   {
-    label: 'Target Farmers',
-    value: '4,200+',
-    badge: 'Projected',
-    badgeColor: 'bg-amber-100 text-amber-700',
+    label: 'Farmers Reached',
+    value: '0',
+    badge: null as string | null,
+    badgeColor: '',
     icon: Users,
     iconBg: 'bg-amber-500',
   },
   {
-    label: 'Countries Planned',
-    value: '3',
-    badge: 'of 20 planned',
-    badgeColor: 'bg-gray-100 text-gray-600',
+    label: 'Countries',
+    value: '0',
+    badge: null as string | null,
+    badgeColor: '',
     icon: Globe,
     iconBg: 'bg-violet-600',
   },
 ];
 
-// ── Capital Deployment by Product (Fallback) ──────────────────────────────
+// ── Capital Deployment by Product (Empty Default) ─────────────────────────
 
-const FALLBACK_PRODUCT_DEPLOYMENT = [
-  { label: 'Agricultural Loans', value: 3.8, pct: 46, icon: Banknote },
-  { label: 'Crop Insurance', value: 1.9, pct: 23, icon: ShieldPlus },
-  { label: 'Trade Finance', value: 1.5, pct: 18, icon: Handshake },
-  { label: 'Input Financing', value: 0.6, pct: 7, icon: Sprout },
-  { label: 'Equipment Finance', value: 0.4, pct: 5, icon: Wrench },
-];
+const FALLBACK_PRODUCT_DEPLOYMENT: { label: string; value: number; pct: number; icon: typeof Banknote }[] = [];
 
-// ── Deployment by Country (Fallback) ──────────────────────────────────────
+// ── Deployment by Country (Empty Default) ─────────────────────────────────
 
-const FALLBACK_COUNTRY_DEPLOYMENT = [
-  { label: 'Zimbabwe', value: 4.1, pct: 50, flag: 'ZW' },
-  { label: 'Uganda', value: 2.5, pct: 30, flag: 'UG' },
-  { label: 'Kenya', value: 1.6, pct: 20, flag: 'KE' },
-];
+const FALLBACK_COUNTRY_DEPLOYMENT: { label: string; value: number; pct: number; flag: string }[] = [];
 
-// ── Activity Feed ───────────────────────────────────────────────────────────
+// ── Activity Feed (empty — populated from Supabase) ───────────────────────
 
-const activityFeed = [
-  {
-    id: 'a1',
-    icon: CreditCard,
-    iconColor: 'text-[#5DB347]',
-    iconBg: 'bg-[#EBF7E5]',
-    title: 'Loan disbursement: $42,000 to Mashonaland cooperative',
-    time: '2 hours ago',
-  },
-  {
-    id: 'a2',
-    icon: ShieldPlus,
-    iconColor: 'text-sky-600',
-    iconBg: 'bg-sky-50',
-    title: 'Insurance payout: $8,500 drought claim settled (Masvingo)',
-    time: '5 hours ago',
-  },
-  {
-    id: 'a3',
-    icon: UserPlus,
-    iconColor: 'text-violet-600',
-    iconBg: 'bg-violet-50',
-    title: 'Farmer onboarding milestone: 4,200 active members',
-    time: '1 day ago',
-  },
-  {
-    id: 'a4',
-    icon: MapPin,
-    iconColor: 'text-amber-600',
-    iconBg: 'bg-amber-50',
-    title: 'New region activated: Nakuru County, Kenya',
-    time: '2 days ago',
-  },
-  {
-    id: 'a5',
-    icon: CreditCard,
-    iconColor: 'text-[#5DB347]',
-    iconBg: 'bg-[#EBF7E5]',
-    title: 'Loan disbursement: $28,000 to Lira district farmers',
-    time: '3 days ago',
-  },
-  {
-    id: 'a6',
-    icon: Rocket,
-    iconColor: 'text-rose-600',
-    iconBg: 'bg-rose-50',
-    title: 'Kenya country launch completed -- operations live',
-    time: '5 days ago',
-  },
-  {
-    id: 'a7',
-    icon: Handshake,
-    iconColor: 'text-[#1B2A4A]',
-    iconBg: 'bg-slate-100',
-    title: 'Trade finance facility: $120K maize export to WFP',
-    time: '1 week ago',
-  },
-  {
-    id: 'a8',
-    icon: CircleDot,
-    iconColor: 'text-emerald-600',
-    iconBg: 'bg-emerald-50',
-    title: 'Repayment received: $67,200 from Season A cycle',
-    time: '1 week ago',
-  },
-];
+const activityFeed: {
+  id: string;
+  icon: typeof CreditCard;
+  iconColor: string;
+  iconBg: string;
+  title: string;
+  time: string;
+}[] = [];
 
 // ── Quick Links ─────────────────────────────────────────────────────────────
 
@@ -315,7 +225,7 @@ const fadeIn = {
 export default function InvestorDashboard() {
   const { user, profile } = useAuth();
   const [investorProfile, setInvestorProfile] = useState<InvestorProfile | null>(null);
-  const [updates, setUpdates] = useState<InvestorUpdate[]>(FALLBACK_UPDATES);
+  const [updates, setUpdates] = useState<InvestorUpdate[]>([]);
   const [investments, setInvestments] = useState<InvestmentRow[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -428,7 +338,7 @@ export default function InvestorDashboard() {
         totalCommitted: investorProfile.total_committed,
         totalDeployed: investorProfile.total_deployed,
         returnsToDate: investorProfile.returns_to_date,
-        activeProjects: investments.filter((inv) => inv.status === 'active' || inv.status === 'Active').length || FALLBACK_STATS.activeProjects,
+        activeProjects: investments.filter((inv) => inv.status === 'active' || inv.status === 'Active').length,
       }
     : FALLBACK_STATS;
 
@@ -568,7 +478,7 @@ export default function InvestorDashboard() {
       {/* ── Illustrative Data Banner ─────────────────────────────────────── */}
       {!hasRealData && (
         <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-6 text-sm text-amber-800">
-          <strong>Illustrative Data</strong> — These figures represent projected targets. Actual portfolio data will appear here once investments are active.
+          <strong>No Investment Data Yet</strong> — Your portfolio data will appear here once investments are active. Explore opportunities to get started.
         </div>
       )}
 

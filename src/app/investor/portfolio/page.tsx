@@ -37,29 +37,11 @@ interface Investment {
 /*  Fallback Demo Data                                                 */
 /* ------------------------------------------------------------------ */
 
-const FALLBACK_INVESTMENTS: Investment[] = [
-  { id: '1', name: 'Zim Blueberry Export Programme', type: 'Equity', committed: 125000, deployed: 125000, returns: 16.2, irr: 16.2, status: 'Active', vintage: 2025 },
-  { id: '2', name: 'Uganda Smallholder Lending Pool', type: 'Debt', committed: 500000, deployed: 420000, returns: 12.8, irr: 12.8, status: 'Active', vintage: 2026 },
-  { id: '3', name: 'East Africa Crop Insurance Fund', type: 'Insurance', committed: 500000, deployed: 380000, returns: 11.2, irr: 11.2, status: 'Active', vintage: 2026 },
-  { id: '4', name: 'Zimbabwe Maize Lending', type: 'Debt', committed: 500000, deployed: 500000, returns: 14.7, irr: 14.7, status: 'Active', vintage: 2025 },
-  { id: '5', name: 'Kenya Trade Finance Facility', type: 'Debt', committed: 375000, deployed: 290000, returns: 12.8, irr: 12.8, status: 'Active', vintage: 2026 },
-  { id: '6', name: 'Zimbabwe Input Finance', type: 'Debt', committed: 500000, deployed: 470000, returns: 13.5, irr: 13.5, status: 'Active', vintage: 2025 },
-];
+const FALLBACK_INVESTMENTS: Investment[] = [];
 
-const FALLBACK_ALLOCATION = [
-  { name: 'AFU Agricultural Debt Fund', pct: 60, amount: 1500000, color: '#1B2A4A' },
-  { name: 'AFU Insurance Premium Pool', pct: 20, amount: 500000, color: '#5DB347' },
-  { name: 'AFU Trade Finance Facility', pct: 15, amount: 375000, color: '#3B82F6' },
-  { name: 'AFU Direct Farm Equity', pct: 5, amount: 125000, color: '#8B5CF6' },
-];
+const FALLBACK_ALLOCATION: { name: string; pct: number; amount: number; color: string }[] = [];
 
-const FALLBACK_QUARTERLY_RETURNS = [
-  { label: 'Q1 2025', value: 2.8 },
-  { label: 'Q2 2025', value: 3.4 },
-  { label: 'Q3 2025', value: 3.7 },
-  { label: 'Q4 2025', value: 3.2 },
-  { label: 'Q1 2026', value: 3.3 },
-];
+const FALLBACK_QUARTERLY_RETURNS: { label: string; value: number }[] = [];
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                            */
@@ -103,7 +85,7 @@ const item = {
 
 export default function PortfolioPage() {
   const { user } = useAuth();
-  const [investments, setInvestments] = useState<Investment[]>(FALLBACK_INVESTMENTS);
+  const [investments, setInvestments] = useState<Investment[]>([]);
   const [loading, setLoading] = useState(true);
   const [hasLiveData, setHasLiveData] = useState(false);
   const supabase = createClient();
@@ -191,7 +173,7 @@ export default function PortfolioPage() {
 
   // ── Compute allocation from investments (grouped by type) ──────────────
   const allocationData = useMemo(() => {
-    if (!hasLiveData) return FALLBACK_ALLOCATION;
+    if (!hasLiveData) return [];
 
     const grouped: Record<string, number> = {};
     investments.forEach((inv) => {
@@ -200,7 +182,7 @@ export default function PortfolioPage() {
     });
 
     const total = Object.values(grouped).reduce((s, v) => s + v, 0);
-    if (total === 0) return FALLBACK_ALLOCATION;
+    if (total === 0) return [];
 
     return Object.entries(grouped)
       .sort((a, b) => b[1] - a[1])
@@ -237,10 +219,10 @@ export default function PortfolioPage() {
         value: Number((data.totalReturn / data.count).toFixed(1)),
       }));
 
-    return entries.length > 0 ? entries : FALLBACK_QUARTERLY_RETURNS;
+    return entries.length > 0 ? entries : [];
   }, [investments, hasLiveData]);
 
-  const maxQuarterlyReturn = Math.max(...quarterlyReturns.map((q) => q.value));
+  const maxQuarterlyReturn = quarterlyReturns.length > 0 ? Math.max(...quarterlyReturns.map((q) => q.value)) : 1;
 
   return (
     <motion.div
@@ -272,7 +254,7 @@ export default function PortfolioPage() {
                 <h3 className="font-semibold">Build Your Portfolio</h3>
               </div>
               <p className="text-sm text-gray-300">
-                The data below is sample portfolio data. Express interest in opportunities to build your real portfolio with AFU.
+                Your portfolio is empty. Express interest in opportunities to build your portfolio with AFU.
               </p>
             </div>
             <Link

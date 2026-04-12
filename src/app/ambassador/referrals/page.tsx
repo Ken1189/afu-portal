@@ -40,18 +40,7 @@ interface ReferralLink {
 
 // ── Demo Data ────────────────────────────────────────────────────────────────
 
-const FALLBACK_REFERRALS: Referral[] = [
-  { id: '1', referred_name: 'John Mwangi', referred_email: 'john@farm.co.ke', signed_up_date: '2026-03-20T00:00:00Z', status: 'active', lifetime_value: 2500, commission_earned: 250 },
-  { id: '2', referred_name: 'Sarah Kimani', referred_email: 'sarah.k@gmail.com', signed_up_date: '2026-03-15T00:00:00Z', status: 'active', lifetime_value: 1200, commission_earned: 120 },
-  { id: '3', referred_name: 'Peter Obi', referred_email: 'peter.obi@agri.ng', signed_up_date: '2026-03-10T00:00:00Z', status: 'active', lifetime_value: 800, commission_earned: 80 },
-  { id: '4', referred_name: 'Grace Achieng', referred_email: 'grace@coopke.org', signed_up_date: '2026-03-05T00:00:00Z', status: 'active', lifetime_value: 3200, commission_earned: 320 },
-  { id: '5', referred_name: 'David Banda', referred_email: 'dbanda@farming.mw', signed_up_date: '2026-02-28T00:00:00Z', status: 'pending', lifetime_value: 0, commission_earned: 0 },
-  { id: '6', referred_name: 'Amina Hassan', referred_email: 'amina.h@tz-ag.co', signed_up_date: '2026-02-20T00:00:00Z', status: 'active', lifetime_value: 1800, commission_earned: 180 },
-  { id: '7', referred_name: 'Emmanuel Kwame', referred_email: 'ekwame@farmgh.com', signed_up_date: '2026-02-15T00:00:00Z', status: 'inactive', lifetime_value: 400, commission_earned: 40 },
-  { id: '8', referred_name: 'Fatima Diallo', referred_email: 'fatima.d@senag.sn', signed_up_date: '2026-02-10T00:00:00Z', status: 'active', lifetime_value: 950, commission_earned: 95 },
-  { id: '9', referred_name: 'Moses Okello', referred_email: 'mokello@ug-farms.co', signed_up_date: '2026-01-28T00:00:00Z', status: 'active', lifetime_value: 2100, commission_earned: 210 },
-  { id: '10', referred_name: 'Blessing Chikwere', referred_email: 'bchikwere@zimag.co.zw', signed_up_date: '2026-01-15T00:00:00Z', status: 'pending', lifetime_value: 0, commission_earned: 0 },
-];
+const FALLBACK_REFERRALS: Referral[] = [];
 
 // ── Component ────────────────────────────────────────────────────────────────
 
@@ -95,6 +84,7 @@ export default function ReferralsPage() {
             .order('created_at', { ascending: false });
 
           if (links && links.length > 0) {
+            // Map links to ReferralLink shape
             setReferralLinks(links.map((l: Record<string, unknown>) => ({
               id: String(l.id),
               referral_code: String(l.referral_code || ''),
@@ -129,10 +119,18 @@ export default function ReferralsPage() {
               });
             }
             setReferrals(referralPeople);
+          } else {
+            // No referral links — show empty state
+            setReferrals([]);
           }
+        } else {
+          // No ambassador record — show empty state
+          setReferrals([]);
         }
       } catch {
-        // Keep demo data
+        // On error, show empty state rather than fake data
+        setReferrals([]);
+        setReferralLinks([]);
       } finally {
         setLoading(false);
       }

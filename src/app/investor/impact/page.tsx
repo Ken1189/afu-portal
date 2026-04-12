@@ -49,7 +49,7 @@ const fadeUp = {
 const heroMetricsFallback = [
   {
     label: 'Farmers Empowered',
-    value: '4,200+',
+    value: '0',
     icon: Users,
     color: 'text-[#5DB347]',
     bg: 'bg-[#5DB347]/10',
@@ -57,7 +57,7 @@ const heroMetricsFallback = [
   },
   {
     label: 'Hectares Financed',
-    value: '12,500',
+    value: '0',
     icon: Sun,
     color: 'text-amber-600',
     bg: 'bg-amber-50',
@@ -65,7 +65,7 @@ const heroMetricsFallback = [
   },
   {
     label: 'Women Farmers',
-    value: '38%',
+    value: '--',
     subLabel: 'of portfolio',
     icon: Heart,
     color: 'text-pink-600',
@@ -74,7 +74,7 @@ const heroMetricsFallback = [
   },
   {
     label: 'Jobs Created',
-    value: '340+',
+    value: '0',
     icon: Briefcase,
     color: 'text-blue-600',
     bg: 'bg-blue-50',
@@ -82,7 +82,7 @@ const heroMetricsFallback = [
   },
   {
     label: 'Avg Income Increase',
-    value: '42%',
+    value: '--',
     icon: TrendingUp,
     color: 'text-emerald-600',
     bg: 'bg-emerald-50',
@@ -90,7 +90,7 @@ const heroMetricsFallback = [
   },
   {
     label: 'Loan Repayment Rate',
-    value: '94.2%',
+    value: '--',
     icon: BadgeCheck,
     color: 'text-[#1B2A4A]',
     bg: 'bg-[#1B2A4A]/10',
@@ -105,153 +105,86 @@ const sdgCards = [
     sdg: 1,
     title: 'No Poverty',
     color: '#E5243B',
-    metric: '4,200 farmers above poverty line',
-    progress: 70,
+    metric: 'Data available once investments are active',
+    progress: 0,
     icon: Target,
   },
   {
     sdg: 2,
     title: 'Zero Hunger',
     color: '#DDA63A',
-    metric: '12,500 hectares food production',
-    progress: 62,
+    metric: 'Data available once investments are active',
+    progress: 0,
     icon: Wheat,
   },
   {
     sdg: 5,
     title: 'Gender Equality',
     color: '#FF3A21',
-    metric: '38% women farmers (target 50%)',
-    progress: 76,
+    metric: 'Data available once investments are active',
+    progress: 0,
     icon: Heart,
   },
   {
     sdg: 8,
     title: 'Decent Work',
     color: '#A21942',
-    metric: '340 direct jobs, 2,100 indirect',
-    progress: 58,
+    metric: 'Data available once investments are active',
+    progress: 0,
     icon: Briefcase,
   },
   {
     sdg: 13,
     title: 'Climate Action',
     color: '#3F7E44',
-    metric: '8,400 tonnes CO2 offset',
-    progress: 48,
+    metric: 'Data available once investments are active',
+    progress: 0,
     icon: Leaf,
   },
   {
     sdg: 17,
     title: 'Partnerships',
     color: '#19486A',
-    metric: "3 country gov'ts, Lloyd's, 20+ partners",
-    progress: 82,
+    metric: 'Data available once investments are active',
+    progress: 0,
     icon: Handshake,
   },
 ];
 
 // ── Country Impact Data ──────────────────────────────────────────────────────
 
-const countryImpact = [
-  {
-    country: 'Zimbabwe',
-    flag: '🇿🇼',
-    farmers: '2,800',
-    hectares: '8,200 ha',
-    deployed: '$3.1M',
-    color: 'from-[#1B2A4A] to-[#2a3f6a]',
-  },
-  {
-    country: 'Uganda',
-    flag: '🇺🇬',
-    farmers: '900',
-    hectares: '2,800 ha',
-    deployed: '$1.2M',
-    color: 'from-[#5DB347] to-[#4a9638]',
-  },
-  {
-    country: 'Kenya',
-    flag: '🇰🇪',
-    farmers: '500',
-    hectares: '1,500 ha',
-    deployed: '$0.8M',
-    color: 'from-[#2d6a4f] to-[#40916c]',
-  },
-];
+const countryImpact: {
+  country: string;
+  flag: string;
+  farmers: string;
+  hectares: string;
+  deployed: string;
+  color: string;
+}[] = [];
 
 // ── Community Programs ───────────────────────────────────────────────────────
 
-const communityPrograms = [
-  {
-    title: 'Women in Agriculture',
-    stat: '1,600 women enrolled',
-    detail: '12 training centres across Africa',
-    icon: Heart,
-    color: 'text-pink-600',
-    bg: 'bg-pink-50',
-    accent: 'border-pink-200',
-  },
-  {
-    title: 'Feed a Child',
-    stat: '45,000 meals funded',
-    detail: 'Through harvest surplus redistribution',
-    icon: Baby,
-    color: 'text-orange-600',
-    bg: 'bg-orange-50',
-    accent: 'border-orange-200',
-  },
-  {
-    title: 'Young Farmers',
-    stat: '280 youth enrolled',
-    detail: 'Incubator programmes with mentorship & land access',
-    icon: GraduationCap,
-    color: 'text-purple-600',
-    bg: 'bg-purple-50',
-    accent: 'border-purple-200',
-  },
-];
+const communityPrograms: {
+  title: string;
+  stat: string;
+  detail: string;
+  icon: typeof Heart;
+  color: string;
+  bg: string;
+  accent: string;
+}[] = [];
 
 // ── Environmental Metrics ────────────────────────────────────────────────────
 
-const environmentalMetrics = [
-  {
-    title: 'Carbon Credits Generated',
-    value: '8,400',
-    unit: 'tonnes CO2',
-    icon: TreePine,
-    color: 'text-green-700',
-    bg: 'bg-green-50',
-    progress: 56,
-  },
-  {
-    title: 'Sustainable Farming Practices',
-    value: '67%',
-    unit: 'of portfolio',
-    icon: Sprout,
-    color: 'text-emerald-700',
-    bg: 'bg-emerald-50',
-    progress: 67,
-  },
-  {
-    title: 'Water Efficiency Improvement',
-    value: '34%',
-    unit: 'reduction in usage',
-    icon: Droplets,
-    color: 'text-blue-700',
-    bg: 'bg-blue-50',
-    progress: 34,
-  },
-  {
-    title: 'Organic Certification',
-    value: '12%',
-    unit: 'of farms (target 25%)',
-    icon: Leaf,
-    color: 'text-lime-700',
-    bg: 'bg-lime-50',
-    progress: 48,
-  },
-];
+const environmentalMetrics: {
+  title: string;
+  value: string;
+  unit: string;
+  icon: typeof TreePine;
+  color: string;
+  bg: string;
+  progress: number;
+}[] = [];
 
 // ═══════════════════════════════════════════════════════════════════════════════
 //  MAIN COMPONENT
@@ -632,7 +565,7 @@ export default function InvestorImpactPage() {
               <Loader2 className="w-5 h-5 text-gray-300 animate-spin" />
             ) : (
               <p className="text-2xl font-bold text-[#1B2A4A]">
-                {carbonCreditsSold !== null ? carbonCreditsSold.toLocaleString() : '960'}
+                {carbonCreditsSold !== null ? carbonCreditsSold.toLocaleString() : '0'}
               </p>
             )}
             <p className="text-xs text-gray-500 mt-1">tonnes of verified carbon credits</p>
@@ -649,7 +582,7 @@ export default function InvestorImpactPage() {
               <Loader2 className="w-5 h-5 text-gray-300 animate-spin" />
             ) : (
               <p className="text-2xl font-bold text-[#1B2A4A]">
-                {carbonCO2Offset !== null ? carbonCO2Offset.toLocaleString() : '2,520'}
+                {carbonCO2Offset !== null ? carbonCO2Offset.toLocaleString() : '0'}
               </p>
             )}
             <p className="text-xs text-gray-500 mt-1">total tonnes CO2 offset through projects</p>

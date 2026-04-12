@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { createClient } from '@/lib/supabase/client';
 import {
   Shield,
   Search,
@@ -54,34 +55,7 @@ interface AuditEntry {
   severity: Severity;
 }
 
-// ── Fallback data ────────────────────────────────────────────────────────────
-
-const FALLBACK_ENTRIES: AuditEntry[] = [
-  { id: 'AT-001', timestamp: '2026-04-10T09:15:00Z', userName: 'Tendai Chikwava', userEmail: 'tendai@afu.africa', action: 'approve', resource: 'loan', resourceId: 'LN-2026-0094', details: 'Approved working capital loan of $12,500 for Grace Phiri', ipAddress: '197.221.44.102', severity: 'info' },
-  { id: 'AT-002', timestamp: '2026-04-10T09:02:00Z', userName: 'Sarah Moatlhodi', userEmail: 'sarah@afu.africa', action: 'reject', resource: 'member', resourceId: 'AFU-2026-118', details: 'Rejected member application — incomplete documentation', ipAddress: '196.216.170.55', severity: 'warning' },
-  { id: 'AT-003', timestamp: '2026-04-10T08:48:00Z', userName: 'System', userEmail: 'system@afu.africa', action: 'delete', resource: 'payment', resourceId: 'PAY-2026-0412', details: 'Auto-purged expired payment record older than 90 days', ipAddress: '10.0.0.1', severity: 'critical' },
-  { id: 'AT-004', timestamp: '2026-04-10T08:30:00Z', userName: 'Grace Nkomo', userEmail: 'grace@afu.africa', action: 'create', resource: 'contract', resourceId: 'CTR-2026-0057', details: 'Created supply agreement with Kalahari Seeds & Feeds', ipAddress: '196.1.2.88', severity: 'info' },
-  { id: 'AT-005', timestamp: '2026-04-10T08:15:00Z', userName: 'Tendai Chikwava', userEmail: 'tendai@afu.africa', action: 'update', resource: 'settings', resourceId: 'CFG-RATES', details: 'Updated base interest rate from 12.5% to 11.8%', ipAddress: '197.221.44.102', severity: 'critical' },
-  { id: 'AT-006', timestamp: '2026-04-10T08:00:00Z', userName: 'Sarah Moatlhodi', userEmail: 'sarah@afu.africa', action: 'login', resource: 'settings', resourceId: 'SESSION-92104', details: 'Admin login from Gaborone, Botswana (2FA verified)', ipAddress: '196.216.170.55', severity: 'info' },
-  { id: 'AT-007', timestamp: '2026-04-10T07:45:00Z', userName: 'Mwangi Kamau', userEmail: 'mwangi@afu.africa', action: 'sign', resource: 'contract', resourceId: 'CTR-2026-0052', details: 'Digitally signed export agreement for 50t maize shipment', ipAddress: '196.192.44.67', severity: 'info' },
-  { id: 'AT-008', timestamp: '2026-04-10T07:30:00Z', userName: 'Grace Nkomo', userEmail: 'grace@afu.africa', action: 'export', resource: 'loan', resourceId: 'RPT-PORTFOLIO-Q1', details: 'Exported Q1 2026 portfolio report (PDF, 62 pages)', ipAddress: '196.1.2.88', severity: 'info' },
-  { id: 'AT-009', timestamp: '2026-04-09T18:20:00Z', userName: 'Tendai Chikwava', userEmail: 'tendai@afu.africa', action: 'approve', resource: 'trade_order', resourceId: 'TRD-2026-0188', details: 'Approved 25t soybean export order to Mozambique', ipAddress: '197.221.44.102', severity: 'info' },
-  { id: 'AT-010', timestamp: '2026-04-09T17:55:00Z', userName: 'System', userEmail: 'system@afu.africa', action: 'update', resource: 'payment', resourceId: 'PAY-2026-0398', details: 'Payment status changed to completed via M-Pesa callback', ipAddress: '10.0.0.1', severity: 'info' },
-  { id: 'AT-011', timestamp: '2026-04-09T17:10:00Z', userName: 'Sarah Moatlhodi', userEmail: 'sarah@afu.africa', action: 'view', resource: 'member', resourceId: 'AFU-2024-034', details: 'Viewed member profile for compliance review', ipAddress: '196.216.170.55', severity: 'info' },
-  { id: 'AT-012', timestamp: '2026-04-09T16:45:00Z', userName: 'Grace Nkomo', userEmail: 'grace@afu.africa', action: 'create', resource: 'loan', resourceId: 'LN-2026-0095', details: 'Created equipment finance application for Chipo Banda ($18,000)', ipAddress: '196.1.2.88', severity: 'info' },
-  { id: 'AT-013', timestamp: '2026-04-09T16:00:00Z', userName: 'Tendai Chikwava', userEmail: 'tendai@afu.africa', action: 'reject', resource: 'trade_order', resourceId: 'TRD-2026-0185', details: 'Rejected trade order — phytosanitary certificate expired', ipAddress: '197.221.44.102', severity: 'warning' },
-  { id: 'AT-014', timestamp: '2026-04-09T15:30:00Z', userName: 'System', userEmail: 'system@afu.africa', action: 'delete', resource: 'content', resourceId: 'CMS-DRAFT-088', details: 'Auto-deleted abandoned draft content older than 60 days', ipAddress: '10.0.0.1', severity: 'warning' },
-  { id: 'AT-015', timestamp: '2026-04-09T14:55:00Z', userName: 'Sarah Moatlhodi', userEmail: 'sarah@afu.africa', action: 'update', resource: 'member', resourceId: 'AFU-2025-092', details: 'Updated KYC tier from Tier 1 to Tier 2 after document verification', ipAddress: '196.216.170.55', severity: 'info' },
-  { id: 'AT-016', timestamp: '2026-04-09T14:20:00Z', userName: 'Grace Nkomo', userEmail: 'grace@afu.africa', action: 'approve', resource: 'payment', resourceId: 'PAY-2026-0395', details: 'Approved bulk disbursement batch of 8 loans totaling $45,200', ipAddress: '196.1.2.88', severity: 'critical' },
-  { id: 'AT-017', timestamp: '2026-04-09T13:45:00Z', userName: 'Mwangi Kamau', userEmail: 'mwangi@afu.africa', action: 'create', resource: 'content', resourceId: 'CMS-POST-142', details: 'Published blog article: "Seasonal planting guide for Southern Africa"', ipAddress: '196.192.44.67', severity: 'info' },
-  { id: 'AT-018', timestamp: '2026-04-09T12:30:00Z', userName: 'Tendai Chikwava', userEmail: 'tendai@afu.africa', action: 'sign', resource: 'contract', resourceId: 'CTR-2026-0049', details: 'Co-signed Watson Vine partnership agreement', ipAddress: '197.221.44.102', severity: 'info' },
-  { id: 'AT-019', timestamp: '2026-04-09T11:00:00Z', userName: 'Sarah Moatlhodi', userEmail: 'sarah@afu.africa', action: 'export', resource: 'member', resourceId: 'RPT-KYC-APR', details: 'Exported KYC compliance report for April review', ipAddress: '196.216.170.55', severity: 'info' },
-  { id: 'AT-020', timestamp: '2026-04-09T10:15:00Z', userName: 'System', userEmail: 'system@afu.africa', action: 'logout', resource: 'settings', resourceId: 'SESSION-91988', details: 'Session expired after 30 minutes of inactivity', ipAddress: '10.0.0.1', severity: 'info' },
-  { id: 'AT-021', timestamp: '2026-04-09T09:30:00Z', userName: 'Grace Nkomo', userEmail: 'grace@afu.africa', action: 'view', resource: 'loan', resourceId: 'LN-2026-0088', details: 'Reviewed loan repayment schedule for compliance audit', ipAddress: '196.1.2.88', severity: 'info' },
-  { id: 'AT-022', timestamp: '2026-04-08T17:45:00Z', userName: 'Tendai Chikwava', userEmail: 'tendai@afu.africa', action: 'update', resource: 'settings', resourceId: 'CFG-SECURITY', details: 'Enabled mandatory 2FA for all admin accounts', ipAddress: '197.221.44.102', severity: 'critical' },
-  { id: 'AT-023', timestamp: '2026-04-08T16:00:00Z', userName: 'Sarah Moatlhodi', userEmail: 'sarah@afu.africa', action: 'create', resource: 'member', resourceId: 'AFU-2026-119', details: 'Registered new smallholder member from Matabeleland South, Zimbabwe', ipAddress: '196.216.170.55', severity: 'info' },
-  { id: 'AT-024', timestamp: '2026-04-08T14:30:00Z', userName: 'System', userEmail: 'system@afu.africa', action: 'reject', resource: 'payment', resourceId: 'PAY-2026-0391', details: 'Auto-rejected payment — mobile money timeout after 5 minutes', ipAddress: '10.0.0.1', severity: 'warning' },
-];
+// ── No more hardcoded data — fetched from Supabase audit_log table ───────────
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -136,7 +110,7 @@ function formatTimestamp(ts: string): string {
 }
 
 function relativeTime(ts: string): string {
-  const now = new Date('2026-04-10T12:00:00Z');
+  const now = new Date();
   const d = new Date(ts);
   const diffMs = now.getTime() - d.getTime();
   const mins = Math.floor(diffMs / 60000);
@@ -183,6 +157,8 @@ const SEVERITIES: Severity[] = ['info', 'warning', 'critical'];
 const PAGE_SIZE = 10;
 
 export default function AuditTrailPage() {
+  const [entries, setEntries] = useState<AuditEntry[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [actionFilter, setActionFilter] = useState<ActionType | ''>('');
   const [resourceFilter, setResourceFilter] = useState<ResourceType | ''>('');
@@ -192,8 +168,39 @@ export default function AuditTrailPage() {
   const [page, setPage] = useState(1);
   const [showFilters, setShowFilters] = useState(false);
 
+  useEffect(() => {
+    const supabase = createClient();
+    async function fetchAudit() {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('audit_log')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(100);
+      if (!error && data) {
+        setEntries(data.map((row: Record<string, unknown>) => {
+          const details = row.details as Record<string, unknown> | null;
+          return {
+            id: String(row.id),
+            timestamp: String(row.created_at),
+            userName: (details?.user_name as string) || String(row.user_id || 'System'),
+            userEmail: (details?.user_email as string) || '',
+            action: (String(row.action || 'view')) as ActionType,
+            resource: (String(row.entity_type || 'settings')) as ResourceType,
+            resourceId: String(row.entity_id || ''),
+            details: (details?.description as string) || (details?.message as string) || JSON.stringify(details || {}),
+            ipAddress: (details?.ip_address as string) || '',
+            severity: (details?.severity as Severity) || 'info',
+          };
+        }));
+      }
+      setLoading(false);
+    }
+    fetchAudit();
+  }, []);
+
   const filtered = useMemo(() => {
-    let result = FALLBACK_ENTRIES;
+    let result = entries;
 
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
@@ -211,17 +218,17 @@ export default function AuditTrailPage() {
     if (dateTo) result = result.filter(e => e.timestamp <= dateTo + 'T23:59:59Z');
 
     return result;
-  }, [searchQuery, actionFilter, resourceFilter, severityFilter, dateFrom, dateTo]);
+  }, [entries, searchQuery, actionFilter, resourceFilter, severityFilter, dateFrom, dateTo]);
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const stats = useMemo(() => ({
-    total: FALLBACK_ENTRIES.length,
-    critical: FALLBACK_ENTRIES.filter(e => e.severity === 'critical').length,
-    warning: FALLBACK_ENTRIES.filter(e => e.severity === 'warning').length,
-    uniqueUsers: new Set(FALLBACK_ENTRIES.map(e => e.userEmail)).size,
-  }), []);
+    total: entries.length,
+    critical: entries.filter(e => e.severity === 'critical').length,
+    warning: entries.filter(e => e.severity === 'warning').length,
+    uniqueUsers: new Set(entries.filter(e => e.userEmail).map(e => e.userEmail)).size,
+  }), [entries]);
 
   return (
     <div className="space-y-6">
@@ -465,12 +472,24 @@ export default function AuditTrailPage() {
           </div>
         )}
 
+        {/* Loading state */}
+        {loading && (
+          <div className="p-12 text-center">
+            <Activity className="w-12 h-12 text-gray-300 mx-auto mb-3 animate-pulse" />
+            <p className="text-sm font-medium text-gray-500">Loading audit entries...</p>
+          </div>
+        )}
+
         {/* Empty state */}
-        {paged.length === 0 && (
+        {!loading && paged.length === 0 && (
           <div className="p-12 text-center">
             <Shield className="w-12 h-12 text-gray-300 mx-auto mb-3" />
             <p className="text-sm font-medium text-gray-500">No audit entries found</p>
-            <p className="text-xs text-gray-400 mt-1">Try adjusting your search or filter criteria</p>
+            <p className="text-xs text-gray-400 mt-1">
+              {entries.length === 0
+                ? 'No audit activity has been recorded yet'
+                : 'Try adjusting your search or filter criteria'}
+            </p>
           </div>
         )}
       </div>

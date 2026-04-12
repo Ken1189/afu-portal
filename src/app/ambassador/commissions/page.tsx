@@ -29,23 +29,7 @@ interface CommissionEntry {
 
 // ── Demo Data ────────────────────────────────────────────────────────────────
 
-const FALLBACK_ENTRIES: CommissionEntry[] = [
-  { id: '1', commission_type: 'membership', source_amount: 250, rate_percent: 10, commission_amount: 25, status: 'paid', created_at: '2026-03-25T10:00:00Z', description: 'John Mwangi membership signup' },
-  { id: '2', commission_type: 'fundraising', source_amount: 5000, rate_percent: 5, commission_amount: 250, status: 'paid', created_at: '2026-03-22T14:00:00Z', description: 'Community fundraiser - Kampala' },
-  { id: '3', commission_type: 'advertising', source_amount: 1200, rate_percent: 10, commission_amount: 120, status: 'pending', created_at: '2026-03-20T09:00:00Z', description: 'AgriTech Co. ad placement' },
-  { id: '4', commission_type: 'membership', source_amount: 250, rate_percent: 10, commission_amount: 25, status: 'paid', created_at: '2026-03-18T16:00:00Z', description: 'Sarah Kimani membership signup' },
-  { id: '5', commission_type: 'membership', source_amount: 500, rate_percent: 10, commission_amount: 50, status: 'pending', created_at: '2026-03-15T11:00:00Z', description: 'Cooperative Premium membership' },
-  { id: '6', commission_type: 'fundraising', source_amount: 2000, rate_percent: 5, commission_amount: 100, status: 'paid', created_at: '2026-03-12T08:00:00Z', description: 'Water project fundraiser' },
-  { id: '7', commission_type: 'advertising', source_amount: 800, rate_percent: 10, commission_amount: 80, status: 'paid', created_at: '2026-03-10T13:00:00Z', description: 'Farm Supplies Ltd. ad' },
-  { id: '8', commission_type: 'membership', source_amount: 250, rate_percent: 10, commission_amount: 25, status: 'pending', created_at: '2026-03-08T15:00:00Z', description: 'Peter Obi membership signup' },
-  { id: '9', commission_type: 'fundraising', source_amount: 10000, rate_percent: 7, commission_amount: 700, status: 'paid', created_at: '2026-03-05T10:00:00Z', description: 'Large-scale irrigation fundraiser' },
-  { id: '10', commission_type: 'membership', source_amount: 250, rate_percent: 10, commission_amount: 25, status: 'paid', created_at: '2026-03-01T09:00:00Z', description: 'Grace Achieng membership signup' },
-  { id: '11', commission_type: 'marketplace', source_amount: 15000, rate_percent: 5, commission_amount: 750, status: 'paid', created_at: '2026-02-25T10:00:00Z', description: 'Seed supplier partnership' },
-  { id: '12', commission_type: 'advertising', source_amount: 2500, rate_percent: 10, commission_amount: 250, status: 'paid', created_at: '2026-02-20T14:00:00Z', description: 'Equipment dealer ad campaign' },
-  { id: '13', commission_type: 'fundraising', source_amount: 8000, rate_percent: 7, commission_amount: 560, status: 'paid', created_at: '2026-02-15T09:00:00Z', description: 'Solar pump fundraiser' },
-  { id: '14', commission_type: 'membership', source_amount: 250, rate_percent: 10, commission_amount: 25, status: 'paid', created_at: '2026-02-10T16:00:00Z', description: 'Moses Okello membership signup' },
-  { id: '15', commission_type: 'membership', source_amount: 250, rate_percent: 10, commission_amount: 25, status: 'paid', created_at: '2026-02-05T11:00:00Z', description: 'Fatima Diallo membership signup' },
-];
+const FALLBACK_ENTRIES: CommissionEntry[] = [];
 
 // ── Component ────────────────────────────────────────────────────────────────
 
@@ -78,10 +62,15 @@ export default function CommissionsPage() {
 
           if (data && data.length > 0) {
             setEntries(data);
+          } else {
+            setEntries([]);
           }
+        } else {
+          setEntries([]);
         }
       } catch {
-        // Keep demo data
+        // On error, show empty state rather than fake data
+        setEntries([]);
       } finally {
         setLoading(false);
       }

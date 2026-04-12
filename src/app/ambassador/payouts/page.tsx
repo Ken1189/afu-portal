@@ -28,13 +28,7 @@ interface Payout {
 
 // ── Demo Data ────────────────────────────────────────────────────────────────
 
-const demoPayouts: Payout[] = [
-  { id: '1', amount: 1200, method: 'Bank Transfer', status: 'completed', reference: 'PAY-2026-001', created_at: '2026-03-15T10:00:00Z' },
-  { id: '2', amount: 850, method: 'Mobile Money', status: 'completed', reference: 'PAY-2026-002', created_at: '2026-02-15T10:00:00Z' },
-  { id: '3', amount: 625, method: 'Bank Transfer', status: 'completed', reference: 'PAY-2026-003', created_at: '2026-01-15T10:00:00Z' },
-  { id: '4', amount: 475, method: 'PayPal', status: 'processing', reference: 'PAY-2025-012', created_at: '2025-12-15T10:00:00Z' },
-  { id: '5', amount: 350, method: 'Mobile Money', status: 'completed', reference: 'PAY-2025-011', created_at: '2025-11-15T10:00:00Z' },
-];
+const demoPayouts: Payout[] = [];
 
 const MINIMUM_PAYOUT = 50;
 
@@ -45,7 +39,7 @@ export default function PayoutsPage() {
   const [loading, setLoading] = useState(true);
   const [payouts, setPayouts] = useState<Payout[]>(demoPayouts);
   const [payoutMethod, setPayoutMethod] = useState('Bank Transfer');
-  const [pendingBalance, setPendingBalance] = useState(475);
+  const [pendingBalance, setPendingBalance] = useState(0);
   const [requesting, setRequesting] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [requestSuccess, setRequestSuccess] = useState(false);
@@ -81,6 +75,8 @@ export default function PayoutsPage() {
               reference: p.payout_reference || p.reference || `PAY-${p.id.slice(0, 8)}`,
               created_at: p.created_at,
             })));
+          } else {
+            setPayouts([]);
           }
 
           // Get pending balance from commission_entries
@@ -92,11 +88,17 @@ export default function PayoutsPage() {
 
           if (pendingEntries) {
             const total = pendingEntries.reduce((s: number, e: any) => s + (e.commission_amount || 0), 0);
-            if (total > 0) setPendingBalance(total);
+            setPendingBalance(total);
           }
+        } else {
+          // No ambassador record — show empty state
+          setPayouts([]);
+          setPendingBalance(0);
         }
       } catch {
-        // Keep demo data
+        // On error, show empty state rather than fake data
+        setPayouts([]);
+        setPendingBalance(0);
       } finally {
         setLoading(false);
       }

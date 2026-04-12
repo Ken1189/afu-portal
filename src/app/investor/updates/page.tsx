@@ -66,76 +66,11 @@ const typeConfig: Record<
   },
 };
 
-const FALLBACK_UPDATES: InvestorUpdate[] = [
-  {
-    id: '1',
-    title: 'Q1 2026 Quarterly Report Published',
-    body: 'Fund I delivered 3.5% quarterly return, bringing YTD IRR to 14.2%. Zimbabwe blueberry programme exceeded export targets by 15%. The loan portfolio maintained a 96.1% repayment rate with PAR30 improving to 3.9%. Total AUM reached $12.4M with new capital deployments into Kenya maize and Uganda coffee value chains.',
-    update_type: 'quarterly_report',
-    published_at: '2026-03-15T00:00:00Z',
-    metrics_snapshot: { 'Quarterly Return': '3.5%', 'YTD IRR': '14.2%', 'Repayment Rate': '96.1%' },
-  },
-  {
-    id: '2',
-    title: 'Uganda Operations Launch',
-    body: 'Officially launched Uganda operations with 2,400 farmers onboarded in first month. MTN MoMo integration live for seamless loan disbursements and repayments. Initial focus on Arabica coffee in the Mt Elgon region and vanilla in Bundibugyo district. Country manager Grace Nakamya leading a 12-person local team.',
-    update_type: 'new_country_launch',
-    published_at: '2026-02-18T00:00:00Z',
-    metrics_snapshot: { 'Farmers Onboarded': '2,400', 'Crops': 'Coffee, Vanilla', 'Team Size': '12' },
-  },
-  {
-    id: '3',
-    title: '4,000 Farmer Milestone',
-    body: 'Crossed 4,000 active farmers across 3 countries. Average farmer income increase of 42% since joining AFU. Women farmers now represent 44% of total membership, exceeding our 40% gender inclusion target. Carbon sequestration from agroforestry reached 18,000 tonnes CO2e for the year.',
-    update_type: 'impact_milestone',
-    published_at: '2026-02-05T00:00:00Z',
-    metrics_snapshot: { 'Active Farmers': '4,000', 'Income Increase': '42%', 'Women Farmers': '44%' },
-  },
-  {
-    id: '4',
-    title: 'Zimbabwe Blueberry First Export',
-    body: 'First commercial blueberry shipment to EU completed. 12 tonnes at $18/kg, generating $216,000 in export revenue. Cold chain infrastructure performing well with less than 1.5% spoilage. Tesco and Marks & Spencer confirmed as off-take partners for the 2026 season. Expansion to 85 hectares planned.',
-    update_type: 'fund_update',
-    published_at: '2026-01-22T00:00:00Z',
-    metrics_snapshot: { 'Export Revenue': '$216,000', 'Price/kg': '$18', 'Spoilage': '<1.5%' },
-  },
-  {
-    id: '5',
-    title: 'Insurance Claims Performance',
-    body: 'Q4 2025 claims ratio of 38% -- well below the 65% target. Parametric weather triggers performed as modelled with 98% correlation to actual crop losses. 1,200 farmers received payouts averaging $145, protecting household food security during the dry spell in Manicaland province.',
-    update_type: 'quarterly_report',
-    published_at: '2026-01-10T00:00:00Z',
-    metrics_snapshot: { 'Claims Ratio': '38%', 'Avg Payout': '$145', 'Farmers Covered': '1,200' },
-  },
-  {
-    id: '6',
-    title: 'Kenya Market Entry',
-    body: 'Kenya operations commenced with Safaricom M-Pesa integration complete. Initial 800 farmer registrations in Nakuru and Trans-Nzoia counties, focused on maize and horticulture. Partnership with Equity Bank for co-lending facility of KES 50M. Regulatory approval obtained from CMA Kenya.',
-    update_type: 'new_country_launch',
-    published_at: '2025-12-12T00:00:00Z',
-    metrics_snapshot: { 'Initial Farmers': '800', 'Co-lending': 'KES 50M', 'Counties': '2' },
-  },
-  {
-    id: '7',
-    title: 'FY2025 Audited Results',
-    body: 'Full year results: 12.5% net IRR, $8.2M deployed, 94.2% repayment rate. Exceeded all fund targets set at inception. The blended finance model proved resilient through commodity price volatility. Independent audit by Deloitte confirmed clean opinion on all financial statements.',
-    update_type: 'quarterly_report',
-    published_at: '2025-12-05T00:00:00Z',
-    metrics_snapshot: { 'Net IRR': '12.5%', 'Capital Deployed': '$8.2M', 'Repayment Rate': '94.2%' },
-  },
-  {
-    id: '8',
-    title: 'Loan Portfolio Update',
-    body: 'Agricultural loan book reached $3.8M. PAR30 at 5.8% -- in line with emerging market microfinance benchmarks. Average loan size $420 with 87-day average tenor. Mobile-first disbursement now accounts for 94% of all loans. Credit scoring model v3.2 deployed with improved default prediction accuracy of 89%.',
-    update_type: 'fund_update',
-    published_at: '2025-11-18T00:00:00Z',
-    metrics_snapshot: { 'Loan Book': '$3.8M', 'PAR30': '5.8%', 'Avg Loan': '$420' },
-  },
-];
+const FALLBACK_UPDATES: InvestorUpdate[] = [];
 
 export default function UpdatesPage() {
   const { user } = useAuth();
-  const [updates, setUpdates] = useState<InvestorUpdate[]>(FALLBACK_UPDATES);
+  const [updates, setUpdates] = useState<InvestorUpdate[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState<string>('all');

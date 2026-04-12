@@ -50,92 +50,7 @@ interface EOIFormData {
 
 // ── Fallback Data ─────────────────────────────────────────────────────────────
 
-const FALLBACK_OPPORTUNITIES: Opportunity[] = [
-  {
-    id: 'afu-debt-fund-ii',
-    name: 'AFU Agricultural Debt Fund II',
-    type: 'Debt Fund',
-    target: 5000000,
-    minInvestment: 100000,
-    targetIRR: '12-16%',
-    term: '3 years',
-    subscribed: 62,
-    subscribedAmount: 3100000,
-    status: 'Open',
-    description:
-      'Senior secured lending to verified African farmers. Portfolio diversified across Africa, 15+ crop types. All loans backed by crop insurance and guaranteed offtake agreements.',
-  },
-  {
-    id: 'zim-blueberry',
-    name: 'Zimbabwe Blueberry Expansion',
-    type: 'Equity',
-    target: 2000000,
-    minInvestment: 250000,
-    targetIRR: '15-20%',
-    term: '5 years',
-    subscribed: 45,
-    subscribedAmount: 900000,
-    status: 'Open',
-    description:
-      'Expand the Watson & Fine blueberry operation from 25ha to 100ha. EU export contracts secured. $18/kg farm-gate price. First commercial harvest delivered January 2026.',
-  },
-  {
-    id: 'ea-crop-insurance',
-    name: 'East Africa Crop Insurance Pool',
-    type: 'Insurance',
-    target: 3000000,
-    minInvestment: 150000,
-    targetIRR: '10-14%',
-    term: '2 years (renewable)',
-    subscribed: 78,
-    subscribedAmount: 2340000,
-    status: 'Open',
-    description:
-      "Participate in Lloyd's of London coverholder insurance premiums. Parametric weather-triggered products with 38% historical claims ratio. Covers 12,000+ farmers across Kenya, Uganda, Tanzania.",
-  },
-  {
-    id: 'trade-finance',
-    name: 'Trade Finance Facility',
-    type: 'Debt',
-    target: 10000000,
-    minInvestment: 500000,
-    targetIRR: '11-15%',
-    term: '1 year (revolving)',
-    subscribed: 35,
-    subscribedAmount: 3500000,
-    status: 'Open',
-    description:
-      'Fund SBLCs, Letters of Credit, and export pre-financing for agricultural commodity exports. Short duration, high turnover. Average deal tenor: 90 days.',
-  },
-  {
-    id: 'macadamia-orchard',
-    name: 'Macadamia Orchard Development',
-    type: 'Equity',
-    target: 2500000,
-    minInvestment: 200000,
-    targetIRR: '13-18%',
-    term: '7 years',
-    subscribed: 15,
-    subscribedAmount: 375000,
-    status: 'Open',
-    description:
-      'Greenfield macadamia orchard development in Zimbabwe and Mozambique. Premium nut commanding $5,000+/tonne. Trees productive for 40+ years. Carbon credit eligible.',
-  },
-  {
-    id: 'uganda-smallholder',
-    name: 'Uganda Smallholder Lending',
-    type: 'Debt',
-    target: 1500000,
-    minInvestment: 50000,
-    targetIRR: '13-16%',
-    term: '2 years',
-    subscribed: 100,
-    subscribedAmount: 1500000,
-    status: 'Fully Subscribed',
-    description:
-      'Fully subscribed. Pre-identified farmer network. MTN MoMo disbursement. 94% repayment rate on existing Zimbabwe portfolio.',
-  },
-];
+const FALLBACK_OPPORTUNITIES: Opportunity[] = [];
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -179,7 +94,7 @@ const fadeIn = {
 
 export default function InvestorOpportunities() {
   const { user, profile } = useAuth();
-  const [opportunities, setOpportunities] = useState<Opportunity[]>(FALLBACK_OPPORTUNITIES);
+  const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
   const [filter, setFilter] = useState<'open' | 'subscribed'>('open');
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [submittedIds, setSubmittedIds] = useState<Set<string>>(new Set());
@@ -253,7 +168,7 @@ export default function InvestorOpportunities() {
           }
         }
       } catch { /* use fallback */ }
-      // Keep FALLBACK_OPPORTUNITIES (already set as initial state)
+      // No fallback — show empty state if no DB data
     }
     load();
   }, []);
