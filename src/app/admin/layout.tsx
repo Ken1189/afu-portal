@@ -80,6 +80,7 @@ import {
   Percent,
   Crown,
   Inbox,
+  Receipt,
 } from 'lucide-react';
 
 // ── Navigation structure with collapsible groups ──
@@ -144,6 +145,7 @@ const navGroups: NavGroup[] = [
       { href: '/admin/contracts', label: 'Proposals & Contracts', icon: <FileText className={ICON_CLS} /> },
       { href: '/admin/wallet', label: 'Wallet', icon: <Wallet className={ICON_CLS} /> },
       { href: '/admin/credit-scores', label: 'Credit Scoring', icon: <Gauge className={ICON_CLS} /> },
+      { href: '/admin/reconciliation', label: 'Reconciliation', icon: <Receipt className={ICON_CLS} /> },
       { href: '/admin/exports', label: 'Exports', icon: <Ship className={ICON_CLS} /> },
     ],
   },

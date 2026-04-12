@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from './client';
+import { captureError } from '@/lib/capture-error';
 
 export interface OfftakeContractRow {
   id: string;
@@ -41,7 +42,7 @@ export function useContracts(memberId?: string) {
         setContracts((data || []) as OfftakeContractRow[]);
       }
     } catch (err) {
-      console.error('[useContracts] exception:', err);
+      captureError('useContracts.fetch', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
       setContracts([]);
     } finally {
@@ -58,7 +59,7 @@ export function useContracts(memberId?: string) {
       await fetchContracts();
       return { data, error: null };
     } catch (err) {
-      console.error('[useContracts] createContract exception:', err);
+      captureError('useContracts.createContract', err);
       return { data: null, error: err instanceof Error ? err.message : 'Unknown error' };
     }
   };
@@ -70,7 +71,7 @@ export function useContracts(memberId?: string) {
       await fetchContracts();
       return { error: null };
     } catch (err) {
-      console.error('[useContracts] updateContract exception:', err);
+      captureError('useContracts.updateContract', err);
       return { error: err instanceof Error ? err.message : 'Unknown error' };
     }
   };

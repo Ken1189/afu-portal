@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from './client';
+import { captureError } from '@/lib/capture-error';
 import type { SupplierCategory, SupplierStatus, SponsorshipTier } from './types';
 
 // ── Types ─────────────────────────────────────────────────────────────────
@@ -80,7 +81,7 @@ export function useSuppliers(page = 1, pageSize = 50) {
         setTotalCount(count ?? 0);
       }
     } catch (err) {
-      console.error('[useSuppliers] exception:', err);
+      captureError('useSuppliers.fetch', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
       setSuppliers([]);
     } finally {
@@ -106,7 +107,7 @@ export function useSuppliers(page = 1, pageSize = 50) {
       await fetchSuppliers();
       return { data: data as SupplierRow, error: null };
     } catch (err) {
-      console.error('[useSuppliers] addSupplier exception:', err);
+      captureError('useSuppliers.addSupplier', err);
       return { data: null, error: err instanceof Error ? err.message : 'Unknown error' };
     }
   };
@@ -122,7 +123,7 @@ export function useSuppliers(page = 1, pageSize = 50) {
       await fetchSuppliers();
       return { error: null };
     } catch (err) {
-      console.error('[useSuppliers] updateSupplier exception:', err);
+      captureError('useSuppliers.updateSupplier', err);
       return { error: err instanceof Error ? err.message : 'Unknown error' };
     }
   };

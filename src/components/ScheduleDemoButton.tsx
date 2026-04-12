@@ -11,7 +11,7 @@ interface Props {
 const INVESTOR_TYPES = [
   'Family Office',
   'DFI / Multilateral',
-  'VC / Private Equity',
+  'VC / Private Investment',
   'Impact Fund',
   'Foundation / Endowment',
   'Angel / HNWI',

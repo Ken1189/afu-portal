@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from './client';
+import { captureError } from '@/lib/capture-error';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -66,7 +67,7 @@ export function useEquipment(country?: string) {
         setEquipment((data || []) as EquipmentRow[]);
       }
     } catch (err) {
-      console.error('[useEquipment] exception:', err);
+      captureError('useEquipment.fetch', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
       setEquipment([]);
     } finally {
@@ -128,7 +129,7 @@ export function useEquipmentBookings(memberId?: string) {
         setBookings((data || []) as EquipmentBookingRow[]);
       }
     } catch (err) {
-      console.error('[useEquipmentBookings] exception:', err);
+      captureError('useEquipmentBookings.fetch', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
       setBookings([]);
     } finally {
@@ -164,7 +165,7 @@ export function useEquipmentBookings(memberId?: string) {
       await fetchBookings();
       return { error: null };
     } catch (err) {
-      console.error('[useEquipmentBookings] cancelBooking exception:', err);
+      captureError('useEquipmentBookings.cancelBooking', err);
       return { error: err instanceof Error ? err.message : 'Unknown error' };
     }
   };
@@ -187,7 +188,7 @@ export function useCreateBooking() {
       if (error) return { data: null, error: error.message };
       return { data, error: null };
     } catch (err) {
-      console.error('[useCreateBooking] exception:', err);
+      captureError('useCreateBooking', err);
       return { data: null, error: err instanceof Error ? err.message : 'Unknown error' };
     }
   };

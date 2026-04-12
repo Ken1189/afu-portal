@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from './client';
+import { captureError } from '@/lib/capture-error';
 
 export type KycTier = 'tier_1' | 'tier_2' | 'tier_3';
 export type KycStatus = 'pending' | 'verified' | 'rejected' | 'expired';
@@ -82,7 +83,7 @@ export function useKyc() {
         setVerification(verRes.data[0] as KycVerificationRow);
       }
     } catch (err) {
-      console.error('[useKyc] exception:', err);
+      captureError('useKyc.fetch', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
       setDocuments([]);
     } finally {
@@ -110,7 +111,7 @@ export function useKyc() {
       }
       return { data, error };
     } catch (err) {
-      console.error('[useKyc] uploadDocument exception:', err);
+      captureError('useKyc.uploadDocument', err);
       return { data: null, error: err instanceof Error ? { message: err.message } : { message: 'Unknown error' } };
     }
   };
@@ -147,7 +148,7 @@ export function useCreditScore() {
         setCreditScore(data as CreditScoreRow);
       }
     } catch (err) {
-      console.error('[useCreditScore] exception:', err);
+      captureError('useCreditScore.fetch', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
       setCreditScore(null);
     } finally {

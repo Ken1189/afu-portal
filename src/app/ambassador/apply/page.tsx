@@ -31,7 +31,7 @@ const SECTORS = [
   { value: 'Social Impact', label: 'Social Impact' },
   { value: 'Investment', label: 'Investment' },
   { value: 'Venture Capital', label: 'Venture Capital' },
-  { value: 'Private Equity', label: 'Private Equity' },
+  { value: 'Private Investment', label: 'Private Investment' },
   { value: 'Development Finance', label: 'Development Finance' },
   { value: 'Impact Investing', label: 'Impact Investing' },
   { value: 'Academia', label: 'Academia' },

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from './client';
+import { captureError } from '@/lib/capture-error';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -76,7 +77,7 @@ export function useCourses() {
         setCourses((data || []) as CourseRow[]);
       }
     } catch (err) {
-      console.error('[useCourses] exception:', err);
+      captureError('useCourses.fetch', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
       setCourses([]);
     } finally {
@@ -133,7 +134,7 @@ export function useCourseModules(courseId: string) {
         setModules((data || []) as CourseModuleRow[]);
       }
     } catch (err) {
-      console.error('[useCourseModules] exception:', err);
+      captureError('useCourseModules.fetch', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
       setModules([]);
     } finally {
@@ -179,7 +180,7 @@ export function useCourseEnrollments(memberId?: string) {
         setEnrollments((data || []) as CourseEnrollmentRow[]);
       }
     } catch (err) {
-      console.error('[useCourseEnrollments] exception:', err);
+      captureError('useCourseEnrollments.fetch', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
       setEnrollments([]);
     } finally {
@@ -226,7 +227,7 @@ export function enrollInCourse() {
       if (error) return { data: null, error: error.message };
       return { data, error: null };
     } catch (err) {
-      console.error('[enrollInCourse] exception:', err);
+      captureError('enrollInCourse', err);
       return { data: null, error: err instanceof Error ? err.message : 'Unknown error' };
     }
   };
@@ -254,7 +255,7 @@ export function updateProgress() {
       if (error) return { data: null, error: error.message };
       return { data, error: null };
     } catch (err) {
-      console.error('[updateProgress] exception:', err);
+      captureError('updateProgress', err);
       return { data: null, error: err instanceof Error ? err.message : 'Unknown error' };
     }
   };

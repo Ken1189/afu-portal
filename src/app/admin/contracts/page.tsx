@@ -130,10 +130,10 @@ const DOCUMENT_TYPES: DocTypeDef[] = [
     label: 'Investor Pack',
     shortLabel: 'Investor',
     icon: Briefcase,
-    description: 'Investment terms, equity structure, and return expectations for investors',
+    description: 'Investment terms, profit share structure, and return expectations for investors',
     color: 'text-emerald-600 bg-emerald-50 border-emerald-200',
     relevantParties: ['investor'],
-    sections: ['parties', 'investment', 'equity', 'returns', 'governance', 'exit', 'duration'],
+    sections: ['parties', 'investment', 'profit_share', 'returns', 'governance', 'exit', 'duration'],
   },
   {
     value: 'supplier_agreement',
@@ -267,7 +267,7 @@ function ContractPreview({
     } else if (contract.document_type === 'investor_pack') {
       if (cf.investment_amount) base.push(['Investment Amount', `USD ${Number(cf.investment_amount).toLocaleString()}`]);
       if (cf.instrument) base.push(['Instrument Type', cf.instrument as string]);
-      if (cf.equity_percentage) base.push(['Equity Stake', `${cf.equity_percentage}%`]);
+      if (cf.equity_percentage) base.push(['Profit Share %', `${cf.equity_percentage}%`]);
       if (cf.valuation) base.push(['Pre-Money Valuation', `USD ${Number(cf.valuation).toLocaleString()}`]);
       if (cf.target_return) base.push(['Target Return', cf.target_return as string]);
       if (cf.dividend_policy) base.push(['Dividend Policy', cf.dividend_policy as string]);
@@ -995,7 +995,7 @@ function TypeSpecificFields({
               <label className={labelClass}>Instrument Type</label>
               <select value={cf('instrument')} onChange={e => setCf('instrument', e.target.value)} className={inputClass}>
                 <option value="">Select</option>
-                <option value="Equity">Equity</option>
+                <option value="Profit Share">Profit Share</option>
                 <option value="Convertible Note">Convertible Note</option>
                 <option value="SAFE">SAFE</option>
                 <option value="Revenue Share">Revenue Share</option>
@@ -1010,7 +1010,7 @@ function TypeSpecificFields({
           </div>
           <div className="grid grid-cols-3 gap-4 mt-3">
             <div>
-              <label className={labelClass}>Equity Stake (%)</label>
+              <label className={labelClass}>Profit Share (%)</label>
               <input type="number" step="0.01" value={cf('equity_percentage')} onChange={e => setCf('equity_percentage', e.target.value)} placeholder="2.0" className={inputClass} />
             </div>
             <div>

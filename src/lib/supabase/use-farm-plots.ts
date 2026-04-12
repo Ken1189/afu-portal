@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from './client';
+import { captureError } from '@/lib/capture-error';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -89,7 +90,7 @@ export function useFarmPlots(memberId?: string, farmId?: string | null) {
         setPlots((data || []) as FarmPlotRow[]);
       }
     } catch (err) {
-      console.error('[useFarmPlots] exception:', err);
+      captureError('useFarmPlots.fetch', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
       setPlots([]);
     } finally {
@@ -141,7 +142,7 @@ export function useCreateFarmPlot() {
       if (error) return { data: null, error: error.message };
       return { data, error: null };
     } catch (err) {
-      console.error('[useCreateFarmPlot] exception:', err);
+      captureError('useCreateFarmPlot', err);
       return { data: null, error: err instanceof Error ? err.message : 'Unknown error' };
     }
   };
@@ -162,7 +163,7 @@ export function useUpdateFarmPlot() {
       if (error) return { data: null, error: error.message };
       return { data, error: null };
     } catch (err) {
-      console.error('[useUpdateFarmPlot] exception:', err);
+      captureError('useUpdateFarmPlot', err);
       return { data: null, error: err instanceof Error ? err.message : 'Unknown error' };
     }
   };
@@ -201,7 +202,7 @@ export function useFarmActivities(plotId?: string) {
         setActivities((data || []) as FarmActivityRow[]);
       }
     } catch (err) {
-      console.error('[useFarmActivities] exception:', err);
+      captureError('useFarmActivities.fetch', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
       setActivities([]);
     } finally {
@@ -245,7 +246,7 @@ export function useCreateFarmActivity() {
       if (error) return { data: null, error: error.message };
       return { data, error: null };
     } catch (err) {
-      console.error('[useCreateFarmActivity] exception:', err);
+      captureError('useCreateFarmActivity', err);
       return { data: null, error: err instanceof Error ? err.message : 'Unknown error' };
     }
   };
@@ -284,7 +285,7 @@ export function useFarmTransactions(memberId?: string) {
         setTransactions((data || []) as FarmTransactionRow[]);
       }
     } catch (err) {
-      console.error('[useFarmTransactions] exception:', err);
+      captureError('useFarmTransactions.fetch', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
       setTransactions([]);
     } finally {

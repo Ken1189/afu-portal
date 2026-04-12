@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from './client';
+import { captureError } from '@/lib/capture-error';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -66,7 +67,7 @@ export function useCooperatives(country?: string) {
         setCooperatives((data || []) as CooperativeRow[]);
       }
     } catch (err) {
-      console.error('[useCooperatives] exception:', err);
+      captureError('useCooperatives.fetch', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
       setCooperatives([]);
     } finally {
@@ -123,7 +124,7 @@ export function useCooperativeMembers(cooperativeId: string) {
         setMembers((data || []) as CooperativeMemberRow[]);
       }
     } catch (err) {
-      console.error('[useCooperativeMembers] exception:', err);
+      captureError('useCooperativeMembers.fetch', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
       setMembers([]);
     } finally {
@@ -169,7 +170,7 @@ export function useJoinCooperative() {
       if (error) return { data: null, error: error.message };
       return { data, error: null };
     } catch (err) {
-      console.error('[useJoinCooperative] exception:', err);
+      captureError('useJoinCooperative', err);
       return { data: null, error: err instanceof Error ? err.message : 'Unknown error' };
     }
   };

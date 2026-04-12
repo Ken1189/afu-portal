@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from './client';
+import { captureError } from '@/lib/capture-error';
 import type { SupplierCategory } from './types';
 
 export interface ProductRow {
@@ -82,7 +83,7 @@ export function useProducts(supplierId?: string) {
         setProducts((data || []) as ProductRow[]);
       }
     } catch (err) {
-      console.error('[useProducts] exception:', err);
+      captureError('useProducts.fetch', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
       setProducts([]);
     } finally {
@@ -111,7 +112,7 @@ export function useProducts(supplierId?: string) {
       } catch { /* non-critical */ }
       return { data: data as ProductRow, error: null };
     } catch (err) {
-      console.error('[useProducts] addProduct exception:', err);
+      captureError('useProducts.addProduct', err);
       return { data: null, error: err instanceof Error ? err.message : 'Unknown error' };
     }
   };
@@ -123,7 +124,7 @@ export function useProducts(supplierId?: string) {
       await fetchProducts();
       return { error: null };
     } catch (err) {
-      console.error('[useProducts] updateProduct exception:', err);
+      captureError('useProducts.updateProduct', err);
       return { error: err instanceof Error ? err.message : 'Unknown error' };
     }
   };

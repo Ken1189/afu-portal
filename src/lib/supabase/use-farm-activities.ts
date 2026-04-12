@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from './client';
+import { captureError } from '@/lib/capture-error';
 
 export interface FarmActivityRow {
   id: string;
@@ -38,7 +39,7 @@ export function useFarmActivities(memberId?: string) {
         setActivities((data || []) as FarmActivityRow[]);
       }
     } catch (err) {
-      console.error('[useFarmActivities] exception:', err);
+      captureError('useFarmActivities.fetch', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
       setActivities([]);
     } finally {
@@ -55,7 +56,7 @@ export function useFarmActivities(memberId?: string) {
       await fetchActivities();
       return { data, error: null };
     } catch (err) {
-      console.error('[useFarmActivities] createActivity exception:', err);
+      captureError('useFarmActivities.createActivity', err);
       return { data: null, error: err instanceof Error ? err.message : 'Unknown error' };
     }
   };

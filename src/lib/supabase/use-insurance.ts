@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from './client';
+import { captureError } from '@/lib/capture-error';
 
 export interface InsuranceProductRow {
   id: string;
@@ -70,7 +71,7 @@ export function useInsuranceProducts() {
         setProducts((data || []) as InsuranceProductRow[]);
       }
     } catch (err) {
-      console.error('[useInsuranceProducts] exception:', err);
+      captureError('useInsuranceProducts.fetch', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
       setProducts([]);
     } finally {
@@ -106,7 +107,7 @@ export function useInsurancePolicies(memberId?: string) {
         setPolicies((data || []) as InsurancePolicyRow[]);
       }
     } catch (err) {
-      console.error('[useInsurancePolicies] exception:', err);
+      captureError('useInsurancePolicies.fetch', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
       setPolicies([]);
     } finally {
@@ -147,7 +148,7 @@ export function useInsuranceClaims(memberId?: string) {
         setClaims((data || []) as InsuranceClaimRow[]);
       }
     } catch (err) {
-      console.error('[useInsuranceClaims] exception:', err);
+      captureError('useInsuranceClaims.fetch', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
       setClaims([]);
     } finally {
@@ -164,7 +165,7 @@ export function useInsuranceClaims(memberId?: string) {
       await fetchClaims();
       return { data, error: null };
     } catch (err) {
-      console.error('[useInsuranceClaims] submitClaim exception:', err);
+      captureError('useInsuranceClaims.submitClaim', err);
       return { data: null, error: err instanceof Error ? err.message : 'Unknown error' };
     }
   };
