@@ -135,6 +135,20 @@ export function useApplications(page = 1, pageSize = 50) {
         .single();
 
       if (insertError) return { data: null, error: insertError.message };
+
+      // Auto-approve free tier applications instantly
+      if (data && app.requested_tier === 'free') {
+        try {
+          await fetch('/api/applications/auto-approve-free', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ applicationId: data.id }),
+          });
+        } catch {
+          // Silent — admin can approve manually if auto-approve fails
+        }
+      }
+
       await fetchApplications();
       return { data: data as ApplicationRow | null, error: null };
     } catch (err) {

@@ -379,6 +379,9 @@ export default function QuotePage() {
   const canCalculate = selectedProduct !== null && (selectedCountry !== '' || true);
   const [submitting, setSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [activating, setActivating] = useState(false);
+  const [policyActivated, setPolicyActivated] = useState(false);
+  const [activateError, setActivateError] = useState<string | null>(null);
 
   const handleCalculate = () => {
     setShowEstimate(true);
@@ -412,6 +415,35 @@ export default function QuotePage() {
       // Silently fail — quote was still calculated and shown
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleActivatePolicy = async () => {
+    if (!premiumEstimate || !selectedProduct) return;
+    setActivating(true);
+    setActivateError(null);
+    try {
+      const res = await fetch('/api/insurance/policies', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          product_id: selectedProduct.id,
+          premium: premiumEstimate.monthly,
+          coverage_amount: premiumEstimate.coverage,
+          start_date: new Date().toISOString().split('T')[0],
+          end_date: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          status: 'active',
+        }),
+      });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || 'Failed to activate policy');
+      }
+      setPolicyActivated(true);
+    } catch (err: any) {
+      setActivateError(err.message || 'Failed to activate policy');
+    } finally {
+      setActivating(false);
     }
   };
 
@@ -887,10 +919,38 @@ export default function QuotePage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.6 }}
                   >
-                    {submitSuccess ? (
-                      <div className="w-full bg-green-500/20 text-green-200 py-4 rounded-xl text-base font-bold flex items-center justify-center gap-2 min-h-[52px]">
-                        <CheckCircle2 className="w-5 h-5" />
-                        Quote Submitted Successfully
+                    {policyActivated ? (
+                      <div className="space-y-3">
+                        <div className="w-full bg-green-500/20 text-green-200 py-4 rounded-xl text-base font-bold flex items-center justify-center gap-2 min-h-[52px]">
+                          <CheckCircle2 className="w-5 h-5" />
+                          Policy Activated!
+                        </div>
+                        <Link
+                          href="/farm/insurance"
+                          className="w-full bg-white/20 hover:bg-white/30 text-white py-3 rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-2 min-h-[48px]"
+                        >
+                          View My Insurance
+                          <ArrowRight className="w-4 h-4" />
+                        </Link>
+                      </div>
+                    ) : submitSuccess ? (
+                      <div className="space-y-3">
+                        <div className="w-full bg-green-500/20 text-green-200 py-4 rounded-xl text-base font-bold flex items-center justify-center gap-2 min-h-[52px]">
+                          <CheckCircle2 className="w-5 h-5" />
+                          Quote Submitted Successfully
+                        </div>
+                        {activateError && (
+                          <p className="text-sm text-red-300 text-center">{activateError}</p>
+                        )}
+                        <button
+                          onClick={handleActivatePolicy}
+                          disabled={activating}
+                          className="w-full bg-gold hover:bg-gold/90 active:bg-gold/80 disabled:opacity-60 text-navy py-4 rounded-xl text-base font-bold transition-colors flex items-center justify-center gap-2 min-h-[52px] shadow-lg"
+                        >
+                          <Shield className="w-5 h-5" />
+                          {activating ? 'Activating...' : 'Proceed to Activate Policy'}
+                          {!activating && <ArrowRight className="w-5 h-5" />}
+                        </button>
                       </div>
                     ) : (
                       <button

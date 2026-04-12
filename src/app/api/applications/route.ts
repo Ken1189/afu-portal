@@ -101,5 +101,41 @@ export async function POST(request: NextRequest) {
     console.error('[applications notifyAdmins]', notifyErr);
   }
 
+  // Auto-approve free tier applications instantly
+  if (data && (validation.data as Record<string, unknown>)?.requested_tier === 'free') {
+    try {
+      const tempPassword = 'AFU-' + Math.random().toString(36).slice(2, 10);
+      const { data: newUser, error: authErr } = await adminClient.auth.admin.createUser({
+        email: data.email,
+        password: tempPassword,
+        email_confirm: true,
+      });
+      if (!authErr && newUser?.user) {
+        await adminClient.from('profiles').upsert({
+          id: newUser.user.id,
+          full_name: data.full_name,
+          email: data.email,
+          phone: data.phone,
+          country: data.country,
+          role: 'farmer',
+        });
+        await adminClient.from('members').insert({
+          profile_id: newUser.user.id,
+          tier: 'free',
+          status: 'active',
+          farm_name: data.farm_name,
+          farm_size_ha: data.farm_size_ha,
+          primary_crops: data.primary_crops,
+        });
+        await adminClient
+          .from('membership_applications')
+          .update({ status: 'approved', reviewed_at: new Date().toISOString() })
+          .eq('id', data.id);
+      }
+    } catch {
+      // Silent — admin can approve manually if auto-approve fails
+    }
+  }
+
   return NextResponse.json({ application: data }, { status: 201 });
 }

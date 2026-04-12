@@ -93,47 +93,7 @@ const MOBILE_MONEY_METHODS = [
 
 const EXCHANGE_RATE = 0.92; // USD equivalent approximation
 
-// ─── Demo Data ────────────────────────────────────────────────────────────
-
-const demoWallet: WalletAccount = {
-  id: 'demo-wallet-001',
-  user_id: 'demo',
-  account_number: 'AFU-2026-00471',
-  account_type: 'savings',
-  currency: 'USD',
-  display_name: 'Main Wallet',
-  status: 'active',
-  balance: 2847.50,
-  created_at: '2025-09-15T10:00:00Z',
-};
-
-const demoTransactions: WalletTransaction[] = [
-  { id: 'txn-001', wallet_id: 'demo-wallet-001', type: 'deposit', amount: 500, currency: 'USD', balance_after: 2847.50, description: 'M-Pesa deposit', reference: 'MPE-20260325-001', counterparty: null, status: 'completed', created_at: '2026-03-25T14:30:00Z' },
-  { id: 'txn-002', wallet_id: 'demo-wallet-001', type: 'payment', amount: 85, currency: 'USD', balance_after: 2347.50, description: 'Fertilizer purchase — AgriSupply', reference: 'PAY-20260323-002', counterparty: 'AgriSupply Ltd', status: 'completed', created_at: '2026-03-23T09:15:00Z' },
-  { id: 'txn-003', wallet_id: 'demo-wallet-001', type: 'transfer', amount: 150, currency: 'USD', balance_after: 2432.50, description: 'P2P transfer to John Mutua', reference: 'TRF-20260322-001', counterparty: 'John Mutua', status: 'completed', created_at: '2026-03-22T16:45:00Z' },
-  { id: 'txn-004', wallet_id: 'demo-wallet-001', type: 'withdrawal', amount: 200, currency: 'USD', balance_after: 2582.50, description: 'EcoCash withdrawal', reference: 'WDR-20260320-003', counterparty: null, status: 'completed', created_at: '2026-03-20T11:00:00Z' },
-  { id: 'txn-005', wallet_id: 'demo-wallet-001', type: 'deposit', amount: 1200, currency: 'USD', balance_after: 2782.50, description: 'Harvest sale — FreshPack Exports', reference: 'DEP-20260318-001', counterparty: 'FreshPack Exports', status: 'completed', created_at: '2026-03-18T08:30:00Z' },
-  { id: 'txn-006', wallet_id: 'demo-wallet-001', type: 'payment', amount: 45, currency: 'USD', balance_after: 1582.50, description: 'Insurance premium — crop cover', reference: 'PAY-20260315-004', counterparty: 'AFU Insurance', status: 'completed', created_at: '2026-03-15T10:00:00Z' },
-  { id: 'txn-007', wallet_id: 'demo-wallet-001', type: 'withdrawal', amount: 300, currency: 'USD', balance_after: 1627.50, description: 'Bank withdrawal to Standard Bank', reference: 'WDR-20260312-002', counterparty: null, status: 'completed', created_at: '2026-03-12T14:20:00Z' },
-  { id: 'txn-008', wallet_id: 'demo-wallet-001', type: 'deposit', amount: 350, currency: 'USD', balance_after: 1927.50, description: 'Contract payment — SesaMe Trading', reference: 'DEP-20260310-003', counterparty: 'SesaMe Trading', status: 'completed', created_at: '2026-03-10T09:00:00Z' },
-  { id: 'txn-009', wallet_id: 'demo-wallet-001', type: 'transfer', amount: 75, currency: 'USD', balance_after: 1577.50, description: 'P2P transfer to Grace Banda', reference: 'TRF-20260308-001', counterparty: 'Grace Banda', status: 'completed', created_at: '2026-03-08T13:15:00Z' },
-  { id: 'txn-010', wallet_id: 'demo-wallet-001', type: 'deposit', amount: 200, currency: 'USD', balance_after: 1652.50, description: 'AFU subsidy — Q1 input support', reference: 'DEP-20260301-001', counterparty: 'AFU', status: 'completed', created_at: '2026-03-01T08:00:00Z' },
-];
-
-const demoDeductions: AutoDeduction[] = [
-  { id: 'ded-001', label: 'Micro-loan repayment', type: 'loan', amount: 45, currency: 'USD', nextDate: '2026-04-01', frequency: 'Monthly' },
-  { id: 'ded-002', label: 'Crop insurance premium', type: 'insurance', amount: 22, currency: 'USD', nextDate: '2026-04-15', frequency: 'Monthly' },
-  { id: 'ded-003', label: 'Equipment lease', type: 'subscription', amount: 30, currency: 'USD', nextDate: '2026-04-01', frequency: 'Monthly' },
-];
-
-const demoMonthlySummary = [
-  { month: 'Oct', income: 1200, expenses: 380 },
-  { month: 'Nov', income: 950, expenses: 420 },
-  { month: 'Dec', income: 1800, expenses: 510 },
-  { month: 'Jan', income: 1100, expenses: 350 },
-  { month: 'Feb', income: 1450, expenses: 480 },
-  { month: 'Mar', income: 2250, expenses: 555 },
-];
+// ─── Empty Defaults (no demo data) ───────────────────────────────────────
 
 // ─── Toast Component ──────────────────────────────────────────────────────
 
@@ -234,8 +194,8 @@ export default function WalletPage() {
   // ── State ─────────────────────────────────────────────────────────────
   const [wallet, setWallet] = useState<WalletAccount | null>(null);
   const [transactions, setTransactions] = useState<WalletTransaction[]>([]);
-  const [deductions] = useState<AutoDeduction[]>(demoDeductions);
-  const [monthlySummary] = useState(demoMonthlySummary);
+  const [deductions] = useState<AutoDeduction[]>([]);
+  const [monthlySummary, setMonthlySummary] = useState<{ month: string; income: number; expenses: number }[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeModal, setActiveModal] = useState<ModalType>(null);
   const [txnFilter, setTxnFilter] = useState<TxnFilter>('all');
@@ -311,19 +271,40 @@ export default function WalletPage() {
           .order('created_at', { ascending: false })
           .limit(50);
 
+        setTransactions(txns || []);
+
+        // Build monthly summary from real transactions
         if (txns && txns.length > 0) {
-          setTransactions(txns);
+          const monthMap: Record<string, { income: number; expenses: number }> = {};
+          txns.forEach((t: WalletTransaction) => {
+            const d = new Date(t.created_at);
+            const key = d.toLocaleDateString('en-US', { month: 'short' });
+            if (!monthMap[key]) monthMap[key] = { income: 0, expenses: 0 };
+            if (t.type === 'deposit') {
+              monthMap[key].income += t.amount;
+            } else {
+              monthMap[key].expenses += t.amount;
+            }
+          });
+          const summary = Object.entries(monthMap).map(([month, data]) => ({
+            month,
+            income: Math.round(data.income * 100) / 100,
+            expenses: Math.round(data.expenses * 100) / 100,
+          }));
+          setMonthlySummary(summary);
         } else {
-          setTransactions(demoTransactions);
+          setMonthlySummary([]);
         }
       } else {
-        // Fallback to demo
-        setWallet(demoWallet);
-        setTransactions(demoTransactions);
+        // No wallet found — show empty state
+        setWallet(null);
+        setTransactions([]);
+        setMonthlySummary([]);
       }
     } catch {
-      setWallet(demoWallet);
-      setTransactions(demoTransactions);
+      setWallet(null);
+      setTransactions([]);
+      setMonthlySummary([]);
     } finally {
       setLoading(false);
     }
@@ -578,7 +559,43 @@ export default function WalletPage() {
     );
   }
 
-  const balance = wallet?.balance ?? 0;
+  // ── No wallet empty state ──────────────────────────────────────────────
+  if (!wallet) {
+    return (
+      <div className="max-w-7xl mx-auto space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-[#1B2A4A]">Digital Wallet</h1>
+            <p className="text-sm text-gray-500 mt-1">Manage your AFU credits, send and receive funds</p>
+          </div>
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-[#1B2A4A] transition-colors"
+          >
+            <ChevronLeft className="w-4 h-4" /> Back to Dashboard
+          </Link>
+        </div>
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center">
+          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Wallet className="w-8 h-8 text-gray-400" />
+          </div>
+          <h2 className="text-lg font-semibold text-[#1B2A4A] mb-2">Wallet Not Yet Active</h2>
+          <p className="text-sm text-gray-500 max-w-md mx-auto">
+            Your wallet will be activated when your membership is approved.
+            Once active, you can deposit, withdraw, and transfer funds directly from this page.
+          </p>
+          <button
+            onClick={fetchWalletData}
+            className="mt-6 inline-flex items-center gap-2 px-5 py-2.5 bg-[#1B2A4A] hover:bg-[#152238] text-white rounded-xl font-medium text-sm transition-colors"
+          >
+            <RefreshCw className="w-4 h-4" /> Check Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const balance = wallet.balance ?? 0;
   const localEquiv = balance * EXCHANGE_RATE;
 
   // ═════════════════════════════════════════════════════════════════════════
@@ -781,22 +798,32 @@ export default function WalletPage() {
           {/* Monthly Summary Chart */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-5">
             <h2 className="text-lg font-semibold text-[#1B2A4A] mb-4">Monthly Summary</h2>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={monthlySummary} barGap={4}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis dataKey="month" fontSize={12} tickLine={false} stroke="#999" />
-                  <YAxis fontSize={12} tickLine={false} stroke="#999" tickFormatter={(v) => `$${v}`} />
-                  <Tooltip
-                    formatter={(value) => [`$${value}`, '']}
-                    contentStyle={{ borderRadius: '12px', border: '1px solid #e5e7eb', fontSize: '13px' }}
-                  />
-                  <Legend wrapperStyle={{ fontSize: '12px' }} />
-                  <Bar dataKey="income" name="Income" fill="#5DB347" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="expenses" name="Expenses" fill="#1B2A4A" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+            {monthlySummary.length === 0 ? (
+              <div className="h-64 flex items-center justify-center">
+                <div className="text-center">
+                  <TrendingUp className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                  <p className="text-sm text-gray-400">No transaction data yet</p>
+                  <p className="text-xs text-gray-300 mt-1">Your monthly income and expenses will appear here</p>
+                </div>
+              </div>
+            ) : (
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={monthlySummary} barGap={4}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <XAxis dataKey="month" fontSize={12} tickLine={false} stroke="#999" />
+                    <YAxis fontSize={12} tickLine={false} stroke="#999" tickFormatter={(v) => `$${v}`} />
+                    <Tooltip
+                      formatter={(value) => [`$${value}`, '']}
+                      contentStyle={{ borderRadius: '12px', border: '1px solid #e5e7eb', fontSize: '13px' }}
+                    />
+                    <Legend wrapperStyle={{ fontSize: '12px' }} />
+                    <Bar dataKey="income" name="Income" fill="#5DB347" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="expenses" name="Expenses" fill="#1B2A4A" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            )}
           </div>
         </div>
 
@@ -823,34 +850,43 @@ export default function WalletPage() {
           {/* Auto-Deductions */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
             <h3 className="text-base font-semibold text-[#1B2A4A] mb-3">Scheduled Deductions</h3>
-            <div className="space-y-3">
-              {deductions.map((d) => (
-                <div key={d.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                    d.type === 'loan' ? 'bg-amber-100 text-amber-600' :
-                    d.type === 'insurance' ? 'bg-blue-100 text-blue-600' :
-                    'bg-purple-100 text-purple-600'
-                  }`}>
-                    {d.type === 'loan' ? <CreditCard className="w-4 h-4" /> :
-                     d.type === 'insurance' ? <Shield className="w-4 h-4" /> :
-                     <RefreshCw className="w-4 h-4" />}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-[#1B2A4A] truncate">{d.label}</p>
-                    <p className="text-xs text-gray-400 flex items-center gap-1">
-                      <Calendar className="w-3 h-3" />
-                      {formatDate(d.nextDate)} &middot; {d.frequency}
-                    </p>
-                  </div>
-                  <p className="text-sm font-semibold text-[#1B2A4A]">
-                    -{formatCurrency(d.amount, d.currency)}
-                  </p>
+            {deductions.length === 0 ? (
+              <div className="text-center py-6">
+                <Clock className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                <p className="text-sm text-gray-400">No scheduled deductions</p>
+              </div>
+            ) : (
+              <>
+                <div className="space-y-3">
+                  {deductions.map((d) => (
+                    <div key={d.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                        d.type === 'loan' ? 'bg-amber-100 text-amber-600' :
+                        d.type === 'insurance' ? 'bg-blue-100 text-blue-600' :
+                        'bg-purple-100 text-purple-600'
+                      }`}>
+                        {d.type === 'loan' ? <CreditCard className="w-4 h-4" /> :
+                         d.type === 'insurance' ? <Shield className="w-4 h-4" /> :
+                         <RefreshCw className="w-4 h-4" />}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-[#1B2A4A] truncate">{d.label}</p>
+                        <p className="text-xs text-gray-400 flex items-center gap-1">
+                          <Calendar className="w-3 h-3" />
+                          {formatDate(d.nextDate)} &middot; {d.frequency}
+                        </p>
+                      </div>
+                      <p className="text-sm font-semibold text-[#1B2A4A]">
+                        -{formatCurrency(d.amount, d.currency)}
+                      </p>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-            <p className="text-xs text-gray-400 mt-3 text-center">
-              Total upcoming: {formatCurrency(deductions.reduce((s, d) => s + d.amount, 0))}
-            </p>
+                <p className="text-xs text-gray-400 mt-3 text-center">
+                  Total upcoming: {formatCurrency(deductions.reduce((s, d) => s + d.amount, 0))}
+                </p>
+              </>
+            )}
           </div>
         </div>
       </div>
