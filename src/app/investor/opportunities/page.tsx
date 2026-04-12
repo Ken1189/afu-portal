@@ -23,7 +23,7 @@ import LegalDisclaimer from '@/components/ui/LegalDisclaimer';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
-type OpportunityType = 'Debt Fund' | 'Equity' | 'Insurance' | 'Debt';
+type OpportunityType = 'Debt Fund' | 'Equity' | 'Insurance' | 'Debt' | 'Profit Share';
 type OpportunityStatus = 'Open' | 'Fully Subscribed';
 
 interface Opportunity {
@@ -69,6 +69,7 @@ const typeBadgeStyles: Record<OpportunityType, string> = {
   Debt: 'bg-blue-100 text-blue-700',
   Equity: 'bg-purple-100 text-purple-700',
   Insurance: 'bg-teal-100 text-teal-700',
+  'Profit Share': 'bg-amber-100 text-amber-700',
 };
 
 // ── Animation Variants ────────────────────────────────────────────────────────
@@ -257,8 +258,9 @@ export default function InvestorOpportunities() {
           Investment Opportunities
         </h1>
         <p className="text-gray-500 text-sm mt-1 max-w-2xl">
-          Deploy capital into Africa&apos;s agricultural transformation. All opportunities are
-          backed by real assets, insured by Lloyd&apos;s, with guaranteed offtake.
+          Deploy capital into Africa&apos;s agricultural transformation through Debt Funds,
+          Equity &amp; Profit Share, and Insurance-Backed Investments &mdash; all backed by real
+          assets with guaranteed offtake.
         </p>
 
         {/* Filter Pills */}
