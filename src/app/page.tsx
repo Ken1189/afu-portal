@@ -139,42 +139,42 @@ const FALLBACK_SERVICES = [
     title: 'Financing',
     desc: 'Working capital, invoice finance, and crop financing from smallholder to commercial scale.',
     link: '/services/financing',
-    img: 'https://images.unsplash.com/photo-1605000797499-95a51c5269ae?w=800&h=500&q=80&auto=format&fit=crop',
+    img: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&h=500&q=80&auto=format&fit=crop',
   },
   {
     icon: Cog,
     title: 'Inputs & Equipment',
     desc: 'Tractors, drones, irrigation, seeds, and fertilizers. Bulk procurement at better prices.',
     link: '/services/inputs',
-    img: 'https://images.unsplash.com/photo-1509391366360-2e959784a276?w=800&h=500&fit=crop',
+    img: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=800&h=500&fit=crop',
   },
   {
     icon: Factory,
     title: 'Processing Hubs',
     desc: 'Milling, drying, cold chain, and packaging. Value-addition at source.',
     link: '/services/processing',
-    img: 'https://images.unsplash.com/photo-1518977822534-7049a61ee0c2?w=1200&q=80&auto=format&fit=crop',
+    img: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=800&h=500&q=80&auto=format&fit=crop',
   },
   {
     icon: ShieldCheck,
     title: 'Guaranteed Offtake',
     desc: 'Pre-arranged buyers and distribution. No more selling cheap or wasting crops.',
     link: '/services/offtake',
-    img: 'https://images.unsplash.com/photo-1504370805625-d32c54b16100?w=800&h=500&fit=crop',
+    img: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=800&h=500&fit=crop',
   },
   {
     icon: CircleDollarSign,
     title: 'Trade Finance',
     desc: 'SBLCs, Letters of Credit, export pre-financing, and FX services via our banking partners.',
     link: '/services/trade-finance',
-    img: 'https://images.unsplash.com/photo-1530267981375-f0de937f5f13?w=800&h=500&fit=crop',
+    img: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&h=500&fit=crop',
   },
   {
     icon: GraduationCap,
     title: 'Training & Certification',
     desc: 'Vocational partnerships to build scalable farmer capacity, compliance, and export readiness.',
     link: '/services/training',
-    img: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=800&h=500&fit=crop',
+    img: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800&h=500&fit=crop',
   },
 ];
 
@@ -270,7 +270,7 @@ const HERO_DEFAULTS = {
   hero_subtitle: 'By farmers, for farmers. Run by Africans, for Africans. We bring the financing, inputs, processing, and guaranteed buyers — you bring the land and the passion. Together, we turn your harvest into real, sustainable income.',
   hero_cta_text: 'Join Our Farming Family',
   hero_cta_link: '/apply',
-  hero_bg_image: 'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=1920&h=1080&fit=crop',
+  hero_bg_image: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=1920&h=1080&fit=crop',
 };
 
 /* ─── Homepage stats fallback (DB key: homepage_stats) ─── */

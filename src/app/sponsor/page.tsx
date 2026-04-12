@@ -37,7 +37,9 @@ interface FarmerProfile {
 /* ─── Fallback farmer data REMOVED — all fake profiles deleted.
      Page now shows empty state when farmer_public_profiles is empty. ─── */
 const FALLBACK_FARMERS: FarmerProfile[] = [];
-const _UNUSED_FALLBACK_FARMERS: FarmerProfile[] = [
+
+// Dead fake farmer data removed — page now queries farmer_public_profiles from Supabase
+const _REMOVED_UNUSED_DATA: FarmerProfile[] = [
   {
     id: 'dummy-1',
     slug: 'grace-moyo',
