@@ -39,6 +39,7 @@ import {
 import { useCountUp } from '@/hooks/useCountUp';
 import { createClient } from '@/lib/supabase/client';
 import LegalDisclaimer from '@/components/ui/LegalDisclaimer';
+import HeroSlider from '@/components/HeroSlider';
 
 /* ─── Animation helpers ─── */
 function FadeInWhenVisible({
@@ -726,83 +727,7 @@ export default function Home() {
   return (
     <>
       {/* ─── HERO ─── */}
-      {showSection('hero') && <section id="section-hero" className="relative min-h-[92vh] flex items-center overflow-hidden">
-        {/* Background image */}
-        <div className="absolute inset-0">
-          <Image
-            src={resolvedHero.hero_bg_image}
-            alt="African farmland at sunrise"
-            fill
-            className="object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-navy-dark/90 via-navy/80 to-navy/50" />
-        </div>
-
-        {/* Content */}
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32 w-full">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 bg-[#5DB347]/20 backdrop-blur-sm border border-[#5DB347]/30 text-[#EBF7E5] px-4 py-1.5 rounded-full text-sm font-medium mb-6">
-              <span className="w-2 h-2 bg-[#5DB347] rounded-full animate-pulse-soft" />
-              {resolvedHero.hero_badge_text}
-            </div>
-
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] text-white mb-6">
-              {resolvedHero.hero_headline.includes('Grow Together') ? (
-                <>
-                  Let&apos;s{' '}
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#6ABF4B] to-[#90D87A]">
-                    Grow Together
-                  </span>
-                </>
-              ) : (
-                resolvedHero.hero_headline
-              )}
-            </h1>
-
-            <p className="text-lg md:text-xl text-gray-300 mb-10 leading-relaxed max-w-2xl">
-              {resolvedHero.hero_subtitle}
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link
-                href={resolvedHero.hero_cta_link}
-                className="group text-white px-8 py-4 rounded-xl font-semibold text-lg transition-smooth flex items-center justify-center gap-2 shadow-lg"
-                style={{ background: '#5DB347' }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = '#449933')}
-                onMouseLeave={(e) => (e.currentTarget.style.background = '#5DB347')}
-              >
-                {resolvedHero.hero_cta_text}
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <Link
-                href="/about"
-                className="group border-2 border-white/30 hover:border-white/60 hover:bg-white/10 backdrop-blur-sm text-white px-8 py-4 rounded-xl font-semibold text-lg transition-smooth flex items-center justify-center gap-2"
-              >
-                <Play className="w-5 h-5" />
-                See How It Works
-              </Link>
-            </div>
-
-            {/* Trust badges */}
-            <div className="mt-12 flex flex-wrap items-center gap-4 text-sm">
-              <div className="flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/10 px-4 py-2 rounded-full text-white/70">
-                <Globe2 className="w-4 h-4 text-[#5DB347]" />
-                <span>20 Countries Active</span>
-              </div>
-              <div className="flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/10 px-4 py-2 rounded-full text-white/70">
-                <Users className="w-4 h-4 text-[#5DB347]" />
-                <span>{memberCount >= 100 ? `${memberCount.toLocaleString()}+ Farmers` : 'Growing Community'}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
-          <ChevronDown className="w-6 h-6 text-white/50 animate-bounce-slow" />
-        </div>
-      </section>}
+      {showSection('hero') && <HeroSlider memberCount={memberCount} badgeText={resolvedHero.hero_badge_text} />}
 
       {/* ─── IMPACT STATS (Animated counters) ─── */}
       {showSection('stats') && <section id="section-stats" className="py-16 bg-gradient-to-b from-white via-[#f8fdf6] to-white relative overflow-hidden">

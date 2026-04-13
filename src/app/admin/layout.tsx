@@ -131,6 +131,7 @@ const navGroups: NavGroup[] = [
       { href: '/admin/partners', label: 'Partners', icon: <Handshake className={ICON_CLS} /> },
       { href: '/admin/trader-applications', label: 'Trader Applications', icon: <BarChart3 className={ICON_CLS} /> },
       { href: '/admin/service-providers', label: 'Service Providers', icon: <Briefcase className={ICON_CLS} /> },
+      { href: '/admin/talent', label: 'Talent Pool', icon: <Briefcase className={ICON_CLS} /> },
       { href: '/directory', label: 'Directory', icon: <Search className={ICON_CLS} /> },
       { href: '/admin/kyc', label: 'KYC', icon: <ScanEye className={ICON_CLS} /> },
     ],
@@ -194,6 +195,8 @@ const navGroups: NavGroup[] = [
       { href: '/admin/countries', label: 'Countries', icon: <Globe className={ICON_CLS} /> },
       { href: '/admin/gallery', label: 'Gallery', icon: <Camera className={ICON_CLS} /> },
       { href: '/admin/media-pr', label: 'Media & PR', icon: <Newspaper className={ICON_CLS} /> },
+      { href: '/admin/hero-slides', label: 'Homepage Slides', icon: <Layers className={ICON_CLS} /> },
+      { href: '/admin/project-submissions', label: 'Project Submissions', icon: <Sprout className={ICON_CLS} /> },
     ],
   },
   // ── 6. Marketing ──
