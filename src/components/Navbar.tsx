@@ -41,6 +41,7 @@ import {
   Megaphone,
   UserCheck,
   Shield,
+  Truck,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useAuth } from "@/lib/supabase/auth-context";
@@ -115,6 +116,7 @@ const exploreLinks: { label: string; href: string; desc: string; icon: LucideIco
   { label: "Jobs & Careers", href: "/jobs", desc: "Join our team", icon: Briefcase },
   { label: "FAQ", href: "/faq", desc: "Common questions", icon: HelpCircle },
   { label: "Newsletter", href: "/newsletter", desc: "Weekly intelligence", icon: Mail },
+  { label: "Logistics (Foober)", href: "/foober", desc: "Delivery services across Africa", icon: Truck },
 ];
 
 /* ─── Navbar config types (from site_config DB) ─── */
