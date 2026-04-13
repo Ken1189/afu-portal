@@ -80,13 +80,17 @@ export default function AdminCooperativesPage() {
   // CSV upload state
   const [showUpload, setShowUpload] = useState(false);
   const [uploadCoopId, setUploadCoopId] = useState<string>('');
-  const [csvData, setCsvData] = useState<Array<{ full_name: string; email: string; phone: string; country: string; region: string }>>([]);
-  const [uploadStep, setUploadStep] = useState<'select' | 'preview' | 'uploading' | 'done'>('select');
-  const [uploadResult, setUploadResult] = useState<{ imported: number; errors: number }>({ imported: 0, errors: 0 });
+  const [uploadMode, setUploadMode] = useState<'existing' | 'new'>('existing');
+  const [newCoopForm, setNewCoopForm] = useState({ name: '', country: '', region: '', type: 'mixed', description: '', contact_email: '', contact_phone: '', chairman: '' });
+  const [csvData, setCsvData] = useState<Array<Record<string, string>>>([]);
+  const [uploadStep, setUploadStep] = useState<'coop' | 'csv' | 'preview' | 'uploading' | 'done'>('coop');
+  const [uploadResult, setUploadResult] = useState<{ imported: number; errors: number; coopCreated: boolean }>({ imported: 0, errors: 0, coopCreated: false });
 
-  const CSV_TEMPLATE = `full_name,email,phone,country,region,farm_size_ha,primary_crop
-Tendai Moyo,tendai@example.com,+263771234567,Zimbabwe,Mashonaland East,5.2,Maize
-Grace Chirwa,,+263772345678,Zimbabwe,Manicaland,3.0,Tobacco`;
+  const CSV_TEMPLATE = `full_name,email,phone,country,region,farm_size_ha,primary_crop,gender,years_farming,membership_tier
+Tendai Moyo,tendai@example.com,+263771234567,Zimbabwe,Mashonaland East,5.2,Maize,Male,12,smallholder
+Grace Chirwa,,+263772345678,Zimbabwe,Manicaland,3.0,Tobacco,Female,8,smallholder
+Simba Chikwanha,simba@example.com,+263773456789,Zimbabwe,Midlands,15.0,Cotton,Male,20,commercial
+Rumbidzai Ngwenya,,+263774567890,Zimbabwe,Masvingo,2.5,Groundnuts,Female,6,free`;
 
   const handleCsvFile = (file: File) => {
     const reader = new FileReader();
@@ -107,25 +111,50 @@ Grace Chirwa,,+263772345678,Zimbabwe,Manicaland,3.0,Tobacco`;
   };
 
   const handleBulkUpload = async () => {
-    if (!uploadCoopId || csvData.length === 0) return;
+    if (csvData.length === 0) return;
     setUploadStep('uploading');
     let imported = 0;
     let errors = 0;
+    let coopId = uploadCoopId;
+    let coopCreated = false;
 
+    // If creating a new co-op first
+    if (uploadMode === 'new' && newCoopForm.name) {
+      try {
+        const { data: newCoop, error: coopErr } = await supabase
+          .from('cooperatives')
+          .insert({
+            name: newCoopForm.name,
+            country: newCoopForm.country || csvData[0]?.country || '',
+            region: newCoopForm.region || null,
+            description: newCoopForm.description || null,
+            contact_email: newCoopForm.contact_email || null,
+            contact_phone: newCoopForm.contact_phone || null,
+            status: 'active',
+          })
+          .select('id')
+          .single();
+        if (newCoop && !coopErr) {
+          coopId = newCoop.id;
+          coopCreated = true;
+        }
+      } catch { /* co-op creation failed */ }
+    }
+
+    // Import farmers
     for (const row of csvData) {
       try {
-        // Create profile + member + add to cooperative
         const res = await fetch('/api/admin/farmers/bulk-import', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ farmers: [row], cooperativeId: uploadCoopId }),
+          body: JSON.stringify({ farmers: [row], cooperativeId: coopId || undefined }),
         });
         if (res.ok) imported++;
         else errors++;
       } catch { errors++; }
     }
 
-    setUploadResult({ imported, errors });
+    setUploadResult({ imported, errors, coopCreated });
     setUploadStep('done');
     fetchCooperatives();
   };
@@ -296,7 +325,7 @@ Grace Chirwa,,+263772345678,Zimbabwe,Manicaland,3.0,Tobacco`;
         </div>
         <div className="flex gap-2">
           <button
-            onClick={() => { setShowUpload(true); setUploadStep('select'); setCsvData([]); }}
+            onClick={() => { setShowUpload(true); setUploadStep('coop'); setCsvData([]); setUploadMode('existing'); }}
             className="flex items-center gap-2 bg-white border border-gray-200 text-[#1B2A4A] text-sm font-medium px-4 py-2.5 rounded-xl hover:bg-gray-50 transition-colors"
           >
             <Users className="w-4 h-4" /> Bulk Upload Members
@@ -319,51 +348,124 @@ Grace Chirwa,,+263772345678,Zimbabwe,Manicaland,3.0,Tobacco`;
               <button onClick={() => setShowUpload(false)}><XCircle className="w-5 h-5 text-gray-400" /></button>
             </div>
 
-            {uploadStep === 'select' && (
+            {/* Step 1: Cooperative Details */}
+            {uploadStep === 'coop' && (
               <div className="space-y-4">
-                <div>
-                  <label className="text-xs font-medium text-gray-600 mb-1 block">Select Cooperative *</label>
-                  <select value={uploadCoopId} onChange={(e) => setUploadCoopId(e.target.value)} className="w-full px-3 py-2.5 border rounded-xl text-sm bg-white">
-                    <option value="">Choose cooperative...</option>
-                    {cooperatives.map((c) => <option key={c.id} value={c.id}>{c.name} ({c.country})</option>)}
-                  </select>
+                <p className="text-sm text-gray-600">Step 1: Choose or create the cooperative these farmers belong to.</p>
+
+                {/* Toggle: existing vs new */}
+                <div className="flex gap-2">
+                  <button onClick={() => setUploadMode('existing')} className={`flex-1 px-3 py-2 rounded-xl text-sm font-medium border transition-colors ${uploadMode === 'existing' ? 'border-[#5DB347] bg-[#5DB347]/5 text-[#5DB347]' : 'border-gray-200 text-gray-600'}`}>
+                    Existing Cooperative
+                  </button>
+                  <button onClick={() => setUploadMode('new')} className={`flex-1 px-3 py-2 rounded-xl text-sm font-medium border transition-colors ${uploadMode === 'new' ? 'border-[#5DB347] bg-[#5DB347]/5 text-[#5DB347]' : 'border-gray-200 text-gray-600'}`}>
+                    Create New Cooperative
+                  </button>
                 </div>
+
+                {uploadMode === 'existing' ? (
+                  <div>
+                    <label className="text-xs font-medium text-gray-600 mb-1 block">Select Cooperative *</label>
+                    <select value={uploadCoopId} onChange={(e) => setUploadCoopId(e.target.value)} className="w-full px-3 py-2.5 border rounded-xl text-sm bg-white">
+                      <option value="">Choose cooperative...</option>
+                      {cooperatives.map((c) => <option key={c.id} value={c.id}>{c.name} ({c.country})</option>)}
+                    </select>
+                  </div>
+                ) : (
+                  <div className="space-y-3 bg-gray-50 rounded-xl p-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="text-xs font-medium text-gray-600 mb-1 block">Cooperative Name *</label>
+                        <input value={newCoopForm.name} onChange={(e) => setNewCoopForm({ ...newCoopForm, name: e.target.value })} className="w-full px-3 py-2 border rounded-lg text-sm" placeholder="e.g. Mashonaland East Farmers Co-op" />
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-gray-600 mb-1 block">Country *</label>
+                        <select value={newCoopForm.country} onChange={(e) => setNewCoopForm({ ...newCoopForm, country: e.target.value })} className="w-full px-3 py-2 border rounded-lg text-sm bg-white">
+                          <option value="">Select...</option>
+                          {ALL_AFRICAN_COUNTRIES.map((c) => <option key={c} value={c}>{c}</option>)}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-gray-600 mb-1 block">Region / Province</label>
+                        <input value={newCoopForm.region} onChange={(e) => setNewCoopForm({ ...newCoopForm, region: e.target.value })} className="w-full px-3 py-2 border rounded-lg text-sm" placeholder="e.g. Mashonaland East" />
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-gray-600 mb-1 block">Type</label>
+                        <select value={newCoopForm.type} onChange={(e) => setNewCoopForm({ ...newCoopForm, type: e.target.value })} className="w-full px-3 py-2 border rounded-lg text-sm bg-white">
+                          <option value="mixed">Mixed Farming</option>
+                          <option value="crop">Crop</option>
+                          <option value="livestock">Livestock</option>
+                          <option value="dairy">Dairy</option>
+                          <option value="marketing">Marketing</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-gray-600 mb-1 block">Contact Email</label>
+                        <input type="email" value={newCoopForm.contact_email} onChange={(e) => setNewCoopForm({ ...newCoopForm, contact_email: e.target.value })} className="w-full px-3 py-2 border rounded-lg text-sm" placeholder="coop@email.com" />
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-gray-600 mb-1 block">Contact Phone</label>
+                        <input value={newCoopForm.contact_phone} onChange={(e) => setNewCoopForm({ ...newCoopForm, contact_phone: e.target.value })} className="w-full px-3 py-2 border rounded-lg text-sm" placeholder="+263 77..." />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-gray-600 mb-1 block">Description</label>
+                      <textarea value={newCoopForm.description} onChange={(e) => setNewCoopForm({ ...newCoopForm, description: e.target.value })} rows={2} className="w-full px-3 py-2 border rounded-lg text-sm" placeholder="Brief description of the cooperative..." />
+                    </div>
+                  </div>
+                )}
+
+                <button
+                  onClick={() => setUploadStep('csv')}
+                  disabled={uploadMode === 'existing' ? !uploadCoopId : !newCoopForm.name}
+                  className="w-full py-2.5 rounded-xl bg-[#5DB347] text-white text-sm font-medium disabled:opacity-50"
+                >
+                  Next: Upload Farmer CSV
+                </button>
+              </div>
+            )}
+
+            {/* Step 2: CSV Upload */}
+            {uploadStep === 'csv' && (
+              <div className="space-y-4">
+                <p className="text-sm text-gray-600">Step 2: Upload a CSV with the farmer details for this cooperative.</p>
 
                 <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center">
                   <Users className="w-8 h-8 text-gray-300 mx-auto mb-2" />
                   <p className="text-sm text-gray-600 mb-2">Drop a CSV file here or click to upload</p>
-                  <input
-                    type="file"
-                    accept=".csv"
-                    onChange={(e) => { const f = e.target.files?.[0]; if (f) handleCsvFile(f); }}
-                    className="block mx-auto text-sm text-gray-500"
-                  />
+                  <input type="file" accept=".csv" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleCsvFile(f); }} className="block mx-auto text-sm text-gray-500" />
                 </div>
 
                 <button onClick={downloadTemplate} className="text-sm text-[#5DB347] hover:underline">
                   Download CSV template
                 </button>
+
+                <button onClick={() => setUploadStep('coop')} className="w-full py-2 rounded-xl border text-sm text-gray-600">Back</button>
               </div>
             )}
 
+            {/* Step 3: Preview */}
             {uploadStep === 'preview' && (
               <div className="space-y-4">
-                <p className="text-sm text-gray-600">{csvData.length} members found in CSV</p>
+                <p className="text-sm text-gray-600">
+                  {uploadMode === 'new' && <span className="font-medium text-[#1B2A4A]">New co-op: {newCoopForm.name} ({newCoopForm.country})<br /></span>}
+                  {csvData.length} farmers to upload
+                </p>
                 <div className="max-h-60 overflow-y-auto border rounded-xl">
                   <table className="w-full text-xs">
-                    <thead><tr className="bg-gray-50"><th className="px-3 py-2 text-left">Name</th><th className="px-3 py-2 text-left">Email</th><th className="px-3 py-2 text-left">Country</th></tr></thead>
+                    <thead><tr className="bg-gray-50"><th className="px-3 py-2 text-left">Name</th><th className="px-3 py-2 text-left">Phone</th><th className="px-3 py-2 text-left">Country</th><th className="px-3 py-2 text-left">Crop</th></tr></thead>
                     <tbody>
                       {csvData.slice(0, 20).map((row, i) => (
-                        <tr key={i} className="border-t"><td className="px-3 py-1.5">{row.full_name}</td><td className="px-3 py-1.5">{row.email || '—'}</td><td className="px-3 py-1.5">{row.country || '—'}</td></tr>
+                        <tr key={i} className="border-t"><td className="px-3 py-1.5">{row.full_name}</td><td className="px-3 py-1.5">{row.phone || row.email || '—'}</td><td className="px-3 py-1.5">{row.country || '—'}</td><td className="px-3 py-1.5">{row.primary_crop || '—'}</td></tr>
                       ))}
-                      {csvData.length > 20 && <tr><td colSpan={3} className="px-3 py-1.5 text-gray-400 text-center">...and {csvData.length - 20} more</td></tr>}
+                      {csvData.length > 20 && <tr><td colSpan={4} className="px-3 py-1.5 text-gray-400 text-center">...and {csvData.length - 20} more</td></tr>}
                     </tbody>
                   </table>
                 </div>
                 <div className="flex gap-2">
-                  <button onClick={() => setUploadStep('select')} className="flex-1 px-4 py-2 rounded-xl border text-sm">Back</button>
-                  <button onClick={handleBulkUpload} disabled={!uploadCoopId} className="flex-1 px-4 py-2 rounded-xl bg-[#5DB347] text-white text-sm font-medium disabled:opacity-50">
-                    Upload {csvData.length} Members
+                  <button onClick={() => setUploadStep('csv')} className="flex-1 px-4 py-2 rounded-xl border text-sm">Back</button>
+                  <button onClick={handleBulkUpload} className="flex-1 px-4 py-2 rounded-xl bg-[#5DB347] text-white text-sm font-medium">
+                    {uploadMode === 'new' ? `Create Co-op + Upload ${csvData.length}` : `Upload ${csvData.length} Members`}
                   </button>
                 </div>
               </div>
@@ -372,7 +474,7 @@ Grace Chirwa,,+263772345678,Zimbabwe,Manicaland,3.0,Tobacco`;
             {uploadStep === 'uploading' && (
               <div className="text-center py-8">
                 <Loader2 className="w-8 h-8 animate-spin text-[#5DB347] mx-auto mb-3" />
-                <p className="text-sm text-gray-600">Uploading members...</p>
+                <p className="text-sm text-gray-600">{uploadMode === 'new' ? 'Creating cooperative and uploading members...' : 'Uploading members...'}</p>
               </div>
             )}
 
@@ -380,7 +482,8 @@ Grace Chirwa,,+263772345678,Zimbabwe,Manicaland,3.0,Tobacco`;
               <div className="text-center py-6">
                 <CheckCircle className="w-12 h-12 text-[#5DB347] mx-auto mb-3" />
                 <p className="font-semibold text-[#1B2A4A] mb-1">Upload Complete</p>
-                <p className="text-sm text-gray-600">{uploadResult.imported} imported, {uploadResult.errors} errors</p>
+                {uploadResult.coopCreated && <p className="text-sm text-[#5DB347] mb-1">Cooperative created successfully</p>}
+                <p className="text-sm text-gray-600">{uploadResult.imported} farmers imported{uploadResult.errors > 0 && `, ${uploadResult.errors} errors`}</p>
                 <button onClick={() => setShowUpload(false)} className="mt-4 px-4 py-2 rounded-xl bg-[#5DB347] text-white text-sm font-medium">Done</button>
               </div>
             )}

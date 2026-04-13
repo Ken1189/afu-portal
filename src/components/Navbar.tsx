@@ -102,6 +102,7 @@ const communityLinks: { label: string; href: string; desc: string; icon: LucideI
   { label: "Young Farmers", href: "/young-farmers", desc: "Next generation", icon: GraduationCap },
   { label: "Advisors", href: "/advisors", desc: "Expert guidance from industry leaders", icon: UserCheck },
   { label: "Sponsor a Farmer", href: "/sponsor", desc: "Change a life today", icon: Handshake },
+  { label: "Logistics (Foober)", href: "/foober", desc: "Delivery services across Africa", icon: Truck },
 ];
 
 const exploreLinks: { label: string; href: string; desc: string; icon: LucideIcon }[] = [
@@ -116,7 +117,6 @@ const exploreLinks: { label: string; href: string; desc: string; icon: LucideIco
   { label: "Jobs & Careers", href: "/jobs", desc: "Join our team", icon: Briefcase },
   { label: "FAQ", href: "/faq", desc: "Common questions", icon: HelpCircle },
   { label: "Newsletter", href: "/newsletter", desc: "Weekly intelligence", icon: Mail },
-  { label: "Logistics (Foober)", href: "/foober", desc: "Delivery services across Africa", icon: Truck },
 ];
 
 /* ─── Navbar config types (from site_config DB) ─── */
