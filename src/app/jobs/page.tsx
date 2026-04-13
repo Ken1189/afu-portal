@@ -317,8 +317,28 @@ export default function JobsPage() {
         </div>
       </section>
 
-      {/* ── Filter Bar ── */}
+      {/* ── Register for Jobs CTA (top) ── */}
       <section className="max-w-7xl mx-auto px-4 mt-8">
+        <div className="rounded-2xl p-6 md:p-8 border border-[#5DB347]/20 bg-[#5DB347]/5 flex flex-col md:flex-row items-center gap-4">
+          <div className="flex-1">
+            <h2 className="text-lg md:text-xl font-bold text-[#1B2A4A] mb-1">
+              Looking for Agricultural Work?
+            </h2>
+            <p className="text-gray-600 text-sm">
+              Register your skills and availability. We&apos;ll match you with opportunities across 20 African countries.
+            </p>
+          </div>
+          <Link
+            href="/jobs/apply"
+            className="inline-flex items-center gap-2 bg-[#5DB347] text-white px-6 py-3 rounded-xl font-semibold hover:bg-[#4a9a38] transition-colors whitespace-nowrap text-sm"
+          >
+            Register Now <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+      </section>
+
+      {/* ── Filter Bar ── */}
+      <section className="max-w-7xl mx-auto px-4 mt-6">
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex flex-col md:flex-row gap-3 items-stretch md:items-center">
           {/* Search */}
           <div className="relative flex-1 min-w-0">

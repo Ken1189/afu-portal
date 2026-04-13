@@ -1482,6 +1482,24 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ─── DONATE CTA ─── */}
+      <section className="py-12 bg-gradient-to-r from-[#1B2A4A] to-[#2A3F6A]">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="text-white">
+            <h3 className="text-xl md:text-2xl font-bold mb-2">Make a Direct Impact</h3>
+            <p className="text-white/70 text-sm">Feed a child, support a woman farmer, or sponsor a full farm. Every contribution makes a measurable difference.</p>
+          </div>
+          <Link
+            href="/donate"
+            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl text-white font-semibold transition-all hover:brightness-110 whitespace-nowrap shadow-lg"
+            style={{ backgroundColor: '#5DB347' }}
+          >
+            Donate Now
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+      </section>
+
       {/* ─── OUR PROMISE ─── */}
       <section id="section-promise" className="py-16 bg-white relative">
         <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#5DB347]/20 to-transparent" />

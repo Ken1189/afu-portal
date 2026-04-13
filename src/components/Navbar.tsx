@@ -22,6 +22,7 @@ import {
   User,
   Settings,
   Briefcase,
+  Camera,
   Award,
   Handshake,
   Target,
@@ -109,6 +110,9 @@ const exploreLinks: { label: string; href: string; desc: string; icon: LucideIco
   { label: "Exchange", href: "/exchange", desc: "Trade with fellow farmers", icon: ArrowLeftRight },
   { label: "Carbon Credits", href: "/carbon", desc: "Offset your footprint", icon: Leaf },
   { label: "Blog", href: "/blog", desc: "News & insights", icon: Newspaper },
+  { label: "Gallery", href: "/gallery", desc: "AFU in action across Africa", icon: Camera },
+  { label: "Media & Press", href: "/media", desc: "AFU in the news", icon: Newspaper },
+  { label: "Jobs & Careers", href: "/jobs", desc: "Join our team", icon: Briefcase },
   { label: "FAQ", href: "/faq", desc: "Common questions", icon: HelpCircle },
   { label: "Newsletter", href: "/newsletter", desc: "Weekly intelligence", icon: Mail },
 ];
