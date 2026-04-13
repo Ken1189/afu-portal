@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
 import {
   ChevronDown,
   Shield,
@@ -194,9 +195,10 @@ export default function PortalSwitcherDropdown({
             {available.map((p) => {
               const isCurrent = currentPortal?.key === p.key;
               return (
-                <a
+                <Link
                   key={p.key}
                   href={p.href}
+                  onClick={() => setOpen(false)}
                   className={`flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
                     isCurrent
                       ? 'bg-[#5DB347]/10 text-[#449933] font-semibold'
@@ -208,7 +210,7 @@ export default function PortalSwitcherDropdown({
                   {isCurrent && (
                     <Check className="w-4 h-4 text-[#5DB347]" />
                   )}
-                </a>
+                </Link>
               );
             })}
           </div>

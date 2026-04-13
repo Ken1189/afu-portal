@@ -157,19 +157,22 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
   }, []);
 
   // Auth-loading safety timeout — only used to hide the initial spinner,
-  // NOT to auto-authorize unauthenticated users
+  // NOT to auto-authorize unauthenticated users.
+  // Increased to 8s to handle slow connections / portal switches.
   const [authCheckComplete, setAuthCheckComplete] = useState(false);
   useEffect(() => {
-    const t = setTimeout(() => setAuthCheckComplete(true), 3000);
+    const t = setTimeout(() => setAuthCheckComplete(true), 8000);
     return () => clearTimeout(t);
   }, []);
 
-  // Redirect to login if auth finished and no user, OR if auth times out
+  // Redirect to login ONLY if auth explicitly finished with no user.
+  // Do NOT redirect on timeout alone — the middleware already handles
+  // unauthenticated access, so if we got here the user IS logged in.
   useEffect(() => {
-    if ((!authLoading && !user) || (authCheckComplete && !user)) {
+    if (!authLoading && !user) {
       router.replace('/login?redirect=/farm');
     }
-  }, [authLoading, authCheckComplete, user, router]);
+  }, [authLoading, user, router]);
 
   // Role guard — farmers/members + admin/super_admin preview access
   useEffect(() => {
@@ -285,12 +288,17 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
   }, [fetchTier]);
 
   // Auth loading state — show spinner while auth context is resolving.
-  // If authLoading is false and there's no user, the redirect effect above
-  // will fire. Show spinner until redirect happens — do NOT render content.
-  if (authLoading && !authCheckComplete) {
+  // If auth is still loading, show spinner. If it finishes with no user,
+  // the redirect effect above will fire.
+  if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#5DB347]" />
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#5DB347] mx-auto" />
+          {authCheckComplete && (
+            <p className="mt-4 text-sm text-gray-500">Loading your farm portal...</p>
+          )}
+        </div>
       </div>
     );
   }
@@ -298,7 +306,7 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
     // Auth finished but no user — show spinner while redirect fires
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#5DB347]" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#5DB347] mx-auto" />
       </div>
     );
   }
