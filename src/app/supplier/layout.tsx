@@ -91,7 +91,7 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
     const safetyTimer = setTimeout(() => {
       if (checkCompleted) return;
       setRoleChecked(true);
-      router.replace('/dashboard');
+      router.replace('/login?redirect=/supplier');
     }, 10000);
 
     const checkRole = async () => {
@@ -101,7 +101,7 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
           checkCompleted = true;
           clearTimeout(safetyTimer);
           setRoleChecked(true);
-          router.replace('/dashboard');
+          router.replace('/login?redirect=/supplier');
           return;
         }
         const data = await res.json();
@@ -138,7 +138,7 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
           checkCompleted = true;
           clearTimeout(safetyTimer);
           setRoleChecked(true);
-          router.replace('/dashboard');
+          router.replace('/login?redirect=/supplier');
         }
       } catch {
         if (!retried) {
@@ -149,7 +149,7 @@ export default function SupplierLayout({ children }: { children: React.ReactNode
         checkCompleted = true;
         clearTimeout(safetyTimer);
         setRoleChecked(true);
-        router.replace('/dashboard');
+        router.replace('/login?redirect=/supplier');
       }
     };
 

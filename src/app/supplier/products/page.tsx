@@ -21,6 +21,7 @@ import {
   Filter,
   X,
   Trash2,
+  AlertCircle,
 } from 'lucide-react';
 
 // ── Inline supplier-product type & fallback data ──
@@ -203,22 +204,79 @@ const emptyForm: ProductFormData = {
 // ═══════════════════════════════════════════════════════════════════════════
 
 export default function SupplierProductsPage() {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const supabase = createClient();
 
   const [mySupplierIds, setMySupplierIds] = useState<string | undefined>(undefined);
+  const [supplierError, setSupplierError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
-    supabase
-      .from('suppliers')
-      .select('id')
-      .eq('profile_id', user.id)
-      .single()
-      .then(({ data }) => {
-        if (data) setMySupplierIds(data.id);
-      });
-  }, [user, supabase]);
+    const isAdmin = profile?.role === 'admin' || profile?.role === 'super_admin';
+
+    async function findSupplier() {
+      // First try: find supplier linked to this user
+      const { data, error } = await supabase
+        .from('suppliers')
+        .select('id')
+        .eq('profile_id', user!.id)
+        .maybeSingle();
+
+      if (data?.id) {
+        setMySupplierIds(data.id);
+        return;
+      }
+
+      // Admin fallback: if admin has no supplier record, auto-create one
+      if (isAdmin) {
+        const { data: existing } = await supabase
+          .from('suppliers')
+          .select('id')
+          .eq('profile_id', user!.id)
+          .maybeSingle();
+
+        if (!existing) {
+          const { data: newSupplier, error: createErr } = await supabase
+            .from('suppliers')
+            .insert({
+              profile_id: user!.id,
+              company_name: profile?.full_name || 'AFU Admin',
+              email: profile?.email || '',
+              status: 'active',
+              category: 'general',
+            })
+            .select('id')
+            .single();
+
+          if (newSupplier?.id) {
+            setMySupplierIds(newSupplier.id);
+            return;
+          }
+          if (createErr) {
+            // If insert fails (e.g., RLS), try fetching any active supplier for admin
+            const { data: anySupplier } = await supabase
+              .from('suppliers')
+              .select('id')
+              .limit(1)
+              .single();
+            if (anySupplier?.id) {
+              setMySupplierIds(anySupplier.id);
+              return;
+            }
+          }
+        }
+      }
+
+      // If we get here, no supplier record found
+      if (error) {
+        setSupplierError('Could not load supplier profile. Please try refreshing.');
+      } else {
+        setSupplierError('No supplier profile found. Please complete your supplier profile first.');
+      }
+    }
+
+    findSupplier();
+  }, [user, profile, supabase]);
 
   const { products: dbProducts, loading: productsLoading, addProduct, updateProduct, fetchProducts } = useProducts(mySupplierIds);
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
@@ -528,6 +586,17 @@ export default function SupplierProductsPage() {
       setDeletingId(null);
     }
   };
+
+  // Show error if supplier profile not found
+  if (supplierError) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-center px-4">
+        <AlertCircle className="w-10 h-10 text-amber-500 mb-3" />
+        <p className="text-[#1B2A4A] font-semibold mb-1">{supplierError}</p>
+        <a href="/supplier/profile" className="text-sm text-[#5DB347] hover:underline mt-2">Go to Supplier Profile</a>
+      </div>
+    );
+  }
 
   return (
     <motion.div
