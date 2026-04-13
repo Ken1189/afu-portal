@@ -44,7 +44,6 @@ import HeroSlider from '@/components/HeroSlider';
 /* ─── Animation helpers ─── */
 function FadeInWhenVisible({
   children,
-  delay = 0,
   className = '',
 }: {
   children: React.ReactNode;
@@ -52,20 +51,10 @@ function FadeInWhenVisible({
   className?: string;
   direction?: 'up' | 'down' | 'left' | 'right';
 }) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.01 });
-
   return (
-    <motion.div
-      ref={ref}
-      initial={false}
-      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0.2, y: 20 }}
-      transition={{ duration: 0.5, delay, ease: 'easeOut' }}
-      className={className}
-      style={{ opacity: 1 }}
-    >
+    <div className={className}>
       {children}
-    </motion.div>
+    </div>
   );
 }
 
@@ -76,22 +65,10 @@ function StaggerChildren({
   children: React.ReactNode;
   className?: string;
 }) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.01 });
-
   return (
-    <motion.div
-      ref={ref}
-      initial={false}
-      animate={isInView ? 'visible' : 'visible'}
-      variants={{
-        visible: { transition: { staggerChildren: 0.1 } },
-      }}
-      className={className}
-      style={{ opacity: 1 }}
-    >
+    <div className={className}>
       {children}
-    </motion.div>
+    </div>
   );
 }
 
