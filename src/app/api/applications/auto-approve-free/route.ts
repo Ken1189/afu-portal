@@ -7,6 +7,11 @@ import { createAdminClient } from '@/lib/supabase/server';
  * Creates auth user, profile, and member record instantly.
  */
 export async function POST(req: Request) {
+  // Rate limit: max 3 auto-approvals per IP per minute
+  const { rateLimitAsync } = await import('@/lib/rateLimit');
+  const blocked = await rateLimitAsync(req);
+  if (blocked) return blocked;
+
   const { applicationId } = await req.json();
   if (!applicationId) {
     return NextResponse.json({ error: 'Missing applicationId' }, { status: 400 });

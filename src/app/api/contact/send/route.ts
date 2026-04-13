@@ -13,6 +13,11 @@ function escapeHtml(input: unknown): string {
 
 export async function POST(req: Request) {
   try {
+    // Rate limit: max 5 contact submissions per IP per minute
+    const { rateLimitAsync } = await import('@/lib/rateLimit');
+    const blocked = await rateLimitAsync(req);
+    if (blocked) return blocked;
+
     const { name, email, organization, subject, message } = await req.json();
 
     if (!name || !email || !subject || !message) {

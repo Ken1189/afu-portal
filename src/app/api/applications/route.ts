@@ -57,6 +57,11 @@ export async function GET(request: NextRequest) {
  * Submit a membership application. Public.
  */
 export async function POST(request: NextRequest) {
+  // Rate limit: max 5 applications per IP per minute
+  const { rateLimitAsync } = await import('@/lib/rateLimit');
+  const blocked = await rateLimitAsync(request);
+  if (blocked) return blocked;
+
   const body = await request.json();
 
   const { validate, createApplicationSchema } = await import('@/lib/validation');
