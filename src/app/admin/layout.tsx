@@ -126,16 +126,16 @@ const navGroups: NavGroup[] = [
     defaultOpen: true,
     links: [
       { href: '/admin/members', label: 'All Members', icon: <Users className={ICON_CLS} /> },
-      { href: '/admin/applications', label: 'Applications', icon: <FileText className={ICON_CLS} /> },
-      { href: '/admin/farmers', label: 'Farmers', icon: <Upload className={ICON_CLS} /> },
+      { href: '/admin/applications', label: 'All Applications', icon: <FileText className={ICON_CLS} /> },
+      { href: '/admin/farmers', label: 'Farmers', icon: <Sprout className={ICON_CLS} /> },
+      { href: '/admin/cooperatives', label: 'Cooperatives', icon: <Users className={ICON_CLS} /> },
       { href: '/admin/suppliers', label: 'Suppliers', icon: <Store className={ICON_CLS} /> },
       { href: '/admin/ambassadors', label: 'Ambassadors', icon: <Megaphone className={ICON_CLS} /> },
       { href: '/admin/investor-relations', label: 'Investors', icon: <Landmark className={ICON_CLS} /> },
       { href: '/admin/partners', label: 'Partners', icon: <Handshake className={ICON_CLS} /> },
-      { href: '/admin/trader-applications', label: 'Trader Applications', icon: <BarChart3 className={ICON_CLS} /> },
+      { href: '/admin/foober/drivers', label: 'Drivers (Foober)', icon: <Truck className={ICON_CLS} /> },
       { href: '/admin/service-providers', label: 'Service Providers', icon: <Briefcase className={ICON_CLS} /> },
       { href: '/admin/talent', label: 'Talent Pool', icon: <Briefcase className={ICON_CLS} /> },
-      { href: '/admin/service-providers', label: 'Directory', icon: <Search className={ICON_CLS} /> },
       { href: '/admin/kyc', label: 'KYC', icon: <ScanEye className={ICON_CLS} /> },
     ],
   },
@@ -149,12 +149,14 @@ const navGroups: NavGroup[] = [
       { href: '/admin/payments', label: 'Payments', icon: <CreditCard className={ICON_CLS} /> },
       { href: '/admin/payouts', label: 'Payouts', icon: <Wallet className={ICON_CLS} /> },
       { href: '/admin/subscriptions', label: 'Subscriptions', icon: <CreditCard className={ICON_CLS} /> },
-      { href: '/admin/disputes', label: 'Disputes', icon: <Scale className={ICON_CLS} /> },
+      { href: '/admin/trading', label: 'Trading Desk', icon: <ArrowLeftRight className={ICON_CLS} /> },
+      { href: '/admin/exchange', label: 'Exchange', icon: <HandCoins className={ICON_CLS} /> },
       { href: '/admin/trade-finance', label: 'Trade Finance', icon: <Ship className={ICON_CLS} /> },
-      { href: '/admin/contracts', label: 'Proposals & Contracts', icon: <FileText className={ICON_CLS} /> },
       { href: '/admin/wallet', label: 'Wallet', icon: <Wallet className={ICON_CLS} /> },
       { href: '/admin/credit-scores', label: 'Credit Scoring', icon: <Gauge className={ICON_CLS} /> },
       { href: '/admin/reconciliation', label: 'Reconciliation', icon: <Receipt className={ICON_CLS} /> },
+      { href: '/admin/disputes', label: 'Disputes', icon: <Scale className={ICON_CLS} /> },
+      { href: '/admin/contracts', label: 'Proposals & Contracts', icon: <FileText className={ICON_CLS} /> },
       { href: '/admin/exports', label: 'Exports', icon: <Ship className={ICON_CLS} /> },
     ],
   },
@@ -163,59 +165,68 @@ const navGroups: NavGroup[] = [
     label: 'Operations',
     defaultOpen: false,
     links: [
-      { href: '/admin/farm-overview', label: 'Farm Operations', icon: <Gauge className={ICON_CLS} /> },
+      { href: '/admin/farm-overview', label: 'Operations Overview', icon: <Gauge className={ICON_CLS} /> },
       { href: '/admin/farm-showcase', label: 'Farm Showcase', icon: <Sprout className={ICON_CLS} /> },
-      { href: '/admin/equipment', label: 'Equipment', icon: <Wrench className={ICON_CLS} /> },
-      { href: '/admin/insurance', label: 'Insurance', icon: <Shield className={ICON_CLS} /> },
       { href: '/admin/crops', label: 'Crops', icon: <Sprout className={ICON_CLS} /> },
       { href: '/admin/livestock', label: 'Livestock', icon: <Beef className={ICON_CLS} /> },
+      { href: '/admin/equipment', label: 'Equipment', icon: <Wrench className={ICON_CLS} /> },
       { href: '/admin/veterinary', label: 'Veterinary', icon: <Stethoscope className={ICON_CLS} /> },
+      { href: '/admin/insurance', label: 'Insurance', icon: <Shield className={ICON_CLS} /> },
       { href: '/admin/warehouse', label: 'Warehouse Ops', icon: <Warehouse className={ICON_CLS} /> },
-      { href: '/admin/cooperatives', label: 'Cooperatives', icon: <Users className={ICON_CLS} /> },
-      { href: '/admin/programs', label: 'Programs', icon: <Sprout className={ICON_CLS} /> },
-      { href: '/admin/trading', label: 'Trading Desk', icon: <ArrowLeftRight className={ICON_CLS} /> },
       { href: '/admin/carbon', label: 'Carbon Credits', icon: <Leaf className={ICON_CLS} /> },
-      { href: '/admin/exchange', label: 'Exchange', icon: <HandCoins className={ICON_CLS} /> },
-      { href: '/admin/foober/applications', label: 'Foober Applications', icon: <Truck className={ICON_CLS} /> },
-      { href: '/admin/foober/drivers', label: 'Foober Drivers', icon: <Truck className={ICON_CLS} /> },
-      { href: '/admin/foober/deliveries', label: 'Foober Deliveries', icon: <Truck className={ICON_CLS} /> },
-      { href: '/admin/foober/pricing', label: 'Foober Pricing', icon: <Truck className={ICON_CLS} /> },
+      { href: '/admin/programs', label: 'Programs', icon: <Sprout className={ICON_CLS} /> },
     ],
   },
-  // ── 5. Content ──
+  // ── 5. Logistics (Foober) ──
+  {
+    label: 'Logistics',
+    defaultOpen: false,
+    links: [
+      { href: '/admin/foober/applications', label: 'Driver Applications', icon: <Truck className={ICON_CLS} /> },
+      { href: '/admin/foober/deliveries', label: 'Active Deliveries', icon: <Truck className={ICON_CLS} /> },
+      { href: '/admin/foober/pricing', label: 'Pricing Config', icon: <Truck className={ICON_CLS} /> },
+    ],
+  },
+  // ── 6. Content ──
   {
     label: 'Content',
     defaultOpen: false,
     links: [
-      { href: '/admin/content-editor', label: 'Content Editor', icon: <PenSquare className={ICON_CLS} /> },
       { href: '/admin/blog', label: 'Blog', icon: <PenSquare className={ICON_CLS} /> },
       { href: '/admin/media', label: 'Media Library', icon: <ImageIcon className={ICON_CLS} /> },
-      { href: '/admin/faq', label: 'FAQ', icon: <HelpCircle className={ICON_CLS} /> },
-      { href: '/admin/announcements', label: 'Announcements', icon: <Bell className={ICON_CLS} /> },
-      { href: '/admin/training', label: 'Training', icon: <GraduationCap className={ICON_CLS} /> },
-      { href: '/admin/training/catalog', label: 'Training Catalogue', icon: <GraduationCap className={ICON_CLS} /> },
-      { href: '/admin/legal', label: 'Legal Pages', icon: <Scale className={ICON_CLS} /> },
-      { href: '/admin/legal-services', label: 'Legal Services', icon: <Scale className={ICON_CLS} /> },
-      { href: '/admin/testimonials', label: 'Testimonials', icon: <MessageSquare className={ICON_CLS} /> },
-      { href: '/admin/research', label: 'Research', icon: <FlaskConical className={ICON_CLS} /> },
-      { href: '/admin/education-projects', label: 'Education Projects', icon: <FlaskConical className={ICON_CLS} /> },
-      { href: '/admin/countries', label: 'Countries', icon: <Globe className={ICON_CLS} /> },
       { href: '/admin/gallery', label: 'Gallery', icon: <Camera className={ICON_CLS} /> },
       { href: '/admin/media-pr', label: 'Media & PR', icon: <Newspaper className={ICON_CLS} /> },
+      { href: '/admin/faq', label: 'FAQ', icon: <HelpCircle className={ICON_CLS} /> },
+      { href: '/admin/testimonials', label: 'Testimonials', icon: <MessageSquare className={ICON_CLS} /> },
+      { href: '/admin/announcements', label: 'Announcements', icon: <Bell className={ICON_CLS} /> },
       { href: '/admin/hero-slides', label: 'Homepage Slides', icon: <Layers className={ICON_CLS} /> },
       { href: '/admin/services', label: 'Services Pages', icon: <Wrench className={ICON_CLS} /> },
+      { href: '/admin/countries', label: 'Countries', icon: <Globe className={ICON_CLS} /> },
+      { href: '/admin/legal', label: 'Legal Pages', icon: <Scale className={ICON_CLS} /> },
       { href: '/admin/project-submissions', label: 'Project Submissions', icon: <Sprout className={ICON_CLS} /> },
+      { href: '/admin/content-editor', label: 'Content Editor', icon: <PenSquare className={ICON_CLS} /> },
     ],
   },
-  // ── 6. Marketing ──
+  // ── 7. Education ──
+  {
+    label: 'Education',
+    defaultOpen: false,
+    links: [
+      { href: '/admin/training', label: 'Training Courses', icon: <GraduationCap className={ICON_CLS} /> },
+      { href: '/admin/training/catalog', label: 'Course Catalogue', icon: <GraduationCap className={ICON_CLS} /> },
+      { href: '/admin/research', label: 'Research', icon: <FlaskConical className={ICON_CLS} /> },
+      { href: '/admin/education-projects', label: 'Education Projects', icon: <FlaskConical className={ICON_CLS} /> },
+    ],
+  },
+  // ── 8. Marketing ──
   {
     label: 'Marketing',
     defaultOpen: false,
     links: [
       { href: '/admin/inbox', label: 'Unified Inbox', icon: <Inbox className={ICON_CLS} /> },
-      { href: '/admin/messaging', label: 'Messaging & Templates', icon: <MessageSquare className={ICON_CLS} /> },
-      { href: '/admin/messaging/templates', label: 'Templates Library', icon: <FileText className={ICON_CLS} /> },
+      { href: '/admin/messaging', label: 'Messaging', icon: <MessageSquare className={ICON_CLS} /> },
       { href: '/admin/messaging/campaigns', label: 'Campaigns', icon: <Send className={ICON_CLS} /> },
+      { href: '/admin/messaging/templates', label: 'Templates', icon: <FileText className={ICON_CLS} /> },
       { href: '/admin/automations', label: 'Automations', icon: <Zap className={ICON_CLS} /> },
       { href: '/admin/advertising', label: 'Advertising', icon: <Megaphone className={ICON_CLS} /> },
       { href: '/admin/advertising/review', label: 'Ad Review', icon: <ScanEye className={ICON_CLS} /> },
@@ -225,9 +236,10 @@ const navGroups: NavGroup[] = [
       { href: '/admin/sponsor', label: 'Sponsor a Farmer', icon: <Heart className={ICON_CLS} /> },
       { href: '/admin/sponsor-tiers', label: 'Sponsor Tiers', icon: <Crown className={ICON_CLS} /> },
       { href: '/admin/jobs', label: 'Jobs Board', icon: <Briefcase className={ICON_CLS} /> },
+      { href: '/admin/legal-services', label: 'Legal Services', icon: <Scale className={ICON_CLS} /> },
     ],
   },
-  // ── 7. Settings ──
+  // ── 9. Settings ──
   {
     label: 'Settings',
     defaultOpen: false,
@@ -251,8 +263,6 @@ const navGroups: NavGroup[] = [
       { href: '/admin/blockchain', label: 'Blockchain', icon: <Database className={ICON_CLS} />, superAdminOnly: true },
     ],
   },
-  // Switch Portal dropdown is now at the TOP of the sidebar (see PortalSwitcherDropdown component).
-  // The old navGroup here was removed to avoid duplication.
 ];
 
 // ── Helper: flatten all links for search ──
@@ -554,13 +564,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   // ── Section nav (two-tier) ──
   type SectionKey = 'all' | 'dashboard' | 'crm' | 'finance' | 'operations' | 'marketplace' | 'content' | 'system';
   const SECTIONS: { key: SectionKey; label: string; icon: React.ReactNode; groups: string[] }[] = [
-    { key: 'all', label: 'All', icon: <Layers className="w-4 h-4" />, groups: ['Dashboard', 'People', 'Finance', 'Operations', 'Content', 'Marketing', 'Settings', 'Super Admin', 'Switch Portal'] },
+    { key: 'all', label: 'All', icon: <Layers className="w-4 h-4" />, groups: ['Dashboard', 'People', 'Finance', 'Operations', 'Logistics', 'Content', 'Education', 'Marketing', 'Settings', 'Super Admin'] },
     { key: 'dashboard', label: 'Home', icon: <LayoutDashboard className="w-4 h-4" />, groups: ['Dashboard'] },
     { key: 'crm', label: 'CRM', icon: <Inbox className="w-4 h-4" />, groups: ['People', 'Marketing'] },
     { key: 'finance', label: 'Finance', icon: <Landmark className="w-4 h-4" />, groups: ['Finance'] },
-    { key: 'operations', label: 'Ops', icon: <Sprout className="w-4 h-4" />, groups: ['Operations'] },
-    { key: 'marketplace', label: 'Portals', icon: <Store className="w-4 h-4" />, groups: ['Switch Portal'] },
-    { key: 'content', label: 'Content', icon: <FileEdit className="w-4 h-4" />, groups: ['Content'] },
+    { key: 'operations', label: 'Ops', icon: <Sprout className="w-4 h-4" />, groups: ['Operations', 'Logistics'] },
+    { key: 'content', label: 'Content', icon: <FileEdit className="w-4 h-4" />, groups: ['Content', 'Education'] },
     { key: 'system', label: 'Settings', icon: <Settings className="w-4 h-4" />, groups: ['Settings'] },
   ];
 
