@@ -118,10 +118,10 @@ export async function updateSession(request: NextRequest) {
 
   // ── Protected route patterns ────────────────────────────────────────
   // Public paths that start with protected prefixes (must be checked first)
-  const publicExceptions = ['/farmers', '/farms', '/farming', '/investors', '/investor-login', '/supplier/apply', '/ambassador/apply', '/ambassadors'];
+  const publicExceptions = ['/farmers', '/farms', '/farming', '/investors', '/investor-login', '/supplier/apply', '/ambassador/apply', '/ambassadors', '/driver/apply', '/foober'];
   const isPublicException = publicExceptions.some((p) => pathname.startsWith(p));
 
-  const protectedPaths = ['/dashboard', '/farm', '/supplier', '/admin', '/investor', '/ambassador', '/warehouse', '/onboarding'];
+  const protectedPaths = ['/dashboard', '/farm', '/supplier', '/admin', '/investor', '/ambassador', '/warehouse', '/driver', '/onboarding'];
   const isProtected = !isPublicException && protectedPaths.some((p) => pathname.startsWith(p));
 
   // If accessing a protected route without a session → redirect to login
@@ -168,6 +168,9 @@ export async function updateSession(request: NextRequest) {
         break;
       case 'warehouse_operator':
         dest.pathname = '/warehouse';
+        break;
+      case 'driver':
+        dest.pathname = '/driver';
         break;
       default:
         dest.pathname = '/farm';

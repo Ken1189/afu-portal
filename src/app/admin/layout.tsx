@@ -37,6 +37,7 @@ import {
   Wrench,
   Mail,
   Mic,
+  Truck,
   Heart,
   MapPin,
   FileEdit,
@@ -175,6 +176,9 @@ const navGroups: NavGroup[] = [
       { href: '/admin/trading', label: 'Trading Desk', icon: <ArrowLeftRight className={ICON_CLS} /> },
       { href: '/admin/carbon', label: 'Carbon Credits', icon: <Leaf className={ICON_CLS} /> },
       { href: '/admin/exchange', label: 'Exchange', icon: <HandCoins className={ICON_CLS} /> },
+      { href: '/admin/foober/applications', label: 'Foober Applications', icon: <Truck className={ICON_CLS} /> },
+      { href: '/admin/foober/drivers', label: 'Foober Drivers', icon: <Truck className={ICON_CLS} /> },
+      { href: '/admin/foober/deliveries', label: 'Foober Deliveries', icon: <Truck className={ICON_CLS} /> },
     ],
   },
   // ── 5. Content ──

@@ -9,6 +9,7 @@ import {
   Store,
   Megaphone,
   TrendingUp,
+  Truck,
   Warehouse as WarehouseIcon,
   Globe,
   Check,
@@ -65,6 +66,14 @@ const ALL_PORTALS: Portal[] = [
     Icon: TrendingUp,
     show: (r, c) =>
       r.includes('investor') || c.includes('investor') || isAdminRole(r),
+  },
+  {
+    key: 'driver',
+    href: '/driver',
+    label: 'Driver Portal',
+    Icon: Truck,
+    show: (r, c) =>
+      r.includes('driver') || c.includes('driver') || isAdminRole(r),
   },
   {
     key: 'warehouse',

@@ -139,6 +139,14 @@ export async function getChatResponse(
     };
   }
 
+  // --- Logistics / Foober / Delivery ---
+  if (/logistic|deliver|foober|transport|courier|pickup|drop.?off|driver|dispatch/.test(lowerMessage)) {
+    return {
+      text: "Foober is AFU's logistics and delivery platform \u2014 like Uber for agricultural goods.\n\n\u2022 **Request a delivery** \u2014 /foober/request\n\u2022 **Learn more** \u2014 /foober\n\u2022 **Become a driver** \u2014 /driver/apply\n\u2022 **Become a logistics partner** \u2014 /driver/apply\n\nDrivers earn per delivery based on distance. Available across all 20 AFU countries.",
+      suggestions: ['Request delivery', 'Become a driver', 'Our services', 'Contact us'],
+    };
+  }
+
   // --- Exchange ---
   if (/exchange|credit.*trade|barter|swap.*goods|trade.*credit/.test(lowerMessage)) {
     return {
