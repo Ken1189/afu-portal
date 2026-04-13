@@ -77,6 +77,69 @@ export default function AdminCooperativesPage() {
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
 
+  // CSV upload state
+  const [showUpload, setShowUpload] = useState(false);
+  const [uploadCoopId, setUploadCoopId] = useState<string>('');
+  const [csvData, setCsvData] = useState<Array<{ full_name: string; email: string; phone: string; country: string; region: string }>>([]);
+  const [uploadStep, setUploadStep] = useState<'select' | 'preview' | 'uploading' | 'done'>('select');
+  const [uploadResult, setUploadResult] = useState<{ imported: number; errors: number }>({ imported: 0, errors: 0 });
+
+  const CSV_TEMPLATE = `full_name,email,phone,country,region,farm_size_ha,primary_crop
+Tendai Moyo,tendai@example.com,+263771234567,Zimbabwe,Mashonaland East,5.2,Maize
+Grace Chirwa,,+263772345678,Zimbabwe,Manicaland,3.0,Tobacco`;
+
+  const handleCsvFile = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = e.target?.result as string;
+      const lines = text.trim().split('\n');
+      const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+      const rows = lines.slice(1).map(line => {
+        const values = line.split(',').map(v => v.trim());
+        const row: Record<string, string> = {};
+        headers.forEach((h, i) => { row[h] = values[i] || ''; });
+        return row as any;
+      }).filter((r: any) => r.full_name);
+      setCsvData(rows);
+      setUploadStep('preview');
+    };
+    reader.readAsText(file);
+  };
+
+  const handleBulkUpload = async () => {
+    if (!uploadCoopId || csvData.length === 0) return;
+    setUploadStep('uploading');
+    let imported = 0;
+    let errors = 0;
+
+    for (const row of csvData) {
+      try {
+        // Create profile + member + add to cooperative
+        const res = await fetch('/api/admin/farmers/bulk-import', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ farmers: [row], cooperativeId: uploadCoopId }),
+        });
+        if (res.ok) imported++;
+        else errors++;
+      } catch { errors++; }
+    }
+
+    setUploadResult({ imported, errors });
+    setUploadStep('done');
+    fetchCooperatives();
+  };
+
+  const downloadTemplate = () => {
+    const blob = new Blob([CSV_TEMPLATE], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'cooperative-members-template.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   // ── Fetch cooperatives ───────────────────────────────────────────────────
   const fetchCooperatives = useCallback(async () => {
     setLoading(true);
@@ -231,13 +294,99 @@ export default function AdminCooperativesPage() {
           <h1 className="text-2xl font-bold text-[#1B2A4A]">Cooperative Management</h1>
           <p className="text-sm text-gray-500 mt-1">Manage farmer cooperatives across all countries</p>
         </div>
-        <button
-          onClick={() => setShowCreate(!showCreate)}
-          className="flex items-center gap-2 bg-[#5DB347] text-white text-sm font-medium px-4 py-2.5 rounded-xl hover:bg-[#449933] transition-colors"
-        >
-          <Plus className="w-4 h-4" /> Create Cooperative
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => { setShowUpload(true); setUploadStep('select'); setCsvData([]); }}
+            className="flex items-center gap-2 bg-white border border-gray-200 text-[#1B2A4A] text-sm font-medium px-4 py-2.5 rounded-xl hover:bg-gray-50 transition-colors"
+          >
+            <Users className="w-4 h-4" /> Bulk Upload Members
+          </button>
+          <button
+            onClick={() => setShowCreate(!showCreate)}
+            className="flex items-center gap-2 bg-[#5DB347] text-white text-sm font-medium px-4 py-2.5 rounded-xl hover:bg-[#449933] transition-colors"
+          >
+            <Plus className="w-4 h-4" /> Create Cooperative
+          </button>
+        </div>
       </div>
+
+      {/* CSV Upload Modal */}
+      {showUpload && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-lg p-6 shadow-xl max-h-[80vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold text-[#1B2A4A]">Bulk Upload Cooperative Members</h2>
+              <button onClick={() => setShowUpload(false)}><XCircle className="w-5 h-5 text-gray-400" /></button>
+            </div>
+
+            {uploadStep === 'select' && (
+              <div className="space-y-4">
+                <div>
+                  <label className="text-xs font-medium text-gray-600 mb-1 block">Select Cooperative *</label>
+                  <select value={uploadCoopId} onChange={(e) => setUploadCoopId(e.target.value)} className="w-full px-3 py-2.5 border rounded-xl text-sm bg-white">
+                    <option value="">Choose cooperative...</option>
+                    {cooperatives.map((c) => <option key={c.id} value={c.id}>{c.name} ({c.country})</option>)}
+                  </select>
+                </div>
+
+                <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center">
+                  <Users className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                  <p className="text-sm text-gray-600 mb-2">Drop a CSV file here or click to upload</p>
+                  <input
+                    type="file"
+                    accept=".csv"
+                    onChange={(e) => { const f = e.target.files?.[0]; if (f) handleCsvFile(f); }}
+                    className="block mx-auto text-sm text-gray-500"
+                  />
+                </div>
+
+                <button onClick={downloadTemplate} className="text-sm text-[#5DB347] hover:underline">
+                  Download CSV template
+                </button>
+              </div>
+            )}
+
+            {uploadStep === 'preview' && (
+              <div className="space-y-4">
+                <p className="text-sm text-gray-600">{csvData.length} members found in CSV</p>
+                <div className="max-h-60 overflow-y-auto border rounded-xl">
+                  <table className="w-full text-xs">
+                    <thead><tr className="bg-gray-50"><th className="px-3 py-2 text-left">Name</th><th className="px-3 py-2 text-left">Email</th><th className="px-3 py-2 text-left">Country</th></tr></thead>
+                    <tbody>
+                      {csvData.slice(0, 20).map((row, i) => (
+                        <tr key={i} className="border-t"><td className="px-3 py-1.5">{row.full_name}</td><td className="px-3 py-1.5">{row.email || '—'}</td><td className="px-3 py-1.5">{row.country || '—'}</td></tr>
+                      ))}
+                      {csvData.length > 20 && <tr><td colSpan={3} className="px-3 py-1.5 text-gray-400 text-center">...and {csvData.length - 20} more</td></tr>}
+                    </tbody>
+                  </table>
+                </div>
+                <div className="flex gap-2">
+                  <button onClick={() => setUploadStep('select')} className="flex-1 px-4 py-2 rounded-xl border text-sm">Back</button>
+                  <button onClick={handleBulkUpload} disabled={!uploadCoopId} className="flex-1 px-4 py-2 rounded-xl bg-[#5DB347] text-white text-sm font-medium disabled:opacity-50">
+                    Upload {csvData.length} Members
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {uploadStep === 'uploading' && (
+              <div className="text-center py-8">
+                <Loader2 className="w-8 h-8 animate-spin text-[#5DB347] mx-auto mb-3" />
+                <p className="text-sm text-gray-600">Uploading members...</p>
+              </div>
+            )}
+
+            {uploadStep === 'done' && (
+              <div className="text-center py-6">
+                <CheckCircle className="w-12 h-12 text-[#5DB347] mx-auto mb-3" />
+                <p className="font-semibold text-[#1B2A4A] mb-1">Upload Complete</p>
+                <p className="text-sm text-gray-600">{uploadResult.imported} imported, {uploadResult.errors} errors</p>
+                <button onClick={() => setShowUpload(false)} className="mt-4 px-4 py-2 rounded-xl bg-[#5DB347] text-white text-sm font-medium">Done</button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Toasts */}
       {success && (
