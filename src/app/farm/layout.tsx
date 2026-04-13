@@ -703,7 +703,7 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
                 animate={{ x: 0 }}
                 exit={{ x: '-100%' }}
                 transition={{ type: 'spring' as const, stiffness: 300, damping: 30 }}
-                className="fixed top-0 left-0 bottom-0 z-50 w-[85vw] max-w-72 bg-white shadow-2xl flex flex-col"
+                className="fixed top-0 left-0 bottom-0 z-50 w-[75vw] max-w-xs bg-white shadow-2xl flex flex-col"
               >
                 {/* Drawer Header with Tier Progress */}
                 <div className="bg-gradient-to-br from-navy to-[#5DB347] p-5 text-white">

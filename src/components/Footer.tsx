@@ -295,12 +295,12 @@ export default function Footer() {
                 placeholder="Your email"
                 value={email}
                 onChange={(e) => { setEmail(e.target.value); if (status === "error") { setStatus("idle"); setMessage(""); } }}
-                className="flex-1 bg-white/5 border border-gray-600 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#5DB347] transition-colors duration-300"
+                className="flex-1 min-h-[44px] bg-white/5 border border-gray-600 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#5DB347] transition-colors duration-300"
               />
               <button
                 type="submit"
                 disabled={status === "loading"}
-                className="px-4 py-2.5 rounded-xl text-white text-sm font-semibold transition-all duration-300 hover:-translate-y-0.5 shadow-lg shadow-[#5DB347]/20 disabled:opacity-50 disabled:cursor-not-allowed gradient-green"
+                className="min-h-[44px] min-w-[44px] px-4 py-2.5 rounded-xl text-white text-sm font-semibold transition-all duration-300 hover:-translate-y-0.5 shadow-lg shadow-[#5DB347]/20 disabled:opacity-50 disabled:cursor-not-allowed gradient-green"
               >
                 {status === "loading" ? "..." : "\u2192"}
               </button>

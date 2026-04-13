@@ -718,15 +718,15 @@ export default function Home() {
           </FadeInWhenVisible>
 
           {/* Stats — DB-driven via site_config key "homepage_stats" with fallback */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
             <FadeInWhenVisible delay={0.2}>
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border-l-4 border-[#5DB347] shadow-lg shadow-[#5DB347]/5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 sm:p-6 lg:p-8 border-l-4 border-[#5DB347] shadow-lg shadow-[#5DB347]/5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                 <CountStat target={1.5} suffix="M+" label="farmers across Africa" decimals={1} />
               </div>
             </FadeInWhenVisible>
             {homepageStats.map((stat, i) => (
               <FadeInWhenVisible key={`${stat.label}-${i}`} delay={0.3 + i * 0.1}>
-                <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border-l-4 border-[#5DB347] shadow-lg shadow-[#5DB347]/5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 text-center">
+                <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 sm:p-6 lg:p-8 border-l-4 border-[#5DB347] shadow-lg shadow-[#5DB347]/5 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 text-center">
                   <div className="text-4xl md:text-5xl font-bold mb-2" style={{ color: '#5DB347' }}>{stat.value}</div>
                   <p className="text-navy/70 text-lg">{stat.label}</p>
                   {stat.source && (
@@ -926,7 +926,7 @@ export default function Home() {
             </div>
           </FadeInWhenVisible>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
             {(content.how_it_works_steps && content.how_it_works_steps.length > 0 ? content.how_it_works_steps : FALLBACK_HOW_IT_WORKS).map((item, i) => {
               const Icon = HOW_IT_WORKS_ICONS[i] || HOW_IT_WORKS_ICONS[0];
               return (
@@ -938,7 +938,7 @@ export default function Home() {
                         <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full shadow-sm" style={{ background: '#5DB347' }} />
                       </div>
                     )}
-                    <div className="bg-white rounded-3xl p-8 h-full shadow-md group-hover:shadow-xl group-hover:-translate-y-1 transition-all duration-300 border border-gray-100 group-hover:border-[#5DB347]/20">
+                    <div className="bg-white rounded-3xl p-4 sm:p-6 lg:p-8 h-full shadow-md group-hover:shadow-xl group-hover:-translate-y-1 transition-all duration-300 border border-gray-100 group-hover:border-[#5DB347]/20">
                       {/* Step number with gradient circle */}
                       <div className="w-14 h-14 rounded-full flex items-center justify-center mb-5 shadow-lg" style={{ background: 'linear-gradient(135deg, #5DB347, #449933)' }}>
                         <span className="text-white text-lg font-bold">{item.step}</span>
@@ -1039,12 +1039,12 @@ export default function Home() {
             </div>
           </FadeInWhenVisible>
 
-          <StaggerChildren className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <StaggerChildren className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
             {testimonials.map((t) => (
               <motion.div
                 key={t.name}
                 variants={fadeUpChild}
-                className="bg-cream rounded-3xl p-8 border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+                className="bg-cream rounded-3xl p-4 sm:p-6 lg:p-8 border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
               >
                 {/* Stars */}
                 <div className="flex gap-1 mb-4">
@@ -1140,7 +1140,7 @@ export default function Home() {
             {membershipTiers.map((item) => (
               <motion.div key={item.name} variants={fadeUpChild}>
                 <div
-                  className={`rounded-3xl p-8 h-full flex flex-col transition-all duration-300 hover:-translate-y-1 ${
+                  className={`rounded-3xl p-4 sm:p-6 lg:p-8 h-full flex flex-col transition-all duration-300 hover:-translate-y-1 ${
                     item.highlight
                       ? 'bg-navy/95 backdrop-blur-sm text-white ring-2 ring-[#5DB347] shadow-2xl shadow-[#5DB347]/10 relative scale-[1.02]'
                       : 'bg-white border border-gray-200 hover:border-[#5DB347]/30 shadow-md hover:shadow-xl'
@@ -1547,7 +1547,7 @@ export default function Home() {
               const Icon = item.icon;
               return (
                 <motion.div key={item.title} variants={fadeUpChild}>
-                  <div className="bg-cream rounded-3xl p-8 border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 h-full">
+                  <div className="bg-cream rounded-3xl p-4 sm:p-6 lg:p-8 border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 h-full">
                     <div className="w-14 h-14 rounded-full flex items-center justify-center mb-5 shadow-lg" style={{ background: 'linear-gradient(135deg, #5DB347, #449933)' }}>
                       <Icon className="w-7 h-7 text-white" />
                     </div>

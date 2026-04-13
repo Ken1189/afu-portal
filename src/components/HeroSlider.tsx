@@ -99,7 +99,7 @@ export default function HeroSlider({ memberCount = 0, badgeText = 'Active across
   return (
     <section
       id="section-hero"
-      className="relative min-h-[92vh] flex items-center overflow-hidden"
+      className="relative min-h-[70vh] md:min-h-[92vh] flex items-center overflow-hidden"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >

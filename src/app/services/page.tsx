@@ -129,12 +129,12 @@ export default async function ServicesPage() {
 
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
             {services.map((svc, i) => (
               <Link
                 key={i}
                 href={svc.link}
-                className="relative bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-lg shadow-[#5DB347]/5 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 group overflow-hidden"
+                className="relative bg-white/80 backdrop-blur-sm rounded-3xl p-4 sm:p-6 lg:p-8 shadow-lg shadow-[#5DB347]/5 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 group overflow-hidden"
               >
                 {/* Floating icon */}
                 <div className="absolute top-6 right-6 w-14 h-14 bg-gradient-to-br from-[#5DB347] to-[#449933] rounded-2xl flex items-center justify-center shadow-md shadow-[#5DB347]/20 group-hover:scale-110 transition-transform duration-300">

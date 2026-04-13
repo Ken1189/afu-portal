@@ -729,25 +729,25 @@ export default function AdminDashboard() {
             <table className="w-full text-sm table-striped">
               <thead>
                 <tr className="border-b border-gray-50">
-                  <th className="text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">
+                  <th className="hidden sm:table-cell text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">
                     ID
                   </th>
-                  <th className="text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">
+                  <th className="text-left py-2.5 px-3 sm:px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">
                     Member
                   </th>
-                  <th className="text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">
+                  <th className="hidden md:table-cell text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">
                     Crop
                   </th>
-                  <th className="text-right py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">
+                  <th className="text-right py-2.5 px-3 sm:px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">
                     Amount
                   </th>
-                  <th className="text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">
+                  <th className="text-left py-2.5 px-3 sm:px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">
+                  <th className="hidden sm:table-cell text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">
                     Date
                   </th>
-                  <th className="text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">
+                  <th className="hidden lg:table-cell text-left py-2.5 px-4 text-xs font-medium text-gray-400 uppercase tracking-wider">
                     Officer
                   </th>
                 </tr>
@@ -760,15 +760,15 @@ export default function AdminDashboard() {
                     animate={{ opacity: 1 }}
                     className="hover:bg-cream/50 transition-colors cursor-default"
                   >
-                    <td className="py-2.5 px-4 text-xs font-mono text-gray-500">{app.id}</td>
-                    <td className="py-2.5 px-4">
+                    <td className="hidden sm:table-cell py-2.5 px-4 text-xs font-mono text-gray-500">{app.id}</td>
+                    <td className="py-2.5 px-3 sm:px-4">
                       <span className="font-medium text-navy text-sm">{app.memberName}</span>
                     </td>
-                    <td className="py-2.5 px-4 text-gray-600 text-xs">{app.crop}</td>
-                    <td className="py-2.5 px-4 text-right font-medium text-navy text-sm tabular-nums">
+                    <td className="hidden md:table-cell py-2.5 px-4 text-gray-600 text-xs">{app.crop}</td>
+                    <td className="py-2.5 px-3 sm:px-4 text-right font-medium text-navy text-sm tabular-nums">
                       ${app.amount.toLocaleString()}
                     </td>
-                    <td className="py-2.5 px-4">
+                    <td className="py-2.5 px-3 sm:px-4">
                       <span
                         className={`inline-block text-xs px-2 py-0.5 rounded-full font-medium ${
                           statusColors[app.status] || 'bg-gray-100 text-gray-600'
@@ -777,8 +777,8 @@ export default function AdminDashboard() {
                         {statusLabels[app.status] || app.status}
                       </span>
                     </td>
-                    <td className="py-2.5 px-4 text-xs text-gray-400">{app.submittedDate}</td>
-                    <td className="py-2.5 px-4 text-xs text-gray-500">{app.assignedOfficer}</td>
+                    <td className="hidden sm:table-cell py-2.5 px-4 text-xs text-gray-400">{app.submittedDate}</td>
+                    <td className="hidden lg:table-cell py-2.5 px-4 text-xs text-gray-500">{app.assignedOfficer}</td>
                   </motion.tr>
                 ))}
               </tbody>
