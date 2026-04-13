@@ -81,6 +81,8 @@ import {
   Crown,
   Inbox,
   Receipt,
+  Camera,
+  Newspaper,
 } from 'lucide-react';
 
 // ── Navigation structure with collapsible groups ──
@@ -127,6 +129,8 @@ const navGroups: NavGroup[] = [
       { href: '/admin/ambassadors', label: 'Ambassadors', icon: <Megaphone className={ICON_CLS} /> },
       { href: '/admin/investor-relations', label: 'Investors', icon: <Landmark className={ICON_CLS} /> },
       { href: '/admin/partners', label: 'Partners', icon: <Handshake className={ICON_CLS} /> },
+      { href: '/admin/trader-applications', label: 'Trader Applications', icon: <BarChart3 className={ICON_CLS} /> },
+      { href: '/admin/service-providers', label: 'Service Providers', icon: <Briefcase className={ICON_CLS} /> },
       { href: '/admin/kyc', label: 'KYC', icon: <ScanEye className={ICON_CLS} /> },
     ],
   },
@@ -187,6 +191,8 @@ const navGroups: NavGroup[] = [
       { href: '/admin/research', label: 'Research', icon: <FlaskConical className={ICON_CLS} /> },
       { href: '/admin/education-projects', label: 'Education Projects', icon: <FlaskConical className={ICON_CLS} /> },
       { href: '/admin/countries', label: 'Countries', icon: <Globe className={ICON_CLS} /> },
+      { href: '/admin/gallery', label: 'Gallery', icon: <Camera className={ICON_CLS} /> },
+      { href: '/admin/media-pr', label: 'Media & PR', icon: <Newspaper className={ICON_CLS} /> },
     ],
   },
   // ── 6. Marketing ──

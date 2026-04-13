@@ -215,9 +215,17 @@ export default function CommoditiesPage() {
               <h1 className="text-3xl md:text-4xl font-bold mb-3">
                 Commodity Markets
               </h1>
-              <p className="text-gray-400 text-lg mb-8 max-w-2xl">
+              <p className="text-gray-400 text-lg mb-6 max-w-2xl">
                 Real-time pricing for 20+ African agricultural commodities across grains, oilseeds, cash crops, horticulture, livestock, and fibres.
               </p>
+              <Link
+                href="/commodities/signup"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-white font-semibold text-sm mb-8 transition-all hover:brightness-110 hover:-translate-y-0.5 shadow-lg shadow-[#5DB347]/20"
+                style={{ background: 'linear-gradient(135deg, #5DB347, #449933)' }}
+              >
+                Sign Up to Trade
+                <ArrowRight className="w-4 h-4" />
+              </Link>
             </motion.div>
 
             {/* Market summary cards */}
