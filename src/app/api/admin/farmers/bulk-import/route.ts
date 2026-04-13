@@ -37,6 +37,50 @@ interface FarmerRow {
   bank_account_number?: string;
   mobile_money_number?: string;
   mobile_money_provider?: string;
+  // Farm Assets
+  tractors_owned?: number;
+  vehicles_owned?: number;
+  storage_capacity_tons?: number;
+  water_source?: string;
+  has_greenhouse?: string;
+  has_cold_storage?: string;
+  // Crop Detail
+  secondary_crops?: string;
+  crop_rotation_plan?: string;
+  harvest_season?: string;
+  avg_yield_per_ha?: number;
+  total_cultivated_ha?: number;
+  fallow_land_ha?: number;
+  // Livestock
+  cattle_count?: number;
+  goats_count?: number;
+  sheep_count?: number;
+  poultry_count?: number;
+  pigs_count?: number;
+  other_livestock?: string;
+  grazing_area_ha?: number;
+  // Infrastructure
+  road_access?: string;
+  electricity_source?: string;
+  distance_to_market_km?: number;
+  distance_to_road_km?: number;
+  has_fencing?: string;
+  // Technology
+  has_smartphone?: string;
+  internet_access?: string;
+  uses_mobile_banking?: string;
+  preferred_communication?: string;
+  // Social
+  languages_spoken?: string;
+  disability_status?: string;
+  next_of_kin_name?: string;
+  next_of_kin_phone?: string;
+  next_of_kin_relationship?: string;
+  // Compliance
+  tax_registration_number?: string;
+  vat_number?: string;
+  farming_license?: string;
+  land_deed_number?: string;
   // Other
   livestock_types?: string;
   challenges?: string;
@@ -218,6 +262,50 @@ export async function POST(request: NextRequest) {
           mobile_money_provider: farmer.mobile_money_provider || null,
           challenges: farmer.challenges ? farmer.challenges.split(';').map((s: string) => s.trim()) : null,
           notes: farmer.notes || null,
+          // Farm Assets
+          tractors_owned: farmer.tractors_owned ? Number(farmer.tractors_owned) : null,
+          vehicles_owned: farmer.vehicles_owned ? Number(farmer.vehicles_owned) : null,
+          storage_capacity_tons: farmer.storage_capacity_tons ? Number(farmer.storage_capacity_tons) : null,
+          water_source: farmer.water_source || null,
+          has_greenhouse: farmer.has_greenhouse === 'true' || farmer.has_greenhouse === 'yes' || false,
+          has_cold_storage: farmer.has_cold_storage === 'true' || farmer.has_cold_storage === 'yes' || false,
+          // Crop Detail
+          secondary_crops: farmer.secondary_crops ? farmer.secondary_crops.split(';').map((s: string) => s.trim()) : null,
+          crop_rotation_plan: farmer.crop_rotation_plan || null,
+          harvest_season: farmer.harvest_season || null,
+          avg_yield_per_ha: farmer.avg_yield_per_ha ? Number(farmer.avg_yield_per_ha) : null,
+          total_cultivated_ha: farmer.total_cultivated_ha ? Number(farmer.total_cultivated_ha) : null,
+          fallow_land_ha: farmer.fallow_land_ha ? Number(farmer.fallow_land_ha) : null,
+          // Livestock
+          cattle_count: farmer.cattle_count ? Number(farmer.cattle_count) : null,
+          goats_count: farmer.goats_count ? Number(farmer.goats_count) : null,
+          sheep_count: farmer.sheep_count ? Number(farmer.sheep_count) : null,
+          poultry_count: farmer.poultry_count ? Number(farmer.poultry_count) : null,
+          pigs_count: farmer.pigs_count ? Number(farmer.pigs_count) : null,
+          other_livestock: farmer.other_livestock || null,
+          grazing_area_ha: farmer.grazing_area_ha ? Number(farmer.grazing_area_ha) : null,
+          // Infrastructure
+          road_access: farmer.road_access || null,
+          electricity_source: farmer.electricity_source || null,
+          distance_to_market_km: farmer.distance_to_market_km ? Number(farmer.distance_to_market_km) : null,
+          distance_to_road_km: farmer.distance_to_road_km ? Number(farmer.distance_to_road_km) : null,
+          has_fencing: farmer.has_fencing === 'true' || farmer.has_fencing === 'yes' || false,
+          // Technology
+          has_smartphone: farmer.has_smartphone !== 'false' && farmer.has_smartphone !== 'no',
+          internet_access: farmer.internet_access || null,
+          uses_mobile_banking: farmer.uses_mobile_banking === 'true' || farmer.uses_mobile_banking === 'yes' || false,
+          preferred_communication: farmer.preferred_communication || null,
+          // Social
+          languages_spoken: farmer.languages_spoken ? farmer.languages_spoken.split(';').map((s: string) => s.trim()) : null,
+          disability_status: farmer.disability_status || null,
+          next_of_kin_name: farmer.next_of_kin_name || null,
+          next_of_kin_phone: farmer.next_of_kin_phone || null,
+          next_of_kin_relationship: farmer.next_of_kin_relationship || null,
+          // Compliance
+          tax_registration_number: farmer.tax_registration_number || null,
+          vat_number: farmer.vat_number || null,
+          farming_license: farmer.farming_license || null,
+          land_deed_number: farmer.land_deed_number || null,
         }, { onConflict: 'profile_id' });
 
         // Create farmer tier record (starts at seedling)
