@@ -272,14 +272,14 @@ export default function InsuranceHomePage() {
       iconBg: 'bg-amber-100',
     },
     {
-      href: '/farm/insurance/policies',
+      href: '/farm/insurance/products',
       label: t.insurance.browseProducts,
       icon: Search,
       color: 'bg-indigo-50 text-indigo-700',
       iconBg: 'bg-indigo-100',
     },
     {
-      href: '/farm/insurance/policies',
+      href: '/farm/insurance/quote',
       label: t.insurance.getQuote,
       icon: Calculator,
       color: 'bg-green-50 text-green-700',

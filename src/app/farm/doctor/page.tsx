@@ -33,6 +33,8 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
+import { useFarmPlots } from '@/lib/supabase/use-farm-plots';
+import { useFarm } from '@/lib/farm-context';
 
 // ---------------------------------------------------------------------------
 // Inlined types & data (previously from @/lib/data/farm)
@@ -591,8 +593,10 @@ function getSymptomIcon(icon: string, size = 16) {
 
 export default function CropDoctorPage() {
   const { t } = useLanguage();
+  const { activeFarm } = useFarm();
+  const { plots } = useFarmPlots(activeFarm?.id ?? undefined);
   const [pageState, setPageState] = useState<PageState>('capture');
-  const [selectedPlotId, setSelectedPlotId] = useState<string>(FALLBACK_FARM_PLOTS[0]?.id ?? '');
+  const [selectedPlotId, setSelectedPlotId] = useState<string>('');
   const [plotDropdownOpen, setPlotDropdownOpen] = useState(false);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [analysisStep, setAnalysisStep] = useState(0);
@@ -607,8 +611,24 @@ export default function CropDoctorPage() {
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
 
-  const selectedPlot = FALLBACK_FARM_PLOTS.find((p) => p.id === selectedPlotId) ?? FALLBACK_FARM_PLOTS[0];
-  const recentScans = FALLBACK_CROP_SCANS.slice(0, 3);
+  // Map real plots to the minimal format needed for the dropdown
+  const farmPlots: FarmPlotMinimal[] = plots.map((p) => ({
+    id: p.id,
+    name: p.name,
+    crop: p.crop || 'Unknown',
+    variety: p.variety || '',
+  }));
+
+  // Set first plot as default when plots load
+  useEffect(() => {
+    if (farmPlots.length > 0 && !selectedPlotId) {
+      setSelectedPlotId(farmPlots[0].id);
+    }
+  }, [farmPlots, selectedPlotId]);
+
+  const selectedPlot = farmPlots.find((p) => p.id === selectedPlotId) ?? farmPlots[0] ?? null;
+  // No fake scan history — will be populated as users actually scan
+  const recentScans: CropScan[] = [];
 
   // ─── Handle photo selection ───
   const handlePhoto = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -855,10 +875,12 @@ export default function CropDoctorPage() {
                 >
                   <div className="flex items-center gap-2">
                     <Leaf className="w-4 h-4 text-teal" />
-                    <span>{selectedPlot?.name}</span>
-                    <span className="text-xs text-gray-400">
-                      ({selectedPlot?.crop})
-                    </span>
+                    <span>{selectedPlot?.name || 'Select a crop'}</span>
+                    {selectedPlot?.crop && (
+                      <span className="text-xs text-gray-400">
+                        ({selectedPlot.crop})
+                      </span>
+                    )}
                   </div>
                   <motion.div
                     animate={{ rotate: plotDropdownOpen ? 180 : 0 }}
@@ -876,7 +898,12 @@ export default function CropDoctorPage() {
                       transition={{ type: 'spring' as const, stiffness: 400, damping: 25 }}
                       className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden z-20"
                     >
-                      {FALLBACK_FARM_PLOTS.map((plot) => (
+                      {farmPlots.length === 0 && (
+                        <div className="px-4 py-3 text-sm text-gray-400 text-center">
+                          No crops added yet. Add crops in My Crops first.
+                        </div>
+                      )}
+                      {farmPlots.map((plot) => (
                         <button
                           key={plot.id}
                           onClick={() => {

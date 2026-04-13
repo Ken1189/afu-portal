@@ -494,7 +494,13 @@ function ChatMessage({ message }: { message: AIMessage }) {
 
 export default function AssistantPage() {
   const { t } = useLanguage();
-  const [messages, setMessages] = useState<AIMessage[]>(() => [...aiConversation]);
+  const [messages, setMessages] = useState<AIMessage[]>(() => [{
+    id: 'AI-WELCOME',
+    role: 'assistant',
+    content: 'Welcome to your AFU Farming Assistant! I can help you with crop advice, pest identification, weather guidance, market prices, and more. How can I help you today?',
+    timestamp: new Date().toISOString(),
+    type: 'text',
+  }]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
