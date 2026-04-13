@@ -12,10 +12,35 @@ interface FarmerRow {
   farm_size_ha?: number;
   primary_crop?: string;
   membership_tier?: string;
+  // Demographics
   gender?: string;
   date_of_birth?: string;
-  years_farming?: number;
   id_number?: string;
+  marital_status?: string;
+  education_level?: string;
+  // Farming details
+  years_farming?: number;
+  number_of_staff?: number;
+  household_size?: number;
+  land_ownership?: string;
+  primary_income_source?: string;
+  irrigation_type?: string;
+  soil_type?: string;
+  farming_method?: string;
+  annual_revenue_usd?: number;
+  cooperative_name?: string;
+  nearest_town?: string;
+  gps_coordinates?: string;
+  // Financial
+  bank_name?: string;
+  bank_account_name?: string;
+  bank_account_number?: string;
+  mobile_money_number?: string;
+  mobile_money_provider?: string;
+  // Other
+  livestock_types?: string;
+  challenges?: string;
+  notes?: string;
 }
 
 interface ImportResult {
@@ -147,23 +172,52 @@ export async function POST(request: NextRequest) {
           userId = authUser.user.id;
         }
 
-        // Update profile (auto-created by trigger or insert)
+        // Update profile with demographics
         await svc.from('profiles').upsert({
           id: userId,
           full_name: farmer.full_name,
           email: farmer.email || email,
           phone: farmer.phone || null,
           country: farmer.country,
+          region: farmer.region || null,
+          address: farmer.nearest_town || null,
           role: 'farmer',
+          gender: farmer.gender || null,
+          date_of_birth: farmer.date_of_birth || null,
+          id_number: farmer.id_number || null,
+          marital_status: farmer.marital_status || null,
+          education_level: farmer.education_level || null,
         }, { onConflict: 'id' });
 
-        // Create member record
+        // Create member record with all farming details
         const tier = farmer.membership_tier || 'smallholder';
         await svc.from('members').upsert({
           profile_id: userId,
           status: 'active',
           tier,
           country: farmer.country,
+          farm_size_ha: farmer.farm_size_ha || null,
+          primary_crops: farmer.primary_crop ? [farmer.primary_crop] : null,
+          livestock_types: farmer.livestock_types ? farmer.livestock_types.split(';').map((s: string) => s.trim()) : null,
+          years_farming: farmer.years_farming ? Number(farmer.years_farming) : null,
+          number_of_staff: farmer.number_of_staff ? Number(farmer.number_of_staff) : null,
+          household_size: farmer.household_size ? Number(farmer.household_size) : null,
+          land_ownership: farmer.land_ownership || null,
+          primary_income_source: farmer.primary_income_source || null,
+          irrigation_type: farmer.irrigation_type || null,
+          soil_type: farmer.soil_type || null,
+          farming_method: farmer.farming_method || null,
+          annual_revenue_usd: farmer.annual_revenue_usd ? Number(farmer.annual_revenue_usd) : null,
+          cooperative_name: farmer.cooperative_name || null,
+          nearest_town: farmer.nearest_town || null,
+          gps_coordinates: farmer.gps_coordinates || null,
+          bank_name: farmer.bank_name || null,
+          bank_account_name: farmer.bank_account_name || null,
+          bank_account_number: farmer.bank_account_number || null,
+          mobile_money_number: farmer.mobile_money_number || null,
+          mobile_money_provider: farmer.mobile_money_provider || null,
+          challenges: farmer.challenges ? farmer.challenges.split(';').map((s: string) => s.trim()) : null,
+          notes: farmer.notes || null,
         }, { onConflict: 'profile_id' });
 
         // Create farmer tier record (starts at seedling)

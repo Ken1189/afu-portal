@@ -131,12 +131,11 @@ function parseCSV(text: string): FarmerRow[] {
   return farmers;
 }
 
-const SAMPLE_CSV = `full_name,email,phone,country,region,farm_size_ha,primary_crop,membership_tier,gender,years_farming
-Tendai Moyo,tendai@example.com,+263771234567,Zimbabwe,Mashonaland East,5.2,Maize,smallholder,Male,12
-Grace Chirwa,,+263772345678,Zimbabwe,Manicaland,3.0,Tobacco,smallholder,Female,8
-Simba Chikwanha,simba.c@example.com,+263773456789,Zimbabwe,Midlands,15.0,Cotton,commercial,Male,20
-Rumbidzai Ngwenya,,+263774567890,Zimbabwe,Masvingo,2.5,Groundnuts,smallholder,Female,6
-Tapiwa Mugabe,tapiwa@example.com,+263775678901,Zimbabwe,Mashonaland West,8.0,Sorghum,commercial,Male,15`;
+const SAMPLE_CSV = `full_name,email,phone,country,region,farm_size_ha,primary_crop,membership_tier,gender,years_farming,number_of_staff,household_size,land_ownership,irrigation_type,farming_method,nearest_town,id_number,date_of_birth,education_level,mobile_money_number,mobile_money_provider,livestock_types,challenges,notes
+Tendai Moyo,tendai@example.com,+263771234567,Zimbabwe,Mashonaland East,5.2,Maize,smallholder,Male,12,2,6,owned,rainfed,conventional,Marondera,63-123456A12,,Secondary,+263771234567,EcoCash,Cattle;Goats,drought;market access,Active farmer
+Grace Chirwa,,+263772345678,Zimbabwe,Manicaland,3.0,Tobacco,smallholder,Female,8,0,4,leased,drip,organic,Mutare,,,Primary,,,,financing,New member
+Simba Chikwanha,simba.c@example.com,+263773456789,Zimbabwe,Midlands,15.0,Cotton,commercial,Male,20,8,5,owned,sprinkler,conventional,Gweru,63-789012C34,1985-03-15,Tertiary,+263773456789,EcoCash,Cattle,,,
+Rumbidzai Ngwenya,,+263774567890,Zimbabwe,Masvingo,2.5,Groundnuts,smallholder,Female,6,1,7,communal,rainfed,conservation,Masvingo,,,Secondary,,,,drought;pests,Small plot farmer`;
 
 /* ------------------------------------------------------------------ */
 /* Helpers                                                              */
