@@ -58,13 +58,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const supabase = createClient();
 
-  // Fetch profile from DB — retry on failure (with 5s timeout to prevent hanging)
+  // Fetch profile from DB — fast with 3s timeout
   const fetchProfile = useCallback(async (userId: string) => {
     try {
       const result = await Promise.race([
         supabase.from('profiles').select('*').eq('id', userId).single(),
         new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Profile fetch timeout')), 5000)
+          setTimeout(() => reject(new Error('Profile fetch timeout')), 3000)
         ),
       ]) as { data: unknown; error: { message?: string; code?: string } | null };
 
@@ -97,15 +97,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setProfile(profileData);
         setIsImpersonating(false);
       } else if (error) {
-        console.warn('[Auth] Profile fetch failed:', error?.message, '— retrying...');
-        // Retry once after 1s
+        console.warn('[Auth] Profile fetch failed:', error?.message);
+        // Single retry after 500ms
         setTimeout(async () => {
-          const { data: retryData } = await supabase.from('profiles').select('*').eq('id', userId).single();
-          if (retryData) {
-            setProfile(retryData as Profile);
-            setRealProfile(retryData as Profile);
-          }
-        }, 1000);
+          try {
+            const { data: retryData } = await supabase.from('profiles').select('*').eq('id', userId).single();
+            if (retryData) {
+              setProfile(retryData as Profile);
+              setRealProfile(retryData as Profile);
+            }
+          } catch { /* give up silently */ }
+        }, 500);
       }
     } catch (err) {
       console.error('[Auth] Profile fetch error:', err);
@@ -133,42 +135,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Listen to auth state changes
   useEffect(() => {
-    // Hard safety timeout: ensure isLoading always resolves to false within 8s
+    // Hard safety timeout: ensure isLoading always resolves to false within 4s
     const safetyTimeout = setTimeout(() => {
       setIsLoading(false);
-      console.warn('[Auth] Safety timeout: forcing isLoading=false after 8s');
-    }, 8000);
+    }, 4000);
+
+    // Track whether we had a user to detect real vs transient sign-outs
+    let hadUser = false;
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, newSession) => {
-        console.log('[Auth] Event:', event, 'User:', newSession?.user?.id ?? 'none');
-
-        // CRITICAL: Ignore transient SIGNED_OUT events that fire during token
-        // refresh. Only clear user state on explicit sign-out or if we never
-        // had a user. This prevents the "bombing out" issue where users get
-        // randomly redirected to login during normal browsing.
-        if (event === 'SIGNED_OUT' && !newSession?.user) {
-          // Check if this is a real sign-out vs a token refresh glitch.
-          // If we currently HAVE a user, give Supabase 2s to send the
-          // TOKEN_REFRESHED event before actually clearing the user.
-          if (user) {
-            console.log('[Auth] SIGNED_OUT while user exists — waiting for token refresh...');
-            const refreshCheck = setTimeout(async () => {
-              const { data: { session: freshSession } } = await supabase.auth.getSession();
-              if (!freshSession?.user) {
-                // Genuinely signed out
-                console.log('[Auth] Confirmed sign-out — clearing user');
-                setSession(null);
-                setUser(null);
-                setProfile(null);
-                setIsLoading(false);
-              } else {
-                console.log('[Auth] Token refreshed — user still valid');
-              }
-            }, 2000);
-            return () => clearTimeout(refreshCheck);
+        // CRITICAL: Ignore transient SIGNED_OUT events during token refresh.
+        // Supabase briefly fires SIGNED_OUT before TOKEN_REFRESHED.
+        if (event === 'SIGNED_OUT' && !newSession?.user && hadUser) {
+          // Verify this is a real sign-out, not a refresh glitch
+          const { data: { session: freshSession } } = await supabase.auth.getSession();
+          if (freshSession?.user) {
+            // Token refreshed — user still valid, ignore the SIGNED_OUT
+            return;
           }
-          // No existing user — this is initial load with no session
+          // Genuinely signed out
+          hadUser = false;
           setSession(null);
           setUser(null);
           setProfile(null);
@@ -179,36 +166,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSession(newSession);
         setUser(newSession?.user ?? null);
 
-        try {
-          if (newSession?.user) {
-            await fetchProfile(newSession.user.id);
-          } else {
-            setProfile(null);
-          }
-        } catch (err) {
-          console.error('[Auth] onAuthStateChange profile fetch failed:', err);
-        } finally {
+        if (newSession?.user) {
+          hadUser = true;
+          // FAST: mark loading done as soon as we have a user.
+          // Profile loads in the background — the UI can render with
+          // user data immediately and profile fills in after.
+          setIsLoading(false);
+          // Profile fetch is non-blocking
+          fetchProfile(newSession.user.id).catch(() => {});
+        } else {
+          setProfile(null);
           setIsLoading(false);
         }
       }
     );
 
-    // Initial session check
+    // Initial session check — fast path
     supabase.auth.getSession()
       .then(async ({ data: { session: initialSession } }) => {
         setSession(initialSession);
         setUser(initialSession?.user ?? null);
-        try {
-          if (initialSession?.user) {
-            await fetchProfile(initialSession.user.id);
-          }
-        } catch (err) {
-          console.error('[Auth] Initial profile fetch failed:', err);
+        if (initialSession?.user) {
+          hadUser = true;
+          setIsLoading(false); // unlock UI immediately
+          fetchProfile(initialSession.user.id).catch(() => {});
         }
       })
-      .catch((err) => {
-        console.error('[Auth] getSession failed:', err);
-      })
+      .catch(() => {})
       .finally(() => {
         setIsLoading(false);
       });
@@ -217,7 +201,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       clearTimeout(safetyTimeout);
       subscription.unsubscribe();
     };
-  }, [supabase, fetchProfile, user]);
+  }, [supabase, fetchProfile]);
 
   // ── Auth methods ──────────────────────────────────────────────────────
 

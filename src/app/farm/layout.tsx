@@ -156,12 +156,10 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // Auth-loading safety timeout — only used to hide the initial spinner,
-  // NOT to auto-authorize unauthenticated users.
-  // Increased to 8s to handle slow connections / portal switches.
+  // Auth-loading safety timeout — show helpful message if auth takes long
   const [authCheckComplete, setAuthCheckComplete] = useState(false);
   useEffect(() => {
-    const t = setTimeout(() => setAuthCheckComplete(true), 8000);
+    const t = setTimeout(() => setAuthCheckComplete(true), 3000);
     return () => clearTimeout(t);
   }, []);
 
