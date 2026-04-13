@@ -164,12 +164,12 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
     return () => clearTimeout(t);
   }, []);
 
-  // Redirect to login immediately if auth finished and no user
+  // Redirect to login if auth finished and no user, OR if auth times out
   useEffect(() => {
-    if (!authLoading && !user) {
+    if ((!authLoading && !user) || (authCheckComplete && !user)) {
       router.replace('/login?redirect=/farm');
     }
-  }, [authLoading, user, router]);
+  }, [authLoading, authCheckComplete, user, router]);
 
   // Role guard — farmers/members + admin/super_admin preview access
   useEffect(() => {
