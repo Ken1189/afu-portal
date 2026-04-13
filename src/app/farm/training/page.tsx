@@ -891,10 +891,7 @@ export default function TrainingPage() {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="bg-white/5 backdrop-blur-xl rounded-3xl p-6 border border-white/10 shadow-xl shadow-black/10"
         >
-          <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-            <span className="text-xl">{FARMER_TIERS[currentTier].emoji}</span>
-            Your Progress
-          </h2>
+          <h2 className="text-lg font-bold text-white mb-4">Your Progress</h2>
           <TierProgress
             currentTier={currentTier}
             totalXp={completions.length * 100}

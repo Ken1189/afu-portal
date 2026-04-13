@@ -6,7 +6,7 @@
 export const FARMER_TIERS = {
   seedling: {
     name: 'Seedling',
-    emoji: 'Seedling',
+    emoji: '\u{1F331}',
     color: '#8CB89C',
     description: 'Getting started with AFU',
     features: ['overview', 'weather', 'market-prices', 'training', 'help'],
@@ -14,7 +14,7 @@ export const FARMER_TIERS = {
   },
   sprout: {
     name: 'Sprout',
-    emoji: 'Sprout',
+    emoji: '\u{1F33F}',
     color: '#5DB347',
     description: 'Farm record keeping',
     features: ['journal', 'crops', 'calendar', 'cooperatives'],
@@ -22,7 +22,7 @@ export const FARMER_TIERS = {
   },
   growth: {
     name: 'Growth',
-    emoji: 'Growth',
+    emoji: '\u{1F33E}',
     color: '#449933',
     description: 'Financial tools',
     features: ['financing', 'insurance', 'payments', 'wallet', 'money', 'warehouse'],
@@ -30,7 +30,7 @@ export const FARMER_TIERS = {
   },
   harvest: {
     name: 'Harvest',
-    emoji: 'Harvest',
+    emoji: '\u{1F33B}',
     color: '#2D7A1E',
     description: 'Digital agriculture',
     features: ['ai-tools', 'doctor', 'scanner', 'sustainability', 'exports'],
@@ -38,7 +38,7 @@ export const FARMER_TIERS = {
   },
   pioneer: {
     name: 'Pioneer',
-    emoji: 'Pioneer',
+    emoji: '\u{2B50}',
     color: '#1B5E14',
     description: 'Full platform access',
     features: ['marketplace', 'exchange', 'offtake', 'logistics', 'tokenize', 'staking'],
