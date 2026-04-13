@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 import {
   DollarSign,
@@ -628,7 +629,7 @@ export default function InvestorDashboard() {
         </div>
         <div className="flex gap-3">
           <a href="/investor/opportunities" className="px-6 py-3 bg-[#5DB347] hover:bg-[#449933] text-white rounded-xl font-semibold text-sm transition-colors">View Opportunities</a>
-          <a href="mailto:devonk@africanfarmingunion.org?subject=Investment%20Inquiry" className="px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl font-semibold text-sm transition-colors border border-white/20">Request Meeting</a>
+          <Link href="/contact?subject=investor-meeting" className="px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl font-semibold text-sm transition-colors border border-white/20">Request Meeting</Link>
         </div>
       </motion.div>
 

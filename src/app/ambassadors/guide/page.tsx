@@ -425,9 +425,9 @@ export default function AmbassadorGuidePage() {
                 <li className="flex items-start gap-2">
                   <span style={{ color: '#5DB347' }} className="mt-1">&bull;</span>
                   <strong>Email:</strong>{' '}
-                  <a href="mailto:peterw@africanfarmingunion.org" className="underline font-medium" style={{ color: '#5DB347' }}>
+                  <Link href="/contact?subject=ambassador" className="underline font-medium" style={{ color: '#5DB347' }}>
                     peterw@africanfarmingunion.org
-                  </a>
+                  </Link>
                 </li>
                 <li className="flex items-start gap-2">
                   <span style={{ color: '#5DB347' }} className="mt-1">&bull;</span>

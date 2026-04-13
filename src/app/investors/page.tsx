@@ -1213,10 +1213,10 @@ export default function InvestorsPage() {
 
           {/* Contact info */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 text-gray-400 text-sm">
-            <a href={`mailto:${content.final_cta.email}`} className="flex items-center gap-2 hover:text-white transition-colors">
+            <Link href="/contact?subject=investment" className="flex items-center gap-2 hover:text-white transition-colors">
               <Mail className="w-4 h-4" />
               {content.final_cta.email}
-            </a>
+            </Link>
             <span className="hidden sm:block text-white/20">|</span>
             <a href="tel:+27000000000" className="flex items-center gap-2 hover:text-white transition-colors">
               <Phone className="w-4 h-4" />

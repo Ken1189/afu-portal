@@ -1034,15 +1034,15 @@ export default function SponsorPage() {
           <p className="text-gray-500 mb-8">
             Recognised across Africa. Reported quarterly. Fully transparent.
           </p>
-          <a
-            href="mailto:peterw@africanfarmingunion.org"
+          <Link
+            href="/contact?subject=sponsorship"
             className="inline-flex items-center gap-2 text-white font-bold px-8 py-4 rounded-xl text-lg transition-all duration-300 shadow-lg shadow-[#1B2A4A]/30 hover:scale-105 hover:shadow-xl"
             style={{ background: 'linear-gradient(135deg, #1B2A4A, #0F1A30)' }}
             onMouseEnter={(e) => (e.currentTarget.style.background = 'linear-gradient(135deg, #0F1A30, #060D1A)')}
             onMouseLeave={(e) => (e.currentTarget.style.background = 'linear-gradient(135deg, #1B2A4A, #0F1A30)')}
           >
             Contact Us About Corporate Sponsorship →
-          </a>
+          </Link>
         </div>
       </section>
     </div>

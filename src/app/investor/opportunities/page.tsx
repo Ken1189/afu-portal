@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
 import {
   TrendingUp,
   DollarSign,
@@ -605,12 +606,12 @@ export default function InvestorOpportunities() {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
           <div className="flex items-center gap-2 text-gray-300">
             <Mail className="w-4 h-4 text-[#5DB347]" />
-            <a
-              href="mailto:peterw@africanfarmingunion.org"
+            <Link
+              href="/contact?subject=investment-opportunity"
               className="text-sm hover:text-white transition-colors"
             >
               peterw@africanfarmingunion.org
-            </a>
+            </Link>
           </div>
           <div className="flex items-center gap-2 text-gray-300">
             <Phone className="w-4 h-4 text-[#5DB347]" />
@@ -619,13 +620,13 @@ export default function InvestorOpportunities() {
             </a>
           </div>
         </div>
-        <a
-          href="mailto:peterw@africanfarmingunion.org?subject=Meeting%20Request%20-%20Custom%20Allocation"
+        <Link
+          href="/contact?subject=investment-opportunity"
           className="inline-flex items-center gap-2 px-6 py-3 bg-[#5DB347] text-white rounded-xl text-sm font-semibold hover:bg-[#4A9A38] transition-colors shadow-sm"
         >
           <Calendar className="w-4 h-4" />
           Schedule a Meeting with Peter Watson, CEO
-        </a>
+        </Link>
       </motion.div>
 
       {/* S3.9: Investment disclaimer — required for financial compliance */}
