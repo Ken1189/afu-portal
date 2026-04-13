@@ -67,7 +67,9 @@ export default function AdminMediaPage() {
   const [deleteTarget, setDeleteTarget] = useState<MediaFile | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [search, setSearch] = useState('');
-  const [typeFilter, setTypeFilter] = useState<'all' | 'images' | 'documents'>('all');
+  const [typeFilter, setTypeFilter] = useState<'all' | 'images' | 'documents' | 'videos'>('all');
+  const [renameTarget, setRenameTarget] = useState<MediaFile | null>(null);
+  const [newName, setNewName] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [bucketExists, setBucketExists] = useState(true);
   const [currentPath, setCurrentPath] = useState('');
@@ -387,6 +389,40 @@ export default function AdminMediaPage() {
     setDeleting(false);
   };
 
+  // Rename file (copy to new name, delete old)
+  const handleRename = async () => {
+    if (!renameTarget || !newName.trim()) return;
+    const oldPath = currentPath ? `${currentPath}/${renameTarget.name}` : renameTarget.name;
+    const ext = renameTarget.name.split('.').pop();
+    const cleanName = newName.trim().replace(/[^a-zA-Z0-9._-]/g, '_');
+    const newFileName = ext && !cleanName.endsWith(`.${ext}`) ? `${cleanName}.${ext}` : cleanName;
+    const newPath = currentPath ? `${currentPath}/${newFileName}` : newFileName;
+
+    // Download old file
+    const { data: blob, error: dlErr } = await supabase.storage.from(BUCKET).download(oldPath);
+    if (dlErr || !blob) {
+      setToast({ message: 'Failed to rename — could not read file', type: 'error' });
+      setRenameTarget(null);
+      return;
+    }
+
+    // Upload with new name
+    const { error: upErr } = await supabase.storage.from(BUCKET).upload(newPath, blob, { upsert: true });
+    if (upErr) {
+      setToast({ message: `Failed to rename: ${upErr.message}`, type: 'error' });
+      setRenameTarget(null);
+      return;
+    }
+
+    // Delete old
+    await supabase.storage.from(BUCKET).remove([oldPath]);
+
+    setToast({ message: `Renamed to ${newFileName}`, type: 'success' });
+    setRenameTarget(null);
+    setNewName('');
+    fetchFiles();
+  };
+
   // Bulk delete
   const handleBulkDelete = async () => {
     if (selectedFiles.size === 0) return;
@@ -455,8 +491,10 @@ export default function AdminMediaPage() {
 
   const filtered = files.filter((f) => {
     if (search && !f.name.toLowerCase().includes(search.toLowerCase())) return false;
+    const isVideo = f.type.startsWith('video/') || /\.(mp4|mov|avi|webm|mkv)$/i.test(f.name);
     if (typeFilter === 'images' && !isImage(f.type)) return false;
-    if (typeFilter === 'documents' && isImage(f.type)) return false;
+    if (typeFilter === 'videos' && !isVideo) return false;
+    if (typeFilter === 'documents' && (isImage(f.type) || isVideo)) return false;
     return true;
   });
 
@@ -523,7 +561,7 @@ export default function AdminMediaPage() {
           <p className="text-sm text-gray-500 mt-1">Drag files onto folders to organise them</p>
         </div>
         <div className="flex gap-2 flex-wrap">
-          <input ref={fileInput} type="file" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" onChange={handleUpload} className="hidden" />
+          <input ref={fileInput} type="file" multiple accept="image/*,video/*,.mp4,.mov,.avi,.webm,.pdf,.doc,.docx,.xls,.xlsx" onChange={handleUpload} className="hidden" />
           <input ref={cameraInput} type="file" accept="image/*" capture="environment" onChange={handleUpload} className="hidden" />
           <button onClick={() => setShowNewFolderInput(true)}
             className="flex items-center gap-2 px-4 py-2.5 bg-white text-[#1B2A4A] text-sm font-medium rounded-lg border border-gray-200 hover:bg-gray-50 shadow-sm transition-all">
@@ -549,7 +587,7 @@ export default function AdminMediaPage() {
             className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#5DB347]/20 focus:border-[#5DB347]" />
         </div>
         <div className="flex gap-2">
-          {(['all', 'images', 'documents'] as const).map((t) => (
+          {(['all', 'images', 'videos', 'documents'] as const).map((t) => (
             <button key={t} onClick={() => setTypeFilter(t)}
               className={`px-3 py-2 rounded-lg text-xs font-medium transition-all ${typeFilter === t ? 'bg-[#1B2A4A] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
               {t.charAt(0).toUpperCase() + t.slice(1)}
@@ -896,6 +934,7 @@ export default function AdminMediaPage() {
                     <td className="py-3 px-4">
                       <div className="flex items-center justify-end gap-1">
                         <button onClick={() => copyUrl(f.url)} className="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100" title="Copy URL"><Copy className="w-3.5 h-3.5" /></button>
+                        <button onClick={() => { setRenameTarget(f); setNewName(f.name.replace(/\.[^.]+$/, '')); }} className="p-2 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-100" title="Rename"><GripVertical className="w-3.5 h-3.5" /></button>
                         <button onClick={() => setDeleteTarget(f)} className="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100" title="Delete"><Trash2 className="w-3.5 h-3.5" /></button>
                       </div>
                     </td>
@@ -926,6 +965,28 @@ export default function AdminMediaPage() {
                 className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 disabled:opacity-50">
                 {deleting && <Loader2 className="w-4 h-4 animate-spin" />} Delete
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Rename Modal */}
+      {renameTarget && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setRenameTarget(null)}>
+          <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 space-y-4" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-lg font-bold text-[#1B2A4A]">Rename File</h3>
+            <p className="text-xs text-gray-500">Current: {renameTarget.name}</p>
+            <input
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+              className="w-full px-3 py-2.5 border rounded-xl text-sm"
+              placeholder="New name"
+              autoFocus
+              onKeyDown={(e) => { if (e.key === 'Enter') handleRename(); }}
+            />
+            <div className="flex justify-end gap-3">
+              <button onClick={() => setRenameTarget(null)} className="px-4 py-2 text-sm font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50">Cancel</button>
+              <button onClick={handleRename} disabled={!newName.trim()} className="px-4 py-2 bg-[#5DB347] text-white text-sm font-medium rounded-lg hover:bg-[#4a9a39] disabled:opacity-50">Rename</button>
             </div>
           </div>
         </div>
