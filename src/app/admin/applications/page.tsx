@@ -47,6 +47,12 @@ const tierColors: Record<string, string> = {
   enterprise: 'bg-purple-100 text-purple-700',
   partner: 'bg-indigo-100 text-indigo-700',
   ambassador: 'bg-amber-100 text-amber-700',
+  driver: 'bg-orange-100 text-orange-700',
+  trader: 'bg-cyan-100 text-cyan-700',
+  vet: 'bg-pink-100 text-pink-700',
+  offtaker: 'bg-lime-100 text-lime-700',
+  processing_hub: 'bg-violet-100 text-violet-700',
+  talent: 'bg-sky-100 text-sky-700',
 };
 
 const tierLabels: Record<string, string> = {
@@ -59,6 +65,12 @@ const tierLabels: Record<string, string> = {
   enterprise: 'Enterprise',
   partner: 'Partner / Vendor',
   ambassador: 'Ambassador',
+  driver: 'Foober Driver',
+  trader: 'Trader',
+  vet: 'Veterinary',
+  offtaker: 'Offtaker',
+  processing_hub: 'Processing Hub',
+  talent: 'Talent / Job Seeker',
 };
 
 // ── Filter tab type ─────────────────────────────────────────────────────────
@@ -102,11 +114,106 @@ export default function AdminApplicationsPage() {
   } = useApplications(page, PAGE_SIZE);
 
   const [activeTab, setActiveTab] = useState<FilterTab>('all');
+  const [sourceFilter, setSourceFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkLoading, setBulkLoading] = useState(false);
+
+  // ── Multi-source applications (Foober drivers, service providers, talent) ──
+  const [otherApps, setOtherApps] = useState<ApplicationRow[]>([]);
+  const [otherLoading, setOtherLoading] = useState(true);
+
+  React.useEffect(() => {
+    async function fetchOtherSources() {
+      setOtherLoading(true);
+      const supabase = (await import('@/lib/supabase/client')).createClient();
+      const results: ApplicationRow[] = [];
+
+      // Foober driver applications
+      try {
+        const { data: drivers } = await supabase.from('foober_driver_applications').select('*').order('created_at', { ascending: false }).limit(100);
+        if (drivers) {
+          for (const d of drivers) {
+            results.push({
+              id: d.id, full_name: d.full_name, email: d.email, phone: d.phone || '',
+              country: d.country || '', region: d.region || '', status: d.status as any,
+              requested_tier: 'driver' as any, farm_name: d.vehicle_type || '', farm_size_ha: null,
+              primary_crops: [], notes: d.experience_description || `Vehicle: ${d.vehicle_type}, Reg: ${d.vehicle_registration || 'N/A'}`,
+              created_at: d.created_at, updated_at: d.created_at, reviewed_by: d.reviewed_by, reviewed_at: d.reviewed_at,
+              _source: 'driver' as any,
+            } as any);
+          }
+        }
+      } catch { /* table may not exist */ }
+
+      // Service provider applications (traders, vets, offtakers, processing)
+      try {
+        const { data: providers } = await supabase.from('service_provider_applications').select('*').order('created_at', { ascending: false }).limit(100);
+        if (providers) {
+          for (const p of providers) {
+            results.push({
+              id: p.id, full_name: p.full_name, email: p.email, phone: p.phone || '',
+              country: p.country || '', region: p.region || '', status: p.status as any,
+              requested_tier: p.provider_type as any, farm_name: p.business_name || '', farm_size_ha: null,
+              primary_crops: [], notes: p.motivation || '',
+              created_at: p.created_at, updated_at: p.updated_at, reviewed_by: p.reviewed_by, reviewed_at: p.reviewed_at,
+              _source: p.provider_type as any,
+            } as any);
+          }
+        }
+      } catch { /* table may not exist */ }
+
+      // Talent applications
+      try {
+        const { data: talent } = await supabase.from('talent_applications').select('*').order('created_at', { ascending: false }).limit(100);
+        if (talent) {
+          for (const t of talent) {
+            results.push({
+              id: t.id, full_name: t.full_name, email: t.email, phone: t.phone || '',
+              country: t.country || '', region: t.region || '', status: t.status as any,
+              requested_tier: 'talent' as any, farm_name: t.job_title || '', farm_size_ha: null,
+              primary_crops: t.skills || [], notes: t.bio || '',
+              created_at: t.created_at, updated_at: t.updated_at, reviewed_by: t.reviewed_by, reviewed_at: t.reviewed_at,
+              _source: 'talent' as any,
+            } as any);
+          }
+        }
+      } catch { /* table may not exist */ }
+
+      setOtherApps(results);
+      setOtherLoading(false);
+    }
+    fetchOtherSources();
+  }, []);
+
+  // Merge all applications
+  const allApplications = React.useMemo(() => {
+    const membership = applications.map((a: any) => ({ ...a, _source: 'membership' }));
+    const merged = [...membership, ...otherApps];
+    // Filter by source
+    if (sourceFilter !== 'all') {
+      return merged.filter((a: any) => a._source === sourceFilter);
+    }
+    return merged.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  }, [applications, otherApps, sourceFilter]);
+
+  // Source counts for filter badges
+  const sourceCounts = React.useMemo(() => {
+    const membership = applications.map((a: any) => ({ ...a, _source: 'membership' }));
+    const all = [...membership, ...otherApps];
+    return {
+      all: all.length,
+      membership: membership.length,
+      driver: otherApps.filter((a: any) => a._source === 'driver').length,
+      trader: otherApps.filter((a: any) => a._source === 'trader').length,
+      vet: otherApps.filter((a: any) => a._source === 'vet').length,
+      offtaker: otherApps.filter((a: any) => a._source === 'offtaker').length,
+      processing_hub: otherApps.filter((a: any) => a._source === 'processing_hub').length,
+      talent: otherApps.filter((a: any) => a._source === 'talent').length,
+    };
+  }, [applications, otherApps]);
 
   // Bulk action handler
   const handleBulkAction = async (status: 'approved' | 'rejected') => {
@@ -187,7 +294,7 @@ export default function AdminApplicationsPage() {
 
   // ── Filtered & searched applications ──
   const filtered = useMemo(() => {
-    let result = [...applications];
+    let result = [...allApplications];
 
     // Status filter
     if (activeTab !== 'all') {
@@ -254,21 +361,28 @@ export default function AdminApplicationsPage() {
   };
 
   // ── Tab counts ──
+  // Tab counts from ALL merged sources
+  const mergedPending = allApplications.filter(a => a.status === 'pending' || a.status === 'applied').length;
+  const mergedApproved = allApplications.filter(a => a.status === 'approved' || a.status === 'hired').length;
+  const mergedRejected = allApplications.filter(a => a.status === 'rejected').length;
+  const mergedUnderReview = allApplications.filter(a => a.status === 'under_review' || a.status === 'shortlisted' || a.status === 'interviewed').length;
+  const mergedVerification = allApplications.filter(a => a.status === 'pending_verification').length;
+
   const tabCounts: Record<FilterTab, number> = {
-    all: stats.total,
-    pending: stats.pending,
-    pending_verification: applications.filter(a => a.status === 'pending_verification').length,
-    under_review: stats.underReview,
-    approved: stats.approved,
-    rejected: stats.rejected,
+    all: allApplications.length,
+    pending: mergedPending,
+    pending_verification: mergedVerification,
+    under_review: mergedUnderReview,
+    approved: mergedApproved,
+    rejected: mergedRejected,
   };
 
   // ── Summary cards ──
   const summaryCards = [
-    { label: 'Total Applications', value: stats.total, icon: <Users className="w-5 h-5" />, color: 'text-teal', bg: 'bg-teal/10' },
-    { label: 'Pending', value: stats.pending, icon: <Clock className="w-5 h-5" />, color: 'text-amber-600', bg: 'bg-amber-50' },
-    { label: 'Under Review', value: stats.underReview, icon: <Eye className="w-5 h-5" />, color: 'text-blue-600', bg: 'bg-blue-50' },
-    { label: 'Approved', value: stats.approved, icon: <CheckCircle2 className="w-5 h-5" />, color: 'text-green-600', bg: 'bg-green-50' },
+    { label: 'Total Applications', value: allApplications.length, icon: <Users className="w-5 h-5" />, color: 'text-teal', bg: 'bg-teal/10' },
+    { label: 'Pending', value: mergedPending, icon: <Clock className="w-5 h-5" />, color: 'text-amber-600', bg: 'bg-amber-50' },
+    { label: 'Under Review', value: mergedUnderReview, icon: <Eye className="w-5 h-5" />, color: 'text-blue-600', bg: 'bg-blue-50' },
+    { label: 'Approved', value: mergedApproved, icon: <CheckCircle2 className="w-5 h-5" />, color: 'text-green-600', bg: 'bg-green-50' },
     { label: 'Rejected', value: stats.rejected, icon: <XCircle className="w-5 h-5" />, color: 'text-red-500', bg: 'bg-red-50' },
   ];
 
@@ -281,7 +395,7 @@ export default function AdminApplicationsPage() {
             <FileText className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-navy">Membership Applications</h1>
+            <h1 className="text-2xl font-bold text-navy">All Applications</h1>
             <p className="text-sm text-gray-500 mt-0.5">Review and manage membership applications</p>
           </div>
         </div>
@@ -301,6 +415,33 @@ export default function AdminApplicationsPage() {
               </div>
             </div>
           </div>
+        ))}
+      </div>
+
+      {/* ── Source Filter (All application types) ── */}
+      <div className="flex gap-1.5 flex-wrap mb-3">
+        {[
+          { key: 'all', label: 'All Sources' },
+          { key: 'membership', label: 'Membership' },
+          { key: 'driver', label: 'Drivers' },
+          { key: 'trader', label: 'Traders' },
+          { key: 'vet', label: 'Vets' },
+          { key: 'offtaker', label: 'Offtakers' },
+          { key: 'processing_hub', label: 'Processing' },
+          { key: 'talent', label: 'Talent' },
+        ].filter(s => s.key === 'all' || (sourceCounts as any)[s.key] > 0).map((s) => (
+          <button
+            key={s.key}
+            onClick={() => setSourceFilter(s.key)}
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+              sourceFilter === s.key ? 'bg-[#5DB347] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            {s.label}
+            {(sourceCounts as any)[s.key] > 0 && (
+              <span className="ml-1 opacity-70">({(sourceCounts as any)[s.key]})</span>
+            )}
+          </button>
         ))}
       </div>
 
@@ -465,9 +606,9 @@ export default function AdminApplicationsPage() {
                         </span>
                       </td>
                       <td className="py-3 px-4">
-                        <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${statusColors[app.status]}`}>
-                          {statusIcons[app.status]}
-                          {statusLabels[app.status]}
+                        <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${statusColors[app.status as ApplicationStatus] || 'bg-gray-100 text-gray-600'}`}>
+                          {statusIcons[app.status as ApplicationStatus] || <Clock className="w-3 h-3" />}
+                          {statusLabels[app.status as ApplicationStatus] || app.status}
                         </span>
                       </td>
                       <td className="py-3 px-4 text-gray-400 text-xs">

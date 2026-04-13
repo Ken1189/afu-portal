@@ -230,7 +230,51 @@ export function useMapData(filters: MapFilterState): UseMapDataResult {
           }
         }
 
-        // 5. Fetch loans to enrich farm points
+        // 5. Warehouses
+        try {
+          const { data: warehouses } = await supabase
+            .from('warehouses')
+            .select('id, name, location, country, capacity_mt, current_stock_mt');
+          if (warehouses) {
+            // Warehouses may not have lat/lng yet, but we can still add them
+            // with country-level approximation from the demo data
+            for (const w of warehouses) {
+              points.push({
+                id: w.id,
+                type: 'warehouse' as any,
+                latitude: 0, longitude: 0, // Will be filtered out if no coordinates
+                warehouseName: w.name,
+                location: w.location,
+                country: w.country,
+                capacity: w.capacity_mt,
+                currentStock: w.current_stock_mt,
+              } as any);
+            }
+          }
+        } catch { /* warehouses table may not exist */ }
+
+        // 6. Suppliers with location
+        try {
+          const { data: suppliers } = await supabase
+            .from('suppliers')
+            .select('id, company_name, category, country, status')
+            .eq('status', 'active')
+            .limit(100);
+          if (suppliers) {
+            for (const s of suppliers) {
+              points.push({
+                id: s.id,
+                type: 'supplier' as any,
+                latitude: 0, longitude: 0,
+                supplierName: s.company_name,
+                category: s.category,
+                country: s.country,
+              } as any);
+            }
+          }
+        } catch { /* safe */ }
+
+        // 7. Fetch loans to enrich farm points
         const { data: loans } = await supabase
           .from('loans')
           .select('id, member_id, amount, status, repaid_percent');
