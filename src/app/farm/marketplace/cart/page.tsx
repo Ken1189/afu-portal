@@ -263,11 +263,13 @@ export default function CartPage() {
   const [orderNumber, setOrderNumber] = useState<string>('');
   const [isPlacing, setIsPlacing] = useState(false);
 
+  const [deliveryMethod, setDeliveryMethod] = useState<'foober' | 'supplier' | 'collect'>('foober');
+
   const itemCount = getItemCount();
   const subtotal = getTotal();
   const memberTotal = getMemberTotal();
   const savings = getSavings();
-  const deliveryFee = memberTotal >= 200 ? 0 : 15;
+  const deliveryFee = deliveryMethod === 'collect' ? 0 : deliveryMethod === 'supplier' ? (memberTotal >= 200 ? 0 : 15) : (memberTotal >= 200 ? 0 : 10);
   const orderTotal = memberTotal + deliveryFee;
 
   const [orderError, setOrderError] = useState<string | null>(null);
@@ -366,6 +368,24 @@ export default function CartPage() {
             body: JSON.stringify({ orderId: order.id }),
           });
         } catch { /* notification is non-critical */ }
+
+        // If Foober delivery, create a delivery request
+        if (deliveryMethod === 'foober') {
+          try {
+            await fetch('/api/foober/request', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                pickupAddress: 'Supplier location (to be confirmed)',
+                dropoffAddress: `${profile?.country || ''} ${profile?.region || ''}`.trim() || 'Delivery address on file',
+                description: `Marketplace order #${order.order_number} — ${items.map(i => i.product.name).join(', ')}`,
+                packageSize: items.length > 3 ? 'large' : items.length > 1 ? 'medium' : 'small',
+                orderId: order.id,
+                notes: `Marketplace order with ${items.length} item(s)`,
+              }),
+            });
+          } catch { /* foober request is non-critical */ }
+        }
       }
 
       setIsPlacing(false);
@@ -675,6 +695,37 @@ export default function CartPage() {
                         </button>
                       );
                     })}
+                  </div>
+                </div>
+
+                {/* Delivery method */}
+                <div className="pt-1">
+                  <p className="text-xs font-semibold text-navy mb-2 flex items-center gap-1.5">
+                    <Truck size={13} />
+                    Delivery Method
+                  </p>
+                  <div className="space-y-2">
+                    {[
+                      { id: 'foober' as const, name: 'Foober Delivery', desc: 'Fast delivery by a Foober driver', fee: memberTotal >= 200 ? 'Free' : '$10.00' },
+                      { id: 'supplier' as const, name: 'Supplier Arranges', desc: 'Supplier ships to your address', fee: memberTotal >= 200 ? 'Free' : '$15.00' },
+                      { id: 'collect' as const, name: 'Self-Collect', desc: 'Pick up from supplier location', fee: 'Free' },
+                    ].map((dm) => (
+                      <button
+                        key={dm.id}
+                        onClick={() => setDeliveryMethod(dm.id)}
+                        className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left border transition-all ${
+                          deliveryMethod === dm.id
+                            ? 'border-teal bg-teal/5 ring-1 ring-teal/20'
+                            : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                      >
+                        <div>
+                          <p className={`text-xs font-medium ${deliveryMethod === dm.id ? 'text-teal' : 'text-navy'}`}>{dm.name}</p>
+                          <p className="text-[10px] text-gray-400">{dm.desc}</p>
+                        </div>
+                        <span className={`text-xs font-semibold ${dm.fee === 'Free' ? 'text-green-600' : 'text-gray-600'}`}>{dm.fee}</span>
+                      </button>
+                    ))}
                   </div>
                 </div>
 

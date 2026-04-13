@@ -185,6 +185,8 @@ interface ProductFormData {
   unit: string;
   image_url: string;
   gallery_images: string[];
+  // Dynamic category-specific fields (stored as JSON in product.metadata)
+  specs: Record<string, string>;
 }
 
 const emptyForm: ProductFormData = {
@@ -197,6 +199,77 @@ const emptyForm: ProductFormData = {
   unit: 'kg',
   image_url: '',
   gallery_images: [],
+  specs: {},
+};
+
+// Category-specific fields that show dynamically
+const CATEGORY_SPECS: Record<string, { key: string; label: string; placeholder: string; type?: string }[]> = {
+  seeds: [
+    { key: 'variety', label: 'Variety', placeholder: 'e.g. SC 513, TMS 30572' },
+    { key: 'maturity_days', label: 'Maturity (days)', placeholder: 'e.g. 120', type: 'number' },
+    { key: 'germination_rate', label: 'Germination Rate (%)', placeholder: 'e.g. 95', type: 'number' },
+    { key: 'treatment', label: 'Seed Treatment', placeholder: 'e.g. Thiram coated, untreated' },
+    { key: 'season', label: 'Planting Season', placeholder: 'e.g. Oct-Dec' },
+    { key: 'yield_potential', label: 'Yield Potential (t/ha)', placeholder: 'e.g. 6-8' },
+  ],
+  fertilizer: [
+    { key: 'npk_ratio', label: 'NPK Ratio', placeholder: 'e.g. 15-15-15' },
+    { key: 'nutrient_content', label: 'Nutrient Content (%)', placeholder: 'e.g. 46% N' },
+    { key: 'form', label: 'Form', placeholder: 'e.g. Granular, liquid, powder' },
+    { key: 'application_rate', label: 'Application Rate', placeholder: 'e.g. 200kg/ha' },
+    { key: 'suitable_crops', label: 'Suitable Crops', placeholder: 'e.g. Maize, sorghum, vegetables' },
+    { key: 'weight_per_bag', label: 'Weight per Bag', placeholder: 'e.g. 50kg' },
+  ],
+  pesticides: [
+    { key: 'active_ingredient', label: 'Active Ingredient', placeholder: 'e.g. Lambda-Cyhalothrin 5%' },
+    { key: 'target_pests', label: 'Target Pests', placeholder: 'e.g. Bollworm, aphids, stem borer' },
+    { key: 'application_method', label: 'Application Method', placeholder: 'e.g. Foliar spray' },
+    { key: 'dosage', label: 'Dosage', placeholder: 'e.g. 30ml per 20L water' },
+    { key: 'pre_harvest_interval', label: 'Pre-Harvest Interval', placeholder: 'e.g. 14 days' },
+    { key: 'toxicity_class', label: 'Toxicity Class', placeholder: 'e.g. Class II (Moderately hazardous)' },
+  ],
+  equipment: [
+    { key: 'make', label: 'Make / Brand', placeholder: 'e.g. John Deere, Massey Ferguson' },
+    { key: 'model', label: 'Model', placeholder: 'e.g. 5050E' },
+    { key: 'year', label: 'Year of Manufacture', placeholder: 'e.g. 2022', type: 'number' },
+    { key: 'condition', label: 'Condition', placeholder: 'e.g. New, used (good), refurbished' },
+    { key: 'hours_mileage', label: 'Hours / Mileage', placeholder: 'e.g. 500 hours, 25000 km' },
+    { key: 'power', label: 'Power / Capacity', placeholder: 'e.g. 50HP, 200L tank' },
+    { key: 'fuel_type', label: 'Fuel Type', placeholder: 'e.g. Diesel, petrol, electric' },
+    { key: 'warranty', label: 'Warranty', placeholder: 'e.g. 12 months, as-is' },
+  ],
+  irrigation: [
+    { key: 'system_type', label: 'System Type', placeholder: 'e.g. Drip, sprinkler, pivot' },
+    { key: 'coverage_area', label: 'Coverage Area', placeholder: 'e.g. 1 hectare' },
+    { key: 'flow_rate', label: 'Flow Rate', placeholder: 'e.g. 2L/hour per emitter' },
+    { key: 'power_source', label: 'Power Source', placeholder: 'e.g. Solar, diesel pump, gravity' },
+  ],
+  'animal-feed': [
+    { key: 'animal_type', label: 'For Animal Type', placeholder: 'e.g. Cattle, poultry, pigs' },
+    { key: 'protein_content', label: 'Protein Content (%)', placeholder: 'e.g. 16%' },
+    { key: 'feed_type', label: 'Feed Type', placeholder: 'e.g. Pellets, mash, concentrate' },
+    { key: 'weight_per_bag', label: 'Weight per Bag', placeholder: 'e.g. 50kg' },
+  ],
+  veterinary: [
+    { key: 'active_ingredient', label: 'Active Ingredient', placeholder: 'e.g. Ivermectin 1%' },
+    { key: 'animal_type', label: 'For Animal Type', placeholder: 'e.g. Cattle, goats, poultry' },
+    { key: 'dosage', label: 'Dosage', placeholder: 'e.g. 1ml per 50kg body weight' },
+    { key: 'withdrawal_period', label: 'Withdrawal Period', placeholder: 'e.g. 28 days (meat), 7 days (milk)' },
+    { key: 'storage', label: 'Storage Requirements', placeholder: 'e.g. Store below 25C, protect from light' },
+  ],
+  livestock: [
+    { key: 'breed', label: 'Breed', placeholder: 'e.g. Brahman, Boer goat, Isa Brown' },
+    { key: 'age', label: 'Age', placeholder: 'e.g. 18 months, 6 weeks' },
+    { key: 'weight', label: 'Weight', placeholder: 'e.g. 350kg, 2.5kg' },
+    { key: 'sex', label: 'Sex', placeholder: 'e.g. Male, female, mixed' },
+    { key: 'vaccination_status', label: 'Vaccination Status', placeholder: 'e.g. Fully vaccinated, FMD + Lumpy skin' },
+    { key: 'health_cert', label: 'Health Certificate', placeholder: 'e.g. Available, pending' },
+  ],
+  tools: [
+    { key: 'material', label: 'Material', placeholder: 'e.g. Stainless steel, carbon steel' },
+    { key: 'dimensions', label: 'Dimensions', placeholder: 'e.g. 60cm blade, 1.5m handle' },
+    { key: 'weight', label: 'Weight', placeholder: 'e.g. 1.2kg' },
+  ],
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -416,6 +489,7 @@ export default function SupplierProductsPage() {
         unit: '10kg bag',
         image_url: '',
         gallery_images: [],
+        specs: {},
       },
     },
     {
@@ -431,6 +505,7 @@ export default function SupplierProductsPage() {
         unit: '50kg bag',
         image_url: '',
         gallery_images: [],
+        specs: {},
       },
     },
     {
@@ -446,6 +521,7 @@ export default function SupplierProductsPage() {
         unit: 'unit',
         image_url: '',
         gallery_images: [],
+        specs: {},
       },
     },
     {
@@ -461,6 +537,7 @@ export default function SupplierProductsPage() {
         unit: '5L jerrycan',
         image_url: '',
         gallery_images: [],
+        specs: {},
       },
     },
     {
@@ -476,6 +553,7 @@ export default function SupplierProductsPage() {
         unit: 'kit',
         image_url: '',
         gallery_images: [],
+        specs: {},
       },
     },
     {
@@ -491,6 +569,7 @@ export default function SupplierProductsPage() {
         unit: 'unit',
         image_url: '',
         gallery_images: [],
+        specs: {},
       },
     },
   ];
@@ -514,12 +593,13 @@ export default function SupplierProductsPage() {
       unit: product.unit,
       image_url: (product as any).image_url || product.image || '',
       gallery_images: (product as any).images || [],
+      specs: (product as any).metadata || {},
     });
     setFormError('');
     setShowModal(true);
   };
 
-  const handleFormChange = (field: keyof ProductFormData, value: string | string[]) => {
+  const handleFormChange = (field: keyof ProductFormData, value: string | string[] | Record<string, string>) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -549,6 +629,10 @@ export default function SupplierProductsPage() {
         if (error) { setFormError(error); return; }
       } else {
         // Create new
+        // Filter out empty spec values
+        const metadata = Object.fromEntries(
+          Object.entries(formData.specs).filter(([, v]) => v && v.trim())
+        );
         const { error } = await addProduct({
           supplier_id: mySupplierIds,
           name: formData.name.trim(),
@@ -560,6 +644,7 @@ export default function SupplierProductsPage() {
           in_stock: Number(formData.stock_quantity) > 0,
           image_url: formData.image_url || undefined,
           images: formData.gallery_images.length > 0 ? formData.gallery_images : undefined,
+          metadata: Object.keys(metadata).length > 0 ? metadata : undefined,
         } as any);
         if (error) { setFormError(error); return; }
       }
@@ -1157,6 +1242,29 @@ export default function SupplierProductsPage() {
                     </optgroup>
                   </select>
                 </div>
+
+                {/* Dynamic category-specific fields */}
+                {CATEGORY_SPECS[formData.category] && (
+                  <div className="bg-[#EBF7E5]/50 border border-[#5DB347]/20 rounded-xl p-4 space-y-3">
+                    <p className="text-xs font-semibold text-[#5DB347] uppercase tracking-wide">
+                      {categoryLabels[formData.category] || formData.category} Details
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {CATEGORY_SPECS[formData.category].map((spec) => (
+                        <div key={spec.key}>
+                          <label className="block text-xs font-medium text-gray-600 mb-1">{spec.label}</label>
+                          <input
+                            type={spec.type || 'text'}
+                            value={formData.specs[spec.key] || ''}
+                            onChange={(e) => handleFormChange('specs', { ...formData.specs, [spec.key]: e.target.value } as any)}
+                            placeholder={spec.placeholder}
+                            className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#8CB89C]/30 focus:border-[#8CB89C]"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* Enterprise custom product note */}
                 {formData.category === 'enterprise' && (
