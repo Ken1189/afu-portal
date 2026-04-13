@@ -92,20 +92,6 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  // 4. Country validation: only accept our 20 operating countries
-  const VALID_COUNTRIES = [
-    'Botswana', 'Zimbabwe', 'Tanzania', 'Kenya', 'Nigeria', 'Zambia',
-    'Mozambique', 'South Africa', 'Ghana', 'Uganda', 'Sierra Leone',
-    'Egypt', 'Ethiopia', 'Malawi', 'Namibia', 'Guinea', 'Guinea-Bissau',
-    'Liberia', 'Mali', 'Ivory Coast',
-  ];
-  if (body.country && !VALID_COUNTRIES.some(c => c.toLowerCase() === body.country?.toLowerCase())) {
-    return NextResponse.json(
-      { error: `We currently operate in ${VALID_COUNTRIES.length} African countries. Please select a valid country.` },
-      { status: 400 }
-    );
-  }
-
   // Clean honeypot/timing fields before validation
   delete body.website_url;
   delete body.company_website;
