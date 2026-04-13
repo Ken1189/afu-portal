@@ -160,7 +160,7 @@ function FarmLayoutInner({ children }: { children: React.ReactNode }) {
   // NOT to auto-authorize unauthenticated users
   const [authCheckComplete, setAuthCheckComplete] = useState(false);
   useEffect(() => {
-    const t = setTimeout(() => setAuthCheckComplete(true), 5000);
+    const t = setTimeout(() => setAuthCheckComplete(true), 3000);
     return () => clearTimeout(t);
   }, []);
 

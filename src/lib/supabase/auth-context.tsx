@@ -133,11 +133,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Listen to auth state changes
   useEffect(() => {
-    // Hard safety timeout: ensure isLoading always resolves to false within 8s
+    // Hard safety timeout: ensure isLoading always resolves to false within 3s
     const safetyTimeout = setTimeout(() => {
       setIsLoading(false);
-      console.warn('[Auth] Safety timeout: forcing isLoading=false after 8s');
-    }, 8000);
+      console.warn('[Auth] Safety timeout: forcing isLoading=false after 3s');
+    }, 3000);
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, newSession) => {
