@@ -303,15 +303,7 @@ export default async function AmbassadorTermsPage() {
                 12. Contact
               </h2>
               <p className="text-gray-600 leading-relaxed">
-                For questions or concerns regarding these Terms and Conditions or the Ambassador Program, please contact us at{" "}
-                <a
-                  href="mailto:peterw@africanfarmingunion.org"
-                  className="font-medium underline"
-                  style={{ color: "#5DB347" }}
-                >
-                  peterw@africanfarmingunion.org
-                </a>{" "}
-                or visit our{" "}
+                For questions or concerns regarding these Terms and Conditions or the Ambassador Program, please visit our{" "}
                 <Link
                   href="/contact"
                   className="font-medium underline"
