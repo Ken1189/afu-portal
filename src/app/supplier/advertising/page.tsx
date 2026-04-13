@@ -200,7 +200,7 @@ export default function AdvertisingDashboard() {
           .from('suppliers')
           .select('id, company_name')
           .eq('profile_id', user?.id ?? '')
-          .single();
+          .maybeSingle();
 
         if (supplier) {
           const { data: dbAds, error: adsError } = await supabase

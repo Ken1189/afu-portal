@@ -410,7 +410,7 @@ export default function SponsorshipProgram() {
           .from('suppliers')
           .select('*')
           .eq('profile_id', user?.id ?? '')
-          .single();
+          .maybeSingle();
 
         if (supplier) {
           setLiveSupplier({

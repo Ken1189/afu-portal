@@ -146,7 +146,7 @@ export default function MemberDiscounts() {
           .from('suppliers')
           .select('*')
           .eq('profile_id', user?.id ?? '')
-          .single();
+          .maybeSingle();
 
         if (supplier) {
           setLiveSupplier({

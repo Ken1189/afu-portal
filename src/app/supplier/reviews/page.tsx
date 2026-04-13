@@ -57,12 +57,13 @@ const fadeUp = {
 
 // -- Star rating breakdown ----------------------------------------------------
 
-const ratingBreakdown = [
-  { stars: 5, count: 165, percentage: 53 },
-  { stars: 4, count: 89, percentage: 29 },
-  { stars: 3, count: 34, percentage: 11 },
-  { stars: 2, count: 15, percentage: 5 },
-  { stars: 1, count: 9, percentage: 3 },
+// Rating breakdown is computed from actual reviews (see useMemo below)
+const EMPTY_BREAKDOWN = [
+  { stars: 5, count: 0, percentage: 0 },
+  { stars: 4, count: 0, percentage: 0 },
+  { stars: 3, count: 0, percentage: 0 },
+  { stars: 2, count: 0, percentage: 0 },
+  { stars: 1, count: 0, percentage: 0 },
 ];
 
 // -- Mock reviews (12) --------------------------------------------------------
@@ -241,14 +242,14 @@ const sentimentData = [
 
 export default function SupplierReviewsPage() {
   const { user } = useAuth();
-  const [reviews, setReviews] = useState<Review[]>(FALLBACK_REVIEWS);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [respondingTo, setRespondingTo] = useState<string | null>(null);
   const [responseText, setResponseText] = useState('');
   const [filterStars, setFilterStars] = useState<number | null>(null);
   const [showAllReviews, setShowAllReviews] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [totalReviews, setTotalReviews] = useState(312);
-  const [averageRating, setAverageRating] = useState(4.8);
+  const [totalReviews, setTotalReviews] = useState(0);
+  const [averageRating, setAverageRating] = useState(0);
 
   // ── Fetch reviews from Supabase ─────────────────────────────────────────
   useEffect(() => {
@@ -259,7 +260,7 @@ export default function SupplierReviewsPage() {
           .from('suppliers')
           .select('id, rating, review_count')
           .eq('profile_id', user?.id ?? '')
-          .single();
+          .maybeSingle();
 
         if (supplier) {
           if (supplier.review_count) setTotalReviews(supplier.review_count);
@@ -298,6 +299,14 @@ export default function SupplierReviewsPage() {
     if (user) fetchReviews();
     else setLoading(false);
   }, [user]);
+
+  // Compute rating breakdown from actual reviews
+  const ratingBreakdown = reviews.length > 0
+    ? [5, 4, 3, 2, 1].map((stars) => {
+        const count = reviews.filter((r) => r.rating === stars).length;
+        return { stars, count, percentage: Math.round((count / reviews.length) * 100) };
+      })
+    : EMPTY_BREAKDOWN;
 
   const filteredReviews = filterStars
     ? reviews.filter((r) => r.rating === filterStars)

@@ -160,7 +160,7 @@ export default function SupplierMarketplacePage() {
           .from('suppliers')
           .select('id, company_name')
           .eq('profile_id', user?.id ?? '')
-          .single();
+          .maybeSingle();
 
         if (supplier) {
           const { data: products } = await supabase

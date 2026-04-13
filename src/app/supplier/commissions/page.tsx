@@ -147,21 +147,7 @@ function formatCurrencyExact(value: number): string {
   return `$${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
-// ── Summary calculations ────────────────────────────────────────────────────
-
-const totalEarned = FALLBACK_COMMISSIONS.reduce((sum, c) => sum + c.commissionAmount, 0);
-const pendingBalance = FALLBACK_COMMISSIONS
-  .filter((c) => c.status === 'pending')
-  .reduce((sum, c) => sum + c.commissionAmount, 0);
-const approvedBalance = FALLBACK_COMMISSIONS
-  .filter((c) => c.status === 'approved')
-  .reduce((sum, c) => sum + c.commissionAmount, 0);
-const paidOut = FALLBACK_COMMISSIONS
-  .filter((c) => c.status === 'paid')
-  .reduce((sum, c) => sum + c.commissionAmount, 0);
-const disputedAmount = FALLBACK_COMMISSIONS
-  .filter((c) => c.status === 'disputed')
-  .reduce((sum, c) => sum + c.commissionAmount, 0);
+// Summary calculations moved inside component to use live data (see useMemo below)
 
 // ── Status badge colors ─────────────────────────────────────────────────────
 
@@ -287,7 +273,7 @@ export default function CommissionTracking() {
   const { user } = useAuth();
   const [selectedPeriod, setSelectedPeriod] = useState<Period>('all-time');
   const [showPayoutModal, setShowPayoutModal] = useState(false);
-  const [liveCommissions, setLiveCommissions] = useState<Commission[]>(FALLBACK_COMMISSIONS);
+  const [liveCommissions, setLiveCommissions] = useState<Commission[]>([]);
   const [loading, setLoading] = useState(true);
 
   // ── Fetch commissions from Supabase ─────────────────────────────────────
@@ -299,7 +285,7 @@ export default function CommissionTracking() {
           .from('suppliers')
           .select('id, company_name')
           .eq('profile_id', user?.id ?? '')
-          .single();
+          .maybeSingle();
 
         if (supplier) {
           const { data: dbCommissions } = await supabase
@@ -336,6 +322,13 @@ export default function CommissionTracking() {
     if (user) fetchCommissions();
     else setLoading(false);
   }, [user]);
+
+  // ── Summary calculations (from live data) ────────────────────────────
+  const totalEarned = liveCommissions.reduce((sum, c) => sum + c.commissionAmount, 0);
+  const pendingBalance = liveCommissions.filter((c) => c.status === 'pending').reduce((sum, c) => sum + c.commissionAmount, 0);
+  const approvedBalance = liveCommissions.filter((c) => c.status === 'approved').reduce((sum, c) => sum + c.commissionAmount, 0);
+  const paidOut = liveCommissions.filter((c) => c.status === 'paid').reduce((sum, c) => sum + c.commissionAmount, 0);
+  const disputedAmount = liveCommissions.filter((c) => c.status === 'disputed').reduce((sum, c) => sum + c.commissionAmount, 0);
 
   // ── Filter commissions by period ──────────────────────────────────────
   const filteredCommissions = useMemo(() => {

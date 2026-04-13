@@ -169,11 +169,11 @@ export default function SupplierOrdersPage() {
           .from('suppliers')
           .select('id')
           .eq('profile_id', user!.id)
-          .single();
+          .maybeSingle();
 
         if (!supplier) {
           setLoading(false);
-          return; // keep fallback data
+          return;
         }
         setSupplierId(supplier.id);
 

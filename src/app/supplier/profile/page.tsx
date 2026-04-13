@@ -312,7 +312,7 @@ export default function SupplierProfilePage() {
             status: 'active',
           })
           .select('id')
-          .single();
+          .maybeSingle();
         if (insertError) { setSaveError('Failed to create supplier profile: ' + insertError.message); setSaving(false); return; }
         if (newSupplier) {
           setSupplierId(newSupplier.id);
@@ -351,7 +351,7 @@ export default function SupplierProfilePage() {
         .from('suppliers')
         .select('*')
         .eq('id', supplierId)
-        .single();
+        .maybeSingle();
       if (supplier) populateFields(supplier, false);
     } else {
       populateFields(fallbackSupplier, true);

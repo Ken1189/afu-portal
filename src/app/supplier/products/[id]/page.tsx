@@ -308,7 +308,7 @@ export default function SupplierProductDetailPage() {
           .from('products')
           .select('*, supplier:suppliers(company_name, verified)')
           .eq('id', productId)
-          .single();
+          .maybeSingle();
 
         if (p) {
           const mapped: SupplierProduct = {

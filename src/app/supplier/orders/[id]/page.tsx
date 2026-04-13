@@ -242,7 +242,7 @@ export default function SupplierOrderDetailPage() {
           .from('orders')
           .select('*, order_items(*, product:products(name))')
           .eq('order_number', orderId)
-          .single();
+          .maybeSingle();
 
         if (orderData) {
           const item = orderData.order_items?.[0];

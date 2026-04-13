@@ -246,7 +246,7 @@ export default function SupplierProductsPage() {
               category: 'general',
             })
             .select('id')
-            .single();
+            .maybeSingle();
 
           if (newSupplier?.id) {
             setMySupplierIds(newSupplier.id);
@@ -258,7 +258,7 @@ export default function SupplierProductsPage() {
               .from('suppliers')
               .select('id')
               .limit(1)
-              .single();
+              .maybeSingle();
             if (anySupplier?.id) {
               setMySupplierIds(anySupplier.id);
               return;

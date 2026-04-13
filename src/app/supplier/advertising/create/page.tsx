@@ -205,7 +205,7 @@ export default function CreateCampaign() {
           .from('suppliers')
           .select('id')
           .eq('profile_id', user?.id ?? '')
-          .single();
+          .maybeSingle();
         if (supplier) setSupplierId(supplier.id);
       } catch {
         // Fallback

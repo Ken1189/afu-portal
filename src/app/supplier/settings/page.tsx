@@ -148,7 +148,7 @@ export default function SupplierSettingsPage() {
           .from('suppliers')
           .select('id')
           .eq('profile_id', user?.id ?? '')
-          .single();
+          .maybeSingle();
         if (supplierRow) setSupplierId(supplierRow.id);
 
         // 2. Fetch profile for settings metadata
@@ -156,7 +156,7 @@ export default function SupplierSettingsPage() {
           .from('profiles')
           .select('*')
           .eq('id', user?.id ?? '')
-          .single();
+          .maybeSingle();
 
         if (profile) {
           // Load notification preferences from profile metadata if available

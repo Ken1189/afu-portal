@@ -200,7 +200,7 @@ export default function AdDetailPage() {
             ad_packages(name)
           `)
           .eq('id', adId)
-          .single();
+          .maybeSingle();
 
         if (adError) throw adError;
         if (!adData) throw new Error('Advertisement not found');
