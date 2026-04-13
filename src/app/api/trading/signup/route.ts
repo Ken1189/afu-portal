@@ -23,7 +23,7 @@ export async function POST(req: Request) {
   const svc = await createAdminClient();
 
   // Insert trader application
-  const { data, error } = await svc.from('trader_applications').insert({
+  const { data, error } = await svc.from('service_provider_applications').insert({
     full_name: body.full_name,
     email: body.email,
     phone: body.phone || null,

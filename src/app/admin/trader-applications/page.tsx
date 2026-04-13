@@ -88,10 +88,10 @@ export default function AdminTraderApplicationsPage() {
   // ── Fetch stats ──────────────────────────────────────────────────────────
   const fetchStats = useCallback(async () => {
     const [totalRes, pendingRes, approvedRes, rejectedRes] = await Promise.all([
-      supabase.from('trader_applications').select('*', { count: 'exact', head: true }),
-      supabase.from('trader_applications').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
-      supabase.from('trader_applications').select('*', { count: 'exact', head: true }).eq('status', 'approved'),
-      supabase.from('trader_applications').select('*', { count: 'exact', head: true }).eq('status', 'rejected'),
+      supabase.from('service_provider_applications').select('*', { count: 'exact', head: true }).eq('provider_type', 'trader'),
+      supabase.from('service_provider_applications').select('*', { count: 'exact', head: true }).eq('provider_type', 'trader').eq('status', 'pending'),
+      supabase.from('service_provider_applications').select('*', { count: 'exact', head: true }).eq('provider_type', 'trader').eq('status', 'approved'),
+      supabase.from('service_provider_applications').select('*', { count: 'exact', head: true }).eq('provider_type', 'trader').eq('status', 'rejected'),
     ]);
     setStats({
       total: totalRes.count ?? 0,
@@ -107,8 +107,9 @@ export default function AdminTraderApplicationsPage() {
     setError(null);
 
     let query = supabase
-      .from('trader_applications')
+      .from('service_provider_applications')
       .select('*', { count: 'exact' })
+      .eq('provider_type', 'trader')
       .order('created_at', { ascending: false });
 
     if (statusFilter !== 'all') {
@@ -147,7 +148,7 @@ export default function AdminTraderApplicationsPage() {
   const updateStatus = async (id: string, newStatus: 'approved' | 'rejected') => {
     setActionLoading(id);
     const { error: updateError } = await supabase
-      .from('trader_applications')
+      .from('service_provider_applications')
       .update({
         status: newStatus,
         reviewed_at: new Date().toISOString(),

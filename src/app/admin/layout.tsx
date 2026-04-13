@@ -132,7 +132,7 @@ const navGroups: NavGroup[] = [
       { href: '/admin/trader-applications', label: 'Trader Applications', icon: <BarChart3 className={ICON_CLS} /> },
       { href: '/admin/service-providers', label: 'Service Providers', icon: <Briefcase className={ICON_CLS} /> },
       { href: '/admin/talent', label: 'Talent Pool', icon: <Briefcase className={ICON_CLS} /> },
-      { href: '/directory', label: 'Directory', icon: <Search className={ICON_CLS} /> },
+      { href: '/admin/service-providers', label: 'Directory', icon: <Search className={ICON_CLS} /> },
       { href: '/admin/kyc', label: 'KYC', icon: <ScanEye className={ICON_CLS} /> },
     ],
   },
