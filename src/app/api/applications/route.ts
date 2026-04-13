@@ -64,6 +64,54 @@ export async function POST(request: NextRequest) {
 
   const body = await request.json();
 
+  // ── Spam protection ──────────────────────────────────────────────────
+  // 1. Honeypot: if hidden field is filled, it's a bot
+  if (body.website_url || body.company_website || body.fax) {
+    return NextResponse.json({ error: 'Application submitted' }, { status: 200 }); // fake success
+  }
+
+  // 2. Timing check: if form was submitted in < 3 seconds, likely a bot
+  if (body._formLoadedAt) {
+    const elapsed = Date.now() - Number(body._formLoadedAt);
+    if (elapsed < 3000) {
+      return NextResponse.json({ error: 'Application submitted' }, { status: 200 });
+    }
+  }
+
+  // 3. Gibberish detection: check key text fields for random strings
+  const textFields = [body.motivation, body.promotion_plan, body.full_name, body.notes].filter(Boolean);
+  for (const text of textFields) {
+    if (typeof text === 'string' && text.length > 5) {
+      const vowelRatio = (text.match(/[aeiouAEIOU]/g) || []).length / text.length;
+      const spaceRatio = (text.match(/ /g) || []).length / text.length;
+      // Normal text has ~35-45% vowels and ~15-20% spaces
+      // Random strings have <15% vowels and <5% spaces
+      if (vowelRatio < 0.12 && spaceRatio < 0.05 && text.length > 10) {
+        return NextResponse.json({ error: 'Application submitted' }, { status: 200 });
+      }
+    }
+  }
+
+  // 4. Country validation: only accept our 20 operating countries
+  const VALID_COUNTRIES = [
+    'Botswana', 'Zimbabwe', 'Tanzania', 'Kenya', 'Nigeria', 'Zambia',
+    'Mozambique', 'South Africa', 'Ghana', 'Uganda', 'Sierra Leone',
+    'Egypt', 'Ethiopia', 'Malawi', 'Namibia', 'Guinea', 'Guinea-Bissau',
+    'Liberia', 'Mali', 'Ivory Coast',
+  ];
+  if (body.country && !VALID_COUNTRIES.some(c => c.toLowerCase() === body.country?.toLowerCase())) {
+    return NextResponse.json(
+      { error: `We currently operate in ${VALID_COUNTRIES.length} African countries. Please select a valid country.` },
+      { status: 400 }
+    );
+  }
+
+  // Clean honeypot/timing fields before validation
+  delete body.website_url;
+  delete body.company_website;
+  delete body.fax;
+  delete body._formLoadedAt;
+
   const { validate, createApplicationSchema } = await import('@/lib/validation');
   const validation = validate(createApplicationSchema, body);
   if (!validation.success) {

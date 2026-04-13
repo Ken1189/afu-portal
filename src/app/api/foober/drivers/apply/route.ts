@@ -15,6 +15,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Name and email are required' }, { status: 400 });
     }
 
+    // Spam protection: honeypot + gibberish detection
+    if (body.website_url || body.fax) {
+      return NextResponse.json({ success: true }, { status: 200 });
+    }
+    const textFields = [full_name, experience_description].filter(Boolean);
+    for (const text of textFields) {
+      if (typeof text === 'string' && text.length > 10) {
+        const vowelRatio = (text.match(/[aeiouAEIOU]/g) || []).length / text.length;
+        const spaceRatio = (text.match(/ /g) || []).length / text.length;
+        if (vowelRatio < 0.12 && spaceRatio < 0.05) {
+          return NextResponse.json({ success: true }, { status: 200 });
+        }
+      }
+    }
+
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
