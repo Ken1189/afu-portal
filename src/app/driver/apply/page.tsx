@@ -26,7 +26,9 @@ export default function DriverApplyPage() {
   const [form, setForm] = useState({
     full_name: '', email: '', phone: '', country: '', region: '', city: '',
     vehicle_type: 'motorcycle', vehicle_registration: '', license_number: '',
+    vehicle_make: '', vehicle_model: '', vehicle_year: '', vehicle_color: '',
     experience_description: '',
+    license_photo_url: '', roadworthiness_photo_url: '', insurance_photo_url: '', registration_photo_url: '',
   });
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -180,6 +182,62 @@ export default function DriverApplyPage() {
                   <input name="license_number" value={form.license_number} onChange={handleChange} className="w-full pl-10 pr-3 py-2.5 border rounded-xl text-sm" placeholder="Driver's license #" />
                 </div>
               </div>
+            </div>
+
+            {/* Vehicle Details */}
+            <div className="border-t border-gray-200 pt-4 mt-2">
+              <p className="text-sm font-semibold text-[#1B2A4A] mb-3">Vehicle Details</p>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div>
+                  <label className="text-xs font-medium text-gray-600 mb-1 block">Make</label>
+                  <input name="vehicle_make" value={form.vehicle_make} onChange={handleChange} className="w-full px-3 py-2.5 border rounded-xl text-sm" placeholder="e.g. Toyota" />
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-gray-600 mb-1 block">Model</label>
+                  <input name="vehicle_model" value={form.vehicle_model} onChange={handleChange} className="w-full px-3 py-2.5 border rounded-xl text-sm" placeholder="e.g. Hilux" />
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-gray-600 mb-1 block">Year</label>
+                  <input name="vehicle_year" type="number" value={form.vehicle_year} onChange={handleChange} className="w-full px-3 py-2.5 border rounded-xl text-sm" placeholder="2020" />
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-gray-600 mb-1 block">Color</label>
+                  <input name="vehicle_color" value={form.vehicle_color} onChange={handleChange} className="w-full px-3 py-2.5 border rounded-xl text-sm" placeholder="White" />
+                </div>
+              </div>
+            </div>
+
+            {/* Document Uploads */}
+            <div className="border-t border-gray-200 pt-4 mt-2">
+              <p className="text-sm font-semibold text-[#1B2A4A] mb-1">Required Documents</p>
+              <p className="text-xs text-gray-400 mb-3">Upload photos of your documents. These will be verified by our team.</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {[
+                  { key: 'license_photo_url', label: "Driver's License" },
+                  { key: 'registration_photo_url', label: 'Vehicle Registration' },
+                  { key: 'roadworthiness_photo_url', label: 'Roadworthiness Certificate' },
+                  { key: 'insurance_photo_url', label: 'Vehicle Insurance' },
+                ].map((doc) => (
+                  <div key={doc.key} className="border border-dashed border-gray-300 rounded-xl p-3">
+                    <label className="text-xs font-medium text-gray-600 mb-1.5 block">{doc.label}</label>
+                    {form[doc.key as keyof typeof form] ? (
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="w-4 h-4 text-[#5DB347]" />
+                        <span className="text-xs text-[#5DB347]">Uploaded</span>
+                        <button type="button" onClick={() => setForm({ ...form, [doc.key]: '' })} className="ml-auto text-xs text-red-400 hover:text-red-600">Remove</button>
+                      </div>
+                    ) : (
+                      <input
+                        type="url"
+                        placeholder="Paste image URL or upload via profile later"
+                        onChange={(e) => setForm({ ...form, [doc.key]: e.target.value })}
+                        className="w-full px-2 py-1.5 border rounded-lg text-xs"
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+              <p className="text-[10px] text-gray-400 mt-2">You can also upload these documents later from your Driver Profile after approval.</p>
             </div>
 
             <div>
