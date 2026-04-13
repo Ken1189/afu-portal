@@ -341,7 +341,42 @@ export default function SupplierOrdersPage() {
         .update({ status: dbStatusMap[newStatus] })
         .eq('id', realOrderId);
 
-      if (error) console.error('Failed to update order status:', error);
+      if (error) {
+        console.error('Failed to update order status:', error);
+        return;
+      }
+
+      // Auto-create commission when order is delivered
+      if (newStatus === 'delivered' && supplierId) {
+        try {
+          // Fetch order items for this order + supplier
+          const { data: orderItems } = await supabase
+            .from('order_items')
+            .select('id, total_price')
+            .eq('order_id', realOrderId)
+            .eq('supplier_id', supplierId);
+
+          if (orderItems && orderItems.length > 0) {
+            const commissionRate = 0.05; // 5% platform commission
+            for (const item of orderItems) {
+              const saleAmount = Number(item.total_price) || 0;
+              const commissionAmount = Math.round(saleAmount * commissionRate * 100) / 100;
+
+              await supabase.from('commissions').insert({
+                supplier_id: supplierId,
+                order_id: realOrderId,
+                order_item_id: item.id,
+                sale_amount: saleAmount,
+                commission_rate: commissionRate,
+                commission_amount: commissionAmount,
+                status: 'pending',
+              });
+            }
+          }
+        } catch {
+          // Commission creation is non-critical
+        }
+      }
     } catch (err) {
       console.error('Status update error:', err);
     }

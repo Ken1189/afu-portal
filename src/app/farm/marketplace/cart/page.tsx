@@ -270,65 +270,111 @@ export default function CartPage() {
   const deliveryFee = memberTotal >= 200 ? 0 : 15;
   const orderTotal = memberTotal + deliveryFee;
 
+  const [orderError, setOrderError] = useState<string | null>(null);
+
   const handlePlaceOrder = async () => {
     if (items.length === 0) return;
     setIsPlacing(true);
+    setOrderError(null);
 
-    // Try to create a real order if user is logged in
-    if (user) {
-      try {
-        // Look up the member record for this user
-        const supabase = createClient();
-        const { data: member } = await supabase
-          .from('members')
-          .select('id')
-          .eq('profile_id', user.id)
-          .single();
-
-        if (member) {
-          // Build order items from cart — need supplier_id for each product
-          const orderItems = await Promise.all(
-            items.map(async (item) => {
-              // Look up product to get supplier_id
-              const { data: product } = await supabase
-                .from('products')
-                .select('supplier_id')
-                .eq('id', item.product.id)
-                .single();
-
-              return {
-                product_id: item.product.id,
-                supplier_id: product?.supplier_id || '',
-                quantity: item.quantity,
-                unit_price: item.product.memberPrice || item.product.price,
-                total_price: (item.product.memberPrice || item.product.price) * item.quantity,
-              };
-            })
-          );
-
-          const validItems = orderItems.filter(i => i.supplier_id);
-
-          if (validItems.length > 0) {
-            const { data: order } = await createOrder(
-              member.id,
-              validItems,
-              { country: profile?.country || '', region: profile?.region || '' }
-            );
-            if (order) {
-              setOrderNumber(order.order_number);
-            }
-          }
-        }
-      } catch {
-        // Order creation failed — silent fallback
-      }
+    if (!user) {
+      setOrderError('Please log in to place an order.');
+      setIsPlacing(false);
+      return;
     }
 
-    setIsPlacing(false);
-    setOrderPlaced(true);
-    setTimeout(() => {
-      clearCart();
-    }, 5000);
+    try {
+      const supabase = createClient();
+
+      // Look up (or auto-create) member record for this user
+      let memberId: string | null = null;
+      const { data: member } = await supabase
+        .from('members')
+        .select('id')
+        .eq('profile_id', user.id)
+        .maybeSingle();
+
+      if (member) {
+        memberId = member.id;
+      } else {
+        // Auto-create member record for logged-in users without one
+        const { data: newMember } = await supabase
+          .from('members')
+          .insert({
+            profile_id: user.id,
+            tier: 'free',
+            status: 'active',
+          })
+          .select('id')
+          .single();
+        memberId = newMember?.id || null;
+      }
+
+      if (!memberId) {
+        setOrderError('Could not create your account. Please contact support.');
+        setIsPlacing(false);
+        return;
+      }
+
+      // Build order items from cart — need supplier_id for each product
+      const orderItems = await Promise.all(
+        items.map(async (item) => {
+          const { data: product } = await supabase
+            .from('products')
+            .select('supplier_id')
+            .eq('id', item.product.id)
+            .maybeSingle();
+
+          return {
+            product_id: item.product.id,
+            supplier_id: product?.supplier_id || '',
+            quantity: item.quantity,
+            unit_price: item.product.memberPrice || item.product.price,
+            total_price: (item.product.memberPrice || item.product.price) * item.quantity,
+          };
+        })
+      );
+
+      const validItems = orderItems.filter(i => i.supplier_id);
+
+      if (validItems.length === 0) {
+        setOrderError('Products not available. Please try again.');
+        setIsPlacing(false);
+        return;
+      }
+
+      const { data: order, error } = await createOrder(
+        memberId,
+        validItems,
+        { country: profile?.country || '', region: profile?.region || '' }
+      );
+
+      if (error) {
+        setOrderError(error);
+        setIsPlacing(false);
+        return;
+      }
+
+      if (order) {
+        setOrderNumber(order.order_number);
+
+        // Notify suppliers about the new order
+        try {
+          await fetch('/api/orders/notify-supplier', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ orderId: order.id }),
+          });
+        } catch { /* notification is non-critical */ }
+      }
+
+      setIsPlacing(false);
+      setOrderPlaced(true);
+      setTimeout(() => { clearCart(); }, 5000);
+    } catch (err) {
+      setOrderError('Something went wrong placing your order. Please try again.');
+      setIsPlacing(false);
+    }
   };
 
   const handleClearCart = () => {
@@ -631,6 +677,13 @@ export default function CartPage() {
                     })}
                   </div>
                 </div>
+
+                {/* Order error */}
+                {orderError && (
+                  <div className="mt-2 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs">
+                    {orderError}
+                  </div>
+                )}
 
                 {/* Place Order button */}
                 <button
