@@ -70,6 +70,10 @@ export const FARM_SIDEBAR_ITEMS = [
   { href: '/farm/financing', label: 'Financing', icon: 'Wallet', tier: 'growth' as FarmerTier, group: 'Finance' },
   { href: '/farm/money', label: 'Money', icon: 'CreditCard', tier: 'growth' as FarmerTier, group: 'Finance' },
 
+  // Marketplace & Exchange — free tier, accessible to all
+  { href: '/farm/marketplace', label: 'Marketplace', icon: 'ShoppingBag', tier: 'seedling' as FarmerTier, group: 'Trade' },
+  { href: '/farm/exchange', label: 'Exchange', icon: 'Coins', tier: 'seedling' as FarmerTier, group: 'Trade' },
+
   // Coming Soon — single link to the full roadmap
   { href: '/farm/coming-soon', label: 'Coming Soon', icon: 'Zap', tier: 'seedling' as FarmerTier, group: 'More' },
 ];
@@ -90,8 +94,6 @@ export const COMING_SOON_FEATURES = [
   { label: 'AI Tools', icon: 'Brain', description: 'AI-powered farm recommendations and yield predictions', href: '/farm/ai-tools' },
   { label: 'Sustainability', icon: 'Leaf', description: 'Carbon credit tracking and sustainable farming practices', href: '/farm/sustainability' },
   { label: 'Exports', icon: 'Ship', description: 'Export documentation, compliance, and logistics', href: '/farm/exports' },
-  { label: 'Marketplace', icon: 'ShoppingBag', description: 'Buy and sell agricultural products and equipment', href: '/farm/marketplace' },
-  { label: 'Exchange', icon: 'Coins', description: 'Credit-based exchange for farming goods and services', href: '/farm/exchange' },
   { label: 'Trading', icon: 'ArrowLeftRight', description: 'Commodity trading with live prices and order matching', href: '/farm/trade' },
   { label: 'Off-take Contracts', icon: 'Handshake', description: 'Secure forward contracts and off-take agreements', href: '/farm/offtake' },
   { label: 'Logistics', icon: 'Truck', description: 'Transport coordination and delivery tracking', href: '/farm/logistics' },
