@@ -179,6 +179,7 @@ const navGroups: NavGroup[] = [
       { href: '/admin/foober/applications', label: 'Foober Applications', icon: <Truck className={ICON_CLS} /> },
       { href: '/admin/foober/drivers', label: 'Foober Drivers', icon: <Truck className={ICON_CLS} /> },
       { href: '/admin/foober/deliveries', label: 'Foober Deliveries', icon: <Truck className={ICON_CLS} /> },
+      { href: '/admin/foober/pricing', label: 'Foober Pricing', icon: <Truck className={ICON_CLS} /> },
     ],
   },
   // ── 5. Content ──
