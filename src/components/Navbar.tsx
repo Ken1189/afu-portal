@@ -80,6 +80,7 @@ const moreServicesLinks: { label: string; href: string; icon: LucideIcon }[] = [
   { label: "Legal Assistance", href: "/services/legal-assistance", icon: Scale },
   { label: "Veterinary", href: "/services/veterinary", icon: Stethoscope },
   { label: "Farm Security", href: "/services/security", icon: Shield },
+  { label: "Find Services", href: "/directory", icon: Target },
   { label: "Advertise with Us", href: "/services/advertising", icon: Megaphone },
 ];
 
