@@ -133,14 +133,49 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Listen to auth state changes
   useEffect(() => {
-    // Hard safety timeout: ensure isLoading always resolves to false within 3s
+    // Hard safety timeout: ensure isLoading always resolves to false within 8s
     const safetyTimeout = setTimeout(() => {
       setIsLoading(false);
-      console.warn('[Auth] Safety timeout: forcing isLoading=false after 3s');
-    }, 3000);
+      console.warn('[Auth] Safety timeout: forcing isLoading=false after 8s');
+    }, 8000);
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, newSession) => {
+        console.log('[Auth] Event:', event, 'User:', newSession?.user?.id ?? 'none');
+
+        // CRITICAL: Ignore transient SIGNED_OUT events that fire during token
+        // refresh. Only clear user state on explicit sign-out or if we never
+        // had a user. This prevents the "bombing out" issue where users get
+        // randomly redirected to login during normal browsing.
+        if (event === 'SIGNED_OUT' && !newSession?.user) {
+          // Check if this is a real sign-out vs a token refresh glitch.
+          // If we currently HAVE a user, give Supabase 2s to send the
+          // TOKEN_REFRESHED event before actually clearing the user.
+          if (user) {
+            console.log('[Auth] SIGNED_OUT while user exists — waiting for token refresh...');
+            const refreshCheck = setTimeout(async () => {
+              const { data: { session: freshSession } } = await supabase.auth.getSession();
+              if (!freshSession?.user) {
+                // Genuinely signed out
+                console.log('[Auth] Confirmed sign-out — clearing user');
+                setSession(null);
+                setUser(null);
+                setProfile(null);
+                setIsLoading(false);
+              } else {
+                console.log('[Auth] Token refreshed — user still valid');
+              }
+            }, 2000);
+            return () => clearTimeout(refreshCheck);
+          }
+          // No existing user — this is initial load with no session
+          setSession(null);
+          setUser(null);
+          setProfile(null);
+          setIsLoading(false);
+          return;
+        }
+
         setSession(newSession);
         setUser(newSession?.user ?? null);
 
@@ -182,7 +217,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       clearTimeout(safetyTimeout);
       subscription.unsubscribe();
     };
-  }, [supabase, fetchProfile]);
+  }, [supabase, fetchProfile, user]);
 
   // ── Auth methods ──────────────────────────────────────────────────────
 

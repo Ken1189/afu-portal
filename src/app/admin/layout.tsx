@@ -726,7 +726,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     const timeout = setTimeout(() => {
       if (checkCompleted) return;
       setRoleChecked(true);
-      router.replace('/dashboard');
+      router.replace('/login?redirect=/admin');
     }, 10000);
 
     const checkRole = async () => {
@@ -736,7 +736,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           checkCompleted = true;
           clearTimeout(timeout);
           setRoleChecked(true);
-          router.replace('/dashboard');
+          router.replace('/login?redirect=/admin');
           return;
         }
         const data = await res.json();
@@ -752,14 +752,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           checkCompleted = true;
           clearTimeout(timeout);
           setRoleChecked(true);
-          router.replace('/dashboard');
+          router.replace('/login?redirect=/admin');
         }
       } catch {
         // Network error — redirect rather than auto-authorize
         checkCompleted = true;
         clearTimeout(timeout);
         setRoleChecked(true);
-        router.replace('/dashboard');
+        router.replace('/login?redirect=/admin');
       }
     };
 
