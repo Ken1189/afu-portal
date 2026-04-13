@@ -46,7 +46,6 @@ function FadeInWhenVisible({
   children,
   delay = 0,
   className = '',
-  direction = 'up',
 }: {
   children: React.ReactNode;
   delay?: number;
@@ -54,21 +53,16 @@ function FadeInWhenVisible({
   direction?: 'up' | 'down' | 'left' | 'right';
 }) {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.05 });
-  const offsets = {
-    up: { y: 40 },
-    down: { y: -40 },
-    left: { x: 40 },
-    right: { x: -40 },
-  };
+  const isInView = useInView(ref, { once: true, amount: 0.01 });
 
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, ...offsets[direction] }}
-      animate={isInView ? { opacity: 1, x: 0, y: 0 } : {}}
-      transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
+      initial={false}
+      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0.2, y: 20 }}
+      transition={{ duration: 0.5, delay, ease: 'easeOut' }}
       className={className}
+      style={{ opacity: 1 }}
     >
       {children}
     </motion.div>
@@ -83,18 +77,18 @@ function StaggerChildren({
   className?: string;
 }) {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.05 });
+  const isInView = useInView(ref, { once: true, amount: 0.01 });
 
   return (
     <motion.div
       ref={ref}
-      initial="hidden"
-      animate={isInView ? 'visible' : 'hidden'}
+      initial={false}
+      animate={isInView ? 'visible' : 'visible'}
       variants={{
         visible: { transition: { staggerChildren: 0.1 } },
-        hidden: {},
       }}
       className={className}
+      style={{ opacity: 1 }}
     >
       {children}
     </motion.div>
