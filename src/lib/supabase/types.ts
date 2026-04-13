@@ -13,7 +13,7 @@ export type PaymentStatus = 'pending' | 'completed' | 'failed' | 'refunded';
 export type PaymentMethod = 'card' | 'mobile_money' | 'bank_transfer' | 'cash';
 export type LoanStatus = 'draft' | 'submitted' | 'under_review' | 'approved' | 'disbursed' | 'repaying' | 'completed' | 'defaulted' | 'rejected';
 export type UserRole = 'member' | 'supplier' | 'admin' | 'super_admin' | 'warehouse_operator';
-export type ApplicationStatus = 'pending' | 'under_review' | 'approved' | 'rejected';
+export type ApplicationStatus = 'pending' | 'pending_verification' | 'under_review' | 'approved' | 'rejected';
 
 export interface Database {
   public: {

@@ -137,21 +137,26 @@ export function useApplications(page = 1, pageSize = 50) {
 
       if (insertError) return { data: null, error: insertError.message };
 
-      // Auto-approve free tier applications instantly
+      // Auto-approve free tier applications (sends verification email first)
+      let requiresVerification = false;
       if (data && app.requested_tier === 'free') {
         try {
-          await fetch('/api/applications/auto-approve-free', {
+          const res = await fetch('/api/applications/auto-approve-free', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ applicationId: data.id }),
           });
+          const body = await res.json();
+          if (body.requiresVerification) {
+            requiresVerification = true;
+          }
         } catch {
           // Silent — admin can approve manually if auto-approve fails
         }
       }
 
       await fetchApplications();
-      return { data: data as ApplicationRow | null, error: null };
+      return { data: data as ApplicationRow | null, error: null, requiresVerification };
     } catch (err) {
       captureError('useApplications.submitApplication', err);
       return { data: null, error: err instanceof Error ? err.message : 'Unknown error' };
@@ -160,7 +165,7 @@ export function useApplications(page = 1, pageSize = 50) {
 
   const stats = {
     total: totalCount,
-    pending: applications.filter(a => a.status === 'pending').length,
+    pending: applications.filter(a => a.status === 'pending' || a.status === 'pending_verification').length,
     underReview: applications.filter(a => a.status === 'under_review').length,
     approved: applications.filter(a => a.status === 'approved').length,
     rejected: applications.filter(a => a.status === 'rejected').length,

@@ -13,6 +13,7 @@ import Pagination from '@/components/admin/Pagination';
 
 const statusColors: Record<ApplicationStatus, string> = {
   pending: 'bg-amber-100 text-amber-700',
+  pending_verification: 'bg-purple-100 text-purple-700',
   under_review: 'bg-blue-100 text-blue-700',
   approved: 'bg-green-100 text-green-700',
   rejected: 'bg-red-100 text-red-600',
@@ -20,6 +21,7 @@ const statusColors: Record<ApplicationStatus, string> = {
 
 const statusLabels: Record<ApplicationStatus, string> = {
   pending: 'Pending',
+  pending_verification: 'Awaiting Email',
   under_review: 'Under Review',
   approved: 'Approved',
   rejected: 'Rejected',
@@ -27,6 +29,7 @@ const statusLabels: Record<ApplicationStatus, string> = {
 
 const statusIcons: Record<ApplicationStatus, React.ReactNode> = {
   pending: <Clock className="w-3 h-3" />,
+  pending_verification: <Clock className="w-3 h-3" />,
   under_review: <Eye className="w-3 h-3" />,
   approved: <CheckCircle2 className="w-3 h-3" />,
   rejected: <XCircle className="w-3 h-3" />,
@@ -254,6 +257,7 @@ export default function AdminApplicationsPage() {
   const tabCounts: Record<FilterTab, number> = {
     all: stats.total,
     pending: stats.pending,
+    pending_verification: applications.filter(a => a.status === 'pending_verification').length,
     under_review: stats.underReview,
     approved: stats.approved,
     rejected: stats.rejected,

@@ -294,13 +294,13 @@ export default function AdminDashboard() {
         const now = new Date();
         const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
 
-        const [membersRes, activeMembersRes, loansRes, loansDeployedRes, pendingAppsRes, totalAppsRes, approvedAppsRes, rejectedAppsRes, suppliersRes, ordersRes, productsRes, auditRes, ambassadorsRes, paymentsRes, signupsThisMonthRes, distinctCountriesRes] = await Promise.all([
+        const [membersRes, activeMembersRes, loansRes, loansDeployedRes, pendingAppsRes, totalAppsRes, approvedAppsRes, rejectedAppsRes, suppliersRes, ordersRes, productsRes, auditRes, ambassadorsRes, paymentsRes, signupsThisMonthRes, distinctCountriesRes, paymentsAmountsRes] = await Promise.all([
           // Total members from members table (not profiles)
           wrap(supabase.from('members').select('id', { count: 'exact', head: true })),
           // Active members
           wrap(supabase.from('members').select('id', { count: 'exact', head: true }).eq('status', 'active')),
           wrap(supabase.from('loans').select('id', { count: 'exact', head: true })),
-          wrap(supabase.from('loans').select('amount').in('status', ['active', 'disbursed'])),
+          wrap(supabase.from('loans').select('amount').in('status', ['active', 'disbursed']).limit(1000)),
           wrap(supabase.from('membership_applications').select('id', { count: 'exact', head: true }).eq('status', 'pending')),
           wrap(supabase.from('membership_applications').select('id', { count: 'exact', head: true })),
           wrap(supabase.from('membership_applications').select('id', { count: 'exact', head: true }).eq('status', 'approved')),
@@ -310,12 +310,14 @@ export default function AdminDashboard() {
           wrap(supabase.from('products').select('id, status', { count: 'exact' })),
           wrap(supabase.from('audit_log').select('id, action, entity_type, details, created_at').order('created_at', { ascending: false }).limit(10)),
           wrap(supabase.from('ambassadors').select('id', { count: 'exact', head: true }).eq('status', 'active')),
-          // Real payments data
-          wrap(supabase.from('payments').select('id, amount, status', { count: 'exact' })),
+          // Real payments data — count via head:true, amounts via limited query
+          wrap(supabase.from('payments').select('id', { count: 'exact', head: true })),
           // Signups this month (profiles created this month)
           wrap(supabase.from('profiles').select('id', { count: 'exact', head: true }).gte('created_at', startOfMonth)),
-          // Distinct countries from profiles
-          wrap(supabase.from('profiles').select('country')),
+          // Distinct countries from profiles (limited)
+          wrap(supabase.from('profiles').select('country').limit(500)),
+          // Payments amounts for revenue sum (limited)
+          wrap(supabase.from('payments').select('amount, status').limit(1000)),
         ]) as { data: unknown; count: number | null; error: unknown }[];
 
         const loansData = (loansDeployedRes.data || []) as { amount: number }[];
@@ -334,8 +336,8 @@ export default function AdminDashboard() {
         const productsData = (productsRes.data || []) as { status: string }[];
         const productsInStock = productsData.filter((p) => p.status === 'active' || p.status === 'in_stock').length;
 
-        // Real payments revenue (sum of completed payments)
-        const paymentsData = (paymentsRes.data || []) as { amount: number; status: string }[];
+        // Real payments revenue (sum of completed payments from limited amounts query)
+        const paymentsData = (paymentsAmountsRes.data || []) as { amount: number; status: string }[];
         const realRevenue = paymentsData
           .filter((p) => p.status === 'completed' || p.status === 'paid' || p.status === 'succeeded')
           .reduce((sum: number, p) => sum + (p.amount || 0), 0);

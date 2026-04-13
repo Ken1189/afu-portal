@@ -35,10 +35,11 @@ export async function GET() {
 
     const { data: payments, error: paymentsError } = await adminClient
       .from('payments')
-      .select('id, amount, purpose, member_id, created_at')
+      .select('id, amount, purpose, member_id, created_at, member:members(profile:profiles(country))')
       .eq('status', 'completed')
       .gte('created_at', cutoff)
-      .order('created_at', { ascending: true });
+      .order('created_at', { ascending: true })
+      .limit(5000);
 
     if (paymentsError) {
       return NextResponse.json({ error: paymentsError.message }, { status: 500 });
@@ -48,18 +49,14 @@ export async function GET() {
       return NextResponse.json({ byMonth: [], byCountry: [], byPurpose: [] });
     }
 
-    // Fetch member-to-country mapping
-    const memberIds = [...new Set(payments.map((p) => p.member_id))];
-    const { data: membersWithCountry } = await adminClient
-      .from('members')
-      .select('id, profile:profiles(country)')
-      .in('id', memberIds);
-
+    // Build member-to-country map from joined data (single query)
     const memberCountryMap = new Map<string, string>();
-    (membersWithCountry ?? []).forEach((m) => {
-      const prof = m.profile as unknown as { country: string | null } | null;
-      memberCountryMap.set(m.id, prof?.country || 'Unknown');
-    });
+    for (const payment of payments) {
+      if (!memberCountryMap.has(payment.member_id)) {
+        const member = payment.member as unknown as { profile: { country: string | null } | null } | null;
+        memberCountryMap.set(payment.member_id, member?.profile?.country || 'Unknown');
+      }
+    }
 
     // Aggregate by month
     const monthMap = new Map<string, number>();

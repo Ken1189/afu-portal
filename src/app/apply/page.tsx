@@ -45,6 +45,7 @@ export default function ApplyPage() {
   const { submitApplication } = useApplications();
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [requiresVerification, setRequiresVerification] = useState(false);
   const [tiers, setTiers] = useState<Record<Tier, { name: string; price: string; priceNote: string; desc: string }>>(FALLBACK_TIERS);
 
   // Fetch tier pricing from site_config
@@ -169,7 +170,7 @@ export default function ApplyPage() {
     const storedRef = referredBy || referralInput || localStorage.getItem("afu_referral_code") || sessionStorage.getItem("afu_referral_code") || undefined;
 
     // Submit to Supabase — include about and referral_code
-    const { error } = await submitApplication({
+    const { error, requiresVerification: needsVerify } = await submitApplication({
       full_name: `${formData.firstName} ${formData.lastName}`.trim(),
       email: formData.email,
       phone: formData.phone || undefined,
@@ -188,6 +189,11 @@ export default function ApplyPage() {
       setSubmitError(typeof error === 'string' ? error : (error as any)?.message || 'Something went wrong. Please try again.');
       return;
     }
+
+      // Track if free tier needs email verification
+      if (needsVerify) {
+        setRequiresVerification(true);
+      }
 
       // Register referral if there's a referral code
       if (storedRef) {
@@ -230,17 +236,27 @@ export default function ApplyPage() {
       <>
         <section className="bg-navy text-white py-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-white via-[#5DB347] to-[#6ABF4B] bg-clip-text text-transparent">You&apos;re In!</h1>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-white via-[#5DB347] to-[#6ABF4B] bg-clip-text text-transparent">
+              {selectedTier === 'free' && requiresVerification ? 'Almost There!' : "You\u0027re In!"}
+            </h1>
           </div>
         </section>
         <section className="py-16 bg-[#EBF7E5]/30">
           <div className="max-w-2xl mx-auto px-4 text-center">
             <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-10 shadow-lg shadow-[#5DB347]/5 border border-white/60">
-              <svg className="w-20 h-20 text-[#5DB347] mx-auto mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+              {selectedTier === 'free' && requiresVerification ? (
+                <svg className="w-20 h-20 text-[#5DB347] mx-auto mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              ) : (
+                <svg className="w-20 h-20 text-[#5DB347] mx-auto mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              )}
               <h2 className="text-3xl font-bold text-[#1B2A4A] mb-4">
-                {selectedTier === 'partner' ? 'Application Received!' : 'Welcome to the Family!'}
+                {selectedTier === 'partner' ? 'Application Received!'
+                  : selectedTier === 'free' && requiresVerification ? 'Check Your Email'
+                  : 'Welcome to the Family!'}
               </h2>
               {selectedTier === 'partner' ? (
                 <>
@@ -249,6 +265,18 @@ export default function ApplyPage() {
                   </p>
                   <p className="text-gray-500 mb-8">
                     We&apos;ll send you a tailored partnership proposal with pricing and next steps via email within 3-5 business days. Once approved, you&apos;ll get full access to your Supplier Portal.
+                  </p>
+                </>
+              ) : selectedTier === 'free' && requiresVerification ? (
+                <>
+                  <p className="text-gray-600 mb-2">
+                    We&apos;ve sent a verification email to <strong>{formData.email}</strong>.
+                  </p>
+                  <p className="text-gray-500 mb-4">
+                    Please check your inbox and click the verification link to activate your free membership. The link expires in 48 hours.
+                  </p>
+                  <p className="text-gray-400 text-sm mb-8">
+                    Did not receive the email? Check your spam folder, or contact us at info@africanfarmingunion.org.
                   </p>
                 </>
               ) : selectedTier === 'free' ? (

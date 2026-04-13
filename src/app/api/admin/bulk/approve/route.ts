@@ -132,47 +132,55 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // S3.1: Send notifications to all affected users
+    // S3.1: Send notifications to all affected users (batch fetch instead of N+1)
     if (entity === 'membership_applications' && updatedRows && updatedRows.length > 0) {
-      const notifyPromises = updatedRows.map(async (row) => {
-        try {
-          const { data: app } = await adminClient
-            .from('membership_applications')
-            .select('email, full_name, profile_id')
-            .eq('id', row.id)
-            .single();
+      try {
+        const { data: apps } = await adminClient
+          .from('membership_applications')
+          .select('id, email, full_name, profile_id')
+          .in('id', updatedRows.map(r => r.id));
 
-          if (app?.profile_id) {
-            const title = action === 'approve' ? 'Application Approved!' : 'Application Update';
-            const body = action === 'approve'
-              ? `Welcome${app.full_name ? `, ${app.full_name}` : ''}! Your membership application has been approved.`
-              : `Your membership application has been reviewed.${reason ? ` Note: ${reason}` : ''}`;
-            await notifyUser(app.profile_id, title, body, 'all', { type: 'system', actionUrl: '/dashboard' });
-          }
-        } catch { /* non-critical */ }
-      });
-      await Promise.allSettled(notifyPromises);
+        const appMap = new Map((apps ?? []).map(a => [a.id, a]));
+
+        const notifyPromises = updatedRows.map(async (row) => {
+          try {
+            const app = appMap.get(row.id);
+            if (app?.profile_id) {
+              const title = action === 'approve' ? 'Application Approved!' : 'Application Update';
+              const body = action === 'approve'
+                ? `Welcome${app.full_name ? `, ${app.full_name}` : ''}! Your membership application has been approved.`
+                : `Your membership application has been reviewed.${reason ? ` Note: ${reason}` : ''}`;
+              await notifyUser(app.profile_id, title, body, 'all', { type: 'system', actionUrl: '/dashboard' });
+            }
+          } catch { /* non-critical */ }
+        });
+        await Promise.allSettled(notifyPromises);
+      } catch { /* non-critical */ }
     }
 
     if (entity === 'loans' && updatedRows && updatedRows.length > 0) {
-      const notifyPromises = updatedRows.map(async (row) => {
-        try {
-          const { data: loan } = await adminClient
-            .from('loans')
-            .select('member_id, amount, loan_number')
-            .eq('id', row.id)
-            .single();
+      try {
+        const { data: loanRows } = await adminClient
+          .from('loans')
+          .select('id, member_id, amount, loan_number')
+          .in('id', updatedRows.map(r => r.id));
 
-          if (loan?.member_id) {
-            const title = action === 'approve' ? 'Loan Approved!' : 'Loan Application Update';
-            const body = action === 'approve'
-              ? `Your loan${loan.loan_number ? ` #${loan.loan_number}` : ''} for $${Number(loan.amount).toLocaleString()} has been approved!`
-              : `Your loan application has been reviewed.${reason ? ` Note: ${reason}` : ''}`;
-            await notifyUser(loan.member_id, title, body, 'all', { type: 'loan', actionUrl: '/dashboard/financing' });
-          }
-        } catch { /* non-critical */ }
-      });
-      await Promise.allSettled(notifyPromises);
+        const loanMap = new Map((loanRows ?? []).map(l => [l.id, l]));
+
+        const notifyPromises = updatedRows.map(async (row) => {
+          try {
+            const loan = loanMap.get(row.id);
+            if (loan?.member_id) {
+              const title = action === 'approve' ? 'Loan Approved!' : 'Loan Application Update';
+              const body = action === 'approve'
+                ? `Your loan${loan.loan_number ? ` #${loan.loan_number}` : ''} for $${Number(loan.amount).toLocaleString()} has been approved!`
+                : `Your loan application has been reviewed.${reason ? ` Note: ${reason}` : ''}`;
+              await notifyUser(loan.member_id, title, body, 'all', { type: 'loan', actionUrl: '/dashboard/financing' });
+            }
+          } catch { /* non-critical */ }
+        });
+        await Promise.allSettled(notifyPromises);
+      } catch { /* non-critical */ }
     }
 
     return NextResponse.json({ processed, failed });

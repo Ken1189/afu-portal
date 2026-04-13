@@ -29,10 +29,11 @@ export async function GET() {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    // Fetch all loans with member country info
+    // Fetch all loans with member country info via JOIN (single query)
     const { data: loans, error: loansError } = await adminClient
       .from('loans')
-      .select('id, amount, amount_repaid, status, due_date, disbursed_at, created_at, member_id');
+      .select('id, amount, amount_repaid, status, due_date, disbursed_at, created_at, member_id, member:members(profile:profiles(country))')
+      .limit(5000);
 
     if (loansError) {
       return NextResponse.json({ error: loansError.message }, { status: 500 });
@@ -49,18 +50,14 @@ export async function GET() {
       });
     }
 
-    // Fetch member-to-country mapping
-    const memberIds = [...new Set(loans.map((l) => l.member_id))];
-    const { data: membersWithCountry } = await adminClient
-      .from('members')
-      .select('id, profile:profiles(country)')
-      .in('id', memberIds);
-
+    // Build member-to-country map from joined data
     const memberCountryMap = new Map<string, string>();
-    (membersWithCountry ?? []).forEach((m) => {
-      const prof = m.profile as unknown as { country: string | null } | null;
-      memberCountryMap.set(m.id, prof?.country || 'Unknown');
-    });
+    for (const loan of loans) {
+      if (!memberCountryMap.has(loan.member_id)) {
+        const member = loan.member as unknown as { profile: { country: string | null } | null } | null;
+        memberCountryMap.set(loan.member_id, member?.profile?.country || 'Unknown');
+      }
+    }
 
     const now = new Date();
     const activeStatuses = ['active', 'disbursed', 'repaying', 'overdue', 'defaulted'];

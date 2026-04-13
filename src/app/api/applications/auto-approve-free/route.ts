@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
+import { sendEmail } from '@/lib/email';
 
 /**
  * POST /api/applications/auto-approve-free
- * Auto-approves free tier applications without admin auth.
- * Creates auth user, profile, and member record instantly.
+ * For free tier applications, sends a verification email first.
+ * If the email is already verified, auto-approves immediately.
  */
 export async function POST(req: Request) {
   // Rate limit: max 3 auto-approvals per IP per minute
@@ -30,6 +31,72 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Not a free tier application' }, { status: 400 });
   }
 
+  // If email is already verified, proceed with auto-approval
+  if (app.email_verified) {
+    return autoApprove(svc, app, applicationId);
+  }
+
+  // Generate verification token and send email
+  const token = crypto.randomUUID();
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://africanfarmingunion.org';
+  const verifyUrl = `${baseUrl}/api/applications/verify-email?token=${token}`;
+
+  // Save token and update status to pending_verification
+  await svc
+    .from('membership_applications')
+    .update({
+      status: 'pending_verification',
+      verification_token: token,
+      verification_sent_at: new Date().toISOString(),
+    })
+    .eq('id', applicationId);
+
+  // Send verification email
+  try {
+    await sendEmail(
+      app.email,
+      'Verify your email — African Farming Union',
+      `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="text-align: center; margin-bottom: 30px;">
+          <h1 style="color: #1B2A4A; margin: 0;">African Farming Union</h1>
+        </div>
+        <h2 style="color: #1B2A4A;">Welcome, ${app.full_name}!</h2>
+        <p style="color: #333; font-size: 16px; line-height: 1.6;">
+          Thank you for joining the African Farming Union. Please verify your email address to activate your free membership.
+        </p>
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${verifyUrl}" style="background-color: #5DB347; color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; display: inline-block;">
+            Verify My Email
+          </a>
+        </div>
+        <p style="color: #666; font-size: 14px; line-height: 1.6;">
+          If the button above does not work, copy and paste this link into your browser:<br/>
+          <a href="${verifyUrl}" style="color: #5DB347; word-break: break-all;">${verifyUrl}</a>
+        </p>
+        <p style="color: #999; font-size: 12px; margin-top: 30px; border-top: 1px solid #eee; padding-top: 15px;">
+          This link expires in 48 hours. If you did not sign up for African Farming Union, you can safely ignore this email.
+        </p>
+      </div>
+      `,
+    );
+  } catch (emailErr) {
+    console.error('[auto-approve-free] Failed to send verification email:', emailErr);
+    // Don't fail the request — admin can resend or approve manually
+  }
+
+  return NextResponse.json({ success: true, requiresVerification: true });
+}
+
+/**
+ * Auto-approve: creates auth user, profile, and member record.
+ * Extracted so it can be called from both this route and verify-email.
+ */
+export async function autoApprove(
+  svc: Awaited<ReturnType<typeof createAdminClient>>,
+  app: Record<string, any>,
+  applicationId: string,
+) {
   // Create auth user
   const tempPassword = 'AFU-' + Math.random().toString(36).slice(2, 10);
   const { data: newUser, error: authErr } = await svc.auth.admin.createUser({

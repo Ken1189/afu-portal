@@ -78,15 +78,15 @@ export default function AdminAnalyticsPage() {
         });
 
       const [memRes, appRes, payRes, trdRes, ambRes, profRes] = await Promise.all([
-        wrap('members', supabase.from('members').select('id, profile_id, tier, status, created_at').order('created_at', { ascending: false })),
+        wrap('members', supabase.from('members').select('id, profile_id, tier, status, created_at').order('created_at', { ascending: false }).limit(1000)),
         wrap('membership_applications', dateFrom
-          ? supabase.from('membership_applications').select('id, full_name, email, country, requested_tier, status, phone, created_at').gte('created_at', dateFrom).order('created_at', { ascending: false })
-          : supabase.from('membership_applications').select('id, full_name, email, country, requested_tier, status, phone, created_at').order('created_at', { ascending: false })
+          ? supabase.from('membership_applications').select('id, full_name, email, country, requested_tier, status, phone, created_at').gte('created_at', dateFrom).order('created_at', { ascending: false }).limit(1000)
+          : supabase.from('membership_applications').select('id, full_name, email, country, requested_tier, status, phone, created_at').order('created_at', { ascending: false }).limit(1000)
         ),
         wrap('payments', supabase.from('payments').select('id, amount, currency, status, type, created_at').order('created_at', { ascending: false }).limit(500)),
         wrap('trade_orders', supabase.from('trade_orders').select('id, order_number, order_type, commodity, quantity, target_price, country, status, created_at').order('created_at', { ascending: false }).limit(500)),
-        wrap('ambassadors', supabase.from('ambassadors').select('id, full_name, country, status, created_at').order('created_at', { ascending: false })),
-        wrap('profiles', supabase.from('profiles').select('id, country, role, created_at').order('created_at', { ascending: false })),
+        wrap('ambassadors', supabase.from('ambassadors').select('id, full_name, country, status, created_at').order('created_at', { ascending: false }).limit(1000)),
+        wrap('profiles', supabase.from('profiles').select('id, country, role, created_at').order('created_at', { ascending: false }).limit(1000)),
       ]) as { data: unknown }[];
 
       if (failures.length > 0) {
