@@ -134,23 +134,7 @@ export default function PortalSwitcherDropdown({
     available.find((p) => p.key === 'public') ||
     available[0];
 
-  // ── Debug log so Devon can verify in DevTools ────────────────────────
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-       
-      console.log('[PortalSwitcher]', {
-        userId: user?.id ?? null,
-        roles: r,
-        capabilities: c,
-        isAdmin,
-        hasNoRoles,
-        availableKeys: available.map((p) => p.key),
-        currentPortalKey: currentPortal?.key,
-        pathname,
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roles, capabilities, pathname, user]);
+
 
   const triggerColors =
     variant === 'dark'

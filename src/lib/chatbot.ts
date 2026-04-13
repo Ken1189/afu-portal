@@ -118,7 +118,7 @@ export async function getChatResponse(
   // --- Countries ---
   if (/countr|where|africa|zimbabwe|uganda|kenya|nigeria|ghana|tanzania|zambia|mozambique|botswana|south\s*africa|ethiopia/.test(lowerMessage)) {
     return {
-      text: "AFU operates across 20 African countries:\n\nZimbabwe, Botswana, Kenya, Tanzania, South Africa, Nigeria, Ghana, Uganda, Zambia, Mozambique, Ethiopia, Malawi, Rwanda, DRC, Senegal, Cameroon, Angola, Madagascar, Ivory Coast, and Sudan.\n\nWe're building local infrastructure and partnerships in each market. Visit /countries to learn more.",
+      text: "AFU operates across 20 African countries:\n\nBotswana, Zimbabwe, Tanzania, Kenya, Nigeria, Zambia, Mozambique, South Africa, Ghana, Uganda, Sierra Leone, Egypt, Ethiopia, Malawi, Namibia, Republic of Guinea, Guinea-Bissau, Liberia, Mali, and Ivory Coast.\n\nWe're building local infrastructure and partnerships in each market. Visit /countries to learn more.",
       suggestions: ['Our services', 'Membership options', 'Contact us'],
     };
   }
@@ -128,6 +128,22 @@ export async function getChatResponse(
     return {
       text: "AFU connects farmers with qualified veterinary professionals across Africa.\n\n\u2022 **Find a vet** \u2014 Browse our directory at /directory/vets\n\u2022 **Register as a vet** \u2014 Apply at /services/vet/apply to join our network\n\u2022 **Request vet services** \u2014 Farmers can submit service requests at /farm/service-requests\n\nOur vet network covers livestock health, vaccinations, breeding support, and emergency care.",
       suggestions: ['Find a vet', 'Apply as a vet', 'Our services', 'Contact us'],
+    };
+  }
+
+  // --- Marketplace / Shop ---
+  if (/marketplace|shop|buy.*seed|buy.*fertiliz|buy.*equipment|buy.*input|shop.*input/.test(lowerMessage)) {
+    return {
+      text: "AFU's Marketplace lets farmers buy seeds, fertilizer, pesticides, equipment, and more from verified suppliers.\n\n\u2022 **Browse marketplace** \u2014 /farm/marketplace (log in to access)\n\u2022 **Become a supplier** \u2014 /supplier/apply\n\nMembers get discounted prices on all products.",
+      suggestions: ['Browse marketplace', 'Become a supplier', 'Membership options', 'Contact us'],
+    };
+  }
+
+  // --- Exchange ---
+  if (/exchange|credit.*trade|barter|swap.*goods|trade.*credit/.test(lowerMessage)) {
+    return {
+      text: "AFU's Exchange is a credit-based trading system where farmers can list surplus produce, equipment for hire, and storage space.\n\n\u2022 **Access exchange** \u2014 /farm/exchange (log in to access)\n\nBuy and sell using AFU credits \u2014 no cash needed.",
+      suggestions: ['Access exchange', 'Marketplace', 'Our services', 'Contact us'],
     };
   }
 

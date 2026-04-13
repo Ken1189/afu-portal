@@ -306,7 +306,7 @@ async function executeAction(
       }
 
       default:
-        console.log(`Unknown automation action: ${rule.action_type}`);
+        console.warn(`[Automations] Unknown action: ${rule.action_type}`);
     }
   } catch (err) {
     console.error(`Automation action ${rule.action_type} failed:`, err);
