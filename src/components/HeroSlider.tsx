@@ -129,7 +129,7 @@ export default function HeroSlider({ memberCount = 0, badgeText = 'Active across
         <div className="max-w-3xl">
           <div className="inline-flex items-center gap-2 bg-[#5DB347]/20 backdrop-blur-sm border border-[#5DB347]/30 text-[#EBF7E5] px-4 py-1.5 rounded-full text-sm font-medium mb-6">
             <span className="w-2 h-2 bg-[#5DB347] rounded-full animate-pulse-soft" />
-            {badgeText}
+            {badgeText && !badgeText.toLowerCase().includes('phase') ? badgeText : 'Active across 20 African countries'}
           </div>
 
           <AnimatePresence mode="wait">

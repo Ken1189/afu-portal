@@ -54,7 +54,7 @@ function FadeInWhenVisible({
   direction?: 'up' | 'down' | 'left' | 'right';
 }) {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: '-60px' });
+  const isInView = useInView(ref, { once: true, amount: 0.05 });
   const offsets = {
     up: { y: 40 },
     down: { y: -40 },
@@ -83,7 +83,7 @@ function StaggerChildren({
   className?: string;
 }) {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: '-40px' });
+  const isInView = useInView(ref, { once: true, amount: 0.05 });
 
   return (
     <motion.div
@@ -140,42 +140,42 @@ const FALLBACK_SERVICES = [
     title: 'Financing',
     desc: 'Working capital, invoice finance, and crop financing from smallholder to commercial scale.',
     link: '/services/financing',
-    img: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&h=500&q=80&auto=format&fit=crop',
+    img: 'https://images.unsplash.com/photo-1604594849809-dfedbc827105?w=800&h=500&q=80&auto=format&fit=crop',
   },
   {
     icon: Cog,
     title: 'Inputs & Equipment',
     desc: 'Tractors, drones, irrigation, seeds, and fertilizers. Bulk procurement at better prices.',
     link: '/services/inputs',
-    img: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=800&h=500&fit=crop',
+    img: 'https://images.unsplash.com/photo-1589923188900-85dae523342b?w=800&h=500&fit=crop',
   },
   {
     icon: Factory,
     title: 'Processing Hubs',
     desc: 'Milling, drying, cold chain, and packaging. Value-addition at source.',
     link: '/services/processing',
-    img: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=800&h=500&q=80&auto=format&fit=crop',
+    img: 'https://images.unsplash.com/photo-1473093295043-cdd812d0e601?w=800&h=500&q=80&auto=format&fit=crop',
   },
   {
     icon: ShieldCheck,
     title: 'Guaranteed Offtake',
     desc: 'Pre-arranged buyers and distribution. No more selling cheap or wasting crops.',
     link: '/services/offtake',
-    img: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=800&h=500&fit=crop',
+    img: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&h=500&fit=crop',
   },
   {
     icon: CircleDollarSign,
     title: 'Trade Finance',
     desc: 'SBLCs, Letters of Credit, export pre-financing, and FX services via our banking partners.',
     link: '/services/trade-finance',
-    img: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&h=500&fit=crop',
+    img: 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=800&h=500&fit=crop',
   },
   {
     icon: GraduationCap,
     title: 'Training & Certification',
     desc: 'Vocational partnerships to build scalable farmer capacity, compliance, and export readiness.',
     link: '/services/training',
-    img: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800&h=500&fit=crop',
+    img: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=800&h=500&fit=crop',
   },
 ];
 
