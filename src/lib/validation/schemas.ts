@@ -12,7 +12,7 @@ export const currency = z.enum([
 ]);
 
 export const membershipTier = z.enum([
-  'student', 'new_enterprise', 'smallholder', 'farmer_grower', 'commercial',
+  'free', 'student', 'new_enterprise', 'smallholder', 'farmer_grower', 'commercial', 'enterprise', 'partner',
 ]);
 
 export const paginationParams = z.object({
