@@ -404,13 +404,17 @@ export default function MemberDetailPage() {
       // Redirect based on the target user's role
       const role = data.impersonation.role;
       const redirectMap: Record<string, string> = {
-        member: '/dashboard',
+        farmer: '/farm',
+        member: '/farm',
         supplier: '/supplier',
+        ambassador: '/ambassador',
+        investor: '/investor',
         admin: '/admin',
         super_admin: '/admin',
         warehouse_operator: '/warehouse',
+        driver: '/driver',
       };
-      router.push(redirectMap[role] || '/dashboard');
+      router.push(redirectMap[role] || '/farm');
     } catch (err) {
       showError('Impersonation request failed');
     } finally {
