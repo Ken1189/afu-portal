@@ -273,8 +273,11 @@ function DesktopServicesDropdown({ openDropdown, handleMouseEnter, handleMouseLe
 }
 
 function DesktopCommunityDropdown({ openDropdown, setOpenDropdown }: DropdownProps) {
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const handleEnter = () => { if (timerRef.current) clearTimeout(timerRef.current); setOpenDropdown("community"); };
+  const handleLeave = () => { timerRef.current = setTimeout(() => setOpenDropdown(null), 200); };
   return (
-    <div className="relative">
+    <div className="relative" onMouseEnter={handleEnter} onMouseLeave={handleLeave}>
       <button
         onClick={() => setOpenDropdown(openDropdown === "community" ? null : "community")}
         className={`flex items-center gap-1 text-sm font-medium px-3 py-2 rounded-lg transition-colors ${
@@ -292,7 +295,7 @@ function DesktopCommunityDropdown({ openDropdown, setOpenDropdown }: DropdownPro
             animate="visible"
             exit="exit"
             transition={{ duration: 0.15 }}
-            className="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50"
+            className="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50 max-h-[70vh] overflow-y-auto"
           >
             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-4 pt-1 pb-2">Community</p>
             {communityLinks.map((link) => {
@@ -315,8 +318,11 @@ function DesktopCommunityDropdown({ openDropdown, setOpenDropdown }: DropdownPro
 }
 
 function DesktopExploreDropdown({ openDropdown, setOpenDropdown }: DropdownProps) {
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const handleEnter = () => { if (timerRef.current) clearTimeout(timerRef.current); setOpenDropdown("explore"); };
+  const handleLeave = () => { timerRef.current = setTimeout(() => setOpenDropdown(null), 200); };
   return (
-    <div className="relative">
+    <div className="relative" onMouseEnter={handleEnter} onMouseLeave={handleLeave}>
       <button
         onClick={() => setOpenDropdown(openDropdown === "explore" ? null : "explore")}
         className={`flex items-center gap-1 text-sm font-medium px-3 py-2 rounded-lg transition-colors ${
@@ -334,7 +340,7 @@ function DesktopExploreDropdown({ openDropdown, setOpenDropdown }: DropdownProps
             animate="visible"
             exit="exit"
             transition={{ duration: 0.15 }}
-            className="absolute top-full right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50"
+            className="absolute top-full right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50 max-h-[70vh] overflow-y-auto"
           >
             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-4 pt-1 pb-2">Explore</p>
             {exploreLinks.map((link) => {
