@@ -127,8 +127,28 @@ export default function FarmShowcaseAdmin() {
   const [form, setForm] = useState<FarmFormData>(EMPTY_FORM);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [existingMembers, setExistingMembers] = useState<{ id: string; name: string; country: string }[]>([]);
+  const [selectedMemberId, setSelectedMemberId] = useState<string>('');
 
   const supabase = createClient();
+
+  // Fetch existing members for the dropdown
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase
+        .from('members')
+        .select('id, profile:profiles(full_name, country)')
+        .eq('status', 'active')
+        .limit(200);
+      if (data) {
+        setExistingMembers(data.map((m: any) => ({
+          id: m.id,
+          name: m.profile?.full_name || 'Unknown',
+          country: m.profile?.country || '',
+        })));
+      }
+    })();
+  }, [supabase]);
 
   /* ─── Fetch ─── */
   const fetchFarms = useCallback(async () => {
@@ -223,9 +243,34 @@ export default function FarmShowcaseAdmin() {
         if (error) throw error;
         setToast({ message: 'Farm updated successfully', type: 'success' });
       } else {
+        // Use selected existing member or auto-create one
+        let memberId: string | null = selectedMemberId || null;
+
+        if (!memberId) {
+          // Auto-create a placeholder member for this showcase farm
+          const email = `${slug}@afu-showcase.farm`;
+          const { data: authUser } = await supabase.auth.admin.createUser({
+            email, password: 'AFU-Showcase-' + Date.now(), email_confirm: true,
+          }).catch(() => ({ data: null })) as { data: { user?: { id: string } } | null };
+
+          let userId = authUser?.user?.id;
+          if (!userId) {
+            const { data: users } = await supabase.auth.admin.listUsers();
+            userId = users?.users?.find((u: { email?: string }) => u.email === email)?.id;
+          }
+
+          if (userId) {
+            await supabase.from('profiles').upsert({ id: userId, full_name: form.display_name.trim(), email, country: form.country, role: 'member' }, { onConflict: 'id' });
+            const { data: member } = await supabase.from('members').upsert({ profile_id: userId, tier: 'partner', status: 'active', country: form.country }, { onConflict: 'profile_id' }).select('id').single();
+            memberId = member?.id || null;
+          }
+        }
+
+        if (!memberId) throw new Error('Could not create member record for showcase farm');
+
         const { error } = await supabase
           .from('farmer_public_profiles')
-          .insert(payload);
+          .insert({ ...payload, member_id: memberId });
         if (error) throw error;
         setToast({ message: 'Farm added successfully', type: 'success' });
       }
@@ -468,6 +513,30 @@ export default function FarmShowcaseAdmin() {
             </div>
 
             <div className="p-6 space-y-4">
+              {/* Link to existing farmer (optional) */}
+              {!editingId && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Link to Existing Farmer (optional)</label>
+                  <select
+                    value={selectedMemberId}
+                    onChange={(e) => {
+                      setSelectedMemberId(e.target.value);
+                      const member = existingMembers.find(m => m.id === e.target.value);
+                      if (member) {
+                        setForm({ ...form, display_name: member.name, country: member.country, slug: member.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') });
+                      }
+                    }}
+                    className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:border-[#5DB347]"
+                  >
+                    <option value="">Create new (or leave blank to auto-create)</option>
+                    {existingMembers.map((m) => (
+                      <option key={m.id} value={m.id}>{m.name} — {m.country}</option>
+                    ))}
+                  </select>
+                  <p className="text-[10px] text-gray-400 mt-1">Choose a farmer from the members list, or leave blank to create a standalone showcase entry.</p>
+                </div>
+              )}
+
               {/* Name */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Farm / Farmer Name *</label>

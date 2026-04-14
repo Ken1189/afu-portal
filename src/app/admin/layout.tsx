@@ -170,7 +170,6 @@ const navGroups: NavGroup[] = [
     links: [
       { href: '/admin/farm-overview', label: 'Operations Overview', icon: <Gauge className={ICON_CLS} /> },
       { href: '/admin/products', label: 'Products Catalogue', icon: <Package className={ICON_CLS} /> },
-      { href: '/admin/farm-showcase', label: 'Farm Showcase', icon: <Sprout className={ICON_CLS} /> },
       { href: '/admin/crops', label: 'Crops', icon: <Sprout className={ICON_CLS} /> },
       { href: '/admin/livestock', label: 'Livestock', icon: <Beef className={ICON_CLS} /> },
       { href: '/admin/equipment', label: 'Equipment', icon: <Wrench className={ICON_CLS} /> },
@@ -205,6 +204,7 @@ const navGroups: NavGroup[] = [
       { href: '/admin/announcements', label: 'Announcements', icon: <Bell className={ICON_CLS} /> },
       { href: '/admin/hero-slides', label: 'Homepage Slides', icon: <Layers className={ICON_CLS} /> },
       { href: '/admin/services', label: 'Services Pages', icon: <Wrench className={ICON_CLS} /> },
+      { href: '/admin/farm-showcase', label: 'Partner Farms', icon: <Sprout className={ICON_CLS} /> },
       { href: '/admin/countries', label: 'Countries', icon: <Globe className={ICON_CLS} /> },
       { href: '/admin/legal', label: 'Legal Pages', icon: <Scale className={ICON_CLS} /> },
       { href: '/admin/project-submissions', label: 'Project Submissions', icon: <Sprout className={ICON_CLS} /> },

@@ -150,7 +150,7 @@ export default function FarmsPage() {
           .order('display_name');
 
         if (error || !data || data.length === 0) {
-          setFarms(DUMMY_FARMERS);
+          setFarms([]);
         } else {
           setFarms(data);
         }
