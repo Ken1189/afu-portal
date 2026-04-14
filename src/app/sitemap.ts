@@ -56,6 +56,40 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Countries
     { path: '/countries', priority: 0.8, freq: 'weekly' },
 
+    // Logistics
+    { path: '/foober', priority: 0.8, freq: 'weekly' },
+    { path: '/foober/request', priority: 0.7, freq: 'monthly' },
+    { path: '/driver/apply', priority: 0.7, freq: 'monthly' },
+
+    // Directories
+    { path: '/directory', priority: 0.8, freq: 'weekly' },
+    { path: '/directory/traders', priority: 0.7, freq: 'weekly' },
+    { path: '/directory/offtakers', priority: 0.7, freq: 'weekly' },
+    { path: '/directory/processing', priority: 0.7, freq: 'weekly' },
+    { path: '/directory/vets', priority: 0.7, freq: 'weekly' },
+
+    // Farming sectors
+    { path: '/farming', priority: 0.8, freq: 'weekly' },
+    { path: '/farming/crops', priority: 0.7, freq: 'monthly' },
+    { path: '/farming/livestock', priority: 0.7, freq: 'monthly' },
+    { path: '/farming/forestry', priority: 0.6, freq: 'monthly' },
+    { path: '/farming/game-farming', priority: 0.6, freq: 'monthly' },
+    { path: '/commodities', priority: 0.8, freq: 'weekly' },
+    { path: '/commodities/signup', priority: 0.7, freq: 'monthly' },
+
+    // Media & content
+    { path: '/gallery', priority: 0.7, freq: 'weekly' },
+    { path: '/media', priority: 0.7, freq: 'weekly' },
+
+    // Apply forms
+    { path: '/services/vet/apply', priority: 0.7, freq: 'monthly' },
+    { path: '/services/offtake/apply', priority: 0.7, freq: 'monthly' },
+    { path: '/services/processing/apply', priority: 0.7, freq: 'monthly' },
+    { path: '/supplier/apply', priority: 0.7, freq: 'monthly' },
+    { path: '/ambassador/apply', priority: 0.7, freq: 'monthly' },
+    { path: '/advisors/apply', priority: 0.6, freq: 'monthly' },
+    { path: '/projects/submit', priority: 0.6, freq: 'monthly' },
+
     // Community
     { path: '/jobs', priority: 0.8, freq: 'weekly' },
     { path: '/ambassadors', priority: 0.7, freq: 'monthly' },

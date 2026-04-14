@@ -690,9 +690,12 @@ export default function Home() {
       (typeof content.hero_bg_image === 'string' && content.hero_bg_image) ||
       hero.hero_bg_image ||
       HERO_DEFAULTS.hero_bg_image,
-    hero_badge_text:
-      (typeof content.hero_badge_text === 'string' && content.hero_badge_text) ||
-      'Active across 20 African countries',
+    hero_badge_text: (() => {
+      const dbBadge = typeof content.hero_badge_text === 'string' ? content.hero_badge_text : '';
+      // Override any "Phase 1" text — we're active across 20 countries now
+      if (!dbBadge || dbBadge.toLowerCase().includes('phase')) return 'Active across 20 African countries';
+      return dbBadge;
+    })(),
   };
 
   return (

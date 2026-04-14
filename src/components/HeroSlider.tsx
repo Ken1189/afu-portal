@@ -120,7 +120,9 @@ export default function HeroSlider({ memberCount = 0, badgeText = 'Active across
             className="object-cover"
             priority={current === 0}
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-navy-dark/90 via-navy/80 to-navy/50" />
+          {/* Solid navy fallback + gradient overlay ensures text is always readable */}
+          <div className="absolute inset-0 bg-[#1B2A4A]" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0f1a30]/95 via-[#1B2A4A]/85 to-[#1B2A4A]/60" />
         </motion.div>
       </AnimatePresence>
 
