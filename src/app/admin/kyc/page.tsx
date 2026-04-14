@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
+import { createClient } from '@/lib/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ShieldCheck,
@@ -228,17 +229,48 @@ function exportPendingList(records: KycRecord[]) {
 // ── Component ────────────────────────────────────────────────────────────────
 
 export default function KycManagementPage() {
-  const [records, setRecords] = useState<KycRecord[]>(FALLBACK_RECORDS);
+  const [records, setRecords] = useState<KycRecord[]>([]);
   const [activeTab, setActiveTab] = useState<KycStatus | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRecord, setSelectedRecord] = useState<KycRecord | null>(null);
   const [reviewNotes, setReviewNotes] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [previewDoc, setPreviewDoc] = useState<{ url: string; type: string; name: string } | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const showSuccess = useCallback((msg: string) => {
     setSuccessMsg(msg);
     setTimeout(() => setSuccessMsg(''), 3000);
+  }, []);
+
+  // Fetch real KYC data from Supabase
+  useEffect(() => {
+    const supabase = createClient();
+    (async () => {
+      try {
+        const { data } = await supabase
+          .from('kyc_verifications')
+          .select('*, profile:profiles(full_name, email, country, avatar_url)')
+          .order('created_at', { ascending: false });
+
+        if (data && data.length > 0) {
+          const mapped: KycRecord[] = data.map((r: any) => ({
+            id: r.id,
+            name: r.profile?.full_name || 'Unknown',
+            email: r.profile?.email || '',
+            type: 'farmer' as MemberType,
+            country: r.profile?.country || '',
+            submittedDate: r.created_at || new Date().toISOString(),
+            status: (r.status || 'pending') as KycStatus,
+            risk: (r.risk_score || 'low') as RiskScore,
+            documents: Array.isArray(r.documents) ? r.documents : [],
+            notes: r.admin_notes || r.notes || '',
+          }));
+          setRecords(mapped);
+        }
+      } catch { /* table may not exist — show empty */ }
+      setLoading(false);
+    })();
   }, []);
 
   const filtered = useMemo(() => {
@@ -264,14 +296,18 @@ export default function KycManagementPage() {
     return { total, pending, verified, approvalRate, avgProcessingTime: '2.4 days' };
   }, [records]);
 
-  const handleApprove = (id: string) => {
+  const handleApprove = async (id: string) => {
+    const supabase = createClient();
+    await supabase.from('kyc_verifications').update({ status: 'verified', admin_notes: reviewNotes || null, reviewed_at: new Date().toISOString() }).eq('id', id);
     setRecords(prev => prev.map(r => r.id === id ? { ...r, status: 'verified' as KycStatus, notes: reviewNotes || r.notes } : r));
     setSelectedRecord(null);
     setReviewNotes('');
     showSuccess(`KYC application ${id} approved successfully`);
   };
 
-  const handleReject = (id: string) => {
+  const handleReject = async (id: string) => {
+    const supabase = createClient();
+    await supabase.from('kyc_verifications').update({ status: 'rejected', admin_notes: reviewNotes || null, reviewed_at: new Date().toISOString() }).eq('id', id);
     setRecords(prev => prev.map(r => r.id === id ? { ...r, status: 'rejected' as KycStatus, notes: reviewNotes || r.notes } : r));
     setSelectedRecord(null);
     setReviewNotes('');

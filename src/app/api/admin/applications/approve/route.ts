@@ -307,6 +307,17 @@ export async function POST(request: Request) {
       console.error('Failed to update application status:', updateError.message);
     }
 
+    // Create in-app notification for the approved user
+    try {
+      await svc.from('notifications').insert({
+        user_id: userId,
+        title: 'Application Approved!',
+        message: `Welcome to AFU! Your ${application.requested_tier || 'membership'} application has been approved. Explore your dashboard to get started.`,
+        type: 'system',
+        link: '/farm',
+      });
+    } catch { /* notifications table may not exist */ }
+
     // Emit cross-system event (fire-and-forget)
     emitEventAsync({
       type: 'APPLICATION_APPROVED',

@@ -270,7 +270,7 @@ export default function PaymentsPage() {
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [payments, setPayments] = useState<PaymentRecord[]>(FALLBACK_PAYMENTS);
+  const [payments, setPayments] = useState<PaymentRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [totalCount, setTotalCount] = useState(0);
   const [page, setPage] = useState(1);
@@ -288,7 +288,7 @@ export default function PaymentsPage() {
           .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
 
         if (error || !data || data.length === 0) {
-          setPayments(FALLBACK_PAYMENTS);
+          setPayments([]);
         } else {
           setTotalCount(count ?? 0);
           const mapped: PaymentRecord[] = data.map((row: Record<string, unknown>) => {

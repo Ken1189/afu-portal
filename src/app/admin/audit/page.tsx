@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
+import { createClient } from '@/lib/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Shield,
@@ -337,39 +338,44 @@ export default function AuditPage() {
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_LOAD);
   const [liveAudit, setLiveAudit] = useState<AuditEntry[] | null>(null);
 
-  // Fetch live audit data
+  // Fetch live audit data from audit_log table
   useEffect(() => {
-    fetch('/api/admin/financial')
-      .then(res => res.json())
-      .then(data => {
-        if (data?.audit?.length) {
-          // Map API audit entries to the existing AuditEntry shape
-          const mapped: AuditEntry[] = data.audit.map((a: Record<string, unknown>, i: number) => {
+    const supabase = createClient();
+    (async () => {
+      try {
+        const { data } = await supabase
+          .from('audit_log')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(200);
+
+        if (data && data.length > 0) {
+          const mapped: AuditEntry[] = data.map((a: Record<string, unknown>, i: number) => {
             const details = (a.details as Record<string, string>) || {};
             return {
               id: (a.id as string) || `live-${i}`,
               timestamp: (a.created_at as string) || new Date().toISOString(),
               userId: (a.user_id as string) || 'system',
-              userName: details.user_name || 'System',
+              userName: details.user_name || details.email || 'System',
               userRole: (details.user_role || 'admin') as AuditEntry['userRole'],
               action: (a.action as AuditAction) || 'settings_changed',
               entityType: ((a.entity_type as string) || 'system') as AuditEntry['entityType'],
               entityId: (a.entity_id as string) || '',
               entityName: details.entity_name || `${a.entity_type || 'system'}`,
               description: (a.description as string) || `${a.action} on ${a.entity_type}`,
-              severity: (a.severity as AuditSeverity) || 'info',
-              ipAddress: (a.ip_address as string) || '—',
+              severity: (details.severity as AuditSeverity) || 'info',
+              ipAddress: (details.ip_address as string) || '—',
               metadata: details,
             };
           });
           setLiveAudit(mapped);
         }
-      })
-      .catch(() => { /* fallback to mock */ });
+      } catch { /* fallback to empty */ }
+    })();
   }, []);
 
-  // Use live data or mock
-  const auditEntries = liveAudit?.length ? liveAudit : mockAuditEntries;
+  // Use live data or empty state (no more mock data)
+  const auditEntries = liveAudit ?? [];
 
   // ── Computed stats ────────────────────────────────────────────────────
 
