@@ -80,6 +80,11 @@ export default function ImageUploader({
     }
   }, [bucket, mediaBrowsePath]);
 
+  // Re-fetch when folder path changes
+  useEffect(() => {
+    if (showMediaBrowser) fetchMedia();
+  }, [mediaBrowsePath, showMediaBrowser, fetchMedia]);
+
   const handleFile = async (file: File) => {
     setError(null);
     if (!file.type.startsWith('image/')) {
