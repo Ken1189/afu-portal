@@ -131,9 +131,9 @@ export default function MaterialsPage() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [downloadToast, setDownloadToast] = useState<{ type: 'success' | 'info' | 'error'; text: string } | null>(null);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
-  const [assets, setAssets] = useState<MaterialAsset[]>(FALLBACK_ASSETS);
-  const [emailTemplates, setEmailTemplates] = useState(FALLBACK_EMAIL_TEMPLATES);
-  const [socialTemplates, setSocialTemplates] = useState(FALLBACK_SOCIAL_TEMPLATES);
+  const [assets, setAssets] = useState<MaterialAsset[]>([]);
+  const [emailTemplates, setEmailTemplates] = useState<typeof FALLBACK_EMAIL_TEMPLATES>([]);
+  const [socialTemplates, setSocialTemplates] = useState<typeof FALLBACK_SOCIAL_TEMPLATES>([]);
   const [loadingMaterials, setLoadingMaterials] = useState(true);
 
   const referralCode = user?.id?.slice(0, 8).toUpperCase() || 'DEMO1234';
