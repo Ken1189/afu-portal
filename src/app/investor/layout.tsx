@@ -71,7 +71,7 @@ export default function InvestorLayout({ children }: { children: React.ReactNode
       if (checkCompleted) return;
       if (!roleChecked) {
         setRoleChecked(true);
-        router.replace('/dashboard');
+        router.replace('/login?redirect=/investor');
       }
     }, 10000);
 
@@ -82,7 +82,7 @@ export default function InvestorLayout({ children }: { children: React.ReactNode
           checkCompleted = true;
           clearTimeout(safetyTimer);
           setRoleChecked(true);
-          router.replace('/dashboard');
+          router.replace('/login?redirect=/investor');
           return;
         }
         const data = await res.json();
@@ -97,7 +97,7 @@ export default function InvestorLayout({ children }: { children: React.ReactNode
           checkCompleted = true;
           clearTimeout(safetyTimer);
           setRoleChecked(true);
-          router.replace('/dashboard');
+          router.replace('/login?redirect=/investor');
         }
       } catch {
         if (!retried) {
@@ -108,7 +108,7 @@ export default function InvestorLayout({ children }: { children: React.ReactNode
         checkCompleted = true;
         clearTimeout(safetyTimer);
         setRoleChecked(true);
-        router.replace('/dashboard');
+        router.replace('/login?redirect=/investor');
       }
     };
 

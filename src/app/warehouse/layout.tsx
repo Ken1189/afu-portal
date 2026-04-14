@@ -71,7 +71,7 @@ export default function WarehouseLayout({ children }: { children: React.ReactNod
       if (checkCompleted) return;
       if (!roleChecked) {
         setRoleChecked(true);
-        router.replace('/dashboard');
+        router.replace('/login?redirect=/warehouse');
       }
     }, 10000);
 
@@ -82,7 +82,7 @@ export default function WarehouseLayout({ children }: { children: React.ReactNod
           checkCompleted = true;
           clearTimeout(safetyTimer);
           setRoleChecked(true);
-          router.replace('/dashboard');
+          router.replace('/login?redirect=/warehouse');
           return;
         }
         const data = await res.json();
@@ -97,7 +97,7 @@ export default function WarehouseLayout({ children }: { children: React.ReactNod
           checkCompleted = true;
           clearTimeout(safetyTimer);
           setRoleChecked(true);
-          router.replace('/dashboard');
+          router.replace('/login?redirect=/warehouse');
         }
       } catch {
         if (!retried) {
@@ -108,7 +108,7 @@ export default function WarehouseLayout({ children }: { children: React.ReactNod
         checkCompleted = true;
         clearTimeout(safetyTimer);
         setRoleChecked(true);
-        router.replace('/dashboard');
+        router.replace('/login?redirect=/warehouse');
       }
     };
 

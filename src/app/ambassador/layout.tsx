@@ -75,7 +75,7 @@ export default function AmbassadorLayout({ children }: { children: React.ReactNo
       if (checkCompleted) return;
       if (!roleChecked) {
         setRoleChecked(true);
-        router.replace('/dashboard');
+        router.replace('/login?redirect=/ambassador');
       }
     }, 10000);
 
@@ -86,7 +86,7 @@ export default function AmbassadorLayout({ children }: { children: React.ReactNo
           checkCompleted = true;
           clearTimeout(safetyTimer);
           setRoleChecked(true);
-          router.replace('/dashboard');
+          router.replace('/login?redirect=/ambassador');
           return;
         }
         const data = await res.json();
@@ -100,7 +100,7 @@ export default function AmbassadorLayout({ children }: { children: React.ReactNo
           checkCompleted = true;
           clearTimeout(safetyTimer);
           setRoleChecked(true);
-          router.replace('/dashboard');
+          router.replace('/login?redirect=/ambassador');
         }
       } catch {
         if (!retried) {
@@ -111,7 +111,7 @@ export default function AmbassadorLayout({ children }: { children: React.ReactNo
         checkCompleted = true;
         clearTimeout(safetyTimer);
         setRoleChecked(true);
-        router.replace('/dashboard');
+        router.replace('/login?redirect=/ambassador');
       }
     };
 

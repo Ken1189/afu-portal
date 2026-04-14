@@ -180,7 +180,7 @@ type SortDirection = 'asc' | 'desc';
 
 export default function DocumentsPage() {
   const { user } = useAuth();
-  const [documents, setDocuments] = useState<InvestorDocument[]>(FALLBACK_DOCUMENTS);
+  const [documents, setDocuments] = useState<InvestorDocument[]>([]);
   const [activeCategory, setActiveCategory] = useState('all');
   const [search, setSearch] = useState('');
   const [sortField, setSortField] = useState<SortField>('date');
