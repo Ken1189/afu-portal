@@ -230,19 +230,21 @@ export function useMapData(filters: MapFilterState): UseMapDataResult {
           }
         }
 
-        // 5. Warehouses
+        // 5. Warehouses (only those with coordinates)
         try {
           const { data: warehouses } = await supabase
             .from('warehouses')
-            .select('id, name, location, country, capacity_mt, current_stock_mt');
+            .select('id, name, location, country, capacity_mt, current_stock_mt, latitude, longitude')
+            .not('latitude', 'is', null)
+            .not('longitude', 'is', null);
           if (warehouses) {
-            // Warehouses may not have lat/lng yet, but we can still add them
-            // with country-level approximation from the demo data
             for (const w of warehouses) {
+              if (!w.latitude || !w.longitude) continue;
               points.push({
                 id: w.id,
                 type: 'warehouse' as any,
-                latitude: 0, longitude: 0, // Will be filtered out if no coordinates
+                latitude: Number(w.latitude),
+                longitude: Number(w.longitude),
                 warehouseName: w.name,
                 location: w.location,
                 country: w.country,
@@ -251,21 +253,24 @@ export function useMapData(filters: MapFilterState): UseMapDataResult {
               } as any);
             }
           }
-        } catch { /* warehouses table may not exist */ }
+        } catch { /* warehouses table may not have lat/lng columns */ }
 
-        // 6. Suppliers with location
+        // 6. Suppliers with location (only those with coordinates)
         try {
           const { data: suppliers } = await supabase
             .from('suppliers')
-            .select('id, company_name, category, country, status')
+            .select('id, company_name, category, country, status, latitude, longitude')
             .eq('status', 'active')
+            .not('latitude', 'is', null)
+            .not('longitude', 'is', null)
             .limit(100);
           if (suppliers) {
             for (const s of suppliers) {
+              if (!s.latitude || !s.longitude) continue;
               points.push({
                 id: s.id,
                 type: 'supplier' as any,
-                latitude: 0, longitude: 0,
+                latitude: Number(s.latitude), longitude: Number(s.longitude),
                 supplierName: s.company_name,
                 category: s.category,
                 country: s.country,
@@ -274,29 +279,17 @@ export function useMapData(filters: MapFilterState): UseMapDataResult {
           }
         } catch { /* safe */ }
 
-        // 7. Fetch loans to enrich farm points
-        const { data: loans } = await supabase
-          .from('loans')
-          .select('id, member_id, amount, status, repaid_percent');
-
-        if (loans && loans.length > 0) {
-          const loanByMember = new Map<string, typeof loans[0]>();
-          for (const loan of loans) {
-            if (loan.member_id) loanByMember.set(loan.member_id, loan);
-          }
-          // Enrich farm points that came from farm_plots (they have member_id context)
-          // This is best-effort — we match by farmer name if needed
-        }
-
         if (!cancelled) {
-          // Use demo data as fallback if DB returned nothing
-          setRawData(points.length > 0 ? points : DEMO_DATA);
+          setRawData(points);
+          if (points.length === 0) {
+            setError('No location data found. Add GPS coordinates to farms, equipment, or cooperatives to see them on the map.');
+          }
         }
       } catch (err) {
         if (!cancelled) {
           console.error('Map data fetch error:', err);
-          setError('Failed to load map data. Showing demo data.');
-          setRawData(DEMO_DATA);
+          setError('Failed to load map data. Please try refreshing.');
+          setRawData([]);
         }
       } finally {
         if (!cancelled) setIsLoading(false);
