@@ -137,5 +137,27 @@ export async function autoApprove(
     .update({ status: 'approved', reviewed_at: new Date().toISOString() })
     .eq('id', applicationId);
 
+  // Send welcome email with login credentials
+  const firstName = (app.full_name || '').split(' ')[0] || 'Farmer';
+  try {
+    await sendEmail(
+      app.email,
+      'Your AFU Account is Ready — Login Credentials',
+      `<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #1B2A4A;">Welcome to AFU, ${firstName}!</h2>
+        <p>Your email has been verified and your free membership is now <strong style="color: #5DB347;">active</strong>.</p>
+        <div style="background: #f9fafb; border-radius: 12px; padding: 20px; margin: 20px 0;">
+          <p style="margin: 0 0 8px;"><strong>Email:</strong> ${app.email}</p>
+          <p style="margin: 0 0 8px;"><strong>Temporary Password:</strong> ${tempPassword}</p>
+          <p style="margin: 0; font-size: 13px; color: #6b7280;">Please change your password after your first login.</p>
+        </div>
+        <a href="https://www.africanfarmingunion.org/login" style="display: inline-block; background: #5DB347; color: white; padding: 14px 24px; border-radius: 8px; text-decoration: none; font-weight: bold;">Log In to Your Farm Portal</a>
+        <p style="color: #6b7280; font-size: 12px; margin-top: 24px;">African Farming Union — By Farmers, For Farmers</p>
+      </div>`
+    );
+  } catch {
+    // Email failed — user can reset password from login page
+  }
+
   return NextResponse.json({ success: true, tempPassword });
 }

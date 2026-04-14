@@ -140,62 +140,41 @@ export async function POST(request: NextRequest) {
     console.error('[applications notifyAdmins]', notifyErr);
   }
 
-  // Auto-approve free tier applications instantly
+  // Free tier: send verification email first, then approve after verification
+  // Non-free tiers: stay pending for admin review
   if (data && (validation.data as Record<string, unknown>)?.requested_tier === 'free') {
     try {
-      const tempPassword = 'AFU-' + Math.random().toString(36).slice(2, 10);
-      const { data: newUser, error: authErr } = await adminClient.auth.admin.createUser({
-        email: data.email,
-        password: tempPassword,
-        email_confirm: true,
-      });
-      if (!authErr && newUser?.user) {
-        await adminClient.from('profiles').upsert({
-          id: newUser.user.id,
-          full_name: data.full_name,
-          email: data.email,
-          phone: data.phone,
-          country: data.country,
-          role: 'farmer',
-        });
-        await adminClient.from('members').insert({
-          profile_id: newUser.user.id,
-          tier: 'free',
-          status: 'active',
-          farm_name: data.farm_name,
-          farm_size_ha: data.farm_size_ha,
-          primary_crops: data.primary_crops,
-        });
-        await adminClient
-          .from('membership_applications')
-          .update({ status: 'approved', reviewed_at: new Date().toISOString() })
-          .eq('id', data.id);
+      // Set application to pending_verification — will be approved after email confirmation
+      await adminClient
+        .from('membership_applications')
+        .update({ status: 'pending_verification' })
+        .eq('id', data.id);
 
-        // Send welcome email with login credentials
-        const firstName = (data.full_name || '').split(' ')[0] || 'Farmer';
-        try {
-          const { sendEmail } = await import('@/lib/email');
-          await sendEmail(
-            data.email,
-            'Welcome to AFU — Your Account is Ready!',
-            `<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-              <h2 style="color: #1B2A4A;">Welcome to the African Farming Union, ${firstName}!</h2>
-              <p>Your free membership has been <strong style="color: #5DB347;">approved</strong> and your account is ready.</p>
-              <div style="background: #f9fafb; border-radius: 12px; padding: 20px; margin: 20px 0;">
-                <p style="margin: 0 0 8px;"><strong>Email:</strong> ${data.email}</p>
-                <p style="margin: 0 0 8px;"><strong>Temporary Password:</strong> ${tempPassword}</p>
-                <p style="margin: 0; font-size: 13px; color: #6b7280;">Please change your password after your first login.</p>
-              </div>
-              <a href="https://www.africanfarmingunion.org/login" style="display: inline-block; background: #5DB347; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold;">Log In to Your Farm Portal</a>
-              <p style="color: #6b7280; font-size: 12px; margin-top: 24px;">African Farming Union — By Farmers, For Farmers</p>
-            </div>`
-          );
-        } catch {
-          // Email send failed — user can still reset password
-        }
+      // Send verification email via our own email system
+      const firstName = (data.full_name || '').split(' ')[0] || 'Farmer';
+      const verifyUrl = `https://www.africanfarmingunion.org/api/applications/verify-email?id=${data.id}&email=${encodeURIComponent(data.email)}`;
+
+      try {
+        const { sendEmail } = await import('@/lib/email');
+        await sendEmail(
+          data.email,
+          'Verify Your Email — African Farming Union',
+          `<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #1B2A4A;">Welcome, ${firstName}!</h2>
+            <p>Thank you for applying to join the African Farming Union.</p>
+            <p>Please verify your email address to complete your registration:</p>
+            <div style="text-align: center; margin: 24px 0;">
+              <a href="${verifyUrl}" style="display: inline-block; background: #5DB347; color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 16px;">Verify My Email</a>
+            </div>
+            <p style="color: #6b7280; font-size: 13px;">Once verified, your free membership will be activated and you will receive your login credentials.</p>
+            <p style="color: #6b7280; font-size: 12px; margin-top: 24px;">African Farming Union — By Farmers, For Farmers</p>
+          </div>`
+        );
+      } catch {
+        // Email failed — admin can approve manually
       }
     } catch {
-      // Silent — admin can approve manually if auto-approve fails
+      // Silent — admin can approve manually
     }
   }
 

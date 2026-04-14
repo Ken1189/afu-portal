@@ -10,8 +10,10 @@ import { autoApprove } from '../auto-approve-free/route';
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const token = searchParams.get('token');
+  const appId = searchParams.get('id');
+  const email = searchParams.get('email');
 
-  if (!token) {
+  if (!token && !appId) {
     return NextResponse.redirect(
       new URL('/apply?error=missing-token', req.url),
     );
@@ -19,12 +21,28 @@ export async function GET(req: Request) {
 
   const svc = await createAdminClient();
 
-  // Look up application by verification token
-  const { data: app, error: fetchErr } = await svc
-    .from('membership_applications')
-    .select('*')
-    .eq('verification_token', token)
-    .single();
+  // Look up application by token OR by id+email
+  let app;
+  let fetchErr;
+
+  if (token) {
+    const result = await svc
+      .from('membership_applications')
+      .select('*')
+      .eq('verification_token', token)
+      .single();
+    app = result.data;
+    fetchErr = result.error;
+  } else if (appId && email) {
+    const result = await svc
+      .from('membership_applications')
+      .select('*')
+      .eq('id', appId)
+      .eq('email', decodeURIComponent(email))
+      .single();
+    app = result.data;
+    fetchErr = result.error;
+  }
 
   if (fetchErr || !app) {
     return NextResponse.redirect(
