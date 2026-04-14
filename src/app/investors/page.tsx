@@ -33,7 +33,6 @@ import {
   UtensilsCrossed,
   type LucideIcon,
 } from "lucide-react";
-import VideoCard from "@/components/VideoCard";
 import ScheduleDemoButton from "@/components/ScheduleDemoButton";
 import LegalDisclaimer from "@/components/ui/LegalDisclaimer";
 import { createClient } from '@/lib/supabase/client';
@@ -642,29 +641,6 @@ export default function InvestorsPage() {
       </div>
 
       {/* ─── INVESTOR OVERVIEW VIDEO ─── */}
-      <section
-        className="py-16 relative overflow-hidden"
-        style={{ background: 'linear-gradient(135deg, #0F1A30 0%, #1B2A4A 60%, #1e3a3a 100%)' }}
-      >
-        <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] rounded-full opacity-10 blur-3xl"
-          style={{ background: '#5DB347' }}
-        />
-        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8">
-            <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#6ABF4B' }}>
-              Investor Overview
-            </span>
-          </div>
-          <VideoCard
-            title="AFU Investment Thesis"
-            duration="5 min"
-            thumbnailUrl="https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1200&h=675&fit=crop"
-            size="large"
-          />
-        </div>
-      </section>
-
       {/* ─── THE OPPORTUNITY ─── */}
       <section className="py-20 bg-white relative overflow-hidden">
         <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: "radial-gradient(circle at 1px 1px, #5DB347 1px, transparent 0)", backgroundSize: "40px 40px" }} />
