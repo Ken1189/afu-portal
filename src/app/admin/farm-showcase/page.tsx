@@ -291,23 +291,7 @@ export default function FarmShowcaseAdmin() {
       fetchFarms();
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Failed to save';
-      setToast({ message: msg, type: 'error' });
-      // If DB table doesn't exist yet, update local state
-      if (editingId) {
-        setFarms((prev) =>
-          prev.map((f) => (f.id === editingId ? { ...f, ...payload, crops: payload.crops } : f))
-        );
-      } else {
-        const newFarm: FarmShowcase = {
-          ...payload,
-          id: `local-${Date.now()}`,
-          crops: payload.crops,
-          created_at: new Date().toISOString(),
-        };
-        setFarms((prev) => [...prev, newFarm]);
-      }
-      setModalOpen(false);
-      setToast({ message: editingId ? 'Farm updated (local)' : 'Farm added (local)', type: 'success' });
+      setToast({ message: `Save failed: ${msg}`, type: 'error' });
     } finally {
       setSaving(false);
     }
@@ -316,18 +300,18 @@ export default function FarmShowcaseAdmin() {
   /* ─── Delete ─── */
   const handleDelete = async (id: string) => {
     try {
-      if (!id.startsWith('showcase-') && !id.startsWith('dummy-') && !id.startsWith('local-')) {
-        const { error } = await supabase
-          .from('farmer_public_profiles')
-          .delete()
-          .eq('id', id);
-        if (error) throw error;
+      const { error } = await supabase
+        .from('farmer_public_profiles')
+        .delete()
+        .eq('id', id);
+      if (error) {
+        setToast({ message: `Delete failed: ${error.message}`, type: 'error' });
+        return;
       }
       setFarms((prev) => prev.filter((f) => f.id !== id));
       setToast({ message: 'Farm removed', type: 'success' });
-    } catch {
-      setFarms((prev) => prev.filter((f) => f.id !== id));
-      setToast({ message: 'Farm removed (local)', type: 'success' });
+    } catch (err) {
+      setToast({ message: `Delete failed: ${err instanceof Error ? err.message : 'Unknown error'}`, type: 'error' });
     }
     setDeleteConfirm(null);
   };
