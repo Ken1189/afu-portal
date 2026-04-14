@@ -44,38 +44,41 @@ export default function ImageUploader({
   const [showUrlInput, setShowUrlInput] = useState(false);
   const [showMediaBrowser, setShowMediaBrowser] = useState(false);
   const [mediaFiles, setMediaFiles] = useState<{ name: string; url: string }[]>([]);
+  const [mediaFolders, setMediaFolders] = useState<string[]>([]);
+  const [mediaBrowsePath, setMediaBrowsePath] = useState('');
   const [mediaLoading, setMediaLoading] = useState(false);
 
   const fetchMedia = useCallback(async () => {
     setMediaLoading(true);
     try {
       const supabase = createClient();
-      const folders = [folder || '', 'gallery', 'partners', 'crops', ''];
-      const seen = new Set<string>();
+      const { data } = await supabase.storage.from(bucket).list(mediaBrowsePath, { limit: 100, sortBy: { column: 'created_at', order: 'desc' } });
+
+      const folders: string[] = [];
       const files: { name: string; url: string }[] = [];
 
-      for (const f of folders) {
-        const { data } = await supabase.storage.from(bucket).list(f, { limit: 50, sortBy: { column: 'created_at', order: 'desc' } });
-        if (data) {
-          for (const file of data) {
-            if (file.metadata && file.name.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i)) {
-              const path = f ? `${f}/${file.name}` : file.name;
-              if (!seen.has(path)) {
-                seen.add(path);
-                const { data: { publicUrl } } = supabase.storage.from(bucket).getPublicUrl(path);
-                files.push({ name: file.name, url: publicUrl });
-              }
-            }
+      if (data) {
+        for (const file of data) {
+          if (file.name === '.emptyFolderPlaceholder' || file.name === '.keep') continue;
+          // Folder detection: no id or no metadata
+          if (file.id === null || (file.metadata === null && !file.created_at)) {
+            folders.push(file.name);
+          } else if (file.name.match(/\.(jpg|jpeg|png|gif|webp|svg|mp4|mov|webm)$/i)) {
+            const path = mediaBrowsePath ? `${mediaBrowsePath}/${file.name}` : file.name;
+            const { data: { publicUrl } } = supabase.storage.from(bucket).getPublicUrl(path);
+            files.push({ name: file.name, url: publicUrl });
           }
         }
       }
+      setMediaFolders(folders);
       setMediaFiles(files);
     } catch {
       setMediaFiles([]);
+      setMediaFolders([]);
     } finally {
       setMediaLoading(false);
     }
-  }, [bucket, folder]);
+  }, [bucket, mediaBrowsePath]);
 
   const handleFile = async (file: File) => {
     setError(null);
@@ -290,7 +293,19 @@ export default function ImageUploader({
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-              <h3 className="font-bold text-[#1B2A4A]">Browse Media Library</h3>
+              <div>
+                <h3 className="font-bold text-[#1B2A4A]">Browse Media Library</h3>
+                {/* Breadcrumb */}
+                <div className="flex items-center gap-1 mt-1 text-xs">
+                  <button onClick={() => setMediaBrowsePath('')} className={`hover:text-[#5DB347] ${!mediaBrowsePath ? 'text-[#5DB347] font-semibold' : 'text-gray-400'}`}>Root</button>
+                  {mediaBrowsePath.split('/').filter(Boolean).map((seg, i, arr) => (
+                    <span key={i} className="flex items-center gap-1">
+                      <span className="text-gray-300">/</span>
+                      <button onClick={() => setMediaBrowsePath(arr.slice(0, i + 1).join('/'))} className={`hover:text-[#5DB347] ${i === arr.length - 1 ? 'text-[#5DB347] font-semibold' : 'text-gray-400'}`}>{seg}</button>
+                    </span>
+                  ))}
+                </div>
+              </div>
               <button onClick={() => setShowMediaBrowser(false)} className="p-1 rounded-lg hover:bg-gray-100">
                 <X className="w-5 h-5 text-gray-400" />
               </button>
@@ -300,13 +315,27 @@ export default function ImageUploader({
                 <div className="flex items-center justify-center py-12">
                   <Loader2 className="w-6 h-6 animate-spin text-[#5DB347]" />
                 </div>
-              ) : mediaFiles.length === 0 ? (
+              ) : mediaFiles.length === 0 && mediaFolders.length === 0 ? (
                 <div className="text-center py-12 text-gray-400">
                   <FolderOpen className="w-10 h-10 mx-auto mb-3 text-gray-300" />
-                  <p className="text-sm">No images in media library yet</p>
-                  <p className="text-xs mt-1">Upload an image first, then it will appear here</p>
+                  <p className="text-sm">No files in this folder</p>
+                  {mediaBrowsePath && <button onClick={() => setMediaBrowsePath('')} className="text-xs text-[#5DB347] hover:underline mt-2">Back to root</button>}
                 </div>
               ) : (
+                <>
+                {/* Folders */}
+                {mediaFolders.length > 0 && (
+                  <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 mb-4">
+                    {mediaFolders.map((f) => (
+                      <button key={f} onClick={() => setMediaBrowsePath(mediaBrowsePath ? `${mediaBrowsePath}/${f}` : f)} className="flex flex-col items-center gap-1 p-2 rounded-xl hover:bg-amber-50 border border-transparent hover:border-amber-200 transition-colors">
+                        <FolderOpen className="w-8 h-8 text-amber-500" />
+                        <span className="text-[10px] text-gray-600 truncate w-full text-center">{f}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {/* Files */}
+                {mediaFiles.length > 0 && (
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
                   {mediaFiles.map((file) => (
                     <button
@@ -330,6 +359,8 @@ export default function ImageUploader({
                     </button>
                   ))}
                 </div>
+                )}
+                </>
               )}
             </div>
           </div>
