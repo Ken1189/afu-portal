@@ -159,7 +159,7 @@ export default function FarmShowcaseAdmin() {
         .select('*')
         .order('display_order', { ascending: true });
       if (error || !data || data.length === 0) {
-        setFarms(FALLBACK_FARMS);
+        setFarms([]);
       } else {
         setFarms(data.map((f: Record<string, unknown>) => ({
           id: f.id as string,
@@ -243,30 +243,43 @@ export default function FarmShowcaseAdmin() {
         if (error) throw error;
         setToast({ message: 'Farm updated successfully', type: 'success' });
       } else {
-        // Use selected existing member or auto-create one
+        // Use selected existing member, or find/create via API
         let memberId: string | null = selectedMemberId || null;
 
         if (!memberId) {
-          // Auto-create a placeholder member for this showcase farm
-          const email = `${slug}@afu-showcase.farm`;
-          const { data: authUser } = await supabase.auth.admin.createUser({
-            email, password: 'AFU-Showcase-' + Date.now(), email_confirm: true,
-          }).catch(() => ({ data: null })) as { data: { user?: { id: string } } | null };
-
-          let userId = authUser?.user?.id;
-          if (!userId) {
-            const { data: users } = await supabase.auth.admin.listUsers();
-            userId = users?.users?.find((u: { email?: string }) => u.email === email)?.id;
-          }
-
-          if (userId) {
-            await supabase.from('profiles').upsert({ id: userId, full_name: form.display_name.trim(), email, country: form.country, role: 'member' }, { onConflict: 'id' });
-            const { data: member } = await supabase.from('members').upsert({ profile_id: userId, tier: 'partner', status: 'active', country: form.country }, { onConflict: 'profile_id' }).select('id').single();
-            memberId = member?.id || null;
-          }
+          // Use the bulk import API to create a farmer, then get their member_id
+          try {
+            const res = await fetch('/api/admin/farmers/bulk-import', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                farmers: [{
+                  full_name: form.display_name.trim(),
+                  country: form.country,
+                  region: form.region.trim() || undefined,
+                  membership_tier: 'partner',
+                }],
+              }),
+            });
+            if (res.ok) {
+              // Now find the member we just created
+              const { data: newMember } = await supabase
+                .from('members')
+                .select('id, profile:profiles(full_name)')
+                .eq('country', form.country)
+                .order('created_at', { ascending: false })
+                .limit(1)
+                .maybeSingle();
+              memberId = newMember?.id || null;
+            }
+          } catch { /* fallback below */ }
         }
 
-        if (!memberId) throw new Error('Could not create member record for showcase farm');
+        if (!memberId) {
+          setToast({ message: 'Please select an existing farmer from the dropdown, or ensure a farmer record exists for this farm.', type: 'error' });
+          setSaving(false);
+          return;
+        }
 
         const { error } = await supabase
           .from('farmer_public_profiles')
