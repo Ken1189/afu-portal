@@ -715,7 +715,11 @@ export default function Navbar() {
             </Link>
 
             {/* Community dropdown */}
-            <div className="relative">
+            <div
+              className="relative"
+              onMouseEnter={() => handleMouseEnter("community")}
+              onMouseLeave={handleMouseLeave}
+            >
               <button
                 onClick={() => setOpenDropdown(openDropdown === "community" ? null : "community")}
                 className={`flex items-center gap-1 text-sm font-medium px-3 py-2 rounded-lg transition-colors ${
@@ -735,7 +739,9 @@ export default function Navbar() {
                     animate="visible"
                     exit="exit"
                     transition={{ duration: 0.15 }}
-                    className="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50"
+                    className="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50 max-h-[70vh] overflow-y-auto"
+                    onMouseEnter={() => handleMouseEnter("community")}
+                    onMouseLeave={handleMouseLeave}
                   >
                     <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-4 pt-1 pb-2">Community</p>
                     {communityLinks.map((link) => {
@@ -761,7 +767,11 @@ export default function Navbar() {
             </div>
 
             {/* Explore dropdown */}
-            <div className="relative">
+            <div
+              className="relative"
+              onMouseEnter={() => handleMouseEnter("explore")}
+              onMouseLeave={handleMouseLeave}
+            >
               <button
                 onClick={() => setOpenDropdown(openDropdown === "explore" ? null : "explore")}
                 className={`flex items-center gap-1 text-sm font-medium px-3 py-2 rounded-lg transition-colors ${
@@ -781,7 +791,9 @@ export default function Navbar() {
                     animate="visible"
                     exit="exit"
                     transition={{ duration: 0.15 }}
-                    className="absolute top-full right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50"
+                    className="absolute top-full right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50 max-h-[70vh] overflow-y-auto"
+                    onMouseEnter={() => handleMouseEnter("explore")}
+                    onMouseLeave={handleMouseLeave}
                   >
                     <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-4 pt-1 pb-2">Explore</p>
                     {exploreLinks.map((link) => {
