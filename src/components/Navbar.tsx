@@ -272,12 +272,9 @@ function DesktopServicesDropdown({ openDropdown, handleMouseEnter, handleMouseLe
   );
 }
 
-function DesktopCommunityDropdown({ openDropdown, setOpenDropdown }: DropdownProps) {
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const handleEnter = () => { if (timerRef.current) clearTimeout(timerRef.current); setOpenDropdown("community"); };
-  const handleLeave = () => { timerRef.current = setTimeout(() => setOpenDropdown(null), 200); };
+function DesktopCommunityDropdown({ openDropdown, handleMouseEnter, handleMouseLeave, setOpenDropdown }: DropdownProps) {
   return (
-    <div className="relative" onMouseEnter={handleEnter} onMouseLeave={handleLeave}>
+    <div className="relative" onMouseEnter={() => handleMouseEnter?.("community")} onMouseLeave={handleMouseLeave}>
       <button
         onClick={() => setOpenDropdown(openDropdown === "community" ? null : "community")}
         className={`flex items-center gap-1 text-sm font-medium px-3 py-2 rounded-lg transition-colors ${
@@ -296,6 +293,8 @@ function DesktopCommunityDropdown({ openDropdown, setOpenDropdown }: DropdownPro
             exit="exit"
             transition={{ duration: 0.15 }}
             className="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50 max-h-[70vh] overflow-y-auto"
+            onMouseEnter={() => handleMouseEnter?.("community")}
+            onMouseLeave={handleMouseLeave}
           >
             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-4 pt-1 pb-2">Community</p>
             {communityLinks.map((link) => {
@@ -317,12 +316,9 @@ function DesktopCommunityDropdown({ openDropdown, setOpenDropdown }: DropdownPro
   );
 }
 
-function DesktopExploreDropdown({ openDropdown, setOpenDropdown }: DropdownProps) {
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const handleEnter = () => { if (timerRef.current) clearTimeout(timerRef.current); setOpenDropdown("explore"); };
-  const handleLeave = () => { timerRef.current = setTimeout(() => setOpenDropdown(null), 200); };
+function DesktopExploreDropdown({ openDropdown, handleMouseEnter, handleMouseLeave, setOpenDropdown }: DropdownProps) {
   return (
-    <div className="relative" onMouseEnter={handleEnter} onMouseLeave={handleLeave}>
+    <div className="relative" onMouseEnter={() => handleMouseEnter?.("explore")} onMouseLeave={handleMouseLeave}>
       <button
         onClick={() => setOpenDropdown(openDropdown === "explore" ? null : "explore")}
         className={`flex items-center gap-1 text-sm font-medium px-3 py-2 rounded-lg transition-colors ${
@@ -341,6 +337,8 @@ function DesktopExploreDropdown({ openDropdown, setOpenDropdown }: DropdownProps
             exit="exit"
             transition={{ duration: 0.15 }}
             className="absolute top-full right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50 max-h-[70vh] overflow-y-auto"
+            onMouseEnter={() => handleMouseEnter?.("explore")}
+            onMouseLeave={handleMouseLeave}
           >
             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-4 pt-1 pb-2">Explore</p>
             {exploreLinks.map((link) => {
@@ -577,8 +575,8 @@ export default function Navbar() {
                   // Known dropdown keys: render the hardcoded mega-dropdowns
                   if (key === "education") return <DesktopEducationDropdown key="education" openDropdown={openDropdown} handleMouseEnter={handleMouseEnter} handleMouseLeave={handleMouseLeave} setOpenDropdown={setOpenDropdown} />;
                   if (key === "services") return <DesktopServicesDropdown key="services" openDropdown={openDropdown} handleMouseEnter={handleMouseEnter} handleMouseLeave={handleMouseLeave} setOpenDropdown={setOpenDropdown} />;
-                  if (key === "community") return <DesktopCommunityDropdown key="community" openDropdown={openDropdown} setOpenDropdown={setOpenDropdown} />;
-                  if (key === "explore") return <DesktopExploreDropdown key="explore" openDropdown={openDropdown} setOpenDropdown={setOpenDropdown} />;
+                  if (key === "community") return <DesktopCommunityDropdown key="community" openDropdown={openDropdown} handleMouseEnter={handleMouseEnter} handleMouseLeave={handleMouseLeave} setOpenDropdown={setOpenDropdown} />;
+                  if (key === "explore") return <DesktopExploreDropdown key="explore" openDropdown={openDropdown} handleMouseEnter={handleMouseEnter} handleMouseLeave={handleMouseLeave} setOpenDropdown={setOpenDropdown} />;
                   // Items with children from DB: render a simple dropdown
                   if (item.children && item.children.length > 0) {
                     return (
