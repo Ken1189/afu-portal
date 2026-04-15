@@ -168,7 +168,7 @@ export async function POST(
       // Update member count (best effort)
       try {
         await supabase.from('cooperatives').update({ member_count: (body.current_count || 0) + 1 }).eq('id', id);
-      } catch (_e) { /* ignore */ }
+      } catch (_e) { console.error("[cooperatives/[id]] member count update non-critical:", _e); }
 
       return NextResponse.json({ membership: data }, { status: 201 });
     }

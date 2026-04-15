@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
@@ -270,7 +271,7 @@ export default function VetsDirectoryPage() {
                     <div className="flex items-start gap-4 mb-4">
                       <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#5DB347] to-emerald-600 flex items-center justify-center flex-shrink-0 overflow-hidden">
                         {p.photo_url ? (
-                          <img src={p.photo_url} alt={p.full_name} className="w-full h-full object-cover" />
+                          <Image src={p.photo_url} alt={p.full_name} className="w-full h-full object-cover" width={56} height={56} unoptimized />
                         ) : (
                           <span className="text-white font-bold text-lg">
                             {p.full_name?.charAt(0) || 'V'}

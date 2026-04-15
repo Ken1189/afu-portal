@@ -1,7 +1,8 @@
 'use client';
 import { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, X, File, Image as ImageIcon, FileText, CheckCircle } from 'lucide-react';
+import { Upload, X, File, Image as ImageIcon, FileText, CheckCircle, AlertCircle } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
 
 interface UploadedFile {
   id: string;
@@ -9,6 +10,8 @@ interface UploadedFile {
   preview?: string;
   progress: number;
   status: 'uploading' | 'complete' | 'error';
+  url?: string;
+  error?: string;
 }
 
 interface FileUploadProps {
@@ -18,38 +21,90 @@ interface FileUploadProps {
   onFilesChange?: (files: UploadedFile[]) => void;
   label?: string;
   description?: string;
+  bucket?: string;
+  folder?: string;
 }
 
-export function FileUpload({ accept = '.pdf,.jpg,.jpeg,.png', maxSize = 10, multiple = true, onFilesChange, label = 'Upload Documents', description }: FileUploadProps) {
+export function FileUpload({
+  accept = '.pdf,.jpg,.jpeg,.png',
+  maxSize = 10,
+  multiple = true,
+  onFilesChange,
+  label = 'Upload Documents',
+  description,
+  bucket = 'documents',
+  folder = 'uploads',
+}: FileUploadProps) {
   const [files, setFiles] = useState<UploadedFile[]>([]);
   const [dragActive, setDragActive] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleFiles = useCallback((newFiles: FileList | null) => {
+  const uploadToStorage = useCallback(async (fileEntry: UploadedFile) => {
+    const supabase = createClient();
+    const ext = fileEntry.file.name.split('.').pop() || 'bin';
+    const path = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+
+    // Upload to Supabase Storage
+    const { data, error } = await supabase.storage
+      .from(bucket)
+      .upload(path, fileEntry.file, {
+        cacheControl: '3600',
+        upsert: false,
+      });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    // Get public URL
+    const { data: urlData } = supabase.storage.from(bucket).getPublicUrl(data.path);
+    return urlData.publicUrl;
+  }, [bucket, folder]);
+
+  const handleFiles = useCallback(async (newFiles: FileList | null) => {
     if (!newFiles) return;
+
+    // Validate file sizes
     const incoming = Array.from(newFiles).map((file) => {
       const id = Math.random().toString(36).slice(2, 9);
       const preview = file.type.startsWith('image/') ? URL.createObjectURL(file) : undefined;
+
+      if (file.size > maxSize * 1024 * 1024) {
+        return { id, file, preview, progress: 100, status: 'error' as const, error: `File exceeds ${maxSize}MB limit` };
+      }
+
       return { id, file, preview, progress: 0, status: 'uploading' as const };
     });
+
     const updated = multiple ? [...files, ...incoming] : incoming;
     setFiles(updated);
-    // Simulate upload progress
-    incoming.forEach((f) => {
-      let progress = 0;
-      const interval = setInterval(() => {
-        progress += Math.random() * 30 + 10;
-        if (progress >= 100) {
-          progress = 100;
-          clearInterval(interval);
-          setFiles((prev) => prev.map((pf) => pf.id === f.id ? { ...pf, progress: 100, status: 'complete' } : pf));
-        } else {
-          setFiles((prev) => prev.map((pf) => pf.id === f.id ? { ...pf, progress } : pf));
-        }
-      }, 300);
-    });
     onFilesChange?.(updated);
-  }, [files, multiple, onFilesChange]);
+
+    // Upload each file that passed validation
+    for (const entry of incoming) {
+      if (entry.status === 'error') continue;
+
+      // Simulate initial progress
+      setFiles((prev) => prev.map((f) => f.id === entry.id ? { ...f, progress: 30 } : f));
+
+      try {
+        const url = await uploadToStorage(entry);
+
+        setFiles((prev) => {
+          const next = prev.map((f) => f.id === entry.id ? { ...f, progress: 100, status: 'complete' as const, url } : f);
+          onFilesChange?.(next);
+          return next;
+        });
+      } catch (err) {
+        const errorMsg = err instanceof Error ? err.message : 'Upload failed';
+        setFiles((prev) => {
+          const next = prev.map((f) => f.id === entry.id ? { ...f, progress: 100, status: 'error' as const, error: errorMsg } : f);
+          onFilesChange?.(next);
+          return next;
+        });
+      }
+    }
+  }, [files, multiple, maxSize, onFilesChange, uploadToStorage]);
 
   const removeFile = (id: string) => {
     const updated = files.filter((f) => f.id !== id);
@@ -104,6 +159,7 @@ export function FileUpload({ accept = '.pdf,.jpg,.jpeg,.png', maxSize = 10, mult
         {files.map((f) => (
           <motion.div key={f.id} initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-lg">
             {f.preview ? (
+              // eslint-disable-next-line @next/next/no-img-element
               <img src={f.preview} alt={`Preview of ${f.file.name}`} className="w-10 h-10 rounded object-cover" />
             ) : (
               <div className="w-10 h-10 rounded bg-gray-100 flex items-center justify-center">{getFileIcon(f.file.type)}</div>
@@ -116,8 +172,12 @@ export function FileUpload({ accept = '.pdf,.jpg,.jpeg,.png', maxSize = 10, mult
                   <motion.div className="h-full bg-teal rounded-full" initial={{ width: 0 }} animate={{ width: `${f.progress}%` }} />
                 </div>
               )}
+              {f.status === 'error' && (
+                <p className="text-xs text-red-500 mt-0.5">{f.error || 'Upload failed'}</p>
+              )}
             </div>
             {f.status === 'complete' && <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />}
+            {f.status === 'error' && <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />}
             <button onClick={(e) => { e.stopPropagation(); removeFile(f.id); }} className="p-1 hover:bg-gray-100 rounded flex-shrink-0" aria-label="Remove file">
               <X className="w-4 h-4 text-gray-400" />
             </button>

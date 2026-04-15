@@ -37,7 +37,8 @@ async function isAuthorized(req: Request): Promise<boolean> {
       .maybeSingle();
 
     return !!profile && ['admin', 'super_admin'].includes(profile.role);
-  } catch {
+  } catch (err) {
+    console.error("[notifications/send] auth check non-critical:", err);
     return false;
   }
 }

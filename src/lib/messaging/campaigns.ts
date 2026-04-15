@@ -11,6 +11,7 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { SmsService } from './sms';
 import { WhatsAppService } from './whatsapp';
+import { sendEmail } from '@/lib/email/resend';
 
 // ── Types ──
 
@@ -23,7 +24,7 @@ export interface TargetAudience {
 
 export interface CampaignInput {
   name: string;
-  channel: 'sms' | 'whatsapp' | 'ussd';
+  channel: 'sms' | 'whatsapp' | 'ussd' | 'email';
   template_id?: string;
   target_audience: TargetAudience;
   scheduled_at?: string;
@@ -168,19 +169,35 @@ export class CampaignService {
         const renderedBody = this.renderTemplate(templateBody, variables);
 
         try {
-          let result;
-          if (campaign.channel === 'sms') {
-            result = await this.smsService.sendSMS(recipient.phone, renderedBody);
+          if (campaign.channel === 'email') {
+            // Email campaign — send via centralized email service
+            if (!recipient.email) { failedCount++; continue; }
+            const htmlBody = `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
+              <div style="background:#1B2A4A;padding:24px;text-align:center">
+                <h1 style="color:#5DB347;margin:0;font-size:22px">African Farming Union</h1>
+              </div>
+              <div style="padding:24px;background:#f8faf6">
+                <div style="color:#333;font-size:15px;line-height:1.6">${renderedBody}</div>
+              </div>
+              <div style="padding:12px;text-align:center;color:#999;font-size:12px">
+                African Farming Union | africanfarmingunion.org
+              </div>
+            </div>`;
+            await sendEmail(recipient.email, campaign.name || 'AFU Update', htmlBody);
+            sentCount++;
+          } else if (campaign.channel === 'sms') {
+            const result = await this.smsService.sendSMS(recipient.phone, renderedBody);
+            if (result.success) sentCount++;
+            else failedCount++;
           } else if (campaign.channel === 'whatsapp') {
-            result = await this.whatsAppService.sendMessage(recipient.phone, renderedBody);
+            const result = await this.whatsAppService.sendMessage(recipient.phone, renderedBody);
+            if (result.success) sentCount++;
+            else failedCount++;
           } else {
             // USSD campaigns don't send outbound — skip
             sentCount++;
             continue;
           }
-
-          if (result.success) sentCount++;
-          else failedCount++;
         } catch {
           failedCount++;
         }
@@ -276,7 +293,7 @@ export class CampaignService {
 
   // ── Private helpers ──
 
-  private async fetchAudience(
+  async fetchAudience(
     audience: TargetAudience,
   ): Promise<Array<{ phone: string; full_name: string; email: string; membership_number: string; membership_tier: string }>> {
     try {

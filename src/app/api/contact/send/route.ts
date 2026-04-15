@@ -87,7 +87,8 @@ export async function POST(req: Request) {
         subject: safeSubject,
         message: safeMessage,
       });
-    } catch {
+    } catch (err) {
+      console.error("[contact/send] DB insert non-critical:", err);
       // contact_submissions table might not exist — that's OK
     }
 

@@ -13,9 +13,11 @@ import {
   X,
   Star,
   ArrowLeft,
+  Upload,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
+import VideoRecorder from '@/components/ui/VideoRecorder';
 
 // ── Toast ─────────────────────────────────────────────────
 
@@ -36,16 +38,20 @@ interface VideoItem {
   title: string;
   description: string;
   youtube_url: string;
+  video_url?: string; // Direct uploaded video URL (Supabase Storage)
   thumbnail_url: string;
   is_featured: boolean;
+  orientation?: 'horizontal' | 'vertical'; // For uploaded videos — how to display
 }
 
 const emptyVideo: Omit<VideoItem, 'id'> = {
   title: '',
   description: '',
   youtube_url: '',
+  video_url: '',
   thumbnail_url: '',
   is_featured: false,
+  orientation: 'horizontal',
 };
 
 const defaultVideos: VideoItem[] = [
@@ -66,6 +72,38 @@ export default function VideoSectionPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<Omit<VideoItem, 'id'>>(emptyVideo);
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [recording, setRecording] = useState(false);
+
+  const handleVideoUpload = async (file: File) => {
+    if (!file) return;
+    if (file.size > 200 * 1024 * 1024) {
+      setToast({ message: 'Video exceeds 200MB limit', type: 'error' });
+      return;
+    }
+    setUploading(true);
+    setUploadProgress(10);
+    try {
+      const ext = file.name.split('.').pop() || 'mp4';
+      const path = `videos/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+      setUploadProgress(30);
+      const { data, error } = await supabase.storage
+        .from('media')
+        .upload(path, file, { cacheControl: '3600', upsert: false });
+      if (error) throw error;
+      setUploadProgress(80);
+      const { data: urlData } = supabase.storage.from('media').getPublicUrl(data.path);
+      setForm((f) => ({ ...f, video_url: urlData.publicUrl, youtube_url: '' }));
+      setUploadProgress(100);
+      setToast({ message: 'Video uploaded', type: 'success' });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Upload failed';
+      setToast({ message: msg, type: 'error' });
+    }
+    setUploading(false);
+    setTimeout(() => setUploadProgress(0), 1000);
+  };
 
   useEffect(() => {
     async function load() {
@@ -122,7 +160,15 @@ export default function VideoSectionPage() {
 
   const openEdit = (v: VideoItem) => {
     setEditingId(v.id);
-    setForm({ title: v.title, description: v.description, youtube_url: v.youtube_url, thumbnail_url: v.thumbnail_url, is_featured: v.is_featured });
+    setForm({
+      title: v.title,
+      description: v.description,
+      youtube_url: v.youtube_url,
+      video_url: v.video_url || '',
+      thumbnail_url: v.thumbnail_url,
+      is_featured: v.is_featured,
+      orientation: v.orientation || 'horizontal',
+    });
     setModalOpen(true);
   };
 
@@ -247,14 +293,102 @@ export default function VideoSectionPage() {
                 />
               </div>
               <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Upload or Record Video</label>
+                <div className="flex items-center gap-2">
+                  <label className="flex-1 flex items-center justify-center gap-2 px-3 py-2 border-2 border-dashed border-gray-300 rounded-lg text-sm text-gray-600 cursor-pointer hover:border-[#5DB347] hover:bg-gray-50 transition-colors">
+                    {uploading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin text-[#5DB347]" />
+                        Uploading {uploadProgress}%
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-4 h-4" />
+                        {form.video_url ? 'Replace file' : 'Choose file (max 200MB)'}
+                      </>
+                    )}
+                    <input
+                      type="file"
+                      accept="video/mp4,video/webm,video/quicktime"
+                      className="hidden"
+                      disabled={uploading}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleVideoUpload(file);
+                      }}
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setRecording(true)}
+                    disabled={uploading}
+                    className="flex items-center gap-1.5 px-3 py-2 border-2 border-dashed border-gray-300 rounded-lg text-sm text-gray-600 hover:border-[#5DB347] hover:bg-gray-50 transition-colors disabled:opacity-50"
+                    title="Record video from your camera"
+                  >
+                    <Video className="w-4 h-4" />
+                    Record
+                  </button>
+                  {form.video_url && (
+                    <button
+                      onClick={() => setForm({ ...form, video_url: '' })}
+                      className="p-2 rounded-lg hover:bg-red-50 text-gray-500 hover:text-red-600"
+                      title="Remove uploaded video"
+                      type="button"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+                {form.video_url && (
+                  <p className="mt-1 text-xs text-green-600 truncate">Uploaded: {form.video_url.split('/').pop()}</p>
+                )}
+                {form.video_url && (
+                  <div className="mt-2">
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Video orientation</label>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setForm({ ...form, orientation: 'horizontal' })}
+                        className={`flex-1 px-3 py-1.5 text-xs rounded-lg border transition-colors ${
+                          form.orientation !== 'vertical'
+                            ? 'bg-[#5DB347] text-white border-[#5DB347]'
+                            : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                        }`}
+                      >
+                        Horizontal (16:9)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setForm({ ...form, orientation: 'vertical' })}
+                        className={`flex-1 px-3 py-1.5 text-xs rounded-lg border transition-colors ${
+                          form.orientation === 'vertical'
+                            ? 'bg-[#5DB347] text-white border-[#5DB347]'
+                            : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                        }`}
+                      >
+                        Vertical (9:16)
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-200" /></div>
+                <div className="relative flex justify-center text-xs uppercase"><span className="bg-white px-2 text-gray-400">or</span></div>
+              </div>
+              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">YouTube URL</label>
                 <input
                   type="text"
                   value={form.youtube_url}
-                  onChange={(e) => setForm({ ...form, youtube_url: e.target.value })}
+                  onChange={(e) => setForm({ ...form, youtube_url: e.target.value, video_url: e.target.value ? '' : form.video_url })}
                   placeholder="https://youtube.com/watch?v=..."
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#5DB347]/20 focus:border-[#5DB347] outline-none"
+                  disabled={!!form.video_url}
                 />
+                {form.video_url && (
+                  <p className="mt-1 text-xs text-gray-400">YouTube URL disabled while video file is uploaded</p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Thumbnail URL</label>
@@ -276,6 +410,32 @@ export default function VideoSectionPage() {
                 <span className="text-gray-700">Featured video</span>
               </label>
             </div>
+            {/* Video recorder overlay */}
+            {recording && (
+              <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4">
+                <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-[#1B2A4A]">Record Video</h3>
+                    <button
+                      onClick={() => setRecording(false)}
+                      className="p-1 rounded-lg hover:bg-gray-100"
+                      type="button"
+                    >
+                      <X className="w-5 h-5 text-gray-500" />
+                    </button>
+                  </div>
+                  <VideoRecorder
+                    onRecorded={async (file) => {
+                      setRecording(false);
+                      await handleVideoUpload(file);
+                    }}
+                    onCancel={() => setRecording(false)}
+                    maxDuration={180}
+                  />
+                </div>
+              </div>
+            )}
+
             <div className="flex justify-end gap-2 mt-6">
               <button onClick={() => setModalOpen(false)} className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 rounded-lg hover:bg-gray-100">Cancel</button>
               <button

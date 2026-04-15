@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 import {
   Layers, Plus, Pencil, Trash2, Save, Loader2, X,
   CheckCircle2, AlertCircle, Eye, EyeOff, GripVertical,
@@ -275,8 +276,7 @@ export default function AdminHeroSlidesPage() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="w-16 h-10 rounded-lg overflow-hidden bg-gray-100">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={slide.image_url} alt={slide.title} className="w-full h-full object-cover" />
+                      <Image src={slide.image_url} alt={slide.title} className="w-full h-full object-cover" width={64} height={40} unoptimized />
                     </div>
                   </td>
                   <td className="px-4 py-3 font-medium text-[#1B2A4A]">{slide.title}</td>

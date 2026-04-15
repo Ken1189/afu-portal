@@ -147,7 +147,8 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ success: true, verification });
-  } catch {
+  } catch (err) {
+    console.error("[admin/kyc/approve] non-critical:", err);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }

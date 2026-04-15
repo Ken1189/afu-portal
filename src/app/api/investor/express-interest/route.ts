@@ -78,7 +78,8 @@ export async function POST(request: Request) {
           status: 'pending',
         });
       }
-    } catch {
+    } catch (err) {
+      console.error("[investor/express-interest] DB insert non-critical:", err);
       // Table may not exist yet — that's fine
     }
 

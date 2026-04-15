@@ -170,10 +170,12 @@ export async function POST(request: NextRequest) {
             <p style="color: #6b7280; font-size: 12px; margin-top: 24px;">African Farming Union — By Farmers, For Farmers</p>
           </div>`
         );
-      } catch {
+      } catch (err) {
+        console.error("[applications] verification email non-critical:", err);
         // Email failed — admin can approve manually
       }
-    } catch {
+    } catch (err2) {
+      console.error("[applications] free tier auto-approve non-critical:", err2);
       // Silent — admin can approve manually
     }
   }

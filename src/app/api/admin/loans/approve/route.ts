@@ -132,7 +132,8 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ success: true, loan });
-  } catch {
+  } catch (err) {
+    console.error("[admin/loans/approve] non-critical:", err);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }

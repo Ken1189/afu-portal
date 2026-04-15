@@ -504,7 +504,8 @@ export default function FarmDashboardPage() {
     );
   };
 
-  // Featured videos state
+  // Featured videos state — normalized to {url, thumbnail, title, is_featured, duration}
+  // Admin schema: {title, description, youtube_url, video_url, thumbnail_url, is_featured, orientation}
   const [videos, setVideos] = useState<Array<{title: string; url: string; thumbnail?: string; is_featured?: boolean; duration?: string}>>([]);
 
   useEffect(() => {
@@ -513,7 +514,17 @@ export default function FarmDashboardPage() {
       .then(({ data }) => {
         if (data?.value) {
           const vids = (typeof data.value === 'string' ? JSON.parse(data.value) : data.value) as any[];
-          setVideos(vids.filter((v: any) => v.url));
+          // Normalize admin schema → farm portal schema. Supports uploaded files + YouTube + legacy `url`.
+          const normalized = vids
+            .map((v: any) => ({
+              title: v.title || '',
+              url: v.video_url || v.youtube_url || v.url || '',
+              thumbnail: v.thumbnail_url || v.thumbnail,
+              is_featured: v.is_featured,
+              duration: v.duration,
+            }))
+            .filter((v) => v.url);
+          setVideos(normalized);
         }
       });
   }, []);

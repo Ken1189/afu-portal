@@ -69,7 +69,8 @@ export async function GET(request: NextRequest) {
           });
 
           results.overdue++;
-        } catch {
+        } catch (err) {
+          console.error("[cron/loans] overdue loan non-critical:", err);
           results.errors++;
         }
       }
@@ -107,7 +108,8 @@ export async function GET(request: NextRequest) {
           }
 
           results.reminders++;
-        } catch {
+        } catch (err) {
+          console.error("[cron/loans] repayment reminder non-critical:", err);
           results.errors++;
         }
       }

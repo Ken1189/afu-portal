@@ -134,7 +134,7 @@ export async function POST(req: NextRequest) {
           country_code: profile?.country || '',
           transaction_type: type,
         });
-      } catch { /* AML screening is non-blocking */ }
+      } catch (err) { console.error("[banking/wallet] AML screening non-critical:", err); /* AML screening is non-blocking */ }
     };
 
     switch (action) {

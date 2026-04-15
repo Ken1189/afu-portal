@@ -99,7 +99,7 @@ export async function PATCH(request: NextRequest) {
             })
             .eq('id', driverId);
         }
-      } catch { /* non-critical */ }
+      } catch (err) { console.error("[foober/status] driver stats non-critical:", err); }
     }
 
     // Notify requester of status change

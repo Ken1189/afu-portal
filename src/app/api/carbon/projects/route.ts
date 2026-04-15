@@ -15,7 +15,8 @@ export async function GET() {
     }
 
     return NextResponse.json({ projects: data || [] });
-  } catch {
+  } catch (err) {
+    console.error("[carbon/projects] GET non-critical:", err);
     return NextResponse.json({ error: 'Failed to fetch projects' }, { status: 500 });
   }
 }
@@ -77,7 +78,8 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ project: data }, { status: 201 });
-  } catch {
+  } catch (err) {
+    console.error("[carbon/projects] POST non-critical:", err);
     return NextResponse.json({ error: 'Failed to create project' }, { status: 500 });
   }
 }

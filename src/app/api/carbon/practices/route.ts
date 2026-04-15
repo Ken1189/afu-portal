@@ -34,7 +34,8 @@ export async function GET() {
     }
 
     return NextResponse.json({ practices: data || [] });
-  } catch {
+  } catch (err) {
+    console.error("[carbon/practices] GET non-critical:", err);
     return NextResponse.json({ error: 'Failed to fetch practices' }, { status: 500 });
   }
 }
@@ -77,7 +78,8 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ practice: data }, { status: 201 });
-  } catch {
+  } catch (err) {
+    console.error("[carbon/practices] POST non-critical:", err);
     return NextResponse.json({ error: 'Failed to log practice' }, { status: 500 });
   }
 }

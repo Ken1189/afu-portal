@@ -85,6 +85,36 @@ export async function POST(request: NextRequest) {
     let processed = 0;
     let failed = 0;
 
+    // For membership_applications approval, use the full single-approve flow
+    // (creates auth account, profile, member record, sends welcome email)
+    if (entity === 'membership_applications' && action === 'approve') {
+      const origin = request.headers.get('origin') || request.nextUrl?.origin || 'https://africanfarmingunion.org';
+      const cookie = request.headers.get('cookie') || '';
+
+      for (const appId of ids) {
+        try {
+          const res = await fetch(`${origin}/api/admin/applications/approve`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', cookie },
+            body: JSON.stringify({ applicationId: appId }),
+          });
+          if (res.ok) {
+            processed++;
+          } else {
+            failed++;
+            const errData = await res.json().catch(() => ({}));
+            console.error(`[bulk/approve] Failed to approve application ${appId}:`, errData);
+          }
+        } catch (err) {
+          failed++;
+          console.error(`[bulk/approve] Error approving application ${appId}:`, err);
+        }
+      }
+
+      return NextResponse.json({ processed, failed });
+    }
+
+    // For all other entities (loans, claims, kyc) — standard bulk status update
     // Build update payload
     const updatePayload: Record<string, unknown> = {
       status: newStatus,
@@ -152,10 +182,10 @@ export async function POST(request: NextRequest) {
                 : `Your membership application has been reviewed.${reason ? ` Note: ${reason}` : ''}`;
               await notifyUser(app.profile_id, title, body, 'all', { type: 'system', actionUrl: '/dashboard' });
             }
-          } catch { /* non-critical */ }
+          } catch (err) { console.error("[admin/bulk/approve] notify member non-critical:", err); }
         });
         await Promise.allSettled(notifyPromises);
-      } catch { /* non-critical */ }
+      } catch (err) { console.error("[admin/bulk/approve] membership notifications non-critical:", err); }
     }
 
     if (entity === 'loans' && updatedRows && updatedRows.length > 0) {
@@ -177,10 +207,10 @@ export async function POST(request: NextRequest) {
                 : `Your loan application has been reviewed.${reason ? ` Note: ${reason}` : ''}`;
               await notifyUser(loan.member_id, title, body, 'all', { type: 'loan', actionUrl: '/dashboard/financing' });
             }
-          } catch { /* non-critical */ }
+          } catch (err) { console.error("[admin/bulk/approve] notify loan member non-critical:", err); }
         });
         await Promise.allSettled(notifyPromises);
-      } catch { /* non-critical */ }
+      } catch (err) { console.error("[admin/bulk/approve] loan notifications non-critical:", err); }
     }
 
     return NextResponse.json({ processed, failed });

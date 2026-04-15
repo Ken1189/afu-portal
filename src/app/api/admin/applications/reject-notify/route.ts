@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
-import { Resend } from 'resend';
+import { sendEmail } from '@/lib/email/resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM = 'African Farming Union <noreply@mail.africanfarmingunion.org>';
 
 /**
@@ -19,11 +18,7 @@ export async function POST(req: Request) {
     const firstName = full_name?.split(' ')[0] || 'Applicant';
     const appType = type === 'ambassador' ? 'Ambassador' : type === 'supplier' ? 'Supplier' : 'Membership';
 
-    await resend.emails.send({
-      from: FROM,
-      to: email,
-      subject: `Update on Your AFU ${appType} Application`,
-      html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
+    await sendEmail(email, `Update on Your AFU ${appType} Application`, `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
         <div style="background:#1B2A4A;padding:30px;text-align:center">
           <h1 style="color:#5DB347;margin:0;font-size:24px">African Farming Union</h1>
         </div>
@@ -52,8 +47,7 @@ export async function POST(req: Request) {
         <div style="padding:16px;text-align:center;color:#999;font-size:12px">
           African Farming Union | <a href="https://africanfarmingunion.org" style="color:#999">africanfarmingunion.org</a>
         </div>
-      </div>`,
-    });
+      </div>`, FROM);
 
     return NextResponse.json({ success: true });
   } catch (err) {

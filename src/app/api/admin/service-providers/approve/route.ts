@@ -262,7 +262,7 @@ export async function POST(request: Request) {
           <a href="https://africanfarmingunion.org/admin/service-providers" style="display:inline-block;background:#5DB347;color:white;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600">View in Admin</a>
         </div>`
       );
-    } catch { /* non-critical */ }
+    } catch (err) { console.error("[admin/service-providers/approve] admin notification non-critical:", err); }
 
     // Fire marketing automations
     fireAutomations('service_provider_approved', {

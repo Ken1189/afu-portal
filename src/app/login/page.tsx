@@ -194,6 +194,9 @@ export default function LoginPage() {
       const { error: signInError } = await signIn(email, password);
       if (signInError) {
         setError(signInError.message);
+      } else if (password.startsWith('AFU-')) {
+        // Temp password detected — force password change
+        router.push('/dashboard/settings?change_password=1');
       } else {
         // Fetch role from server API (bypasses RLS) and redirect
         await fetchRoleAndRedirect();

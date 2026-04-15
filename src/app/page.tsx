@@ -40,6 +40,7 @@ import { useCountUp } from '@/hooks/useCountUp';
 import { createClient } from '@/lib/supabase/client';
 import LegalDisclaimer from '@/components/ui/LegalDisclaimer';
 import HeroSlider from '@/components/HeroSlider';
+import HomepageVideo from '@/components/HomepageVideo';
 
 /* ─── Animation helpers ─── */
 function FadeInWhenVisible({
@@ -741,6 +742,9 @@ export default function Home() {
           </div>
         </div>
       </section>}
+
+      {/* ─── FEATURED VIDEO — DB-driven via site_config key "video_section" ─── */}
+      {showSection('video') && <HomepageVideo />}
 
       {/* ─── WHAT AFU PROVIDES (Services Grid) ─── */}
       {showSection('services') && <section id="section-services" className="py-16 bg-cream">

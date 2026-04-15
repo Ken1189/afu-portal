@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
             type: 'order',
             link: '/supplier/orders',
           });
-        } catch { /* notifications table may not exist */ }
+        } catch (err) { console.error("[orders/notify-supplier] notification insert non-critical:", err); }
       }
 
       // 2. Send email notification

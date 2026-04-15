@@ -108,7 +108,8 @@ export async function POST(req: NextRequest) {
         },
         status: 'processed',
       });
-    } catch {
+    } catch (err) {
+      console.error("[carbon/purchase] event logging non-critical:", err);
       // Non-critical: event logging failure shouldn't block purchase
     }
 
@@ -116,7 +117,8 @@ export async function POST(req: NextRequest) {
       purchase,
       message: `Thank you! Your purchase of ${quantity} tonnes CO\u2082 is being processed. Certificate will be emailed within 24 hours.`,
     }, { status: 201 });
-  } catch {
+  } catch (err) {
+    console.error("[carbon/purchase] non-critical:", err);
     return NextResponse.json({ error: 'Failed to process purchase' }, { status: 500 });
   }
 }

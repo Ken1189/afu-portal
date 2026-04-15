@@ -4,6 +4,31 @@ import { createServerSupabaseClient } from '@/lib/supabase/server';
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent?key=${GEMINI_API_KEY}`;
 
+// S1.10: Simple in-memory rate limiter — 10 requests per minute per IP
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT = 10;
+const RATE_WINDOW_MS = 60_000;
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip);
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_WINDOW_MS });
+    return true;
+  }
+  if (entry.count >= RATE_LIMIT) return false;
+  entry.count++;
+  return true;
+}
+
+// Clean up stale entries every 5 minutes
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, entry] of rateLimitMap) {
+    if (now > entry.resetAt) rateLimitMap.delete(ip);
+  }
+}, 300_000);
+
 const FARMING_PROMPT =
   'You are an expert African agriculture AI assistant for the African Farming Union (AFU). ' +
   'You help farmers across African countries (Botswana, Zimbabwe, Tanzania, Kenya, Nigeria, Zambia, Mozambique, South Africa, Ghana, Uganda, Sierra Leone, Egypt, Ethiopia, Malawi, Namibia, Republic of Guinea, Guinea-Bissau, Liberia, Mali, Ivory Coast) ' +
@@ -29,13 +54,22 @@ const BUSINESS_PROMPT =
 
 export async function POST(request: NextRequest) {
   try {
+    // S1.10: Rate limit — 10 requests/minute per IP
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+    if (!checkRateLimit(ip)) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please wait a moment and try again.' },
+        { status: 429 }
+      );
+    }
+
     // Allow both authenticated and unauthenticated users (public chatbot)
     let userId: string | null = null;
     try {
       const supabase = await createServerSupabaseClient();
       const { data: { user } } = await supabase.auth.getUser();
       userId = user?.id || null;
-    } catch { /* public access OK */ }
+    } catch (err) { console.error("[ai/chat] auth check non-critical:", err); /* public access OK */ }
 
     if (!GEMINI_API_KEY) {
       return NextResponse.json(

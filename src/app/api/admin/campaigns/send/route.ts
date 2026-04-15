@@ -30,13 +30,48 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { campaignId } = body;
+    const { campaignId, dryRun } = body;
 
     if (!campaignId) {
       return NextResponse.json({ error: 'campaignId is required' }, { status: 400 });
     }
 
     const campaignService = new CampaignService(adminClient);
+
+    // Dry-run mode: fetch audience and preview without sending
+    if (dryRun) {
+      const { data: campaign } = await adminClient
+        .from('message_campaigns')
+        .select('*')
+        .eq('id', campaignId)
+        .single();
+
+      if (!campaign) {
+        return NextResponse.json({ error: 'Campaign not found' }, { status: 404 });
+      }
+
+      const audience = await campaignService.fetchAudience(campaign.target_audience || {});
+
+      return NextResponse.json({
+        success: true,
+        dryRun: true,
+        campaign: {
+          name: campaign.name,
+          channel: campaign.channel,
+          body: campaign.body,
+        },
+        audience: {
+          total: audience.length,
+          sample: audience.slice(0, 5).map((r: Record<string, unknown>) => ({
+            name: r.full_name,
+            email: r.email,
+            phone: r.phone,
+            country: r.country,
+          })),
+        },
+      });
+    }
+
     const result = await campaignService.sendCampaign(campaignId);
 
     if (!result.success) {

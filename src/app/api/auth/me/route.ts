@@ -75,7 +75,8 @@ export async function GET() {
       if (extra?.roles && Array.isArray(extra.roles)) rolesArr = extra.roles;
       if (extra?.capabilities && Array.isArray(extra.capabilities))
         capabilities = extra.capabilities;
-    } catch {
+    } catch (err) {
+      console.error("[auth/me] roles/capabilities lookup non-critical:", err);
       // columns don't exist — fine
     }
 
@@ -93,7 +94,8 @@ export async function GET() {
       isAdmin,
       error: null,
     });
-  } catch {
+  } catch (err) {
+    console.error("[auth/me] non-critical:", err);
     return NextResponse.json(
       { role: null, roles: [], capabilities: [], error: 'Server error' },
       { status: 500 }

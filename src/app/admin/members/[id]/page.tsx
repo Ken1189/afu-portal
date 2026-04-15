@@ -375,6 +375,16 @@ export default function MemberDetailPage() {
   const [tierModalOpen, setTierModalOpen] = useState(false);
   const [selectedTier, setSelectedTier] = useState<MemberTier>('smallholder');
   const [confirmSuspend, setConfirmSuspend] = useState(false);
+  const [suspendReason, setSuspendReason] = useState('');
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [emailSubject, setEmailSubject] = useState('');
+  const [emailBody, setEmailBody] = useState('');
+  const [emailSending, setEmailSending] = useState(false);
+  const [showWalletModal, setShowWalletModal] = useState(false);
+  const [walletAction, setWalletAction] = useState<'credit' | 'debit' | 'freeze' | 'unfreeze'>('credit');
+  const [walletAmount, setWalletAmount] = useState('');
+  const [walletReason, setWalletReason] = useState('');
+  const [walletLoading, setWalletLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -531,19 +541,82 @@ export default function MemberDetailPage() {
   };
 
   const handleToggleStatus = async () => {
-    if (!member) return;
+    if (!member || !dbProfileId) return;
     setStatusLoading(true);
-    const supabase = createClient();
-    const newStatus = member.status === 'active' ? 'suspended' : 'active';
-    const { error } = await supabase.from('members').update({ status: newStatus }).eq('member_id', memberId);
+    const action = member.status === 'active' ? 'suspend' : 'unsuspend';
+    try {
+      const res = await fetch(`/api/admin/users/${dbProfileId}/suspend`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action, reason: suspendReason || 'Admin action' }),
+      });
+      const result = await res.json();
+      if (res.ok && result.success) {
+        showSuccess(`Member ${action === 'suspend' ? 'suspended' : 'reactivated'} successfully.`);
+        fetchMemberData();
+      } else {
+        showError(result.error || 'Failed to update status');
+      }
+    } catch {
+      showError('Network error');
+    }
     setStatusLoading(false);
     setConfirmSuspend(false);
-    if (!error) {
-      showSuccess(`Member ${newStatus === 'suspended' ? 'suspended' : 'activated'} successfully.`);
-      fetchMemberData();
-    } else {
-      showError(`Error: ${error.message}`);
-    }
+    setSuspendReason('');
+  };
+
+  const handleSendEmail = async () => {
+    if (!dbProfileId || !emailSubject || !emailBody) return;
+    setEmailSending(true);
+    try {
+      const res = await fetch('/api/admin/communications/email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: dbProfileId, subject: emailSubject, body: emailBody }),
+      });
+      const result = await res.json();
+      if (res.ok && result.success) {
+        showSuccess('Email sent successfully.');
+        setShowEmailModal(false);
+        setEmailSubject('');
+        setEmailBody('');
+      } else {
+        showError(result.error || 'Failed to send email');
+      }
+    } catch { showError('Network error'); }
+    setEmailSending(false);
+  };
+
+  const handleWalletAction = async () => {
+    if (!dbProfileId || !walletReason) return;
+    setWalletLoading(true);
+    try {
+      if (walletAction === 'freeze' || walletAction === 'unfreeze') {
+        const res = await fetch('/api/admin/wallet/freeze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: dbProfileId, action: walletAction, reason: walletReason }),
+        });
+        const result = await res.json();
+        if (res.ok) showSuccess(walletAction === 'freeze' ? 'Wallet frozen.' : 'Wallet unfrozen.');
+        else showError(result.error || 'Failed');
+      } else {
+        const amt = parseFloat(walletAmount);
+        if (!amt || amt <= 0) { showError('Enter a valid amount'); setWalletLoading(false); return; }
+        const res = await fetch('/api/admin/wallet/adjust', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: dbProfileId, amount: amt, type: walletAction, reason: walletReason }),
+        });
+        const result = await res.json();
+        if (res.ok) showSuccess(`Wallet ${walletAction}ed $${amt.toFixed(2)}.`);
+        else showError(result.error || 'Failed');
+      }
+    } catch { showError('Network error'); }
+    setWalletLoading(false);
+    setShowWalletModal(false);
+    setWalletAmount('');
+    setWalletReason('');
   };
 
   const handleChangeTier = async () => {
@@ -692,6 +765,20 @@ export default function MemberDetailPage() {
                 Activate
               </button>
             )}
+            <button
+              onClick={() => setShowEmailModal(true)}
+              className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
+            >
+              <Mail className="w-3.5 h-3.5" />
+              Send Email
+            </button>
+            <button
+              onClick={() => { setWalletAction('credit'); setShowWalletModal(true); }}
+              className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-colors"
+            >
+              <DollarSign className="w-3.5 h-3.5" />
+              Wallet
+            </button>
           </div>
         </div>
       </motion.div>
@@ -1283,14 +1370,106 @@ export default function MemberDetailPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="bg-white rounded-xl p-6 max-w-sm w-full mx-4 shadow-2xl">
             <h3 className="text-lg font-bold text-navy mb-2">Suspend Member?</h3>
-            <p className="text-sm text-gray-500 mb-4">
+            <p className="text-sm text-gray-500 mb-3">
               This member will lose access to the platform. You can reactivate them later.
             </p>
+            <input
+              type="text"
+              placeholder="Reason for suspension (required)"
+              value={suspendReason}
+              onChange={(e) => setSuspendReason(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-red-300"
+            />
             <div className="flex items-center justify-end gap-2">
-              <button onClick={() => setConfirmSuspend(false)} className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">Cancel</button>
-              <button onClick={handleToggleStatus} disabled={statusLoading} className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2">
+              <button onClick={() => { setConfirmSuspend(false); setSuspendReason(''); }} className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">Cancel</button>
+              <button onClick={handleToggleStatus} disabled={statusLoading || !suspendReason.trim()} className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2">
                 {statusLoading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                 Suspend
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Send Email Modal ──────────────────────────────────────────── */}
+      {showEmailModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl">
+            <h3 className="text-lg font-bold text-navy mb-4">Send Email to {member?.firstName}</h3>
+            <input
+              type="text"
+              placeholder="Subject"
+              value={emailSubject}
+              onChange={(e) => setEmailSubject(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-blue-300"
+            />
+            <textarea
+              placeholder="Email body (HTML supported)"
+              value={emailBody}
+              onChange={(e) => setEmailBody(e.target.value)}
+              rows={5}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-blue-300 resize-none"
+            />
+            <div className="flex items-center justify-end gap-2">
+              <button onClick={() => { setShowEmailModal(false); setEmailSubject(''); setEmailBody(''); }} className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">Cancel</button>
+              <button onClick={handleSendEmail} disabled={emailSending || !emailSubject.trim() || !emailBody.trim()} className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2">
+                {emailSending && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                Send
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Wallet Action Modal ───────────────────────────────────────── */}
+      {showWalletModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-xl p-6 max-w-sm w-full mx-4 shadow-2xl">
+            <h3 className="text-lg font-bold text-navy mb-4">Wallet Action</h3>
+            <div className="flex gap-2 mb-4">
+              {(['credit', 'debit', 'freeze', 'unfreeze'] as const).map((a) => (
+                <button
+                  key={a}
+                  onClick={() => setWalletAction(a)}
+                  className={`flex-1 px-3 py-2 text-xs font-medium rounded-lg transition-colors capitalize ${
+                    walletAction === a
+                      ? a === 'freeze' ? 'bg-red-600 text-white' : a === 'unfreeze' ? 'bg-blue-600 text-white' : a === 'credit' ? 'bg-emerald-600 text-white' : 'bg-amber-600 text-white'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  {a}
+                </button>
+              ))}
+            </div>
+            {walletAction !== 'freeze' && walletAction !== 'unfreeze' && (
+              <input
+                type="number"
+                placeholder="Amount (USD)"
+                value={walletAmount}
+                onChange={(e) => setWalletAmount(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-emerald-300"
+                min="0"
+                step="0.01"
+              />
+            )}
+            <input
+              type="text"
+              placeholder={walletAction === 'freeze' ? 'Reason for freeze (required)' : walletAction === 'unfreeze' ? 'Reason for unfreeze (required)' : 'Reason (required)'}
+              value={walletReason}
+              onChange={(e) => setWalletReason(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-emerald-300"
+            />
+            <div className="flex items-center justify-end gap-2">
+              <button onClick={() => { setShowWalletModal(false); setWalletAmount(''); setWalletReason(''); }} className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">Cancel</button>
+              <button
+                onClick={handleWalletAction}
+                disabled={walletLoading || !walletReason.trim() || (walletAction !== 'freeze' && walletAction !== 'unfreeze' && (!walletAmount || parseFloat(walletAmount) <= 0))}
+                className={`px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2 ${
+                  walletAction === 'freeze' ? 'bg-red-600 hover:bg-red-700' : walletAction === 'unfreeze' ? 'bg-blue-600 hover:bg-blue-700' : walletAction === 'credit' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-amber-600 hover:bg-amber-700'
+                }`}
+              >
+                {walletLoading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                {walletAction === 'freeze' ? 'Freeze Wallet' : walletAction === 'unfreeze' ? 'Unfreeze Wallet' : walletAction === 'credit' ? 'Credit Wallet' : 'Debit Wallet'}
               </button>
             </div>
           </div>

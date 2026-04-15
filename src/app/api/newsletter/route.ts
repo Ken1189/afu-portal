@@ -73,7 +73,8 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ success: true, message: 'Thanks for subscribing!' });
-  } catch {
+  } catch (err) {
+    console.error("[newsletter] non-critical:", err);
     return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 });
   }
 }

@@ -226,7 +226,7 @@ export async function POST(request: Request) {
           <a href="https://africanfarmingunion.org/admin/ambassadors" style="display:inline-block;background:#5DB347;color:white;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600">View in Admin</a>
         </div>`,
       });
-    } catch { /* non-critical */ }
+    } catch (err) { console.error("[admin/ambassadors/approve] admin notification non-critical:", err); }
 
     // Fire marketing automations
     fireAutomations('ambassador_approved', {

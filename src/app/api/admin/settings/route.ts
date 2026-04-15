@@ -62,7 +62,8 @@ export async function GET() {
     const settings: Record<string, unknown> = {};
     data.forEach(row => { settings[row.key] = row.value; });
     return NextResponse.json(settings);
-  } catch {
+  } catch (err) {
+    console.error("[admin/settings] GET non-critical:", err);
     return NextResponse.json({ error: 'Failed to fetch settings' }, { status: 500 });
   }
 }
@@ -113,7 +114,8 @@ export async function PUT(request: Request) {
     });
 
     return NextResponse.json({ success: true });
-  } catch {
+  } catch (err) {
+    console.error("[admin/settings] PUT non-critical:", err);
     return NextResponse.json({ error: 'Failed to update settings' }, { status: 500 });
   }
 }

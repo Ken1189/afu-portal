@@ -192,7 +192,7 @@ export async function POST(req: NextRequest) {
           <div style="padding:12px;text-align:center;color:#999;font-size:12px">African Farming Union | africanfarmingunion.org</div>
         </div>`,
       });
-    } catch { /* non-critical */ }
+    } catch (err) { console.error("[sponsor/checkout] thank-you email non-critical:", err); }
 
     // Notify all 3 admins (info, peter, devon) + write to universal inbox
     try {
@@ -216,7 +216,7 @@ export async function POST(req: NextRequest) {
         businessName: body.sponsor_company,
         tags: ['sponsorship', body.tier],
       });
-    } catch { /* non-critical */ }
+    } catch (err) { console.error("[sponsor/checkout] admin notification non-critical:", err); }
 
     return NextResponse.json({
       success: true,

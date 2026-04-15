@@ -565,7 +565,16 @@ export default function TrainingPage() {
       .then(({ data }) => {
         if (data?.value) {
           const vids = (typeof data.value === 'string' ? JSON.parse(data.value) : data.value) as any[];
-          setTrainingVideos(vids.filter((v: any) => v.url));
+          const normalized = vids
+            .map((v: any) => ({
+              title: v.title || '',
+              url: v.video_url || v.youtube_url || v.url || '',
+              thumbnail: v.thumbnail_url || v.thumbnail,
+              is_featured: v.is_featured,
+              duration: v.duration,
+            }))
+            .filter((v) => v.url);
+          setTrainingVideos(normalized);
         }
       });
   }, []);

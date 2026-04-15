@@ -63,7 +63,8 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ enrollment }, { status: 201 });
-  } catch {
+  } catch (err) {
+    console.error("[carbon/enroll] non-critical:", err);
     return NextResponse.json({ error: 'Failed to enroll' }, { status: 500 });
   }
 }

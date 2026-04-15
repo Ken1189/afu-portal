@@ -10,7 +10,8 @@ export async function GET() {
     const { data, error } = await admin.from('automation_rules').select('*').order('created_at', { ascending: false });
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
     return NextResponse.json({ rules: data || [] });
-  } catch {
+  } catch (err) {
+    console.error("[admin/automations] GET non-critical:", err);
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }
@@ -41,7 +42,8 @@ export async function POST(req: NextRequest) {
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
     return NextResponse.json({ rule: data }, { status: 201 });
-  } catch {
+  } catch (err) {
+    console.error("[admin/automations] POST non-critical:", err);
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }
@@ -66,7 +68,8 @@ export async function PATCH(req: NextRequest) {
     const { data, error } = await admin.from('automation_rules').update(updates).eq('id', id).select().single();
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
     return NextResponse.json({ rule: data });
-  } catch {
+  } catch (err) {
+    console.error("[admin/automations] PATCH non-critical:", err);
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }
@@ -82,7 +85,8 @@ export async function DELETE(req: NextRequest) {
     const { error } = await admin.from('automation_rules').delete().eq('id', body.id);
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
     return NextResponse.json({ success: true });
-  } catch {
+  } catch (err) {
+    console.error("[admin/automations] DELETE non-critical:", err);
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }

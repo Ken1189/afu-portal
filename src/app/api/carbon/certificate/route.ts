@@ -53,7 +53,8 @@ export async function GET(req: NextRequest) {
     };
 
     return NextResponse.json({ certificate });
-  } catch {
+  } catch (err) {
+    console.error("[carbon/certificate] non-critical:", err);
     return NextResponse.json({ error: 'Failed to generate certificate' }, { status: 500 });
   }
 }

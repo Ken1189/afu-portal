@@ -74,7 +74,8 @@ export async function GET(request: NextRequest) {
           });
 
           results.warnings++;
-        } catch {
+        } catch (err) {
+          console.error("[cron/membership-expiry] warning email non-critical:", err);
           results.errors++;
         }
       }
@@ -114,7 +115,8 @@ export async function GET(request: NextRequest) {
           });
 
           results.expired++;
-        } catch {
+        } catch (err) {
+          console.error("[cron/membership-expiry] expire member non-critical:", err);
           results.errors++;
         }
       }
@@ -159,11 +161,13 @@ export async function GET(request: NextRequest) {
           if (member.email) {
             try {
               await sendTierDowngradeEmail(member.email, member.email.split('@')[0], previousTier);
-            } catch {
+            } catch (err) {
+              console.error("[cron/membership-expiry] downgrade email non-critical:", err);
               // Don't fail cron if email fails
             }
           }
-        } catch {
+        } catch (err) {
+          console.error("[cron/membership-expiry] downgrade member non-critical:", err);
           results.errors++;
         }
       }

@@ -24,7 +24,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     }
 
     return NextResponse.json({ conversation, messages: messages || [] });
-  } catch {
+  } catch (err) {
+    console.error("[admin/inbox/[id]] GET non-critical:", err);
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }
@@ -52,7 +53,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
     return NextResponse.json({ conversation: data });
-  } catch {
+  } catch (err) {
+    console.error("[admin/inbox/[id]] PATCH non-critical:", err);
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }

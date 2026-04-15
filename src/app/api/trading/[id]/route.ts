@@ -142,7 +142,7 @@ export async function PATCH(
             </div>`,
           }).catch(() => {});
         }
-      } catch { /* non-critical */ }
+      } catch (err) { console.error("[trading/[id]] status email non-critical:", err); }
     }
 
     return NextResponse.json({ order });

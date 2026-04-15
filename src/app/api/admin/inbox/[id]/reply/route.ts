@@ -91,7 +91,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     }
 
     return NextResponse.json({ message: msg, sendError });
-  } catch {
+  } catch (err) {
+    console.error("[admin/inbox/[id]/reply] non-critical:", err);
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }

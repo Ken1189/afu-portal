@@ -116,7 +116,8 @@ export async function POST(req: Request) {
       </div>
       `,
     );
-  } catch {
+  } catch (err) {
+    console.error("[service-providers/apply] confirmation email non-critical:", err);
     // Silent — don't fail the request
   }
 
@@ -129,7 +130,8 @@ export async function POST(req: Request) {
       name: full_name,
       country,
     });
-  } catch {
+  } catch (err) {
+    console.error("[service-providers/apply] admin notification non-critical:", err);
     // Silent
   }
 

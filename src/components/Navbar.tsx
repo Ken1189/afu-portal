@@ -606,7 +606,7 @@ export default function Navbar() {
                   }
                   if (key === "donate") {
                     return (
-                      <Link key="donate" href={item.href || "/donate"} className="text-white font-semibold text-xs px-4 py-2 rounded-lg transition-colors flex items-center gap-1.5 whitespace-nowrap border border-white/20 hover:bg-white/10">
+                      <Link key="donate" href={item.href || "/donate"} className="text-[#1B2A4A] font-semibold text-xs px-4 py-2 rounded-lg transition-colors flex items-center gap-1.5 whitespace-nowrap border border-[#1B2A4A]/30 hover:bg-[#1B2A4A] hover:text-white hover:border-[#1B2A4A]">
                         {item.label}
                       </Link>
                     );
@@ -829,7 +829,7 @@ export default function Navbar() {
             </Link>
             <Link
               href="/donate"
-              className="text-white font-semibold text-xs px-4 py-2 rounded-lg transition-colors flex items-center gap-1.5 whitespace-nowrap border border-white/20 hover:bg-white/10"
+              className="text-[#1B2A4A] font-semibold text-xs px-4 py-2 rounded-lg transition-colors flex items-center gap-1.5 whitespace-nowrap border border-[#1B2A4A]/30 hover:bg-[#1B2A4A] hover:text-white hover:border-[#1B2A4A]"
             >
               Donate
             </Link>

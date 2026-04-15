@@ -725,7 +725,7 @@ export async function POST(request: NextRequest) {
                 </div>`,
                 FROM
               );
-            } catch { /* non-critical */ }
+            } catch (err) { console.error("[payments/webhook/stripe] donation thank-you email non-critical:", err); }
           }
 
           // Notify Devon + Peter
@@ -739,7 +739,7 @@ export async function POST(request: NextRequest) {
             for (const adminEmail of NOTIFY_TO) {
               await sendEmail(adminEmail, `New Donation: $${amount} from ${donorName}`, donationAdminHtml, FROM);
             }
-          } catch { /* non-critical */ }
+          } catch (err) { console.error("[payments/webhook/stripe] donation admin notification non-critical:", err); }
         }
 
         break;

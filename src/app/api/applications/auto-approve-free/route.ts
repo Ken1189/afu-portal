@@ -155,7 +155,8 @@ export async function autoApprove(
         <p style="color: #6b7280; font-size: 12px; margin-top: 24px;">African Farming Union — By Farmers, For Farmers</p>
       </div>`
     );
-  } catch {
+  } catch (err) {
+    console.error("[applications/auto-approve-free] welcome email non-critical:", err);
     // Email failed — user can reset password from login page
   }
 

@@ -23,7 +23,8 @@ export async function GET(req: NextRequest) {
     }
 
     return NextResponse.json({ credits: data || [] });
-  } catch {
+  } catch (err) {
+    console.error("[carbon/credits] GET non-critical:", err);
     return NextResponse.json({ error: 'Failed to fetch credits' }, { status: 500 });
   }
 }
@@ -78,7 +79,8 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ credit: data }, { status: 201 });
-  } catch {
+  } catch (err) {
+    console.error("[carbon/credits] POST non-critical:", err);
     return NextResponse.json({ error: 'Failed to mint credits' }, { status: 500 });
   }
 }
@@ -119,7 +121,8 @@ export async function PATCH(req: NextRequest) {
     }
 
     return NextResponse.json({ credit: data });
-  } catch {
+  } catch (err) {
+    console.error("[carbon/credits] PATCH non-critical:", err);
     return NextResponse.json({ error: 'Failed to update credit' }, { status: 500 });
   }
 }

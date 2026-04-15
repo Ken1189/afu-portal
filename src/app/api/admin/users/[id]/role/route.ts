@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
+import { notifyUser } from '@/lib/events/notifications';
 
 const ALLOWED_ROLES = [
   'farmer', 'supplier', 'ambassador', 'investor',
@@ -216,6 +217,18 @@ export async function PATCH(
         side_effects: sideEffects,
       },
     });
+
+    // Notify the user about their role change
+    if (oldRole !== newRole) {
+      const roleLabel = newRole.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
+      notifyUser(
+        targetUserId,
+        'Account Role Updated',
+        `Your account role has been updated to ${roleLabel}. You may now have access to new features and portals.`,
+        'all',
+        { type: 'system', actionUrl: '/dashboard' },
+      ).catch((err) => console.error('[role PATCH] notification non-critical:', err));
+    }
 
     return NextResponse.json({
       success: true,

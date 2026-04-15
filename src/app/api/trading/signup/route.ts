@@ -63,7 +63,7 @@ export async function POST(req: Request) {
         <p style="color: #999; font-size: 12px; margin-top: 20px;">African Farming Union | info@africanfarmingunion.org</p>
       </div>
     `);
-  } catch { /* silent */ }
+  } catch (err) { console.error("[trading/signup] confirmation email non-critical:", err); }
 
   // Notify admins
   try {
@@ -74,7 +74,7 @@ export async function POST(req: Request) {
       name: body.full_name,
       country: body.country,
     });
-  } catch { /* silent */ }
+  } catch (err) { console.error("[trading/signup] admin notification non-critical:", err); }
 
   return NextResponse.json({ success: true, id: data?.id });
 }

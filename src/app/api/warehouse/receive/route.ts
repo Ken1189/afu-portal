@@ -127,7 +127,8 @@ export async function POST(request: NextRequest) {
     try {
       const weightMT = body.net_weight_kg / 1000;
       await adminClient.rpc('increment_warehouse_stock', { weight_mt: weightMT });
-    } catch {
+    } catch (err) {
+      console.error("[warehouse/receive] increment_warehouse_stock non-critical:", err);
       // If the RPC doesn't exist, try a direct update
       try {
         const { data: wh } = await adminClient
@@ -141,7 +142,8 @@ export async function POST(request: NextRequest) {
             .update({ current_stock_mt: (wh.current_stock_mt || 0) + body.net_weight_kg / 1000 })
             .eq('id', wh.id);
         }
-      } catch {
+      } catch (err) {
+        console.error("[warehouse/receive] warehouse capacity update non-critical:", err);
         // Non-critical — log and continue
       }
     }
@@ -164,7 +166,8 @@ export async function POST(request: NextRequest) {
         }).catch(() => {
           // SMS send is best-effort
         });
-      } catch {
+      } catch (err) {
+        console.error("[warehouse/receive] SMS non-critical:", err);
         // SMS is non-critical
       }
     }

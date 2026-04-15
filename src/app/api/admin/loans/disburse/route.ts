@@ -223,7 +223,7 @@ export async function POST(request: NextRequest) {
             scheduleRows[0].due_date,
           ).catch(() => {});
         }
-      } catch { /* non-blocking */ }
+      } catch (err) { console.error("[admin/loans/disburse] lifecycle email non-critical:", err); /* non-blocking */ }
     }
 
     // S2.9: Emit LOAN_DISBURSED event for cross-system workflows
@@ -240,7 +240,8 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ success: true, disbursement });
-  } catch {
+  } catch (err) {
+    console.error("[admin/loans/disburse] non-critical:", err);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }

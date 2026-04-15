@@ -61,7 +61,8 @@ export async function GET() {
         totalEarnings = rewards.filter(r => r.status === 'paid').reduce((s, r) => s + Number(r.reward_amount), 0);
         pendingEarnings = rewards.filter(r => r.status === 'pending').reduce((s, r) => s + Number(r.reward_amount), 0);
       }
-    } catch {
+    } catch (err) {
+      console.error("[referral] rewards lookup non-critical:", err);
       // referral_rewards table may not exist yet
     }
 
@@ -72,7 +73,8 @@ export async function GET() {
       pendingEarnings,
       recentReferrals,
     });
-  } catch {
+  } catch (err) {
+    console.error("[referral] non-critical:", err);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }

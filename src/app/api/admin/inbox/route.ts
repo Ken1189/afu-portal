@@ -34,7 +34,8 @@ export async function GET(req: NextRequest) {
     const { count: unreadTotal } = await admin.from('conversations').select('id', { count: 'exact', head: true }).gt('unread_count', 0);
 
     return NextResponse.json({ conversations: data || [], total: count || 0, unread: unreadTotal || 0 });
-  } catch {
+  } catch (err) {
+    console.error("[admin/inbox] GET non-critical:", err);
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }
@@ -100,7 +101,8 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ conversation: conv }, { status: 201 });
-  } catch {
+  } catch (err) {
+    console.error("[admin/inbox] POST non-critical:", err);
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }

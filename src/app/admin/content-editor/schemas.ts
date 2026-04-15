@@ -337,6 +337,97 @@ export const SERVICE_TRADE_FINANCE_SCHEMA = makeServiceSchema('trade-finance', '
 export const SERVICE_LEGAL_ASSISTANCE_SCHEMA = makeServiceSchema('legal-assistance', 'Legal Assistance');
 
 // ───────────────────────────────────────────────────────────────────────
+// Farming, Commodities, Programs pages
+// ───────────────────────────────────────────────────────────────────────
+
+export const FARMING_SCHEMA: PageSchema = {
+  id: 'page_farming',
+  label: 'Farming Sectors',
+  publishedKey: 'page_farming',
+  draftKey: 'page_farming_draft',
+  previewPath: '/farming?preview=draft',
+  sections: [
+    { id: 'hero', title: 'Hero', fields: [
+      { key: 'title', label: 'Title', type: 'text', placeholder: 'Farming Sectors' },
+      { key: 'subtitle', label: 'Subtitle', type: 'textarea', placeholder: 'Explore African agricultural sectors' },
+      { key: 'image', label: 'Hero Image', type: 'image' },
+    ]},
+    { id: 'sectors', title: 'Sectors', fields: [
+      { key: 'sectors', label: 'Farming Sectors', type: 'object-list',
+        itemFields: [
+          { key: 'title', label: 'Sector Name', type: 'text' },
+          { key: 'description', label: 'Description', type: 'textarea' },
+          { key: 'icon', label: 'Icon', type: 'text' },
+          { key: 'link', label: 'Link', type: 'text' },
+        ],
+        defaultItem: { title: 'New Sector', description: '', icon: 'sprout', link: '/farming/crops' },
+      },
+    ]},
+    { id: 'cta', title: 'Call to Action', fields: [
+      { key: 'cta_text', label: 'CTA Text', type: 'text' },
+      { key: 'cta_link', label: 'CTA Link', type: 'text' },
+    ]},
+  ],
+};
+
+export const COMMODITIES_SCHEMA: PageSchema = {
+  id: 'page_commodities',
+  label: 'Commodities Trading',
+  publishedKey: 'page_commodities',
+  draftKey: 'page_commodities_draft',
+  previewPath: '/commodities?preview=draft',
+  sections: [
+    { id: 'hero', title: 'Hero', fields: [
+      { key: 'title', label: 'Title', type: 'text', placeholder: 'Commodity Trading Platform' },
+      { key: 'subtitle', label: 'Subtitle', type: 'textarea' },
+      { key: 'badge', label: 'Badge Text', type: 'text', placeholder: 'Live Prices' },
+    ]},
+    { id: 'features', title: 'Platform Features', fields: [
+      { key: 'features', label: 'Features', type: 'object-list',
+        itemFields: [
+          { key: 'title', label: 'Title', type: 'text' },
+          { key: 'description', label: 'Description', type: 'textarea' },
+        ],
+        defaultItem: { title: 'New Feature', description: '' },
+      },
+    ]},
+    { id: 'cta', title: 'Call to Action', fields: [
+      { key: 'cta_text', label: 'CTA Text', type: 'text' },
+      { key: 'cta_link', label: 'CTA Link', type: 'text' },
+    ]},
+  ],
+};
+
+export const PROGRAMS_SCHEMA: PageSchema = {
+  id: 'page_programs',
+  label: 'Programs',
+  publishedKey: 'page_programs',
+  draftKey: 'page_programs_draft',
+  previewPath: '/programs?preview=draft',
+  sections: [
+    { id: 'hero', title: 'Hero', fields: [
+      { key: 'title', label: 'Title', type: 'text', placeholder: 'AFU Programs' },
+      { key: 'subtitle', label: 'Subtitle', type: 'textarea' },
+    ]},
+    { id: 'programs', title: 'Active Programs', fields: [
+      { key: 'programs', label: 'Programs', type: 'object-list',
+        itemFields: [
+          { key: 'title', label: 'Program Name', type: 'text' },
+          { key: 'description', label: 'Description', type: 'textarea' },
+          { key: 'status', label: 'Status', type: 'text' },
+          { key: 'link', label: 'Link', type: 'text' },
+        ],
+        defaultItem: { title: 'New Program', description: '', status: 'Active', link: '#' },
+      },
+    ]},
+    { id: 'cta', title: 'Call to Action', fields: [
+      { key: 'cta_text', label: 'CTA Text', type: 'text' },
+      { key: 'cta_link', label: 'CTA Link', type: 'text' },
+    ]},
+  ],
+};
+
+// ───────────────────────────────────────────────────────────────────────
 // Page chrome schemas (text-only marketing chrome around dynamic pages)
 // ───────────────────────────────────────────────────────────────────────
 
@@ -1569,6 +1660,10 @@ export const ALL_SCHEMAS: PageSchema[] = [
   FAQ_CHROME_SCHEMA,
   CARBON_CHROME_SCHEMA,
   ADVISORS_CHROME_SCHEMA,
+  // Additional pages
+  FARMING_SCHEMA,
+  COMMODITIES_SCHEMA,
+  PROGRAMS_SCHEMA,
   // Forms
   FORM_CONTACT_SCHEMA,
   FORM_REGISTRATION_SCHEMA,
@@ -1618,7 +1713,7 @@ export const SCHEMA_GROUPS: SchemaGroup[] = [
   },
   {
     title: 'Information Pages',
-    schemaIds: ['page_chrome_countries', 'page_chrome_faq', 'page_chrome_carbon'],
+    schemaIds: ['page_chrome_countries', 'page_chrome_faq', 'page_chrome_carbon', 'page_farming', 'page_commodities', 'page_programs'],
   },
   {
     title: 'Forms',

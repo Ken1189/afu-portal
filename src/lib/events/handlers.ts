@@ -557,10 +557,10 @@ registerHandler('APPLICATION_APPROVED', async (event: AFUEvent) => {
         .single();
 
       if (ambassador) {
-        await supabase.from('ambassador_commissions').insert({
+        await supabase.from('commission_entries').insert({
           ambassador_id: ambassador.user_id,
           referred_user_id: userId,
-          amount: 0, // Commission calculated on first payment
+          commission_amount: 0, // Commission calculated on first payment
           reason: 'New member referral',
           status: 'pending',
         });

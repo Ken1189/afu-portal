@@ -273,7 +273,8 @@ export async function POST(request: NextRequest) {
         'Content-Disposition': `inline; filename="${type}-${Date.now()}.html"`,
       },
     });
-  } catch {
+  } catch (err) {
+    console.error("[pdf/generate] non-critical:", err);
     return NextResponse.json({ error: 'Failed to generate document' }, { status: 500 });
   }
 }

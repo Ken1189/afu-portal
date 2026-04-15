@@ -173,7 +173,7 @@ export async function POST(request: Request) {
               </div>
             </div>`,
           });
-        } catch { /* non-critical */ }
+        } catch (err) { console.error("[admin/applications/approve] existing user email non-critical:", err); }
 
         return NextResponse.json({
           success: true,
@@ -316,7 +316,7 @@ export async function POST(request: Request) {
         type: 'system',
         link: '/farm',
       });
-    } catch { /* notifications table may not exist */ }
+    } catch (err) { console.error("[admin/applications/approve] notification insert non-critical:", err); /* notifications table may not exist */ }
 
     // Emit cross-system event (fire-and-forget)
     emitEventAsync({
@@ -459,7 +459,7 @@ export async function POST(request: Request) {
           <a href="https://africanfarmingunion.org/admin/${isSupplier ? 'suppliers' : 'members'}" style="display:inline-block;background:#5DB347;color:white;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:600">View in Admin</a>
         </div>`,
       });
-    } catch { /* non-critical */ }
+    } catch (err) { console.error("[admin/applications/approve] admin notification non-critical:", err); }
 
     // Fire marketing automations (non-blocking)
     fireAutomations('member_approved', {

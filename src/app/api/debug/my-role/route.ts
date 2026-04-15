@@ -65,7 +65,8 @@ export async function GET() {
       if (extra?.roles && Array.isArray(extra.roles)) rolesArr = extra.roles;
       if (extra?.capabilities && Array.isArray(extra.capabilities))
         capabilities = extra.capabilities;
-    } catch {
+    } catch (err) {
+      console.error("[debug/my-role] roles/capabilities lookup non-critical:", err);
       // columns missing — fine
     }
 

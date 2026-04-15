@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
         tier: 'free',
         status: 'active',
       });
-    } catch { /* may already exist */ }
+    } catch (err) { console.error("[admin/foober/approve-driver] member insert non-critical:", err); /* may already exist */ }
 
     // Create driver record
     await supabase.from('foober_drivers').insert({

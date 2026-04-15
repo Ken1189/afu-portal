@@ -369,7 +369,17 @@ export default function SupplierDashboard() {
       .then(({ data }) => {
         if (data?.value) {
           const vids = (typeof data.value === 'string' ? JSON.parse(data.value) : data.value) as any[];
-          setSupplierVideos(vids.filter((v: any) => v.url));
+          // Normalize admin schema (uploaded file OR youtube) → supplier portal shape
+          const normalized = vids
+            .map((v: any) => ({
+              title: v.title || '',
+              url: v.video_url || v.youtube_url || v.url || '',
+              thumbnail: v.thumbnail_url || v.thumbnail,
+              is_featured: v.is_featured,
+              duration: v.duration,
+            }))
+            .filter((v) => v.url);
+          setSupplierVideos(normalized);
         }
       });
   }, []);

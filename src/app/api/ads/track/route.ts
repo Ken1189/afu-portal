@@ -88,6 +88,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ tracked });
   } catch (err) {
+    console.error("[ads/track] non-critical:", err);
     // Fire-and-forget — don't fail the page load
     return NextResponse.json({ tracked: false, error: (err as Error).message }, { status: 200 });
   }

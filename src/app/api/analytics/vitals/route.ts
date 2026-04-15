@@ -9,7 +9,8 @@ export async function POST(request: Request) {
     // Optional: console.debug('[web-vitals]', body);
     // Future: forward to Sentry / Plausible / custom analytics_events table
     void body;
-  } catch {
+  } catch (err) {
+    console.error("[analytics/vitals] non-critical:", err);
     // Ignore — fire-and-forget analytics
   }
   return new NextResponse(null, { status: 204 });
