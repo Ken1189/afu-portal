@@ -59,7 +59,8 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=(self), interest-cohort=()',
+            // Allow camera + microphone on same-origin (needed for admin video recorder)
+            value: 'camera=(self), microphone=(self), geolocation=(self), interest-cohort=()',
           },
           {
             key: 'Content-Security-Policy',
@@ -67,9 +68,13 @@ const nextConfig: NextConfig = {
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline' https://js.stripe.com https://*.sentry.io",
               "style-src 'self' 'unsafe-inline'",
-              "img-src 'self' data: blob: https://images.unsplash.com https://*.supabase.co https://flagcdn.com https://ui-avatars.com https://lh3.googleusercontent.com https://cdnjs.cloudflare.com https://*.tile.openstreetmap.org",
+              "img-src 'self' data: blob: https://images.unsplash.com https://*.supabase.co https://flagcdn.com https://ui-avatars.com https://lh3.googleusercontent.com https://cdnjs.cloudflare.com https://*.tile.openstreetmap.org https://i.ytimg.com https://img.youtube.com",
               "font-src 'self' data:",
               "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://eth-mainnet.g.alchemy.com https://*.edma.app https://*.sentry.io https://*.ingest.sentry.io https://checkout.stripe.com https://api.stripe.com https://*.resend.com https://*.tile.openstreetmap.org https://*.openstreetmap.org https://api.open-meteo.com",
+              // Allow YouTube/Vimeo embeds
+              "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com https://js.stripe.com https://checkout.stripe.com",
+              // Allow uploaded videos from Supabase Storage + recorded blobs
+              "media-src 'self' blob: data: https://*.supabase.co",
               "frame-ancestors 'self'",
               "base-uri 'self'",
               "form-action 'self'",
