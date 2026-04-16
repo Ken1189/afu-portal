@@ -204,6 +204,7 @@ const navGroups: NavGroup[] = [
       { href: '/admin/testimonials', label: 'Testimonials', icon: <MessageSquare className={ICON_CLS} /> },
       { href: '/admin/announcements', label: 'Announcements', icon: <Bell className={ICON_CLS} /> },
       { href: '/admin/hero-slides', label: 'Homepage Slides', icon: <Layers className={ICON_CLS} /> },
+      { href: '/admin/settings/homepage-services', label: 'Homepage Services', icon: <Layers className={ICON_CLS} /> },
       { href: '/admin/settings/videos', label: 'Videos', icon: <Video className={ICON_CLS} /> },
       { href: '/admin/services', label: 'Services Pages', icon: <Wrench className={ICON_CLS} /> },
       { href: '/admin/farm-showcase', label: 'Partner Farms', icon: <Sprout className={ICON_CLS} /> },

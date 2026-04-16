@@ -330,6 +330,34 @@ export default function Home() {
   const [partners, setPartners] = useState<{ name: string; initials: string; color: string; logo_url?: string }[]>(FALLBACK_PARTNERS);
   const [hero, setHero] = useState(HERO_DEFAULTS);
   const [services, setServices] = useState(FALLBACK_SERVICES);
+
+  // Load admin-managed service cards (images etc) from site_config
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.from('site_config').select('value').eq('key', 'homepage_services').maybeSingle()
+      .then(({ data }) => {
+        if (data?.value) {
+          try {
+            const parsed = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              // Merge DB data with fallback (keep icons from fallback)
+              const merged = FALLBACK_SERVICES.map((fb, i) => {
+                const dbCard = parsed[i];
+                if (!dbCard) return fb;
+                return {
+                  ...fb,
+                  title: dbCard.title || fb.title,
+                  desc: dbCard.desc || fb.desc,
+                  link: dbCard.link || fb.link,
+                  img: dbCard.img || fb.img,
+                };
+              });
+              setServices(merged);
+            }
+          } catch { /* keep fallback */ }
+        }
+      });
+  }, []);
   const [programs, setPrograms] = useState(FALLBACK_PROGRAMS);
   const [memberCount, setMemberCount] = useState(0);
   const [homepageStats, setHomepageStats] = useState<HomepageStat[]>(FALLBACK_HOMEPAGE_STATS);
