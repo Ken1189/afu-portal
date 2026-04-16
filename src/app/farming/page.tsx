@@ -108,13 +108,13 @@ const featuredCrops = [
   {
     name: "Coffee",
     slug: "coffee",
-    image: "https://images.unsplash.com/photo-1447933601403-56dc2df6e3f5?w=600&h=400&fit=crop",
+    image: "https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=600&h=400&fit=crop",
     countries: ["Ethiopia", "Kenya", "Tanzania"],
   },
   {
     name: "Maize",
     slug: "maize",
-    image: "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&h=400&fit=crop",
+    image: "https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=600&h=400&fit=crop",
     countries: ["Zambia", "Zimbabwe", "Mozambique"],
   },
   {
@@ -126,7 +126,7 @@ const featuredCrops = [
   {
     name: "Cocoa",
     slug: "cocoa",
-    image: "https://images.unsplash.com/photo-1606312619070-d48b4c652a52?w=600&h=400&fit=crop",
+    image: "https://images.unsplash.com/photo-1599599810694-b5b37304c041?w=600&h=400&fit=crop",
     countries: ["Ghana", "Cameroon"],
   },
   {
@@ -138,31 +138,31 @@ const featuredCrops = [
   {
     name: "Macadamia",
     slug: "macadamia",
-    image: "https://images.unsplash.com/photo-1607113256194-5c4a47107170?w=600&h=400&fit=crop",
+    image: "https://images.unsplash.com/photo-1608797178974-15b35a64ede9?w=600&h=400&fit=crop",
     countries: ["South Africa", "Kenya", "Malawi"],
   },
   {
     name: "Soya",
     slug: "soya",
-    image: "https://images.unsplash.com/photo-1592395748679-4bea45148903?w=600&h=400&fit=crop",
+    image: "https://images.unsplash.com/photo-1599708153386-62bf3f035c78?w=600&h=400&fit=crop",
     countries: ["Zambia", "Zimbabwe", "Malawi"],
   },
   {
     name: "Cotton",
     slug: "cotton",
-    image: "https://images.unsplash.com/photo-1616431101954-40f0af28c0df?w=600&h=400&fit=crop",
+    image: "https://images.unsplash.com/photo-1594897030264-ab7d87efc473?w=600&h=400&fit=crop",
     countries: ["Zimbabwe", "Mozambique", "Tanzania"],
   },
   {
     name: "Tea",
     slug: "tea",
-    image: "https://images.unsplash.com/photo-1582793988951-9aed5509eb97?w=600&h=400&fit=crop",
+    image: "https://images.unsplash.com/photo-1564890369478-c89ca6d9cde9?w=600&h=400&fit=crop",
     countries: ["Kenya", "Malawi", "Tanzania"],
   },
   {
     name: "Tobacco",
     slug: "tobacco",
-    image: "https://images.unsplash.com/photo-1416339134316-0e91dc9ded92?w=600&h=400&fit=crop",
+    image: "https://images.unsplash.com/photo-1631379578550-7038263db699?w=600&h=400&fit=crop",
     countries: ["Zimbabwe", "Malawi", "Mozambique"],
   },
 ];
