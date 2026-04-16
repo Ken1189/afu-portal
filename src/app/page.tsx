@@ -119,14 +119,14 @@ const FALLBACK_SERVICES = [
     title: 'Inputs & Equipment',
     desc: 'Tractors, drones, irrigation, seeds, and fertilizers. Bulk procurement at better prices.',
     link: '/services/inputs',
-    img: 'https://images.unsplash.com/photo-1509391366360-2e959784a276?w=800&h=500&fit=crop',
+    img: 'https://images.unsplash.com/photo-1593113630400-ea4288922497?w=800&h=500&fit=crop',
   },
   {
     icon: Factory,
     title: 'Processing Hubs',
     desc: 'Milling, drying, cold chain, and packaging. Value-addition at source.',
     link: '/services/processing',
-    img: 'https://images.unsplash.com/photo-1518977822534-7049a61ee0c2?w=1200&q=80&auto=format&fit=crop',
+    img: 'https://images.unsplash.com/photo-1625758476104-f2ed6c81248e?w=800&h=500&fit=crop',
   },
   {
     icon: ShieldCheck,

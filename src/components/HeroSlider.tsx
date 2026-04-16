@@ -26,7 +26,7 @@ const DEFAULT_SLIDE: HeroSlide = {
   title: "Let's Grow Together",
   subtitle: 'By farmers, for farmers. Run by Africans, for Africans. We bring the financing, inputs, processing, and guaranteed buyers — you bring the land and the passion. Together, we turn your harvest into real, sustainable income.',
   description: null,
-  image_url: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=1920&h=1080&fit=crop',
+  image_url: 'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=1920&h=1080&fit=crop',
   cta_text: 'Join Our Farming Family',
   cta_link: '/apply',
   display_order: 0,
