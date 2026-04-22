@@ -376,8 +376,52 @@ export default function AmbassadorsPage() {
   const stat3Value = (chrome?.stat3_value as string) ?? '15%';
   const stat3Label = (chrome?.stat3_label as string) ?? 'Earn Up To';
   const howItWorksTitle = (chrome?.how_it_works_title as string) ?? 'How It Works';
+  const howItWorksSubtitle = (chrome?.how_it_works_subtitle as string) ?? 'Start earning in four simple steps. No experience required.';
   const tiersTitle = (chrome?.tiers_title as string) ?? 'Ambassador Tiers';
+  const tiersSubtitle = (chrome?.tiers_subtitle as string) ?? 'The more you grow, the more you earn. Advance through tiers as you bring new members to AFU.';
+  const commissionTitle = (chrome?.commission_title as string) ?? 'Commission Structure';
+  const commissionSubtitle = (chrome?.commission_subtitle as string) ?? 'Multiple revenue streams to maximise your earnings';
+  const commissionFooter = (chrome?.commission_footer as string) ?? 'Rates are configurable by admin and may vary by region and tier level.';
+  const ambassadorsSectionTitle = (chrome?.ambassadors_section_title as string) ?? 'Our Ambassadors';
+  const ambassadorsSectionSubtitle = (chrome?.ambassadors_section_subtitle as string) ?? "The people driving Africa's agricultural revolution";
   const applyTitle = (chrome?.apply_title as string) ?? 'Apply to Become an Ambassador';
+  const applySubtitle = (chrome?.apply_subtitle as string) ?? 'Join our network of ambassadors across Africa and start earning commissions today.';
+  const applySuccessHeading = (chrome?.apply_success_heading as string) ?? 'Application Submitted!';
+  const applySuccessMessage = (chrome?.apply_success_message as string) ?? "Thank you for your interest in becoming an AFU Ambassador. We review applications within 48 hours. You'll receive a confirmation email shortly.";
+  const formReviewNote = (chrome?.form_review_note as string) ?? 'Your application will be reviewed within 48 hours.';
+
+  // How It Works steps — keep icons, override title/description from chrome
+  const chromeSteps = Array.isArray(chrome?.how_it_works_steps) ? (chrome!.how_it_works_steps as { title: string; description: string }[]) : null;
+  const howItWorksSteps = (chromeSteps && chromeSteps.length > 0)
+    ? chromeSteps.map((s, i) => ({ ...s, icon: HOW_IT_WORKS_STEPS[i]?.icon || UserPlus }))
+    : HOW_IT_WORKS_STEPS;
+
+  // Tiers — keep icons/colors, override name/minReferrals/commission/perks from chrome
+  const TIER_VISUALS = [
+    { icon: Shield, color: '#CD7F32', bgColor: '#CD7F3220' },
+    { icon: Star, color: '#6B7280', bgColor: '#6B728020' },
+    { icon: Award, color: '#D97706', bgColor: '#D9770620' },
+    { icon: Crown, color: '#6366F1', bgColor: '#6366F120' },
+    { icon: Gem, color: '#0EA5E9', bgColor: '#0EA5E920' },
+  ];
+  const chromeTiers = Array.isArray(chrome?.tiers) ? (chrome!.tiers as { name: string; minReferrals: number; commission: string; perks: string[] }[]) : null;
+  const tiers = (chromeTiers && chromeTiers.length > 0)
+    ? chromeTiers.map((t, i) => ({ ...t, ...(TIER_VISUALS[i] || TIER_VISUALS[TIER_VISUALS.length - 1]) }))
+    : TIERS;
+
+  // Commission rates from chrome (if present) override DEFAULT + commission_rates key
+  const chromeRates = Array.isArray(chrome?.commission_rates) ? (chrome!.commission_rates as { label: string; amount: string; description: string }[]) : null;
+  const RATE_VISUALS = [
+    { icon: Repeat, gradient: 'from-[#5DB347] to-[#449933]' },
+    { icon: Landmark, gradient: 'from-blue-500 to-blue-600' },
+    { icon: Building2, gradient: 'from-indigo-500 to-indigo-600' },
+    { icon: Rocket, gradient: 'from-purple-500 to-purple-600' },
+    { icon: BadgeDollarSign, gradient: 'from-amber-500 to-amber-600' },
+    { icon: Trophy, gradient: 'from-[#FFD700] to-amber-500' },
+  ];
+  const effectiveCommissionRates = (chromeRates && chromeRates.length > 0)
+    ? chromeRates.map((r, i) => ({ ...r, ...(RATE_VISUALS[i] || RATE_VISUALS[RATE_VISUALS.length - 1]) }))
+    : commissionRates;
 
   const filtered = useMemo(() => {
     if (activeSector === 'All') return ambassadors;
@@ -555,15 +599,15 @@ export default function AmbassadorsPage() {
               {howItWorksTitle}
             </h2>
             <p className="text-gray-500 max-w-2xl mx-auto">
-              Start earning in four simple steps. No experience required.
+              {howItWorksSubtitle}
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {HOW_IT_WORKS_STEPS.map((step, idx) => (
-              <div key={step.title} className="relative text-center group">
+            {howItWorksSteps.map((step, idx) => (
+              <div key={`${step.title}-${idx}`} className="relative text-center group">
                 {/* Connector line */}
-                {idx < HOW_IT_WORKS_STEPS.length - 1 && (
+                {idx < howItWorksSteps.length - 1 && (
                   <div className="hidden lg:block absolute top-12 left-[60%] w-[80%] h-px bg-[#5DB347]/20" />
                 )}
                 <div
@@ -588,15 +632,15 @@ export default function AmbassadorsPage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-14">
             <h2 className="text-3xl md:text-4xl font-extrabold text-[#1B2A4A] mb-4">
-              Commission Structure
+              {commissionTitle}
             </h2>
             <p className="text-gray-500 max-w-2xl mx-auto">
-              Multiple revenue streams to maximise your earnings
+              {commissionSubtitle}
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            {commissionRates.map((rate) => {
+            {effectiveCommissionRates.map((rate) => {
               const Icon = rate.icon || DollarSign;
               const grad = rate.gradient || 'from-[#5DB347] to-[#449933]';
               return (
@@ -622,7 +666,7 @@ export default function AmbassadorsPage() {
           </div>
 
           <p className="text-center text-xs text-gray-400 mt-8">
-            Rates are configurable by admin and may vary by region and tier level.
+            {commissionFooter}
           </p>
         </div>
       </section>
@@ -637,12 +681,12 @@ export default function AmbassadorsPage() {
               {tiersTitle}
             </h2>
             <p className="text-gray-500 max-w-2xl mx-auto">
-              The more you grow, the more you earn. Advance through tiers as you bring new members to AFU.
+              {tiersSubtitle}
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
-            {TIERS.map((tier) => (
+            {tiers.map((tier) => (
               <div
                 key={tier.name}
                 className="relative bg-white rounded-xl border-2 p-6 text-center transition-all hover:shadow-lg hover:-translate-y-1"
@@ -695,10 +739,10 @@ export default function AmbassadorsPage() {
             Our Ambassadors
           </div>
           <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4 tracking-tight">
-            Our Ambassadors
+            {ambassadorsSectionTitle}
           </h2>
           <p className="text-lg text-white/70 max-w-2xl mx-auto">
-            The people driving Africa&apos;s agricultural revolution
+            {ambassadorsSectionSubtitle}
           </p>
         </div>
       </section>
@@ -874,7 +918,7 @@ export default function AmbassadorsPage() {
               {applyTitle}
             </h2>
             <p className="text-white/60 max-w-xl mx-auto">
-              Join our network of ambassadors across Africa and start earning commissions today.
+              {applySubtitle}
             </p>
           </div>
 
@@ -886,10 +930,9 @@ export default function AmbassadorsPage() {
               >
                 <CheckCircle2 className="w-10 h-10 text-[#5DB347]" />
               </div>
-              <h3 className="text-2xl font-bold text-[#1B2A4A] mb-3">Application Submitted!</h3>
+              <h3 className="text-2xl font-bold text-[#1B2A4A] mb-3">{applySuccessHeading}</h3>
               <p className="text-gray-500 mb-6">
-                Thank you for your interest in becoming an AFU Ambassador.
-                We review applications within 48 hours. You&apos;ll receive a confirmation email shortly.
+                {applySuccessMessage}
               </p>
               <Link
                 href="/"
@@ -1113,7 +1156,7 @@ export default function AmbassadorsPage() {
               </button>
 
               <p className="text-xs text-gray-400 text-center">
-                Your application will be reviewed within 48 hours.
+                {formReviewNote}
                 {authUser && (
                   <span className="block mt-1 text-[#5DB347]">
                     Signed in as {authUser.email} -- your profile will be linked automatically.

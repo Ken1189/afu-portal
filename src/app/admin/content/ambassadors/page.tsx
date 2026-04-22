@@ -3,18 +3,16 @@
 /**
  * Dedicated Content Editor for /ambassadors
  *
- * Follows the pattern established in /admin/settings/homepage-services:
- * - Shows the ACTUAL current fields on the live page
- * - Pre-populates with current live values (not empty defaults)
- * - Saves to site_config key 'page_chrome_ambassadors'
- * - Live page reads same key with fallback to hardcoded defaults
+ * Every piece of copy on the live page is editable here.
+ * Saves to site_config key 'page_chrome_ambassadors'.
+ * The live page reads the same key and falls back to hardcoded defaults.
  */
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import {
-  Save, Loader2, CheckCircle2, AlertCircle, ArrowLeft, Eye, RotateCcw,
+  Save, Loader2, CheckCircle2, AlertCircle, ArrowLeft, Eye, RotateCcw, Plus, Trash2,
 } from 'lucide-react';
 
 // ── Toast ─────────────────────────────────────────────────
@@ -29,9 +27,45 @@ function Toast({ message, type, onClose }: { message: string; type: 'success' | 
   );
 }
 
+// ── Types ─────────────────────────────────────────────
+
+type Step = { title: string; description: string };
+type Tier = { name: string; minReferrals: number; commission: string; perks: string[] };
+type CommissionRate = { label: string; amount: string; description: string };
+
+type FormShape = {
+  hero_badge: string;
+  hero_title: string;
+  hero_subtitle: string;
+  hero_cta_text: string;
+  stat1_value: string;
+  stat1_label: string;
+  stat2_value: string;
+  stat2_label: string;
+  stat3_value: string;
+  stat3_label: string;
+  how_it_works_title: string;
+  how_it_works_subtitle: string;
+  how_it_works_steps: Step[];
+  commission_title: string;
+  commission_subtitle: string;
+  commission_footer: string;
+  commission_rates: CommissionRate[];
+  tiers_title: string;
+  tiers_subtitle: string;
+  tiers: Tier[];
+  ambassadors_section_title: string;
+  ambassadors_section_subtitle: string;
+  apply_title: string;
+  apply_subtitle: string;
+  apply_success_heading: string;
+  apply_success_message: string;
+  form_review_note: string;
+};
+
 // ── Current live defaults (match /ambassadors/page.tsx exactly) ─────
 
-const LIVE_DEFAULTS = {
+const LIVE_DEFAULTS: FormShape = {
   hero_badge: 'Ambassador Program',
   hero_title: '',
   hero_subtitle: "Earn commissions by connecting farmers, suppliers, and investors to Africa's largest agricultural platform",
@@ -43,11 +77,41 @@ const LIVE_DEFAULTS = {
   stat3_value: '15%',
   stat3_label: 'Earn Up To',
   how_it_works_title: 'How It Works',
+  how_it_works_subtitle: 'Start earning in four simple steps. No experience required.',
+  how_it_works_steps: [
+    { title: 'Sign Up', description: 'Apply to join the ambassador programme and get approved within 48 hours' },
+    { title: 'Share Your Link', description: 'Get a unique referral link and share it with farmers, suppliers, and investors' },
+    { title: 'Farmers Join', description: 'When people sign up through your link, they are tracked to your account' },
+    { title: 'Earn Commissions', description: 'Get paid for every signup, transaction, and milestone your referrals achieve' },
+  ],
+  commission_title: 'Commission Structure',
+  commission_subtitle: 'Multiple revenue streams to maximise your earnings',
+  commission_footer: 'Rates are configurable by admin and may vary by region and tier level.',
+  commission_rates: [
+    { label: 'Membership Fees', amount: '10% recurring', description: 'Earn 10% of every membership fee your referrals pay — every month, for life' },
+    { label: 'Fundraising $100K-$500K', amount: '2%', description: 'Commission on capital raised between $100K and $500K' },
+    { label: 'Fundraising $500K-$1M', amount: '2.5%', description: 'Commission on capital raised between $500K and $1M' },
+    { label: 'Fundraising $1M-$5M', amount: '5%', description: 'Commission on capital raised between $1M and $5M' },
+    { label: 'Fundraising $5M-$10M', amount: '7.5%', description: 'Commission on capital raised between $5M and $10M' },
+    { label: 'Fundraising $100M+', amount: '10%', description: 'Commission on capital raised above $100M' },
+  ],
   tiers_title: 'Ambassador Tiers',
+  tiers_subtitle: 'The more you grow, the more you earn. Advance through tiers as you bring new members to AFU.',
+  tiers: [
+    { name: 'Bronze', minReferrals: 0, commission: '2%', perks: ['Base commission rate', 'Ambassador dashboard', 'Referral link'] },
+    { name: 'Silver', minReferrals: 10, commission: '4%', perks: ['Increased commission', 'Monthly bonus', 'Priority email support'] },
+    { name: 'Gold', minReferrals: 25, commission: '6%', perks: ['Premium commission', 'Quarterly bonus', 'Priority support'] },
+    { name: 'Platinum', minReferrals: 50, commission: '8%', perks: ['Top commission rate', 'Exclusive events', 'Dedicated manager'] },
+    { name: 'Diamond', minReferrals: 100, commission: '10%', perks: ['Maximum commission', 'Advisory role', 'Revenue sharing'] },
+  ],
+  ambassadors_section_title: 'Our Ambassadors',
+  ambassadors_section_subtitle: "The people driving Africa's agricultural revolution",
   apply_title: 'Apply to Become an Ambassador',
+  apply_subtitle: 'Join our network of ambassadors across Africa and start earning commissions today.',
+  apply_success_heading: 'Application Submitted!',
+  apply_success_message: "Thank you for your interest in becoming an AFU Ambassador. We review applications within 48 hours. You'll receive a confirmation email shortly.",
+  form_review_note: 'Your application will be reviewed within 48 hours.',
 };
-
-type FormShape = typeof LIVE_DEFAULTS;
 
 // ── Main Page ─────────────────────────────────────────────
 
@@ -59,7 +123,6 @@ export default function AmbassadorsContentEditor() {
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [dbLoaded, setDbLoaded] = useState(false);
 
-  // Load current DB values (if any), otherwise show live defaults
   useEffect(() => {
     async function load() {
       try {
@@ -70,7 +133,6 @@ export default function AmbassadorsContentEditor() {
           .maybeSingle();
         if (data?.value) {
           const parsed = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
-          // Merge with defaults so any new fields also show
           setForm({ ...LIVE_DEFAULTS, ...parsed });
           setDbLoaded(true);
         }
@@ -82,9 +144,59 @@ export default function AmbassadorsContentEditor() {
     load();
   }, [supabase]);
 
-  const updateField = (key: keyof FormShape, value: string) => {
+  const updateField = <K extends keyof FormShape>(key: K, value: FormShape[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
+
+  // Step helpers
+  const updateStep = (idx: number, key: keyof Step, value: string) => {
+    setForm((prev) => ({
+      ...prev,
+      how_it_works_steps: prev.how_it_works_steps.map((s, i) => (i === idx ? { ...s, [key]: value } : s)),
+    }));
+  };
+  const addStep = () => setForm((p) => ({ ...p, how_it_works_steps: [...p.how_it_works_steps, { title: '', description: '' }] }));
+  const removeStep = (idx: number) => setForm((p) => ({ ...p, how_it_works_steps: p.how_it_works_steps.filter((_, i) => i !== idx) }));
+
+  // Tier helpers
+  const updateTier = (idx: number, key: keyof Tier, value: string | number | string[]) => {
+    setForm((prev) => ({
+      ...prev,
+      tiers: prev.tiers.map((t, i) => (i === idx ? { ...t, [key]: value } : t)),
+    }));
+  };
+  const updateTierPerk = (tierIdx: number, perkIdx: number, value: string) => {
+    setForm((prev) => ({
+      ...prev,
+      tiers: prev.tiers.map((t, i) =>
+        i === tierIdx ? { ...t, perks: t.perks.map((p, j) => (j === perkIdx ? value : p)) } : t,
+      ),
+    }));
+  };
+  const addTierPerk = (tierIdx: number) => {
+    setForm((prev) => ({
+      ...prev,
+      tiers: prev.tiers.map((t, i) => (i === tierIdx ? { ...t, perks: [...t.perks, ''] } : t)),
+    }));
+  };
+  const removeTierPerk = (tierIdx: number, perkIdx: number) => {
+    setForm((prev) => ({
+      ...prev,
+      tiers: prev.tiers.map((t, i) => (i === tierIdx ? { ...t, perks: t.perks.filter((_, j) => j !== perkIdx) } : t)),
+    }));
+  };
+  const addTier = () => setForm((p) => ({ ...p, tiers: [...p.tiers, { name: '', minReferrals: 0, commission: '', perks: [] }] }));
+  const removeTier = (idx: number) => setForm((p) => ({ ...p, tiers: p.tiers.filter((_, i) => i !== idx) }));
+
+  // Commission rate helpers
+  const updateRate = (idx: number, key: keyof CommissionRate, value: string) => {
+    setForm((prev) => ({
+      ...prev,
+      commission_rates: prev.commission_rates.map((r, i) => (i === idx ? { ...r, [key]: value } : r)),
+    }));
+  };
+  const addRate = () => setForm((p) => ({ ...p, commission_rates: [...p.commission_rates, { label: '', amount: '', description: '' }] }));
+  const removeRate = (idx: number) => setForm((p) => ({ ...p, commission_rates: p.commission_rates.filter((_, i) => i !== idx) }));
 
   const save = async () => {
     setSaving(true);
@@ -186,25 +298,120 @@ export default function AmbassadorsContentEditor() {
           </div>
         </Section>
 
-        {/* Section titles */}
-        <Section title="Section Titles" description="The headlines for each section on the page">
-          <Field label="'How It Works' section title" value={form.how_it_works_title} onChange={(v) => updateField('how_it_works_title', v)} />
-          <Field label="'Ambassador Tiers' section title" value={form.tiers_title} onChange={(v) => updateField('tiers_title', v)} />
-          <Field label="Apply form section title" value={form.apply_title} onChange={(v) => updateField('apply_title', v)} />
+        {/* How It Works */}
+        <Section title="How It Works" description="The four-step explainer section">
+          <Field label="Section title" value={form.how_it_works_title} onChange={(v) => updateField('how_it_works_title', v)} />
+          <Field label="Section subtitle" value={form.how_it_works_subtitle} onChange={(v) => updateField('how_it_works_subtitle', v)} multiline />
+          <div className="space-y-3 pt-2">
+            {form.how_it_works_steps.map((step, idx) => (
+              <div key={idx} className="bg-gray-50 border border-gray-200 rounded-lg p-3 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-gray-500">Step {idx + 1}</span>
+                  <button type="button" onClick={() => removeStep(idx)} className="text-red-500 hover:text-red-700 text-xs inline-flex items-center gap-1">
+                    <Trash2 className="w-3 h-3" /> Remove
+                  </button>
+                </div>
+                <Field label="Title" value={step.title} onChange={(v) => updateStep(idx, 'title', v)} />
+                <Field label="Description" value={step.description} onChange={(v) => updateStep(idx, 'description', v)} multiline />
+              </div>
+            ))}
+            <button type="button" onClick={addStep} className="inline-flex items-center gap-1.5 px-3 py-2 text-sm text-[#5DB347] border border-[#5DB347]/30 rounded-lg hover:bg-[#5DB347]/5">
+              <Plus className="w-4 h-4" /> Add step
+            </button>
+          </div>
         </Section>
 
-        {/* Footer info */}
-        <div className="bg-[#F0F4F8] border border-[#1B2A4A]/10 rounded-xl p-4 text-sm text-[#1B2A4A]">
-          <p className="font-medium mb-1">What&apos;s NOT editable here (yet):</p>
-          <ul className="list-disc list-inside text-xs text-gray-600 space-y-1">
-            <li>The 4 &quot;How It Works&quot; steps (Sign Up, Share Your Link, Farmers Join, Earn Commissions)</li>
-            <li>Ambassador tier names, amounts, and descriptions</li>
-            <li>The commission rates (Signup, Transaction, Milestone)</li>
-            <li>Featured ambassador cards (managed via /admin/ambassadors)</li>
-            <li>The application form fields</li>
-          </ul>
-          <p className="text-xs text-gray-500 mt-2">These are still hardcoded. Tell Claude which ones you want editable next.</p>
-        </div>
+        {/* Commission Structure */}
+        <Section title="Commission Structure" description="Commission rates shown as cards">
+          <Field label="Section title" value={form.commission_title} onChange={(v) => updateField('commission_title', v)} />
+          <Field label="Section subtitle" value={form.commission_subtitle} onChange={(v) => updateField('commission_subtitle', v)} multiline />
+          <Field label="Footer note (below the cards)" value={form.commission_footer} onChange={(v) => updateField('commission_footer', v)} multiline />
+          <div className="space-y-3 pt-2">
+            {form.commission_rates.map((rate, idx) => (
+              <div key={idx} className="bg-gray-50 border border-gray-200 rounded-lg p-3 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-gray-500">Rate {idx + 1}</span>
+                  <button type="button" onClick={() => removeRate(idx)} className="text-red-500 hover:text-red-700 text-xs inline-flex items-center gap-1">
+                    <Trash2 className="w-3 h-3" /> Remove
+                  </button>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <Field label="Label" value={rate.label} onChange={(v) => updateRate(idx, 'label', v)} />
+                  <Field label="Amount (e.g. '5%')" value={rate.amount} onChange={(v) => updateRate(idx, 'amount', v)} />
+                </div>
+                <Field label="Description" value={rate.description} onChange={(v) => updateRate(idx, 'description', v)} multiline />
+              </div>
+            ))}
+            <button type="button" onClick={addRate} className="inline-flex items-center gap-1.5 px-3 py-2 text-sm text-[#5DB347] border border-[#5DB347]/30 rounded-lg hover:bg-[#5DB347]/5">
+              <Plus className="w-4 h-4" /> Add commission rate
+            </button>
+          </div>
+        </Section>
+
+        {/* Tiers */}
+        <Section title="Ambassador Tiers" description="Tier cards (Bronze, Silver, Gold, etc.)">
+          <Field label="Section title" value={form.tiers_title} onChange={(v) => updateField('tiers_title', v)} />
+          <Field label="Section subtitle" value={form.tiers_subtitle} onChange={(v) => updateField('tiers_subtitle', v)} multiline />
+          <div className="space-y-3 pt-2">
+            {form.tiers.map((tier, idx) => (
+              <div key={idx} className="bg-gray-50 border border-gray-200 rounded-lg p-3 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-gray-500">Tier {idx + 1}</span>
+                  <button type="button" onClick={() => removeTier(idx)} className="text-red-500 hover:text-red-700 text-xs inline-flex items-center gap-1">
+                    <Trash2 className="w-3 h-3" /> Remove
+                  </button>
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  <Field label="Name" value={tier.name} onChange={(v) => updateTier(idx, 'name', v)} />
+                  <Field label="Min referrals" value={String(tier.minReferrals)} onChange={(v) => updateTier(idx, 'minReferrals', Number(v) || 0)} />
+                  <Field label="Commission (e.g. '6%')" value={tier.commission} onChange={(v) => updateTier(idx, 'commission', v)} />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Perks</label>
+                  <div className="space-y-2">
+                    {tier.perks.map((perk, perkIdx) => (
+                      <div key={perkIdx} className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          value={perk}
+                          onChange={(e) => updateTierPerk(idx, perkIdx, e.target.value)}
+                          className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#5DB347]/20 focus:border-[#5DB347] outline-none"
+                        />
+                        <button type="button" onClick={() => removeTierPerk(idx, perkIdx)} className="text-red-500 hover:text-red-700 p-1">
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                    <button type="button" onClick={() => addTierPerk(idx)} className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs text-[#5DB347] border border-[#5DB347]/30 rounded-md hover:bg-[#5DB347]/5">
+                      <Plus className="w-3 h-3" /> Add perk
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+            <button type="button" onClick={addTier} className="inline-flex items-center gap-1.5 px-3 py-2 text-sm text-[#5DB347] border border-[#5DB347]/30 rounded-lg hover:bg-[#5DB347]/5">
+              <Plus className="w-4 h-4" /> Add tier
+            </button>
+          </div>
+        </Section>
+
+        {/* Ambassadors list section */}
+        <Section title="Our Ambassadors Section" description="The header above the ambassador profile cards">
+          <Field label="Section title" value={form.ambassadors_section_title} onChange={(v) => updateField('ambassadors_section_title', v)} />
+          <Field label="Section subtitle" value={form.ambassadors_section_subtitle} onChange={(v) => updateField('ambassadors_section_subtitle', v)} multiline />
+          <p className="text-xs text-gray-400 mt-1">
+            To add/edit individual ambassador profiles, go to <Link href="/admin/ambassadors" className="text-[#5DB347] hover:underline">Admin → Ambassadors</Link>.
+          </p>
+        </Section>
+
+        {/* Apply form */}
+        <Section title="Apply Form Section" description="The application form at the bottom of the page">
+          <Field label="Form section title" value={form.apply_title} onChange={(v) => updateField('apply_title', v)} />
+          <Field label="Form section subtitle" value={form.apply_subtitle} onChange={(v) => updateField('apply_subtitle', v)} multiline />
+          <Field label="Review note (below the submit button)" value={form.form_review_note} onChange={(v) => updateField('form_review_note', v)} multiline />
+          <Field label="Success heading (after submit)" value={form.apply_success_heading} onChange={(v) => updateField('apply_success_heading', v)} />
+          <Field label="Success message" value={form.apply_success_message} onChange={(v) => updateField('apply_success_message', v)} multiline />
+        </Section>
       </div>
     </div>
   );
