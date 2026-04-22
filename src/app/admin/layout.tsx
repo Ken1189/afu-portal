@@ -194,7 +194,7 @@ const navGroups: NavGroup[] = [
   // ── 6. Content ──
   {
     label: 'Content',
-    defaultOpen: false,
+    defaultOpen: true,
     links: [
       { href: '/admin/blog', label: 'Blog', icon: <PenSquare className={ICON_CLS} /> },
       { href: '/admin/media', label: 'Media Library', icon: <ImageIcon className={ICON_CLS} /> },
